@@ -1,3 +1,7 @@
+2003-03-20  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/*.c: merged _config and kernel_*_init functions.
+
 2003-03-19  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/audioconfig.c, fts/bmaxfile.c, fts/client.c, fts/midi.c, fts/object.c, fts/package.c,

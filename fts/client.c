@@ -1488,7 +1488,14 @@ static void client_manager_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_sched_ready, client_manager_select);
 }
 
-void fts_client_config( void)
+/***********************************************************************
+*
+* Initialization
+*
+*/
+
+void
+fts_kernel_client_init( void)
 {
   s_package_loaded = fts_new_symbol( "package_loaded");
   s_remove_object = fts_new_symbol( "removeObject");

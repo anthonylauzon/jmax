@@ -164,11 +164,6 @@ fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)
     fts_object_set_outlets_number(obj, noutlet + 1);
 }
 
-void fts_error_object_config(void)
-{
-  fts_error_object_class = fts_class_install(NULL, error_object_instantiate);
-}
-
 /*******************************************************************
  *
  *  unique global error symbol
@@ -268,4 +263,16 @@ fts_object_error(fts_object_t *obj, const char *format, ...)
     fts_object_runtime_error(obj, error);
 }
 
+
+/***********************************************************************
+*
+* Initialization
+*
+*/
+
+void 
+fts_kernel_error_object_init(void)
+{
+  fts_error_object_class = fts_class_install(NULL, error_object_instantiate);
+}
 

@@ -721,8 +721,14 @@ audioconfig_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, audioconfig_s_sampling_rate, audioconfig_sample_rate);
 }
 
+/***********************************************************************
+ *
+ * Initialization
+ *
+ */
 
-void fts_audioconfig_config(void)
+void
+fts_kernel_audioconfig_init(void)
 {
   audioconfig_s_name = fts_new_symbol("__audioconfig");  
   audioconfig_s_unconnected = fts_new_symbol("-");

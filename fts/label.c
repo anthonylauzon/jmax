@@ -238,8 +238,14 @@ label_instantiate(fts_class_t *cl)
   fts_class_input_handler(cl, label_input_handler);
 }
 
+/***********************************************************************
+*
+* Initialization
+*
+*/
+
 void 
-fts_label_config(void)
+fts_kernel_label_init(void)
 {
   fts_label_class = fts_class_install( NULL, label_instantiate);
 }

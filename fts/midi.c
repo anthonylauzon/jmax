@@ -2301,13 +2301,13 @@ midiconfig_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, midiconfig_print);
 }
 
-/************************************************************
+/* **********************************************************************
  *
- *  Initialization of the midi module
+ * Initialization
  *
- */ 
+ */
 void
-fts_midi_config(void)
+fts_kernel_midi_init(void)
 {
   fts_atom_t a;
   int i;

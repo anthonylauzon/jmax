@@ -808,7 +808,8 @@ static void nullaudioport_instantiate(fts_class_t* cl)
  *
  */
 
-void fts_audio_config( void)
+void
+fts_kernel_audio_init( void)
 {
   fts_class_t *audio_sched_class;
   fts_class_t* nullaudioport_class;

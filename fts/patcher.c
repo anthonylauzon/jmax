@@ -2032,10 +2032,10 @@ fts_patcher_get_scope(fts_patcher_t *patcher)
 }
 
 /***********************************************************************
-*
-* initialization/shutdown
-*
-*/
+ *
+ * initialization/shutdown
+ *
+ */
 
 void fts_kernel_patcher_init(void)
 {
@@ -2075,10 +2075,7 @@ void fts_kernel_patcher_init(void)
   fts_class_alias(send_class, fts_new_symbol("s~"));
 
   patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_class, 0, 0);
-}
 
-void fts_patcher_config( void)
-{
   fts_create_root_patcher();
 }
 

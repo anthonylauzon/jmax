@@ -278,24 +278,21 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_time_init);
   _K_DECNCALL( fts_kernel_sched_init);
   _K_DECNCALL( fts_kernel_audiofile_init);
-
-  /* code from fts_kernel_classes_config */
-  _K_DECNCALL( fts_patcher_config);
-  _K_DECNCALL( fts_error_object_config);
-  _K_DECNCALL( fts_message_config);
-  _K_DECNCALL( fts_audio_config);
-  _K_DECNCALL( fts_audioconfig_config);  
-  _K_DECNCALL( fts_client_config);
-  _K_DECNCALL( fts_update_config);
-  _K_DECNCALL( fts_clipboard_config);
-  _K_DECNCALL( fts_label_config);
-  _K_DECNCALL( fts_midi_config);
-  _K_DECNCALL( fts_config_config);
-  _K_DECNCALL( fts_objectset_config);
-  _K_DECNCALL( fts_selection_config);
-  _K_DECNCALL( fts_saver_config);
-  _K_DECNCALL( fts_thread_manager_config);
-  _K_DECNCALL( fts_binary_protocol_config);
+  _K_DECNCALL( fts_kernel_error_object_init);
+  _K_DECNCALL( fts_kernel_message_init);
+  _K_DECNCALL( fts_kernel_audio_init);
+  _K_DECNCALL( fts_kernel_audioconfig_init);  
+  _K_DECNCALL( fts_kernel_client_init);
+  _K_DECNCALL( fts_kernel_update_init);
+  _K_DECNCALL( fts_kernel_clipboard_init);
+  _K_DECNCALL( fts_kernel_label_init);
+  _K_DECNCALL( fts_kernel_midi_init);
+  _K_DECNCALL( fts_kernel_config_init);
+  _K_DECNCALL( fts_kernel_objectset_init);
+  _K_DECNCALL( fts_kernel_selection_init);
+  _K_DECNCALL( fts_kernel_saver_init);
+  _K_DECNCALL( fts_kernel_thread_manager_init);
+  _K_DECNCALL( fts_kernel_binary_protocol_init);
 }
 
 void fts_init( int argc, char **argv)

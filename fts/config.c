@@ -373,7 +373,13 @@ fts_config_get(void)
     }
 }
 
-void fts_config_config(void)
+/* **********************************************************************
+ *
+ * Initialization
+ *
+ */
+void 
+fts_kernel_config_init(void)
 {
   config_s_name = fts_new_symbol("__config");
 

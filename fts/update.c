@@ -222,7 +222,8 @@ fts_update_reset( fts_object_t *obj)
  *
  */
 
-void fts_update_config( void)
+void
+fts_kernel_update_init( void)
 {
   s_update_group_begin = fts_new_symbol( "update_group_begin");
   s_update_group_end = fts_new_symbol( "update_group_end");

@@ -114,13 +114,13 @@ objectset_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_objectset_t), fts_objectset_method_init, fts_objectset_method_destroy);
 }
 
-/***********************************************************************
+/* **********************************************************************
  *
  * Initialization
  *
  */
-
-void fts_objectset_config( void)
+void 
+fts_kernel_objectset_init( void)
 {
   objectset_symbol = fts_new_symbol("__objectset");
   sym_objectset_append = fts_new_symbol("append");

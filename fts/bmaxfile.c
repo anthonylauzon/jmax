@@ -205,11 +205,11 @@ fts_status_t fts_bmax_file_load( const char *name, fts_object_t *parent, int ac,
   if ( !(f = fopen( name, "rb")))
     return fts_cannot_open_file_error;
 
-  if (fts_binary_file_map(f, &descr) < 0)
+  if ((status = fts_binary_file_map(f, &descr)) != fts_ok)
     {
       fclose(f);
       post("fts_bmax_file_load: Cannot load jMax max file %s\n", name);
-      return 0;
+      return status;
     }
 
   fclose(f);
@@ -2006,8 +2006,13 @@ saver_dumper_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(saver_dumper_t), saver_dumper_init, saver_dumper_delete);
 }
 
+/* **********************************************************************
+ *
+ * Initialization
+ *
+ */
 void
-fts_saver_config(void)
+fts_kernel_saver_init(void)
 {
   saver_dumper_type = fts_class_install(NULL, saver_dumper_instantiate);
   s_sequence = fts_new_symbol("sequence");

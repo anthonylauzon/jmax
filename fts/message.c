@@ -105,12 +105,6 @@ message_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_message_t), message_init, message_delete);
 }
 
-void
-fts_message_config(void)
-{
-  fts_message_class = fts_class_install(NULL, message_instantiate);
-}
-
 /************************************************
  *
  *  message dumper
@@ -744,3 +738,16 @@ fts_atom_t *fts_get_return_value( void)
 {
   return &fts_return_value;
 }
+
+/***********************************************************************
+*
+* Initialization
+*
+*/
+
+void
+fts_kernel_message_init(void)
+{
+  fts_message_class = fts_class_install(NULL, message_instantiate);
+}
+
