@@ -1,0 +1,3 @@
+all	all	explode.jpk
+all	all     java/classes/explode.jar
+all	all	c/lib/ARCH/opt/libexplode.so

@@ -1,15 +1,14 @@
 ## package declaration
-
 package provide explode
 
-## Load the explode class
-## The explode extension will install
-## the data type and handler
-##
+# load server module
+global jmaxArch jmaxMode
+ucs load module explode $dir/c/lib/$jmaxArch/$jmaxMode/libexplode.so
 
+# load client java class
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.explode.ExplodeExtension
 
-puts "explode editor loaded"
+puts "package loaded: explode"
 
 
 
