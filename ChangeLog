@@ -1,3 +1,9 @@
+2003-08-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* fts/object.c (eval_object_description_expression_callback): commented a piece of code to readd error message in GUI Error Panel, but perhaps this piece of code is usefull somewhere....
+
+	* fts/template.c (fts_template_file_modified): fixed reinstanciation of template instance if a template file is modified.
+
 2003-08-04  Carl Seleborg  <seleborg@licorne.ircam.fr>
 	
 	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v" in Track and Sequence editors.
