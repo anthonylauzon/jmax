@@ -30,7 +30,7 @@
 
 fts_symbol_t messevt_symbol = 0;
 
-static void messevt_set(fts_object_t *this, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void messevt_set_message(fts_object_t *this, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 static void
 messevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -42,8 +42,9 @@ messevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->s = 0;
   this->ac = -2;
   this->at = 0;
+  this->pos = -1;
 
-  messevt_set(o, 0, 0, ac - 1, at + 1);
+  messevt_set_message(o, 0, 0, ac - 1, at + 1);
 }
 
 /**************************************************************
@@ -75,14 +76,19 @@ messevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-messevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messevt_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messevt_t *this = (messevt_t *)o;
   int i;
 
   if(ac)
     {
-      this->s = fts_get_symbol(at);
+      if(fts_is_symbol(at))
+	this->s = fts_get_symbol(at);
+      else if(ac == 1)
+	this->s = fts_get_selector(at);
+      else
+	this->s = fts_s_list;
 
       ac--; /* skip selector */
       at++;
@@ -100,6 +106,24 @@ messevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       for(i=0; i<ac; i++)
 	this->at[i + 2] = at[i]; /* first two atoms reserved for uploading */
     }
+  else
+    {
+      this->s = 0;
+
+      if(this->at)
+	fts_block_free(this->at, (this->ac + 2) * sizeof(fts_atom_t));
+	  
+      this->ac = 0;
+    }
+}
+
+static void
+messevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  messevt_t *this = (messevt_t *)o;
+
+  messevt_set_message(o, 0, 0, ac - 1, at);
+  this->pos = fts_get_int(at + ac - 1);
 }
 
 void 
@@ -125,9 +149,10 @@ messevt_set_from_string(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
   /* &@$*&!@$%_*&!@$%&*$% 
    * for now we set the hole message string to the selector until there is a parser 
+   * (the y-pos integer following is ingnored for now!)
    */
 
-  messevt_set(o, 0, 0, ac, at);
+  messevt_set_message(o, 0, 0, 1, at);
 }
 
 /**************************************************************
@@ -145,8 +170,12 @@ messevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), messevt_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), messevt_move);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), messevt_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_string"), messevt_set_from_string);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), messevt_print);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_string"), messevt_set_from_string);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_message"), messevt_set_message);
+  /*fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_position"), messevt_set_position);*/
 
   return fts_Success;
 }

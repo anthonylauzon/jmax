@@ -72,22 +72,21 @@ public class ZoomTool extends Tool implements PositionListener {
   public void positionChoosen(int x, int y, int modifiers) 
   {
  
-    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-    Geometry geometry = egc.getAdapter().getGeometry();
+      /*SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+	Geometry geometry = egc.getAdapter().getGeometry();
 
-    if ((modifiers & InputEvent.ALT_MASK) == 0) //zoom out
-      {
+	if ((modifiers & InputEvent.SHIFT_MASK) == 0) //zoom out
+	{
 	geometry.setXZoom((int) (geometry.getXZoom() * 100 * 2));
-
-      }
-    else 
-      {                                       //zoom in
+	
+	}
+	else 
+	{                                       //zoom in
 	if (geometry.getXZoom() <= 0.01) return;
 	geometry.setXZoom((int) (geometry.getXZoom() * 100 / 2));
-
-      }
-
-    //gc.getGraphicDestination().repaint();
+	
+	}
+	egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+geometry.getXZoom()*100+"%");*/
   }
   
 

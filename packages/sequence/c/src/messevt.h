@@ -37,6 +37,7 @@ typedef struct _messevt_
   fts_symbol_t s;
   int ac;
   fts_atom_t *at;
+  int pos;
 } messevt_t;
 
 #endif

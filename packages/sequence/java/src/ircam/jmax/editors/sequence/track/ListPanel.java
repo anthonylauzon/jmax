@@ -59,6 +59,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       data = track.getTrackDataModel();	
       this.gc = gc;
 
+      fm = getFontMetrics(listFont);
+
       data.addListener(this);
 
       //to make current this selection maybe move on the mouseright-showpopup  action
@@ -67,19 +69,21 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
       SequenceSelection.getCurrent().addListSelectionListener(this);
 
-      setSize((data.getNumProperty()+1)*100 +25, data.length()*20+20);
+      setSize((data.getNumProperty()+1)*xstep +25, data.length()*20+20);
 
       addMouseListener(this);
       addKeyListener(this);
 
-      area = new JTextArea();
-      area.setCursor( Cursor.getPredefinedCursor( Cursor.TEXT_CURSOR));
-      area.setEditable(true);
+      area = new SequenceTextArea(txtRenderer, gc);
+      area.setMinimumSize(new Dimension(xstep-5, ystep-2));
       area.setBorder(BorderFactory.createEtchedBorder());
-      area.setLineWrap(true);
-      area.setWrapStyleWord(true);
-      area.setBackground(Color.white);
-
+      area.setForeground(Color.black);
+      area.addSequenceTextAreaListener(new SequenceTextAreaListener(){
+	  public void sizeChanged(int width, int height)
+	  {
+	      repaint();
+	  }
+      });
       add(area);
       validate();
     }
@@ -116,12 +120,12 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     
     public Dimension getPreferredSize()
     {
-	return new Dimension((data.getNumProperty()+1)*100+25, data.length()*20+20);
+	return new Dimension((data.getNumProperty()+1)*xstep+25, data.length()*20+20);
     }
 
     public Dimension getMinimumSize()
     {
-	return new Dimension((data.getNumProperty()+1)*100+25, 250);
+	return new Dimension((data.getNumProperty()+1)*xstep+25, 250);
     }
 
     public void paintComponent(Graphics g) 
@@ -156,8 +160,11 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		for(Enumeration e1 = track.getTrackDataModel().getPropertyNames(); e1.hasMoreElements();)
 		    {
 			text = getPropertyAsString(evt.getProperty((String)e1.nextElement()));
-			if(text.length() > 10) text = text.substring(0, 10)+"...";
-			g.drawString(text, 5+i*xstep, y-6);
+			int width = SwingUtilities.computeStringWidth(fm, text);
+			if(width > xstep) 
+			    text = getSubstringOfWidth(text, xstep-10);
+
+			g.drawString(text, i*xstep, y-6);
 			i++;
 		    }
 		y = y+ystep;
@@ -169,6 +176,31 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	  g.drawLine(5, (ystep)*i, 5+d.width, (ystep)*i);
     }
    
+    String getSubstringOfWidth(String text, int maxWidth)
+    {
+	int length = text.length();
+	int width = SwingUtilities.computeStringWidth(fm, text);
+
+	if (width < maxWidth)
+	    return text;
+
+	String string = text;
+	String string2 = "..";
+
+	while(( maxWidth <= width) && (text.length() > 0) )
+	    {
+		string = string.substring( 0, string.length()-1);
+		width = SwingUtilities.computeStringWidth(fm, string);
+	    }
+	
+	if ( ( width + SwingUtilities.computeStringWidth(fm, "..") >= maxWidth)
+	     && ( string.length() > 0) )
+	    string = string.substring( 0, string.length() - 1);
+
+	string = string + string2;
+	return string;
+    }
+
     String getPropertyAsString(Object prop)
     {
 	if(prop instanceof Integer)
@@ -362,16 +394,13 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	else
 	    text = getPropertyAsString(evt.getProperty(getPropNameByIndex(param-1)));
 
-	int width  = txtRenderer.getTextWidth(text, gc);
-	if(width < xstep-10) width = xstep-10;
+	int width  = txtRenderer.getTextWidth(text, gc)+5;
+	if(width < xstep-5) width = xstep-5;
 	
 	int height = txtRenderer.getTextHeight(text, gc)+4;
 	if(height < ystep-4) height = ystep-4;
 
-	area.setBounds(xstep*param+1, index*ystep+2-1, width, height);	
-	area.requestFocus();
-	area.setText(text);
-	area.setVisible(true);	
+	area.doEdit(text, xstep*param+1, index*ystep+2-1, width, height);
     }
 
     void endEdit()
@@ -541,7 +570,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 				      popupEvent.getValue().getPropertyValues());
     }
 
-    final public static int xstep = 100;
+    final public static int xstep = 120;
     final public static int ystep = 20;
     TrackDataModel data;
     Track track;
@@ -551,6 +580,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     int currentIndex = -1;
     Vector selectedIndexVector = new Vector();
     public static final Font listFont = new Font("Dialog", Font.PLAIN, 12);
+    FontMetrics fm; 
 
     int currentParamInEvent = 0;
 
@@ -559,7 +589,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
     TextRenderer txtRenderer = new TextRenderer(listFont, Color.white, Color.black);
 
-    JTextArea area;
+    //JTextArea area;
+    SequenceTextArea area;
     boolean isEditing = false;
 
     private int popupx, popupy;

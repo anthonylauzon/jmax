@@ -54,6 +54,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	track.getTrackDataModel().addListener(new TrackDataListener() {
 	    public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
 	    public void objectAdded(Object whichObject, int index) {
+		updateNewObject(whichObject);
 		MonoTrackEditor.this.repaint();
 	    }
 	    public void objectsAdded(int maxTime) {
@@ -137,12 +138,20 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	gc = new SequenceGraphicContext(model, selection, track); //loopback?
 	gc.setGraphicSource(this);
 	gc.setGraphicDestination(this);
-	MonoDimensionalAdapter ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
+	ad = new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET);
 	track.getPropertySupport().addPropertyChangeListener(ad);
 	gc.setAdapter(ad);
 
 	renderer = new MonoTrackRenderer(gc);
 	gc.setRenderManager(renderer);
+    }
+
+    public void setAdapter(MonoDimensionalAdapter adapter)
+    {
+	track.getPropertySupport().removePropertyChangeListener(ad);	
+	track.getPropertySupport().addPropertyChangeListener(adapter);
+	gc.setAdapter(adapter);	
+	ad = adapter;
     }
 
     public void setRenderer(MonoTrackRenderer renderer)
@@ -229,6 +238,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	return track;
     }
 
+    public void updateNewObject(Object obj){};
+
     //--- FricativeTrackEditor fields
     Geometry geometry;
     SequenceGraphicContext gc;
@@ -236,6 +247,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
     static public int DEFAULT_HEIGHT = 127;
     MonoTrackRenderer renderer;
+    MonoDimensionalAdapter ad;
 
     Track track;
 

@@ -57,6 +57,8 @@ public class IntegerTrackEditor extends MonoTrackEditor
 
 	((MonoDimensionalAdapter)gc.getAdapter()).setLabelMapper(IntegerLabelMapper.getMapper());
 	setRenderer(new IntegerTrackRenderer(gc));
+
+	super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
     }
     
     /*public JPopupMenu getMenu()

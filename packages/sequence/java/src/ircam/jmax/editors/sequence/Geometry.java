@@ -33,6 +33,13 @@ public class Geometry
 	notifyZoom(xZoomFactor);
     }
     
+    public void incrXZoom(int delta) 
+    {
+	xZoomFactor = (xZoomFactor*100+delta)/(float)100;
+	if(xZoomFactor<0.01) xZoomFactor = (float)0.01;
+	if(xZoomFactor>10) xZoomFactor = (float)10.0;
+	notifyZoom(xZoomFactor);
+    }
     
     /**
      * get the zoom factor for the x coordinates (percentage)

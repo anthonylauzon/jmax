@@ -63,11 +63,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     Hashtable trackContainers = new Hashtable();
     MutexPropertyHandler mutex = new MutexPropertyHandler("active");
     //---
-    JScrollBar itsTimeZoom;
     JLabel itsZoomLabel;
     JScrollBar itsTimeScrollbar;
     Geometry geometry;
-    PartitionAdapter utilityPartitionAdapter;
     ToolManager manager;
 
     public final int INITIAL_ZOOM = 20;
@@ -91,20 +89,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     //Create a Geometry object for this sequencer
     geometry = new Geometry();
-
-    utilityPartitionAdapter = new PartitionAdapter(geometry, null);
-
     //------------------------------------------------
     // Create the ruler
-    ruler = new Ruler();
-    ruler.setDoubleBuffered(false);
-    geometry.addTranspositionListener( new TranspositionListener() {
-	public void transpositionChanged(int newValue)
-	    {
-		ruler.repaint();
-	    }
-    });
-
+    ruler = new SequenceRuler(geometry, this);
 
     //-------------------------------------------------
     //-- Tools, toolbar and status bar:
@@ -113,13 +100,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     //- Create a status bar containing the toolbar
     
     manager = new ToolManager(SequenceTools.instance);
-    Tool arrow = manager.getToolByName("arrow"); 
-    
-    manager.activate(arrow, null); //we do not have a gc yet...
-
     toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(200, 30);
-
+    toolbar.setSize(200, 30);    
+    Tool arrow = manager.getToolByName("arrow");     
+    manager.activate(arrow, null); //we do not have a gc yet...
     //------------------- prepare the track panel:
     trackPanel = new Box(BoxLayout.Y_AXIS);
     scrollTracks = new JScrollPane(trackPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
@@ -135,7 +119,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
     separate_tracks.add(scrollTracks, BorderLayout.CENTER);
     
-    //-- prepares the Status bar    
+    //------------------ prepares the Status bar    
     Box northSection = new Box(BoxLayout.Y_AXIS);
     
     statusBar = new InfoPanel();
@@ -165,40 +149,17 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     itsContainer.getFrame().pack();
 
     itsContainer.getFrame().setVisible(true);
-
     
-    //-- prepares the zoom scrollbar (time stretching) and its listeners
-
-    itsTimeZoom = new JScrollBar(Scrollbar.HORIZONTAL, INITIAL_ZOOM, 200, 1, 1000);
-    itsTimeZoom.setBlockIncrement(10);
-
-    itsZoomLabel = new JLabel("Zoom: "+INITIAL_ZOOM+"%");
-    
-    itsZoomLabel.setMaximumSize(new Dimension (100, 15));
-    itsZoomLabel.setMinimumSize(new Dimension (100, 15));
-    itsZoomLabel.setPreferredSize(new Dimension (100, 15));
-    
+    //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom)
 	    {
-		itsZoomLabel.setText("Zoom: "+((int)(zoom*100))+"%"); 
+		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
 		repaint();
 	    }
-    });
-    
-    itsTimeZoom.addAdjustmentListener(new AdjustmentListener() {
-	
-	public void adjustmentValueChanged(AdjustmentEvent e) {
-	    
-	    geometry.setXZoom(e.getValue());
-	    itsTimeScrollbar.setVisibleAmount(Geometry.sizeToMsec(geometry, SequencePanel.this.getSize().width)/2);
-	}
-	
-    });
-    
-    
-    //-- prepares the SOUTH scrollbar (time scrolling) and its listener
-    
+      });
+
+    //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
     int totalTime = MINIMUM_TIME;
     
     itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
@@ -215,20 +176,9 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    geometry.setXTransposition(-currentTime);	    
 	}
     });
-    
-    JPanel aSliderPanel = new JPanel();
-    aSliderPanel.setLayout(new ProportionalLayout(ProportionalLayout.X_AXIS, (float) 0.75));
-    aSliderPanel.add("", itsTimeScrollbar);
-    Box aZoomBox = new Box(BoxLayout.X_AXIS);
-    aZoomBox.add(itsZoomLabel);
-    aZoomBox.add(itsTimeZoom);
-    
-    aSliderPanel.add("", aZoomBox);
-    
-    separate_tracks.add(aSliderPanel, BorderLayout.SOUTH);
-
+ 
+    separate_tracks.add(itsTimeScrollbar, BorderLayout.SOUTH);
     add(separate_tracks, BorderLayout.CENTER);
-
   }
 
     /**
@@ -528,60 +478,16 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	
 	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
     }
-
-    /**
-     * A graphic JPanel that represents a ruler containing time indications */
-    class Ruler extends JPanel {
-
-	Ruler()
-	{
-	    super();
-	    setOpaque(false);
-	    setFont(rulerFont);
-	    fm = getFontMetrics(rulerFont);
-	}
-
-	public void paint(Graphics g)
-	{
-	    int xPosition;
-	    int snappedTime;
-	    AmbitusValue value = new AmbitusValue();
-	    UtilTrackEvent tempEvent = new UtilTrackEvent(value);
-	    int logicalTime = -geometry.getXTransposition();
-	    int windowTime = getMaximumVisibleTime();	    
-
-	    int timeStep = ScoreBackground.findBestTimeStep(windowTime-logicalTime);
-
-	    //controll if the time string is too long (in this case draw one string on two)
-	    int stringLenght = fm.stringWidth(""+(logicalTime+timeStep));
-	    int delta = utilityPartitionAdapter.getX(logicalTime+timeStep)-utilityPartitionAdapter.getX(logicalTime);
-	    int k;
-	    if(stringLenght>delta-10) k = 2;
-	    else k=1;
-
-	    g.setColor(SequencePanel.violetColor);
-	    for (int i=logicalTime+timeStep; i<windowTime; i+=timeStep*k) 
-		{
-		    snappedTime = (i/timeStep)*timeStep;
-		    tempEvent.setTime(snappedTime);
-		    xPosition = utilityPartitionAdapter.getX(tempEvent)+TrackContainer.BUTTON_WIDTH-10;
-
-		    g.drawString(""+snappedTime, xPosition, 15);
-		}
-	}
-	
-	
-	public Dimension getPreferredSize()
-	{ return rulerDimension; }
-	
-	public Dimension getMinimumSize()
-	{ return rulerDimension; }
-    	
-	//--- Ruler fields
-	Dimension rulerDimension = new Dimension(200, 30);
-	FontMetrics fm;
-    }    
 }
+
+
+
+
+
+
+
+
+
 
 
 

@@ -11,7 +11,7 @@ import ircam.jmax.editors.sequence.menus.*;
 
 /**
  **/
-public class ToggleBar extends /*JPanel*/PopupToolbarPanel
+public class ToggleBar extends PopupToolbarPanel
 {
     public ToggleBar(TrackEditor trkEd)
     {

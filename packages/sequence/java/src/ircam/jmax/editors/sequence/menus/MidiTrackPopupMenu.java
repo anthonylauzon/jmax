@@ -86,7 +86,6 @@ public class MidiTrackPopupMenu extends JPopupMenu
     maxSlider.setMinorTickSpacing(6);
     maxSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
     maxSlider.setPaintTicks(true);
-    //maxSlider.setPaintLabels(true);
     maxSlider.addChangeListener(new ChangeListener(){
 	public void stateChanged(ChangeEvent e) {
 	    JSlider source = (JSlider)e.getSource();
@@ -113,7 +112,6 @@ public class MidiTrackPopupMenu extends JPopupMenu
     minSlider.setMinorTickSpacing(6);
     minSlider.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
     minSlider.setPaintTicks(true);
-    //minSlider.setPaintLabels(true);
     minSlider.addChangeListener(new ChangeListener(){
 	public void stateChanged(ChangeEvent e) {
 	    JSlider source = (JSlider)e.getSource();

@@ -35,12 +35,11 @@ import java.beans.*;
 
 /**
  * An adapter that treats the y parameter as a constant*/
-public class MonoDimensionalAdapter extends PartitionAdapter {
+public class IntegerAdapter extends MonoDimensionalAdapter{
 
-    public MonoDimensionalAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
+    public IntegerAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
     {
-	super(geometry, gc);
-	this.constant = constant;
+	super(geometry, gc, constant);
 	
 	YMapper = IntegerMapper.getMapper();
 	viewMode = MonoTrackEditor.PEAKS_VIEW;
@@ -105,7 +104,17 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
      */
     public int getLenght(Event e) 
     {
-	return super.getLenght(e);
+	if(viewMode == MonoTrackEditor.PEAKS_VIEW)
+	    return IntegerEventRenderer.INTEGER_WIDTH;
+	else
+	    {//STEP_VIEW
+		Event next = gc.getDataModel().getNextEvent(e);
+		
+		if(next != null)		    
+		    return (getX(next.getTime()) - getX(e.getTime()));
+		else
+		    return (gc.getGraphicDestination().getSize().width - getX(e.getTime()));
+	    }
     }
 
   /**

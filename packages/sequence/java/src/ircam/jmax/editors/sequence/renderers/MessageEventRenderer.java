@@ -77,7 +77,7 @@ public class MessageEventRenderer implements ObjectRenderer {
 	int x = gc.getAdapter().getX(e);
 	int y = gc.getAdapter().getY(e);
 
-	int width = ((PartitionAdapter)gc.getAdapter()).getLenght(e)-BUTTON_WIDTH;	
+	int width = ((MessageAdapter)gc.getAdapter()).getLenght(e)-BUTTON_WIDTH;	
 	
 	int height = ((Integer)e.getProperty("height")).intValue()+2;
 	if(height==0)
@@ -131,12 +131,12 @@ public class MessageEventRenderer implements ObjectRenderer {
     {
 	Event e = (Event) obj;
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-	Adapter a = gc.getAdapter();
+	MessageAdapter a = (MessageAdapter)gc.getAdapter();
     
 	int evtx = a.getX(e);
 	int evty = a.getY(e);
 
-	int evtLenght = ((PartitionAdapter)gc.getAdapter()).getLenght(e);
+	int evtLenght = a.getLenght(e);
 	int evtHeight = ((Integer)e.getProperty("height")).intValue()+2;
 	
 	tempRect.setBounds(evtx, evty, evtLenght, evtHeight);
@@ -163,12 +163,12 @@ public class MessageEventRenderer implements ObjectRenderer {
     {
 	Event e = (Event) obj;
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-	Adapter a = gc.getAdapter();
+	MessageAdapter a = (MessageAdapter)gc.getAdapter();
 
 	int evtx = a.getX(e);
 	int evty = a.getY(e);
 	
-	int evtLenght = ((PartitionAdapter)gc.getAdapter()).getLenght(e);
+	int evtLenght = a.getLenght(e);
 	int evtHeight = ((Integer)e.getProperty("height")).intValue()+2;
 
 	eventRect.setBounds(evtx, evty, evtLenght, evtHeight);

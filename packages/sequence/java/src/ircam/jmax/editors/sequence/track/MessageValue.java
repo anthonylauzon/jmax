@@ -40,17 +40,19 @@ import java.awt.*;
  * The EventValue object that represents a Integer event. Is used during score-recognition */
 public class MessageValue extends AbstractEventValue
 {
+    Object message = "";
+    Object integer = new Integer(0);
+    Object open = new Boolean(true);
+
     public MessageValue()
     {
 	super();
 
 	setText("", null, null);
-	properties.put("integer", new Integer(0));
-	properties.put("open", new Boolean(true));
+	properties.put("integer", integer);
+	properties.put("open", open);
     }
 
-    Object message = "";
-    Object integer;
     public void setProperty(String name, Object value)
     {
 	if(name.equals("message"))
@@ -58,7 +60,10 @@ public class MessageValue extends AbstractEventValue
 	else
 	    if(name.equals("integer"))
 		integer = value;
-	
+	else
+	    if(name.equals("open"))
+		open = value;
+
 	super.setProperty( name, value);
     }
 
@@ -69,6 +74,9 @@ public class MessageValue extends AbstractEventValue
 	else
 	    if(name.equals("integer"))
 		return integer;
+	    else
+		if(name.equals("open"))
+		    return open;
 	    else
 		return super.getProperty(name);
     }
@@ -81,7 +89,7 @@ public class MessageValue extends AbstractEventValue
 		boolean open = ((Boolean)getProperty("open")).booleanValue();
 		setProperty("open", new Boolean(!open));
 		
-		String text = gc.getAdapter().getLabel(evt);
+		String text = ((MessageAdapter)gc.getAdapter()).getLabel(evt);
 		
 		if(!text.equals(""))
 		    height = TextRenderer.getRenderer().getTextHeight(text, gc);
@@ -89,7 +97,7 @@ public class MessageValue extends AbstractEventValue
 		    height = DEFAULT_HEIGHT;
 		
 		if(open) 
-		    width = gc.getAdapter().getInvWidth(MessageEventRenderer.BUTTON_WIDTH);
+		    width = ((MessageAdapter)gc.getAdapter()).getInvWidth(MessageEventRenderer.BUTTON_WIDTH);
 		else 
 		    {
 			int evtLenght;
@@ -99,7 +107,7 @@ public class MessageValue extends AbstractEventValue
 			else
 			    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
 			
-			width = gc.getAdapter().getInvWidth(evtLenght);
+			width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
 		    }
 		setProperty("duration", new Integer(width));
 		setProperty("height", new Integer(height));
@@ -115,6 +123,7 @@ public class MessageValue extends AbstractEventValue
     public void setText(String text, TrackEvent evt, SequenceGraphicContext gc)
     {	
 	int width, evtLenght, height;
+	
 	if(gc!=null)
 	    {
 		if(!text.equals(""))
@@ -128,19 +137,41 @@ public class MessageValue extends AbstractEventValue
 			height = DEFAULT_HEIGHT;
 		    }
 
-		width = gc.getAdapter().getInvWidth(evtLenght);
+		width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
 	    }
 	else 
 	    {
 		width = DEFAULT_WIDTH;
 		height = DEFAULT_HEIGHT;
 	    }
+
 	setProperty("message", text);
 	setProperty("duration", new Integer(width));
 	setProperty("height", new Integer(height));
 	
 	if(evt!=null)
-	    evt.sendSetMessage(info.getName(), getPropertyCount(), getPropertyValues());
+	    //evt.sendSetMessage(info.getName(), getPropertyCount(), getPropertyValues());
+	    evt.sendThisMessage("set_from_string", info.getName(), getPropertyCount(), getPropertyValues());
+    }
+
+    public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
+    {
+	int width, evtLenght;
+	String text = (String) message;
+	boolean open = ((Boolean)getProperty("open")).booleanValue();
+	if(open)
+	    {
+		if(!text.equals(""))
+		    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
+		else
+		    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
+	    }
+	else
+	    evtLenght = MessageEventRenderer.BUTTON_WIDTH;
+
+	 width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
+	
+	 setProperty("duration", new Integer(width));
     }
 
     public ValueInfo getValueInfo() 

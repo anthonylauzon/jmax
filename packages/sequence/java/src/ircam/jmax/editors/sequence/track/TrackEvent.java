@@ -145,6 +145,14 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	sendMessage(FtsObject.systemInlet, "set", nArgs, sendArgs);
     }
 
+    void sendThisMessage(String mess, String type, int nArgs, Object args[])
+    {
+	for(int i=0; i<nArgs; i++)
+	    sendArgs[i].setValue(args[i]);
+	
+	sendMessage(FtsObject.systemInlet, mess, nArgs, sendArgs);
+    }
+
     /**
      * Get the given property.
      * The property can be either a time or a

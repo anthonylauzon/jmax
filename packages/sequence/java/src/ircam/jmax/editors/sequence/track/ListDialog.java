@@ -59,14 +59,14 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 	JLabel aLabel;
 
 	aLabel = new JLabel("time" , JLabel.LEFT);
-	aLabel.setPreferredSize(new Dimension(100 , 20));
+	aLabel.setPreferredSize(new Dimension(ListPanel.xstep , 20));
 	labelPanel.add(aLabel);
 
 	for(Enumeration e = track.getTrackDataModel().getPropertyNames(); e.hasMoreElements();)
 	    {
 		name = (String)e.nextElement();
 		aLabel = new JLabel(name , JLabel.LEFT);
-		aLabel.setPreferredSize(new Dimension(100 , 20));
+		aLabel.setPreferredSize(new Dimension(ListPanel.xstep , 20));
 		labelPanel.add(aLabel);
 	    }
 	labelPanel.add(Box.createHorizontalGlue());
