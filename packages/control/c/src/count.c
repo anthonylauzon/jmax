@@ -45,7 +45,7 @@ typedef struct
   int value;
   int begin;
   int end;
-  int incr;
+  int step;
   int reverse;
 } count_int_t;
 
@@ -56,17 +56,15 @@ typedef struct
   double value;
   double begin;
   double end;
-  double incr;
+  double step;
   double reverse;
 } count_float_t;
 
 /************************************************************
  *
- *  user methods
+ *  int methods
  *
  */
-
-/* int */
 
 static void
 count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -78,9 +76,8 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int reverse = this->reverse;
   int target = (reverse > 0)? end: begin;
   int sign = (begin < end)? reverse: -reverse;
-  int incr = sign * this->incr;
+  int step = sign * this->step;
   int carrier = 0;
-  int i;
   
   if((value - target) * sign >= 0)
     {
@@ -96,7 +93,7 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	    if((value - target) * sign > 0)
 	      value = target;
 	    
-	    this->value = value + incr;
+	    this->value = value + step;
 	  }
 	  break;
 	  
@@ -110,7 +107,7 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	      value = root;
 	    
 	    this->reverse = -reverse;
-	    this->value = value - incr;
+	    this->value = value - step;
 	  }
 	  break;
 	}
@@ -118,7 +115,7 @@ count_int_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       carrier = 1;
     }
   else
-    this->value = value + incr;
+    this->value = value + step;
   
   if(carrier)
     fts_outlet_bang(o, 1);
@@ -152,15 +149,15 @@ count_int_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-count_int_set_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_int_set_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_int_t *this = (count_int_t *)o;
-  int incr = fts_get_number_int(at);
+  int step = fts_get_number_int(at);
 
-  if(incr <= 0)
-    this->incr = 0;
+  if(step <= 0)
+    this->step = 0;
   else
-    this->incr = incr;
+    this->step = step;
 }
 
 static void
@@ -173,7 +170,7 @@ count_int_set_parameters(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     default:
     case 3:
       if(fts_is_number(at + 2))
-	this->incr = fts_get_number_int(at + 2);
+	this->step = fts_get_number_int(at + 2);
     case 2:
       if(fts_is_number(at + 1))
 	this->end = fts_get_number_int(at + 1);
@@ -225,13 +222,20 @@ count_int_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
+count_int_stepement(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  count_int_t *this = (count_int_t *)o;
+
+}
+
+static void
 count_int_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_int_t *this = (count_int_t *)o;
   fts_symbol_t mode = fts_get_symbol(at);
-  int incr = (this->begin < this->end)? this->incr: -this->incr;
+  int step = (this->begin < this->end)? this->step: -this->step;
 
-  this->value -= incr * this->reverse;
+  this->value -= step * this->reverse;
 
   if(mode == sym_clip)
     {
@@ -246,7 +250,7 @@ count_int_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   else if(mode == sym_reverse)
     this->mode = mode_reverse;
 
-  this->value += incr * this->reverse;
+  this->value += step * this->reverse;
 }
 
 static void
@@ -255,7 +259,11 @@ count_int_set_mode_prop(fts_daemon_action_t action, fts_object_t *o, fts_symbol_
   count_int_set_mode(o, 0, 0, 1, value);
 }
 
-/* float */
+/************************************************************
+ *
+ *  float methods
+ *
+ */
 
 static void
 count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -267,7 +275,7 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   double reverse = this->reverse;
   double target = (reverse > 0)? end: begin;
   double sign = (begin < end)? reverse: -reverse;
-  double incr = sign * this->incr;
+  double step = sign * this->step;
   int carrier = 0;
   int i;
   
@@ -285,7 +293,7 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	    if((value - target) * sign > 0)
 	      value = target;
 	    
-	    this->value = value + incr;
+	    this->value = value + step;
 	  }
 	  break;
 	  
@@ -299,7 +307,7 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	      value = root;
 	    
 	    this->reverse = -reverse;
-	    this->value = value - incr;
+	    this->value = value - step;
 	  }
 	  break;
 	}
@@ -307,7 +315,7 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       carrier = 1;
     }
   else
-    this->value = value + incr;
+    this->value = value + step;
   
   if(carrier)
     fts_outlet_bang(o, 1);
@@ -364,15 +372,15 @@ count_float_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-count_float_set_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_float_set_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_float_t *this = (count_float_t *)o;
-  double incr = fts_get_number_float(at);
+  double step = fts_get_number_float(at);
 
-  if(incr <= 0)
-    this->incr = 0;
+  if(step <= 0)
+    this->step = 0;
   else
-    this->incr = incr;
+    this->step = step;
 }
 
 static void
@@ -385,7 +393,7 @@ count_float_set_parameters(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     default:
     case 3:
       if(fts_is_number(at + 2))
-	this->incr = fts_get_number_float(at + 2);
+	this->step = fts_get_number_float(at + 2);
     case 2:
       if(fts_is_number(at + 1))
 	this->end = fts_get_number_float(at + 1);
@@ -441,9 +449,9 @@ count_float_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 {
   count_float_t *this = (count_float_t *)o;
   fts_symbol_t mode = fts_get_symbol(at);
-  double incr = (this->begin < this->end)? this->incr: -this->incr;
+  double step = (this->begin < this->end)? this->step: -this->step;
 
-  this->value -= incr * this->reverse;
+  this->value -= step * this->reverse;
 
   if(mode == sym_clip)
     {
@@ -458,7 +466,7 @@ count_float_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   else if(mode == sym_reverse)
     this->mode = mode_reverse;
 
-  this->value += incr * this->reverse;
+  this->value += step * this->reverse;
 }
 
 static void
@@ -482,7 +490,7 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->value = 0;
   this->begin = 0;
   this->end = 127;
-  this->incr = 1;
+  this->step = 1;
   this->reverse = 1;
 
   count_int_set_parameters(o, 0, 0, ac - 1, at + 1);
@@ -498,7 +506,7 @@ count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->value = 0.0;
   this->begin = 0.0;
   this->end = 0.1;
-  this->incr = 0.01;
+  this->step = 0.01;
   this->reverse = 1;
 
   count_float_set_parameters(o, 0, 0, ac - 1, at + 1);
@@ -553,8 +561,8 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 2, fts_s_int, count_int_set_end);
       fts_method_define_varargs(cl, 2, fts_s_float, count_int_set_end);
 
-      fts_method_define_varargs(cl, 3, fts_s_int, count_int_set_incr);
-      fts_method_define_varargs(cl, 3, fts_s_float, count_int_set_incr);
+      fts_method_define_varargs(cl, 3, fts_s_int, count_int_set_step);
+      fts_method_define_varargs(cl, 3, fts_s_float, count_int_set_step);
     }
   else
     {
@@ -577,8 +585,8 @@ count_float_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 2, fts_s_int, count_float_set_end);
       fts_method_define_varargs(cl, 2, fts_s_float, count_float_set_end);
 
-      fts_method_define_varargs(cl, 3, fts_s_int, count_float_set_incr);
-      fts_method_define_varargs(cl, 3, fts_s_float, count_float_set_incr);
+      fts_method_define_varargs(cl, 3, fts_s_int, count_float_set_step);
+      fts_method_define_varargs(cl, 3, fts_s_float, count_float_set_step);
     }
 
   return fts_Success;

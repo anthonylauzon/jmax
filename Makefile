@@ -194,9 +194,11 @@ install-bin:
 	$(MAKE) -C tcl install 
 	$(MAKE) -C fts install
 	$(MAKE) -C packages install 
+	$(MAKE) -C tutorials install 
 # The following line is a hack that installs the <package>.jpk file on all platforms,
 # so that you can load the sgidev package even if you are running the GUI on Linux.
 	$(MAKE) -C packages install-noarch 
+	$(MAKE) -C tuorials install-noarch 
 .PHONY: install-bin
 
 install-includes:
