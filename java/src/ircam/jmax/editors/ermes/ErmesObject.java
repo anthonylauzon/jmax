@@ -197,6 +197,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	if (i<old_ninlts) {
 	  aErmesObjInlet = (ErmesObjInlet) itsInletList.elementAt(i);
 	  aErmesObjInlet.MoveTo(itsX+2+(i)*in_local_distance, aErmesObjInlet.itsY);
+	  ReroutingConnections(aErmesObjInlet);
 	}
 	else {
 	  if (this instanceof ircam.jmax.editors.ermes.ErmesObjOut) 
@@ -218,6 +219,7 @@ public class ErmesObject implements FtsPropertyHandler {
 	if (i<n_inlts){
 	  aErmesObjInlet = (ErmesObjInlet) itsInletList.elementAt(i);
 	  aErmesObjInlet.MoveTo(itsX+2+(i)*aHDist,aErmesObjInlet.itsY);
+	  ReroutingConnections(aErmesObjInlet);
 	  if (offGraphics!= null) {
 	    aErmesObjInlet.Repaint(); 
 	    //itsSketchPad.CopyTheOffScreen(g);//e.m.
@@ -246,6 +248,7 @@ public class ErmesObject implements FtsPropertyHandler {
      for (i=0; i<itsOutletList.size(); i++) {
        aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
        aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
+       ReroutingConnections(aErmesObjOutlet);
        if(offGraphics!= null){
 	 aErmesObjOutlet.Repaint();
 	 //itsSketchPad.CopyTheOffScreen(g); //e.m.
@@ -264,6 +267,7 @@ public class ErmesObject implements FtsPropertyHandler {
       for (i=0;i<n_outlts;i++){
 	aErmesObjOutlet = (ErmesObjOutlet) itsOutletList.elementAt(i);
 	aErmesObjOutlet.MoveTo(itsX+2+i*aHDist, aErmesObjOutlet.itsY);
+	ReroutingConnections(aErmesObjOutlet);
       }
     }
     
@@ -324,7 +328,6 @@ public class ErmesObject implements FtsPropertyHandler {
       itsFont = new Font(aFont,itsSketchPad.sketchFont.getStyle(), aIntSize);
     }
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
-
     if(aResized==null) itsResized = false;
     else itsResized = true;
 
@@ -346,11 +349,11 @@ public class ErmesObject implements FtsPropertyHandler {
     
     if(width<10){
       width  = getPreferredSize().width;
-      itsResized = true;
+      //itsResized = true;
     }
     if(height<10){
       height  = getPreferredSize().height;
-      itsResized = true;
+      //itsResized = true;
     }
     currentRect = new Rectangle(itsX, itsY, width, height);
 

@@ -70,7 +70,7 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.GetTextArea().setBackground(Color.white);
     
     ParseText(itsArgs);
-    RestoreDimensions();    
+    if(!itsResized) RestoreDimensions();    
     return true;
   }
 	
