@@ -6,7 +6,7 @@
 	
 2003-07-10  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 	
-	* fixed bug "[ 754960 ] package entry not saved to project file" with package.c 1.97, package.h 1.29, FtsPackage.java 1.21, ConfigPanel.java 1.24.
+	* fixed bug "[ 754960 ] package entry not saved to project file" with package.c 1.97, package.h 1.29, FtsPackage.java 1.21, ConfigPackagePanel.java 1.24.
 	These files have been tagged with tag "BEFORE_BUG_754960" before committing the following changes.
 	
 	* java/src/ircam/jmax/editors/project/ConfigPackagePanel.java: the "used" box show if package has been successfully loaded (checked).
