@@ -1254,7 +1254,7 @@ _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fmat_set_size(self, m, n);
       
       if(fmat_editor_is_open(self))
-        fmat_upload(self);
+        fmat_upload_size(self);
     }
   }
   
@@ -1268,13 +1268,12 @@ _fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int m = fts_get_number_int(at);
 
   if(m >= 0)
-  {
+  {    
     fmat_set_m(self, m);
   
     if(fmat_editor_is_open(self))
-      fmat_upload(self);
+      fmat_upload_size(self);
   }
-  
   fts_return_object(o);
 }
 
@@ -1283,13 +1282,13 @@ _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fmat_t *self = (fmat_t *)o;
   int n = fts_get_number_int(at);
-  
+    
   if(n >= 0)
   {
     fmat_set_n(self, n);
   
     if(fmat_editor_is_open(self))
-      fmat_upload(self);
+      fmat_upload_size(self);
   }
   fts_return_object(o);
 }

@@ -49,22 +49,67 @@ mat_set_size(mat_t *mat, int m, int n)
   int alloc   = mat->alloc;
   int oldsize = mat->m * mat->n;
   int newsize = m * n;
-  int i;
+  int i, j;
+  
+  int min_m = (m < mat->m)? m: mat->m;
+  int min_n = (n < mat->n)? n: mat->n;
   
   if (newsize > alloc)
   {
     mat->data  = fts_realloc(mat->data, newsize * sizeof(fts_atom_t));
     mat->alloc = newsize;
-    
-    /* set newly allocated region to void */
-    for (i = oldsize; i < newsize; i++)
-      fts_set_int(mat->data + i, 0);
   }
   else
-  {
+  {    
     if (newsize < 0)	/* size can be 0, but n or m nonzero */
       m = n = newsize = 0;
+  }
+  
+  /*************************/
+  if(n > mat->n)
+  {     
+    /* copy values (from last to first row) */
+    for(i=min_m-1; i>=1; i--)
+    {
+      fts_atom_t *old_row = mat->data + i * mat->n;
+      fts_atom_t *new_row = mat->data + i * n;
+      
+      /* copy old rows */
+      for(j=mat->n-1; j>=0; j--)
+        new_row[j] = old_row[j];
+    }
     
+    /* complete rows by zeros */
+    for(i=0; i<mat->m; i++)
+    {
+      fts_atom_t *row = mat->data + i * n;
+      
+      /* zero end of new rows */
+      for(j=mat->n; j<n; j++)
+        fts_set_int(row + j, 0);
+    }
+  }
+  else /* if(n < old_n) */
+  {      
+    /* copy and shorten rows */
+    for(i=1; i<min_m; i++)
+    {
+      fts_atom_t *old_row = mat->data + i * mat->n;
+      fts_atom_t *new_row = mat->data + i * n;
+      
+      /* copy beginning of old rows */
+      for(j=0; j<n; j++)
+        new_row[j] = old_row[j];
+    }
+  }
+  
+  /* zero new rows at end (if any) */
+  for(i=min_m*n; i<newsize; i++)
+    fts_set_int(mat->data + i, 0);
+  
+  /*********************/
+  if (newsize < alloc)
+  {
     /* void region cut off */
     for (i = newsize; i < oldsize; i++)
     {
@@ -72,6 +117,7 @@ mat_set_size(mat_t *mat, int m, int n)
       fts_set_int(mat->data + i, 0);
     }
   }
+  /*********************/
   
   mat->m = m;
   mat->n = n;
@@ -934,7 +980,6 @@ mat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (self->data != NULL)
     fts_free(self->data);
 }
-
 
 static void
 mat_instantiate(fts_class_t *cl)

@@ -218,8 +218,12 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   
   public void requestAppendColumn()
   {
+    args.clear();
+    args.addInt( n_rows);
+    args.addInt( n_cols+1);
+    
     try{
-      send( FtsSymbol.get("append_column"));
+      send( FtsSymbol.get("size"), args);
     }
     catch(IOException e)
     {

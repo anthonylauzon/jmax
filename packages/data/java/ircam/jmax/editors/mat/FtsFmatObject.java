@@ -57,12 +57,6 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
         ((FtsFmatObject)obj).setSize( args.getInt(0), args.getInt(1));
     }
     });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("fmat_append_row"), new FtsMessageHandler(){
-      public void invoke( FtsObject obj, FtsArgs args)
-    {
-        ((FtsFmatObject)obj).appendRow();
-    }
-    });
     FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
     {
@@ -145,29 +139,23 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   {
     if(n_rows != m || n_cols != n)
     {
+      Object[][] temp = new Object[m][n];
+      for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+        {
+          if(i < n_rows && j < n_cols)
+            temp[i][j] = values[i][j];
+          else
+            temp[i][j] = new Float(0.0);
+        }
       n_rows = m;
       n_cols = n;
-      values = new Object[n_rows][n_cols];
+      values = temp;
       
       notifySizeChanged(n_rows, n_cols);
     }
   }
-  
-  public void appendRow()
-  {
-    Object[][] temp = new Object[n_rows+1][n_cols];
-    for(int i = 0; i < n_rows; i++)
-      for(int j = 0;j<n_cols; j++)
-        temp[i][j] = values[i][j];
-    for(int j = 0; j < n_cols; j++)
-      temp[n_rows][j] = new Integer(0);
     
-    values = temp;
-    n_rows++;
-    
-    notifySizeChanged(n_rows, n_cols);
-  }
-  
   boolean uploading = false;
   public void startUpload()
   {
@@ -206,20 +194,24 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   
   public void requestAppendRow()
   {
+    args.clear();
+    args.addInt( n_rows+1);
     try{
-      send( FtsSymbol.get("append"));
+      send( FtsSymbol.get("rows"), args);
     }
     catch(IOException e)
     {
-      System.err.println("FtsFmatObject: I/O Error sending append Message!");
+      System.err.println("FtsFmatObject: I/O Error sending append_row Message!");
       e.printStackTrace(); 
     }    
   }
   
   public void requestAppendColumn()
   {
+    args.clear();
+    args.addInt( n_cols+1);
     try{
-      send( FtsSymbol.get("append_column"));
+      send( FtsSymbol.get("cols"), args);
     }
     catch(IOException e)
     {

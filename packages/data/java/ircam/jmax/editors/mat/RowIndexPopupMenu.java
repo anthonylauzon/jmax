@@ -38,7 +38,7 @@ public class RowIndexPopupMenu extends JPopupMenu
     super();
     JMenuItem item;
     rowIndex = rowId;
-    item = new JMenuItem("Add Row");
+    item = new JMenuItem("Append Row");
     item.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 	  	{
@@ -50,7 +50,7 @@ public class RowIndexPopupMenu extends JPopupMenu
 		
     if(rowIndex.data.canAppendColumn())
     {
-      item = new JMenuItem("Add Column");
+      item = new JMenuItem("Append Column");
       item.addActionListener( new ActionListener(){
         public void actionPerformed(ActionEvent e)
 	  	  {
