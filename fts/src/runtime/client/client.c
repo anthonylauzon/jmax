@@ -1,11 +1,18 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+/*
  *  Communication with the client: this file define the client logical
  *  device, the client module including the client poll function
  * 

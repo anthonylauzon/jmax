@@ -1,4 +1,17 @@
 #!/bin/sh
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+
 OPTIMIZE_IT_HOME_DIR=/u/worksta/jmax/OptimizeIt
 LD_LIBRARY_PATH=${OPTIMIZE_IT_HOME_DIR}/lib ; export LD_LIBRARY_PATH
 ROOTDIR=${HOME}/projects/max

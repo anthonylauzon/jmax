@@ -1,14 +1,15 @@
 /*
- *                      Copyright (c) 1997 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *
- *  Eric Viara for Ircam, January 1995
- *  The real time team, Ircam, 96, 97
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
  */
 
 /* This file implement the class/metaclass structure */

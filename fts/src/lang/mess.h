@@ -1,20 +1,18 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
 #ifndef _MESS_H_
 #define _MESS_H_
-
-/*
- *                      Copyright (c) 1995 by IRCAM
- *                          All rights reserved.
- *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.14 $ IRCAM $Date: 1998/10/21 16:35:10 $
- *
- *  Eric Viara for Ircam, January 1995
- *
- */
-
 
 extern fts_module_t fts_mess_module;
 

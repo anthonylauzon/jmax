@@ -1,4 +1,18 @@
 /*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+
+/*
  * New implementation of send/receive: the connections correspond strictly
  * to what the user does (and the connection method has been scrapped).
  * the receive_list is just a place holder that point to a list of receives with the same name,

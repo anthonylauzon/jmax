@@ -1,16 +1,16 @@
-/*
- * ConsoleKeyListener.java
- *
- * Copyright (c) 1997 Sun Microsystems, Inc.
- *
- *   This class implements the ConsoleKeyListener class.
- *
- * See the file "license.terms" for information on usage and
- * redistribution of this file, and for a DISCLAIMER OF ALL
- * WARRANTIES.
- * 
- * SCCS: @(#) ConsoleKeyListener.java 1.3 97/10/06 17:46:37
- */
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
+//
 
 package ircam.jmax.editors.console;
 

@@ -1,3 +1,16 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
 /* This file include the device specific to the SGI architecture IRIX 6.4 with the new
    audio library.
 

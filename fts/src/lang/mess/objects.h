@@ -1,15 +1,15 @@
 /*
- *                      Copyright (c) 1995 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.13 $ IRCAM $Date: 1998/09/24 15:36:06 $
- *
- *  Eric Viara for Ircam, January 1995
- *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
  */
 
 #ifndef _OBJECTS_H_

@@ -1,16 +1,17 @@
 #
-#			Copyright (c) 1995 by IRCAM
-#			    All rights reserved.
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
 #
-#  For any information regarding this and other IRCAM software, please
-#  send email to:
-#                              manager@ircam.fr
-#
-#
-# $Revision: 1.8 $ IRCAM $Date: 1996/10/30 14:31:54 $
-#
-# Makefile for the New FTS message library
-#
+
 
 ROOTDIR = ../../..
 

@@ -1,14 +1,15 @@
 /*
- *                      Copyright (c) 1993 by IRCAM
- *                          All rights reserved.
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
  *
- *  For any information regarding this and other IRCAM software, please
- *  send email to:
- *                              manager@ircam.fr
- *
- *      $Revision: 1.60 $ IRCAM $Date: 1998/12/29 16:16:08 $
- *
- *  Eric Viara for Ircam, January 1995
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
  */
 
 /* Define TRACE_DEBUG to get some debug printing during object creation.  */

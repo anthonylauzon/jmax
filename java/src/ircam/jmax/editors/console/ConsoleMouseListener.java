@@ -1,16 +1,17 @@
-/*
- * ConsoleMouseListener.java
- *
- * Copyright (c) 1997 Sun Microsystems, Inc.
- *
- *   This class implements the ConsoleMouseListener class.
- *
- * See the file "license.terms" for information on usage and
- * redistribution of this file, and for a DISCLAIMER OF ALL
- * WARRANTIES.
- *
- * SCCS: @(#) ConsoleMouseListener.java 1.2 97/09/29 18:08:03
- */
+//
+// jMax
+// 
+// Copyright (C) 1999 by IRCAM
+// All rights reserved.
+// 
+// This program may be used and distributed under the terms of the 
+// accompanying LICENSE.
+//
+// This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+// for DISCLAIMER OF WARRANTY.
+// 
+//
+
 package ircam.jmax.editors.console;
 
 import java.awt.*;
