@@ -2122,7 +2122,6 @@
 				5C54259705AB0B8A0042B7A2,
 				5C54259805AB0B8A0042B7A2,
 				5C54259905AB0B8A0042B7A2,
-				5C54259A05AB0B8A0042B7A2,
 				5C54259B05AB0B8A0042B7A2,
 				5C54259C05AB0B8A0042B7A2,
 				5C54259D05AB0B8A0042B7A2,
@@ -2170,12 +2169,6 @@
 		};
 		5C54259905AB0B8A0042B7A2 = {
 			fileRef = F5FB89B7035E0C20016640F1;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C54259A05AB0B8A0042B7A2 = {
-			fileRef = F8B8E5990286822501664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -24851,7 +24844,6 @@
 		F8B8E4AD02867E1C01664092 = {
 			children = (
 				F8B8E5980286822501664092,
-				F8B8E5990286822501664092,
 				F8B8E59C0286822501664092,
 				F8B8E59D0286822501664092,
 				F8B8E59E0286822501664092,
@@ -25851,14 +25843,6 @@
 			lastKnownFileType = file;
 			name = data.summary.jmax;
 			path = ../../packages/data/help/data.summary.jmax;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F8B8E5990286822501664092 = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = fvec.help.jmax;
-			path = ../../packages/data/help/fvec.help.jmax;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
