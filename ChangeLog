@@ -1,3 +1,23 @@
+2003-02-25  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* change fts_udpstream_t implementation
+	constructor arguments:	   
+	   <input>: port (int)
+	   <output>: host (symbol) port (int)
+
+	constructor call:
+           udpstream <input>          : can receive
+	   udpstream <input> <output> : can receive and send
+	   udpstream <->     <output> : can send  
+	   
+	
+	* now udpstream is never connected
+	
+	* remove fts_udpstream_get_port, fts_udpstream_get_connected_port, fts_udpstream_connect
+	and fts_udpstream_disconnect functions.
+
+	* remove unused fts_tcpstream_t and fts_tcpstream_class
+
 2003-02-25  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* fixed several (unreported) minor bugs in object set
