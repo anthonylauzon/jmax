@@ -23,9 +23,7 @@
  *
  */
 
-#include <unistd.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 
 #include <fts/fts.h>
