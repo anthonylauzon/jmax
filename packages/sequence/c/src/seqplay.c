@@ -145,19 +145,15 @@ seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       double now = fts_get_time_in_msecs();    
       
       if(!this->event)
+	seqplay_locate(o, 0, 0, 0, 0);
+      
+      if(this->event)
 	{
-	  seqplay_locate(o, 0, 0, 0, 0);
+	  this->start_time = now;
 	  
-	  if(this->event)
-	    fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_lock, 0, 0);
-	  else
-	    return;
+	  fts_alarm_set_time(&this->alarm, now + event_get_time(this->event) - this->start_location);
+	  fts_alarm_arm(&this->alarm);
 	}
-      
-      this->start_time = now;
-      
-      fts_alarm_set_time(&this->alarm, now + event_get_time(this->event) - this->start_location);
-      fts_alarm_arm(&this->alarm);
     }
 }
 
