@@ -62,6 +62,8 @@ typedef void (*fts_audioport_copy_fun_t)( fts_audioport_t *port, float *buff, in
 typedef void (*fts_audioport_mute_fun_t)( fts_audioport_t *port, int channel);
 typedef int (*fts_audioport_xrun_fun_t)( fts_audioport_t *port);
 
+#define FTS_AUDIOPORT_MAX_CHANNELS 64
+
 struct fts_audioport_direction {
   int valid;
   fts_audioport_io_fun_t io_fun;
@@ -110,6 +112,7 @@ FTS_API void fts_audioport_delete( fts_audioport_t *port);
  */
 
 struct fts_audiolabel_direction {
+  fts_symbol_t port_name;
   fts_audioport_t *port;
   int channel;
   struct fts_audiolabel *next_same_port;
@@ -122,6 +125,9 @@ struct fts_audiolabel {
   struct fts_audiolabel_direction inout[2];
 };
 
+#define fts_audiolabel_get_name( label) ((label)->name)
+
+#define fts_audiolabel_get_port_name( label, direction) ((label)->inout[(direction)].port_name)
 #define fts_audiolabel_get_port( label, direction) ((label)->inout[(direction)].port)
 #define fts_audiolabel_get_channel( label, direction) ((label)->inout[(direction)].channel)
 

@@ -140,6 +140,8 @@ static fts_heap_t *audiolabel_listeners_heap;
 static fts_symbol_t s_input_channel;
 static fts_symbol_t s_output_channel;
 
+fts_class_t *fts_audiolabel_class;
+
 static audiolabel_listener_t **lookup_listener( fts_object_t *listener)
 {
   audiolabel_listener_t **p = &audiolabel_listeners;
@@ -202,14 +204,17 @@ audiolabel_fire_removed( fts_symbol_t label_name)
 }
 
 static void
-audiolabel_set_port( fts_audiolabel_t *label, int direction, fts_audioport_t *port)
+audiolabel_set_port( fts_audiolabel_t *label, int direction, fts_symbol_t port_name)
 {
+  fts_audioport_t *port = fts_audiomanager_get_port( port_name);
+
   if ( label->inout[direction].port != NULL)
     {
       fts_audioport_remove_label( label->inout[direction].port, direction, label);
       fts_object_release( label->inout[direction].port);
     }
 
+  label->inout[direction].port_name = port_name;
   label->inout[direction].port = port;
 
   if (port != NULL)
@@ -235,12 +240,12 @@ static void
 audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
-  fts_symbol_t name = fts_get_symbol(at);
+  fts_symbol_t port_name = fts_get_symbol(at);
 
-  post("[audiolabel:] audiolabel_input, label name: %s, output device: %s\n", self->name, name);
+  post("[audiolabel:] audiolabel_input, label name: %s, output port: %s\n", self->name, port_name);
 
   /* Make a query on audiomanager to retreive corresponding fts_audioport_t* */
-  audiolabel_set_port( self, FTS_AUDIO_INPUT, fts_audiomanager_get_port( name));
+  audiolabel_set_port( self, FTS_AUDIO_INPUT, port_name);
 
   fts_client_send_message(o, fts_s_input, 1, at);  
 
@@ -251,12 +256,12 @@ static void
 audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
-  fts_symbol_t name = fts_get_symbol(at);
+  fts_symbol_t port_name = fts_get_symbol(at);
 
-  post("[audiolabel:] audiolabel_output, label name: %s, output device: %s\n", self->name, name);
+  post("[audiolabel:] audiolabel_output, label name: %s, output port: %s\n", self->name, port_name);
   
   /* Make a query on audiomanager to retreive corresponding fts_audioport_t* */
-  audiolabel_set_port( self, FTS_AUDIO_OUTPUT, fts_audiomanager_get_port( name));
+  audiolabel_set_port( self, FTS_AUDIO_OUTPUT, port_name);
 
   fts_client_send_message(o,  fts_s_output, 1, at);  
 
@@ -324,10 +329,15 @@ audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
   else
     self->name = fts_new_symbol( "unnamed");
 
+  self->inout[FTS_AUDIO_INPUT].port_name = fts_s_unconnected;
   self->inout[FTS_AUDIO_INPUT].port = NULL;
   self->inout[FTS_AUDIO_INPUT].channel = -1;
+
+  self->inout[FTS_AUDIO_OUTPUT].port_name = fts_s_unconnected;
   self->inout[FTS_AUDIO_OUTPUT].port = NULL;
   self->inout[FTS_AUDIO_OUTPUT].channel = -1;
+
+  audiolabel_fire_added( self->name);
 }
 
 static void
@@ -337,6 +347,8 @@ audiolabel_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 
   audiolabel_set_port( self, FTS_AUDIO_INPUT, NULL);
   audiolabel_set_port( self, FTS_AUDIO_OUTPUT, NULL);
+
+  audiolabel_fire_removed( self->name);
 }
 
 static void
@@ -510,7 +522,7 @@ void fts_audio_config( void)
   s_input_channel = fts_new_symbol("input_channel");  
   s_output_channel = fts_new_symbol("output_channel");
 
-  fts_class_install( fts_new_symbol("__audiolabel"), audiolabel_instantiate);
+  fts_audiolabel_class = fts_class_install( fts_new_symbol("__audiolabel"), audiolabel_instantiate);
 
   fts_hashtable_init( &audiomanager_table, FTS_HASHTABLE_SMALL);
 }

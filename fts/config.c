@@ -211,13 +211,13 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   self->dirty = 0;
 
   /* create midi config object */
-  midi_config = (fts_midiconfig_t*)fts_object_create(midiconfig_type, NULL, 0, 0);
+  midi_config = (fts_midiconfig_t*)fts_object_create( fts_midiconfig_class, NULL, 0, 0);
   fts_object_refer((fts_object_t*)midi_config);
   self->midi_config = midi_config;
   fts_midiconfig_set_defaults(self->midi_config);
 
   /* create audio config object */
-  audio_config = (fts_audioconfig_t*)fts_object_create(audioconfig_type, NULL, 0, 0);
+  audio_config = (fts_audioconfig_t*)fts_object_create( fts_audioconfig_class, NULL, 0, 0);
   fts_object_refer((fts_object_t*)audio_config);
   self->audio_config = audio_config;
   fts_audioconfig_set_defaults(self->audio_config);

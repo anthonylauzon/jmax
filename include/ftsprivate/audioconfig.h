@@ -35,7 +35,7 @@ typedef struct fts_audioconfig {
 
 } fts_audioconfig_t;
 
-extern fts_class_t* audioconfig_type;
+extern fts_class_t* fts_audioconfig_class;
 
 extern void fts_audioconfig_set_defaults( fts_audioconfig_t* config);
 extern void fts_audioconfig_dump( fts_audioconfig_t *mc, fts_bmax_file_t *f);

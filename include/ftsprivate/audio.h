@@ -46,6 +46,14 @@ extern void fts_audioport_remove_label( fts_audioport_t *port, int direction, ft
 
 /* **********************************************************************
  *
+ * audio label private API
+ *
+ */
+
+extern fts_class_t *fts_audiolabel_class;
+
+/* **********************************************************************
+ *
  * audio manager private API
  *
  */

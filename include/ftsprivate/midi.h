@@ -40,16 +40,10 @@ typedef struct fts_midiconfig {
 } fts_midiconfig_t;
 
 
-extern fts_class_t* midiconfig_type;
+extern fts_class_t* fts_midiconfig_class;
 
 void fts_midiconfig_set( fts_midiconfig_t* config);
 void fts_midiconfig_set_defaults( fts_midiconfig_t* config);
 extern void fts_midiconfig_dump( fts_midiconfig_t *mc, fts_bmax_file_t *f);
 
 #endif /* _FTS_PRIVATE_MIDI_H_ */
-
-
-
-
-
-

@@ -42,12 +42,11 @@
 
 /****************************************************
  *
- *  AUDIO label 
+ * audio config
  *
  */
-/* array of devices names */
-static fts_array_t audioconfig_inputs_array;
-static fts_array_t audioconfig_outputs_array;
+
+fts_class_t *fts_audioconfig_class;
 
 /* array of sampling rates */
 static fts_array_t audioconfig_sample_rates_array;
@@ -66,9 +65,6 @@ static fts_symbol_t audioconfig_s_sampling_rate;
 
 static fts_symbol_t audioconfig_s_inputs;
 static fts_symbol_t audioconfig_s_outputs;
-
-
-
 
 
 static void
@@ -154,26 +150,29 @@ audioconfig_update_devices(fts_audioconfig_t* config)
 {
   int ac;
   fts_atom_t* at;
+  fts_symbol_t *names;
   
   fts_array_clear(&audioconfig_sample_rates_array);
   fts_array_clear(&audioconfig_buffer_sizes_array);
 
-  fts_array_append_symbol(&audioconfig_inputs_array, audioconfig_s_unconnected);
-  fts_array_append_int(&audioconfig_inputs_array, -1);
-  fts_array_append_symbol(&audioconfig_outputs_array, audioconfig_s_unconnected);
-  fts_array_append_int(&audioconfig_outputs_array, -1);
+  /* get audio port names */
+  names = fts_audiomanager_get_input_names();
+  fts_client_start_message( (fts_object_t *)config, audioconfig_s_inputs);
+  while (*names)
+    {
+      fts_client_add_symbol( (fts_object_t *)config, *names);
+      names++;
+    }
+  fts_client_done_message( (fts_object_t *)config);
 
-  /* get devices names from all audiomanagers */
-  audiomanagers_get_device_names(&audioconfig_inputs_array, &audioconfig_outputs_array);
-  
-  ac = fts_array_get_size(&audioconfig_inputs_array);
-  at = fts_array_get_atoms(&audioconfig_inputs_array);
-  fts_client_send_message((fts_object_t*)config, audioconfig_s_inputs, ac, at);
-
-  ac = fts_array_get_size(&audioconfig_outputs_array);
-  at = fts_array_get_atoms(&audioconfig_outputs_array);
-  fts_client_send_message((fts_object_t*)config, audioconfig_s_outputs, ac, at);
-  
+  names = fts_audiomanager_get_output_names();
+  fts_client_start_message( (fts_object_t *)config, audioconfig_s_outputs);
+  while (*names)
+    {
+      fts_client_add_symbol( (fts_object_t *)config, *names);
+      names++;
+    }
+  fts_client_done_message( (fts_object_t *)config);
 }
 
 static void 
@@ -248,7 +247,7 @@ audioconfig_label_get_by_index(fts_audioconfig_t* config, int index)
 
 /* Return NULL if no such label name */
 fts_audiolabel_t*
-audioconfig_label_get_by_name(fts_audioconfig_t* config, fts_symbol_t name)
+fts_audioconfig_label_get_by_name(fts_audioconfig_t* config, fts_symbol_t name)
 {
   fts_audiolabel_t* label = config->labels;
   while(label && label->name != name)
@@ -261,15 +260,15 @@ static fts_audiolabel_t*
 audioconfig_label_insert(fts_audioconfig_t* config, int index, fts_symbol_t name)
 {
   fts_audiolabel_t** p = &config->labels;
-  fts_audiolabel_t* label = (fts_audiolabel_t*)fts_object_create(fts_audiolabel_type, NULL, 0, 0);
+  fts_audiolabel_t* label;
   int n = index;
+  fts_atom_t a[1];
+
+  fts_set_symbol( a, name);
+  label = (fts_audiolabel_t*)fts_object_create(fts_audiolabel_class, NULL, 1, a);
 
   fts_object_refer((fts_object_t*)label);
 
-  label->name = name;
-  label->input_device = audioconfig_s_unconnected;
-  label->output_device = audioconfig_s_unconnected;
-  
   /* insert label to list */
   while ((*p) && n--)
     p = &(*p)->next;
@@ -316,55 +315,7 @@ audioconfig_label_remove(fts_audioconfig_t* config, int index)
   fts_config_set_dirty((fts_config_t*)fts_config_get(), 1);
 }
 
-static void
-audioconfig_label_set_input_port(fts_audioconfig_t* config, fts_audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
-{
-  if(audioport == NULL)
-    name = audioconfig_s_unconnected;
-
-  if(audioport != label->input_audioport || name != label->input_device) 
-  {
-    audiolabel_set_input_port(label, audioport, name);
-      
-    if(fts_object_has_id((fts_object_t *)config)) 
-    {
-      fts_atom_t args[2];
-	  
-      fts_set_int(args + 0, index);
-      fts_set_symbol(args + 1, name);
-      fts_client_send_message((fts_object_t *)config, fts_s_input, 2, args);
-    }
-
-    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
-  }
-}
-
-static void
-audioconfig_label_set_output_port(fts_audioconfig_t *config, fts_audiolabel_t *label, int index, fts_audioport_t *audioport, fts_symbol_t name)
-{
-  if(audioport == NULL)
-    name = audioconfig_s_unconnected;
-  
-  if(audioport != label->output_audioport || name != label->output_device) 
-  {
-    audiolabel_set_output_port(label, audioport, name);
-      
-    if(fts_object_has_id((fts_object_t *)config)) 
-    {
-      fts_atom_t args[2];
-	  
-      fts_set_int(args + 0, index);
-      fts_set_symbol(args + 1, name);
-      fts_client_send_message((fts_object_t *)config, fts_s_output, 2, args);
-    }
-    
-    fts_config_set_dirty( (fts_config_t *)fts_config_get(), 1);
-  }
-}
-
-
-
-void
+void 
 fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
 {
   if(audioconfig != NULL)
@@ -374,6 +325,7 @@ fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
     if(label == NULL)
       label = audioconfig_label_insert(audioconfig, 0, fts_s_default);
 
+#if 0
     if(label->input_audioport == NULL)
     {
       fts_symbol_t name = audiomanagers_get_default_input();
@@ -389,6 +341,7 @@ fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
 	  
       audioconfig_label_set_output_port(audioconfig, label, 0, port, name);
     }
+#endif
 
     fts_config_set_dirty((fts_config_t*)fts_config_get(), 0);
   }
@@ -400,10 +353,8 @@ fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
  *  AUDIO configuration class
  *
  */
+
 #define AUDIO_CONFIG_DEBUG
-
-fts_class_t* fts_audioconfig_type = NULL;
-
 
 static void
 audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -419,7 +370,7 @@ audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 
 /* name utility */
 fts_symbol_t
-audioconfig_get_fresh_label_name(fts_audioconfig_t *config, fts_symbol_t name)
+fts_audioconfig_get_fresh_label_name(fts_audioconfig_t *config, fts_symbol_t name)
 {
   const char *str = name;
   int len = strlen(str);
@@ -440,7 +391,7 @@ audioconfig_get_fresh_label_name(fts_audioconfig_t *config, fts_symbol_t name)
   }
   
   /* generate new label name */
-  while(audioconfig_label_get_by_name(config, name) != NULL) 
+  while(fts_audioconfig_label_get_by_name(config, name) != NULL) 
   {
     sprintf(new_str + len, "%d", ++num);
     name = fts_new_symbol(new_str);
@@ -460,7 +411,7 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 
   if( name == fts_s_default)
     {
-      label = audioconfig_label_get_by_name( self, name);
+      label = fts_audioconfig_label_get_by_name( self, name);
 
       if( label == NULL)
 	label = audioconfig_label_insert( self, 0, name);
@@ -468,19 +419,20 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   else
     {
       /* check if name is not already used */
-      if (audioconfig_label_get_by_name(self, name) != NULL)
-	name = audioconfig_get_fresh_label_name(self, name);
+      if (fts_audioconfig_label_get_by_name(self, name) != NULL)
+	name = fts_audioconfig_get_fresh_label_name(self, name);
   
       label = audioconfig_label_insert(self, index, name);
     }
 
-  if( ac == 6)
-    {
-      label->input_device = fts_get_symbol(at + 2);
-      label->input_channel = fts_get_int(at + 3);
-      label->output_device = fts_get_symbol(at + 4);
-      label->output_channel = fts_get_int(at + 5);
-    }
+  /* It seems that this method is never called with 6 arguments */
+/*   if( ac == 6) */
+/*     { */
+/*       label->input_device = fts_get_symbol(at + 2); */
+/*       label->input_channel = fts_get_int(at + 3); */
+/*       label->output_device = fts_get_symbol(at + 4); */
+/*       label->output_channel = fts_get_int(at + 5); */
+/*     } */
   
   if (fts_object_has_id(o))
     {
@@ -490,11 +442,11 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
       
       fts_set_int(args, index);
       fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
-      fts_set_symbol(args + 2, label->name);
-      fts_set_symbol(args + 3, label->input_device);
-      fts_set_int(args + 4, label->input_channel);
-      fts_set_symbol(args + 5, label->output_device);
-      fts_set_int(args + 6, label->output_channel);
+      fts_set_symbol(args + 2, fts_audiolabel_get_name(label));
+      fts_set_symbol(args + 3, fts_audiolabel_get_port_name( label, FTS_AUDIO_INPUT));
+      fts_set_int(args + 4, fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT));
+      fts_set_symbol(args + 5, fts_audiolabel_get_port_name( label, FTS_AUDIO_OUTPUT));
+      fts_set_int(args + 6, fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT));
       fts_client_send_message(o, fts_s_insert, 7, args);    
     }
 }
@@ -627,11 +579,14 @@ fts_audioconfig_dump( fts_audioconfig_t *this, fts_bmax_file_t *f)
     {
       fts_set_symbol(a, fts_s_insert);
       fts_set_int(a+1, i);
-      fts_set_symbol(a+2, label->name);
-      fts_set_symbol(a+3, label->input_device);
-      fts_set_int(a+4, label->input_channel);
-      fts_set_symbol(a+5, label->output_device);
-      fts_set_int(a+6, label->output_channel);
+      fts_set_symbol(a+2, fts_audiolabel_get_name(label));
+
+      fts_set_symbol(a+3, fts_audiolabel_get_port_name( label, FTS_AUDIO_INPUT));
+      fts_set_int(a+4, fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT));
+
+      fts_set_symbol(a+5, fts_audiolabel_get_port_name( label, FTS_AUDIO_OUTPUT));
+      fts_set_int(a+6, fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT));
+
       fts_bmax_code_push_atoms(f, 7, a);
       fts_bmax_code_obj_mess(f, fts_s_audio_config, 7);
       fts_bmax_code_pop_args(f, 7);
@@ -688,15 +643,16 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       {
 	fts_client_register_object((fts_object_t *)label, fts_get_client_id(o));
       }
+
       /* send new label to client */
-    
       fts_set_int(args, index);
       fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
-      fts_set_symbol(args + 2, label->name);
-      fts_set_symbol(args + 3, label->input_device);
-      fts_set_int(args + 4, label->input_channel);
-      fts_set_symbol(args + 5, label->output_device);
-      fts_set_int(args + 6, label->output_channel);
+      fts_set_symbol(args + 2, fts_audiolabel_get_name(label));
+      fts_set_symbol(args + 3, fts_audiolabel_get_port_name( label, FTS_AUDIO_INPUT));
+      fts_set_int(args + 4, fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT));
+      fts_set_symbol(args + 5, fts_audiolabel_get_port_name( label, FTS_AUDIO_OUTPUT));
+      fts_set_int(args + 6, fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT));
+
       fts_client_send_message(o, fts_s_insert, 7, args);      
     }
     label = label->next;
@@ -731,7 +687,7 @@ audioconfig_set_to_defaults(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-audiconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   fts_bytestream_t* stream = fts_post_get_stream(ac, at);
@@ -741,17 +697,19 @@ audiconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 	    self->sample_rate, 
 	    self->buffer_size);
   fts_spost(stream, "labels\n");
+
   while(NULL != label)
   {
     fts_spost(stream, "\t%s: input: %s channel: %d output: %s channel: %d\n",
-	      label->name, 
-	      label->input_device, label->input_channel,
-	      label->output_device, label->output_channel);
+	      fts_audiolabel_get_name( label), 
+	      fts_audiolabel_get_port_name( label, FTS_AUDIO_INPUT), 
+	      fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT),
+	      fts_audiolabel_get_port_name( label, FTS_AUDIO_OUTPUT), 
+	      fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT));
     label = label->next;
   }
 }
 
-/* DUMMY CONSTRUCTOR */
 static void
 audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
@@ -761,14 +719,12 @@ audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   self->buffer_size = AUDIO_CONFIG_DEFAULT_BUFFER_SIZE;
 }
 
-/* DUMMY DESTRUCTOR */
 static void
 audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 }
 
-/* DUMMY CLASS INSTANTIATION */
 static void
 audioconfig_instantiate(fts_class_t* cl)
 {
@@ -789,7 +745,6 @@ audioconfig_instantiate(fts_class_t* cl)
 
 void fts_audioconfig_config(void)
 {
-  /* AUDIO configuration class */
   audioconfig_s_name = fts_new_symbol("__audioconfig");  
   audioconfig_s_unconnected = fts_new_symbol("-");
 
@@ -805,8 +760,7 @@ void fts_audioconfig_config(void)
   fts_array_init(&audioconfig_sample_rates_array, 0, 0);
   fts_array_init(&audioconfig_buffer_sizes_array, 0, 0);
 
-  /* AUDIO configuration class */
-  fts_audioconfig_type = fts_class_install(audioconfig_s_name, audioconfig_instantiate);
+  fts_class_install(audioconfig_s_name, audioconfig_instantiate);
 }
 
 
