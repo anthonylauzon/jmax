@@ -1,4 +1,4 @@
-#  $Id: Makefile.am,v 1.1 2002/08/30 14:07:13 schwarz Exp $
+#  $Id: Makefile.am,v 1.2 2002/08/30 17:20:57 schwarz Exp $
 #
 #  jMax
 #  
@@ -11,7 +11,11 @@
 #  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 #  for DISCLAIMER OF WARRANTY.
 #  
+#
 #  $Log: Makefile.am,v $
+#  Revision 1.2  2002/08/30 17:20:57  schwarz
+#  SDIF library now configured by configure script!
+#
 #  Revision 1.1  2002/08/30 14:07:13  schwarz
 #  First working version of sdif package.
 #  In/out of scalars (singleton matrices).
@@ -21,21 +25,8 @@
 #  Revision 1.1  2002/08/12 13:12:14  schwarz
 #  Initial revision
 
-# all this is now set by:
+# all SDIF config is now set by:
 # ./configure --prefix /u/formes/schwarz --bindir /u/formes/schwarz/bin/i686 --libdir /u/formes/schwarz/lib/i686 --enable-debug --with-sdif --with-sdif-incl=/u/formes/share/include --with-sdif-libdir=/u/formes/share/lib/$SYS
-
-
-# where is the sdif library and sdif.h?  todo: configure
-#ifeq ($(MODE), debug)
-#  debug_suffix	= -debug
-#else
-#  debug_suffix	=
-#endif
-
-# sdif_include		= /u/formes/share/include
-# sdif_lib_dir		= /u/formes/share/lib/$(SYS)
-# sdif_lib_name		= libsdif$(debug_suffix).a
-# SDIF_LIB		= $(sdif_lib_dir)/$(sdif_lib_name)
 
 # defines and compilation options
 BUILD_DATE	= $(shell date)
@@ -43,7 +34,8 @@ BUILD_ID	= '-DBUILD_DATE="$(BUILD_DATE) on $(HOST) for $(USER)"'
 VERSION		= '-DSDIFVERSIONSTR="$(SDIFVERSION)"'
 
 CFLAGS	       += $(BUILD_ID) $(VERSION)
-INCLUDES       += -I$(top_srcdir)/include @SDIF_INCLUDE@
+INCLUDES       += -I$(top_srcdir)/include -I$(top_srcdir)/packages/data/c/src \
+		  @SDIF_INCLUDE@
 
 
 packagedir 		= $(pkgdatadir)/packages/sdif/c
