@@ -1,0 +1,7 @@
+#!/bin/sh
+
+
+CLASSPATH=/usr/local/max/java/classes/jmax.jar:/usr/local/max/java/lib/jacl1.0b1/jacl.jar; export CLASSPATH
+
+java -noasyncgc -mx64m -ms2m  ircam.jmax.MaxApplication -root /usr/local/max $*
+

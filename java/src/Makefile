@@ -23,7 +23,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	@echo jar packaging Not yet implemented
+	(cd $(ROOTDIR)/java/classes ; jar -cvf jmax.jar ircam )
 .PHONY: jar
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
