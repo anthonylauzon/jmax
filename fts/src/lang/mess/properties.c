@@ -78,8 +78,6 @@
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
-static const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
-
 static fts_heap_t *daemon_heap;
 static fts_heap_t *plist_cell_heap;
 static fts_heap_t *plist_heap;
@@ -411,7 +409,7 @@ fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property)
 
 /* null if no prop */
 
-static const fts_atom_t *
+const fts_atom_t *
 fts_class_get_prop(fts_class_t *cl, fts_symbol_t property)
 {
   if (cl->properties)

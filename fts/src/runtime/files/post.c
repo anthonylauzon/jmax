@@ -80,7 +80,7 @@ post_atoms(int ac, const fts_atom_t *at)
       if (fts_is_int(&at[i]))
 	post("%d%s", fts_get_int(&at[i]), ps);
       else if (fts_is_float(&at[i]))
-	post("%f%s", fts_get_float(&at[i]), ps);
+	post("%g%s", fts_get_float(&at[i]), ps);
       else if (fts_is_symbol(&at[i]))
 	post("%s%s", fts_symbol_name(fts_get_symbol(&at[i])), ps);
       else if (fts_is_void(&at[i]))

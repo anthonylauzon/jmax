@@ -40,7 +40,6 @@ extern void fts_classes_init(void);
 extern void fts_patcher_init(void);
 extern void fts_patcher_shutdown(void);
 extern void fts_events_init(void);
-extern void send_config(void);
 extern void fts_patparser_init(void);
 extern void fts_mess_naming_init(void);
 extern void fts_params_init(void);

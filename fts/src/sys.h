@@ -38,9 +38,9 @@
   */
 
 #include "sys/hw.h"
-#include "sys/status.h"
 #include "sys/platform.h"
 #include "sys/mem.h"
+#include "sys/status.h"
 #include "sys/modules.h"
 #include "sys/version.h"
 

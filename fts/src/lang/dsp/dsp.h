@@ -27,6 +27,8 @@
 #ifndef _FTS_DSP_H_
 #define _FTS_DSP_H_
 
+#include "gphiter.h"
+
 extern fts_module_t fts_dsp_module;
 
 typedef struct 
@@ -45,13 +47,12 @@ typedef struct
 } fts_dsp_descr_t;
 
 /* Macro to access the input and output characteristics
- from a dsp descriptor
- This macros are official part of the object DSP API, and their definition
- depend on the actual dsp structure.
- */
+   from a dsp descriptor
+   This macros are official part of the object DSP API, and their definition
+   depend on the actual dsp structure.
+*/
 
 /* get input properties */
-
 #define fts_dsp_get_input_name(DESC, IN) ((DESC)->in[(IN)]->name)
 #define fts_dsp_get_input_size(DESC, IN) ((DESC)->in[(IN)]->length)
 #define fts_dsp_get_input_srate(DESC, IN) ((DESC)->in[(IN)]->srate)
@@ -67,7 +68,6 @@ extern int fts_dsp_is_sig_inlet(fts_object_t *o, int num);
 #define fts_dsp_get_output_name(DESC, OUT) ((DESC)->out[(OUT)]->name)
 #define fts_dsp_get_output_size(DESC, OUT) ((DESC)->out[(OUT)]->length)
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
-
 /* End of macros */
 
 extern dsp_signal * Sig_new(int vectorSize, float sampleRate);
@@ -114,8 +114,25 @@ extern fts_symbol_t fts_s_dsp_downsampling;
 extern fts_symbol_t fts_s_dsp_outputsize;
 extern fts_symbol_t fts_s_dsp_descr;
 
-/* The function that is called by the scheduler */
+/* the function that is called by the scheduler */
 extern void fts_dsp_chain_poll( void);
 
+/************************************************************************
+ * 
+ *  message "dspgraph_replace"
+ *  
+ *   this message is send to each object while dsp graph building in order to
+ *   give them chance to replace themselves by other objects in the graph
+ *   (usefull for objects like patcher in/outlets and send/receive)
+ *
+ *   the replaced object calls fts_dspgraph_insert() in order to add others
+ *   in place of itself
+ *
+ */
+extern fts_symbol_t fts_s_dspgraph_replace;
+typedef graph_iterator_t fts_dspgraph_t;
+
+extern void fts_dspgraph_insert(fts_dspgraph_t *graph, fts_object_t *object, int outlet);
+#define fts_dspgraph_insert(g, obj, out) graph_iterator_push((g), (obj), (out))
 
 #endif

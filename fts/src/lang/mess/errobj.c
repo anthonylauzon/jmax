@@ -54,19 +54,16 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
   char buf[1024];
   fts_atom_t a;
   fts_object_t *obj;
-
   fts_atom_t description[1];
 
+  /* make new patcher object */
   fts_set_symbol(&description[0], fts_s_patcher);
-
   fts_object_new_to_patcher(parent, 1, description, &obj);
 
-  /* flag the patcher as error */
-
+  /* flag the patcher object as error */
   fts_patcher_set_error((fts_patcher_t *)obj);
 
   /* Make up the errdesc property (eat symbols !!) */
-
   va_start(ap, format);
   vsprintf(buf, format, ap);
   va_end(ap);
@@ -75,7 +72,6 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
   fts_object_put_prop(obj, fts_s_error_description, &a);
 
   /* Return the object  */
-
   return obj;
 }
 
@@ -159,15 +155,11 @@ void fts_object_set_error(fts_object_t *obj, const char *format, ...)
   char buf[1024];
   fts_atom_t a;
 
-  fts_atom_t description[1];
-
-  /* Make up the error  property  */
-
+  /* make up the error  property  */
   fts_set_int(&a, 1);
   fts_object_put_prop(obj, fts_s_error, &a);
 
-  /* Make up the errdesc property  */
-
+  /* make up the errdesc property  */
   va_start(ap, format);
   vsprintf(buf, format, ap);
   va_end(ap);

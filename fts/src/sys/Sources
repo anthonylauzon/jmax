@@ -24,12 +24,8 @@
 #
 
 SOURCES = \
-	mem.c		\
-	modules.c	\
-	smem.c		\
-	version.c	\
-
-
-
-
-
+mem.c \
+modules.c \
+smem.c \
+status.c \
+version.c \

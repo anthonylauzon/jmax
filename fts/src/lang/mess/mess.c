@@ -72,8 +72,8 @@ static void fts_mess_init( void )
   /* Create the patcher class */
   fts_patcher_init();
 
-  /* Create the send/receive class */
-  send_config();
+  /* Create the channel (send/receive) class */
+  fts_channel_config();
 
   /* Initialize the .pat parser */
   fts_patparser_init();

@@ -41,12 +41,9 @@ extern fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t
 extern void fts_object_destroy(fts_object_t *obj);
 
 #define fts_object_refer(o) ((o)->refcnt++)
-#define fts_object_release(o) ((--((o)->refcnt) > 0)? 0: fts_object_destroy(o))
+#define fts_object_release(o) ((--((o)->refcnt) > 0)? 0: (fts_object_destroy(o), 0))
 
 #define fts_object_has_only_one_reference(o) ((o)->refcnt == 1)
-
-extern void fts_object_unbind(fts_object_t *obj);
-extern void fts_object_unconnect(fts_object_t *obj);
 
 /* traditional object in patcher functions */
 extern fts_status_t fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
@@ -78,9 +75,6 @@ extern int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s
 /* variables */
 #define fts_object_get_variable(o) ((o)->varname)
 #define fts_object_set_variable(o, name) ((o)->varname = (name))
-
-#define fts_object_is_outlet(o) ((o)->head.cl->mcl == outlet_metaclass)
-#define fts_object_is_inlet(o) ((o)->head.cl->mcl == inlet_metaclass)
 
 #define fts_object_has_id(o) ((o)->head.id != FTS_NO_ID)
 #define fts_object_get_id(o) ((o)->head.id)

@@ -40,4 +40,6 @@ typedef fts_status_description_t *fts_status_t;
 
 #define fts_status_get_description(s) ((s)->description)
 
+extern fts_status_t fts_new_status(const char *description);
+
 #endif

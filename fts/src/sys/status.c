@@ -20,23 +20,18 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
+#include "status.h"
+#include "mem.h"
 
-#ifndef _FTS_SEND_H_
-#define _FTS_SEND_H_
+fts_status_t
+fts_new_status(const char *description)
+{
+  fts_status_description_t *sd = fts_malloc(sizeof(fts_status_description_t));
 
-extern fts_metaclass_t *fts_send_metaclass;
-extern fts_metaclass_t *fts_receive_metaclass;
-
-#define fts_object_is_send(o) (fts_object_get_metaclass(o) == fts_send_metaclass)
-#define fts_object_is_receive(o) (fts_object_get_metaclass(o) == fts_receive_metaclass)
-
-extern int fts_send_message_to_receives(fts_symbol_t name, fts_symbol_t selector, int ac, const fts_atom_t *at);
-extern int fts_receive_exists(fts_symbol_t name);
-
-extern fts_object_t *fts_send_get_first_receive(fts_object_t *send);
-extern fts_object_t *fts_receive_get_next_receive(fts_object_t *receive);
-
-#endif
+  sd->description = description;
+  
+  return (fts_status_t)sd;
+}

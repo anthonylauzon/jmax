@@ -24,11 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
-
-#include "lang/mess/messP.h"
+#include "fts.h"
+#include "send.h"
 
 /*
  * Basic naming services; for now, just provide global names,
@@ -73,7 +70,7 @@ ispw_unregister_named_object(fts_object_t *obj, fts_symbol_t name)
 int 
 ispw_named_object_exists(fts_symbol_t name)
 {
-  if (fts_receive_exists(name))
+  if (ispw_receive_exists(name))
     return 1;
   else
     {
@@ -96,8 +93,8 @@ ispw_named_object_exists(fts_symbol_t name)
 void 
 ispw_named_object_send(fts_symbol_t name, fts_symbol_t s, int argc, const fts_atom_t *argv)
 {
-  if (fts_receive_exists(name))
-    fts_send_message_to_receives(name, s, argc, argv);
+  if (ispw_receive_exists(name))
+    ispw_send_message_to_receives(name, s, argc, argv);
   else
     {
       fts_atom_t d;

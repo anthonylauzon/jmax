@@ -33,11 +33,12 @@ struct graph_iterator_t {
   struct stack_element_t *top;
 };
 
-void graph_iterator_init( graph_iterator_t *iter, fts_object_t *object, int outlet);
+extern void graph_iterator_init( graph_iterator_t *iter, fts_object_t *object, int outlet);
 
-void graph_iterator_next( graph_iterator_t *iter);
-int graph_iterator_end( const graph_iterator_t *iter);
-void graph_iterator_get_current( const graph_iterator_t *iter, fts_object_t **obj, int *inlet);
+extern void graph_iterator_next( graph_iterator_t *iter);
+extern int graph_iterator_end( const graph_iterator_t *iter);
+extern void graph_iterator_get_current( const graph_iterator_t *iter, fts_object_t **obj, int *inlet);
+
+extern void graph_iterator_push( graph_iterator_t *iter, fts_object_t *object, int outlet);
 
 #endif
-

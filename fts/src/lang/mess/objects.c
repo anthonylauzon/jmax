@@ -34,6 +34,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
+#include "runtime/files/post.h"
 
 /* stuff from runtime/client */
 extern void fts_client_release_object(fts_object_t *c);
@@ -47,6 +48,9 @@ static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data);
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
 static void fts_object_send_kernel_properties(fts_object_t *obj);
 static fts_symbol_t fts_object_description_get_variable_name(int ac, const fts_atom_t *at);
+
+static void fts_object_unbind(fts_object_t *obj);
+static void fts_object_free(fts_object_t *obj);
 
 void fts_objects_init()
 {
@@ -141,18 +145,46 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
     fts_mess_set_run_time_check(save_check_status);
   }
 
-  if (status != fts_Success && status != &fts_MethodNotFound)
+  if(status != &fts_MethodNotFound)
     {
-      if (obj->out_conn)
-	fts_block_free((char *)obj->out_conn, obj->head.cl->noutlets * sizeof(fts_connection_t *));
+      if (status != fts_Success)
+	{
+	  /* free already allocated */
+	  fts_object_free(obj);
 
-      if (obj->in_conn)
-	fts_block_free((char *)obj->in_conn, obj->head.cl->ninlets * sizeof(fts_connection_t *));
+	  /* return NULL */
+	  *ret = 0;
+	  
+	  return status;
+	}
+      else
+	{
+	  fts_atom_t error_prop;
 
-      fts_block_free((char *)obj, obj->head.cl->size);
-      *ret = 0;
+	  fts_object_get_prop(obj, fts_s_error, &error_prop);
 
-      return status;
+	  if(!fts_is_void(&error_prop))
+	    {
+	      fts_atom_t error_description_prop;
+
+	      fts_object_get_prop(obj, fts_s_error_description, &error_description_prop);
+	      
+	      /* free already allocated */
+	      fts_object_free(obj);
+	      
+	      /* return NULL */
+	      *ret = 0;
+	  
+	      if(fts_is_symbol(&error_description_prop))
+		{
+		  fts_symbol_t error_description = fts_get_symbol(&error_description_prop);
+	      
+		  return fts_new_status(fts_symbol_name(error_description));
+		}
+	      else
+		return &fts_CannotInstantiate;
+	    }
+	}
     }
 
   fts_patcher_add_object(patcher, obj);
@@ -344,7 +376,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 	  else if (ret == &fts_ArgumentTypeMismatch)
 	    obj = fts_error_object_new(patcher, aoc, aot, "Argument types mismatch");
 	  else
-	    obj = fts_error_object_new(patcher, aoc, aot, "Error in class instantiation");
+	    obj = fts_error_object_new(patcher, aoc, aot, fts_status_get_description(ret));
 	}
     }
 
@@ -458,7 +490,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
  *
  */
 
-void 
+static void 
 fts_object_unbind(fts_object_t *obj)
 {
   int outlet, inlet;
@@ -473,7 +505,7 @@ fts_object_unbind(fts_object_t *obj)
 }
 
 /* remove all connections from the object (done when unplugged from the patcher) */
-void 
+static void 
 fts_object_unconnect(fts_object_t *obj)
 {
   int outlet, inlet;
@@ -499,7 +531,7 @@ fts_object_unconnect(fts_object_t *obj)
     }
 }
 
-void 
+static void 
 fts_object_unclient(fts_object_t *obj)
 {
   /* take the object away from the update queue (if there) and free it */
@@ -515,7 +547,7 @@ fts_object_unclient(fts_object_t *obj)
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
-void 
+static void 
 fts_object_free(fts_object_t *obj)
 {
   /* free the object properties */
@@ -672,9 +704,6 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
   if (old->varname && (old->varname == var))
     fts_variable_suspend(old->patcher, old->varname);
 
-  /* Reset the old object, and call its delete method, so that
-     it will release resources that may be needed by the new object,
-     like the name for globally named objects like table */
   fts_object_unbind(old);
 
   /*if((old->head.id == new_id) && fts_object_description_variable_name_changed_only(fts_object_t *old, int ac, const fts_atom_t *at))*/
@@ -689,7 +718,7 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
       old->head.id = FTS_NO_ID;
     }
 
-  /* Make the new object  */
+  /* make the new object  */
   new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
   fts_object_set_id(new, new_id);
   

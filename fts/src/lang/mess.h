@@ -45,7 +45,6 @@ extern fts_module_t fts_mess_module;
 #include "mess/patcherdata.h"
 #include "mess/properties.h"
 #include "mess/errobj.h"
-#include "mess/send.h"
 #include "mess/objtable.h"
 #include "mess/expressions.h"
 #include "mess/variables.h"

@@ -114,12 +114,15 @@ PREDEF_SYMBOL( fts_s_abstraction, "abstraction")
 PREDEF_SYMBOL( fts_s_template, "template")
 PREDEF_SYMBOL( fts_s_patcher_type, "type")
 PREDEF_SYMBOL( fts_s_filename, "filename")
+PREDEF_SYMBOL( fts_s_named_defaults, "named_defaults")
 
 /* Symbols related to builtin classes */
 PREDEF_SYMBOL( fts_s_old_patcher, "patcher")
 PREDEF_SYMBOL( fts_s_patcher, "jpatcher")
 PREDEF_SYMBOL( fts_s_inlet, "inlet")
 PREDEF_SYMBOL( fts_s_outlet, "outlet")
+PREDEF_SYMBOL( fts_s_channel, "channel")
+
 PREDEF_SYMBOL( fts_s_qlist, "qlist")
 PREDEF_SYMBOL( fts_s_table, "table")
 PREDEF_SYMBOL( fts_s_explode, "explode")

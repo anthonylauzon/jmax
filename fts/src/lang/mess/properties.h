@@ -74,12 +74,11 @@ extern void  fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_a
 
    Also the is remove is provided for completness, but should not
    be used after class initialization.
-
-   The get is not available (properties are always relative to objects)
 */
 
 extern void fts_class_put_prop(fts_class_t *cl, fts_symbol_t property, const fts_atom_t *value);
 extern void fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property);
+extern const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
 
 
 /* 

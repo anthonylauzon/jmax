@@ -55,9 +55,9 @@ fts_symbol_t fts_s_put;
 fts_symbol_t fts_s_sig;
 fts_symbol_t fts_s_sig_zero;
 fts_symbol_t fts_s_dsp_descr;
+fts_symbol_t fts_s_dspgraph_replace;
 
 /* up and down sampling factors are now specified with properties */
-
 fts_symbol_t fts_s_dsp_upsampling;
 fts_symbol_t fts_s_dsp_downsampling;
 fts_symbol_t fts_s_dsp_outputsize; /* give an absolute size for output vector */
@@ -77,6 +77,7 @@ dsp_module_init(void)
   fts_s_dsp_downsampling = fts_new_symbol("DSP_DOWNSAMPLING");
   fts_s_dsp_outputsize = fts_new_symbol("DSP_OUTPUTSIZE");
   fts_s_dsp_descr = fts_new_symbol("__DSP_DESCR");
+  fts_s_dspgraph_replace = fts_new_symbol("dspgraph_replace");
 
   /* Initialize signals management */
   Sig_init();

@@ -48,6 +48,7 @@ extern void prepend_config(void);
 extern void random_config(void);
 extern void route_config(void);
 extern void select_config(void);
+extern void send_config(void);
 extern void speedlim_config(void);
 extern void split_config(void);
 extern void time_config(void);
@@ -89,6 +90,7 @@ ispw_control_module_init(void)
   random_config();
   route_config();
   select_config();
+  send_config();
   speedlim_config();
   split_config();
   time_config();

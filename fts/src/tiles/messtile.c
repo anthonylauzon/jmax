@@ -570,7 +570,7 @@ fts_mess_client_reposition_inlet(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_inlet_reposition(obj, pos);
+      fts_patcher_inlet_reposition(obj, pos);
     }
   else
     printf_mess("System Error in FOS message REPOSITION INLET: bad args", ac, av);
@@ -602,7 +602,7 @@ fts_mess_client_reposition_outlet(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      fts_outlet_reposition(obj, pos);
+      fts_patcher_outlet_reposition(obj, pos);
     }
   else
     printf_mess("System Error in FOS message REPOSITION OUTLET: bad args", ac, av);

@@ -190,7 +190,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     while (iArg--) list_store[iArg] = at[iArg];
 	
 
-    if (! fts_send_message_to_receives(sym_receive[idx], fts_s_list, n_args, list_store))
+    if (! ispw_send_message_to_receives(sym_receive[idx], fts_s_list, n_args, list_store))
       post("%s: no receive: %s\n", CLASS_name, fts_symbol_name(sym_receive[idx]));
   }
 

@@ -31,6 +31,8 @@
    tools provided by FTS.
 */
 
+#include <stdio.h>
+
 /* allocation routines */
 
 #define fts_malloc(size)        fts_do_malloc((size), __FILE__, __LINE__)
