@@ -402,7 +402,8 @@ public class FtsGraphicObject extends FtsObject {
 
   public final void setCurrentFont( String font, int size, int style)
   {
-    ((GraphicObject)getObjectListener()).setCurrentFont( font, size, style);
+    if(getObjectListener() != null)
+      ((GraphicObject)getObjectListener()).setCurrentFont( font, size, style);
   }
 
   public final void setCurrentFontName(String font)
@@ -592,7 +593,8 @@ public class FtsGraphicObject extends FtsObject {
   public final void setVariableName( String name)
   {
     this.varName = name;
-    ((GraphicObject)getObjectListener()).setCurrentName( name);
+    if(getObjectListener() != null)
+      ((GraphicObject)getObjectListener()).setCurrentName( name);
   }
 
   public final String getVariableName()
@@ -603,7 +605,8 @@ public class FtsGraphicObject extends FtsObject {
   public void setPersistent( int persist)
   {
     this.isPersistent = persist;
-    ((GraphicObject)getObjectListener()).redraw();
+    if(getObjectListener() != null)
+      ((GraphicObject)getObjectListener()).redraw();
   }
 
   public int isPersistent()

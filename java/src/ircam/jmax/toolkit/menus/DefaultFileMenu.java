@@ -49,44 +49,45 @@ public class DefaultFileMenu extends EditorMenu
   public DefaultFileMenu()
   {
     super("File");
-
-	setMnemonic(KeyEvent.VK_F);
+    
+    setMnemonic(KeyEvent.VK_F);
 
     setHorizontalTextPosition(AbstractButton.LEFT);
     setDefaultNumEntries(10);
-
+    
     add(DefaultActions.newAction); //, "New Patcher", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
     add(DefaultActions.openAction); //, "Open ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
-
+    
     addSeparator();
 
     add(DefaultActions.saveAction); //,   "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S);
     add(DefaultActions.saveAsAction); // , "Save As ...");
 
     add(DefaultActions.closeAction); //, "Close", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_W);
-
+    
     addSeparator();
 
     add(DefaultActions.printAction); //, "Print ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P);
 
     dspMenuItem = add(DefaultActions.dspAction); // , "Enable DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
     add(DefaultActions.quitAction); //, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
-
-    recentFileListener = new ListDataListener(){
-      public void contentsChanged(ListDataEvent e){
-        buildRecentFiles();
-      }
-      public void intervalAdded(ListDataEvent e){
-        buildRecentFiles();
-      }
-      public void intervalRemoved(ListDataEvent e){
-        buildRecentFiles();
-      }
-    };
-
-    JMaxApplication.getRecentFileHistory().addListDataListener( recentFileListener);
-
-    buildRecentFiles();
+    
+    if(JMaxApplication.getRecentFileHistory() != null)
+    {
+      recentFileListener = new ListDataListener(){
+        public void contentsChanged(ListDataEvent e){
+          buildRecentFiles();
+        }
+        public void intervalAdded(ListDataEvent e){
+          buildRecentFiles();
+        }
+        public void intervalRemoved(ListDataEvent e){
+          buildRecentFiles();
+        }
+      };
+      JMaxApplication.getRecentFileHistory().addListDataListener( recentFileListener);
+      buildRecentFiles();
+    }
   }
 
   public void reset()

@@ -1236,6 +1236,7 @@ track_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   track_t *this = (track_t *)o;
 
   track_set_editor_open( this);
+  
   fts_client_send_message( o, fts_s_openEditor, 0, 0);
   track_upload(o, 0, 0, 0, 0);
 }

@@ -42,6 +42,7 @@
 
 /* Define to equivalent of C99 restrict keyword, or to nothing if this is not supported.  Do not define if restrict is supported directly. */
 #define restrict 
+#define inline
 
 /* Define if you have the acosf function.  */
 /* #undef HAVE_ACOSF */
