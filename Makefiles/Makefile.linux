@@ -21,7 +21,7 @@
 # Based on Max/ISPW by Miller Puckette.
 #
 
-PLATFORM := linux-intel
+PLATFORM := linux
 
 CC := gcc
 LD := gcc
