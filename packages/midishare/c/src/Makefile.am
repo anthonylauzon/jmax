@@ -6,3 +6,5 @@ midishareport.c
 libmidishare_la_CFLAGS = @MIDISHARE_CFLAGS@
 libmidishare_la_LIBADD = -L$(top_builddir)/fts -lfts @MIDISHARE_LDFLAGS@
 
+INCLUDES=-I$(top_srcdir)/include
+
