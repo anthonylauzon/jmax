@@ -13,12 +13,12 @@ defineDevice stereoOut1 { SgiALOut ALdevice RAD1.AESOut channels 2 } "RAD 1.AES 
 defineDevice stereoOut2 { SgiALOut ALdevice RAD2.AESOut channels 2 } "RAD 2.AES Out"
 defineDevice stereoOut3 { SgiALOut ALdevice RAD3.AESOut channels 2 } "RAD 3.AES Out"
 
-defineDevice adatIn  { SgiALIn ALdevice ADATIn channels 8 }      "RAD 1.ADAT In"
+defineDevice adatIn  { SgiALIn ALdevice ADATIn channels 8 }      "ADAT In"
 defineDevice adatIn1 { SgiALIn ALdevice RAD1.ADATIn channels 8 } "RAD 1.ADAT In"
 defineDevice adatIn2 { SgiALIn ALdevice RAD2.ADATIn channels 8 } "RAD 2.ADAT In"
 defineDevice adatIn3 { SgiALIn ALdevice RAD3.ADATIn channels 8 } "RAD 3.ADAT In"
 
-defineDevice adatOut  { SgiALOut ALdevice ADATOut channels 8 }      "RAD 1.ADAT Out"
+defineDevice adatOut  { SgiALOut ALdevice ADATOut channels 8 }      "ADAT Out"
 defineDevice adatOut1 { SgiALOut ALdevice RAD1.ADATOut channels 8 } "RAD 1.ADAT Out"
 defineDevice adatOut2 { SgiALOut ALdevice RAD2.ADATOut channels 8 } "RAD 2.ADAT Out"
 defineDevice adatOut3 { SgiALOut ALdevice RAD3.ADATOut channels 8 } "RAD 3.ADAT Out"
