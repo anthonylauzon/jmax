@@ -7,10 +7,12 @@ import tcl.lang.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
+import ircam.jmax.fts.*;
 
 /**
  * This class represent the environement where a patch is loaded.
  * For the moment, it provide very trivial experimental functionalities.
+ * Actually this file should be somewhere else !!! not in mda package.
  */
 
 public class MaxEnv
@@ -58,7 +60,15 @@ public class MaxEnv
 
     try
       {
+	MaxVector command = new MaxVector();
+
+	command.addElement("set");
+	command.addElement("projectdir");
+	command.addElement(file.getParent());
+
+	Fts.getServer().ucsMessage(command);
 	MaxApplication.getTclInterp().eval("sourceFile " + file.getPath());
+
       }
     catch (tcl.lang.TclException e)
       {
