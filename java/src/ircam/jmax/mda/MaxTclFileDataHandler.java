@@ -10,26 +10,43 @@ import ircam.jmax.utils.*;
 /** An instance of this data handler can load MaxData from
  *  a tcl file obeyng the "jmax" command conventions
  * 
- * It can be instantiate with a filename extension, so that
- * that extension will be automatically reconized.
+ * A TCL Data file is a file that start with the jmax command
+ * at the *beginning* of the first line.
  */
 
 public class MaxTclFileDataHandler extends MaxFileDataHandler
 {
-  String extension;
-  
-  public MaxTclFileDataHandler(String extension)
+  public MaxTclFileDataHandler()
   {
     super();
-
-    this.extension = extension;
   }
 
-  /** We can load from a file, whose name end by extension */
+  /** We can load from a file start with the "jmax " string*/
 
   protected boolean canLoadFrom(File file)
   {
-    return file.getName().endsWith(extension);
+    try
+      {
+	FileReader fr = new FileReader(file);
+
+	char buf[] = new char[5];
+    
+	fr.read(buf);
+	fr.close();
+
+	if ((new String(buf)).equals("jmax "))
+	  return true;
+	else
+	  return false;
+      }
+    catch (FileNotFoundException e)
+      {
+	return false;
+      }
+    catch (IOException e)
+      {
+	return false;
+      }
   }
 
   /** Make the real instance */

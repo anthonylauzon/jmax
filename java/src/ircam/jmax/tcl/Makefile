@@ -19,54 +19,58 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all: 
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 
 
 MaxFtsConnectCmd:
-	javac $(JFLAGS) MaxFtsConnectCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFtsConnectCmd.java)
 .PHONY: MaxFtsConnectCmd
 
 MaxOpenCmd:
-	javac $(JFLAGS) MaxOpenCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxOpenCmd.java)
 .PHONY: MaxOpenCmd
 
 MaxQuitCmd:
-	javac $(JFLAGS) MaxQuitCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxQuitCmd.java)
 .PHONY: MaxQuitCmd
 
 MaxRunHooksCmd:
-	javac $(JFLAGS) MaxRunHooksCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxRunHooksCmd.java)
 .PHONY: MaxRunHooksCmd
 
 MaxSystemPropertyCmd:
-	javac $(JFLAGS) MaxSystemPropertyCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxSystemPropertyCmd.java)
 .PHONY: MaxSystemPropertyCmd
 
 MaxWhenCmd:
-	javac $(JFLAGS) MaxWhenCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWhenCmd.java)
 .PHONY: MaxWhenCmd
 
 MaxOpenConsoleCmd:	
-	javac $(JFLAGS) MaxOpenConsoleCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxOpenConsoleCmd.java)
 .PHONY: MaxOpenConsoleCmd
 
 MaxSourceCmd:
-	javac $(JFLAGS) MaxSourceCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxSourceCmd.java)
 .PHONY: MaxSourceCmd
 
 MaxSysSourceCmd:
-	javac $(JFLAGS) MaxSysSourceCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxSysSourceCmd.java)
 .PHONY: MaxSysSourceCmd
 
 MaxSplashCmd:
-	javac $(JFLAGS) MaxSplashCmd.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxSplashCmd.java)
 .PHONY: MaxSplashCmd
 
 TclMaxPackage:
-	javac $(JFLAGS) TclMaxPackage.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclMaxPackage.java)
 .PHONY: TclMaxPackage
 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+
+
+

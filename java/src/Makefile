@@ -15,11 +15,11 @@ all:
 .PHONY: all
 
 doc:  
-	javadoc -d $(ROOTDIR)/java/doc $(ALL_PACKAGES)
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH ; javadoc -d $(ROOTDIR)/java/doc $(ALL_PACKAGES))
 .PHONY: doc
 
 doc_private:  
-	javadoc -private -d $(ROOTDIR)/java/doc_private $(ALL_PACKAGES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javadoc -private -d $(ROOTDIR)/java/doc_private $(ALL_PACKAGES))
 .PHONY: doc_private
 
 jar:  

@@ -19,31 +19,31 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all: 
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 Console:
-	javac $(JFLAGS) Console.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Console.java)
 .PHONY: Console
 
 ConsoleKeyListener:
-	  ConsoleKeyListener.java
+	  (CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; ConsoleKeyListener.java)
 .PHONY: ConsoleKeyListener
 
 ConsoleWriter:
-	javac $(JFLAGS) ConsoleWriter.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleWriter.java)
 .PHONY: ConsoleWriter
 
 ConsoleWindow:
-	javac $(JFLAGS) ConsoleWindow.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleWindow.java)
 .PHONY: ConsoleWindow
 
 ConsoleThread:
-	javac $(JFLAGS) ConsoleThread.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleThread.java)
 .PHONY: ConsoleThread
 
 ConsoleDocument:
-	javac $(JFLAGS) ConsoleDocument.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConsoleDocument.java)
 .PHONY: ConsoleDocument
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

@@ -19,68 +19,68 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all: 
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 MaxData:
-	javac $(JFLAGS) MaxData.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxData.java)
 .PHONY: MaxData
 
 MaxDataException:
-	javac $(JFLAGS) MaxDataException.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataException.java)
 .PHONY: MaxDataException
 
 MaxDataHandler:
-	javac $(JFLAGS) MaxDataHandler.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataHandler.java)
 .PHONY: MaxDataHandler
 
 MaxDataSource:
-	javac $(JFLAGS) MaxDataSource.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataSource.java)
 .PHONY: MaxDataSource
 
 MaxDataType:
-	javac $(JFLAGS) MaxDataType.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataType.java)
 .PHONY: MaxDataType
 
 MaxFileDataHandler:
-	javac $(JFLAGS) MaxFileDataHandler.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileDataHandler.java)
 .PHONY: MaxFileDataHandler
 
 MaxFileDataSource:
-	javac $(JFLAGS) MaxFileDataSource.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileDataSource.java)
 .PHONY: MaxFileDataSource
 
 MaxFtsDataSource:
-	javac $(JFLAGS) MaxFtsDataSource.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFtsDataSource.java)
 .PHONY: MaxFtsDataSource
 
 MaxURLDataHandler:
-	javac $(JFLAGS) MaxURLDataHandler.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxURLDataHandler.java)
 .PHONY: MaxURLDataHandler
 
 MaxURLDataSource:
-	javac $(JFLAGS) MaxURLDataSource.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxURLDataSource.java)
 .PHONY: MaxURLDataSource
 
 MaxDataEditor:
-	javac $(JFLAGS) MaxDataEditor.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataEditor.java)
 .PHONY: MaxDataEditor
 
 MaxEditorFactory:
-	javac $(JFLAGS) MaxEditorFactory.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxEditorFactory.java)
 .PHONY: MaxEditorFactory
 
 MaxTclEditorFactory:
-	javac $(JFLAGS) MaxTclEditorFactory.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclEditorFactory.java)
 .PHONY:  MaxTclEditorFactory
 
 
 MaxTclData:
-	javac $(JFLAGS) MaxTclData.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclData.java)
 .PHONY:  MaxTclData
 
 MaxTclInterpreter:
-	javac $(JFLAGS) MaxTclInterpreter.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclInterpreter.java)
 .PHONY:  MaxTclInterpreter
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

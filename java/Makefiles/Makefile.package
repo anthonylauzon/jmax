@@ -28,10 +28,6 @@
 
 DEPFLAG =  -deprecation
 
-ifeq ($(strip $(ARCH)),)
-ARCH  = origin
-endif
-
 ifeq ($(strip $(MODE)),)
 MODE  = debug
 endif
@@ -42,7 +38,6 @@ endif
 
 ## includes
 
-include $(ROOTDIR)/java/Makefiles/Makefile.$(ARCH)
 include $(ROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
 ##
@@ -56,7 +51,7 @@ JAVA_CLASSES_ROOT =  $(ROOTDIR)/packages/$(MAX_PACKAGE_NAME)/java/classes
 
 JAVA_SRC_ROOT =  $(ROOTDIR)/packages/$(MAX_PACKAGE_NAME)/java/src
 
-JAVA_CLASSPATH = $(JAVA_MAX_CLASSES_ROOT):$(JAVA_MAX_LIBS_CLASSPATH):$(JAVA_SRC_ROOT):$(JAVA_LIBS_CLASSPATH):$(JAVA_CLASSES_ROOT):$(SYSTEM_CLASSPATH)
+JMAX_CLASSPATH = $(JAVA_MAX_CLASSES_ROOT):$(JAVA_MAX_LIBS_CLASSPATH):$(JAVA_SRC_ROOT):$(JAVA_LIBS_CLASSPATH):$(JAVA_CLASSES_ROOT)
 
 JFLAGS = -d $(JAVA_CLASSES_ROOT) -classpath  $(JAVA_CLASSPATH) $(JAVAC_FLAGS) $(DEPFLAG)
 

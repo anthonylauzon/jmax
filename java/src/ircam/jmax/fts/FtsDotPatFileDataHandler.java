@@ -16,9 +16,32 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
 {
   /** Check for .pat  files */
 
+  /** We can load from a file start with the "max v2" string*/
+
   protected boolean canLoadFrom(File file)
   {
-    return file.getName().endsWith(".pat");
+    try
+      {
+	FileReader fr = new FileReader(file);
+
+	char buf[] = new char[6];
+    
+	fr.read(buf);
+	fr.close();
+
+	if ((new String(buf)).equals("max v2"))
+	  return true;
+	else
+	  return false;
+      }
+    catch (FileNotFoundException e)
+      {
+	return false;
+      }
+    catch (IOException e)
+      {
+	return false;
+      }
   }
 
   /** Make the real instance */

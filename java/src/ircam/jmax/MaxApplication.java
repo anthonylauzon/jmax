@@ -829,7 +829,7 @@ public class MaxApplication extends Object {
 
     // the handler of .tpa files 
 
-    MaxDataHandler.installDataHandler(new MaxTclFileDataHandler(".tpa"));
+    MaxDataHandler.installDataHandler(new MaxTclFileDataHandler());
 
     // the handler of .pat files
 

@@ -18,37 +18,38 @@ PACKAGE_DIR = ircam/jmax
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all:  
-	javac $(JFLAGS) -depend MaxApplication.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) -depend MaxApplication.java)
 	(cd editors/ermes ; $(MAKE) dynamics )
 .PHONY: all
 
 
 MaxApplication:
-	javac $(JFLAGS) MaxApplication.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxApplication.java)
 .PHONY: MaxApplication
 
 MaxDocument:
-	javac $(JFLAGS) MaxDocument.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocument.java)
 .PHONY: MaxDocument
 
 MaxEditor:
-	javac $(JFLAGS) MaxEditor.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxEditor.java)
 .PHONY: MaxEditor
 
 MaxInterp:
-	javac $(JFLAGS) MaxInterp.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxInterp.java)
 .PHONY: MaxInterp
 
 MaxResourceId:
-	javac $(JFLAGS) MaxResourceId.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxResourceId.java)
 .PHONY: MaxResourceId
 
 MaxWindow:
-	javac $(JFLAGS) MaxWindow.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWindow.java)
 .PHONY: MaxWindow
 
 MaxWhenHookTable:
-	javac $(JFLAGS) MaxWhenHookTable.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWhenHookTable.java)
 .PHONY: MaxWhenHookTable
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+

@@ -19,33 +19,33 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all: 
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 
 
 ExtensionFilter:
-	javac $(JFLAGS) ExtensionFilter.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ExtensionFilter.java)
 .PHONY: ExtensionFilter
 
 TWOutputStream:
-	javac $(JFLAGS) TWOutputStream.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TWOutputStream.java)
 .PHONY: TWOutputStream
 
 TWPrintStream:
-	javac $(JFLAGS) TWPrintStream.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TWPrintStream.java)
 .PHONY: TWPrintStream
 
 TextWindow:
-	javac $(JFLAGS) TextWindow.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TextWindow.java)
 .PHONY: TextWindow
 
 Platform:
-	javac $(JFLAGS) Platform.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Platform.java)
 .PHONY: Platform
 
 IndentedPrintWriter:
-	javac $(JFLAGS) IndentedPrintWriter.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) IndentedPrintWriter.java)
 .PHONY: IndentedPrintWriter
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

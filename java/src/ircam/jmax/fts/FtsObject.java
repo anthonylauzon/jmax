@@ -98,6 +98,75 @@ abstract public class FtsObject
     return obj;
   }
 
+  /******************************************************************************/
+  /*                                                                            */
+  /*              The property system                                           */
+  /*                                                                            */
+  /******************************************************************************/
+
+
+
+  /* The class PropertyTable handle properties and handlers; it is installed
+     only by need, and is an inner class of FtsObject
+     */
+
+  abstract class PropertyTable
+  {
+    class Property
+    {
+      String name;
+      Object value;
+    }
+
+    class Watch
+    {
+      String name;
+      FtsPropertyHandler handler;
+    }
+
+    Property properties = null;
+    Watch watcher = null;
+
+    abstract public void   put(String name, Object value);
+    abstract public Object get(String name, Object value);
+    abstract public FtsPropertyHandler  watch(String property, FtsPropertyHandler handler);
+    abstract public FtsPropertyHandler  patcherWatch(String property, FtsPropertyHandler handler);
+    abstract public void   removeWatch(FtsPropertyHandler id);
+    abstract public Enumeration properties();
+  }
+   
+
+  /* PropertyTable  propertyTable = null; */
+
+  /**
+   * Store and access the properties, activating
+   * watchers here and in the container if needed.
+   * Also "catch" and locally process properties
+   * valid for all the objects.
+   *
+   * Values here have been already parsed from the Tcl
+   * command.
+   * 
+   */
+
+  /*
+  public void put(String name, Object value)
+  {
+    if (propertyTable == null)
+      propertyTable = new PropertyTable();
+
+    propertyTable.put(name, value);
+  }
+
+  public void get(String name)
+  {
+    if (propertyTable == null)
+      propertyTable = new PropertyTable();
+
+    return propertyTable.get(name);
+  }
+  */
+
 
   /******************************************************************************/
   /*                                                                            */

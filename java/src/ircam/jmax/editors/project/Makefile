@@ -19,27 +19,27 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all: 
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 Project:
-	javac $(JFLAGS) Project.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Project.java)
 .PHONY: Project
 
 ProjectBar:
-	javac $(JFLAGS) ProjectBar.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectBar.java)
 .PHONY: ProjectBar
 
 ProjectEntry:
-	javac $(JFLAGS) ProjectEntry.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectEntry.java)
 .PHONY: ProjectEntry
 
 ProjectNewDialog:
-	javac $(JFLAGS) ProjectNewDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectNewDialog.java)
 .PHONY: ProjectNewDialog
 
 ProjectWindow:
-	javac $(JFLAGS) ProjectWindow.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ProjectWindow.java)
 .PHONY: ProjectWindow
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

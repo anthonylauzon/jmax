@@ -19,181 +19,181 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all:
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 	(cd tcl; $(MAKE) all)
 .PHONY: all
 
 dynamics:
-	javac $(JFLAGS) $(DSOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(DSOURCES))
 .PHONY: all
 
 
 ErmesConnCircle:
-	javac $(JFLAGS) ErmesConnCircle.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnCircle.java)
 .PHONY: ErmesConnCircle
 
 ErmesConnSegment:
-	javac $(JFLAGS) ErmesConnSegment.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnSegment.java)
 .PHONY: ErmesConnSegment
 
 ErmesConnection:
-	javac $(JFLAGS) ErmesConnection.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnection.java)
 .PHONY: ErmesConnection
 
 ErmesConnectionSet:
-	javac $(JFLAGS) ErmesConnectionSet.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnectionSet.java)
 .PHONY: ErmesConnectionSet
 
 ErmesObjBang:
-	javac $(JFLAGS) ErmesObjBang.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjBang.java)
 .PHONY: ErmesObjBang
 
 ErmesObjComment:
-	javac $(JFLAGS) ErmesObjComment.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjComment.java)
 .PHONY: ErmesObjComment
 
 ErmesObjEditField:
-	javac $(JFLAGS) ErmesObjEditField.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjEditField.java)
 .PHONY: ErmesObjEditField
 
 ErmesObjEditableObject:
-	javac $(JFLAGS) ErmesObjEditableObject.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjEditableObject.java)
 .PHONY: ErmesObjEditableObject
 
 ErmesObjExternal:
-	javac $(JFLAGS) ErmesObjExternal.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjExternal.java)
 .PHONY: ErmesObjExternal
 
 ErmesObjFloat:
-	javac $(JFLAGS) ErmesObjFloat.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjFloat.java)
 .PHONY: ErmesObjFloat
 
 ErmesObjFloatDialog:
-	javac $(JFLAGS) ErmesObjFloatDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjFloatDialog.java)
 .PHONY: ErmesObjFloatDialog
 
 ErmesObjIn:
-	javac $(JFLAGS) ErmesObjIn.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjIn.java)
 .PHONY: ErmesObjIn
 
 ErmesObjInOutChoice:
-	javac $(JFLAGS) ErmesObjInOutChoice.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInOutChoice.java)
 .PHONY: ErmesObjInOutChoice
 
 ErmesObjInOutlet:
-	javac $(JFLAGS) ErmesObjInOutlet.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInOutlet.java)
 .PHONY: ErmesObjInOutlet
 
 ErmesObjInlet:
-	javac $(JFLAGS) ErmesObjInlet.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInlet.java)
 .PHONY: ErmesObjInlet
 
 ErmesObjInletOutlet:
-	javac $(JFLAGS) ErmesObjInletOutlet.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInletOutlet.java)
 .PHONY: ErmesObjInletOutlet
 
 ErmesObjInt:
-	javac $(JFLAGS) ErmesObjInt.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInt.java)
 .PHONY: ErmesObjInt
 
 ErmesObjMessThread:
-	javac $(JFLAGS) ErmesObjMessThread.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjMessThread.java)
 .PHONY: ErmesObjMessThread
 
 ErmesObjMessage:
-	javac $(JFLAGS) ErmesObjMessage.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjMessage.java)
 .PHONY: ErmesObjMessage
 
 ErmesObjOut:
-	javac $(JFLAGS) ErmesObjOut.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjOut.java)
 .PHONY: ErmesObjOut
 
 ErmesObjOutInlet:
-	javac $(JFLAGS) ErmesObjOutInlet.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjOutInlet.java)
 .PHONY: ErmesObjOutInlet
 
 ErmesObjOutlet:
-	javac $(JFLAGS) ErmesObjOutlet.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjOutlet.java)
 .PHONY: ErmesObjOutlet
 
 ErmesObjPatcher:
-	javac $(JFLAGS) ErmesObjPatcher.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjPatcher.java)
 .PHONY: ErmesObjPatcher
 
 ErmesObjSlider:
-	javac $(JFLAGS) ErmesObjSlider.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjSlider.java)
 .PHONY: ErmesObjSlider
 
 ErmesObjSliderDialog:
-	javac $(JFLAGS) ErmesObjSliderDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjSliderDialog.java)
 .PHONY: ErmesObjSliderDialog
 
 ErmesObjTextArea:
-	javac $(JFLAGS) ErmesObjTextArea.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjTextArea.java)
 .PHONY: ErmesObjTextArea
 
 ErmesObjThrottle:
-	javac $(JFLAGS) ErmesObjThrottle.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjThrottle.java)
 .PHONY: ErmesObjThrottle
 
 ErmesObjToggle:
-	javac $(JFLAGS) ErmesObjToggle.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjToggle.java)
 .PHONY: ErmesObjToggle
 
 ErmesObject:
-	javac $(JFLAGS) ErmesObject.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObject.java)
 .PHONY: ErmesObject
 
 ErmesPatcherDoc:
-	javac $(JFLAGS) ErmesPatcherDoc.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherDoc.java)
 .PHONY: ErmesPatcherDoc
 
 ErmesRegion:
-	javac $(JFLAGS) ErmesRegion.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesRegion.java)
 .PHONY: ErmesRegion
 
 ErmesScrollerView:
-	javac $(JFLAGS) ErmesScrollerView.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesScrollerView.java)
 .PHONY: ErmesScrollerView
 
 ErmesSketchHelper:
-	javac $(JFLAGS) ErmesSketchHelper.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSketchHelper.java)
 .PHONY: ErmesSketchHelper
 
 ErmesSketchPad:
-	javac $(JFLAGS) ErmesSketchPad.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSketchPad.java)
 .PHONY: ErmesSketchPad
 
 ErmesSketchWindow:
-	javac $(JFLAGS) ErmesSketchWindow.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSketchWindow.java)
 .PHONY: ErmesSketchWindow
 
 ErmesToggleButton:
-	javac $(JFLAGS) ErmesToggleButton.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesToggleButton.java)
 .PHONY: ErmesToggleButton
 
 ErmesToolBar:
-	javac $(JFLAGS) ErmesToolBar.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesToolBar.java)
 .PHONY: ErmesToolBar
 
 ErmesSwToolbar:
-	javac $(JFLAGS) ErmesSwToolbar.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSwToolbar.java)
 .PHONY: ErmesSwToolbar
 
 ErmesSwVarEdit:
-	javac $(JFLAGS) ErmesSwVarEdit.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSwVarEdit.java)
 .PHONY: ErmesSwVarEdit
 
 ErmesToolBarLayout:
-	javac $(JFLAGS) ErmesToolBarLayout.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesToolBarLayout.java)
 .PHONY: ErmesToolBarLayout
 
 ErmesSwToggleButton:
-	javac $(JFLAGS) ErmesSwToggleButton.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSwToggleButton.java)
 .PHONY: ErmesSwToggleButton
 
 ErmesKeyAdapter:
-	javac $(JFLAGS) ErmesKeyAdapter.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesKeyAdapter.java)
 .PHONY: ErmesKeyAdapter
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

@@ -19,35 +19,35 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 include Sources
 
 all: 
-	javac $(JFLAGS) $(SOURCES)
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
 ConnectionDialog:
-	javac $(JFLAGS) ConnectionDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ConnectionDialog.java)
 .PHONY: ConnectionDialog.java
 
 ErrorDialog:
-	javac $(JFLAGS) ErrorDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErrorDialog.java)
 .PHONY: ErrorDialog.java
 
 FileNotSavedDialog:
-	javac $(JFLAGS) FileNotSavedDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FileNotSavedDialog.java)
 .PHONY: FileNotSavedDialog.java
 
 SplashDialog:
-	javac $(JFLAGS) SplashDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) SplashDialog.java)
 .PHONY: SplashDialog.java
 
 SplashDialogThread:
-	javac $(JFLAGS) SplashDialogThread.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) SplashDialogThread.java)
 .PHONY: SplashDialogThread.java
 
 StatisticsDialog:
-	javac $(JFLAGS) StatisticsDialog.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) StatisticsDialog.java)
 .PHONY: StatisticsDialog.java
 
 MaxFileChooser:
-	javac $(JFLAGS) MaxFileChooser.java
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileChooser.java)
 .PHONY: MaxFileChooser.java
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
