@@ -284,8 +284,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       Object aObject;
       int x=0;
       int y=0;
-      int width=400;
-      int height=400;
+      int width=500;
+      int height=480;
       Integer x1, y1, width1, height1;
       String autorouting;
       //double check the existence of the window properties. If there aren't, use defaults
@@ -307,7 +307,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       if (autorouting == null) patcher.put("autorouting", "on");
       //get the window dimension use it for: reshape to the right dimensions
 
-      setBounds(x, y, width, height/*+80*/);
+      setBounds(x, y, width, height);
 
       //assigning the autorouting mode.
 

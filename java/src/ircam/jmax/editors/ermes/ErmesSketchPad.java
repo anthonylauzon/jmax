@@ -817,7 +817,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     FtsContainerObject aFtsPatcher = theContainerObject;
     // chiama tanti AddObject...
     Vector objectVector = aFtsPatcher.getObjects();	//usefull?
-    
+
     FtsObject	fo;
     FtsConnection fc;
     ErmesObject aObject;

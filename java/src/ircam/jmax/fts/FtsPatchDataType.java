@@ -32,7 +32,7 @@ public class FtsPatchDataType extends MaxDataType
     patcher.put("win.pos.x", 100);
     patcher.put("win.pos.y", 100);
     patcher.put("win.size.w", 500);
-    patcher.put("win.size.h", 400);
+    patcher.put("win.size.h", 480);
 
     FtsPatchData obj = new FtsPatchData();
 

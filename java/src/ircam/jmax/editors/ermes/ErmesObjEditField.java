@@ -112,6 +112,7 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       if(itsOwner.itsOutletList.size()>0)
 	itsOwner.MoveOutlets();
     }
+    itsOwner.Repaint();
     itsOwner.update(itsOwner.itsFtsObject);
     
     AbortEdit();
