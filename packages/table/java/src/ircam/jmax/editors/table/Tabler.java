@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.awt.AWTEvent.*;
 import java.io.*;
 //import tcl.lang.*;
+//import com.sun.java.swing.*;
 
 /** 
  A simple table editor
@@ -23,7 +24,8 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   Panel itsFrontHeader;
   MenuItem itsRefreshMenuItem;
   Dimension preferredSize = new Dimension(512,412);
-  
+  ScrollPane itsScrollPane;
+
   public FtsIntegerVectorData itsData;
   static int untitledCounter = 1;
   
@@ -36,15 +38,21 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     }
     itsData = (FtsIntegerVectorData) theData;
     getContentPane().setLayout(new BorderLayout());
-    
+    getContentPane().setBackground(Color.white);
+
     itsFormula = new TextField("", 40);
     itsFormula.resize(300, 20);
     getContentPane().add("South", itsFormula);
     
     itsTablePanel = new TablePanel(this);
     itsTablePanel.resize(itsTablePanel.getPreferredSize().width,itsTablePanel.getPreferredSize().height);
-    getContentPane().add("Center", itsTablePanel);
+    // getContentPane().add("Center", itsTablePanel);
     
+    itsScrollPane = new ScrollPane();
+    itsScrollPane.add(itsTablePanel);
+    itsScrollPane.setScrollPosition(0,itsTablePanel.getPreferredSize().height);
+    getContentPane().add("Center", itsScrollPane);
+
     itsFrontHeader = new Panel();
     itsFrontHeader.setLayout(new BorderLayout());
     itsFrontHeader.setBackground(Color.lightGray);
@@ -73,7 +81,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     aPanel.add(aLabel3);
     aPanel.add(itsCoordY);
     aPanel.validate();
-
+    
     itsFrontHeader.add("West", aPanel);
 
     itsFrontHeader.resize(512, 20);
@@ -81,7 +89,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     getContentPane().add("North", itsFrontHeader);
     
     Init();
-
+    
     itsTablePanel.fillTable((FtsIntegerVector) theData.getContent());
     itsTablePanel.repaint();
     preferredSize.width = itsTablePanel.getPreferredSize().width;//????????
@@ -155,7 +163,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
   public Dimension preferredSize() {
-    return preferredSize; /*new Dimension(512,412);*/
+    return /*preferredSize;*/new Dimension(512,412);
   }
 
   public Dimension minimumSize() {

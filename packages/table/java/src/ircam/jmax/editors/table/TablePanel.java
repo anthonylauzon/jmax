@@ -20,12 +20,27 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   int values[];
   Tabler itsTabler;
   
+  Graphics offGraphics = null;
+  Dimension offDimension;	   
+  Image offImage;	
+
   public TablePanel(Tabler theTabler) {
     super();
     itsTabler = theTabler;
+    setBackground(Color.white);
     values = new int[N_POINTS];
+    //InitOffScreen();
     addMouseMotionListener(this);
     addMouseListener(this);
+  }
+
+  void InitOffScreen(){
+    Dimension d = preferredSize();	    
+    if((offGraphics == null)){					  
+      offDimension = d;
+      offImage = createImage(d.width, d.height);
+      offGraphics = offImage.getGraphics();
+    }
   }
 
   public void initValues(int[] vector) {
@@ -39,11 +54,28 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     if (i > 0 && i<values.length) return values[i];
     else return 0;
   }
-  
+
+  public void update(Graphics g) {
+  }
+
   public void paint(Graphics g) {
-    for(int i = 0; i<N_POINTS;i++){
+    //System.err.println("fava");
+    /*for(int i = 0; i<N_POINTS;i++){
       PaintSingle(i, g);
-    }
+    }*/
+    InitOffScreen();
+    CopyTheOffScreen(g);
+  }
+  
+  void DoublePaint(int x) {
+    PaintSingle(x, getGraphics());
+    InitOffScreen();
+    PaintSingle(x, offGraphics);
+  }
+
+  public void CopyTheOffScreen(Graphics g) {
+    InitOffScreen();
+    g.drawImage(offImage, 0, 0, this);	
   }
 
   public void fillTable(FtsIntegerVector aIntV) {
@@ -67,7 +99,8 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     values[x] = y;
     Interpolate(old_dragx, old_dragy, x, y);
     old_dragx = x; old_dragy = y;
-    PaintSingle(x, getGraphics());
+    //PaintSingle(x, getGraphics());
+    DoublePaint(x);
     itsTabler.setCoordinates(x, y);
   }
   //////////////////////////////////////////////////////////////////
@@ -82,11 +115,13 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     float factor = (y2-y1)/(x2-x1);
     if (x2>x1) for (int i=x1+1; i<x2; i++) {
       values[i] = (int) (values[i-1]+factor);
-      PaintSingle(i, getGraphics());
+      //PaintSingle(i, getGraphics());
+      DoublePaint(i);
     }
     else for (int i=x1-1; i>x2; i--) {
       values[i] = (int) (values[i+1]+factor);
-      PaintSingle(i, getGraphics());
+      //PaintSingle(i, getGraphics());
+      DoublePaint(i);
     }
   }
   
@@ -102,7 +137,8 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
     old_dragx = x;
     old_dragy = y;
     values[x] = y;
-    PaintSingle(x, getGraphics());
+    //PaintSingle(x, getGraphics());
+    DoublePaint(x);
   }
 
   public void mouseReleased(MouseEvent e){
@@ -188,7 +224,8 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
 	return;
       }
       ((FtsIntegerVector)(itsTabler.itsData.getContent())).changed();
-      PaintSingle(i, getGraphics());
+      //PaintSingle(i, getGraphics());
+      DoublePaint(i);
     }
   }
 
