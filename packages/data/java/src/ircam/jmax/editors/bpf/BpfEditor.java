@@ -110,6 +110,9 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	addMouseMotionListener(new MouseMotionListener(){
 		public void mouseMoved(MouseEvent e)
 		{
+		    /* workaround: right-mouse events used when popup is visible */
+		    if(getMenu().isVisible()) return;
+
 		    if(gc.getToolManager().getCurrentTool().getName().equals("edit tool"))
 			{
 			    float time = gc.getAdapter().getInvX(e.getX());
@@ -120,6 +123,9 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 		}
 		public void mouseDragged(MouseEvent e)
 		{
+		    /* workaround: right-mouse events used when popup is visible */
+		    if(getMenu().isVisible()) return;
+
 		    String toolName = gc.getToolManager().getCurrentTool().getName();
 		    if(toolName.equals("edit tool"))
 			{
