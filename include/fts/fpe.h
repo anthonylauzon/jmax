@@ -38,4 +38,8 @@ FTS_API void fts_disable_fpe_traps( void);
 
 FTS_API unsigned int fts_check_fpe( void);
 
+FTS_API void fts_fpe_start_collect(fts_objectset_t *set);
+FTS_API void fts_fpe_stop_collect(void);
+FTS_API void fts_fpe_empty_collection(void);
+
 #endif
