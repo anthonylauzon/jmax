@@ -10,7 +10,6 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjInt extends ErmesObject {
   
-  static ErmesObjIntegerDialog itsIntegerDialog = null;
   ErmesObjInlet itsInlet;
   ErmesObjOutlet itsOutlet;
   int itsInteger = 0;
@@ -44,15 +43,12 @@ class ErmesObjInt extends ErmesObject {
     DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*5+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("..");
     preferredSize.height = DEFAULT_HEIGHT+4;
     preferredSize.width = DEFAULT_WIDTH/*+DEFAULT_HEIGHT/2*/+20;
-    if(itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(theSketchPad.GetSketchWindow(), this);
     super.Init(theSketchPad, x, y, theString);
     return true;
   }
 
    public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
      super.Init(theSketchPad,  theFtsObject);
-     if(itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(theSketchPad.GetSketchWindow(), this);
-
      //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
@@ -165,9 +161,9 @@ class ErmesObjInt extends ErmesObject {
     
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-      itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, GetSketchWindow());
-      itsIntegerDialog.setVisible(true);
+      itsSketchPad.GetIntegerDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsSketchPad.GetIntegerDialog().ReInit(String.valueOf(itsInteger), this);
+      itsSketchPad.GetIntegerDialog().setVisible(true);
       return true;
     }
     if (itsSketchPad.itsRunMode) {

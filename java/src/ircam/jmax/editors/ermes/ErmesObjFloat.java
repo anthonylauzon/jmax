@@ -10,7 +10,6 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjFloat extends ErmesObject {
 	
-  static ErmesObjFloatDialog itsFloatDialog = null;
   float itsFloat =  (float) 0.;
   final int WIDTH_DIFF = 14;
   final int HEIGHT_DIFF = 2;
@@ -38,14 +37,12 @@ class ErmesObjFloat extends ErmesObject {
     DEFAULT_WIDTH = theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("0")*6+theSketchPad.getFontMetrics(theSketchPad.sketchFont).stringWidth("...");
     preferredSize.height = DEFAULT_HEIGHT+4;
     preferredSize.width = DEFAULT_WIDTH/*+DEFAULT_HEIGHT/2*/+20;
-    if(itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(theSketchPad.GetSketchWindow(), this);
     super.Init(theSketchPad, x, y, theString);
     return true;
   }
   
   public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
     super.Init(theSketchPad, theFtsObject);
-    if(itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(theSketchPad.GetSketchWindow(), this);
     //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
     DEFAULT_HEIGHT = itsFontMetrics.getHeight();
@@ -146,9 +143,9 @@ class ErmesObjFloat extends ErmesObject {
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-      itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsFloatDialog.ReInit(String.valueOf(itsFloat), this, GetSketchWindow());
-      itsFloatDialog.setVisible(true);
+      itsSketchPad.GetFloatDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsSketchPad.GetFloatDialog().ReInit(String.valueOf(itsFloat), this);
+      itsSketchPad.GetFloatDialog().setVisible(true);
       return true;
     }
     if (itsSketchPad.itsRunMode) {

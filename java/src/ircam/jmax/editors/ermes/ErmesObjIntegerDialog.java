@@ -12,14 +12,13 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
   Button okButton;
   Button cancelButton;
   TextField value;
-  ErmesObjInt itsIntObject;
+  ErmesObjInt itsIntObject = null;
   String itsValue = "";
   
   
-  public ErmesObjIntegerDialog(Frame theFrame, ErmesObjInt theIntObject) {
+  public ErmesObjIntegerDialog(Frame theFrame) {
     super(theFrame, "Integer setting", true);
     
-    itsIntObject = theIntObject;
     itsParent = theFrame;
     setLayout(new BorderLayout());
     
@@ -81,11 +80,10 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theValue, ErmesObjInt theInt, Frame theFrame){
+  public void ReInit(String theValue, ErmesObjInt theInt){
     itsValue = theValue;
     value.setText(theValue);
     itsIntObject = theInt;
-    itsParent = theFrame;
   }
  
   /////////////////////////////////////////////////////////////////////////////
@@ -112,6 +110,9 @@ class ErmesObjIntegerDialog extends Dialog implements KeyListener, ActionListene
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
 }
+
+
+
 
 
 

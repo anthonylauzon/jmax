@@ -10,46 +10,40 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
   Button okButton;
   Button cancelButton;
   TextField itsMaxValueField, itsMinValueField, itsCurrentValueField;
-  ErmesObjSlider itsSliderObject;
+  ErmesObjSlider itsSliderObject = null;
   String itsMaxValue = "";
   String itsMinValue = "";
   String itsCurrentValue = "";
   
-  public ErmesObjSliderDialog(Frame theFrame, ErmesObjSlider theSliderObject) {
+  public ErmesObjSliderDialog(Frame theFrame) {
     super(theFrame, "Slider setting", true);
     
-    itsSliderObject = theSliderObject;
     itsParent = theFrame;
     setLayout(new BorderLayout());
     
     //Create north section.
     Panel p1 = new Panel();
-    p1.setLayout(new GridLayout(3,1));
-
+    p1.setLayout(new GridLayout(1,2));
+    
     Panel p11 = new Panel();
-    p11.setLayout(new FlowLayout(FlowLayout.LEFT));
-    p11.add(new Label("Slider Current Value    "));
+    p11.setLayout(new GridLayout(3,1));
+    p11.add(new Label("Slider Current Value"));
+    p11.add(new Label("Slider Maximum Value"));
+    p11.add(new Label("Slider Minimum Value"));
+    p1.add(p11);
+    
+    Panel p12 = new Panel();
+    p12.setLayout(new GridLayout(3,1));
     itsCurrentValueField = new TextField("", 20);
     itsCurrentValueField.addActionListener(this);
-    p11.add(itsCurrentValueField);
-    p1.add(p11);
-
-
-    Panel p12 = new Panel();
-    p12.setLayout(new FlowLayout(FlowLayout.LEFT));
-    p12.add(new Label("Slider Maximum Value"));
+    p12.add(itsCurrentValueField);
     itsMaxValueField = new TextField("", 20);
     itsMaxValueField.addActionListener(this);
     p12.add(itsMaxValueField);
-    p1.add(p12);
-    
-    Panel p13 = new Panel();
-    p13.setLayout(new FlowLayout(FlowLayout.LEFT));
-    p13.add(new Label("Slider Minimum Value"));
     itsMinValueField = new TextField("", 20);
     itsMinValueField.addActionListener(this);
-    p13.add(itsMinValueField);    
-    p1.add(p13);
+    p12.add(itsMinValueField);    
+    p1.add(p12);
 
     add("North", p1);
 
@@ -77,17 +71,23 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
   ///////////////////////////////////////////////////////////////// actionListener --inizio
 
   public void actionPerformed(ActionEvent e){        
-    Integer aInt = null;
+    Integer aMaxInt = null;
+    Integer aCurrentInt = null;
+    Integer aMinInt = null;
     if (e.getSource() == okButton) {
       itsMaxValue = itsMaxValueField.getText();
+      itsCurrentValue = itsCurrentValueField.getText();
+      itsMinValue = itsMinValueField.getText();
       try{
-	aInt = new Integer(itsMaxValue);
+	aMaxInt = new Integer(itsMaxValue);
+	aCurrentInt = new Integer(itsCurrentValue);
+	aMinInt = new Integer(itsMinValue);
       }
       catch (NumberFormatException e1){
 	setVisible(false);
 	return;
       }
-      itsSliderObject.FromDialogValueChanged(aInt);
+      itsSliderObject.FromDialogValueChanged(aCurrentInt, aMaxInt, aMinInt);
       setVisible(false);
     }
     else if (e.getSource()==cancelButton) {
@@ -96,11 +96,17 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     else if (e.getSource()==itsMaxValueField) {
       itsMaxValue = itsMaxValueField.getText();
     }
+    else if (e.getSource()==itsCurrentValueField) {
+      itsCurrentValue = itsCurrentValueField.getText();
+    }
+    else if (e.getSource()==itsMinValueField) {
+      itsMinValue = itsMinValueField.getText();
+    }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theMaxValue, String theMinValue, String theCurrentValue,ErmesObjSlider theSlider, Frame theFrame){
+  public void ReInit(String theMaxValue, String theMinValue, String theCurrentValue,ErmesObjSlider theSlider){
     itsMaxValue = theMaxValue;
     itsMinValue = theMinValue;
     itsCurrentValue = theCurrentValue;
@@ -108,7 +114,6 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
     itsMinValueField.setText(theMinValue);
     itsCurrentValueField.setText(theCurrentValue);
     itsSliderObject = theSlider;
-    itsParent = theFrame;
   }
     
 
@@ -119,23 +124,32 @@ class ErmesObjSliderDialog extends Dialog implements KeyListener, ActionListener
   public void keyReleased(KeyEvent e){}
 
   public void keyPressed(KeyEvent e){
-    Integer aInteger = null;
+    Integer aMaxInt = null;
+    Integer aCurrentInt = null;
+    Integer aMinInt = null;
     if (e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY){	
       itsMaxValue = itsMaxValueField.getText();
+      itsCurrentValue = itsCurrentValueField.getText();
+      itsMinValue = itsMinValueField.getText();
       try{
-	aInteger = new Integer(itsMaxValue);
+	aMaxInt = new Integer(itsMaxValue);
+	aCurrentInt = new Integer(itsCurrentValue);
+	aMinInt = new Integer(itsMinValue);
       }
       catch (NumberFormatException e1){
 	setVisible(false);
 	return;
       }
-      itsSliderObject.FromDialogValueChanged(aInteger);
+      itsSliderObject.FromDialogValueChanged(aCurrentInt, aMaxInt, aMinInt);
       setVisible(false);
     }
   }
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
 }
+
+
+
 
 
 

@@ -12,14 +12,13 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener{
   Button okButton;
   Button cancelButton;
   TextField value;
-  ErmesObjFloat itsFloatObject;
+  ErmesObjFloat itsFloatObject = null;
   String itsValue = "";
   
   
-  public ErmesObjFloatDialog(Frame theFrame, ErmesObjFloat theFloatObject) {
+  public ErmesObjFloatDialog(Frame theFrame) {
     super(theFrame, "Float setting", true);
     
-    itsFloatObject = theFloatObject;
     itsParent = theFrame;
     setLayout(new BorderLayout());
     
@@ -81,11 +80,10 @@ class ErmesObjFloatDialog extends Dialog implements KeyListener, ActionListener{
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// actionListener --fine
     
-  public void ReInit(String theValue, ErmesObjFloat theFloat, Frame theFrame){
+  public void ReInit(String theValue, ErmesObjFloat theFloat){
     itsValue = theValue;
     value.setText(theValue);
     itsFloatObject = theFloat;
-    itsParent = theFrame;
   }
  
   /////////////////////////////////////////////////////////////////////////////

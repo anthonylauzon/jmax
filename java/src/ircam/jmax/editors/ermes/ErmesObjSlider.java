@@ -12,7 +12,6 @@ import ircam.jmax.fts.*;
  */
 class ErmesObjSlider extends ErmesObject {
 	
-  static ErmesObjSliderDialog itsSliderDialog = null;
   ErmesObjThrottle itsThrottle;
   int itsInteger = 0;
   final static int BOTTOM_OFFSET = 10;
@@ -21,13 +20,14 @@ class ErmesObjSlider extends ErmesObject {
   final static int PREFERRED_RANGE_MIN = 0;
   int itsRangeMax = PREFERRED_RANGE_MAX;
   int itsRangeMin = PREFERRED_RANGE_MIN;
+  int itsRange = itsRangeMax-itsRangeMin;
   int itsPixelRange = itsRangeMax-itsRangeMin;
   static Dimension preferredSize = new Dimension(20,BOTTOM_OFFSET+PREFERRED_RANGE_MAX+UP_OFFSET);
   boolean itsMovingThrottle = false;
   int itsDelta = 0;
-  float itsStep =  itsRangeMax/itsPixelRange;
+  float itsStep =  itsRange/itsPixelRange;
 
-  static final int TRUST=100;		//how many transmitted values we trust?
+  static final int TRUST=50;		//how many transmitted values we trust?
   int transmission_buffer[];
   int transmission_index = 0;
   int receiving_index = 0;
@@ -41,10 +41,8 @@ class ErmesObjSlider extends ErmesObject {
   
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-    Dimension d = getPreferredSize();
-    currentRect = new Rectangle(x, y, d.width, d.height);
+    //currentRect = new Rectangle(x, y, getPreferredSize().width, getPreferredSize().height);
     itsThrottle = new ErmesObjThrottle(this);
-    if(itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(theSketchPad.GetSketchWindow(), this);
     return true;
   }
 
@@ -52,16 +50,14 @@ class ErmesObjSlider extends ErmesObject {
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     super.Init(theSketchPad,  theFtsObject);
     itsThrottle = new ErmesObjThrottle(this);
-    if(itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(theSketchPad.GetSketchWindow(), this);
     return true;
   }
 
   public void Resize(int theDeltaH, int theDeltaV){
     super.Resize(theDeltaH, theDeltaV);
-    // Change itsStep
-    itsPixelRange += theDeltaV;
-
-    itsStep = (float)itsRangeMax/itsPixelRange;
+    itsPixelRange = currentRect.height-(UP_OFFSET+BOTTOM_OFFSET);
+    
+    itsStep = (float)itsRange/itsPixelRange;
     itsThrottle.Resize(itsThrottle.getPreferredSize().width+theDeltaH, itsThrottle.getPreferredSize().height);
     itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -itsInteger/itsStep));
   }
@@ -85,10 +81,16 @@ class ErmesObjSlider extends ErmesObject {
     // sliders do not redefine themselves
   }
 
-  public void FromDialogValueChanged(Integer theInt){
-    itsRangeMax = theInt.intValue();
-    Resize(0,0);
-    DoublePaint();
+  public void FromDialogValueChanged(Integer theCurrentInt, Integer theMaxInt, Integer theMinInt){
+    itsRangeMax = theMaxInt.intValue();
+    itsRangeMin = theMinInt.intValue();
+    itsRange = itsRangeMax-itsRangeMin;
+    itsStep = (float)itsRange/itsPixelRange;
+
+    int temp = theCurrentInt.intValue();        
+    int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax-1:temp);
+    itsInteger = clippedValue;
+    itsFtsObject.put("value", new Integer(itsInteger));
   }
 
   
@@ -97,12 +99,12 @@ class ErmesObjSlider extends ErmesObject {
   //***************************
 
   protected void FtsValueChanged(Object value) {
-    int temp = ((Integer) value).intValue();        
-    int clippedValue = (temp<0)?0:((temp>=itsRangeMax)?itsRangeMax:temp);
-
+    int temp = ((Integer) value).intValue();
+    int clippedValue = (temp<itsRangeMin)?itsRangeMin:((temp>=itsRangeMax)?itsRangeMax:temp);
+    clippedValue-=itsRangeMin;
     last_value = temp;
     if ((itsThrottle != null) && (!itsMovingThrottle)) {
-      itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height - BOTTOM_OFFSET -clippedValue/itsStep));
+      itsThrottle.Move(itsThrottle.itsX, (int)(itsY+currentRect.height-BOTTOM_OFFSET-clippedValue/itsStep));
       DoublePaint();
     }
   }
@@ -112,16 +114,15 @@ class ErmesObjSlider extends ErmesObject {
   public boolean MouseDown_specific(MouseEvent evt, int x, int y){
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-      itsSliderDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
-      itsSliderDialog.ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin),
-			     String.valueOf(itsInteger), this, GetSketchWindow());
-      itsSliderDialog.setVisible(true);
+      itsSketchPad.GetSliderDialog().setLocation(aPoint.x + itsX,aPoint.y + itsY - 25);
+      itsSketchPad.GetSliderDialog().ReInit(String.valueOf(itsRangeMax), String.valueOf(itsRangeMin),
+			     String.valueOf(itsInteger), this);
+      itsSketchPad.GetSliderDialog().setVisible(true);
       return true;
     }
     if(itsSketchPad.itsRunMode){
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
-	//itsDelta = y-itsThrottle.itsY;// for now
 	return true;
       }
     }
@@ -131,11 +132,17 @@ class ErmesObjSlider extends ErmesObject {
   
   public boolean MouseDrag(MouseEvent evt,int x, int y){
     if((itsSketchPad.itsRunMode)&&(itsMovingThrottle == true)){
-      if (itsY+currentRect.height-y> BOTTOM_OFFSET && itsY+UP_OFFSET<y) {
+      if(itsY+currentRect.height-BOTTOM_OFFSET>=y && itsY+UP_OFFSET<y) {
 	//compute the value and send to FTS
 	itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
-	itsFtsObject.put("value", new Integer(itsInteger));
+	itsFtsObject.put("value", new Integer(itsInteger+itsRangeMin));
 	itsThrottle.Move(itsThrottle.itsX, y);
+	DoublePaint();
+      }
+      else if(itsY+currentRect.height-BOTTOM_OFFSET<y){//theValue is the minimum
+	itsFtsObject.put("value", new Integer(itsRangeMin));
+	itsInteger = 0;
+	itsThrottle.Move(itsThrottle.itsX, itsY+currentRect.height-BOTTOM_OFFSET);
 	DoublePaint();
       }
       return true;
@@ -154,7 +161,6 @@ class ErmesObjSlider extends ErmesObject {
       //e.m.System.out.println("-->\t\tmore then "+TRUST+"values without ack");
     }
     else {
-      //e.m.System.out.println("+ "+theInt);
       transmission_buffer[transmission_index] = theInt;
       transmission_index = (transmission_index+1) % TRUST;
     }
@@ -177,11 +183,7 @@ class ErmesObjSlider extends ErmesObject {
   
   void MoveThrottleTo(int value) {//value between 0 and itsRange, to be scaled to 0ÖcurrentRect.height
     itsThrottle.Move(itsThrottle.itsX, itsThrottle.DragToAbsolute((int)(value*itsStep)));
-    /*if(value>itsRange) value = itsRange;
-      else if(value<0) value = 0;
-      itsThrottle.Move(itsThrottle.itsX, itsY + UP_OFFSET + itsPixelRange - (value * itsStep));*/
     if (itsSketchPad.getGraphics() != null)
-      // Paint_specific(itsSketchPad.getGraphics());
       DoublePaint();//?
   }
 	
@@ -209,7 +211,6 @@ class ErmesObjSlider extends ErmesObject {
     }
     if(!itsSelected) g.setColor(itsUINormalColor);
     else g.setColor(itsUISelectedColor);
-    //g.fillRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2);
     g.fill3DRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2, true);
     g.setColor(Color.black);
     g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
@@ -219,9 +220,7 @@ class ErmesObjSlider extends ErmesObject {
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     //paint throttle
-    // g.translate(itsX+itsThrottle.LATERAL_OFFSET, itsY+itsThrottle.AbsoluteToSlider(itsThrottle.itsY));
     itsThrottle.Paint(g);
-    //g.translate(-itsX-itsThrottle.LATERAL_OFFSET, -itsY-itsThrottle.AbsoluteToSlider(itsThrottle.itsY));
   }
 
   public void MoveBy(int theDeltaH, int theDeltaV) {

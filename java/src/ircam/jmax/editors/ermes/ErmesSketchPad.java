@@ -151,6 +151,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   boolean itsScrolled = false;
 
 
+  static ErmesObjSliderDialog itsSliderDialog = null;
+  static ErmesObjIntegerDialog itsIntegerDialog = null;
+  static ErmesObjFloatDialog itsFloatDialog = null;
+
   // debug utility, to be removed //
   public void paintAllRegions() {
 
@@ -900,6 +904,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     itsPatcherElements = new Vector();
     itsConnectingLetList = new Vector();
 
+    itsSliderDialog = new ErmesObjSliderDialog(itsSketchWindow);
+    itsIntegerDialog = new ErmesObjIntegerDialog(itsSketchWindow);
+    itsFloatDialog = new ErmesObjFloatDialog(itsSketchWindow);
+    
     itsEditField = new ErmesObjEditField(this);
     itsMessThread = new ErmesObjMessThread(this, "aFlash");
     add(itsEditField);
@@ -1369,6 +1377,18 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListenr--fine
   
+  public ErmesObjSliderDialog GetSliderDialog(){
+    return itsSliderDialog;
+  }
+
+  public ErmesObjIntegerDialog GetIntegerDialog(){
+    return itsIntegerDialog;
+  }
+
+  public ErmesObjFloatDialog GetFloatDialog(){
+    return itsFloatDialog;
+  }
+
   public ErmesObjEditField GetEditField(){
     return itsEditField;
   }
