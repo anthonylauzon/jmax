@@ -37,7 +37,7 @@ java::load -classpath "$dir/java/classes" ircam.jmax.editors.sequence.SequenceEx
 sourceFile $dir/help/sequence.help.index.tcl
 helpSummary Sequence $dir/help/sequence.summary.jmax
 
-puts "package: sequence (EXPERIMENTAL sequencing classes)"
+puts "package: sequence (sequencing classes)"
 
 
 
