@@ -15,8 +15,6 @@
  */
 #include "fts.h"
 
-/* #define BUS_OBJECTS */
-
 extern void at_config(void);
 extern void bangbang_config(void);
 extern void change_config(void);
@@ -54,9 +52,6 @@ extern void mtof_config(void);
 extern void scale_config(void);
 extern void blip_config(void);
 
-#ifdef BUS_OBJECTS
-extern void bus_config(void);
-#endif
 
 static void
 control_module_init(void)
@@ -98,10 +93,6 @@ control_module_init(void)
   scale_config();
 
   blip_config();
-
-#ifdef BUS_OBJECTS
-  bus_config();
-#endif
 }
 
 fts_module_t control_module = {"control", "ISPW miscellaneous control classes", control_module_init};

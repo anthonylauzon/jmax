@@ -1,0 +1,106 @@
+/*
+ * jMax
+ * 
+ * Copyright (C) 1999 by IRCAM
+ * All rights reserved.
+ * 
+ * This program may be used and distributed under the terms of the 
+ * accompanying LICENSE.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+ * for DISCLAIMER OF WARRANTY.
+ * 
+ */
+#include "fts.h"
+
+/************************************************************
+ *
+ *  object
+ *
+ */
+
+typedef struct 
+{
+  fts_object_t o;
+  int out;
+  int n;
+} demux_t;
+
+static void
+demux_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  demux_t *this = (demux_t *)o;
+  int n = fts_get_int_arg(ac, at, 1, 0);
+  int i = fts_get_int_arg(ac, at, 2, 0);
+  
+  if(n < 2)
+    this->n = 2;
+  else
+    this->n = n;
+  
+  if(i >= 0 && i < n)
+    this->out = i;
+  else
+    this->out = 0;
+}
+
+static void
+demux_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  demux_t *this = (demux_t *)o;
+}
+
+/************************************************************
+ *
+ *  user methods
+ *
+ */
+
+static void
+demux_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  demux_t *this = (demux_t *)o;
+
+  fts_outlet_send(o, this->out, s, 1, at);
+}
+
+static void
+demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  demux_t *this = (demux_t *)o;
+  int i = fts_get_number_int(at);
+  int n = this->n;
+  
+  if(i >= 0 && i < n)
+    this->out = i;
+}
+
+/************************************************************
+ *
+ *  class
+ *
+ */
+static fts_status_t
+demux_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t a[3];
+
+  fts_class_init(cl, sizeof(demux_t), 2, 1, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, demux_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, demux_delete);
+
+  fts_method_define_varargs(cl, 0, fts_s_anything, demux_input);
+
+  a[0] = fts_s_int;
+  fts_method_define(cl, 1, fts_s_int, demux_set, 1, a);
+  fts_method_define(cl, 1, fts_s_float, demux_set, 1, a);
+
+  return fts_Success;
+}
+
+void
+demux_config(void)
+{
+  fts_metaclass_install(fts_new_symbol("demux"), demux_instantiate, fts_first_arg_equiv);
+}

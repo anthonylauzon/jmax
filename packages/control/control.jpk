@@ -1,0 +1,24 @@
+#
+#  jMax
+#  
+#  Copyright (C) 1999 by IRCAM
+#  All rights reserved.
+#  
+#  This program may be used and distributed under the terms of the 
+#  accompanying LICENSE.
+# 
+#  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
+#  for DISCLAIMER OF WARRANTY.
+#  
+package provide control
+
+global jmaxArch jmaxMode
+ucs load module control $dir/c/lib/$jmaxArch/$jmaxMode/libcontrol.so
+
+puts "package: control (control classes)"
+
+# help
+helpPatch xxx $dir/help/xxx.help.jmax
+helpSummary "Control" $dir/help/control.summary.jmax
+
+
