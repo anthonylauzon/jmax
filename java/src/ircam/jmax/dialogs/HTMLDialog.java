@@ -115,15 +115,16 @@ public class HTMLDialog extends JDialog
 
     JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(1,1));
-    JButton button = new JButton("Close");
-    button.setPreferredSize(new Dimension(100, 30));
-    button.setMaximumSize(new Dimension(100, 30));
-    button.addActionListener(new ActionListener() {
-      public  void actionPerformed(ActionEvent e){
-	setVisible(false); 
-      }
-    });
-    panel.add(button);
+
+    //    JButton button = new JButton("Close");
+    //    button.setPreferredSize(new Dimension(100, 30));
+    //    button.setMaximumSize(new Dimension(100, 30));
+    //    button.addActionListener(new ActionListener() {
+    //      public  void actionPerformed(ActionEvent e){
+    //	setVisible(false); 
+    //      }
+    //    });
+    //    panel.add(button);
 
     getContentPane().setLayout(new BorderLayout());
     

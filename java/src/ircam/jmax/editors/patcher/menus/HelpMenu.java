@@ -46,34 +46,13 @@ import ircam.jmax.toolkit.actions.*;
 
 /** Implement the patcher editor File Menu */
 
-public class HelpMenu extends /*EditorMenu*/DefaultHelpMenu
+public class HelpMenu extends DefaultHelpMenu
 {
   public HelpMenu()
   {
-      super();
-      //super("Help");
-      //setHorizontalTextPosition(AbstractButton.LEFT);
-
-      //add(Actions.openHelpPatchAction, "Help Patch", Event.CTRL_MASK, KeyEvent.VK_H);
-      insert(Actions.openHelpPatchAction, "Help Patch", Event.CTRL_MASK, KeyEvent.VK_H, 0);
-      insertSeparator(1);
-
-    // Adding the summaries 
-
-      /*Enumeration en = FtsHelpPatchTable.getSummaries(); 
-
-	while (en.hasMoreElements())
-	{
-	final String str = (String) en.nextElement();
-	add( new OpenHelpSummaryAction(str), str + " summary");
-	}*/
-
-      addSeparator();
-      add(Actions.showHtmlAction, "Patch Editor summary");
+    super();
+    
+    insert(Actions.openHelpPatchAction, "Object Help", Event.CTRL_MASK, KeyEvent.VK_H, 0);
+    /*insert(Actions.showHtmlAction, "Editor Help", 1);*/
   }
 }
-
-
-
-
-

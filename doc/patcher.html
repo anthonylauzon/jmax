@@ -1,0 +1,420 @@
+<html>
+<!--                                                                      -->
+<!-- jMax                                                                 -->
+<!--                                                                      -->
+<!-- Copyright (C) 1999 by IRCAM                                          -->
+<!-- All rights reserved.                                                 -->
+<!--                                                                      -->
+<!-- This program may be used and distributed under the terms of the      -->
+<!-- accompanying LICENSE.                                                -->
+<!--                                                                      -->
+<!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
+<!-- for DISCLAIMER OF WARRANTY.                                          -->
+<!--                                                                      -->
+<head>
+<title>jMax Documentation</title>
+</head>
+
+<body bgcolor="white">
+
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+<tr>
+  <td align=left valign=top>
+    <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_logo_small_transp.gif" border=0 alt="jMax"></A>
+  </td>
+  <td align=right valign=top>
+    <a href="http://www.ircam.fr/"><img src="images/ircam_banner.gif" border=0 alt="IRCAM - Centre Georges Pompidou"></a>
+  </td>
+</tr>
+
+</table>
+
+
+<table width=75% border=0 cellspacing=0 cellpadding=0>
+
+<tr>
+<td><spacer type="block" height="1" width="1"></td>
+</tr>
+
+<tr>
+<td align=right><font size=+3><b>Console and Patcher Window</b></font></td>
+</tr>
+
+<tr>
+<td align=right valign=top><a href="index.html"><font size=-1>jMax Documentation</font></a></td>
+</tr>
+
+<tr>
+<td><spacer type="block" height="1" width="1"></td>
+</tr>
+
+</table>
+
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- End of header                                                          -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+
+<p>
+
+<hr>
+
+<h2>Console Window</h2>
+
+<ul TYPE=DOT>
+  <li><a href="#control_panel">Control Panel</a></li>
+  <li><a href="#log messages">Log Messages</a></li>
+</ul>
+
+<h2>Patcher Window</h2>
+
+<ul TYPE=DOT>
+  <li><a href="#toolbar">Toolbar</a></li>
+  <li><a href="#objects">Manipulating Objects</a></li>
+  <li><a href="#connections">Manipulating Connections</a></li>
+  <li><a href="#text">Objects &amp; Text</a></li>
+  <li><a href="#graphical controllers">Graphical Controllers</a></li>
+  <li><a href="#patcher">The Patcher Object</a></li>
+  <li><a href="#help">Obtaining help</a></li>
+</ul>
+
+<p>
+<hr>
+
+<a NAME="control_panel"></a>
+<h2>Control Panel</h2>
+
+The control panel of the console window contains the indicators for floating-point exceptions
+(<b>FPE</b>) and synchronization errors (<b>Out of sync</b>) as well as
+a button to enable and disable the signal computation (<b>DSP</b>):
+<center>
+<p><img SRC="images/control_panel.gif" BORDER=0 WIDTH=488 HEIGHT=25 ></center>
+
+<p>In case that a floating exception or synchronization error occurs at
+run-time an indicator lights up&nbsp;<img SRC="images/led_on.gif" BORDER=0 WIDTH=12 HEIGHT=12 > for
+a while and than memorizes the signal&nbsp;<img SRC="images/led_memory.gif" BORDER=0 WIDTH=12 HEIGHT=12 >.
+The indicator can be reset by clicking on it. Synchronization errors are
+signalled when the systems audio buffers are over or under flowing due
+to heavy computation load or external synchronization problems.
+<p>When the signal computation is enabled the signal objects (by convention
+having a name ending with ~) are activated. The signal connections are
+marked as active&nbsp;<img SRC="images/dsp_conn.gif" BORDER=0 WIDTH=71 HEIGHT=10 >.
+<p>The control panel can be detached from the console window by dragging
+its handle at the left border out of the console window.
+
+<p>
+<hr>
+
+<a NAME="log messages"></a>
+<h2>Log Messages</h2>
+
+The console window shows system log messages by the installation (packages,
+audio and MIDI setup, ...) and object instantiation (error messages, initialization
+notifications, ...).
+<p>One can print out messages and data to the console window using the
+object <b>print</b>.
+
+<p>
+<hr>
+
+<a NAME="toolbar"></a>
+<h2>The Toolbar</h2>
+
+The toolbar of the patcher window gives control over the basic mode and
+edit functions of the patcher window.
+<p>The <i>j</i>Max patcher window is at the same time the graphical patch
+editor and an interface for controlling a program (patch) using some graphical
+controllers like sliders. It distinguishes modes <b><i>edit</i></b> and
+<b><i>lock</i></b>.
+<p>In <b>lock mode</b> the toolbar shows only the button to toggle between
+the modes&nbsp;<img SRC="../images/tool_lock_mode.gif" BORDER=0 WIDTH=14 HEIGHT=14 > (indicating the
+lock mode). In this state the patcher can not be edited and the graphic
+display is optimized for real-time performance.
+<center>
+<p><img SRC="images/toolbar_lock.gif" BORDER=0 WIDTH=507 HEIGHT=23 ></center>
+
+<p><br>
+<p>In <b>edit mode&nbsp;<img SRC="../images/tool_edit_mode.gif" BORDER=0 WIDTH=16 HEIGHT=14 ></b> the
+palette of the jMax objects appears in the toolbar and the patcher can
+be edited.
+<center>
+<p><img SRC="images/toolbar_edit.gif" BORDER=0 WIDTH=507 HEIGHT=23 ></center>
+
+<p><br>
+<p>The key shortcut <b>control-e </b>can be used to toggle between edit
+and lock mode.
+<p>When the content of a patcher changes, the <b>save button&nbsp;<img SRC="../images/to_save.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></b>
+appears on the right of the toolbar. It disappears when the patcher is
+saved (via the Files menu or by clicking the save button).
+<p>Patchers inside a patcher (sub-patchers) have an additional button on
+the right of the toolbar:&nbsp;<img SRC="../images/tool_up.gif" BORDER=0 WIDTH=15 HEIGHT=15 >. This
+button allows to focus the window of the current patchers <b>parent patcher</b>.
+The object associated to the current patcher will appear selected inside
+of its parent patcher window.
+
+<p>
+<hr>
+
+<a NAME="objects"></a>
+<h2>Manipulating Objects</h2>
+
+For <b>adding</b> an object to a patcher in edit mode one selects an object
+in the toolbar and clicks to the position inside the patcher window where
+the object will be instantiated. By holding the shift-key, multiple instances
+of the same object can be created one after the other. The content of the
+toolbar is as well accessible via a contextual pop-up menu (right mouse
+button) inside the patcher window. Objects that can be added are:
+<br>&nbsp;
+<br>&nbsp;
+<center><table BORDER=0 CELLPADDING=5 WIDTH="90%" BGCOLOR="#CCCCCC" >
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_ext.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>generic object</b>
+<br>generic <i>j</i>Max object, where the class name has to be typed in</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_messconst.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
+
+<td><b>message constant</b>
+<br>expression of a single message or constant</td>
+</tr>
+
+<tr>
+<td><img SRC="../images/tool_mess.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>message box</b>
+<br>ISPW compatible message box</td>
+</tr>
+
+<tr>
+<td><img SRC="../images/tool_patcher.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>patcher object</b>
+<br>patcher object to create a sub-patcher (or patcher inside the patcher)</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_in.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>inlet</b>
+<br>inlet for a patcher or template</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_out.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>outlet</b>
+<br>outlet for a patcher or template</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_text.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>comment box</b>
+<br>box to add comments to the patcher&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_bang.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>button</b>
+<br>button which outputs a <tt>bang</tt> message when pressed</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_toggle.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>toggle</b>
+<br>button toggling between (and outputting) <tt>0</tt> and <tt>1</tt>
+when pressed</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_slider.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>slider</b>
+<br>slider outputting integers</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_int.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>integer box</b>
+<br>display and input integer values</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_float.gif" BORDER=0 WIDTH=15 HEIGHT=15 ></td>
+
+<td><b>float box</b>
+<br>display and input float values</td>
+</tr>
+
+<tr>
+<td VALIGN=TOP><img SRC="../images/tool_display.gif" BORDER=0 WIDTH=15 HEIGHT=15 height=15 width=15></td>
+
+<td><b>display field</b>
+<br>generic display field</td>
+</tr>
+</table></center>
+
+<p>(Refer to help patches for further information about the objects.)&nbsp;
+<p>Objects can be <b>selected</b> by clicking over them (mouse left button)
+or dragging a selection rectangle over them (left mouse button pressed
+inside the window and drag). The selection can be extended by holding the
+shift-key. A number of manipulations can be applied either to a single
+object
+or to a selection of objects:
+<p>Objects can be <b>deleted</b> by using the delete-key or the cut functions.
+The edit menu provides the usual functions for <b>cut</b>, <b>copy</b>
+and <b>paste</b> with the usual shortcuts.
+<p>Objects can be <b>moved</b> by dragging or using the arrow-keys (speed
+up moving by holding the shift-key).
+<p>Objects can be <b>resized</b> by dragging their right border or using
+the plus-key "<b>+</b>" and minus-key "<b>-</b>" (speed up resizing by
+holding the shift-key).
+<p>A selection of objects can be <b>aligned</b> to the left, right, top,
+and bottom most border, by using the control-key plus the respective arrow-key.
+<p>Additional manipulations can by applied to a single object via a contextual
+pop-up menu (right mouse button). The possible manipulations depend on
+the type of object.
+<p>Note that there is <b>no</b> <b>undo</b> function implemented yet.
+
+
+<p>
+<hr>
+
+<a NAME="connections"></a>
+<h2>Manipulating Connections</h2>
+
+A connection between two objects can be established in edit mode between
+the outlet of one object and the inlet of the other under the condition
+that the inlet of the second object accepts the message or data emitted
+by the connected outlet.&nbsp;
+<p><b>Adding</b> a connection is done by clicking to its origin and then
+to its target (both from outlet to inlet and from inlet to outlet). Alternatively,
+a connection can be dragged from the origin to the target (it is created
+when releasing left mouse button). By holding the shift-key multiple targets
+can be connected to the same origin (inlet or outlet).
+<p>A connection can be <b>selected</b> (by clicking on it) and <b>deleted</b>
+with the <b>cut</b> edit function or the delete-key. The contextual pop-up
+menu (right mouse button) of an inlet or outlet allows to delete all its
+connections.
+
+<p>
+<hr>
+
+<a NAME="text"></a>
+<h2>Objects &amp; Text</h2>
+
+When an object containing text (generic object, message, comment, ....)
+is instantiated from the object palette, or by pasting, the text cursor
+is immediately placed at the beginning of its text field and one can enter
+or modify its description. Clicking to an object containing text automatically
+enters the text field. The editing of an object is terminated by clicking
+outside of its text field (another object, elsewhere in the patcher window,
+another window).
+<p>The object description typed inside an object is automatically reformatted
+by jMax. Only the <b>comment</b> object can contain text of an arbitrary
+formatting. Text can be <b>cut</b>, <b>copied</b>, and <b>pasted</b> from
+one object to another.
+<p>The edit menu provides a "<b>Find</b>" function to search for symbols
+in text objects. All objects containing a given symbol will be listed in
+the find panel. By clicking to an entry of the object list, the window
+of the objects patcher will be opened and the object will appear selected.
+<p>An <b>invalid object</b> which can not be correctly instantiated because
+of an invalid description or the current system setup appears grey. An
+<b>error
+description</b> for each invalid object can be obtained by the key shortcut
+<b>control-z</b>.
+The edit menu provides a "<b>Find Errors</b>" function to obtain a list
+of invalid objects.
+<p>Objects containing text have some special functions, which are accessible
+via the text menu of the patcher window and the contextual pop-up menu
+(right mouse button) of the objects. In this way <b>font</b>, <b>style</b>
+and <b>size</b> can be adjusted for each object separately.
+<p>The function "<b>Fit to text</b>" in the Text menu of the patcher window
+automatically adapts the object size to its description.
+
+<p>
+<hr>
+<a NAME="graphical controllers"></a>
+<h2>Graphical Controllers</h2>
+
+The graphical controller objects (<b>slider</b>, <b>button</b>, <b>toggle</b>,
+...) are activated in lock mode. In edit mode they can be activated by
+holding the control-key while manipulating or clicking them.
+<p>Some graphical properties of the controllers can be set via a contextual
+pop-up menu (right mouse button) of the object. For example, in this way
+one can change the colour of a button or the range of a slider.
+
+<p>
+<hr>
+<a NAME="patcher"></a>
+<h2>The Patcher Object</h2>
+
+The patcher object can be used to group objects into a sub-patcher embedded
+in the patcher. A patcher object can behave like any other object, it can
+have inlets and outlets and can be parameterized by arguments.&nbsp;
+<p>The first value typed to the patcher object (a symbol) is it's name.
+Double clicking on the patcher object opens another patcher window where
+the content of the patcher can be edited. Inlet&nbsp;<img SRC="../images/tool_in.gif" BORDER=0 WIDTH=15 HEIGHT=15 >
+and outlet objects&nbsp;<img SRC="../images/tool_out.gif" BORDER=0 WIDTH=15 HEIGHT=15 > can be added
+inside the patcher window, each one corresponding to an inlet or an outlet
+of the patcher object.
+<p>The inlets and outlets of a patcher are numbered, starting from 0. The
+given number associates the inlet or outlet object inside the patcher window
+to the inlet or outlet of the patcher object. A patcher may contain several
+inlet or outlet objects) of the same number. Inlets objects of the same
+number receive from the same inlet of the patcher object (in undefined
+order). Outlet objects of the same number send messages to the same outlet
+of the patcher object.
+<p>
+
+<hr>
+<a NAME="help"></a>
+<h2>Obtaining Help</h2>
+
+Help information about an object in the patcher window can be obtained
+by the clicking on it while holding the <b>alt-key</b> (or by clicking
+the middle mouse button). Help on a selection of objects (as for a single
+object) can be obtained via the help menu (shortcut <b>control-h</b>).
+<p>The help menu gives also access to the summary patches of the loaded
+packages, examples and tutorials.
+<br>&nbsp;</td>
+
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- Beginning of footer                                                    -->
+<!-- ---------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------- -->
+
+<p>
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+
+<tr>
+<td><spacer type="block" height="20" width="1"></td>
+</tr>
+
+<tr>
+<td bgcolor="#cccccc"><spacer type="block" height="1" width="1"></td>
+</tr>
+
+<tr>
+<td><spacer type="block" height="20" width="1"></td>
+</tr>
+
+<tr>
+<td align=right><font size=-2>
+Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.<br>
+All rights reserved.
+</font></td>
+</tr>
+
+</table>
+
+</body>
+</html>

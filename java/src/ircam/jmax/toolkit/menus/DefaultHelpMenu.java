@@ -45,6 +45,7 @@ import ircam.jmax.toolkit.actions.*;
 public class DefaultHelpMenu extends EditorMenu
 {
   private boolean initDone = false;
+
   public DefaultHelpMenu()
   {
     super("Help");
@@ -62,6 +63,7 @@ public class DefaultHelpMenu extends EditorMenu
 	 add( new OpenHelpSummaryAction(str), str);
 	 initDone = true;
        }
+
   }
 
   public void init()
