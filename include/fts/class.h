@@ -81,8 +81,8 @@ struct fts_class {
   fts_class_description_function_t description_function;
   fts_class_copy_function_t copy_function;
   fts_class_array_function_t array_function;
-  fts_list_t *import_handlers; /* list of import handlers */
-  fts_list_t *export_handlers; /* list of export handlers */
+  fts_hashtable_t import_handlers; /* table of import handlers */
+  fts_hashtable_t export_handlers; /* table of export handlers */
   
   fts_instantiate_fun_t instantiate_fun;
   
@@ -118,6 +118,9 @@ struct fts_class {
 #define fts_class_get_description_function(cl) ((cl)->description_function)
 #define fts_class_get_copy_function(cl) ((cl)->copy_function)
 #define fts_class_get_array_function(cl) ((cl)->array_function)
+
+#define fts_class_get_import_handlers(c) (&(c)->import_handlers)
+#define fts_class_get_export_handlers(c) (&(c)->export_handlers)
 
 #define fts_class_set_super(C, s) ((C)->super_class = s)
 
@@ -218,8 +221,7 @@ FTS_API void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t con
  */
 FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
 
-
-/** prepend import handler to list of handlers to try 
+/** add import handler to table of handlers to try 
 *
 *  An import handler is called with the object to import into, and
 *  the list of filename and arguments.  It should examine the object
@@ -227,10 +229,10 @@ FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
 *  not, just return false (a void atom with fts_return) and don't
 *  make any fuss (don't print error messages).
 */
-FTS_API void fts_class_add_import_handler (fts_class_t *cl, fts_method_t func);
+FTS_API void fts_class_import_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth);
+#define fts_class_import_handler_default(c, m) fts_class_import_handler(c, fts_s_default, m)
 
-
-/** prepend export handler to list of handlers to try 
+/** add export handler to table of handlers to try 
 *
 *  An export handler is called with the object to export from, and
 *  the list of filename and arguments.  It should examine the object
@@ -238,8 +240,8 @@ FTS_API void fts_class_add_import_handler (fts_class_t *cl, fts_method_t func);
 *  export to that type of file.  If not, just return a void atom and don't
 *  make any fuss (don't print error messages).
 */
-FTS_API void fts_class_add_export_handler (fts_class_t *cl, fts_method_t func);
-
+FTS_API void fts_class_export_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth);
+#define fts_class_export_handler_default(c, m) fts_class_export_handler(c, fts_s_default, m)
 
 /**
 * Register a method for a given message and argument type (of a single argument or void).

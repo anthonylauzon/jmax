@@ -319,14 +319,7 @@ fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
       }
     case 1:
       if(fts_is_number(at))
-      {
-        int index = fts_get_number_int(at);
-        
-        if(index > 0)
-          fvec->index = index;
-        else
-          fvec->index = 0;
-      }
+        fvec->index = fts_get_number_int(at);
     case 0:
       break;
   }
@@ -385,7 +378,9 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       
     case fvec_type_diagonal:
       
-      if(fvec_index > fmat_m)
+      if(fvec_index < 0)
+        fvec_index = 0;
+      else if(fvec_index > fmat_m)
         fvec_index = fmat_m;
       
       if(fvec_onset > fmat_n)
@@ -405,7 +400,9 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
     case fvec_type_unwrap:
       
       /* row onset */
-      if(fvec_index > fmat_m)
+      if(fvec_index < 0)
+        fvec_index = 0;
+      else if(fvec_index > fmat_m)
         fvec_index = fmat_m;
       
       /* column onset */

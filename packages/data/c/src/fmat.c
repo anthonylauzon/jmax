@@ -441,188 +441,6 @@ fmat_get_min_value_in_range(fmat_t *mat, int a, int b)
   return min;
 }
 
-
-
-
-/********************************************************
- *
- *  files
- *
- */
-
-#define FMAT_BLOCK_SIZE 256
-
-static void
-fmat_grow(fmat_t *fmat, int size)
-{
-  int alloc = fmat->alloc;
-
-  while(size > alloc)
-    alloc += FMAT_BLOCK_SIZE;
-
-  fmat_reshape(fmat, 1, alloc);
-}
-
-int
-fmat_read_atom_file(fmat_t *fmat, fts_symbol_t file_name)
-{
-  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
-  int m = 0;
-  int n = 0;
-  int i = 0;
-  int j = 0;
-  fts_atom_t a;
-  char c;
-
-  if(!file)
-    return -1;
-
-  while(fts_atom_file_read(file, &a, &c))
-  {
-    m = i + 1;
-
-    /* first row determines # of columns */
-    if(i == 0)
-      n = j + 1;
-
-    fmat_grow(fmat, m * n);
-    
-    if(j < n)
-    {
-      if(fts_is_number(&a))
-        fmat->values[i * n + j] = (float)fts_get_number_float(&a);
-      else
-        fmat->values[i * n + j] = 0.0;
-
-      j++;
-
-      if(c == '\n')
-      {
-        for(; j<n; j++)
-          fmat->values[i * n + j] = 0.0;
-      
-        /* reset to beginning of next row */
-        i++;
-        j = 0;
-      }
-    }
-    else if(c == '\n')
-    {
-      /* reset to beginning of next row */
-      i++;
-      j = 0;
-    }
-  }
-
-  /* maybe empty rest of last line */
-  if(j > 0)
-  {
-    i++;
-    j = 0;
-  }
-
-  fmat->m = m;
-  fmat->n = n;
-
-  fts_atom_file_close(file);
-
-  return(m * n);
-}
-
-int
-fmat_write_atom_file(fmat_t *fmat, fts_symbol_t file_name)
-{
-  fts_atom_file_t *file;
-  int m = fmat->m;
-  int n = fmat->n;
-  int i, j;
-
-  file = fts_atom_file_open(file_name, "w");
-
-  if(!file)
-    return -1;
-
-  /* write the content of the fmat */
-  for(i=0; i<m; i++)
-  {
-    float *row = fmat->values + i * n;
-    fts_atom_t a;
-
-    for(j=0; j<n-1; j++)
-    {
-      fts_set_float(&a, row[j]);
-      fts_atom_file_write(file, &a, ' ');
-    }
-
-    fts_set_float(&a, row[n - 1]);
-    fts_atom_file_write(file, &a, '\n');
-  }
-
-  fts_atom_file_close(file);
-
-  return(m * n);
-}
-
-static int
-fmat_import_audiofile(fmat_t *mat, fts_symbol_t file_name)
-{
-  fts_audiofile_t *sf = fts_audiofile_open_read(file_name);
-  int size = 0;
-  
-  if(fts_audiofile_is_valid(sf))
-  {
-    float *ptr;
-    
-    size = fts_audiofile_get_num_frames(sf);
-    fmat_reshape(mat, size, 1);
-    ptr = fmat_get_ptr(mat);
-    
-    size = fts_audiofile_read(sf, &ptr, 1, size);
-    fmat_reshape(mat, size, 1);
-    
-    fts_audiofile_close(sf);
-    
-    if(size <= 0)
-    {
-      fts_object_error((fts_object_t *)mat, "cannot load from soundfile \"%s\"", fts_symbol_name(file_name));
-      size = 0;
-    }
-  }
-  else
-  {
-    fts_object_error((fts_object_t *)mat, "cannot open file \"%s\"", fts_symbol_name(file_name));
-    fts_audiofile_close(sf);
-  }
-  
-  return size;
-}
-
-static int
-fmat_export_audiofile(fmat_t *mat, fts_symbol_t file_name)
-{
-  int size = 0;
-  
-  if(fmat_get_n(mat) == 1)
-  {
-    fts_audiofile_t *sf = fts_audiofile_open_write(file_name, 1, (int)fts_dsp_get_sample_rate(), fts_s_int16);
-    int mat_size = fmat_get_m(mat);
-    
-    if( fts_audiofile_is_valid(sf))
-    {
-      float *ptr = fmat_get_ptr(mat);
-      
-      size = fts_audiofile_write(sf, &ptr, 1, mat_size);
-      
-      fts_audiofile_close(sf);
-    }
-  }
-  else
-    fts_post("*** fmat export of multi channel audio files not yet implemented ***");
-  
-  return size;
-}
-
-
 /********************************************************************
  *
  *  check & errors
@@ -3615,84 +3433,209 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  *
  */
 
-static const char str_aiff[3] = "aif";
-
-/* well this works for "aif" and "aiff" and "aifff" and "aaiiiffff" and so on  */
-static int
-postfix_aiff(fts_symbol_t name)
-{
-  const char *str = fts_symbol_name(name);
-  int n = strlen(str) - 1;
-  int i = strlen(str_aiff) - 1;
-
-  while(i >= 0 && str[n] == str_aiff[i])
-  {
-    while(n >= 0 && str[n] == str_aiff[i])
-      n--;
-    
-    i--;
-  }
-  
-  return (i < 0);
-}
-
 static void
-fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fmat_import_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
 
   if(ac > 0 && fts_is_symbol(at))
   {
     fts_symbol_t file_name = fts_get_symbol(at);
-    int size = 0;
+    fts_audiofile_t *sf = fts_audiofile_open_read(file_name);
     
-    if(postfix_aiff(file_name))
-      size = fmat_import_audiofile(self, file_name);
-    else
-      size = fmat_read_atom_file(self, file_name);
-    
-    if(size > 0)
+    if(sf != NULL)
     {
-      fts_object_changed(o);
-      fts_return_object(o);
+      int m = fts_audiofile_get_num_frames(sf);
+      int n = fts_audiofile_get_num_channels(sf);
+      float *ptr;
+      
+      fmat_reshape(self, m, n);
+      ptr = fmat_get_ptr(self);
+      
+      m = fts_audiofile_read_interleaved(sf, ptr, n, m);
+      fmat_reshape(self, m, n);
+      
+      fts_audiofile_close(sf);      
+      
+      if(m > 0)
+      {
+        fts_object_changed(o);
+        fts_return_object(o);
+      }
+      else
+        fts_object_error(o, "import: coudn't read any audio data from file \"%s\"", fts_symbol_name(file_name));
     }
     else
-      fts_object_error(o, "can't import from file \"%s\"", fts_symbol_name(file_name));
+      fts_object_error(o, "import: cannot open audio file \"%s\"", fts_symbol_name(file_name));
   }
 }
 
 static void
-fmat_import_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
-{
-  fts_object_open_dialog(o, fts_s_import, fts_new_symbol("import file"), ac, at);
-}
-
-static void
-fmat_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   
   if(ac > 0 && fts_is_symbol(at))
   {
     fts_symbol_t file_name = fts_get_symbol(at);
-    int size = 0;
+    fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
+    float *ptr = fmat_get_ptr(self);
+    int m = 0;
+    int n = 0;
+    int i = 0;
+    int j = 0;
+    fts_atom_t a;
+    char c;
     
-    if(postfix_aiff(file_name))
-      size = fmat_export_audiofile(self, file_name);
+    if(file != NULL)
+    {
+      while(fts_atom_file_read(file, &a, &c))
+      {
+        int alloc = self->alloc;
+        m = i + 1;
+        
+        /* first row determines # of columns */
+        if(i == 0)
+          n = j + 1;
+        
+        /* grow matrix */
+        while(m * n > alloc)
+          alloc += 256;
+        
+        fmat_reshape(self, 1, alloc);
+        ptr = fmat_get_ptr(self);
+        
+        if(j < n)
+        {
+          if(fts_is_number(&a))
+            ptr[i * n + j] = (float)fts_get_number_float(&a);
+          else
+            ptr[i * n + j] = 0.0;
+          
+          j++;
+          
+          if(c == '\n')
+          {
+            for(; j<n; j++)
+              ptr[i * n + j] = 0.0;
+            
+            /* reset to beginning of next row */
+            i++;
+            j = 0;
+          }
+        }
+        else if(c == '\n')
+        {
+          /* reset to beginning of next row */
+          i++;
+          j = 0;
+        }
+      }
+      
+      /* maybe empty rest of last line */
+      if(j > 0)
+      {
+        i++;
+        j = 0;
+      }
+      
+      fmat_set_m(self, m);
+      fmat_set_n(self, n);
+      
+      fts_atom_file_close(file);
+      
+      if(m * n > 0)
+      {
+        fts_object_changed(o);
+        fts_return_object(o);
+      }
+      else
+        fts_object_error(o, "import: coudn't read any text data from file \"%s\"", fts_symbol_name(file_name));
+    }
     else
-      size = fmat_write_atom_file(self, file_name);
-    
-    if(size > 0)
-      fts_return_object(o);
-    else
-      fts_object_error(o, "can't export to file \"%s\"", fts_symbol_name(file_name));
+      fts_object_error(o, "import: cannot open text file \"%s\"", fts_symbol_name(file_name));
   }
 }
 
 static void
-fmat_export_dialog(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fmat_export_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("export fmat"), fts_project_get_dir(), fts_new_symbol(".aiff"), ac, at);
+  fmat_t *self = (fmat_t *)o;
+  
+  if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t file_name = fts_get_symbol(at);
+    float *ptr = fmat_get_ptr(self);
+    int m = fmat_get_m(self);
+    int n = fmat_get_n(self);
+    fts_audiofile_t *sf = NULL;
+    double sr = fmat_get_sr(self);
+    int size = 0;
+    
+    if(sr == 1.0)
+      sr = 44100.0;
+    
+    sf = fts_audiofile_open_write(file_name, n, (int)sr, s, NULL);
+    
+    if(sf != NULL)
+    {
+      size = fts_audiofile_write_interleaved(sf, ptr, n, m);
+      fts_audiofile_close(sf);
+
+      if(size > 0)
+        fts_return_object(o);
+      else
+        fts_object_error(o, "export: coudn't write any audio data to file \"%s\"", fts_symbol_name(file_name));
+    }
+    else
+      fts_object_error(o, "export: cannot create audio file \"%s\"", fts_symbol_name(file_name));
+  }
+}
+
+static void
+fmat_export_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  
+  if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t file_name = fts_get_symbol(at);
+    fts_atom_file_t *file;
+    float *ptr = fmat_get_ptr(self);
+    int m = fmat_get_m(self);
+    int n = fmat_get_n(self);
+    int i, j;
+    
+    file = fts_atom_file_open(file_name, "w");
+    
+    if(file != NULL)
+    {
+      /* write the content of the fmat */
+      for(i=0; i<m; i++)
+      {
+        float *row = ptr + i * n;
+        fts_atom_t a;
+        
+        for(j=0; j<n-1; j++)
+        {
+          fts_set_float(&a, row[j]);
+          fts_atom_file_write(file, &a, ' ');
+        }
+        
+        fts_set_float(&a, row[n - 1]);
+        fts_atom_file_write(file, &a, '\n');
+      }
+      
+      fts_atom_file_close(file);
+      
+      if(m * n > 0)
+        fts_return_object(o);
+      else
+        fts_object_error(o, "export: coudn't write any text data to file \"%s\"", fts_symbol_name(file_name));
+    }
+    else
+      fts_object_error(o, "export: cannot open audio file \"%s\"", fts_symbol_name(file_name));
+  }
 }
 
 /*********************************************************
@@ -4028,11 +3971,14 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
   
-  fts_class_message_symbol(cl, fts_s_import, fmat_import);
-  fts_class_message_void(cl, fts_s_import, fmat_import_dialog);
-  fts_class_message_symbol(cl, fts_s_export, fmat_export);
-  fts_class_message_void(cl, fts_s_export, fmat_export_dialog);
-  
+  fts_atomfile_import_handler(cl, fmat_import_textfile);
+  fts_audiofile_import_handler(cl, fmat_import_audiofile);
+  fts_class_import_handler_default(cl, fmat_import_audiofile);
+
+  fts_atomfile_export_handler(cl, fmat_export_textfile);
+  fts_audiofile_export_handler(cl, fmat_export_audiofile);
+  fts_class_export_handler_default(cl, fmat_export_audiofile);
+
   fts_class_inlet_bang(cl, 0, data_object_output);
 
   fts_class_message_varargs(cl, fts_s_openEditor, fmat_open_editor);

@@ -111,16 +111,12 @@ FTS_API void fts_object_call_listeners(fts_object_t *o);
 #define fts_object_changed fts_object_call_listeners
 
 /** try import handlers from class with the given arguments until one returns true */
-FTS_API void fts_object_import (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_object_import_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /** try export handlers from class with the given arguments until one returns true */
-FTS_API void fts_object_export (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-/** open dialog and then call "import" method with the selected filename */
-FTS_API void fts_object_import_dialog (fts_object_t *o, int w, fts_symbol_t s,int ac, const fts_atom_t *at);
-
-/** open dialog and then call "export" method with the selected filename */
-FTS_API void fts_object_export_dialog (fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_object_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_object_export_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /** try list of functions until one returns true (anything but void) */
 FTS_API int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at);

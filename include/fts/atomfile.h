@@ -57,3 +57,5 @@ FTS_API void fts_atom_file_close(fts_atom_file_t *f);
 FTS_API int fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator);
 FTS_API int fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator);
 
+FTS_API void fts_atomfile_import_handler(fts_class_t *cl, fts_method_t meth);
+FTS_API void fts_atomfile_export_handler(fts_class_t *cl, fts_method_t meth);

@@ -83,8 +83,8 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   fts_class_set_copy_function (cl, NULL);
   fts_class_set_array_function (cl, NULL);
   
-  cl->import_handlers = NULL;
-  cl->export_handlers = NULL;
+  fts_hashtable_init(&cl->import_handlers, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init(&cl->export_handlers, FTS_HASHTABLE_SMALL);
 
   if (name != NULL)
   {
@@ -669,25 +669,37 @@ fts_class_doc(fts_class_t *cl, fts_symbol_t name, const char *args, const char *
   *list = line;
 }
 
-
 void 
-fts_class_add_import_handler (fts_class_t *cl, fts_method_t func)
+fts_class_import_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth)
 {
-    fts_atom_t a;
-
-    fts_set_pointer(&a, func);
-    cl->import_handlers = fts_list_prepend(cl->import_handlers, &a);
+  fts_atom_t k, v;
+  
+  fts_set_symbol(&k, suffix);
+  fts_set_pointer(&v, meth);
+  fts_hashtable_put(&cl->import_handlers, &k, &v);
+  
+  if(!fts_class_get_method_varargs(cl, fts_s_import))
+  {
+    fts_class_message_varargs(cl, fts_s_import, fts_object_import);
+    fts_class_message_varargs(cl, fts_s_importas, fts_object_import_as);
+  }
 }
 
 void 
-fts_class_add_export_handler (fts_class_t *cl, fts_method_t func)
+fts_class_export_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth)
 {
-    fts_atom_t a;
+  fts_atom_t k, v;
+  
+  fts_set_symbol(&k, suffix);
+  fts_set_pointer(&v, meth);
+  fts_hashtable_put(&cl->export_handlers, &k, &v);
 
-    fts_set_pointer(&a, func);
-    cl->export_handlers = fts_list_prepend(cl->export_handlers, &a);
+  if(!fts_class_get_method_varargs(cl, fts_s_export))
+  {
+    fts_class_message_varargs(cl, fts_s_export, fts_object_export);
+    fts_class_message_varargs(cl, fts_s_exportas, fts_object_export_as);
+  }
 }
-
 
 /***********************************************************************
 *
@@ -719,7 +731,6 @@ fts_kernel_class_init (void)
   fts_class_class->constructor = dummy_method;
   fts_class_class->deconstructor = dummy_method;
   fts_class_class->methods = fts_hashtable_new (FTS_HASHTABLE_MEDIUM);
-  fts_class_class->input_handler = NULL;
   
   fts_class_set_name (fts_class_class, fts_s_class);
   

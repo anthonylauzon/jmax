@@ -1979,56 +1979,66 @@ track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     fts_midifile_t *file = fts_midifile_open_read(name);
     fts_class_t *type = track_get_type(self);
     
-    if(file != NULL && (type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL))
+    if(type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL)
     {
-      int size;
-      char *error;
-      int i;
-      
-      /* clear track and markers(!) */
-      _track_clear(o, 0, NULL, 0, NULL);
-      
-      /* get import options */
-      for(i=1; i<ac; i+=2)
+      if(file != NULL)
       {
-        if(fts_is_symbol(at + i) && fts_is_number(at + i + 1))
+        int size;
+        char *error;
+        int i;
+        
+        /* clear track and markers(!) */
+        _track_clear(o, 0, NULL, 0, NULL);
+        
+        /* get import options */
+        for(i=1; i<ac; i+=2)
         {
-          fts_symbol_t sym = fts_get_symbol(at + i);
-          
-          if(sym == seqsym_track)
+          if(fts_is_symbol(at + i) && fts_is_number(at + i + 1))
           {
-            int n = fts_get_number_int(at + i + 1);
+            fts_symbol_t sym = fts_get_symbol(at + i);
             
-            if(n >= 0)
-              fts_midifile_select_track(file, n);
-          }
-          else if(sym == seqsym_channel)
-          {
-            int n = fts_get_number_int(at + i + 1);
-            
-            if(n > 0)
-              fts_midifile_select_channel(file, n);
+            if(sym == seqsym_track)
+            {
+              int n = fts_get_number_int(at + i + 1);
+              
+              if(n >= 0)
+                fts_midifile_select_track(file, n);
+            }
+            else if(sym == seqsym_channel)
+            {
+              int n = fts_get_number_int(at + i + 1);
+              
+              if(n > 0)
+                fts_midifile_select_channel(file, n);
+            }
           }
         }
-      }
-      
-      size  = track_import_from_midifile(self, file);
-      error = fts_midifile_get_error(file);
-      
-      if (!error && size > 0)   /* set return value: sucess */
-      {
-        if (self->markers)
-          marker_track_renumber_bars(self->markers, track_get_first(self->markers), FIRST_BAR_NUMBER, 0);
         
-        track_update_editor(self);
-        fts_return_object(o);
+        size  = track_import_from_midifile(self, file);
+        error = fts_midifile_get_error(file);
+        
+        if (!error && size > 0)   /* set return value: sucess */
+        {
+          if (self->markers)
+            marker_track_renumber_bars(self->markers, track_get_first(self->markers), FIRST_BAR_NUMBER, 0);
+          
+          track_update_editor(self);
+          fts_return_object(o);
+        }
+        else
+          fts_object_error(o, "import: coudn't read any MIDI data from file \"%s\"", fts_symbol_name(name));        
+        
+        fts_midifile_close(file);
       }
-      
-      fts_midifile_close(file);
+      else
+        fts_object_error(o, "import: cannot open MIDI file \"%s\"", fts_symbol_name(name));
     }
+    else
+      fts_object_error(o, "cannot import MIDI file to %s track", fts_symbol_name(fts_class_get_name(type)));
   }
+  else
+    fts_object_error(o, "import: file name argument missing");
 }
-
 
 
 /* exporting */
@@ -2042,50 +2052,31 @@ track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   if (ac > 0  &&  fts_is_symbol(at))
   {
     fts_symbol_t  sym  = fts_get_symbol(at);
-    const char   *name = fts_symbol_name(sym);
+    const char *name = fts_symbol_name(sym);
+    fts_midifile_t *file = fts_midifile_open_write(sym);
     
-    /* check extension */
-    if (strcmp(fts_extension(name), "mid") == 0)
+    if(file != NULL)
     {
-      fts_midifile_t *file = fts_midifile_open_write(sym);
+      int size = track_export_to_midifile(self, file);
+      char *error = fts_midifile_get_error(file);
       
-      if(file)
-      {
-        int size = track_export_to_midifile(self, file);
-        char *error = fts_midifile_get_error(file);
-        
-        if(error != NULL)
-          fts_object_error(o, "export midi: write error in \"%s\" (%s)", name, error);
-        else if (size <= 0)
-          fts_object_error(o, "export midi: couldn't write data to \"%s\"", name);
-        else
-          fts_return_object(o);
-        
-        fts_midifile_close(file);
-      }
+      if(error != NULL)
+        fts_object_error(o, "export: write error in file \"%s\" (%s)", name, error);
+      else if (size <= 0)
+        fts_object_error(o, "export: coudn't write any MIDI data to file \"%s\"", name);
       else
-        fts_object_error(o, "export midi: cannot open \"%s\"", name);    
+        fts_return_object(o);
+      
+      fts_midifile_close(file);
     }
+    else
+      fts_object_error(o, "export: cannot open MIDI file \"%s\"", name);    
   }
-}
-
-
-static void
-track_export_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t track_name = track_get_name(self);   /* why always NULL? */
-  fts_symbol_t default_name = track_name?  track_name:  fts_new_symbol("untitled.mid");
-  
-  /* todo: ask export handlers for their extensions (when called with 0 args)
-    construct dialog with permitted extensions in popup 
-    (ex: *.mid *.sdif *.*)
-    */
-  
-  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("Select file to export"), fts_project_get_dir(), default_name, ac, at);
+  else
+    fts_object_error(o, "export: file name argument missing");
 }
 
 /* editor */
-
 static void
 track_set_editor_at_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -2394,14 +2385,12 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("duration"), _track_get_duration);
   fts_class_message_void(cl, fts_new_symbol("size"), _track_get_size);
   
-  /* im/export */
-  fts_class_message_void(cl, fts_s_import, fts_object_import_dialog);
-  fts_class_message_varargs(cl, fts_s_import, fts_object_import);
-  fts_class_message_varargs(cl, seqsym_import_midifile, track_import_midifile);
+  /* the midifile importer/exporter is registered first, so it will be the last handler tried */
+  fts_midifile_import_handler(cl, track_import_midifile);
+  fts_midifile_export_handler(cl, track_export_midifile);
   
-  fts_class_message_void(cl, fts_s_export, track_export_dialog);
-  fts_class_message_varargs(cl, fts_s_export, fts_object_export);
-  fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
+  /* marker track import/export */
+  fts_class_import_handler(cl, fts_new_symbol("labels"), marker_track_import_labels_txt);  
   
   /* markers */
   fts_class_message_void(cl, fts_new_symbol("getmarkers"), _track_get_markers);
@@ -2440,12 +2429,4 @@ void
 track_config(void)
 {
   track_class = fts_class_install(seqsym_track, track_instantiate);
-  
-  /* the midifile importer/exporter is registered first, 
-     so it will be the last handler tried */
-  fts_class_add_import_handler(track_class, track_import_midifile);
-  fts_class_add_export_handler(track_class, track_export_midifile);
-
-  /* marker track import/export */
-  fts_class_add_import_handler(track_class, marker_track_import_labels_txt);
 }

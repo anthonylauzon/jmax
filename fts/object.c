@@ -301,85 +301,112 @@ fts_object_call_listeners(fts_object_t *o)
  *
  */
 
-/* try import handlers from list in class until one returns true */
-void
-fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+object_imexport_dialog(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *at, fts_symbol_t mode)
 {
-  if(ac > 0 && fts_is_symbol(at))
+  char str[1024];
+
+  if(mode == fts_s_import)
   {
-    fts_symbol_t name = fts_get_symbol(at);
-    
-    if(name != fts_s_minus)
-    {  
-      fts_list_t *handlers = fts_object_get_class(o)->import_handlers;
-      
-      if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-        fts_object_error(o, "import: cannot open file %", fts_symbol_name(name));
-    }
-    else
-      fts_object_import_dialog(o, winlet, s, ac - 1, at + 1);
+    snprintf(str, 1023, "Open%s file to import", (suffix != fts_s_default)? fts_symbol_name(suffix): "");
+    fts_object_open_dialog(o, fts_s_import, fts_new_symbol(str), ac, at);
   }
   else
-    fts_object_import_dialog(o, winlet, s, ac, at);
+  {
+    fts_symbol_t default_name;
+    
+    snprintf(str, 1023, "untitled.%s", (suffix != fts_s_default)? fts_symbol_name(suffix): "???");
+    default_name = fts_new_symbol(str);
+
+    snprintf(str, 1023, "Select file for%s export", (suffix != fts_s_default)? fts_symbol_name(suffix): "");
+    fts_object_save_dialog(o, fts_s_export, fts_new_symbol(str), fts_project_get_dir(), default_name, ac, at);
+  }
 }
 
-/* try export handlers from list in class until one returns true */
+static void
+object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *at, fts_symbol_t mode)
+{
+  fts_class_t *cl = fts_object_get_class(o);
+  
+  /* without name or "-" as name open file chooser */
+  if(ac == 0)
+    object_imexport_dialog(o, suffix, 0, NULL, mode);
+  else if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+  
+    if(name == fts_s_minus)
+      object_imexport_dialog(o, suffix, ac - 1, at + 1, mode);
+    else
+    {
+      fts_hashtable_t *hash = (mode == fts_s_import)? fts_class_get_import_handlers(cl): fts_class_get_export_handlers(cl);
+      fts_atom_t k, v;
+      
+      if(suffix == fts_s_default)
+      {
+        char *str = strrchr((char *)fts_symbol_name(name), '.');
+        
+        if(str != NULL)
+          suffix = fts_new_symbol(str + 1);
+      }
+      
+      fts_set_symbol(&k, suffix);
+      if(fts_hashtable_get(hash, &k, &v))
+      {        
+        fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
+        (*meth)(o, 0, suffix, ac, at);
+      }
+      else if(suffix != fts_s_default)
+      {
+        fts_set_symbol(&k, fts_s_default);
+        if(fts_hashtable_get(hash, &k, &v))
+        {        
+          fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
+          (*meth)(o, 0, fts_s_default, ac, at);
+        }
+        else
+          fts_object_error(o, "cannot %s %s data as %s", fts_symbol_name(mode), fts_symbol_name(fts_class_get_name(cl)), fts_symbol_name(suffix));
+      }
+      else
+        fts_object_error(o, "cannot %s %s data", fts_symbol_name(mode), fts_symbol_name(fts_class_get_name(cl)));
+    }
+  }
+}
+
+void 
+fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  object_imexport(o, fts_s_default, ac, at, fts_s_import);
+}
+
 void 
 fts_object_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
+  object_imexport(o, fts_s_default, ac, at, fts_s_export);
+}
+
+void
+fts_object_import_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
   if(ac > 0 && fts_is_symbol(at))
   {
-    fts_symbol_t name = fts_get_symbol(at);
+    fts_symbol_t suffix = fts_get_symbol(at);
     
-    if(name != fts_s_minus)
-    {  
-      fts_list_t *handlers = fts_object_get_class(o)->export_handlers;
-      
-      if (!fts_object_try_handlers(handlers, o, winlet, s, ac, at))
-        fts_object_error(o, "export: cannot open file %", fts_symbol_name(name));
-    }
-    else
-      fts_object_export_dialog(o, winlet, s, ac - 1, at + 1);
+    object_imexport(o, suffix, ac - 1, at + 1, fts_s_import);
   }
   else
-    fts_object_export_dialog(o, winlet, s, ac, at);
+    fts_object_error(o, "importas: type argument missing");
 }
 
-/* try list of functions until one returns true (anything but void) */
-int 
-fts_object_try_handlers(fts_list_t *handlers, fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at)
+void
+fts_object_export_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int done = 0;
-  
-  while (handlers  &&  !done)
+  if(ac > 0 && fts_is_symbol(at))
   {
-    fts_method_t func = fts_get_pointer(fts_list_get(handlers));
+    fts_symbol_t suffix = fts_get_symbol(at);
     
-    /* try handler */
-    func(o, w, s, ac, at);
-    
-    /* check if return atom is not void == success */
-    done = !fts_is_void(fts_get_return_value());
-    
-    handlers = fts_list_next(handlers);
+    object_imexport(o, suffix, ac - 1, at + 1, fts_s_export);
   }
-  
-  return done;
-}
-
-/* open dialog and then call "import" method with the selected filename */
-void
-fts_object_import_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_open_dialog(o, fts_s_import, fts_new_symbol("Open file to import"), ac, at);
-}
-
-
-/* open dialog and then call "export" method with the selected filename */
-void
-fts_object_export_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_symbol_t default_name = fts_new_symbol("untitled");
-  
-  fts_object_save_dialog(o, fts_s_export, fts_new_symbol("Select file to export"), fts_project_get_dir(), default_name, ac, at);
+  else
+    fts_object_error(o, "exportas: type argument missing");
 }
