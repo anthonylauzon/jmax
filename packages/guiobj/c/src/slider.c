@@ -139,19 +139,19 @@ slider_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if (cmd == fts_s_object)
     {
-      fts_object_blip(o, "Slider");
+      fts_object_blip(o, "slider");
     }
   else if (cmd == fts_s_inlet)
     {
       int n = fts_get_int_arg(ac, at, 1, 0);
 
-      fts_object_blip(o, "<int> set and output the value,set <int> set only");
+      fts_object_blip(o, "<number>: set and output the value, set <number>: set only");
     }
   else if (cmd == fts_s_outlet)
     {
       int n = fts_get_int_arg(ac, at, 1, 0);
 
-      fts_object_blip(o, "Output the slider position as an integer", n);
+      fts_object_blip(o, "output value", n);
     }
 }
 
@@ -178,11 +178,10 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_list, slider_list);
 
-  a[0] = fts_s_anything;	/* number */
+  a[0] = fts_s_anything; /* number */
   fts_method_define(cl, 0, fts_s_set, slider_set, 1, a);
 
    /* Add  the value daemon */
-
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, slider_get_value);
   fts_class_add_daemon(cl, obj_property_put, fts_s_value, slider_put_value);
 

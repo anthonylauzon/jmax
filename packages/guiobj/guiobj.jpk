@@ -20,7 +20,7 @@ global jmaxArch jmaxMode
 ucs load module guiobj $dir/c/lib/$jmaxArch/$jmaxMode/libguiobj.so
 
 ## load help patch table
-#sourceFile $dir/help/guiobj.help.index.tcl
+sourceFile $dir/help/guiobj.help.index.tcl
 
 # load silently
 #post "package: guiobj"

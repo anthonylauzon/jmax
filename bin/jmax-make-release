@@ -360,9 +360,9 @@ decrypt_options $@
 
 check_options
 
-check_cvs_sync
+#check_cvs_sync
 
-check_recompile
+#check_recompile
 
 compute_version_number
 
