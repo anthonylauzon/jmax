@@ -68,7 +68,7 @@ class BpfTableDialog extends JDialog implements BpfDataListener {
 	validate();
     }
       
-    public void pointsDeleted(int[] indexs) 
+    public void pointsDeleted(int index, int size) 
     {
 	getContentPane().validate();
 	tabPanel.validate();

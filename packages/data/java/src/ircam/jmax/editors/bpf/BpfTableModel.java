@@ -70,8 +70,8 @@ class BpfTableModel extends AbstractTableModel{
 
   /**
    * SetValue method: invoked by the cellEditor, sets the given value
-   * in the Explode. Row is the event number, column is the field to change. 
-   * @see WholeNumberField*/
+   * (row is the event number, column is the field to change)
+   */
   public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
   {
       if((columnIndex == 0)||(aValue==null)) return;

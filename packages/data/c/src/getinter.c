@@ -20,6 +20,7 @@
  *
  */
 #include <fts/fts.h>
+#include <float.h>
 #include "bpf.h"
 #include "ivec.h"
 #include "fvec.h"
@@ -147,71 +148,62 @@ getinter_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 
-static int
-bpf_advance(bpf_t *bpf, int index, double time)
-{
-  /* time must be > 0.0 */
-  if(time >= bpf_get_time(bpf, index + 1))
-    {
-      index++;
-      
-      while(time > bpf_get_time(bpf, index + 1))
-	index++;
-    }
-  else if(time < bpf_get_time(bpf, index))
-    {
-      index--;
-      
-      while(time < bpf_get_time(bpf, index))
-	index--;
-    }
-  else if(bpf_get_time(bpf, index) == bpf_get_time(bpf, index + 1))
-    index++;
-
-  return index;
-}
-
 static void
 getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getinter_bpf_t *this = (getinter_bpf_t *)o;
   bpf_t *bpf = (bpf_t *)this->obj;
   int size = bpf_get_size(bpf);
-  double duration = bpf_get_duration(bpf);
-  double time = fts_get_number_float(at);
-  int index;
-  
-  if(size < 2 || time < 0.0)
+
+  if(size > 0)
     {
-      this->index = 0;
-      fts_outlet_float(o, 0, bpf_get_value(bpf, 0));
-    }
-  else
-    {
-      if(time >= duration)
+      double time = fts_get_number_float(at);
+      
+      if(time < bpf_get_time(bpf, 0))
 	{
-	  this->index = size - 2;
-	  fts_outlet_float(o, 0, bpf_get_value(bpf, size - 1));
+	  this->index = 0;
+	  fts_outlet_float(o, 0, bpf_get_value(bpf, 0));
+	}
+      else if(time >= bpf_get_duration(bpf))
+	{
+	  this->index = size - 1;
+	  fts_outlet_float(o, 0, bpf_get_target(bpf));
 	}
       else
 	{
-	  double t0, t1, y0, y1;
-      
-	  if(this->index > size - 2)
-	    index = bpf_advance(bpf, size - 2, time);
-	  else
-	    index = bpf_advance(bpf, this->index, time);
-      
+	  int index = this->index;
+
+	  if(index > size - 2)
+	    index = size - 2;
+	  
+	  /* search index */
+	  if(time >= bpf_get_time(bpf, index + 1))
+	    {
+	      index++;
+	      
+	      while(time > bpf_get_time(bpf, index + 1))
+		index++;
+	    }
+	  else if(time < bpf_get_time(bpf, index))
+	    {
+	      index--;
+	      
+	      while(time < bpf_get_time(bpf, index))
+		index--;
+	    }
+	  else if(bpf_get_slope(bpf, index) == DBL_MAX)
+	    index++;
+	  
+	  /* remember new index */
 	  this->index = index;
 	  
-	  t0 = bpf_get_time(bpf, index + 0);
-	  t1 = bpf_get_time(bpf, index + 1);
-	  y0 = bpf_get_value(bpf, index + 0);
-	  y1 = bpf_get_value(bpf, index + 1);
-	  
-	  fts_outlet_float(o, 0, y0 + (y1 - y0) * (time - t0) / (t1 - t0));
+	  /* output interpolated value */
+	  fts_outlet_float(o, 0, bpf_get_value(bpf, index) + 
+			   (time - bpf_get_time(bpf, index)) * bpf_get_slope(bpf, index));
 	}
     }
+  else
+    fts_outlet_float(o, 0, 0.0);    
 }
   
 /******************************************************

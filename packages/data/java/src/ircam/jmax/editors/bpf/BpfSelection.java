@@ -255,7 +255,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
   public void pointAdded(int index) 
   {
-      select(index);    
+    select(index);    
   }
   /**
    * TrackDataListener interface: keep the index-based selection consistent. */
@@ -302,16 +302,14 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
     public void pointsChanged(){}
 
-    /** TrackDataListener interface */
-    public void pointsDeleted(int[] oldIndexs) 
+    public void pointsDeleted(int index, int size) 
     {
-	for(int i =0; i<oldIndexs.length;i++)
+	for(int i=0; i<size; i++)
 	    {
-		if(isSelectedIndex(oldIndexs[i]))
-		    removeSelectionInterval(i,i);
-		else
-		    if(oldIndexs[i] < getMinSelectionIndex())
-			setSelectionInterval(getMinSelectionIndex()-1, getMaxSelectionIndex()-1);
+	      if(isSelectedIndex(index + i))
+		removeSelectionInterval(i, i);
+	      else if(index + i < getMinSelectionIndex())
+		setSelectionInterval(getMinSelectionIndex() - 1, getMaxSelectionIndex() - 1);
 	    }
     }
 
@@ -321,16 +319,9 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
     public void deleteAll()
     {
-	if(isSelectedIndex(0)) removeSelectionInterval(0, 0);
-	
-	MaxVector v = new MaxVector();		           
-	for (Enumeration en = getSelected(); en.hasMoreElements();)
-	    v.addElement(en.nextElement());
+	((FtsBpfObject)itsModel).requestPointsRemove(getMinSelectionIndex(), size());
+
 	deselectAll();
-
-	((FtsBpfObject)itsModel).requestPointsRemove(v.elements());
-
-	v = null;
     }
 
     public void selectNext()

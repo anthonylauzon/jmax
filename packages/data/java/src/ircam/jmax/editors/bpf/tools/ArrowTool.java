@@ -96,21 +96,7 @@ public class ArrowTool extends SelecterTool implements DragListener{
       float value = bgc.getAdapter().getInvY(y);
       int index = ftsObj.getNextPointIndex(time);
 
-      /* new time equals previous time */
-      if(time == ftsObj.getPointAt(index - 1).getTime())
-	  {
-	      if(index == ftsObj.length() || value == ftsObj.getPointAt(index - 1).getValue())
-		  {
-		      // do nothing! (don't add jump point at the end or double point)
-		  }
-	      else if(index == 1 || time == ftsObj.getPointAt(index - 2).getTime())
-		  {
-		      // set value of previous point (no add!)      
-		      ftsObj.requestSetPoint(index-1, time, value); 
-		  }
-	  }
-	  else
-	      ftsObj.requestPointCreation(index, time, value); 
+      ftsObj.requestPointCreation(index, time, value); 
   
       mountIModule(itsSelecter);
   }
@@ -126,12 +112,8 @@ public class ArrowTool extends SelecterTool implements DragListener{
     BpfGraphicContext bgc = (BpfGraphicContext) gc;
     BpfAdapter a = bgc.getAdapter();
     FtsBpfObject ftsObj = bgc.getFtsObject();
-
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
-
-    if(bgc.getSelection().isInSelection(ftsObj.getPointAt(0)))
-	deltaX = 0;
 
     if((deltaX==0)&&(deltaY==0)) 
       {
@@ -176,94 +158,19 @@ public class ArrowTool extends SelecterTool implements DragListener{
     BpfPoint prev = ftsObj.getPreviousPoint(first);
     int nextX = -1;
     int prevX = -1;
+
     if(next!=null)
       nextX = a.getX(next);
     if(prev!=null)
       prevX = a.getX(prev);
 
-    if((lastX+deltaX > nextX)&&(next!=null)) deltaX = nextX-lastX;
-	else if((firstX+deltaX < prevX)&&(prev!=null)) deltaX = prevX-firstX;
+    if((lastX + deltaX > nextX) && (next!=null)) 
+      deltaX = nextX-lastX;
+    else if((firstX+deltaX < prevX) && (prev!=null)) 
+      deltaX = prevX-firstX;
 
     // starts a serie of undoable moves
     ((UndoableData) bgc.getDataModel()).beginUpdate();
-
-    //control of Jumps and double points  ///////////////
-    
-    boolean repeat = false; 
-    if(bgc.getSelection().size()>1)
-	{
-	    if(deltaX<0)
-		{
-		    if(first.getTime() == ftsObj.getNextPoint(first).getTime())
-			repeat = true;
-		}		   
-	    else
-		if(last.getTime() == ftsObj.getPreviousPoint(last).getTime())
-		    repeat = true;
-	}
-
-    if(firstX+deltaX <= prevX)
-	{
-	    if(firstIndex == ftsObj.length() - 1 || first.getValue() == prev.getValue())
-		{
-		    //remove the first selected index and send the rest;
-		    bgc.getSelection().deSelect(first);
-		    ftsObj.requestPointRemove(firstIndex);
-		}
-	    else
-		if(firstIndex == 1 ||
-		   a.getInvX(firstX + deltaX) <= ftsObj.getPointAt(firstIndex - 2).getTime())
-		    {
-			//remove prev and send the points with index -1
-			if(repeat)
-			    {
-				//remove prev and first
-				int[] indexs = {firstIndex, firstIndex-1};
-				bgc.getSelection().deSelect(first);
-				ftsObj.requestPointsRemove(indexs);	
-			    }
-			else
-			    ftsObj.requestPointRemove(firstIndex-1);		    
-			firstIndex--;		    
-		    }
-		else
-		    if(repeat) 
-			{
-			    bgc.getSelection().deSelect(first);
-			    ftsObj.requestPointRemove(firstIndex);
-			}
-	}
-    else if((lastX+deltaX == nextX) && (lastIndex < ftsObj.length() - 1 ))
-	{
-	    if(last.getValue() == next.getValue())
-		{
-		    //remove the last selected index and send the rest;
-		    bgc.getSelection().deSelect(last);
-		    ftsObj.requestPointRemove(lastIndex);
-		}
-	    else 
-		if(lastIndex == ftsObj.length() - 2 ||
-		   a.getInvX(lastX + deltaX) >= ftsObj.getPointAt(lastIndex + 2).getTime())
-		    {
-			// remove next and send all 
-			if(repeat)
-			    {
-				//remove prev and first
-				int[] indexs = {lastIndex+1, lastIndex};
-				bgc.getSelection().deSelect(last);
-				ftsObj.requestPointsRemove(indexs);				
-			    }
-			else
-			    ftsObj.requestPointRemove(lastIndex+1);		    
-		    }
-		else
-		    if(repeat) 
-			{
-			    bgc.getSelection().deSelect(last);
-			    ftsObj.requestPointRemove(lastIndex);
-			}
-	}
-    /////////////////////////////////////////
 
     int i = 0;
     int selSize = bgc.getSelection().size();

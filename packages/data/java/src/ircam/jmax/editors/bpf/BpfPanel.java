@@ -165,7 +165,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     {
 	resizePanelToPointTime(bpfData.getPointAt(index));	
     }
-    public void pointsDeleted(int[] index){}
+    public void pointsDeleted(int index, int size){}
     public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue) 
     {
 	if(oldIndex!=newIndex)
@@ -173,7 +173,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     }
     public void pointsChanged() 
     {
-	//resizePanelToPointTime(bpfData.getPointAt(newIndex));//????????
+      //resizePanelToPointTime(bpfData.getPointAt(bpfData.length() - 1));
     }
     public void cleared(){}
     /////////////////////////////////////////////////////////////

@@ -60,7 +60,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 	validate();
 	
 	model.addBpfListener(new BpfDataListener() {
-		public void pointsDeleted(int[] oldIndexs){BpfEditor.this.repaint();}
+		public void pointsDeleted(int index, int size){BpfEditor.this.repaint();}
 		public void pointAdded(int index) {
 		    BpfEditor.this.repaint();			
 		}

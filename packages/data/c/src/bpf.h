@@ -38,6 +38,7 @@ typedef struct _bp_
 {
   double time; /* absolute break point time */
   double value; /* break point value */
+  double slope; /* slope to next value */
 } bp_t;
 
 /*************************************************
@@ -62,14 +63,10 @@ DATA_API fts_type_t bpf_type;
 
 #define bpf_get_time(b, i) ((b)->points[i].time)
 #define bpf_get_value(b, i) ((b)->points[i].value)
-#define bpf_set_point(b, i, t, v) ((b)->points[i].time = (t), (b)->points[i].value = (v))
+#define bpf_get_slope(b, i) ((b)->points[i].slope)
 
 #define bpf_get_duration(b) ((b)->points[(b)->size - 1].time)
 #define bpf_get_target(b) ((b)->points[(b)->size - 1].value)
-
-/* search index by time */
-DATA_API int bpf_search_index(bpf_t *bpf, double time, int index);
-#define bpf_get_index(b, t) (bpf_search_index((b), (t), (b)->size / 2))
 
 /* bpf atoms */
 #define bpf_atom_set(ap, x) fts_set_object_with_type((ap), (x), bpf_type)

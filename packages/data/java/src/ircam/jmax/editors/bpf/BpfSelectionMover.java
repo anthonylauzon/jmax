@@ -194,10 +194,6 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     BpfGraphicContext bgc = (BpfGraphicContext)gc;
     BpfAdapter a = bgc.getAdapter();
     FtsBpfObject ftsObj = bgc.getFtsObject();
-
-    if(bgc.getSelection().isInSelection(bgc.getFtsObject().getPointAt(0)))
-	dx = 0;
-
     Rectangle tempr, clip; 
     tempr = (Rectangle) g.getClip();
     clip = bgc.getEditorClip();
