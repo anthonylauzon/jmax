@@ -28,6 +28,10 @@
 
 #include "ftsconfig.h"
 
+#if HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
