@@ -208,15 +208,19 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if(dy > 0)
     {
 	int minY = a.getY(bgc.getSelection().getMinValueInSelection());
-	int h = bgc.getGraphicDestination().getSize().height;
-	if(minY + dy > h)
-	    dy = h - minY;
+	/*int hMin = bgc.getGraphicDestination().getSize().height;*/
+	int hMin = a.getY(ftsObj.getMinimumValue());
+	if(minY + dy > hMin)
+	  dy = hMin - minY;
     }
     else
     {
 	int maxY = a.getY(bgc.getSelection().getMaxValueInSelection());
-	if(maxY + dy < 0)
-	    dy = -maxY;
+	int hMax = a.getY(ftsObj.getMaximumValue());
+	if(maxY + dy < hMax)
+	  dy = hMax - maxY;
+	/*if(maxY + dy < 0)
+	  dy = -maxY;*/
     }
 	
     //// Clip deltaX
@@ -236,7 +240,9 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     if(next!=null)
 	nextX = a.getX(next);
     if(prev!=null)
-	prevX = a.getX(prev);
+      prevX = a.getX(prev);
+    else
+      prevX = a.getX(0);
 
     if((next != null)&&(lastX+dx > nextX)) dx = nextX-lastX;
     else if((prev != null)&&(firstX+dx < prevX)) dx = prevX-firstX;
@@ -281,6 +287,8 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 	    PointRenderer.getRenderer().render(tempPoint, g, true, bgc);
 	  }
       }
+
+    displayMovingSelectionInfo(dx, dy);
     
     g.setPaintMode();
     g.setColor(Color.black);
@@ -312,6 +320,30 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
     {
 	return itsMovements;
     }
+
+  void displayMovingSelectionInfo(int dx, int dy)
+  {
+    BpfGraphicContext bgc = (BpfGraphicContext)gc;
+    BpfAdapter a = bgc.getAdapter();
+
+    BpfPoint first = bgc.getSelection().getFirstInSelection();
+    BpfPoint last = bgc.getSelection().getLastInSelection();
+    BpfPoint prev = bgc.getFtsObject().getPreviousPoint(first);
+
+    String text = "("+PointRenderer.numberFormat.format(a.getInvX(a.getX(first)+dx))+" , "+
+      PointRenderer.numberFormat.format(a.getInvY(a.getY(first)+dy))+" )  ";
+    
+    if(bgc.getSelection().size() > 1)
+      text = text+"["+(int)(last.getTime()-first.getTime())+"]";
+    
+    if(prev!=null)
+      {
+	float prevTime = a.getInvX(a.getX(first)+dx) - prev.getTime();
+	if(prevTime < 0) prevTime = 0;
+	text = PointRenderer.numberFormat.format(prevTime)+" --> "+text;
+      }
+    bgc.displayInfo(text);
+  }
 
   //--- Fields
   Rectangle enclosingRect = new Rectangle();

@@ -66,6 +66,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JAVACFLAGSX = @JAVACFLAGSX@
+JAVACX = @JAVACX@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
@@ -81,8 +83,8 @@ VERSION = @VERSION@
 
 SUBDIRS = actions menus renderers tools
 
-noinst_PROGRAMS = package
-package_SOURCES = \
+packagedir = $(pkgdatadir)
+package_JAVA = \
 ChangeRangeDialog.java \
 CoordinateWriter.java \
 FreeHandDrawer.java \
@@ -105,52 +107,22 @@ Tabler.java \
 UndoableValueSet.java 
 
 
-JAVACX = @JAVACX@
-JAVACFLAGSX = @JAVACFLAGSX@
-JAVAROOTX = @top_srcdir@/packages/data/java
-CLASSPATH_ENVX = CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/data/java
-
-SUFFIXES = .java .class
+JAVAC = @JAVACX@
+JAVACFLAGS = @JAVACFLAGSX@
+JAVAROOT = @top_srcdir@/packages/data/java
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-noinst_PROGRAMS =  package$(EXEEXT)
-PROGRAMS =  $(noinst_PROGRAMS)
-
-
-DEFS = @DEFS@ -I. -I$(srcdir) -I../../../../../../../include
-CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
-LIBS = @LIBS@
-package_OBJECTS =  ChangeRangeDialog.class CoordinateWriter.class \
-FreeHandDrawer.class FtsTableObject.class LineDrawer.class \
-LineListener.class ScalePanel.class StripeSelecter.class \
-TableAdapter.class TableDataListener.class TableDataModel.class \
-TableDisplay.class TableDynamicDragListener.class \
-TableGraphicContext.class TableInteractionModule.class \
-TableMouseDragTracker.class TablePanel.class TableSelection.class \
-Tabler.class UndoableValueSet.class
-package_LDADD = $(LDADD)
-package_DEPENDENCIES = 
-package_LDFLAGS = 
-CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-DIST_COMMON =  Makefile.am Makefile.in
+DIST_COMMON =  $(package_JAVA) Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(package_SOURCES)
-OBJECTS = $(package_OBJECTS)
-
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .class .java .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --foreign packages/data/java/ircam/jmax/editors/table/Makefile
 
@@ -159,54 +131,31 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-mostlyclean-noinstPROGRAMS:
+mostlyclean-packageJAVA:
 
-clean-noinstPROGRAMS:
-	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+clean-packageJAVA:
+	-rm *.class classpackage.stamp
 
-distclean-noinstPROGRAMS:
+distclean-packageJAVA:
 
-maintainer-clean-noinstPROGRAMS:
+maintainer-clean-packageJAVA:
 
-# FIXME: We should only use cygpath when building on Windows,
-# and only if it is available.
-.c.obj:
-	$(COMPILE) -c `cygpath -w $<`
+install-packageJAVA: classpackage.stamp
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(packagedir)
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(packagedir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(packagedir)/$$p; \
+	done
 
-.s.o:
-	$(COMPILE) -c $<
-
-.S.o:
-	$(COMPILE) -c $<
-
-mostlyclean-compile:
-	-rm -f *.o core *.core
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-maintainer-clean-compile:
-
-.s.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
-
-.S.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
-
-distclean-libtool:
-
-maintainer-clean-libtool:
-
-package$(EXEEXT): $(package_OBJECTS) $(package_DEPENDENCIES)
-	@rm -f package$(EXEEXT)
-	$(LINK) $(package_LDFLAGS) $(package_OBJECTS) $(package_LDADD) $(LIBS)
+uninstall-packageJAVA:
+	@$(NORMAL_UNINSTALL)
+	for p in *.class; do \
+	  rm -f $(DESTDIR)$(packagedir)/$$p; \
+	done
+classpackage.stamp: $(package_JAVA)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > classpackage.stamp
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -338,20 +287,21 @@ installcheck: installcheck-recursive
 install-exec-am:
 install-exec: install-exec-recursive
 
-install-data-am:
+install-data-am: install-packageJAVA
 install-data: install-data-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-recursive
-uninstall-am:
+uninstall-am: uninstall-packageJAVA
 uninstall: uninstall-recursive
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile classpackage.stamp
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs: installdirs-recursive
 installdirs-am:
+	$(mkinstalldirs)  $(DESTDIR)$(packagedir)
 
 
 mostlyclean-generic:
@@ -363,39 +313,31 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-noinstPROGRAMS mostlyclean-compile \
-		mostlyclean-libtool mostlyclean-tags \
+mostlyclean-am:  mostlyclean-packageJAVA mostlyclean-tags \
 		mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-noinstPROGRAMS clean-compile clean-libtool clean-tags \
-		clean-generic mostlyclean-am
+clean-am:  clean-packageJAVA clean-tags clean-generic mostlyclean-am
 
 clean: clean-recursive
 
-distclean-am:  distclean-noinstPROGRAMS distclean-compile \
-		distclean-libtool distclean-tags distclean-generic \
+distclean-am:  distclean-packageJAVA distclean-tags distclean-generic \
 		clean-am
 	-rm -f libtool
 
 distclean: distclean-recursive
 
-maintainer-clean-am:  maintainer-clean-noinstPROGRAMS \
-		maintainer-clean-compile maintainer-clean-libtool \
-		maintainer-clean-tags maintainer-clean-generic \
-		distclean-am
+maintainer-clean-am:  maintainer-clean-packageJAVA maintainer-clean-tags \
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
 maintainer-clean: maintainer-clean-recursive
 
-.PHONY: mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
-clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
-mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile mostlyclean-libtool distclean-libtool \
-clean-libtool maintainer-clean-libtool install-data-recursive \
-uninstall-data-recursive install-exec-recursive \
+.PHONY: mostlyclean-packageJAVA distclean-packageJAVA clean-packageJAVA \
+maintainer-clean-packageJAVA uninstall-packageJAVA install-packageJAVA \
+install-data-recursive uninstall-data-recursive install-exec-recursive \
 uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \
 dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
@@ -407,14 +349,6 @@ uninstall-am uninstall all-redirect all-am all installdirs-am \
 installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
-
-.java.class:
-	$(CLASSPATH_ENVX) $(JAVACX) -d $(JAVAROOTX) $(JAVACFLAGSX) $?
-
-package: $(package_OBJECTS) $(package_DEPENDENCIES)
-
-clean-compile:
-	rm -f *.class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -6,7 +6,8 @@ GraphicConnection.java\
 GraphicObject.java\
 NumberBox.java\
 ObjectPopUp.java\
-SensibilityArea.java
+SensibilityArea.java\
+Standard.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@

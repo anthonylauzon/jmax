@@ -82,7 +82,7 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 
 	      BpfPoint point = (BpfPoint) gc.getRenderManager().firstObjectContaining(x, y);	      
 	      if (point != null) 
-		  { //click on event
+		  { //click on point
 		      startingPoint.setLocation(x,y);
 		      if (!selection.isInSelection(point)) 
 			  {
@@ -113,11 +113,15 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 	      
 		      singleObjectSelected(x, y, modifiers);
 		  }
-	      else //click on empty
-		  if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-		      if (!selection.isSelectionEmpty())
-			  selection.deselectAll(); 
+	      else 
+		  if(!clickOnConnection(x, y, modifiers))//click on empty
+		      {
+			  if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+			      if (!selection.isSelectionEmpty())
+				  selection.deselectAll(); 
+		      }
 	  }
+      ((BpfGraphicContext)gc).displaySelectionInfo();		    
   }
 
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
@@ -128,6 +132,98 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   public void controlAction(int x, int y, int modifiers) 
   {
       //
+  }
+
+  public boolean clickOnConnection(int x, int y, int modifiers)
+  {
+      BpfAdapter a = ((BpfGraphicContext)gc).getAdapter();
+      FtsBpfObject data = ((BpfGraphicContext)gc).getFtsObject();
+      BpfPoint start, end;
+
+      float time = a.getInvX(x);
+      start = data.getPreviousPoint(time);
+      if(start!=null) end = data.getNextPoint(start);
+      else end = data.getNextPoint(time);
+	  
+      if( start == null || end == null) return false;
+
+      int startX = a.getX(start);
+      int startY = a.getY(start);
+      int endX = a.getX(end);
+      int endY = a.getY(end);
+
+      boolean down  = (startX <= endX);
+      boolean right = (startY <= endY);
+
+      boolean onConnection = false;
+
+      if (down)
+	  {
+	      if ((x < (startX - 4)) || (x > (endX + 4)))
+		  onConnection = false;
+	  }
+      else
+	  {
+	      if ((x < (endX - 4)) || (x > (startX + 4)))
+		  onConnection = false;
+	  }
+      
+      if (right)
+	  {
+	      if ((y < startY - 4) || (y > endY + 4))
+		  onConnection = false;
+	  }
+      else
+	  {
+	      if ((y < endY - 4) || (y > startY + 4))
+		  onConnection = false;
+	  }
+      
+      float length = (float) Math.sqrt((startX - endX)*(startX - endX) + (startY - endY)*(startY - endY));
+      float z = (float) ((startY - y) * (endX - startX) - (startX - x) * (endY - startY));
+      
+      if (z > 0.0)
+	  onConnection = ((z/length) < 4.0);
+      else
+	  onConnection = ((z/length) > -4.0);
+  
+      if(onConnection)
+	  {
+	      BpfSelection selection = ((BpfGraphicContext)gc).getSelection();
+
+	      startingPoint.setLocation(x,y);
+	      
+	      if (!(selection.isInSelection(start)&&selection.isInSelection(end))) 
+		  {
+		      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+			  {
+			      selection.deselectAll();
+			      selection.setSelectionInterval(data.indexOf(start), data.indexOf(end));
+			  }
+		      else
+			  {
+			      int min = selection.getMinSelectionIndex();
+			      int max = selection.getMaxSelectionIndex();
+			      int index = ((BpfGraphicContext)gc).getFtsObject().indexOf(start);
+			      if((min<0)||(max<0))  selection.setSelectionInterval(index, index+1);
+			      else
+				  {
+				      if(index < min) 					  
+					  selection.setSelectionInterval(index, max);
+				      else if(index+1 > max)
+					  selection.setSelectionInterval(min, index+1);
+				      
+				      selection.setLastSelectedPoint(end);
+				  }
+			  }
+		  }
+	      else
+		  selection.setLastSelectedPoint(end);
+		
+	      singleObjectSelected(x, y, modifiers);
+	  }
+
+      return onConnection;
   }
 
   /**

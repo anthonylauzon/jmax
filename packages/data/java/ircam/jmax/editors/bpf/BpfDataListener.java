@@ -37,7 +37,7 @@ public interface BpfDataListener {
   /**
    * callbacks
    */
-  abstract public void pointsDeleted(int[] oldIndexs);
+  abstract public void pointsDeleted(int index, int size);
   abstract public void pointAdded(int index);
   abstract public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue);
   abstract public void pointsChanged();

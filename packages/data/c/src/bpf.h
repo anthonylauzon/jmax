@@ -38,6 +38,7 @@ typedef struct _bp_
 {
   double time; /* absolute break point time */
   double value; /* break point value */
+  double slope; /* slope to next value */
 } bp_t;
 
 /*************************************************
@@ -53,28 +54,34 @@ typedef struct _bpf_
   int size;
   fts_symbol_t keep;
   int opened; /* non zero if editor open */
+  int editid; /* index of changes */
 } bpf_t;
 
 DATA_API fts_symbol_t bpf_symbol;
 DATA_API fts_metaclass_t *bpf_type;
+DATA_API fts_class_t *bpf_class;
 
 #define bpf_get_size(b) ((b)->size)
 
 #define bpf_get_time(b, i) ((b)->points[i].time)
 #define bpf_get_value(b, i) ((b)->points[i].value)
-#define bpf_set_point(b, i, t, v) ((b)->points[i].time = (t), (b)->points[i].value = (v))
+#define bpf_get_slope(b, i) ((b)->points[i].slope)
 
-#define bpf_get_duration(b) ((b)->points[(b)->size - 1].time)
-#define bpf_get_target(b) ((b)->points[(b)->size - 1].value)
+#define bpf_get_duration(b) ((b)->size > 0? (b)->points[(b)->size - 1].time: 0.0)
+#define bpf_get_target(b) ((b)->size > 0? (b)->points[(b)->size - 1].value: 0.0)
 
-/* search index by time */
-DATA_API int bpf_search_index(bpf_t *bpf, double time, int index);
-#define bpf_get_index(b, t) (bpf_search_index((b), (t), (b)->size / 2))
+#define bpf_get_editid(b) ((b)->editid)
 
 /* bpf atoms */
 #define bpf_atom_get(ap) ((bpf_t *)fts_get_object(ap))
 #define bpf_atom_is(ap) (fts_is_a((ap), bpf_type))
 
+DATA_API void bpf_clear(bpf_t *bpf);
 DATA_API void bpf_copy(bpf_t *bpf, bpf_t *copy);
+DATA_API void bpf_append_point(bpf_t *bpf, double time, double value);
+DATA_API void bpf_set_point(bpf_t *bpf, int index, double time, double value);
+DATA_API void bpf_insert_point(bpf_t *bpf, double time, double value);
+DATA_API void bpf_remove_points(bpf_t *bpf, int index, int n);
+DATA_API void bpf_simplify(bpf_t *bpf, double time, double value);
 
 #endif

@@ -61,6 +61,8 @@ public class BpfForeground implements Layer {
 
       g.clipRect(0, 0, gc.getGraphicDestination().getSize().width, gc.getGraphicDestination().getSize().height);
 
+      drawPhantom(g, r);
+
       for (Enumeration e = gc.getRenderManager().
 	       objectsIntersecting( r.x, 0, r.width, d.height); e.hasMoreElements();) 
 	  {
@@ -76,6 +78,27 @@ public class BpfForeground implements Layer {
       g.setClip(tempr);
   }
     
+    
+
+  private void drawPhantom(Graphics g, Rectangle r)
+  {
+      BpfPoint first = gc.getDataModel().getPointAt(0);
+      BpfPoint last = gc.getDataModel().getLastPoint();
+      BpfAdapter a = gc.getAdapter();
+
+      if(first == null) return;
+
+      if(first.getTime() > 0)
+	  {
+	      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	      ((Graphics2D)g).setStroke(dashed);
+	      
+	      g.setColor(Color.gray);
+	      g.drawLine(a.getX((float)0), a.getY(last), a.getX(first), a.getY(first));
+	      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	      ((Graphics2D)g).setStroke(normal);
+	  }
+  }
   /** Returns the current EventRenderer */
   public ObjectRenderer getObjectRenderer()
   {
@@ -84,6 +107,16 @@ public class BpfForeground implements Layer {
 
   //--- Fields
   BpfGraphicContext gc;
+
+  final static float dash[] = {1.0f, 5.0f};
+  final static BasicStroke dashed = new BasicStroke(1.0f, 
+						    BasicStroke.CAP_BUTT, 
+						    BasicStroke.JOIN_MITER, 
+						    10.0f, dash, 2.0f);
+  final static BasicStroke normal = new BasicStroke(1.0f, 
+						    BasicStroke.CAP_BUTT, 
+						    BasicStroke.JOIN_MITER, 
+						    10.0f);
 }
 
 

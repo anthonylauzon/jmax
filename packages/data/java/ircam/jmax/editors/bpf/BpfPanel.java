@@ -47,8 +47,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     
     FtsBpfObject bpfData;
     EditorContainer itsContainer;
-
-    //public BpfRuler ruler;
     
     Box trackPanel;
     //---
@@ -80,7 +78,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	geometry = new Geometry();
 	geometry.setXZoom(20);
 	geometry.setYZoom(300);
-	geometry.setYInvertion(true);
 	geometry.setYTransposition(136);
     }
     //-------------------------------------------------
@@ -94,8 +91,8 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     ///prepare the bpfEditor
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
-    container_panel.setPreferredSize(new Dimension(BpfWindow.DEFAULT_WIDTH, BpfWindow.DEFAULT_HEIGHT/*-30*/));
-    container_panel.setSize(BpfWindow.DEFAULT_WIDTH, BpfWindow.DEFAULT_HEIGHT/*-30*/);
+    container_panel.setPreferredSize(new Dimension(BpfWindow.DEFAULT_WIDTH, BpfWindow.DEFAULT_HEIGHT));
+    container_panel.setSize(BpfWindow.DEFAULT_WIDTH, BpfWindow.DEFAULT_HEIGHT);
 
     editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());
@@ -111,16 +108,25 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	public void zoomChanged(float zoom, float oldZoom)
 	    {
 		repaint();
-		BpfPoint lastPoint = bpfData.getLastPoint();
-		if(lastPoint!=null)
-		    resizePanelToTimeWithoutScroll((int)lastPoint.getTime());
+		if((editor.getSize().width>0)&&(zoom!=oldZoom))
+		  resizePanelToLastPoint();
 	    }
     });
 
+    addComponentListener( new ComponentAdapter() {
+	public void componentResized(ComponentEvent e)
+	{
+	  repaint();
+	  if(editor.getSize().width>0)
+	    resizePanelToLastPoint();
+	}
+      });
+
     //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
-    int totalTime = MINIMUM_TIME;
+    int totalTime = (int)editor.getGraphicContext().getAdapter().getInvX(BpfWindow.DEFAULT_WIDTH);
     
-    itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, 1000, 0, totalTime);
+    itsTimeScrollbar = new JScrollBar(Scrollbar.HORIZONTAL, 0, totalTime, 0, totalTime);
+    itsTimeScrollbar.setVisible(false);
     itsTimeScrollbar.setUnitIncrement(10);
     itsTimeScrollbar.setBlockIncrement(1000);
     
@@ -146,7 +152,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     {
 	resizePanelToPointTime(bpfData.getPointAt(index));	
     }
-    public void pointsDeleted(int[] index){}
+    public void pointsDeleted(int index, int size){}
     public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue) 
     {
 	if(oldIndex!=newIndex)
@@ -173,48 +179,43 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
       
 	if(time > maximumTime)
 	    {
-		int delta = maximumTime-itsTimeScrollbar.getMaximum();
-		
-		itsTimeScrollbar.setMaximum(time-delta);
-		itsTimeScrollbar.setValue(time);
+	      resizePanelToLastPoint();
+	      itsTimeScrollbar.setValue(time);
 	    }
 	else 
-	    if( time > maxVisibleTime)		
-		itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
-	    else
-		if(time < -geometry.getXTransposition())
-		    itsTimeScrollbar.setValue(time);
+	  if(( time > maxVisibleTime)||(time < -geometry.getXTransposition()))
+	    itsTimeScrollbar.setValue(time); 
     }
+  
+  private void resizePanelToLastPoint()
+  {
+    BpfPoint lastPoint = bpfData.getLastPoint();
+    int time =0;	    
+    
+    int timeWindow = editor.getGraphicContext().getTimeWindow();
+    if(lastPoint!=null)
+      time = (int)(lastPoint.getTime() + BpfAdapter.DX/geometry.getXZoom());		
+    if(time<timeWindow) time = timeWindow;
+    
+    itsTimeScrollbar.setVisible( (time > timeWindow));
+    itsTimeScrollbar.setValue(0);
+    itsTimeScrollbar.setVisibleAmount(timeWindow);
+    itsTimeScrollbar.setMaximum(time);				
+  }
 
-    private void resizePanelToTimeWithoutScroll(int time)
-    {
-	int maximumTime = getMaximumTime();
-      
-	if(time > maximumTime)
-	    {
-		int delta = maximumTime-itsTimeScrollbar.getMaximum();
-		itsTimeScrollbar.setMaximum(time-delta);
-	    }
-    }
-    private void resizePanelToPointTimeWithoutScroll(BpfPoint point)
-    {
-	int evtTime = (int)(point.getTime());
-	resizePanelToTimeWithoutScroll(evtTime);
-    }
+  public Frame getFrame(){
+    return itsContainer.getFrame();
+  }
 
-    public Frame getFrame(){
-	return itsContainer.getFrame();
-    }
+  public FtsBpfObject getFtsObject()
+  {
+    return bpfData;
+  }
 
-    public FtsBpfObject getFtsObject()
-    {
-	return bpfData;
-    }
-
-    public BpfEditor getBpfEditor()
-    {
-	return editor;
-    }
+  public BpfEditor getBpfEditor()
+  {
+    return editor;
+  }
   //------------------- Editor interface ---------------
 
   public EditorContainer getEditorContainer(){
@@ -226,107 +227,108 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
     
-    /**
-     * ListSelectionListener interface
-     */    
-    public void valueChanged(ListSelectionEvent e)
-    {
-	BpfSelection sel = editor.getGraphicContext().getSelection();
-	if (sel.size()==1)
-	    {
-		BpfPoint pt = (BpfPoint)sel.getSelected().nextElement();
-		makeVisible(pt);
-	    }
-    }
+  /**
+   * ListSelectionListener interface
+   */    
+  public void valueChanged(ListSelectionEvent e)
+  {
+    BpfSelection sel = editor.getGraphicContext().getSelection();
+    if (sel.size()==1)
+      {
+	BpfPoint pt = (BpfPoint)sel.getSelected().nextElement();
+	makeVisible(pt);
+      }
+  }
     
-    public boolean pointIsVisible(BpfPoint point)
-    {
-	int time = (int)point.getTime();
-	int startTime = -geometry.getXTransposition(); 
-	int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
-	return ((time>startTime)&&(time<endTime));
-    }
+  public boolean pointIsVisible(BpfPoint point)
+  {
+    int time = (int)point.getTime();
+    int startTime = -geometry.getXTransposition(); 
+    int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
+    return ((time>startTime)&&(time<endTime));
+  }
 
-    ///////AUTOMATIC SCROLLING  
-    public boolean pointIsVisible(int x, int y)
-    {
-	Rectangle r = itsContainer.getViewRectangle();
-	return ((x > r.x) && (x < r.x + r.width));
-    } 
+  ///////AUTOMATIC SCROLLING  
+  public boolean pointIsVisible(int x, int y)
+  {
+    Rectangle r = itsContainer.getViewRectangle();
+    return ((x > r.x) && (x < r.x + r.width));
+  } 
 
-    public boolean pointIsScrollable(int x, int y)
-    {
-	return !((editor.getGraphicContext().getLogicalTime()==0)&&(x<=0));
-    }
+  public boolean pointIsScrollable(int x, int y)
+  {
+    return !((editor.getGraphicContext().getLogicalTime()==0)&&(x<=0));
+  }
 
-    private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
-    private int scrolledDelta = 2;//the corresponding graphic delta
-    public int scrollBy(int x, int y)
-    {
-	Rectangle r = itsContainer.getViewRectangle();
-	if(x < r.x)
-	    {
-		if(itsTimeScrollbar.getValue()-scrollingDelta >0)
-		    {
-			itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
-			return -scrolledDelta;//scroll to left
-		    }
-		else return 0;//is already scrolled to zero
-	    }
-	else
-	    {		
-		if(x > r.x + r.width)
-		    {
-			int value = itsTimeScrollbar.getValue()+scrollingDelta;
-			if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
-			    itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
-			
-			itsTimeScrollbar.setValue(value);
-			return scrolledDelta;//scroll to rigth
-		    }
-		else return 0;//the mouse is in the window
-	    }
-    }
+  private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
+  private int scrolledDelta = 2;//the corresponding graphic delta
+  public int scrollBy(int x, int y)
+  {
+    Rectangle r = itsContainer.getViewRectangle();
+    if(x < r.x)
+      {
+	if(itsTimeScrollbar.getValue()-scrollingDelta >0)
+	  {
+	    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
+	    return -scrolledDelta;//scroll to left
+	  }
+	else return 0;//is already scrolled to zero
+      }
+    else
+      {		
+	if(x > r.x + r.width)
+	  {
+	    int value = itsTimeScrollbar.getValue()+scrollingDelta;
+	    if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
+	      itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
+	    
+	    itsTimeScrollbar.setValue(value);
+	    return scrolledDelta;//scroll to rigth
+	  }
+	else return 0;//the mouse is in the window
+      }
+  }
 
-    public void makeVisible(BpfPoint pt)
-    {
-	int time = (int)pt.getTime();
-	int startTime = -geometry.getXTransposition(); 
-	int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
-	  
-	if((time<startTime)||(time>endTime))
-	    itsTimeScrollbar.setValue(time);
-    }
+  public void makeVisible(BpfPoint pt)
+  {
+    int time = (int)pt.getTime();
+    int startTime = -geometry.getXTransposition(); 
+    int endTime = geometry.sizeToMsec(geometry, getSize().width)-1 ;
+    
+    if((time<startTime)||(time>endTime))
+      itsTimeScrollbar.setValue(time);
+  }
 
-    public int getMaximumVisibleTime()
-    {
-	return geometry.sizeToMsec(geometry, getSize().width)-1 ;
-    }
+  public boolean isScrollbarVisible()
+  {
+    return itsTimeScrollbar.isVisible();
+  }
 
-    public int getMaximumTime()
-    {
-	int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
-	int size = getSize().width;
-      
-	if (geometry.getXInvertion()) 
-	    return (int) (maxTransp -(size)/geometry.getXZoom())-1;
-	
-	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
-    }
+  public int getMaximumVisibleTime()
+  {
+    return geometry.sizeToMsec(geometry, getSize().width)-1 ;
+  }
 
-      /////////////////ScrollManager Interface
-    public void scrollIfNeeded(int time)
-    {
-	resizePanelToTime(time);
-    }
-    public void scrollToValue(int value)
-    {
-	itsTimeScrollbar.setValue(value);
-    }
-    public Rectangle getViewRectangle()
-    {
-	return getBpfEditor().getBounds();
-    }
+  public int getMaximumTime()
+  {
+    int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
+    int size = getSize().width - BpfAdapter.DX;
+    return (int) ((size)/geometry.getXZoom() - maxTransp);
+  }
+
+  /////////////////ScrollManager Interface
+  public void scrollIfNeeded(int time)
+  {
+    resizePanelToTime(time);
+  }
+  public void scrollToValue(int value)
+  {
+    itsTimeScrollbar.setValue(value);
+  }
+  public Rectangle getViewRectangle()
+  {
+    return getBpfEditor().getBounds();
+  }
 }
 
 

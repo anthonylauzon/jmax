@@ -71,7 +71,7 @@ public class PointRenderer implements ObjectRenderer {
 
 	int x = adapter.getX(point);
 	int y = adapter.getY(point);    
-      
+
 	if(selected)
 	    g.setColor(Color.red);
 	else
@@ -100,13 +100,6 @@ public class PointRenderer implements ObjectRenderer {
 			    int nextX = adapter.getX(next)+((UtilBpfPoint)point).getDeltaX(adapter);
 			    g.drawLine(x, y, nextX, adapter.getY(next)+((UtilBpfPoint)point).getDeltaY(adapter));
 			}
-
-		//draw the cross and the current values
-		if(bgc.getSelection().size()==1)
-		    {
-			g.drawLine(x, y-10, x, y+10);
-			g.drawLine(x-10, y, x+10, y);
-		    }
 	    }
 	else //normal paint
 	    {
@@ -116,7 +109,20 @@ public class PointRenderer implements ObjectRenderer {
 		    g.setColor(Color.black);
 		
 		if(next != null)
-		    g.drawLine(x, y, adapter.getX(next), adapter.getY(next)); 
+		    {			
+			int nextX = adapter.getX(next);
+			int nextY = adapter.getY(next);
+
+			g.drawLine(x, y, nextX, nextY); 			
+
+			if( selected && bgc.getSelection().isInSelection(next))  
+			    {
+				if( java.lang.Math.abs(x - nextX) > java.lang.Math.abs(y - nextY))
+				    g.drawLine(x, y+1, nextX, nextY+1);
+				else 
+				    g.drawLine(x+1, y, nextX+1, nextY);
+			    } 				
+		    }
 	    }
   }
   

@@ -1,7 +1,6 @@
 SUBDIRS=renderers tools
-
-noinst_PROGRAMS = package
-package_SOURCES = \
+packagedir=$(pkgdatadir)
+package_JAVA = \
 BpfWindow.java \
 BpfAdapter.java \
 BpfDataListener.java \
@@ -22,19 +21,9 @@ FtsBpfObject.java \
 ScrollManager.java \
 UtilBpfPoint.java 
 
-JAVACX = @JAVACX@
-JAVACFLAGSX=@JAVACFLAGSX@
-JAVAROOTX=@top_srcdir@/packages/data/java
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/data/java
-
-SUFFIXES = .java .class
-
-.java.class:
-	$(CLASSPATH_ENVX) $(JAVACX) -d $(JAVAROOTX) $(JAVACFLAGSX) $?
-
-package: $(package_OBJECTS) $(package_DEPENDENCIES)
-
-clean-compile:
-	rm -f *.class
+JAVAC = @JAVACX@
+JAVACFLAGS=@JAVACFLAGSX@
+JAVAROOT=@top_srcdir@/packages/data/java
+CLASSPATH_ENV=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/data/java
 
 

@@ -77,7 +77,7 @@ class BpfTablePanel extends JPanel implements ListSelectionListener {
 	    {
 		table.revalidate();
 	    }
-	    public void pointsDeleted(int[] indexs)
+	    public void pointsDeleted( int index, int size)
 	    {
 		table.revalidate();
 	    }

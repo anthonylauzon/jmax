@@ -60,11 +60,7 @@ public class BpfAdapter {
    */
   public int getX(BpfPoint p) 
   {
-    float temp = p.getTime();
-    
-    if (geometry.getXInvertion()) temp = -temp;
-
-    return (int) ((temp+geometry.getXTransposition())*geometry.getXZoom());
+      return getX(p.getTime());
   }
 
     /**
@@ -73,9 +69,7 @@ public class BpfAdapter {
    */
   public int getX(float x) 
   {
-    if (geometry.getXInvertion()) x = -x;
-
-    return (int) ((x+geometry.getXTransposition())*geometry.getXZoom());
+    return (int) ((x+geometry.getXTransposition())*geometry.getXZoom()) + DX;
   }
 
   public int getWidth(float w)
@@ -89,11 +83,9 @@ public class BpfAdapter {
    */
     public float getInvX(int x) 
     {
-      if (geometry.getXInvertion()) return (float) (geometry.getXTransposition() - x/geometry.getXZoom());
-
-      else return (float) (x/geometry.getXZoom() - geometry.getXTransposition());
-    
-  }
+	x = x - DX;
+	return (float) (x/geometry.getXZoom() - geometry.getXTransposition());    
+    }
 
   public int getInvWidth(int w)
   {
@@ -117,12 +109,7 @@ public class BpfAdapter {
    */
     public int getY(BpfPoint p) 
     {  
-	float value = p.getValue() - /*(float)minValue*/gc.getDataModel().getMinimumValue();
-	int height = gc.getGraphicDestination().getSize().height;
-	float range = gc.getDataModel().getRange();
-	float step = (float)((float)height/range);
-	
-	return height - (int)(value*step);
+	return getY(p.getValue());
     }
     /**
      * it returns the Y graphic value of the event from the y logic value,
@@ -130,11 +117,11 @@ public class BpfAdapter {
      */
     public int getY(float y) 
     {  
-	float value = y - /*(float)minValue*/ gc.getDataModel().getMinimumValue();
-	int height = gc.getGraphicDestination().getSize().height;
+	float value = y - gc.getDataModel().getMinimumValue();
+	int height = gc.getGraphicDestination().getSize().height -2*DY;
 	float range = gc.getDataModel().getRange();
 	float step = (float)((float)height/range);
-	return height - (int)(value*step);
+	return height - (int)(value*step) + DY;
     }
 
   public void setInvY(BpfPoint p, int y)
@@ -148,12 +135,14 @@ public class BpfAdapter {
    */  
   public float getInvY(int y) 
   {
+    y = y - DY;
+
     float temp;
-    int height = gc.getGraphicDestination().getSize().height;
+    int height = gc.getGraphicDestination().getSize().height -2*DY;
     float range = gc.getDataModel().getRange();
     float step = (float)(range/(float)height);
 	
-    temp = (((height-y)*step) + /*(float)minValue*/gc.getDataModel().getMinimumValue());
+    temp = (((height-y)*step) + gc.getDataModel().getMinimumValue());
 
     return temp;
   }
@@ -223,6 +212,9 @@ public class BpfAdapter {
     Geometry geometry;
 
     BpfGraphicContext gc;
+
+    public static int DX = 15;
+    public static int DY = 20;
 }
 
 

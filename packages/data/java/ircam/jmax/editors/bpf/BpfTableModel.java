@@ -70,8 +70,8 @@ class BpfTableModel extends AbstractTableModel{
 
   /**
    * SetValue method: invoked by the cellEditor, sets the given value
-   * in the Explode. Row is the event number, column is the field to change. 
-   * @see WholeNumberField*/
+   * (row is the event number, column is the field to change)
+   */
   public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
   {
       if((columnIndex == 0)||(aValue==null)) return;
@@ -89,9 +89,12 @@ class BpfTableModel extends AbstractTableModel{
 	      float nextTime = -1;
 	      if(rowIndex>0)
 		  prevTime = model.getPointAt(rowIndex-1).getTime();
-	      if(rowIndex< model.length())
-		  nextTime = model.getPointAt(rowIndex+1).getTime();
 	      
+	      if(rowIndex< model.length()-1)
+		  nextTime = model.getPointAt(rowIndex+1).getTime();
+	      else
+		  nextTime = current;
+
 	      if(current > nextTime) current = nextTime;
 	      else if(current < prevTime) current = prevTime;
 	      

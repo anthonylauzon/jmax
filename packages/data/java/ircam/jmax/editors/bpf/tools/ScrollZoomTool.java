@@ -68,7 +68,7 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
 
   public Cursor getCursor()
   {
-    return Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
+      return Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
   }  
   
   /**
@@ -95,7 +95,7 @@ public class ScrollZoomTool extends Tool implements  DirectionListener, DynamicD
     {
 	/* workaround: right-mouse events used when popup is visible */
 	if(((BpfEditor)gc.getGraphicSource()).getMenu().isVisible()) return;
-	BpfGraphicContext bgc = (BpfGraphicContext) gc;	
+	BpfGraphicContext bgc = (BpfGraphicContext) gc;
 	Geometry geometry = bgc.getAdapter().getGeometry();
 
 	if(e.isShiftDown())

@@ -30,7 +30,6 @@ public class JMaxPackageLoader {
     String fs = File.separator;
     String packagePath = ((String)JMaxApplication.getProperty( "jmaxRoot")) + fs + "packages";
     String jarPath = packagePath + fs + packageName + fs + "java" + fs + packageName + ".jar";
-
     char[] ch = packageName.toCharArray();
     ch[0] = Character.toUpperCase( ch[0]);
     String className = new String( ch);

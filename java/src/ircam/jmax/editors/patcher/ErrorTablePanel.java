@@ -41,7 +41,6 @@ import ircam.jmax.widgets.*;
 
 public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 
-  /*private final static Color selectedColor = new Color(204, 204, 255);*/
   static class ErrorTableCellRenderer extends DefaultTableCellRenderer
   {
     public Component getTableCellRendererComponent(JTable table, Object obj, 

@@ -40,19 +40,18 @@ public class BpfGraphicContext extends GraphicContext {
 
   /**
    * Constructor */
-  public BpfGraphicContext(BpfDataModel model, BpfSelection s)
+  public BpfGraphicContext(BpfDataModel model)
   {
-      super();
-      setDataModel(model);
-      itsSelection = s;
+    super();
+    setDataModel(model);
   }
 
   /**
    * Returns the lenght (in msec) rapresented in the current window */
   public int getTimeWindow()
   {
-    return (int)(itsGraphicDestination.getSize().width/
-			   (itsAdapter.getGeometry().getXZoom()));
+    return (int)(( itsGraphicDestination.getSize().width - BpfAdapter.DX)/
+		 (itsAdapter.getGeometry().getXZoom()));
   }
 
 
@@ -95,14 +94,22 @@ public class BpfGraphicContext extends GraphicContext {
     return -itsAdapter.getGeometry().getXTransposition();
   }
 
+  public int getMaximumTime()
+  {
+    if(scrollManager.isScrollbarVisible())
+      return scrollManager.getMaximumTime();
+    else
+      return (int)itsAdapter.getInvX(getGraphicDestination().getSize().width);
+  }
+
     /*
      * returns visible rectangle of the associated track editor
      */
    public Rectangle getEditorClip()
-    {
-	return new Rectangle(0, 0, ((BpfWindow)getFrame()).getViewRectangle().width - 2, 
-			     getGraphicDestination().getSize().height);
-    }
+  {
+    return new Rectangle(0, 0, ((BpfWindow)getFrame()).getViewRectangle().width - 2, 
+			 getGraphicDestination().getSize().height);
+  }
 
   public void setToolManager(BpfToolManager t)
   {
@@ -143,25 +150,55 @@ public class BpfGraphicContext extends GraphicContext {
 	display.setText(text);
     }
 
-    public void setDisplay(JLabel label)
-    {
-	display = label;
-    }
+  public void displayInfo(String text)
+  {
+    info.setText(text);
+  }
+  public void displaySelectionInfo()
+  {
+    if(getSelection().size()==0)
+      info.setText("");
+    else
+      {		
+	BpfPoint first = getSelection().getFirstInSelection();
+	BpfPoint last = getSelection().getLastInSelection();
+	BpfPoint prev = getFtsObject().getPreviousPoint(first);
+
+	String text = "("+PointRenderer.numberFormat.format(first.getTime())+" , "+
+	  PointRenderer.numberFormat.format(first.getValue())+" )  ";
+	
+	if(getSelection().size() > 1)
+	  text = text+"["+PointRenderer.numberFormat.format(last.getTime()-first.getTime())+"]";
+	
+	if(prev!=null)
+	  text = PointRenderer.numberFormat.format(first.getTime()-prev.getTime())+" --> "+text;
+	
+	info.setText(text);
+      }
+  }
+  
+  public void setDisplay(JLabel label, JLabel infoLabel)
+  {
+    display = label;
+    info = infoLabel;
+  }
   //---- Fields 
     
-    BpfDataModel itsDataModel;
+  BpfDataModel itsDataModel;
 
-    BpfSelection itsSelection;
+  BpfSelection itsSelection;
 
-    BpfAdapter itsAdapter;
+  BpfAdapter itsAdapter;
 
-    int itsLogicalTime;
+  int itsLogicalTime;
+  
+  int maximumTime;
 
-    BpfToolManager toolManager;
+  BpfToolManager toolManager;
 
-    ScrollManager scrollManager;
+  ScrollManager scrollManager;
     
-    JLabel display;
+  JLabel display, info;
 }
 
 

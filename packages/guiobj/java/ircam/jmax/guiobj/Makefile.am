@@ -32,7 +32,6 @@ ScopeControlPanel.java \
 ScopeRunModePopUp.java \
 Slider.java \
 SliderControlPanel.java \
-Standard.java \
 Toggle.java \
 VecDispControlPanel.java \
 VecDispRModePopUp.java \

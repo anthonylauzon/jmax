@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.guiobj;
+package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -34,7 +34,6 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
-import ircam.jmax.editors.patcher.objects.*;
 
 public class Standard extends Editable implements FtsObjectErrorListener
 {
