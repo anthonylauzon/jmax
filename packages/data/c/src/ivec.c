@@ -805,7 +805,7 @@ ivec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   ivec_t *this = (ivec_t *)o;
 
-  if(this->persistent)
+  if(this->keep == fts_s_yes)
     {
       fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
       int size = ivec_get_size(this);
@@ -818,15 +818,14 @@ ivec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       for(i=0; i<size; i++)
 	{
 	  fts_set_int(av + ac, this->values[i]);
+	  ac++;
 	  
-	  if(ac == 256)
+	  if(ac == 257)
 	    {
 	      fts_bmax_save_message(f, fts_s_set, ac, av);
 	      fts_set_int(av , i + 1); /* set next offset */
 	      ac = 1;
 	    }
-	  
-	  ac++;
 	}
       
       if(ac > 1) 
@@ -855,19 +854,12 @@ ivec_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-ivec_set_persistent(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+ivec_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   ivec_t *this = (ivec_t *)obj;
 
-  if(fts_is_symbol(value))
-    {
-      fts_symbol_t s = fts_get_symbol(value);
-
-      if(s == fts_s_yes)
-	this->persistent = 1;
-      else
-	this->persistent = 0;	
-    }
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
 }
 
 static void
@@ -917,10 +909,24 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   ac--;
   at++;
 
+  this->opened = 0; 
+  this->vsize = 0; 
+  this->vindex = 0;
+  this->zoom = 1.0;
+  this->pixsize = 1;
+  this->copy = 0;
+  this->keep = fts_s_no;
+
   if(ac == 0)
-    ivec_alloc(this, 0);
+    {
+      ivec_alloc(this, 0);
+      this->keep = fts_s_no;
+    }
   else if(ac == 1 && fts_is_int(at))
-    ivec_alloc(this, fts_get_int(at));
+    {
+      ivec_alloc(this, fts_get_int(at));
+      this->keep = fts_s_no;
+    }
   else if(ac == 1 && fts_is_list(at))
     {
       fts_list_t *aa = fts_get_list(at);
@@ -928,20 +934,16 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
       ivec_alloc(this, size);
       ivec_set_from_atom_list(this, 0, size, fts_list_get_ptr(aa));
+      this->keep = fts_s_args;
     }
   else if(ac > 1)
     {
       ivec_alloc(this, ac);
       ivec_set_from_atom_list(this, 0, ac, at);
+      this->keep = fts_s_args;
     }
-
-  this->persistent = 0;
-  this->opened = 0; 
-  this->vsize = 0; 
-  this->vindex = 0;
-  this->zoom = 1.0;
-  this->pixsize = 1;
-  this->copy = 0;
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -984,7 +986,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, ivec_set);
 
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, ivec_get_state);
-      fts_class_add_daemon(cl, obj_property_put, fts_s_keep, ivec_set_persistent);
+      fts_class_add_daemon(cl, obj_property_put, fts_s_keep, ivec_set_keep);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
 

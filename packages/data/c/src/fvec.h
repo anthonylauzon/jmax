@@ -35,7 +35,7 @@ typedef struct _fvec_
   float *values;
   int size;
   int alloc;
-  int persistent;
+  fts_symbol_t keep;
   float sr; /* sr > 0: force sample rate when loading sample files, sr <= 0: sample rate of current file */
 } fvec_t;
 

@@ -121,13 +121,14 @@ bpf_set_client(bpf_t *bpf)
 }
 
 int
-bpf_get_index(bpf_t *bpf, double time)
+bpf_search_index(bpf_t *bpf, double time, int index)
 {
   bp_t *points = bpf->points;
   int size = bpf_get_size(bpf);
-  int index = size / 2;
 
-  if(time >= points[index].time)
+  if(size == 1 || time == 0.0)
+    return 0;
+  else if(time >= points[index].time)
     {
       if(time >= points[size - 2].time)
 	return size - 2;
@@ -240,7 +241,7 @@ bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	}      
     }
   
-  set_size(this, size + index);  
+  set_size(this, index);
 }
 
 static void
@@ -405,13 +406,8 @@ bpf_set_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   if(index == 0)
     {
       /* set value of point 0.0 */
+      time = 0.0;
       this->points[0].value = value;
-
-      fts_set_int(a, 0);
-      fts_set_float(a + 1, 0.0);
-      fts_set_float(a + 2, value);
-
-      fts_client_send_message(o, sym_setPoint, 3, a);
     }
   else
     {
@@ -428,6 +424,8 @@ bpf_set_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
 
 	      fts_set_int(a, index);
 	      fts_client_send_message(o, sym_removePoints, 1, a);
+
+	      return;
 	    }
 	  else if(index > 1 && time == this->points[index - 2].time)
 	    {
@@ -444,6 +442,8 @@ bpf_set_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
 	      fts_set_float(a + 1, time);
 	      fts_set_float(a + 2, value);	      
 	      fts_client_send_message(o, sym_setPoint, 3, a);
+
+	      return;
 	    }
 	}
       else if (index < size - 1 && time >= this->points[index + 1].time)
@@ -457,6 +457,8 @@ bpf_set_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
 	      
 	      fts_set_int(a, index);
 	      fts_client_send_message(o, sym_removePoints, 1, a);
+
+	      return;
 	    }
 	  else if(index < size - 2 && time == this->points[index + 2].time)
 	    {
@@ -473,16 +475,20 @@ bpf_set_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
 	      fts_set_float(a + 1, time);
 	      fts_set_float(a + 2, value);	      
 	      fts_client_send_message(o, sym_setPoint, 3, a);	      
+
+	      return;
 	    }
 	}
-      else
-	{
-	  this->points[index].time = time;
-	  this->points[index].value = value;
-
-	  fts_client_send_message(o, sym_setPoint, 3, at);
-	}	
     }
+
+  this->points[index].time = time;
+  this->points[index].value = value;
+  
+  fts_set_int(a, index);
+  fts_set_float(a + 1, time);
+  fts_set_float(a + 2, value);
+  
+  fts_client_send_message(o, sym_setPoint, 3, a);
 }
 
 static void
@@ -517,7 +523,7 @@ bpf_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   double append_time = 0.0;
   int append = 0;
 
-  if(this->persistent)
+  if(this->keep == fts_s_yes)
     {
       fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);      
       int size = bpf_get_size(this);
@@ -580,19 +586,12 @@ bpf_assist(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-bpf_set_persistent(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+bpf_set_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   bpf_t *this = (bpf_t *)obj;
 
-  if(fts_is_symbol(value))
-    {
-      fts_symbol_t s = fts_get_symbol(value);
-
-      if(s == fts_s_yes)
-	this->persistent = 1;
-      else
-	this->persistent = 0;	
-    }
+  if(this->keep != fts_s_args && fts_is_symbol(value))
+    this->keep = fts_get_symbol(value);
 }
 
 static void
@@ -621,9 +620,21 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->points = 0;
   this->alloc = 0;
   this->size = 0;
-  this->persistent = 0;
 
-  bpf_set(o, 0, 0, ac, at);
+  if(ac)
+    {
+      bpf_set(o, 0, 0, ac, at);
+      this->keep = fts_s_args;
+    }
+  else
+    {
+      set_size(this, 1);
+      
+      this->points[0].time = 0.0;
+      this->points[0].value = 0.0;
+
+      this->keep = fts_s_no;
+    }
 }
 
 static void
@@ -666,7 +677,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, bpf_print);
 
-      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), bpf_set_persistent);
+      fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), bpf_set_keep);
       fts_class_add_daemon(cl, obj_property_get, fts_s_state, bpf_get_state);
 
       /* save and restore bmax file */
@@ -684,7 +695,6 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);
 
       fts_method_define_varargs(cl, 0, fts_s_set, bpf_set);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("absolute"), bpf_set);
       
       return fts_Success;
     }

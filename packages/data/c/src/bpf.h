@@ -51,7 +51,7 @@ typedef struct _bpf_
   bp_t *points; /* break points */
   int alloc;
   int size;
-  int persistent;
+  fts_symbol_t keep;
   int opened; /* non zero if editor open */
 } bpf_t;
 
@@ -69,7 +69,8 @@ extern fts_type_t bpf_type;
 #define bpf_get_target(b) ((b)->points[(b)->size - 1].value)
 
 /* search index by time */
-extern int bpf_get_index(bpf_t *bpf, double time);
+extern int bpf_search_index(bpf_t *bpf, double time, int index);
+#define bpf_get_index(b, t) (bpf_search_index((b), (t), (b)->size / 2))
 
 /* bpf atoms */
 #define bpf_atom_set(ap, x) fts_set_object_with_type((ap), (x), bpf_type)
