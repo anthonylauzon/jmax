@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.*;
 
 /**
  * The "integer box" graphic object.
@@ -14,7 +15,6 @@ class ErmesObjInt extends ErmesObject {
   ErmesObjOutlet itsOutlet;
   int itsInteger = 0;
   
-  static Frame itsFalseFrame = new Frame();
   static ErmesObjIntegerDialog itsIntegerDialog = null;
   static final int TRUST=10;		//how many transmitted values we trust?
   int transmission_buffer[];
@@ -54,8 +54,8 @@ class ErmesObjInt extends ErmesObject {
 
    public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
      super.Init(theSketchPad,  theFtsObject);
-     //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
-    //le valeur affiche risque de sortir de la boite
+
+     itsInteger = ((Integer)theFtsObject.get("value")).intValue();
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
      DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
      if(currentRect.height<DEFAULT_HEIGHT+4) {
@@ -96,6 +96,7 @@ class ErmesObjInt extends ErmesObject {
   // callback function from the associated FtsObject in FTS
   //--------------------------------------------------------
   protected void FtsValueChanged(Object value) {
+    
     int temp = ((Integer) value).intValue();
     
     last_value = temp;
@@ -112,9 +113,10 @@ class ErmesObjInt extends ErmesObject {
       // we're receiving other values
       transmission_index = 0;
       receiving_index = 0;
-      itsInteger = temp;
-      //DoublePaint();
-      Paint_specific(itsSketchPad.getGraphics());
+      if (itsInteger != temp) {
+	itsInteger = temp;//era solo questo
+	Paint_specific(itsSketchPad.getGraphics());
+      }
     }		
   }
 
@@ -170,7 +172,7 @@ class ErmesObjInt extends ErmesObject {
     
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-    if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(itsFalseFrame);
+    if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(MaxWindowManager.getTopFrame());
       itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY);
       itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
       itsIntegerDialog.setVisible(true);
@@ -224,7 +226,6 @@ class ErmesObjInt extends ErmesObject {
     if(itsSketchPad.itsRunMode || evt.isControlDown()){
       itsInteger = itsStartingY+(itsFirstY-y);
       itsFtsObject.put("value", new Integer(itsInteger));
-      //((FtsInteger) itsFtsActive).setValue(itsInteger);	ENZOOO
       DoublePaint();
       Trust(itsInteger);
       return true;
@@ -244,6 +245,8 @@ class ErmesObjInt extends ErmesObject {
   // paint
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
+
+    if (g == null) return;
     //draw the white area
     int xWhitePoints[] = {itsX+3, itsX+currentRect.width-3, itsX+currentRect.width-3, itsX+3, itsX+currentRect.height/2+3};
     int yWhitePoints[] = {itsY+1, itsY+1, itsY+currentRect.height-1,itsY+currentRect.height-1, itsY+currentRect.height/2};

@@ -704,6 +704,7 @@ Rectangle previousResizeRect = new Rectangle();
 
       objectX = ((Integer)fo.get("x")).intValue();
       objectY = ((Integer)fo.get("y")).intValue();
+      System.err.println("oggetto in posizione originale "+objectX+" "+objectY);
       fo.put("x", objectX+pasteDeltaX+incrementalPasteOffset);     
       fo.put("y", objectY+pasteDeltaY+incrementalPasteOffset);
        

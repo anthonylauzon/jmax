@@ -119,6 +119,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   
    public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
      if(evt.getClickCount()>1) {
+       Cursor temp = itsSketchPad.getCursor();
        
        if(itsFtsObject instanceof FtsObjectWithData){
 	 try{
@@ -126,10 +127,13 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	   // patchers now !!!
 	   
 	   MaxData data;
+	   itsSketchPad.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	   
-	   data = ((FtsObjectWithData) itsFtsObject).getData();
-	   
+	   data = ((FtsObjectWithData) itsFtsObject).getData();	   
 	   Mda.edit(data);
+
+	   itsSketchPad.setCursor(temp);
+
 	 }
 	 catch (MaxDocumentException e)
 	   {
@@ -157,10 +161,13 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   //--------------------------------------------------------
   int paintCount = 0;
   public void Paint_specific(Graphics g) {
-    //System.err.println(". "+(paintCount++));
-    //(new Throwable()).printStackTrace();
-    if(!itsSelected) g.setColor(itsLangNormalColor);
-    else g.setColor(itsLangSelectedColor);
+    Integer errorFlag = null;
+    if (itsFtsObject != null) errorFlag = (Integer) itsFtsObject.get("error");
+    if (errorFlag == null) {
+      if(!itsSelected) g.setColor(itsLangNormalColor);
+      else g.setColor(itsLangSelectedColor);
+    }
+    else  g.setColor(Color.red);
 
     g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);

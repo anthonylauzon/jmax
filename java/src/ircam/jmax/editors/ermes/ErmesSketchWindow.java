@@ -332,11 +332,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   protected void Copy() {
     CreateFtsGraphics(this);
 
-    //fill the systemClipboard AND the FtsClipboard
-
     itsSketchPad.ftsClipboard.copy(Fts.getSelection());
 
-    /*itsClipboardProvider.addSelection(Fts.getSelection());*/
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
   }
 

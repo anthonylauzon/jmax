@@ -170,10 +170,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	try
 	  {
 	    MaxData data;
-
+	    Cursor temp = itsSketchPad.getCursor();
+	    itsSketchPad.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    data = ((FtsObjectWithData) itsFtsObject).getData();
 
 	    Mda.edit(data);
+
+	    itsSketchPad.setCursor(temp);
 	  }
 	catch (MaxDocumentException e)
 	  {

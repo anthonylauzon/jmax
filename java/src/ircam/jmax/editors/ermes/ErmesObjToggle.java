@@ -75,6 +75,7 @@ class ErmesObjToggle extends ErmesObject {
   }
 
   public void Paint_specific(Graphics g) {
+    if (g == null) return;
     if(!itsSelected) g.setColor(itsUINormalColor/*Color.lightGray*/);
     else g.setColor(itsUISelectedColor/*Color.gray*/);
     g.fillRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2);

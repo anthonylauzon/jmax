@@ -22,6 +22,7 @@ public class ErmesSelection {
   }
 
   public void addObject(Object theObject) {
+    //System.err.println("add the object in pos."+((ErmesObject)theObject).itsX+" "+((ErmesObject)theObject).itsY);
     itsObjects.addElement(theObject);
     itsFtsSelection.addObject(((ErmesObject)theObject).itsFtsObject);
   }

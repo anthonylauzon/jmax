@@ -3,6 +3,7 @@ package ircam.jmax.editors.ermes;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /**
@@ -12,7 +13,6 @@ class ErmesObjFloat extends ErmesObject {
 	
   float itsFloat =  (float) 0.;
   static ErmesObjFloatDialog itsFloatDialog = null;
-  static Frame itsFalseFrame = new Frame();
   final int WIDTH_DIFF = 14;
   final int HEIGHT_DIFF = 2;
   int DEFAULT_WIDTH = 50;
@@ -47,8 +47,8 @@ class ErmesObjFloat extends ErmesObject {
   
   public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
     super.Init(theSketchPad, theFtsObject);
-    //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
-    //le valeur affiche risque de sortir de la boite
+    
+    itsFloat = ((Float)theFtsObject.get("value")).floatValue();
     DEFAULT_HEIGHT = itsFontMetrics.getHeight();
     DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("...");
     if(currentRect.height<DEFAULT_HEIGHT+4) {
@@ -151,7 +151,7 @@ class ErmesObjFloat extends ErmesObject {
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
-      if (itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(itsFalseFrame);
+      if (itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(MaxWindowManager.getTopFrame());
       itsFloatDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY);
       itsFloatDialog.ReInit(String.valueOf(itsFloat), this, itsSketchPad.GetSketchWindow());
       itsFloatDialog.setVisible(true);
@@ -216,7 +216,8 @@ class ErmesObjFloat extends ErmesObject {
   // paint
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
-    //draw the white area	
+    //draw the white area
+    if (g == null) return;
     int xWhitePoints[] = {itsX+3, itsX+currentRect.width-3, itsX+currentRect.width-3, itsX+3, itsX+currentRect.height/2+3};
     int yWhitePoints[] = {itsY+1, itsY+1, itsY+currentRect.height-1,itsY+currentRect.height-1, itsY+currentRect.height/2};
     if(!itsSelected) g.setColor(Color.white);

@@ -34,6 +34,8 @@ public class MaxWindowManager implements WindowListener
 
   private DefaultListModel windows = new DefaultListModel();
 
+  private static Frame topFrame = new Frame();
+
   static public MaxWindowManager getWindowManager()
   {
     return theWindowManager;
@@ -105,7 +107,7 @@ public class MaxWindowManager implements WindowListener
   }
 
   /** This method return a frame good for running a 
-    dialog that doesn't have a parent window;
+    dialog that doesn't care about the window actually activated;
     of course, at least one window must exists.
     */
   
@@ -117,6 +119,12 @@ public class MaxWindowManager implements WindowListener
       return null;
   }
 
+  /** This method returns a frame good for showing a dialog without
+   * changing the present hierarchy of windows
+   */
+  public static Frame getTopFrame() {
+    return topFrame;
+  }
 
   /** Produce a unique window title for the Name 
    *  the technique is the following (naive, but usefull)

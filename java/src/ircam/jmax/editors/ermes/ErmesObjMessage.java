@@ -139,6 +139,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
     
+    if (g == null) return;
     if (!itsSketchPad.itsRunMode) {
       if((!itsSelected)&&(!itsFlashing)) g.setColor(itsLangNormalColor);
       else g.setColor(itsLangSelectedColor);

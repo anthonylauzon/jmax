@@ -80,6 +80,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   }
 
   public void Paint_specific(Graphics g) {
+    if (g == null) return;
     if(!itsFlashing){
       if(!itsSelected) g.setColor(itsUINormalColor);
       else g.setColor(itsUISelectedColor);
