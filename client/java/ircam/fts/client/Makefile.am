@@ -16,6 +16,8 @@ FtsProtocolDecoder.java \
 FtsProtocolEncoder.java \
 FtsServer.java \
 FtsServerConnection.java \
+FtsServerEvent.java \
+FtsServerListener.java \
 FtsSocketConnection.java \
 FtsSymbol.java 
 

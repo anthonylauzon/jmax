@@ -31,13 +31,10 @@ import java.util.*;
 public class FtsServer {
 
   class ReceiveThread extends Thread {
-    ReceiveThread()
-    {
-      inputBuffer = new byte[0x10000];
-    }
-
     public void run()
     {
+      byte[] inputBuffer = new byte[0x10000];
+
       try
 	{
 	  while ( true)
@@ -53,11 +50,26 @@ public class FtsServer {
 	  return;
 	}
     }
-
-    private byte[] inputBuffer;
   }
 
-  public FtsServer( FtsServerConnection connection, FtsObject client)
+  class FtsClientObject extends FtsObject {
+    FtsClientObject( FtsServer server, FtsObject root, int id)
+    {
+      super( server, root, id);
+    }
+  }
+
+  static
+  {
+    FtsObject.registerMessageHandler( FtsClientObject.class, FtsSymbol.get( "notify"), new FtsMessageHandler() {
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsClientObject)obj).getServer().fireFtsServerEvent( args);
+	}
+      });
+  }
+
+  public FtsServer( FtsServerConnection connection)
   {
     this.connection = connection;
 
@@ -68,24 +80,13 @@ public class FtsServer {
     decoder = new FtsBinaryProtocolDecoder( this);
 
     root = new FtsObject( this, null, 0);
+    client = new FtsClientObject( this, root, 1);
 
-    if (client != null)
-      {
-	this.client = client;
-	putObject( 1, client);
-      }
-    else
-      {
-	this.client = new FtsObject( this, root, 1);
-      }
+    listeners = new ArrayList();
+    event = new FtsServerEvent( this);
 
     receiveThread = new ReceiveThread();
     receiveThread.start();
-  }
-
-  public FtsServer( FtsServerConnection connection)
-  {
-    this( connection, null);
   }
 
   /**
@@ -114,6 +115,42 @@ public class FtsServer {
     return root;
   }
 
+  public void addFtsServerListener( FtsServerListener listener)
+  {
+    listeners.add( listener);
+  }
+
+  public void removeFtsServerListener( FtsServerListener listener)
+  {
+    listeners.remove( listener);
+  }
+
+
+  // Non-public methods
+
+  void fireFtsServerEvent( FtsArgs args)
+  {
+    for ( Iterator i = listeners.iterator(); i.hasNext(); )
+      {
+	FtsServerListener listener = (FtsServerListener)i.next();
+	listener.messageReceived( event, args);
+      }
+  }
+
+  int getNewObjectID()
+  {
+    int id = newObjectID;
+
+    newObjectID += 2;
+
+    return id;
+  }
+
+  FtsObject getClient()
+  {
+    return client;
+  }
+
   FtsObject getObject( int id)
   {
     return (FtsObject)objectTable.get( new Integer( id));
@@ -122,11 +159,6 @@ public class FtsServer {
   void putObject( int id, FtsObject object)
   {
     objectTable.put( new Integer( id), object);
-  }
-
-  public int getNewObjectID()
-  {
-    return newObjectID+=2;
   }
 
   FtsProtocolEncoder getEncoder()
@@ -150,11 +182,15 @@ public class FtsServer {
   private FtsProtocolEncoder encoder;
 
   // Proxies of remote root and client
-  FtsObject root;
-  FtsObject client;
+  private FtsObject root;
+  private FtsObject client;
 
   // Objects ID handling
   private int newObjectID;
   private HashMap objectTable;
+
+  // FtsServerEvent handling
+  private FtsServerEvent event;
+  private List listeners;
 }
 

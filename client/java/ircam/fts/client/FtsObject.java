@@ -59,8 +59,8 @@ public class FtsObject {
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    encoder.writeObject( server.client);
-    encoder.writeSymbol( FtsSymbol.get( "new_object"));
+    encoder.writeObject( server.getClient());
+    encoder.writeSymbol( sNewObject );
     encoder.writeObject( parent);
     encoder.writeInt( id);
     encoder.writeSymbol( ftsClassName);
@@ -76,8 +76,8 @@ public class FtsObject {
     id = server.getNewObjectID();
     server.putObject( id, this);
 
-    encoder.writeObject( server.client);
-    encoder.writeSymbol( FtsSymbol.get("new_object"));
+    encoder.writeObject( server.getClient());
+    encoder.writeSymbol( sNewObject );
     encoder.writeObject( parent);
     encoder.writeInt( id);
     encoder.writeSymbol( ftsClassName);
@@ -114,7 +114,7 @@ public class FtsObject {
   public void send( FtsArgs args) throws IOException
   {
     encoder.writeObject( this);
-    encoder.writeSymbol( FtsSymbol.get("list"));
+    encoder.writeSymbol( sList);
     encoder.writeArgs( args);
     encoder.flush();
   }
@@ -122,7 +122,7 @@ public class FtsObject {
   public void send( int n) throws IOException
   {
     encoder.writeObject( this);
-    encoder.writeSymbol( FtsSymbol.get("int"));
+    encoder.writeSymbol( sInt);
     encoder.writeInt( n);
     encoder.flush();
   }
@@ -130,7 +130,7 @@ public class FtsObject {
   public void send( float f) throws IOException
   {
     encoder.writeObject( this);
-    encoder.writeSymbol( FtsSymbol.get("float"));
+    encoder.writeSymbol( sFloat);
     encoder.writeFloat( f);
     encoder.flush();
   }
@@ -174,29 +174,19 @@ public class FtsObject {
     while (cl != null);
   }
 
-  int getID()
-  {
-    return id;
-  }
-
-  public FtsObject getRoot()
-  {
-    return server.getRoot();
-  }
-
   public FtsObject getParent()
   {
     return parent;
   }
 
-  public boolean isARootPatcher()
-  {
-    return (getParent() == getServer().getRoot());
-  }
-    
-  public FtsServer getServer()
+  public final FtsServer getServer()
   {
     return server;
+  }
+
+  int getID()
+  {
+    return id;
   }
 
   private int id;
@@ -210,4 +200,9 @@ public class FtsObject {
 
   private static HashMap messageHandlersTable = new HashMap();
   private static MessageHandlerEntry lookupEntry = new MessageHandlerEntry( null, null);
+
+  private static FtsSymbol sNewObject = FtsSymbol.get( "new_object");
+  private static FtsSymbol sInt = FtsSymbol.get( "int");
+  private static FtsSymbol sFloat = FtsSymbol.get( "float");
+  private static FtsSymbol sList = FtsSymbol.get( "list");
 }
