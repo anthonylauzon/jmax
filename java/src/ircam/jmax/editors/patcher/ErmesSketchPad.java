@@ -887,7 +887,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
   public void print()
   {
-    PatcherPrintManager.Print( itsEditorContainer);
+    PatcherPrintManager.print( itsEditorContainer);
   }
   
   // -----------------------------------------------------------------------

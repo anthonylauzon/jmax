@@ -165,8 +165,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     // Finally, activate the updates
     itsPatcher.startUpdates();
 
-    if(itsSketchPad.getFtsPatcher() instanceof FtsPatcherObject)
-	((FtsPatcherObject)itsSketchPad.getFtsPatcher()).setEditorFrame(this);
+    itsPatcher.setEditorFrame(this);
 
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
   }

@@ -106,22 +106,9 @@ public class MaxWindowManager implements WindowListener
 
     windowOperationCount++;
 
-    if(/*(windows.size() > 0)&&(*/windows.contains(window))/*)*/
+    if(windows.contains(window))
       windows.setElementAt(window, windows.indexOf(window));
   }
-
-
-    /*void suspendWindow(Frame window)
-      {
-      windowOperationCount++;
-      windows.removeElement(window);
-      }
-
-      void readdWindow(Frame window)
-      {
-      windowOperationCount++;
-      windows.addElement(window);
-      }*/
 
   public ListModel getWindowList()
   {
@@ -237,7 +224,7 @@ public class MaxWindowManager implements WindowListener
       if(currentFrame == e.getWindow()) currentFrame=null;
   }
 
-  public void TileWindows()
+  public void tileWindows()
   {
     int width;
     int height;
@@ -300,7 +287,7 @@ public class MaxWindowManager implements WindowListener
   }
 
 
-  public void StackWindows()
+  public void stackWindows()
   {
     Frame window;
     int x, y;

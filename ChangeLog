@@ -1,3 +1,24 @@
+2003-03-19  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/audioconfig.c, fts/bmaxfile.c, fts/client.c, fts/midi.c, fts/object.c, fts/package.c,
+	fts/variable.c, include/ftsconfig-ac.h.in, include/ftsconfig-win32.h, packages/ispw/c/src/atomlist.c,
+	packages/numeric/c/src/abs.c, packages/numeric/c/src/clip.c: unified use of alloca().
+	The rules are now:
+	 - any file that uses alloca() *must* include ftsconfig.h
+	 - any file that uses alloca() *must* do: 
+	 #if HAVE_ALLOCA_H
+	 #include <alloca.h>
+	 #endif
+	 - we don't use HAVE_ALLOCA and assume that all platforms will have alloca().
+	
+	* java/src/ircam/jmax/JMaxApplication.java, java/src/ircam/jmax/MaxWindowManager.java,
+	java/src/ircam/jmax/editors/patcher/ErmesSketchPad.java, 
+	java/src/ircam/jmax/editors/patcher/ErmesSketchWindow.java,
+	java/src/ircam/jmax/editors/patcher/PatcherPrintManager.java,
+	java/src/ircam/jmax/toolkit/menus/MaxWindowJMenu.java: 
+	cleaned code for printing (I want to add a 'print' option to jmax in order to print files
+	without manual intervention).
+
 2003-03-17  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* integrating patches from Jarek for Windows compilation.

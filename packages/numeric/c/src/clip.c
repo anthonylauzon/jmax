@@ -22,6 +22,10 @@
 
 #include <stdlib.h>
 #include <fts/fts.h>
+#include <ftsconfig.h>
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 typedef struct 
 {

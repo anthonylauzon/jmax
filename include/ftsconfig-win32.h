@@ -52,12 +52,11 @@
 #undef WORDS_BIGENDIAN 
 
 /* mapping posix names to win32 names */
+#define alloca _alloca
 #define getcwd _getcwd
-#define isatty _isatty
-#define alloca _alloca
 #define getpid _getpid
+#define isatty _isatty
 #define snprintf _snprintf
-#define alloca _alloca
 #define bcopy(src,dst,n)  memcpy(dst,src,n)
 
 /* file handling macros */

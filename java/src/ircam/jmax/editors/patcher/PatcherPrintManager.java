@@ -22,24 +22,15 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
-// import javax.swing.*;
 import javax.swing.RepaintManager;
 
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import java.awt.print.*;
 
-public class PatcherPrintManager
+class PatcherPrintManager
 {
-  static private PatcherPrintManager printManager = new PatcherPrintManager();
-
-  /****************************************************************************/
-  /*                                                                          */
-  /*           ACTIONS                                                        */
-  /*                                                                          */
-  /****************************************************************************/
-  
-  static public void Print(EditorContainer container)
+  static void print(EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
 
@@ -49,10 +40,14 @@ public class PatcherPrintManager
     PageFormat format = printJob.pageDialog(printJob.defaultPage());    
     printJob.setPrintable(sketch, format);
 
-    if (printJob.printDialog()) {
-	try {
+    if (printJob.printDialog())
+      {
+	try
+	  {
 	    printJob.print();
-	} catch (Exception ex) {
+	  } 
+	catch (Exception ex)
+	  {
 	    ex.printStackTrace();
 	}
     }

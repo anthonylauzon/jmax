@@ -29,6 +29,9 @@
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 #include <ftsprivate/package.h>
 #include <ftsprivate/patcher.h>
@@ -1066,11 +1069,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       int i = 0;
       fts_iterator_t keys;
 
-#if HAVE_ALLOCA
       a = alloca(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
-#else
-      a = malloc(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
-#endif
               
       fts_list_get_values( this->template_names, &keys);
       
@@ -1084,11 +1083,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_bmax_code_push_atoms(&f, i, a);
       fts_bmax_code_obj_mess(&f, fts_s_template, i);
       fts_bmax_code_pop_args(&f, i);
-  
-#ifndef HAVE_ALLOCA
-      free(a);
-#endif    
-    }
+      }
 
   if ((this->help ) &&  fts_hashtable_get_size(this->help))
     {
@@ -1096,11 +1091,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       int i = 0;
       fts_iterator_t keys;
 
-#if HAVE_ALLOCA
       a = alloca(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
-#else
-      a = malloc(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
-#endif
               
       fts_list_get_values( this->help_classes, &keys);
       
@@ -1113,10 +1104,6 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_bmax_code_push_atoms(&f, i, a);
       fts_bmax_code_obj_mess(&f, fts_s_help, i);
       fts_bmax_code_pop_args(&f, i);
-  
-#ifndef HAVE_ALLOCA
-      free(a);
-#endif    
     }
 
   if( this->config)

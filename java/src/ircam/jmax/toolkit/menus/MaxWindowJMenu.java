@@ -116,12 +116,12 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
     add(mi);
     mi.addActionListener(new ActionListener()
 				{public  void actionPerformed(ActionEvent e)
-				    { MaxWindowManager.getWindowManager().StackWindows();}});
+				    { MaxWindowManager.getWindowManager().stackWindows();}});
     mi = new JMenuItem("Tile");
     add(mi);
     mi.addActionListener(new ActionListener()
 				{public  void actionPerformed(ActionEvent e)
-				    { MaxWindowManager.getWindowManager().TileWindows();}});
+				    { MaxWindowManager.getWindowManager().tileWindows();}});
 
     addSeparator();
 

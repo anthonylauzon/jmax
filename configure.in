@@ -1,8 +1,12 @@
-dnl $Id: configure.in,v 1.109 2003/02/05 11:42:26 p_tisserand Exp $
+dnl $Id: configure.in,v 1.110 2003/02/28 16:22:49 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.110  2003/02/28 16:22:49  p_tisserand
+dnl Add a check on doxygen
+dnl Add jmax/utils/linux_desktop/Makefile in list of file to generate
+dnl
 dnl Revision 1.109  2003/02/05 11:42:26  p_tisserand
 dnl Remove platform dependant default project file setting
 dnl
@@ -157,7 +161,6 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h netdb.h)
 
 dnl Checks for library functions.
-AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(socket)
 
 dnl Checks for typedefs, structures, and compiler characteristics.

@@ -28,6 +28,10 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
@@ -73,9 +77,6 @@ typedef SOCKET socket_t;
 #endif
 #if HAVE_UNISTD_H
 #include <unistd.h>
-#endif
-#if HAVE_ALLOCA_H
-#include <alloca.h>
 #endif
 #include <errno.h>
 
@@ -746,6 +747,7 @@ static void client_open_file( fts_object_t *o, int winlet, fts_symbol_t s, int a
    * We change the working directory so that it is the directory of the opened file.
    */
   dir_name = (char *)alloca( strlen( file_name) + 1);
+
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
   chdir( dir_name);
@@ -803,6 +805,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
    * opened patch.
    */
   dir_name = (char *)alloca( strlen( file_name) + 1);
+
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
   chdir( dir_name);

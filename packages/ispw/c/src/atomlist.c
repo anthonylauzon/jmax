@@ -25,9 +25,9 @@
 
 #if HAVE_ALLOCA_H
 #include <alloca.h>
-#else
-#include <stdlib.h>
 #endif
+
+#include <stdlib.h>
 
 /* Heaps */
 
@@ -110,11 +110,7 @@ static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, in
   fts_atom_t* a;
   int i =0;
 
-#if HAVE_ALLOCA
   a = alloca((this->size + 1) * sizeof(fts_atom_t));
-#else
-  a = malloc((this->size + 1) * sizeof(fts_atom_t));
-#endif
 
   if(!fts_object_has_id((fts_object_t *)this))
     fts_object_upload((fts_object_t *)this);
@@ -211,33 +207,25 @@ static void fts_atom_list_set_name( fts_object_t *o, int winlet, fts_symbol_t s,
 
 static void fts_atom_list_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-    fts_atom_list_t *this = (fts_atom_list_t *)o;
-    fts_atom_list_iterator_t *iterator;
-    fts_atom_t* a; 
-    int i =0;
+  fts_atom_list_t *this = (fts_atom_list_t *)o;
+  fts_atom_list_iterator_t *iterator;
+  fts_atom_t* a; 
+  int i =0;
 
-#if HAVE_ALLOCA
   a = alloca(this->size * sizeof(fts_atom_t));
-#else
-  a = malloc(this->size * sizeof(fts_atom_t));
-#endif
 
-    iterator = fts_atom_list_iterator_new(this);
+  iterator = fts_atom_list_iterator_new(this);
 
-    while (! fts_atom_list_iterator_end(iterator))
-      {
-	a[i] = *fts_atom_list_iterator_current(iterator);
-	fts_atom_list_iterator_next(iterator);
-	i++;
-      }
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      a[i] = *fts_atom_list_iterator_current(iterator);
+      fts_atom_list_iterator_next(iterator);
+      i++;
+    }
 
-    fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
+  fts_client_send_message((fts_object_t *)this, sym_setValues, i, a);
 
-    fts_atom_list_iterator_free(iterator);
-
-#ifndef HAVE_ALLOCA
-    free(a);
-#endif
+  fts_atom_list_iterator_free(iterator);
 }
 
 void fts_atom_list_get_atoms( fts_atom_list_t *list, fts_atom_t *a)

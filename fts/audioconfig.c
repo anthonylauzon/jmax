@@ -28,6 +28,9 @@
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/audio.h>

@@ -401,56 +401,55 @@ static float GET_F(unsigned char *p)
 static fts_symbol_t s_sequence = 0;
 static fts_symbol_t s_const = 0;
 
-static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+static fts_object_t *
+fix_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
 {
-  if (version == 1 && fts_is_symbol(at))
-  {
-    fts_atom_t *a = alloca(ac * sizeof(fts_atom_t));
-    fts_symbol_t class_name = NULL;
-    fts_symbol_t name = NULL;
-    int persistence = 0;
-    fts_object_t *obj;
-    int i;
+  fts_atom_t *a = (fts_atom_t *)alloca(ac * sizeof(fts_atom_t));
+  fts_symbol_t class_name = NULL;
+  fts_symbol_t name = NULL;
+  int persistence = 0;
+  fts_object_t *obj;
+  int i;
 
-    /* scan for "{", "}" and "=" */
-    for(i=0; i<ac; i++)
+  /* scan for "{", "}" and "=" */
+  for(i=0; i<ac; i++)
     {
       if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_open_cpar)
         fts_set_symbol(a + i, fts_s_open_par);
       else if(fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_closed_cpar)
         fts_set_symbol(a + i, fts_s_closed_par);
       else if(i > 0 && fts_is_symbol(at + i) && fts_get_symbol(at + i) == fts_s_equal)
-      {
-        if(fts_is_symbol(at + i - 1) && fts_get_symbol(at + i - 1) == fts_s_keep)
-        {
-          ac = i - 1;
-          persistence = 1;
+	{
+	  if(fts_is_symbol(at + i - 1) && fts_get_symbol(at + i - 1) == fts_s_keep)
+	    {
+	      ac = i - 1;
+	      persistence = 1;
 
-          break;
-        }
-        else
-        {
-          a[i] = at[i - 1];
-          fts_set_symbol(a + i - 1, fts_s_comma);
-        }
-      }
+	      break;
+	    }
+	  else
+	    {
+	      a[i] = at[i - 1];
+	      fts_set_symbol(a + i - 1, fts_s_comma);
+	    }
+	}
       else
         a[i] = at[i];
     }
 
-    /* get class name and variable definition */
-    if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon && fts_is_symbol(a + 2))
+  /* get class name and variable definition */
+  if(ac >= 3 && fts_is_symbol(a + 1) && fts_get_symbol(a + 1) == fts_s_colon && fts_is_symbol(a + 2))
     {
       name = fts_get_symbol(a);
       class_name = fts_get_symbol(a + 2);
       ac -= 2;
       a += 2;
     }
-    else
-      class_name = fts_get_symbol(at);
+  else
+    class_name = fts_get_symbol(at);
 
-    /* some particular objects */
-    if(class_name == fts_s_jpatcher)
+  /* some particular objects */
+  if(class_name == fts_s_jpatcher)
     {
       obj = fts_eval_object_description(patcher, 1, a);
 
@@ -459,7 +458,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 
       return obj;
     }
-    else if(class_name == fts_s_comment)
+  else if(class_name == fts_s_comment)
     {
       fts_atom_t s;
 
@@ -471,7 +470,7 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 
       return obj;
     }
-    else if(class_name == s_const)
+  else if(class_name == s_const)
     {
       fts_atom_t s;
 
@@ -480,11 +479,11 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
 
       fts_send_message_varargs(obj, fts_s_set, ac, a);      
     }
-    else
-      obj = fts_eval_object_description(patcher, ac, at);
+  else
+    obj = fts_eval_object_description(patcher, ac, at);
 
-    /* fix persistence (keep = yes) */
-    if(name != NULL)
+  /* fix persistence (keep = yes) */
+  if(name != NULL)
     {
       fts_atom_t s;
 
@@ -492,8 +491,8 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
       fts_send_message_varargs(obj, fts_s_name, 1, &s);
     }
 
-    /* fix persistence (keep = yes) */
-    if(persistence > 0 || class_name == s_sequence)
+  /* fix persistence (keep = yes) */
+  if(persistence > 0 || class_name == s_sequence)
     {
       fts_atom_t n;
 
@@ -501,11 +500,16 @@ static fts_object_t *fix_eval_object_description( int version, fts_patcher_t *pa
       fts_send_message_varargs(obj, fts_s_persistence, 1, &n);
     }
 
-    return obj;
-  }
+  return obj;
+}
+
+static fts_object_t *
+versioned_eval_object_description( int version, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  if (version == 1 && fts_is_symbol(at))
+    return fix_eval_object_description( patcher, ac, at);
 
   return fts_eval_object_description( patcher, ac, at);
-
 }
 
 static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_descr_t *descr, int ac, const fts_atom_t *at)
@@ -786,7 +790,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_B(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = versioned_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 	    object_tos--;
@@ -801,7 +805,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = versioned_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 	    object_tos--;
@@ -817,7 +821,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
+	    new  = versioned_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs, &eval_stack[eval_tos]);
 
 	    /* Push the object in the object stack */
 	    object_tos--;
@@ -832,7 +836,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_B(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
+	    new  = versioned_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
             if(fts_object_is_patcher(new))
               fts_patcher_set_scope((fts_patcher_t *)new);
 
@@ -849,7 +853,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_S(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
+	    new  = versioned_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
             if(fts_object_is_patcher(new))
               fts_patcher_set_scope((fts_patcher_t *)new);
 
@@ -867,7 +871,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    fts_object_t *new;
 	    int nargs = GET_L(p);
 
-	    new  = fix_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
+	    new  = versioned_eval_object_description( descr->version, (fts_patcher_t *) object_stack[object_tos], nargs + ac, &eval_stack[eval_tos]);
             if(fts_object_is_patcher(new))
               fts_patcher_set_scope((fts_patcher_t *)new);
 
