@@ -29,8 +29,6 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
-
 PACKAGELIB=$(LIBDIR)/libnumeric.so
 
 all: $(PACKAGELIB)

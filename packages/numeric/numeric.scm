@@ -25,8 +25,6 @@
 
 (provide-package "numeric" "0.0.0")
 
-(require-package "reftype" "0.0.0")
-
 (ucs "load" "module" "numeric" (file-cat dir "c" "lib" jmax-arch jmax-mode "libnumeric.so"))
 
 (println "package: numeric (numeric classes)")

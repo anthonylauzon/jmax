@@ -28,5 +28,5 @@ package provide reftype
 global jmaxArch jmaxMode
 ucs load module reftype $dir/c/lib/$jmaxArch/$jmaxMode/libreftype.so
 
-puts "package: reftype (reference types)"
-
+#load silently
+#post "package: reftype"
