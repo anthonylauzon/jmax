@@ -34,7 +34,6 @@ linedrive.help.jmax \
 line~.help.jmax \
 line.help.jmax \
 loadbang.help.jmax \
-logscale.help.jmax \
 makenote.help.jmax \
 messbox.help.jmax \
 metro.help.jmax \
