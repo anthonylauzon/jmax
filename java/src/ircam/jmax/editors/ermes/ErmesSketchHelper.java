@@ -148,7 +148,7 @@ class ErmesSketchHelper extends Object{
     ErmesObjOutlet aOutlet = theConnection.GetOutlet();
     ErmesObjInlet aInlet = theConnection.GetInlet();
     
-    itsSketchPad.itsSelectedConnections.removeElement(theConnection);
+    ErmesSketchPad.currentSelection.removeConnection(theConnection);
     itsSketchPad.itsConnections.removeElement(theConnection);
     aOutlet.GetConnections().removeElement(theConnection);
     aInlet.GetConnections().removeElement(theConnection);
@@ -174,7 +174,7 @@ class ErmesSketchHelper extends Object{
     //removes theObject from the selected elements list	
     if(theObject.NeedPropertyHandler())
       if(theObject.GetFtsObject()!=null) theObject.GetFtsObject().removeWatch(theObject);
-    itsSketchPad.itsSelectedList.removeElement(theObject);
+    ErmesSketchPad.currentSelection.removeObject(theObject);
     //removes theObject from the element list (delete)
     itsSketchPad.itsElements.removeElement(theObject);
     itsSketchPad.RemoveInOutlets(theObject);
@@ -194,14 +194,14 @@ class ErmesSketchHelper extends Object{
     ErmesObjInlet aInlet;
 
     if(!DeleteInOutletConnections(false)){
-      while (!itsSketchPad.itsSelectedList.isEmpty()) {
-	aObject = (ErmesObject) itsSketchPad.itsSelectedList.firstElement();
+      while (!ErmesSketchPad.currentSelection.itsObjects.isEmpty()) {
+	aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.firstElement();
 	DeleteObject(aObject, false);
       }
       
-      while(!itsSketchPad.itsSelectedConnections.isEmpty()){
+      while(!ErmesSketchPad.currentSelection.itsConnections.isEmpty()){
 	int i=0;
-	aConnection = (ErmesConnection) itsSketchPad.itsSelectedConnections.firstElement();
+	aConnection = (ErmesConnection) ErmesSketchPad.currentSelection.itsConnections.firstElement();
 	DeleteConnection(aConnection, false);
       }
     }
@@ -250,7 +250,7 @@ class ErmesSketchHelper extends Object{
 
   //--------------------------------------------------------
   //	deselectObjects
-  //	deselect all the objects of a given list
+  //	deselect all the objects of a given selection
   //--------------------------------------------------------
   
   void deselectObjects(Vector theObjects, boolean paintNow){
@@ -265,7 +265,7 @@ class ErmesSketchHelper extends Object{
   }
   //--------------------------------------------------------
   //	deselectConnections
-  //	deselect all the connections of a given list
+  //	deselect all the connections of a given Selection
   //--------------------------------------------------------
 
   void deselectConnections(Vector theConnections, boolean paintNow){
@@ -293,15 +293,14 @@ class ErmesSketchHelper extends Object{
       itsSketchPad.GetEditField().LostFocus();
     }
 
-    if(itsSketchPad.itsSelectedList.size() != 0) 
+    if(ErmesSketchPad.currentSelection.itsObjects.size() != 0) 
       itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
 
     deselectCurrentInOutlet(false);
-    deselectObjects(itsSketchPad.itsSelectedList, false);
-    deselectConnections(itsSketchPad.itsSelectedConnections, false);
+    deselectObjects(ErmesSketchPad.currentSelection.itsObjects, false);
+    deselectConnections(ErmesSketchPad.currentSelection.itsConnections, false);
     
-    itsSketchPad.itsSelectedList.removeAllElements();
-    itsSketchPad.itsSelectedConnections.removeAllElements();
+    ErmesSketchPad.currentSelection.removeAllElements();
 
     if (paintNow) {
       itsSketchPad.paintDirtyList();
@@ -446,7 +445,7 @@ class ErmesSketchHelper extends Object{
   //--------------------------------------------------------
   public void MoveElements(int theDeltaH, int theDeltaV){
     ErmesObject aObject;
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
+    for (Enumeration e = ErmesSketchPad.currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
       aObject.MoveBy(theDeltaH, theDeltaV);
     }
@@ -532,8 +531,8 @@ class ErmesSketchHelper extends Object{
     Rectangle aRect;
     ErmesObjOutlet aOutlet;
     ErmesConnection aConnection;
-    for(int i=0; i<itsSketchPad.itsSelectedList.size(); i++){
-      aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(i);
+    for(int i=0; i<ErmesSketchPad.currentSelection.itsObjects.size(); i++){
+      aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(i);
       //aRect = aObject.Bounds();
       aRegion.addArea(aObject);
     }

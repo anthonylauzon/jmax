@@ -200,6 +200,10 @@ ErmesDrawable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesDrawable.java)
 .PHONY: ErmesDrawable
 
+ErmesSelection:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesSelection.java)
+.PHONY: ErmesSelection
+
 ErmesPatcherFactory:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherFactory.java)
 .PHONY: ErmesPatcherFactory

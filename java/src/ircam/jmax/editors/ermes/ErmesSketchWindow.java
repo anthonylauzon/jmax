@@ -333,12 +333,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsSelection.clean();
     //fill the Fts selection
 
-    for (Enumeration e = itsSketchPad.itsSelectedList.elements(); e.hasMoreElements();) {
+    for (Enumeration e = ErmesSketchPad.currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       ErmesObject aObj = (ErmesObject)e.nextElement();
       itsSelection.addObject(aObj.itsFtsObject);
     }
 
-    for (Enumeration e = itsSketchPad.itsSelectedConnections.elements(); e.hasMoreElements();) {
+    for (Enumeration e = ErmesSketchPad.currentSelection.itsConnections.elements(); e.hasMoreElements();) {
       ErmesConnection aConnection = (ErmesConnection)e.nextElement();
       itsSelection.addConnection(aConnection.itsFtsConnection);
     }
@@ -721,8 +721,8 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	  String urlToOpen;
 	  Interp interp  = MaxApplication.getTclInterp();
 	  
-	  if (itsSketchPad.itsSelectedList.size() > 0){
-	    aObject = (ErmesObject) itsSketchPad.itsSelectedList.elementAt(0);
+	  if (ErmesSketchPad.currentSelection.itsObjects.size() > 0){
+	    aObject = (ErmesObject) ErmesSketchPad.currentSelection.itsObjects.elementAt(0);
 	    
 	    urlToOpen = FtsReferenceURLTable.getReferenceURL(aObject.itsFtsObject);
 	    
@@ -757,7 +757,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       //ask help for the selected element...
       ErmesObject aObject = null;
       
-      for (Enumeration en = itsSketchPad.itsSelectedList.elements(); en.hasMoreElements();) {
+      for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements();) {
 	aObject = (ErmesObject) en.nextElement();
 	
 	FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
@@ -884,11 +884,11 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     
     if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
     
-    if(itsSketchPad.GetSelectedList().size()==0) itsSketchFontMenu=(CheckboxMenuItem) theMenuItem;
+    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) itsSketchFontMenu=(CheckboxMenuItem) theMenuItem;
     
     itsSelectedFontMenu = (CheckboxMenuItem) theMenuItem;
     
-    if(itsSketchPad.GetSelectedList().size()==0)
+    if(ErmesSketchPad.currentSelection.itsObjects.size()==0)
       itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
     else itsSketchPad.ChangeNameFont(theString);
     
@@ -998,9 +998,9 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     //if we are here, a font size have been choosen from the FONT menu
 
-    if(itsSketchPad.GetSelectedList().size()==0) itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
+    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
     
-    if(itsSketchPad.GetSelectedList().size()==0) {
+    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) {
       itsSketchPad.sketchFontSize = theFontSize;
       itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), theFontSize));
     }
@@ -1013,7 +1013,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsSketchPad.ChangeJustification(theString);
     itsSelectedJustificationMenu = (CheckboxMenuItem)theMenuItem;
     itsSelectedJustificationMenu.setState(true);
-    if(itsSketchPad.itsSelectedList.size()==0) itsSketchJustificationMenu = itsSelectedJustificationMenu;
+    if(ErmesSketchPad.currentSelection.itsObjects.size()==0) itsSketchJustificationMenu = itsSelectedJustificationMenu;
     return true;
   }
 

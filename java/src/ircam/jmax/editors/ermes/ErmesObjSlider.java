@@ -6,6 +6,7 @@ import java.util.*;
 import java.lang.Math;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.utils.*;
 
 /**
  * The "slider" graphic object
