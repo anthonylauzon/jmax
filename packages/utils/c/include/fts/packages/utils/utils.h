@@ -23,9 +23,8 @@
 
 
 #include <fts/fts.h>
+#include <fts/config.h>
 #include <math.h>
-
-#include <ftsconfig.h>
 
 #ifdef WIN32
 #if defined(UTILS_EXPORTS) 
