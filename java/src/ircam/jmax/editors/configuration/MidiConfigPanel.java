@@ -61,23 +61,31 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     midiTable = new JTable( midiModel){
 	public TableCellEditor getCellEditor(int row, int column)
-      {
-    switch( column)
-      {
-      case 0:
-        return super.getCellEditor(row, column);
-      case 1:
-        return inputCellEditor;
-      case 2:
-        return outputCellEditor;
+	{
+	  switch( column)
+	    {
+	    case 0:
+	      return super.getCellEditor(row, column);
+	    case 1:
+	      return inputCellEditor;
+	    case 2:
+	      return outputCellEditor;
 	    default: 
 	      return super.getCellEditor(row, column);
-      }
-      }
-    }; 
+	    }
+	}
+      }; 
     midiTable.setPreferredScrollableViewportSize( new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     midiTable.setRowHeight(17);
     midiTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+
+    midiTable.addMouseListener( new MouseAdapter(){
+	public void mousePressed( MouseEvent e){
+	  int index = midiTable.rowAtPoint( e.getPoint());
+	  if( index == -1)
+	    midiTable.getSelectionModel().clearSelection();
+	}
+      });
 
     scrollPane = new JScrollPane( midiTable);
     scrollPane.setPreferredSize( new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
