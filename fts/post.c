@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include <fts/fts.h>
+#include <fts/private/OLDclient.h>
 
 
 /******************************************************************************/
@@ -114,50 +115,14 @@ post_atoms(int ac, const fts_atom_t *at)
 }
 
 #define POST_LINE_MAXLENGTH 512
-#define POST_BUFFER_LENGTH 4096
-
-static char post_buffer[POST_BUFFER_LENGTH + POST_LINE_MAXLENGTH];
-static char *fill_p = post_buffer;
-static char *flush_p = post_buffer;
-
-void post_flush( void)
-{
-  char *p;
-
-  p = flush_p;
-
-  while ( *p)
-    {
-      if (*p == '\n')
-	{
-
-	  /* At end of a line, so flush current line to client. */
-	  *p = '\0';
-	  p++;
-
-	  fts_client_start_msg( POST_LINE_CODE);
-	  fts_client_add_string( flush_p);
-	  fts_client_done_msg();
-
-	  /* 
-	   * Test if we are past POST_BUFFER_LENGTH.
-	   * If yes, back up to beginning of post_buffer
-	   */
-	  if ( p >= post_buffer + POST_BUFFER_LENGTH)
-	    p = post_buffer;
-
-	  flush_p = p;
-	}
-      else
-	p++;
-    }
-}
 
 void post( const char *format, ...)
 {
   va_list ap;
   char buf[POST_LINE_MAXLENGTH];
   char *p;
+  static char post_buffer[POST_LINE_MAXLENGTH];
+  static char *fill_p = post_buffer;
 
   va_start( ap, format);
   vsprintf( buf, format, ap);
@@ -166,27 +131,22 @@ void post( const char *format, ...)
   p = buf;
   while ( *p)
     {
-      *fill_p = *p;
-      fill_p++;
-
-      /*
-       * (fd) 
-       * If at end of a line and past POST_BUFFER_LENGTH, then
-       * back up to beginning of post_buffer.
-       * We are sure that it will not overflow because post_buffer 
-       * has a reserve at end to store one complete line. If this
-       * overflows, then the 'vsprintf' above has already overflowed
-       * and memory is already corrupted...
-       */
-      if (*p == '\n' && fill_p >= post_buffer + POST_BUFFER_LENGTH)
-	fill_p = post_buffer;
+      if (*p == '\n')
+	{
+	  *fill_p = '\0';
+	  fts_client_start_msg( POST_LINE_CODE);
+	  fts_client_add_string( post_buffer);
+	  fts_client_done_msg();
+	  fill_p = post_buffer;
+	}
+      else
+	{
+	  *fill_p = *p;
+	  fill_p++;
+	}
 
       p++;
     }
-  *fill_p = '\0';
-
-  if (client_dev)
-    post_flush();
 }
 
 /* 

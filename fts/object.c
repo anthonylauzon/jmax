@@ -31,13 +31,6 @@
 #include <fts/private/patcher.h>
 
 
-/* stuff from runtime/client */
-extern void fts_client_release_object(fts_object_t *c);
-extern void fts_client_release_object_data(fts_object_t *c);
-extern void fts_client_upload_object(fts_object_t *obj);
-extern void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
-extern void fts_object_reset_changed(fts_object_t *obj);
-
 /* forward declarations  */
 static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data);
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);

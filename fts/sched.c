@@ -306,8 +306,7 @@ void fts_sched_halt( void)
  *
  */
 
-void 
-fts_kernel_sched_init(void)
+void fts_kernel_sched_init(void)
 {
   fts_sched_init(&main_sched);
 }

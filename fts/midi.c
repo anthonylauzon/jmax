@@ -90,19 +90,6 @@ struct fts_midiport_listeners
 
 /************************************************************
  *
- *  Initialization of the midi module
- */ 
-
-void 
-fts_kernel_midi_init(void)
-{
-  fts_s_midiport = fts_new_symbol("midiport");
-  fts_s__superclass = fts_new_symbol("_superclass");
-}
-
-
-/************************************************************
- *
  *  MIDI parser
  *
  */
@@ -891,3 +878,17 @@ fts_midiport_t *fts_midiport_get_default(void)
 {
   return default_midiport;
 }
+
+/************************************************************
+ *
+ *  Initialization of the midi module
+ */ 
+
+void 
+fts_kernel_midi_init(void)
+{
+  fts_s_midiport = fts_new_symbol("midiport");
+  fts_s__superclass = fts_new_symbol("_superclass");
+}
+
+

@@ -77,7 +77,7 @@ void fts_patcher_data_free( fts_patcher_data_t *data)
  */
 
 
-void fts_patcher_data_redefine(fts_patcher_data_t *d)
+static void fts_patcher_data_redefine(fts_patcher_data_t *d)
 {
   fts_patcher_data_t *this = (fts_patcher_data_t *)d;
   fts_object_t *p;

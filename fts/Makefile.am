@@ -8,6 +8,8 @@ OLDpatcherdata.c \
 abstraction.c \
 array.c \
 atom.c \
+atomfile.c \
+audio.c \
 autosave.c \
 class.c \
 clipboard.c \
@@ -17,6 +19,7 @@ dsp.c \
 dspgraph.c \
 errobj.c \
 expression.c \
+file.c \
 fpe.c \
 ftl.c \
 ftlmem.c \
@@ -25,32 +28,29 @@ inout.c \
 loader.c \
 mem.c \
 message.c \
+midi.c \
+midifile.c \
+object.c \
 objectlist.c \
 objectset.c \
-object.c \
 objtable.c \
 param.c \
 patcher.c \
 patparser.c \
+post.c \
 property.c \
 saver.c \
+sched.c \
 selection.c \
 sigconn.c \
-symbol.c \
-template.c \
-variable.c \
-version.c \
-vm.c \
-sched.c \
-time.c \
-file.c \
-atomfile.c \
-midifile.c \
-srconv.c \
 soundfile.c \
 soundfile_af.c \
-soundfile_def.c \
-midi.c \
-post.c 
+srconv.c \
+symbol.c \
+template.c \
+time.c \
+variable.c \
+version.c \
+vm.c 
 
 INCLUDES=-I$(top_srcdir)/include

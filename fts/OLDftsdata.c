@@ -22,6 +22,7 @@
 
 #include <assert.h>
 #include <fts/fts.h>
+#include <fts/private/OLDclient.h>
 #include <fts/private/OLDftsdata.h>
 
 /* (nos):
