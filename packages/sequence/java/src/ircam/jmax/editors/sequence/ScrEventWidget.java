@@ -118,6 +118,7 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
     if (target == whichObject) setTarget(null);
   }
   public void objectAdded(Object whichObject, int index){}
+  public void objectsAdded(int maxTime){}
   public void objectChanged(Object whichObject){
     if (target == whichObject) refresh();
   }

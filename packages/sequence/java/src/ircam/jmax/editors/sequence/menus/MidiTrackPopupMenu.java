@@ -193,7 +193,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
     else
 	{
 	  popup.remove(popup.target.getToolsMenu());
-	  MonodimensionalTrackPopupMenu.getInstance().remove(popup.target.getToolsMenu());
+	  MonoTrackPopupMenu.getInstance().remove(popup.target.getToolsMenu());
 
 	  popup.insert(editor.getToolsMenu(), 0);
 	  popup.target = editor;

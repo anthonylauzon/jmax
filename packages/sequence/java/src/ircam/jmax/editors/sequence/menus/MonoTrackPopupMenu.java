@@ -43,19 +43,19 @@ import ircam.jmax.editors.sequence.track.*;
 // The graphic pop-up menu used to change the number of an inlet or an outlet in a subpatcher.
 //
 
-public class MonodimensionalTrackPopupMenu extends JPopupMenu 
+public class MonoTrackPopupMenu extends JPopupMenu 
 {
-  static private MonodimensionalTrackPopupMenu popup = new MonodimensionalTrackPopupMenu();
+  static private MonoTrackPopupMenu popup = new MonoTrackPopupMenu();
 
   int x;
   int y;
-  MonodimensionalTrackEditor target = null;    
+  MonoTrackEditor target = null;    
   private boolean added = false;
   JMenuItem displayLabelItem;
   JMenu moveMenu;
   int trackCount = 1;
 
-  public MonodimensionalTrackPopupMenu()
+  public MonoTrackPopupMenu()
   {
     super();
     JMenuItem item;
@@ -71,16 +71,16 @@ public class MonodimensionalTrackPopupMenu extends JPopupMenu
     pack();
   }
 
-  static public MonodimensionalTrackPopupMenu getInstance()
+  static public MonoTrackPopupMenu getInstance()
   {
     return popup;
   }
 
-  static public MonodimensionalTrackEditor getPopupTarget(){
+  static public MonoTrackEditor getPopupTarget(){
     return popup.target;
   }
 
-  static public void update(MonodimensionalTrackEditor editor)
+  static public void update(MonoTrackEditor editor)
   {
     if(!popup.added) 
       {

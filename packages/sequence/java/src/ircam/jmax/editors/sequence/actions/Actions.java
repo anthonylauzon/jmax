@@ -53,7 +53,7 @@ public class Actions
     //public static EditorAction mergeAction     = new MergeAction();
 
   public static EditorAction moveMidiTrackToAction = new MoveMidiTrackToAction();
-  public static EditorAction moveMonodimensionalTrackToAction = new MoveMonodimensionalTrackToAction();
+  public static EditorAction moveMonodimensionalTrackToAction = new MoveMonoTrackToAction();
 }
 
 

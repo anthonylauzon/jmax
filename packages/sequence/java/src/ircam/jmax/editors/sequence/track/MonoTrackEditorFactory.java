@@ -7,11 +7,11 @@ import javax.swing.*;
 
 /**
  * Creates new MidiTrack editors. */
-public class MonodimensionalTrackEditorFactory implements TrackEditorFactory {
+public class MonoTrackEditorFactory implements TrackEditorFactory {
     
     public TrackEditor newEditor(Track track, Geometry geometry)
     {
-	return new MonodimensionalTrackEditor(geometry, track);
+	return new MonoTrackEditor(geometry, track);
     }
 
     public int getWeight()
@@ -21,5 +21,5 @@ public class MonodimensionalTrackEditorFactory implements TrackEditorFactory {
 
     //-- Fields
     static int MONODIMENSIONAL_EDITOR_WEIGHT = 4;
-    public static MonodimensionalTrackEditorFactory instance = new MonodimensionalTrackEditorFactory();
+    public static MonoTrackEditorFactory instance = new MonoTrackEditorFactory();
 }

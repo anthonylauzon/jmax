@@ -40,6 +40,7 @@ public interface TrackDataListener {
 
   abstract public void objectDeleted(Object whichObject, int oldIndex);
   abstract public void objectAdded(Object whichObject, int index);
+  abstract public void objectsAdded(int maxTime);
   abstract public void objectChanged(Object whichObject);
   abstract public void objectMoved(Object whichObject, int oldIndex, int newIndex);
 }

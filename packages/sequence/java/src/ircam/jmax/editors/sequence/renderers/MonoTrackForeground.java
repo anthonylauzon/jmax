@@ -34,9 +34,9 @@ import java.util.Enumeration;
 
 /**
  * The foreground layer of a monodimensionalTrack representation */
-public class MonodimensionalTrackForeground implements Layer {
+public class MonoTrackForeground implements Layer {
 
-  public MonodimensionalTrackForeground(SequenceGraphicContext theGc)
+  public MonoTrackForeground(SequenceGraphicContext theGc)
   {
     gc = theGc;
   }

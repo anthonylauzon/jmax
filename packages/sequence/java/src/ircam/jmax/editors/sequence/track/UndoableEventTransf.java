@@ -45,7 +45,7 @@ import javax.swing.undo.*;
  * </ul>
  * A better organization is needed...
  * @see UndoableAdd */  
-public class UndoableEventTransformation extends AbstractUndoableEdit {
+public class UndoableEventTransf extends AbstractUndoableEdit {
   
   TrackEvent itsEvent;  
 
@@ -65,7 +65,7 @@ public class UndoableEventTransformation extends AbstractUndoableEdit {
 
   /**
    * Constructor. theEvent is the event that is going to be modified. */
-  public UndoableEventTransformation(TrackEvent theEvent)
+  public UndoableEventTransf(TrackEvent theEvent)
   {
 
     itsEvent = theEvent;

@@ -85,8 +85,35 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     
 	// ends the undoable transition
 	//((UndoableData)model).endUpdate();
-  }
+    }
+    public void addEvents(int nArgs , FtsAtom args[])
+    {
+	TrackEvent evt;
+	int evtTime, index;
+	int maxTime = 0;
+	for(int i=0; i<nArgs; i++)
+	    {
+		evt = (TrackEvent)(args[i].getObject());
+		///////////FIND THE MAX TIME
+		evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
+		if(evtTime>maxTime) maxTime = evtTime;
 
+		/////////////////////////////
+		evt.setDataModel(this);
+		index = getIndexAfter(evt.getTime());
+	
+		if (index == EMPTY_COLLECTION)
+		    index = 0;
+		else if (index == NO_SUCH_EVENT)
+		    index = events_fill_p;
+	
+		makeRoomAt(index);
+		events[index] = evt;
+		////////////////////////
+	    }
+
+	notifyObjectsAdded(maxTime);
+    }
 
   public void requestEventCreation(float time, String type, int nArgs, Object args[])
   {
@@ -367,6 +394,12 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     {
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
 	    ((TrackDataListener) e.nextElement()).objectAdded(spec, index);
+    }
+
+    private void notifyObjectsAdded(int maxTime)
+    {
+	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+	    ((TrackDataListener) e.nextElement()).objectsAdded(maxTime);
     }
     
     private void notifyObjectDeleted(Object spec, int oldIndex)

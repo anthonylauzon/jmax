@@ -155,6 +155,11 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     {
 	repaint();
     }
+
+    public void objectsAdded(int maxTime) 
+    {
+	repaint();
+    }
     
     public void objectDeleted(Object whichObject, int index) 
     {

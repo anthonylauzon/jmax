@@ -337,6 +337,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     {
 	resizePanelToEventTime((TrackEvent)spec);	
     }
+    public void objectsAdded(int maxTime) 
+    {
+	resizePanelToTime(maxTime);	
+    }
     public void objectDeleted(Object whichObject, int index){}
     public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
     {
@@ -347,22 +351,26 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     private void resizePanelToEventTime(TrackEvent evt)
     {
 	int evtTime = (int)(evt.getTime()) + ((Integer)evt.getProperty("duration")).intValue();
-	int maxVisibleTime = getMaximumVisibleTime();
-
-	if(evtTime > getMaximumTime())
-	{
-	    itsTimeScrollbar.setMaximum(evtTime);
-	    itsTimeScrollbar.setValue(evtTime);
-	}
-	else 
-	    if( evtTime > maxVisibleTime)		
-		itsTimeScrollbar.setValue(evtTime-maxVisibleTime-geometry.getXTransposition()+10);
-	    else
-		if(evtTime < -geometry.getXTransposition())
-		    itsTimeScrollbar.setValue(evtTime);
-
+	resizePanelToTime(evtTime);
     }
 
+    private void resizePanelToTime(int time)
+    {
+	int maxVisibleTime = getMaximumVisibleTime();
+
+	if(time > getMaximumTime())
+	{
+	    itsTimeScrollbar.setMaximum(time);
+	    itsTimeScrollbar.setValue(time);
+	}
+	else 
+	    if( time > maxVisibleTime)		
+		itsTimeScrollbar.setValue(time-maxVisibleTime-geometry.getXTransposition()+10);
+	    else
+		if(time < -geometry.getXTransposition())
+		    itsTimeScrollbar.setValue(time);
+    }
+    
   ////////////////////////////////////////////////////////////
   public void Copy()
   {

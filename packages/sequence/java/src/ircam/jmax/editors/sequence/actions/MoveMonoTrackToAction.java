@@ -38,7 +38,7 @@ import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class MoveMonodimensionalTrackToAction extends EditorAction
+public class MoveMonoTrackToAction extends EditorAction
 {
   int position;
   public  void actionPerformed(ActionEvent e)
@@ -49,7 +49,7 @@ public class MoveMonodimensionalTrackToAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-    ((SequencePanel)container.getEditor()).moveTrackTo( MonodimensionalTrackPopupMenu.getPopupTarget(), position);    
+    ((SequencePanel)container.getEditor()).moveTrackTo( MonoTrackPopupMenu.getPopupTarget(), position);    
   }
 }
 

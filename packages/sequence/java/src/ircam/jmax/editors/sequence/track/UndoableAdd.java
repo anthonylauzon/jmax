@@ -32,7 +32,7 @@ import javax.swing.undo.*;
 
 
 /** Undo support: this class knows how to undo an "add note" action. 
- * @see UndoableEventTransformation.*/
+ * @see UndoableEventTransf.*/
 class UndoableAdd extends AbstractUndoableEdit {
   TrackEvent itsEvent;
   

@@ -68,6 +68,11 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     {
 	scroll.validate();
     }
+
+    public void objectsAdded(int maxTime) 
+    {
+	scroll.validate();
+    }
     
     public void objectDeleted(Object whichObject, int index) 
     {

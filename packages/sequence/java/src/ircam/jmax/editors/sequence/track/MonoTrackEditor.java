@@ -42,9 +42,9 @@ import javax.swing.event.*;
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
-public class MonodimensionalTrackEditor extends PopupToolbarPanel implements ListSelectionListener, TrackEditor
+public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionListener, TrackEditor
 {
-    public MonodimensionalTrackEditor(Geometry g, Track track)
+    public MonoTrackEditor(Geometry g, Track track)
     {
 	super();
 
@@ -52,12 +52,15 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 	this.track = track;
 
 	track.getTrackDataModel().addListener(new TrackDataListener() {
-	    public void objectDeleted(Object whichObject, int oldIndex) {MonodimensionalTrackEditor.this.repaint();}
+	    public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
 	    public void objectAdded(Object whichObject, int index) {
-		MonodimensionalTrackEditor.this.repaint();
+		MonoTrackEditor.this.repaint();
 	    }
-	    public void objectChanged(Object whichObject) {MonodimensionalTrackEditor.this.repaint();}
-	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {MonodimensionalTrackEditor.this.repaint();}
+	    public void objectsAdded(int maxTime) {
+		MonoTrackEditor.this.repaint();
+	    }
+	    public void objectChanged(Object whichObject) {MonoTrackEditor.this.repaint();}
+	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {MonoTrackEditor.this.repaint();}
 	});
 
 	geometry.addTranspositionListener(new TranspositionListener() {
@@ -106,8 +109,8 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
     
     public JPopupMenu getMenu()
     {
-	MonodimensionalTrackPopupMenu.getInstance().update(this);
-	return MonodimensionalTrackPopupMenu.getInstance();
+	MonoTrackPopupMenu.getInstance().update(this);
+	return MonoTrackPopupMenu.getInstance();
 	//return gc.getToolbar().itsPopupMenu;
     }
 
@@ -133,7 +136,7 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
 
 	gc.setAdapter(new MonoDimensionalAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
 
-	renderer = new MonodimensionalTrackRenderer(gc);
+	renderer = new MonoTrackRenderer(gc);
 	gc.setRenderManager(renderer);
     }
 
@@ -192,7 +195,7 @@ public class MonodimensionalTrackEditor extends PopupToolbarPanel implements Lis
     SequenceGraphicContext gc;
     SequenceSelection selection;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-    MonodimensionalTrackRenderer renderer;
+    MonoTrackRenderer renderer;
 
     Track track;
 }

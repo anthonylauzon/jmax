@@ -105,22 +105,12 @@ public class Sequence extends JFrame implements EditorContainer{
     private final void initTrackEditorFactoryTable()
     {
 	TrackEditorFactoryTable.setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
-	TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonodimensionalTrackEditorFactory.instance);
-	TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonodimensionalTrackEditorFactory.instance);
-	TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonodimensionalTrackEditorFactory.instance);
-	TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, MonodimensionalTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(FricativeValue.info, MonoTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(LogicValue.info, MonoTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(CueValue.info, MonoTrackEditorFactory.instance);
+	TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, MonoTrackEditorFactory.instance);
     }
 
-  /*
-    private final void initValueInfoTable()
-    {
-	ValueInfoTable.registerInfo(AmbitusValue.info);
-	ValueInfoTable.registerInfo(FricativeValue.info);
-	ValueInfoTable.registerInfo(LogicValue.info);
-	ValueInfoTable.registerInfo(CueValue.info);
-	ValueInfoTable.registerInfo(IntegerValue.info);
-    }
-  */
     private final void makeTitle(FtsSequenceObject maxData){
 	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + maxData.getName()));
 	MaxWindowManager.getWindowManager().windowChanged(this);

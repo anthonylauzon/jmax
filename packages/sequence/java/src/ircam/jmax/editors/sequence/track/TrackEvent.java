@@ -112,7 +112,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	if (itsTrackDataModel != null)
 	    {
 		if (((UndoableData) itsTrackDataModel).isInGroup())
-		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransformation(this));
+		    ((UndoableData) itsTrackDataModel).postEdit(new UndoableEventTransf(this));
 	    }
 	*/
 	

@@ -97,25 +97,6 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
   }
 
   /**
-   * Fts callback: add a TrackEvent(first arg) in a track (second arg). 
-   * 
-   */
-    /*public void addEvent(int nArgs , FtsAtom args[])
-      {
-      String trackName = args[0].getString();
-      TrackEvent evt = (TrackEvent)(args[1].getObject());
-      TrackDataModel model = getTrackByName(trackName).getTrackDataModel();
-
-      // starts an undoable transition
-      ((UndoableData)model).beginUpdate();
-      
-      model.addEvent(evt);
-    
-      // ends the undoable transition
-      ((UndoableData)model).endUpdate();
-      }*/
-
-  /**
    * Fts callback: add a new Track(first arg) . 
    * 
    */

@@ -102,6 +102,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	select((TrackEvent)spec, index, 0);
 	repaint();
     }
+
+    public void objectsAdded(int maxTime){}
     
     public void objectDeleted(Object whichObject, int index) 
     {

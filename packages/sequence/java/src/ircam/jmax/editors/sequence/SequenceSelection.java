@@ -277,6 +277,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
       select(spec);
     
   }
+  public void objectsAdded(int maxTime) {}
 
   /**
    * TrackDataListener interface: keep the index-based selection consistent. */

@@ -41,15 +41,15 @@ import ircam.jmax.MaxApplication;
  * The main class for a monodimensionalTrack representation.
  * It provides the support for  editing,
  * using a background layer and a foreground.
- * The grid is rendered in the MonodimensionalTrackBackground
- * The events are painted by the MonodimensionalTrackForeground.
+ * The grid is rendered in the MonoTrackBackground
+ * The events are painted by the MonoTrackForeground.
  */
-public class MonodimensionalTrackRenderer extends AbstractRenderer{
+public class MonoTrackRenderer extends AbstractRenderer{
   
   /**
    * Constructor.
    */
-  public MonodimensionalTrackRenderer(SequenceGraphicContext theGc) 
+  public MonoTrackRenderer(SequenceGraphicContext theGc) 
   {  
     super();
     gc = theGc;
@@ -64,9 +64,9 @@ public class MonodimensionalTrackRenderer extends AbstractRenderer{
 
     tempList = new MaxVector();
 
-    itsForegroundLayer = new MonodimensionalTrackForeground(gc);
+    itsForegroundLayer = new MonoTrackForeground(gc);
 
-    itsLayers.addElement(new MonodimensionalTrackBackground(gc));
+    itsLayers.addElement(new MonoTrackBackground(gc));
     itsLayers.addElement(itsForegroundLayer);
   }
 
@@ -131,7 +131,7 @@ public class MonodimensionalTrackRenderer extends AbstractRenderer{
   //------------------  Fields
   SequenceGraphicContext gc;
 
-  MonodimensionalTrackForeground itsForegroundLayer;
+  MonoTrackForeground itsForegroundLayer;
   
   private MaxVector tempList;
 }

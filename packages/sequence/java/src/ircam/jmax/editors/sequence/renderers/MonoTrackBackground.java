@@ -38,10 +38,10 @@ import javax.swing.*;
 
 /**
  * The background layer of a monodimensionalTrackeditor. It builds the background Image */
-public class MonodimensionalTrackBackground implements Layer{
+public class MonoTrackBackground implements Layer{
   
   /** Constructor */
-  public  MonodimensionalTrackBackground( SequenceGraphicContext theGc)
+  public  MonoTrackBackground( SequenceGraphicContext theGc)
   {
     super();
     gc = theGc;
