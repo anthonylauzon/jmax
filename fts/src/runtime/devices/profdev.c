@@ -29,16 +29,6 @@
 
 static void prof_dac_init();
 
-/******************************************************************************/
-/*                                                                            */
-/*                              Module Definition                             */
-/*                                                                            */
-/******************************************************************************/
-
-/* init and shutdown functions */
-
-void profdev_init(void);
-
 void
 profdev_init(void)
 {

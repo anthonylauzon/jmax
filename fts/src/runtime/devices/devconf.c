@@ -18,8 +18,7 @@
 #include "runtime/devices/ossdev.h"
 #endif
 
-
-
+extern void null_init(void);
 
 void fts_dev_configure(void)
 {
@@ -36,6 +35,8 @@ void fts_dev_configure(void)
 #ifdef HAS_OSS
   ossdev_init();
 #endif
+
+  null_init();
 }
 
 
