@@ -172,7 +172,6 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	    reader->buffer_index = &self->buffer_index;
 	    thread_job->object = (fts_object_t*)reader;
 	    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
-						      0,
 						      fts_s_read);
 	    if (0 == thread_job->method)
 	    {

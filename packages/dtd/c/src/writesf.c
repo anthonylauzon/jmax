@@ -145,7 +145,6 @@ static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	    writer->buffer_index = &self->buffer_index;		
 	    thread_job->object = (fts_object_t*)writer;
 	    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
-						      0,
 						      fts_s_write);
 	    if (0 == thread_job->method)
 	    {
