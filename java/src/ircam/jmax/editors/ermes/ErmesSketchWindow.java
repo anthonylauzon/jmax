@@ -456,7 +456,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
   private void FillExecutionMenu(Menu theExecutionMenu){
  
-    theExecutionMenu.add(itsRunModeMenuItem = new MenuItem("Edit Mode Ctrl+E"));
+    theExecutionMenu.add(itsRunModeMenuItem = new MenuItem("Run Mode Ctrl+E"));
     itsRunModeMenuItem.addActionListener(this);
   }
 
@@ -1096,14 +1096,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     if (inAnApplet) {
       dispose();
     } else {
-      if (isSubPatcher) {
-	setVisible(false);
-      }
-      else {
-	//MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
-	Close();
-	//dispose();
-      }
+      if (isSubPatcher) setVisible(false);
+      else Close();
     }
   }
   public void windowOpened(WindowEvent e){}

@@ -46,6 +46,7 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
     setMenuBar(mb);
     
     addKeyListener(this);
+    addWindowListener(this);
     SetupMenu();
 
     mb.add(itsWindowsMenu);
@@ -470,7 +471,6 @@ public abstract class MaxEditor extends JFrame implements MaxWindow, KeyListener
    ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////WindowListener --inizio  
   public void windowClosing(WindowEvent e){
-    //MaxApplication.ObeyCommand(MaxApplication.CLOSE_WINDOW);
     Close();
   }
   public void windowOpened(WindowEvent e){}
