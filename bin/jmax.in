@@ -350,8 +350,7 @@ check_ibm_jvm ()
 check_java ()
 {
     # check functions
-    #check_functions="check_path_jvm check_compilation_jvm check_sun_jvm check_ibm_jvm"
-    check_functions="check_path_jvm check_compilation_jvm check_ibm_jvm"
+    check_functions="check_path_jvm check_compilation_jvm check_sun_jvm check_ibm_jvm"
     for ff in $check_functions; do
 	$ff
 	if test $? -eq 0; then
