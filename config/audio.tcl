@@ -17,7 +17,9 @@ if {[systemProperty "myProperty"] == "myValue"} {
 }
 
 #set jMax sample rate
-ucs set sample_rate $jmaxSampleRate
+
+ucs set param sampling_rate $jmaxSampleRate
+ucs set param fifo_size     $jmaxAudioBuffer
 
 ######################################################################################
 #
@@ -35,8 +37,8 @@ ucs set sample_rate $jmaxSampleRate
 if {$jmaxArch == "irix6.2"} {
 
 #    puts "Irix 6.2 audio configuration: analog 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
-#    ucs open device out~ default as SgiALOut channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device in~ default as SgiALIn channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device out~ default as SgiALOut channels 2
+#    ucs open device in~ default as SgiALIn channels 2 
 #    
 #    ucs default out~ default 
 #    ucs default in~ default
@@ -44,8 +46,8 @@ if {$jmaxArch == "irix6.2"} {
 } elseif {$jmaxArch == "o2r5k" || $jmaxArch == "o2r10k"} {
 
 #    puts "O2 audio configuration: analog 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
-#    ucs open device in~ default as SgiALIn ALdevice AnalogIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice AnalogOut channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice AnalogIn channels 2 
+#    ucs open device out~ default as SgiALOut ALdevice AnalogOut channels 2 
 
 #    ucs default in~ default
 #    ucs default out~ default
@@ -55,12 +57,12 @@ if {$jmaxArch == "irix6.2"} {
 # one ADAT card
 
 #    puts "    default: 8/8 (default)"
-#    ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 
+#    ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8
 
 #    puts "    default: 2/2"
-#    ucs open device in~ default as SgiALIn ALdevice AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice AESOut channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice AESIn channels 2 
+#    ucs open device out~ default as SgiALOut ALdevice AESOut channels 2
 
 #    ucs default in~ default
 #    ucs default out~ default
@@ -69,20 +71,20 @@ if {$jmaxArch == "irix6.2"} {
 # two ADAT cards
 
 #    puts "    default: 8/8 (default)"
-#    ucs open device in~ default as SgiALIn ALdevice RAD1.ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice RAD1.ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice RAD1.ADATIn channels 8 
+#    ucs open device out~ default as SgiALOut ALdevice RAD1.ADATOut channels 8
 
 #    puts "    default: 2/2"
-#    ucs open device in~ default as SgiALIn ALdevice RAD1.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice RAD1.AESOut channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice RAD1.AESIn channels 2 
+#    ucs open device out~ default as SgiALOut ALdevice RAD1.AESOut channels 2 
 
 #    puts "    default: 8/8"
-#    ucs open device in~ default as SgiALIn ALdevice RAD2.ADATIn channels 8 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice RAD2.ADATOut channels 8 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice RAD2.ADATIn channels 8 
+#    ucs open device out~ default as SgiALOut ALdevice RAD2.ADATOut channels 8 
 
 #    puts "    default: 2/2"
-#    ucs open device in~ default as SgiALIn ALdevice RAD2.AESIn channels 2 fifo_size $jmaxAudioBuffer
-#    ucs open device out~ default as SgiALOut ALdevice RAD2.AESOut channels 2 fifo_size $jmaxAudioBuffer
+#    ucs open device in~ default as SgiALIn ALdevice RAD2.AESIn channels 2
+#    ucs open device out~ default as SgiALOut ALdevice RAD2.AESOut channels 2 
 
 #    ucs default in~ default
 #    ucs default out~ default
