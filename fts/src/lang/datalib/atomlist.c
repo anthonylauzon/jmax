@@ -11,7 +11,7 @@ static fts_heap_t *atom_list_iterator_heap;
 /* Remote call codes */
 
 #define ATOM_LIST_SET    1
-#define ATOM_LIST_APPEND   1
+#define ATOM_LIST_UPDATE 2
 
 /********************************************************************************/
 /*                                                                              */
@@ -67,6 +67,7 @@ static fts_data_class_t *fts_atom_list_data_class = 0;
 
 struct fts_atom_list
 {
+  fts_data_t dataobj;
   fts_atom_list_cell_t *head;
   fts_atom_list_cell_t *tail;
 };
@@ -84,11 +85,14 @@ fts_atom_list_t *fts_atom_list_new( void)
       list->tail = 0;
     }
 
+  fts_data_init((fts_data_t *) list, fts_atom_list_data_class);
+
   return list;
 }
 
 void fts_atom_list_free( fts_atom_list_t *list)
 {
+  fts_data_delete((fts_data_t *) list);
   fts_atom_list_clear( list);
   fts_heap_free((char *)list, atom_list_heap);
 }
@@ -361,12 +365,93 @@ void fts_atom_list_save_bmax(fts_atom_list_t *list, fts_bmax_file_t *f, fts_obje
 }
 
 
+/********************************************************************/
+/*                                                                  */
+/*            FTS_DATA functions on atom list                       */
+/*                                                                  */
+/********************************************************************/
+
+/*
+ * The export function
+ */
+
+
+static void fts_atom_list_export_fun(fts_data_t *d)
+{
+  fts_atom_list_iterator_t *iterator;
+  fts_atom_list_t *this = (fts_atom_list_t *)d;
+  int i;
+
+  iterator = fts_atom_list_iterator_new(this);
+  fts_data_start_remote_call(d, ATOM_LIST_SET, 0, 0);
+
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
+    }
+
+  fts_data_end_remote_call();
+  fts_atom_list_iterator_free(iterator);
+}
+
+
+/*
+ * The remote set function.
+ */
+
+static void fts_atom_list_remote_set( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_t *this = (fts_atom_list_t *)d;
+
+  fts_atom_list_clear(this);
+  fts_atom_list_set(this, ac, at);
+}
+
+static void fts_atom_list_remote_update( fts_data_t *d, int ac, const fts_atom_t *at)
+{
+  fts_atom_list_iterator_t *iterator;
+  fts_atom_list_t *this = (fts_atom_list_t *)d;
+  int i;
+
+  iterator = fts_atom_list_iterator_new(this);
+
+  fts_data_start_remote_call(d, ATOM_LIST_SET, 0, 0);
+
+  while (! fts_atom_list_iterator_end(iterator))
+    {
+      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
+      fts_atom_list_iterator_next(iterator);
+    }
+
+  fts_data_end_remote_call();
+  fts_atom_list_iterator_free(iterator);
+}
+
+/********************************************************************/
+/*                                                                  */
+/*            INIT_DATA functions on integer vectors                */
+/*                                                                  */
+/********************************************************************/
+
 void fts_atom_list_config(void)
 {
   atom_list_cell_heap     = fts_heap_new(sizeof( fts_atom_list_cell_t));
   atom_list_heap          = fts_heap_new(sizeof( fts_atom_list_t));
   atom_list_iterator_heap = fts_heap_new(sizeof( fts_atom_list_iterator_t));
+
+  fts_atom_list_data_class = fts_data_class_new( fts_new_symbol( "atom_list_data"));
+  fts_data_class_define_export_function(fts_atom_list_data_class, fts_atom_list_export_fun);
+  fts_data_class_define_function(fts_atom_list_data_class, ATOM_LIST_SET, fts_atom_list_remote_set);
+  fts_data_class_define_function(fts_atom_list_data_class, ATOM_LIST_UPDATE, fts_atom_list_remote_update);
 }
+
+
+
+
+
+
+
 
 
 

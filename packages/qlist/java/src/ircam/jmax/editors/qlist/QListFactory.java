@@ -12,7 +12,7 @@ public class QListFactory implements MaxDataEditorFactory {
   }
   
   public MaxDataEditor newEditor(MaxData theData) {
-    return new QList(theData);
+    return new QListDataEditor((FtsAtomList) theData);
   }
 }
 

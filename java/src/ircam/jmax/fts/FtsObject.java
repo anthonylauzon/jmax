@@ -54,9 +54,7 @@ abstract public class FtsObject
 
     className = ((String) msg.getArgument(2)).intern();
 
-    if (className == "qlist")
-      return new FtsQlistObject(parent, className, FtsParse.unparseObjectDescription(2, msg), objId);
-    else if (className == "jpatcher")
+    if (className == "jpatcher")
       return new FtsPatcherObject(parent, FtsParse.unparseObjectDescription(3, msg), objId);
     else if (className == "inlet")
       return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);

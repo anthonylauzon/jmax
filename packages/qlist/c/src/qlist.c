@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:57:09 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/09/25 17:36:32 $
  *
  * FTS by Miller Puckette
  * 
@@ -19,9 +19,6 @@
 
 #include "fts.h"
 
-
-/* Updates are handled with the atom list update mechanism.
-   Easier, cleaner, faster ... */
 
 typedef struct
 {
@@ -229,31 +226,8 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 qlist_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  /* Not Yet implemented */
+  /* Not Yet implemented (will it ever be ??) */
 }
-
-static void
-qlist_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  qlist_t *this = (qlist_t *)o;
-  fts_atom_list_iterator_t *iterator;
-
-  iterator = fts_atom_list_iterator_new(this->atom_list);
-
-  fts_client_mess_start_msg(CLIENTMESS_CODE);
-  fts_client_mess_add_object(o);
-  fts_client_mess_add_sym(fts_new_symbol("atomList"));
-
-  while (! fts_atom_list_iterator_end(iterator))
-    {
-      fts_client_mess_add_atoms(1, fts_atom_list_iterator_current(iterator));
-      fts_atom_list_iterator_next(iterator);
-    }
-
-  fts_client_mess_send_msg();
-  fts_atom_list_iterator_free(iterator);
-}
-
 
 /* Method for message "read" <sym> inlet 0 */
 
@@ -276,7 +250,6 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 
-
 static void
 qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -295,6 +268,22 @@ qlist_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_list_save_bmax(this->atom_list, f, (fts_object_t *) this);
 }
 
+
+/* Daemon for getting the property "data".
+   Note that we return a pointer to the data; 
+   if the request come from the client, it will be the
+   kernel to handle the export of the data, not the explode
+   object.
+ */
+
+static void
+qlist_get_data(fts_daemon_action_t action, fts_object_t *obj,
+		 int idx, fts_symbol_t property, fts_atom_t *value)
+{
+  qlist_t *this = (qlist_t *)obj;
+
+  fts_set_data(value, (fts_data_t *) this->atom_list);
+}
 
 static fts_status_t
 qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -320,9 +309,6 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* Method for loading from the user interface */
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), qlist_set);
-  fts_method_define(cl, fts_SystemInlet, fts_new_symbol("update"), qlist_update, 0, 0);
-
   a[0] = fts_s_int;
 
   fts_method_define(cl, 0, fts_new_symbol("rewind"), qlist_rewind, 0, 0);
@@ -340,6 +326,10 @@ qlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("set"), qlist_set);
 
   fts_method_define_varargs(cl, 0, fts_s_append, qlist_append);
+
+  /* daemon for data property */
+
+  fts_class_add_daemon(cl, obj_property_get, fts_s_data, qlist_get_data);
 
   return fts_Success;
 }

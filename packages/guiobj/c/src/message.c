@@ -149,10 +149,10 @@ static void
 message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
 
   if (fts_atom_list_is_subsequence(this->atom_list, ac - 1, at + 1))
-    fts_objectset_add(set, o);
+    fts_object_set_add(set, o);
 }
 
 

@@ -61,8 +61,18 @@ public abstract class FtsRemoteData implements MaxData {
      cannot be solved in general; we support first messages
      that can have vector related arguments.
      */
-     
+   
+  public void remoteCall( int key)
+  {
+    Fts.getServer().remoteCall( this, key, (MaxVector) null);
+  }
+  
   public void remoteCall( int key, Object args[])
+  {
+    Fts.getServer().remoteCall( this, key, args);
+  }
+
+  public void remoteCall( int key, MaxVector args)
   {
     Fts.getServer().remoteCall( this, key, args);
   }

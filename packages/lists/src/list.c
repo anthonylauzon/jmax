@@ -77,7 +77,7 @@ static void
 list_floatvector_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   list_t *this = (list_t *)o;
-  floatvector_t *vector = fts_get_ptr(at);
+  fts_float_vector_t *vector = fts_get_ptr(at);
   long size = vector->size;
   int i;
 
@@ -91,7 +91,7 @@ list_floatvector_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   this->size = size;
 
   for(i=0; i<size; i++)
-    fts_set_float(&this->list[i], floatvector_get_element(vector, i));
+    fts_set_float(&this->list[i], fts_float_vector_get_element(vector, i));
 }
 
 static void
@@ -131,9 +131,9 @@ list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_list, list_list);
   fts_method_define_varargs(cl, 1, fts_s_list, list_list_store);
 
-  a[0] = sym_floatvector;
-  fts_method_define(cl, 0, sym_floatvector, list_floatvector, 1, a);
-  fts_method_define(cl, 1, sym_floatvector, list_floatvector_store, 1, a);
+  a[0] = fts_s_floatvector;
+  fts_method_define(cl, 0, fts_s_floatvector, list_floatvector, 1, a);
+  fts_method_define(cl, 1, fts_s_floatvector, list_floatvector_store, 1, a);
 
   /* type the outlet */
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/09/11 16:55:54 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:26 $
  *
  */
 #include <stdio.h>		/* for sprintf */
@@ -33,11 +33,11 @@
 int
 max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *optr)
 {
-  fts_intvec_t *tw = 0;
+  fts_integer_vector_t *tw = 0;
   long i;
   float rest;
   
-  tw = table_intvec_get_by_name(s);
+  tw = table_integer_vector_get_by_name(s);
 
   if (! tw)
     {
@@ -49,7 +49,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
 
   optr->ex_type = ET_INT;
 
-  if (! fts_intvec_get_size(tw)) {
+  if (! fts_integer_vector_get_size(tw)) {
     optr->ex_int = 0;
     return (0);
   } 
@@ -57,15 +57,15 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
   switch (arg->ex_type) {
   case ET_INT:
 
-    optr->ex_int =  fts_intvec_get_value(tw, arg->ex_int % fts_intvec_get_size(tw)); 
+    optr->ex_int =  fts_integer_vector_get_value(tw, arg->ex_int % fts_integer_vector_get_size(tw)); 
     break;
   case ET_FLT:
     /* CHANGE are we zero based or one based? */
 
-    i = (int)arg->ex_flt % fts_intvec_get_size(tw); 
+    i = (int)arg->ex_flt % fts_integer_vector_get_size(tw); 
 
-    optr->ex_int =  fts_intvec_get_value(tw,i);
-    if (i  == fts_intvec_get_size(tw) - 1)
+    optr->ex_int =  fts_integer_vector_get_value(tw,i);
+    if (i  == fts_integer_vector_get_size(tw) - 1)
       break;
 
     /*
@@ -73,7 +73,7 @@ max_ex_tab(struct expr *exp, fts_symbol_t s, struct ex_ex *arg, struct ex_ex *op
      * the table do a interpolation with the fraction 
      */
     rest = arg->ex_flt - (int)arg->ex_flt;
-    optr->ex_int+=(int) ((float)(fts_intvec_get_value(tw,i)- fts_intvec_get_value(tw,i+1))*rest);
+    optr->ex_int+=(int) ((float)(fts_integer_vector_get_value(tw,i)- fts_integer_vector_get_value(tw,i+1))*rest);
     break;
 
   default:	/* do something with strings */

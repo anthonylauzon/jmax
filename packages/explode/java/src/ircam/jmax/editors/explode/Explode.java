@@ -25,7 +25,7 @@ public class Explode extends MaxEditor implements AAAReadme {
    */
   public Explode(ExplodeRemoteData maxData)
   {
-    super( Mda.getDocumentTypeByName( "explodeRemoteData"));
+    super();
 
     Init();
 

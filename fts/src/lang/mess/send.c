@@ -198,16 +198,16 @@ receive_list_remove_send(receive_list_t *t, send_t *r)
 }
 
 static void
-receive_list_add_to_set(receive_list_t *t, fts_objectset_t *set)
+receive_list_add_to_set(receive_list_t *t, fts_object_set_t *set)
 {
   send_t     *s;
   receive_t  *r;
 
   for (r = t->first_receive; r ; r = r->next_receive)
-    fts_objectset_add(set, (fts_object_t *) r);
+    fts_object_set_add(set, (fts_object_t *) r);
 
   for (s = t->first_send; s ; s = s->next_send)
-    fts_objectset_add(set, (fts_object_t *) s);
+    fts_object_set_add(set, (fts_object_t *) s);
 }
 
 /******************************************************************************/
@@ -254,7 +254,7 @@ static void
 send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   send_t *this = (send_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
 
   receive_list_add_to_set(this->receive_list, set);
 }
@@ -331,7 +331,7 @@ static void
 receive_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   receive_t *this = (receive_t *) o;
-  fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
+  fts_object_set_t *set = (fts_object_set_t *)fts_get_data(at);
 
   receive_list_add_to_set(this->receive_list, set);
 }

@@ -508,7 +508,7 @@ ftl_program_allocate_signals( ftl_program_t *prog)
     {
       ftl_memory_declaration *m;
 
-      m = (ftl_memory_declaration *)fts_hash_table_iterator_current_data( &iter);
+      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
 
       total_size = total_size + m->size;
     }
@@ -534,7 +534,7 @@ ftl_program_allocate_signals( ftl_program_t *prog)
     {
       ftl_memory_declaration *m;
 
-      m = (ftl_memory_declaration *)fts_hash_table_iterator_current_data( &iter);
+      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
 
       m->address = p;
 
@@ -684,7 +684,7 @@ static void ftl_print_functions_table( void)
       ! fts_hash_table_iterator_end( &it);
       fts_hash_table_iterator_next( &it) )
     {
-      decl = (ftl_function_declaration *)fts_hash_table_iterator_current_data(&it);
+      decl = (ftl_function_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data(&it));
       s = fts_hash_table_iterator_current_symbol( &it);
       post( "/* Function %s (0x%x) */\n", fts_symbol_name(s), decl->wrapper);
     }
@@ -719,7 +719,7 @@ void ftl_program_print_signals( const ftl_program_t *prog)
       ftl_memory_declaration *m;
       fts_symbol_t s;
 
-      m = (ftl_memory_declaration *)fts_hash_table_iterator_current_data( &iter);
+      m = (ftl_memory_declaration *)fts_get_ptr(fts_hash_table_iterator_current_data( &iter));
       s = fts_hash_table_iterator_current_symbol( &iter);
       post( "float %s[%d];  /* adress 0x%x */\n", fts_symbol_name(s), m->size, m->address);
     }

@@ -55,9 +55,6 @@ FtsContainerObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsContainerObject.java)
 .PHONY: FtsContainerObject
 
-FtsDataObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDataObject.java)
-.PHONY: FtsDataObject
 
 FtsDotPatRemoteDocumentHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatRemoteDocumentHandler.java)
@@ -146,10 +143,6 @@ FtsPropertyDescriptor:
 FtsPropertyHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyHandler.java)
 .PHONY: FtsPropertyHandler
-
-FtsQlistObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsQlistObject.java)
-.PHONY: FtsQlistObject
 
 FtsReferenceURLTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsReferenceURLTable.java)

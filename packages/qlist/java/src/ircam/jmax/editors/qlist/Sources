@@ -2,6 +2,7 @@ SOURCES = \
 	QList.java		\
 	QListExtension.java	\
 	QListFactory.java	\
+	QListDataEditor.java    \
 	QListPanel.java		\
 	QListFindDialog.java	\
 

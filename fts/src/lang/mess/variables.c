@@ -337,7 +337,7 @@ void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object)
 }
 
 
-static void fts_binding_add_users_to_set(fts_binding_t *var, fts_objectset_t *set)
+static void fts_binding_add_users_to_set(fts_binding_t *var, fts_object_set_t *set)
 {
   fts_object_list_t  *u;	
 
@@ -345,7 +345,7 @@ static void fts_binding_add_users_to_set(fts_binding_t *var, fts_objectset_t *se
   for (u = var->users; u; u = u->next)
     {
       fprintf(stderr, "\nAdding user %lx (%d)\n", u->obj, u->obj->id);
-      fts_objectset_add(set, u->obj);
+      fts_object_set_add(set, u->obj);
       
     }
   fprintf(stderr, "Done Adding users\n");
@@ -828,7 +828,7 @@ void fts_variable_remove_wannabe(fts_patcher_t *scope, fts_symbol_t name, fts_ob
 
 /* Support for find  */
 
-void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_objectset_t *set)
+void fts_variable_find_users(fts_patcher_t *scope, fts_symbol_t name, fts_object_set_t *set)
 {
   fts_binding_t *b;
 

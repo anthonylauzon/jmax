@@ -10,30 +10,23 @@ import ircam.jmax.utils.*;
  *  FTS
  */
 
-public class FtsAtomList implements FtsDataObject
+public class FtsAtomList extends FtsRemoteData
 {
-  FtsObject object = null; 
+  /** Key for remote calls */
+
+  static final int REMOTE_SET     = 1;
+  static final int REMOTE_UPDATE  = 2;
+
   MaxVector values = new MaxVector();
 
   public FtsAtomList()
   {
-  }
-
-  public FtsAtomList(FtsObject object)
-  {
-    this.object = object;
-  }
-
-  // Max Data implementation
-
-  public MaxDocument getDocument()
-  {
-    return object.getParent().getDocument();
+    super();
   }
 
   public String getName()
   {
-    return object.getObjectName();
+    return "atomList";
   }
 
   public int getSize()
@@ -46,14 +39,7 @@ public class FtsAtomList implements FtsDataObject
     return values;
   }
 
-  /** Set the corresponding FTS objetc */
-
-  void setObject(FtsObject object)
-  {
-    this.object = object;
-  }
-
-  /** Get the list in text form */
+  /** Get the list in text form; it should use the FtsParse unparser !!*/
 
   public String getValuesAsText()
   {
@@ -72,7 +58,7 @@ public class FtsAtomList implements FtsDataObject
 
 	buffer.append(element.toString());
 
-	if (element == ";")
+	if (element.equals(";"))
 	  {
 	    buffer.append("\n");
 	    addBlank = false;
@@ -95,26 +81,8 @@ public class FtsAtomList implements FtsDataObject
 
   public void forceUpdate()
   {
-    if (object != null)
-      {
-	Fts.getServer().sendObjectMessage(object, -1, "update", (MaxVector) null);
-	Fts.sync();
-      }
-  }
-
-  void updateFromMessage(FtsMessage msg)
-  {
-    int updateSize;
-
-    updateSize = msg.getNumberOfArguments();
-
-    updateSize -= 2; // Skip target and the "atomList" atom
-
-    values.removeAllElements();
-
-    for (int i = 0 ; i < updateSize; i++)
-      values.addElement(msg.getArgument(i + 2));
-
+    remoteCall(REMOTE_UPDATE);
+    Fts.sync();
   }
 
   /** Declare that a range in the list has been changed
@@ -123,13 +91,22 @@ public class FtsAtomList implements FtsDataObject
 
   public void changed()
   {
-    // Mandare un messaggio set_atom_list all'oggetto
-    // Senza offset
+    remoteCall(REMOTE_SET, values);
+  }
 
-    if (object != null)
+
+  /* a method inherited from FtsRemoteData */
+
+  public final void call( int key, FtsMessage msg)
+  {
+    switch( key)
       {
-	Fts.getServer().sendSetMessage(object, values);
-	object.setDirty();
+      case REMOTE_SET:
+	for (int i = 2 ; i < msg.getNumberOfArguments(); i++)
+	  values.addElement(msg.getArgument(i));
+	break;
+      default:
+	break;
       }
   }
 }

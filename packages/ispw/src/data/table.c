@@ -3,43 +3,43 @@
 #include "fts.h"
 #include "table.h"
 
-/* Naming and reference counting of fts_intvec_t is done here, locally
-   and privately for tables; tables store intvec in the table only
+/* Naming and reference counting of fts_integer_vector_t is done here, locally
+   and privately for tables; tables store integer_vector in the table only
    if named, otherwise allocate directly the vecint.
    */
   
 
-static fts_hash_table_t table_intvec_table; /* the name binding table */
-static fts_heap_t *table_intvec_heap;
+static fts_hash_table_t table_integer_vector_table; /* the name binding table */
+static fts_heap_t *table_integer_vector_heap;
 
-typedef struct table_intvec
+typedef struct table_integer_vector
 {
   fts_symbol_t name;
   int refcount;
-  fts_intvec_t *v;
-} table_intvec_t;
+  fts_integer_vector_t *v;
+} table_integer_vector_t;
 
 
-static fts_intvec_t *
-table_intvec_get(fts_symbol_t name, int size)
+static fts_integer_vector_t *
+table_integer_vector_get(fts_symbol_t name, int size)
 {
-  table_intvec_t *this;
+  table_integer_vector_t *this;
   fts_atom_t d;
 
-  if (fts_hash_table_lookup(&table_intvec_table, name, &d))
+  if (fts_hash_table_lookup(&table_integer_vector_table, name, &d))
     {
-      this = (table_intvec_t *) fts_get_ptr(&d);
+      this = (table_integer_vector_t *) fts_get_ptr(&d);
       this->refcount++;
     }
   else
     {
-      this = (table_intvec_t *) fts_heap_alloc(table_intvec_heap);
+      this = (table_integer_vector_t *) fts_heap_alloc(table_integer_vector_heap);
       this->name = name;
-      this->v = fts_intvec_new(size);
+      this->v = fts_integer_vector_new(size);
       this->refcount = 1;
 
       fts_set_ptr(&d, this);
-      fts_hash_table_insert(&table_intvec_table, name, &d);
+      fts_hash_table_insert(&table_integer_vector_table, name, &d);
     }
 
   return this->v;
@@ -47,14 +47,14 @@ table_intvec_get(fts_symbol_t name, int size)
 
 
 static void
-table_intvec_release(fts_symbol_t name)
+table_integer_vector_release(fts_symbol_t name)
 {
   fts_atom_t d;
-  table_intvec_t *this;
+  table_integer_vector_t *this;
 
-  if (fts_hash_table_lookup(&table_intvec_table, name, &d))
+  if (fts_hash_table_lookup(&table_integer_vector_table, name, &d))
     {
-      this = (table_intvec_t *) fts_get_ptr(&d);
+      this = (table_integer_vector_t *) fts_get_ptr(&d);
       this->refcount--;
     }
   else
@@ -62,24 +62,24 @@ table_intvec_release(fts_symbol_t name)
 
   if (this->refcount == 0)
     {
-      fts_intvec_delete(this->v);
-      fts_hash_table_remove(&table_intvec_table, this->name);
-      fts_heap_free((char *) this, table_intvec_heap);
+      fts_integer_vector_delete(this->v);
+      fts_hash_table_remove(&table_integer_vector_table, this->name);
+      fts_heap_free((char *) this, table_integer_vector_heap);
     }
 }
 
-/* Find a  fts_intvec by name */
+/* Find a  fts_integer_vector by name */
 
 
-fts_intvec_t *
-table_intvec_get_by_name(fts_symbol_t name)
+fts_integer_vector_t *
+table_integer_vector_get_by_name(fts_symbol_t name)
 {
   fts_atom_t d;
-  table_intvec_t *this;
+  table_integer_vector_t *this;
 
-  if (fts_hash_table_lookup(&table_intvec_table, name, &d))
+  if (fts_hash_table_lookup(&table_integer_vector_table, name, &d))
     {
-      this = (table_intvec_t *) fts_get_ptr(&d);
+      this = (table_integer_vector_t *) fts_get_ptr(&d);
       return this->v;
     }
   else
@@ -93,7 +93,7 @@ typedef struct
   int new_value;
   int new_value_valid;
   fts_symbol_t name;
-  fts_intvec_t *table_vec;
+  fts_integer_vector_t *table_vec;
 } table_t;
 
 
@@ -102,7 +102,7 @@ table_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   table_t *this = (table_t *)o;
 
-  fts_outlet_int(o, 0, fts_intvec_get_quantile(this->table_vec, rand() & 0x7fff));
+  fts_outlet_int(o, 0, fts_integer_vector_get_quantile(this->table_vec, rand() & 0x7fff));
 }
 
 static void
@@ -113,16 +113,16 @@ table_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if (n < 0)
     n = 0;
-  else if (n >= fts_intvec_get_size(this->table_vec))
-    n = fts_intvec_get_size(this->table_vec) - 1;
+  else if (n >= fts_integer_vector_get_size(this->table_vec))
+    n = fts_integer_vector_get_size(this->table_vec) - 1;
 
   if (this->new_value_valid)
     {
-      fts_intvec_set_value(this->table_vec, n, this->new_value);
+      fts_integer_vector_set_value(this->table_vec, n, this->new_value);
       this->new_value_valid = 0;
     }
   else
-    fts_outlet_int(o, 0, fts_intvec_get_value(this->table_vec, n));
+    fts_outlet_int(o, 0, fts_integer_vector_get_value(this->table_vec, n));
 }
 
 
@@ -161,7 +161,7 @@ table_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   onset = fts_get_int_arg(ac, at, 0, 0);
 
   if (ac > 1)
-    fts_intvec_set(this->table_vec, onset, ac - 1, at + 1);
+    fts_integer_vector_set(this->table_vec, onset, ac - 1, at + 1);
 }
 
 
@@ -170,7 +170,7 @@ table_inv(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   table_t *this = (table_t *)o;
 
-  fts_outlet_int(o, 0, fts_intvec_get_inv(this->table_vec, fts_get_int(&at[0])));
+  fts_outlet_int(o, 0, fts_integer_vector_get_inv(this->table_vec, fts_get_int(&at[0])));
 }
 
 static void
@@ -178,7 +178,7 @@ table_quantile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   table_t *this = (table_t *)o;
 
-  fts_outlet_int(o, 0, fts_intvec_get_quantile(this->table_vec, fts_get_int(&at[0])));
+  fts_outlet_int(o, 0, fts_integer_vector_get_quantile(this->table_vec, fts_get_int(&at[0])));
 }
 
 static void
@@ -186,7 +186,7 @@ table_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   table_t *this = (table_t *)o;
 
-  fts_intvec_set_const(this->table_vec, 0);
+  fts_integer_vector_set_const(this->table_vec, 0);
 }
 
 static void
@@ -195,7 +195,7 @@ table_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   table_t *this = (table_t *)o;
   int n = fts_get_int(&at[0]);
 
-  fts_intvec_set_const(this->table_vec, n);
+  fts_integer_vector_set_const(this->table_vec, n);
 }
 
 static void
@@ -204,7 +204,7 @@ table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   table_t *this = (table_t *)o;
   int new_size = fts_get_int(&at[0]);
 
-  fts_intvec_set_size(this->table_vec, new_size);
+  fts_integer_vector_set_size(this->table_vec, new_size);
 }
 
 static void
@@ -212,7 +212,7 @@ table_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   table_t *this = (table_t *)o;
 
-  fts_outlet_int(o, 0, fts_intvec_get_sum(this->table_vec, 0, -1));
+  fts_outlet_int(o, 0, fts_integer_vector_get_sum(this->table_vec, 0, -1));
 }
 
 
@@ -225,7 +225,7 @@ table_get_size(fts_daemon_action_t action, fts_object_t *obj,
 {
   table_t *this = (table_t *)obj;
 
-  fts_set_int(value, fts_intvec_get_size(this->table_vec));
+  fts_set_int(value, fts_integer_vector_get_size(this->table_vec));
 }
 
 
@@ -250,9 +250,9 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->name = name;
 
   if (this->name)
-    this->table_vec = table_intvec_get(name, size);
+    this->table_vec = table_integer_vector_get(name, size);
   else
-    this->table_vec = fts_intvec_new(size);
+    this->table_vec = fts_integer_vector_new(size);
   
   if(name)
     fts_register_named_object(o, name);
@@ -265,9 +265,9 @@ table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   table_t *this = (table_t *)o;
 
   if (this->name)
-    table_intvec_release(this->name);
+    table_integer_vector_release(this->name);
   else
-    fts_intvec_delete(this->table_vec);
+    fts_integer_vector_delete(this->table_vec);
 
   if (this->name)
     fts_unregister_named_object(o, this->name);
@@ -280,7 +280,7 @@ table_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   table_t *this = (table_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
 
-  fts_intvec_save_bmax(this->table_vec, f);
+  fts_integer_vector_save_bmax(this->table_vec, f);
 }
 
 /* Daemon for getting the property "data".
@@ -374,8 +374,8 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 table_config(void)
 {
-  table_intvec_heap = fts_heap_new(sizeof(table_intvec_t));
-  fts_hash_table_init(&table_intvec_table);
+  table_integer_vector_heap = fts_heap_new(sizeof(table_integer_vector_t));
+  fts_hash_table_init(&table_integer_vector_table);
   fts_metaclass_create(fts_new_symbol("table"),table_instantiate, fts_always_equiv);
 }
 

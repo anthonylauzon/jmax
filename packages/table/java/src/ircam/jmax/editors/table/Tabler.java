@@ -29,7 +29,7 @@ public class Tabler extends MaxEditor {
   public FtsIntegerVector itsData;
   
   public Tabler(FtsIntegerVector theData) {
-    super(Mda.getDocumentTypeByName("Table"));
+    super();
 
     itsData = theData;
 

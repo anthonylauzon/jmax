@@ -31,10 +31,14 @@ public class FtsModule
 
     // Install the Integer vector class
 
-    Fts.registerRemoteDataClass("intvec_data", ircam.jmax.fts.FtsIntegerVector.class);
+    Fts.registerRemoteDataClass("integer_vector_data", ircam.jmax.fts.FtsIntegerVector.class);
 
     // Install the Object set class
 
-    Fts.registerRemoteDataClass("objectset_data", ircam.jmax.fts.FtsObjectSet.class);
+    Fts.registerRemoteDataClass("object_set_data", ircam.jmax.fts.FtsObjectSet.class);
+
+    // Install the atom list class
+
+    Fts.registerRemoteDataClass("atom_list_data", ircam.jmax.fts.FtsAtomList.class);
   }
 }

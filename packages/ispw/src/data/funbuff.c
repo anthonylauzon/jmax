@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.3 $ IRCAM $Date: 1998/08/28 13:52:57 $
+ *      $Revision: 1.1 $ IRCAM $Date: 1998/09/19 14:36:22 $
  *
  * Ported to FTS 1.3.x by MDC From the original sources of Zack Settel & Miller Puckette
  */
@@ -785,12 +785,12 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_symbol_t sym;
   long xn, x1, x2, tab_domain, tab_range, tab_x, tab_y;
   long  low = 0, high = 0;
-  fts_intvec_t *tab = 0;
+  fts_integer_vector_t *tab = 0;
   
   xn  = fts_get_long(at);
   sym = fts_get_symbol(at + 1);
 
-  tab = table_intvec_get_by_name(sym);
+  tab = table_integer_vector_get_by_name(sym);
 
   if (! tab)
     {
@@ -815,9 +815,9 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       return;
     }
 
-  tab_domain = fts_intvec_get_size(tab);
-  low  = fts_intvec_get_min_value(tab);
-  high = fts_intvec_get_max_value(tab);
+  tab_domain = fts_integer_vector_get_size(tab);
+  low  = fts_integer_vector_get_min_value(tab);
+  high = fts_integer_vector_get_max_value(tab);
   tab_range = high - low;
 
   if (tab_range == 0)
@@ -830,7 +830,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   x2 = z->next->x;
 
   tab_x = tab_domain * ((xn - x1) / (float)(x2 - x1));
-  tab_y = fts_intvec_get_value(tab, tab_x) - low;
+  tab_y = fts_integer_vector_get_value(tab, tab_x) - low;
   xn = z->y + (z->next->y - z->y) * (float)tab_y / tab_range;
 
   fts_outlet_int((fts_object_t *)this, 0, xn);			

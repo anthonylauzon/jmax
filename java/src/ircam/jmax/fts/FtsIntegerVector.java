@@ -84,7 +84,7 @@ public class FtsIntegerVector extends FtsRemoteData
 
   public void forceUpdate()
   {
-    remoteCall(REMOTE_UPDATE, null);
+    remoteCall(REMOTE_UPDATE);
     Fts.sync();
   }
 

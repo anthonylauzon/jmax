@@ -950,6 +950,31 @@ public class FtsServer
       }
   }
 
+  final void remoteCall( FtsRemoteData data, int key, MaxVector args)
+  {
+    if (! connected)
+      return;
+
+    if (FtsServer.debug)
+      System.err.println( "remoteCall(" + data + ", " + key + "," + args + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.remote_call_code);
+	port.sendRemoteData(data);
+	port.sendInt(key);
+
+	if (args != null)
+	  port.sendVector( args); // we may have zero args call
+
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCall(data, key, args)");
+      }
+  }
+
   final void remoteCall( FtsRemoteData data, int key, int offset, int size, int values[])
   {
     if (! connected)

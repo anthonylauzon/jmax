@@ -6,7 +6,6 @@ SOURCES = \
 	FtsCommentObject.java		\
 	FtsConnection.java		\
 	FtsContainerObject.java		\
-	FtsDataObject.java		\
 	FtsDatagramClientPort.java	\
 	FtsDatagramPort.java		\
 	FtsDatagramServer.java	\
@@ -32,7 +31,6 @@ SOURCES = \
 	FtsPort.java			\
 	FtsPropertyDescriptor.java	\
 	FtsPropertyHandler.java		\
-	FtsQlistObject.java		\
 	FtsReferenceURLTable.java	\
 	FtsRemoteData.java		\
 	FtsRemoteDataID.java		\

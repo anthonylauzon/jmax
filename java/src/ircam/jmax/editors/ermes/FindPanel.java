@@ -77,7 +77,7 @@ class FindPanel extends JFrame {
     pack();
     validate();
 
-    set = (FtsObjectSet) Fts.newRemoteData( "objectset_data", null);
+    set = (FtsObjectSet) Fts.newRemoteData( "object_set_data", null);
     objectSetViewer.setModel( set.getListModel());
 
     objectSetViewer.setObjectSelectedListener(new ObjectSelectedListener() {
