@@ -84,6 +84,8 @@ data_release(fts_data_t *data)
  *
  */
 
+extern void fts_complex_vector_config(void);
+
 extern void data_expr_init(void);
 extern void data_types_init(void);
 
@@ -103,6 +105,8 @@ extern void getsize_config(void);
 static void
 data_module_init(void)
 {
+  fts_complex_vector_config();
+
   data_expr_init();
   data_types_init();
 

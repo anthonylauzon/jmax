@@ -40,53 +40,43 @@ void ftl_sampwrite(fts_word_t *argv)
 
 void ftl_sampread(fts_word_t *argv)
 {
-  float *in1 = (float *)fts_word_get_ptr(argv);
+  float *in = (float *)fts_word_get_ptr(argv);
   float *out = (float *)fts_word_get_ptr(argv + 1);
-  sampread_ctl_t *ctl = (sampread_ctl_t *)fts_word_get_ptr(argv + 2);
-  long n = fts_word_get_long(argv + 3);
-  long addr1, addr2, n2;
-  float f1, f2, extent, *fp;
-
+  sampread_ctl_t * restrict ctl = (sampread_ctl_t *)fts_word_get_ptr(argv + 2);
+  long n_tick = fts_word_get_long(argv + 3);
   sampbuf_t *buf = ctl->buf;
-  float *sp;
-  float tbuf[512];
-
-  /* add by ev for portage */
-  in1 += n-1;
-
-  if(!buf) goto zero;
+  float f1, f2, extent;
+  long index, incr, n1;
+  float *onset;
+  int i;
 
   f1 = ctl->last_in;
-  f2 = in1[0] * ctl->conv;
+  f2 = in[n_tick-1] * ctl->conv;
   ctl->last_in = f2;
 
-  if(f2 >= f1){        /* reading forward */
-    if(f1 < 0 || f2 >= buf->size - 6 || (extent = f2 - f1) > ctl->max_extent) goto zero;
-    n2 = f1;
-    sp = buf->samples + n2;
-    addr1 = (f1 - n2) * 65536.0f;
-    addr2 = 65536.0f * extent * ctl->inv_n;
-  }else{ /* reading backward */
-    if(f2 < 0 || f1 >= buf->size - 6 || (extent = f1 - f2) > ctl->max_extent) goto zero;
-    n2 = f2 - .5f;
-    sp = buf->samples + n2;
-    addr1 = (f1 - n2) * 65536.0f;
-    addr2 = - (long)(65536.0f * extent * ctl->inv_n);
-    /* are you sure this won't go past the bottom? */
-  }
-  n2 = ((long)extent) + 5;
-  
-  for(fp = tbuf; n2--;) *fp++ = *sp++;
-  
-  while(n--){
-    sampfilt_t *t = sampfilt_tab + ((addr1 >> 8) & 255);
-    fp = tbuf + (addr1 >> 16);
-    *out++ = t->f1 * fp[0] + t->f2 * fp[1] + t->f3 * fp[2] + t->f4 * fp[3];
-    addr1 += addr2;
-  }
-  return;
-  
- zero:
-  while(n--) *out++ = 0;
-}
+  extent = f2 - f1;
 
+  if(extent > 0.0f && f1 >= 0.0f && f2 < buf->size - 4 && extent <= ctl->max_extent)
+    n1 = f1;
+  else if(extent < 0.0f && f2 >= 0 && f1 < buf->size - 4 && extent >= -ctl->max_extent)
+    n1 = f2 - 0.5f;
+  else
+    {
+      for(i=0; i<n_tick; i++)
+	out[i] = 0.0f;
+
+      return;
+    }
+  
+  onset = buf->samples + n1;
+  index = (f1 - n1) * 65536.0f;
+  incr = 65536.0f * extent * ctl->inv_n;
+  
+  for(i=0; i<n_tick; i++)
+    {
+      sampfilt_t * restrict sampfilt = sampfilt_tab + ((index >> 8) & 255);
+      float * restrict fp = onset + (index >> 16);
+      out[i] = sampfilt->f1 * fp[0] + sampfilt->f2 * fp[1] + sampfilt->f3 * fp[2] + sampfilt->f4 * fp[3];
+      index += incr;
+    }
+}

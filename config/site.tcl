@@ -24,7 +24,7 @@
 #  Like:
 #
 #  proc octaneStandardConfig {} {
-# 	openDefaultMidi     SerialPort2
+# 	openDefaultMidi     "SerialPort2"
 #	openDefaultAudioIn  ADATIn   8 
 #	openDefaultAudioOut ADATOut  8     
 #  }

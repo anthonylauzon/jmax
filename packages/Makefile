@@ -10,10 +10,10 @@
 #  This program is distributed WITHOUT ANY WARRANTY. See the LICENSE
 #  for DISCLAIMER OF WARRANTY.
 #  
-C_TARGETS=ispw guiobj lists additive eric system io sources
+C_TARGETS=ispw guiobj lists additive eric system io data sources
+
 JAVA_TARGETS=table
 MIXED_TARGETS=qlist explode
-
 
 # Late targets must be done at the end, because they depend
 # on the mixed target

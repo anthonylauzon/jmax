@@ -173,7 +173,7 @@ sigline_set_target(sigline_t *this, float target)
 
   if (this->time > 0.0f)
     {
-      int n_ticks = this->time * 0.001f * this->srate / this->vecsize;
+      int n_ticks = this->time * 0.001f * this->srate / this->vecsize + 0.5;
       int steps = n_ticks * this->vecsize;
 
       ctl->target = target;

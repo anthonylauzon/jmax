@@ -1,4 +1,4 @@
-/*
+ /*
  * jMax
  * 
  * Copyright (C) 1999 by IRCAM
@@ -19,18 +19,21 @@
 #define DEFn_vox  16L
 #define DEFn_args 6L
 
+#define HALF_TICK 
+
 typedef struct 
 {
   fts_object_t   t_ob;
   fts_symbol_t *sym_receive;
   float *time_over;
-  long n_vox;
-  long idx;
+  int n_vox;
+  int idx;
   fts_atom_t *list_store;
-  long n_args;
-  long i_dur;
+  int n_args;
+  int i_dur;
   float dur;
   float last_dur;
+  float half_tick;
 } voxalloc_t;
 
 
@@ -46,12 +49,14 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   voxalloc_t *this = (voxalloc_t *) o;
 
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  long n_vox    = fts_get_long_arg(ac, at, 2, 16);
-  long n_args   = fts_get_long_arg(ac, at, 3, 6);
-  long i_dur = fts_get_long_arg(ac, at, 4, 0);
-  long dur = fts_get_long_arg(ac, at, 5, 0);
-  int i;
+  int n_vox    = fts_get_int_arg(ac, at, 2, 16);
+  int n_args   = fts_get_int_arg(ac, at, 3, 6);
+  int i_dur = fts_get_int_arg(ac, at, 4, 0);
+  int dur = fts_get_int_arg(ac, at, 5, 0);
   char rec_name[MAX_size_rec_name + 1];
+  float vs = fts_param_get_float(fts_s_vector_size, DEFAULTVS);
+  float sr = fts_param_get_float(fts_s_sampling_rate, 1.0);
+  int i;
 
   this->sym_receive = (fts_symbol_t *) fts_malloc(sizeof(fts_symbol_t ) * n_vox);
   this->n_vox = n_vox;
@@ -76,7 +81,9 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     this->time_over[i] = (float)0;
 	
   for(i = 0; i < n_args; i++)
-    fts_set_long(&this->list_store[i], 0);
+    fts_set_int(&this->list_store[i], 0);
+
+  this->half_tick = 500.0f * vs / sr;
 }
 
 static void
@@ -101,18 +108,22 @@ voxalloc_used(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   voxalloc_t *this = (voxalloc_t *) o;
 
-  long n_used   = 0;
+  int n_used   = 0;
   float *time_over  = this->time_over;
-  long idx = this->idx;
-  long here  = idx;
-  float now   = fts_clock_get_time(0);
+  int idx = this->idx;
+  int here = idx;
+  float now = fts_clock_get_time(0) - 2.0 * this->half_tick;
 
-  do{
-    if(now <= time_over[idx]) n_used++;
+  do {
+    if(now < time_over[idx]) 
+      n_used++;
+
     idx++;
-    if(idx == this->n_vox) idx = 0;
-  }while (idx != here);
-	
+
+    if(idx == this->n_vox) 
+      idx = 0;
+  } while (idx != here);
+  
   fts_outlet_int(o, 1, n_used);	
 }
 
@@ -130,11 +141,11 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   voxalloc_t *this = (voxalloc_t *) o;
   fts_symbol_t *sym_receive = this->sym_receive;
   fts_atom_t *list_store  = this->list_store;
-  long n_args   = this->n_args;
-  long i_dur = this->i_dur;
+  int n_args = this->n_args;
+  int i_dur = this->i_dur;
   float *time_over  = this->time_over;
-  long idx = this->idx;
-  long here  = idx;
+  int idx = this->idx;
+  int here  = idx;
   float now = fts_clock_get_time(0);
   float dur;
 	
@@ -147,7 +158,8 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	
   while (time_over[idx] > now){
     idx++;
-    if(idx == this->n_vox) idx = 0;
+    if(idx == this->n_vox) 
+      idx = 0;
 
     if(idx == here){
       fts_outlet_list(o, 0, ac, at);	
@@ -156,7 +168,7 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
   }
 	
-  time_over[idx] = now + dur;
+  time_over[idx] = now + dur - this->half_tick;
 
   {
     fts_object_t *rec;
@@ -208,7 +220,7 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  if(fts_get_long_arg(ac, at, 4, 0) == 0)
+  if(fts_get_int_arg(ac, at, 4, 0) == 0)
     fts_class_init(cl, sizeof(voxalloc_t), 2, 2, 0); /* no dur arg in list -> dur inlet */
   else
     fts_class_init(cl, sizeof(voxalloc_t), 1, 2, 0); /* no dur inlet */
@@ -239,7 +251,7 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   a[0] = fts_s_float;
   fts_method_define(cl, 0, fts_s_float, voxalloc_float, 1, a);
 
-  if(fts_get_long_arg(ac, at, 4, 0) == 0){ /* dur inlet */
+  if(fts_get_int_arg(ac, at, 4, 0) == 0){ /* dur inlet */
     a[0] = fts_s_int;
     fts_method_define(cl, 1, fts_s_int, voxalloc_number_1, 1, a);
     a[0] = fts_s_float;
@@ -260,7 +272,7 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static int
 voxalloc_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 {
-  return(fts_get_long_arg(ac0, at0, 4, 0) == fts_get_long_arg(ac1, at1, 4, 0));
+  return(fts_get_int_arg(ac0, at0, 4, 0) == fts_get_int_arg(ac1, at1, 4, 0));
 }
 
 void

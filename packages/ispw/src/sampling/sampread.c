@@ -95,7 +95,6 @@ sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       float f;
 
-      
       f = this->max_speed * n_tick;
       ftl_data_set(sampread_ctl_t, this->sampread_data, max_extent, &f);
 
