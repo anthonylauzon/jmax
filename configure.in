@@ -1,8 +1,18 @@
-dnl $Id: configure.in,v 1.102 2002/11/21 15:17:47 p_tisserand Exp $
+dnl $Id: configure.in,v 1.103 2003/01/23 15:51:12 p_tisserand Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.103  2003/01/23 15:51:12  p_tisserand
+dnl Rename default project files:
+dnl 	    config.jprj -> default_project.jprj
+dnl 	    config_linux_alsa.jprj -> default_project_linux_alsa.jprj
+dnl 	    config_linux_oss.jprj  -> default_project_linux_oss.jprj
+dnl 	    config_macosx.jprj     -> default_project_macosx.jprj
+dnl 	    config_win32.jprj      -> default_project_win32.jprj
+dnl Add default project file for jack audio connection kit:
+dnl             default_project_linux_jack.jprj
+dnl
 dnl Revision 1.102  2002/11/21 15:17:47  p_tisserand
 dnl configure.in: add shell script to set restrict definition in include/fts/config-ac.h
 dnl utils.h: change include of ftsconfig.h into include <fts/config.h> and include <fts/wrap.h>
@@ -392,18 +402,14 @@ then
 	LDFLAGS="$tmp_LDFLAGS"
 	LIBS="$tmp_LIBS"
 	dnl Add jack in packages to compile
-	ADDITIONAL_PACKAGES="$ADDITIONAL_PACKAGES jack"
+	AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")	
 	dnl Define macro to enable scheduler special function (fts_sched_run_one_tick)
-	CFLAGS="$CFLAGS -DUSE_JACK"
 	DEFAULT_PROJECT_FILE=default_project_linux_jack.jprj
 fi
 
+
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
-
-
-dnl tell makefiles to use this variable 
-AC_SUBST(ADDITIONAL_PACKAGES)
 
 AC_SUBST(DEFAULT_PROJECT_FILE)
 
