@@ -88,14 +88,31 @@ public class FtsUndoableObject extends FtsGraphicObject implements UndoableData{
   }
 
   public void endUpdate()
-  {
+  {    
     if (!inGroup) return;
     undo.endUpdate();
     inGroup = false;
   }
 
-  public void postEdit(UndoableEdit e)
+  String actionType = null;
+  public void beginUpdate(String type)
   {
+    undo.beginUpdate();
+    inGroup = true;
+    actionType = type;
+  }
+
+  public void endUpdate(String type)
+  {    
+    if (!inGroup || (actionType!=null && !actionType.equals(type))) return;
+
+    undo.endUpdate();
+    inGroup = false;
+    actionType = null;
+  }
+  
+  public void postEdit(UndoableEdit e)
+  {    
     undo.postEdit(e);
   }
 

@@ -306,6 +306,12 @@ public  void beginUpdate()
   inGroup = true;
 }
 
+public  void beginUpdate(String type)  
+{
+  //((UndoableData) itsTrackDataModel).beginUpdate();
+  inGroup = true;
+}
+
 /**
 * posts an undo edit in the buffers */
 public  void postEdit(UndoableEdit e)
@@ -315,6 +321,14 @@ public  void postEdit(UndoableEdit e)
 /**
 * Signal that the undoable section ended */
 public void endUpdate() 
+{
+  //((UndoableData) itsTrackDataModel).endUpdate();
+  inGroup = false;
+}
+
+/**
+* Signal that the undoable section ended */
+public void endUpdate(String type) 
 {
   //((UndoableData) itsTrackDataModel).endUpdate();
   inGroup = false;

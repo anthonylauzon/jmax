@@ -35,6 +35,13 @@ public abstract class AbstractUndoableObject implements UndoableData {
   {
     inGroup = true;
   }
+  
+  String actionType = null;
+  public void beginUpdate(String type)
+  {
+    inGroup = true;
+    actionType = type;
+  }
 
   /**
    * Add the given UndoableEdit to the undo Buffers */
@@ -46,7 +53,15 @@ public abstract class AbstractUndoableObject implements UndoableData {
   {
     inGroup = false;
   }
-
+  
+  public void endUpdate(String type) 
+  {
+    if(actionType == null || ((actionType != null) && actionType.equals(type)))
+    {
+      inGroup = false;
+      actionType = null;
+    }  
+  }
   /**
    * undo the last section */
   public void undo(){}

@@ -33,6 +33,10 @@ public interface UndoableData {
   /**
    * tells the model to start an undo section */
   public abstract void beginUpdate();
+  
+  /**
+  * tells the model to start an undo section with the name of action */
+  public abstract void beginUpdate(String type);
 
   /**
    * posts an undo edit in the buffers */
@@ -41,6 +45,10 @@ public interface UndoableData {
   /**
    * terminates the undo critical section */
   public abstract void endUpdate();
+  
+  /**
+    * terminates the undo critical section with name of action */
+  public abstract void endUpdate(String type);
   
   /**
    * ask to undo the section */

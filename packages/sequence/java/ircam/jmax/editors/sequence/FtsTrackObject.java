@@ -279,14 +279,14 @@ public void addEventFromServer(TrackEvent evt)
   addEvent(evt);
 	
   // ends the undoable transition
-  endUpdate();
+  endUpdate("addEvent");
 }
 public void addEvents(int nArgs , FtsAtom args[])
 {
   addEvent( new TrackEvent(getServer(), this, args[0].intValue, "event", args, 1, nArgs));
 	
   // ends the undoable transition
-  endUpdate();
+  endUpdate("addEvent");
 }
 
 public void removeEvents(int nArgs , FtsAtom args[])
@@ -301,7 +301,7 @@ public void removeEvents(int nArgs , FtsAtom args[])
     deleteEventAt(removeIndex);
   }
   // ends the undoable transition
-  endUpdate();
+  endUpdate("removeEvents");
 }
 
 public void clear()
@@ -654,6 +654,8 @@ public void requestInsertMarker(double time)
 
 public void makeTrillFromSelection( Enumeration events)
 {  
+  beginUpdate("addEvent");
+  
   try{
     args.clear();
     for (Enumeration e = events; e.hasMoreElements();) 
