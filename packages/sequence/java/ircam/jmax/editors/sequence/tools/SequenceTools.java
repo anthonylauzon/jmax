@@ -36,44 +36,17 @@ import javax.swing.event.*;
  * of the SequenceToolManager by the knowledge of the tools */
 public class SequenceTools implements ToolProvider{
 
-  public SequenceTools( int type)
+  public SequenceTools()
   {
     String path = null;
     String fs = File.separator;
-    /*
-      WARNING:
-      Waiting for a method to get the packagePath from the package name
-    */
+ 
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
-    /*************************************************************/
-
-    if( type == COMPLETE_TOOLS)
-      tools = new Tool[5];
-    else if( type == SCOOB_TOOLS)
-      tools = new Tool[3];
-    else
-      tools = new Tool[4];
+    
+    tools = new Tool[2];
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    
-    if( type == COMPLETE_TOOLS)
-      {
-	tools[1] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
-	tools[2] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-	tools[3] = new LinerTool(new ImageIcon(path+"liner.gif"));
-	tools[4] = new CombTool(new ImageIcon(path+"comber.gif"));
-      }
-    else if( type == SCOOB_TOOLS)
-      {
-	tools[1] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
-	tools[2] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-      }
-    else
-      {
-	tools[1] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-	tools[2] = new LinerTool(new ImageIcon(path+"liner.gif"));
-	tools[3] = new CombTool(new ImageIcon(path+"comber.gif"));
-      }
+    tools[1] = new ResizerTool(new ImageIcon(path+"resizer.gif"));
   }
 
   public Enumeration getTools()
@@ -106,13 +79,7 @@ public class SequenceTools implements ToolProvider{
 
   //---
   Tool tools[];
-  public static final int COMPLETE_TOOLS = 0;
-  public static final int SCOOB_TOOLS = 1;
-  public static final int NUMBER_TOOLS = 2;
-
-  public static SequenceTools scoobInstance = new SequenceTools( SCOOB_TOOLS);
-  public static SequenceTools numberInstance = new SequenceTools( NUMBER_TOOLS);
-  public static SequenceTools completeInstance = new SequenceTools( COMPLETE_TOOLS);
+  public static SequenceTools instance = new SequenceTools();
 }
 
 

@@ -1,14 +1,10 @@
 packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/renderers
 package_JAVA = \
 ArrowTool.java \
-CombTool.java \
-LinerTool.java \
 ResizerTool.java \
 SelecterTool.java \
 SequenceToolManager.java \
-SequenceTools.java \
-VResizerTool.java \
-ZoomTool.java 
+SequenceTools.java 
 
 JAVAC = @JAVACX@
 JAVACFLAGS=@JAVACFLAGSX@

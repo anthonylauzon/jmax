@@ -148,7 +148,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
     if( scrollManager instanceof SequencePanel)
       return 3+TrackContainer.BUTTON_WIDTH;
     else
-      return 3;
+      return 1;
   }
   
   protected void processMouseEvent(MouseEvent e)

@@ -51,7 +51,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
   public final static int MAX_HEIGHT     = 800;
-  public final static int EMPTY_HEIGHT   = 94;
+  public final static int EMPTY_HEIGHT   = /*94*/92;
   /**
    * Constructor with FtsSequenceObject
    */

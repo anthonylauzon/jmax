@@ -102,7 +102,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
     
-    manager = new SequenceToolManager( SequenceTools.completeInstance);
+    manager = new SequenceToolManager( SequenceTools.instance);
     Tool arrow = manager.getToolByName("edit");     
     manager.activate(arrow, null); //we do not have a gc yet...
 

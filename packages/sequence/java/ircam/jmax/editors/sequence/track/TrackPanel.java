@@ -91,16 +91,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
     ruler = new SequenceRuler(geometry, this);
 
     //-------------------------------------------------
-    //-- Tools, toolbar and status bar:
     //- Create the ToolManager with the needed tools
-    //- Create a toolbar associated to this ToolManager
-    //- Create a status bar containing the toolbar
-
-    if( ftsTrackObject.getType().getName().equals( AmbitusValue.AMBITUS_NAME) )
-      manager = new SequenceToolManager( SequenceTools.scoobInstance);
-    else
-      manager = new SequenceToolManager( SequenceTools.numberInstance);
-
+    manager = new SequenceToolManager( SequenceTools.instance);
     Tool arrow = manager.getToolByName("edit");     
     manager.activate(arrow, null); //we do not have a gc yet...
 
