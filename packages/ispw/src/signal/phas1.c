@@ -109,9 +109,9 @@ static void ftl_phasor(fts_word_t *argv)
 
   for(i=0; i<n; i++)
     {
-      float freq = freq[i];
+      float this_freq = freq[i];
       out[i] = fts_wrapper_frac_get_wrap(&phi);
-      fts_wrapper_incr(&phi, freq * incr);
+      fts_wrapper_incr(&phi, this_freq * incr);
     }
 
   state->phase = phi;
@@ -128,9 +128,9 @@ static void ftl_inplace_phasor(fts_word_t *argv)
 
   for(i=0; i<n; i++)
     {
-      float freq = sig[i];
+      float this_freq = sig[i];
       sig[i] = fts_wrapper_frac_get_wrap(&phi);
-      fts_wrapper_incr(&phi, freq * incr);
+      fts_wrapper_incr(&phi, this_freq * incr);
     }
 
   state->phase = phi;
