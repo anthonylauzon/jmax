@@ -260,22 +260,6 @@ static int audio_desc_update( audio_desc_t *aud, int cmd)
 {
   int fd, flags;
 
-
-  /* 
-     First, test if we want to reopen the device with read and write, and
-     if this is true, if the device supports full duplex.
-     If it does not support full duplex, then return error 
-  */
-  if ( aud->fd >= 0) 
-    {    
-      if ( (aud->dac_open && (cmd == CMD_OPEN_ADC)) 
-	   || (aud->adc_open && (cmd == CMD_OPEN_DAC)) )
-	{
-	  if (audio_desc_check_full_duplex_caps( aud) < 0)
-	    return -1;
-	}
-    }
-
   flags = -1;
 
   switch (cmd) {
@@ -328,6 +312,16 @@ static int audio_desc_update( audio_desc_t *aud, int cmd)
     }
 
   aud->fd = fd;
+
+  /* 
+     If the device is opened read and write, check 
+     if the device supports full duplex.
+     If it does not support full duplex, then return error 
+  */
+  if ( aud->dac_open && aud->adc_open)
+    {
+      audio_desc_check_full_duplex_caps( aud);
+    }
 
   if ( audio_desc_set_parameters( aud) )
     {
