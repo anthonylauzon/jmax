@@ -1,0 +1,156 @@
+<HTML>
+<HEAD>
+<TITLE> jMax documentation </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+
+<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
+
+<BR>
+<BR>
+
+<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TR>
+<TD ALIGN=CENTER VALIGN=MIDDLE>
+<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
+</TD>
+
+<TD>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+</TD>
+
+<TD ALIGN=LEFT VALIGN=MIDDLE>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html"> Documentation </A>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html"> User documentation </A>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <B><FONT SIZE=+2>Installation</FONT></B>
+</DL>
+</DL>
+</DL>
+</TD>
+
+</TR>
+</TABLE>
+
+<HR>
+
+<UL>
+  <LI>
+    <A HREF="#distribution">Installing the <I>j</I>Max distribution</A>
+  <LI>
+    <A HREF="#java">Java installation</A>
+  <LI>
+    <A HREF="#configuration">Configuration files</A>
+</UL>
+
+<HR>
+
+<A NAME="distribution">
+<H2>Installing the <I>j</I>Max distribution</H2>
+
+<I>j</I>Max is distributed as a tar gzip'ed file. After downloading the <I>j</I>Max 
+distribution file (for instance jmax.free.linuxpc.2.3.12.tar.gz),
+you will need to execute the following:
+
+<OL>
+<LI> untar the package:
+<PRE>
+tar xvzf DISTRIB-FILE
+</PRE>
+This will create a directory max-&lt;VERSION NUMBER&gt;. To keep environment unchanged with
+new releases of <I>j</I>Max, you can make a symbolic link to it, as :
+<PRE>
+ln -s max-2.3.12 max
+</PRE>
+Note: be carefull to untar the files with the correct access permissions.
+
+<P>
+<LI> execute as root the script INSTALL.sh in <I>j</I>Max root directory. This script
+will change the access permissions of <I>j</I>Max server executables to allow
+it to switch to real-time scheduling policy and priority.
+</OL>
+
+<HR>
+
+<A NAME="java">
+<H2>Java Installation</H2>
+
+The current version of <I>j</I>Max requires:
+<OL>
+<LI> an installation of the <I>Java Runtime Environment (JRE)</I> or the 
+<I>Java Development Kit (JDK)</I> version 1.1.5 or higher.
+<LI> JavaTM Foundation Classes (JFC) Swing 1.1 Beta 2
+</OL>
+
+<P>
+<STRONG>NOTE:</STRONG> <I>j</I>Max requires Swing 1.1 Beta 2. It is known <STRONG>not</STRONG> to work
+with Swing 1.1 Beta 1 and Swing 1.1 Beta 3 !
+
+<P>
+How to get the <I>JRE</I> or <I>JDK</I> and how to install it on your machine will be better 
+explained there:
+<UL>
+<LI> JDK: <A HREF="http://java.sun.com/products/jdk/1.1/index.html"> 
+http://java.sun.com/products/jdk/1.1/index.html</A> 
+<LI> Silicon Graphics Java Development Environment: <A HREF="http://www.sgi.com/Products/Evaluation/#jdk">
+http://www.sgi.com/Products/Evaluation/#jdk</A>
+</UL>
+
+<P>
+JavaTM Foundation Classes (JFC) Swing 1.1 Beta 2 can be found at:<BR>
+<A HREF="http://developer.java.sun.com/developer/earlyAccess/jfc/index.html">
+http://developer.java.sun.com/developer/earlyAccess/jfc/index.html</A><BR>
+This site requires registration (which is free...).
+
+
+
+<HR>
+
+<A NAME="configuration">
+<H2>Configuration files</H2>
+
+<P>
+In the current distribution, the configuration for an installation
+depends on the following files in the <B><TT>config</TT></B> directory:
+
+<DL>
+  <DT><TT><B>defaults.tcl</B></TT>
+  <DD>
+    installation default settings of the <I>system properties</I><BR>
+    (overwritten by user settings and command line arguments)
+    <P>
+  <DT><TT><B>packages.tcl</B></TT>
+  <DD>
+     packages loaded by default for this installation<BR>
+    <P>
+  <DT><TT><B>audio.cfg</B></TT>
+  <DD>
+     default audio configuration at startup<BR>
+    <P>
+  <DT><TT><B>midi.cfg</B></TT>
+  <DD>
+     default MIDI configuration at startup<BR>
+    <P>
+</DL>
+
+<P>
+These files should assure that a user can startup <I>j</I>Max anytime 
+running a minimum configuration without further declarations.
+They should be modified to match your installation
+(at least edit <TT>defaults.tcl</TT> to set the right server architecture).
+
+<P>
+The <I>j</I>Max user can give his own values for the system properties
+in his user configuration file <TT>~/.jmaxrc</TT>.
+You find an example of a user configuration file the <TT>config</TT> directory
+of the distribution as <TT>examples.jmaxrc</TT>.
+
+
+<P>
+<HR>
+
+</BODY>
+</HTML>

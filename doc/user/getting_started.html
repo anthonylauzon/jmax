@@ -1,0 +1,109 @@
+<HTML>
+<HEAD>
+<TITLE> jMax documentation </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+
+<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
+
+<BR>
+<BR>
+
+<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TR>
+<TD ALIGN=CENTER VALIGN=MIDDLE>
+<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
+</TD>
+
+<TD>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+</TD>
+
+<TD ALIGN=LEFT VALIGN=MIDDLE>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="../index.html"> Documentation </A>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <A HREF="index.html"> User documentation </A>
+<DL>
+<DT> <IMG SRC="../images/dot.gif"> <B><FONT SIZE=+2>Getting started</FONT></B>
+</DL>
+</DL>
+</DL>
+</TD>
+
+</TR>
+</TABLE>
+
+<HR>
+
+<UL>
+  <LI>
+    <A HREF="#running"> Running jMax </A>
+  <LI>
+    <A HREF="#System properties"> System properties </A>
+  <LI>
+    <A HREF="#.jmaxrc"> <B><TT>.jmaxrc</B></TT> file </A>
+</UL>
+
+<HR>
+
+<A NAME="running"> 
+<H2>Running <I>j</I>Max</H2>
+
+<P>
+<I>j</I>Max can be run by executing the shell script &lt;INSTALLATION_DIRECTORY&gt;/bin/jmax.
+This script accepts a set of options (see <B><TT> jmax -help </TT></B> for description)
+that are either interpreted by the script or passed as command line arguments
+to the Java application as <I>system properties</I>.
+
+
+<A NAME="System properties"> 
+<H2> System properties </H2>
+
+
+<P>
+<I>j</I>Max uses a number of <I>properties</I> to parametrize the system. 
+A <I>property</I> is a named variable with a default value,
+that can be set by a Tcl script or by command-line arguments, and that can be accessed from
+Java code.
+
+
+<P>
+The system properties given by a default in <TT>defaults.tcl</TT> or in the user configuration file.
+can be overwritten by command line arguments to <TT>jmax</TT> script:
+
+<P>
+&nbsp; &nbsp; 
+<B><TT>-jmax</TT>&lt;<I>system property name</I>&gt; &lt;<I>system property value</I>&gt;</B>
+
+<P>
+Additional system properties can be defined by using the same syntax 
+(see <A HREF="./configuration.html"><I>Configuration and Environment Setup</I></A>).
+
+
+<A NAME=".jmaxrc">
+<H2> <B><TT>.jmaxrc</TT></B> file </H2>
+
+<P>
+To start it, you must first install a .jmaxrc file in
+your home directory. A set of template <TT>.jmaxrc</TT> files
+can be found in the distribution.
+
+<PRE>
+# --- .jmaxrc
+set jmaxArch  origin
+when start {
+jmaxSetSampleRate 44100
+jmaxSetAudioBuffer 512
+ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 fifo_size [jmaxGetAudioBuffer]
+ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8 fifo_size [jmaxGetAudioBuffer]
+}
+# --- end of .jmaxrc
+</PRE>
+
+<P>
+<HR>
+
+</BODY>
+</HTML>
