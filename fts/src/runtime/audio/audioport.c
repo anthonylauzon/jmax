@@ -396,6 +396,8 @@ static fts_status_t indispatch_instantiate(fts_class_t *cl, int ac, const fts_at
 
 static void fts_audioport_create_audioportin( fts_audioport_t *port)
 {
+  fts_atom_t a[2];
+
   if ( !port->audioportin)
     {
       fts_set_symbol( a+0, s_audioportin);
@@ -441,6 +443,8 @@ static fts_status_t outdispatch_instantiate(fts_class_t *cl, int ac, const fts_a
 
 static void fts_audioport_create_audioportout( fts_audioport_t *port)
 {
+  fts_atom_t a[2];
+
   if ( !port->audioportout)
     {
       fts_set_symbol( a+0, s_audioportout);
@@ -475,7 +479,6 @@ void fts_audioport_remove_out_object( fts_object_t *out_object)
 void fts_audioport_add_input_output_objects( void)
 {
   fts_audioport_t *port;
-  fts_atom_t a[2];
 
   for ( port = audioport_list; port; port = port->next)
     {
