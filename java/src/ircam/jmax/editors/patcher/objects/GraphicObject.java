@@ -512,7 +512,8 @@ abstract public class GraphicObject implements DisplayObject
     final int inletsAnchorY  = getY() - 1;
     SensibilityArea area = SensibilityArea.get(this, Squeack.INLET);
 
-    if ((mouseY < inletsAnchorY)||(mouseX < getX()))
+    if ((mouseY < inletsAnchorY) || (mouseX < getX()) ||
+	(mouseX > getX()+getWidth()) || (mouseY > inletsAnchorY+getHeight()))
       {
 	area.setTransparent(true);
 	area.setCost(xcost + Math.abs(mouseY - inletsAnchorY));
@@ -528,7 +529,8 @@ abstract public class GraphicObject implements DisplayObject
     final int outletsAnchorY = getY() + getHeight();
     SensibilityArea area = SensibilityArea.get(this, Squeack.OUTLET);
 
-    if ((mouseY > outletsAnchorY) || (mouseX < getX()))
+    if ((mouseY > outletsAnchorY) || (mouseX < getX()) ||
+	 (mouseY < getY()-1) || (mouseX > getX()+getWidth()))
       {
 	area.setTransparent(true);
 	area.setCost(xcost + Math.abs(mouseY - outletsAnchorY));

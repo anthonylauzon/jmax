@@ -98,6 +98,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
       gr.setClip(invalid);
       displayList.updatePaint(gr);
+      //((Container)this).repaint();
     }    
     else
       repaint(invalid); 
@@ -595,7 +596,22 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   public void paintComponent(Graphics g)
   {
     displayList.paint(g);
-  }	
+  }
+  
+  public void update(Graphics g)
+  {
+    //se e' vero quello che raccontano: l'update e' chiamato sulo su repaint espliciti dell'user
+    //mentre il paint su quelli di sistema... ora l'update puo' distinguere di gia' sistema da utente
+    //resta da distinguere tra update da fts e gli altri paint... il controllo su locked dovrebbe bastare
+    // controllare che funzioni veramente...
+    System.err.println("update sketch");
+
+    if(isLocked())
+      displayList.updatePaint(g);
+    else
+      displayList.paint(g);
+    super.update(g);
+  }
 
    final public void redraw()
   {
@@ -957,6 +973,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void setHighlightedInlet(GraphicObject object, int inlet)
   {
+    resetHighlightedInlet();
+
     highlightedInletObject = object;
     highlightedInlet       = inlet;
 
@@ -1008,6 +1026,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 
   public void setHighlightedOutlet(GraphicObject object, int outlet)
   {
+    resetHighlightedOutlet();
+
     highlightedOutletObject = object;
     highlightedOutlet       = outlet;
 
@@ -1100,7 +1120,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     if (itsPatcherData != null)
       itsPatcherData.startUpdates();
   }
-
 }
 
 

@@ -507,8 +507,9 @@ public class DisplayList
 			}
 		    }
 		}
-	      else
+	      else{
 		return area;
+	      }
 	    }
 	}
       }

@@ -247,6 +247,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     dispose();
   }
+
   /****************************************************************************/
   /*                                                                          */
   /*           LISTENERS                                                      */
