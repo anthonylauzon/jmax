@@ -55,7 +55,7 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			combo.setFont(table.getFont());
 		}
 		/************/
-    table.setPreferredScrollableViewportSize(new Dimension(600, 300));
+    table.setPreferredScrollableViewportSize(new Dimension(650, 300));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setPreferredWidth(50);
     table.getColumnModel().getColumn(0).setMaxWidth(50);

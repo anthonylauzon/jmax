@@ -51,7 +51,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
     setLocation(200, 200);
     Dimension dim = tabPanel.getSize();
     
-    if(dim.height+30>700) dim.height = 700;
+    if(dim.height+30 > DEFAULT_HEIGHT) dim.height = DEFAULT_HEIGHT;
     else dim.height += 30;
     setSize(dim);
     
@@ -132,6 +132,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   Track track;
   SequenceTablePanel tabPanel;
   Frame frame;
+	final static int DEFAULT_HEIGHT = 700;
 }
 
 
