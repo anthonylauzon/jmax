@@ -38,6 +38,8 @@ class FtsErrorStreamer implements Runnable
   private InputStream in;
   private PrintStream out;
   private boolean running;
+  private boolean first = true;
+  private String fileName;
 
   private static FtsErrorStreamer errorStreamer;
   
@@ -58,10 +60,10 @@ class FtsErrorStreamer implements Runnable
 
     Properties p = System.getProperties();
     OutputStream f = null;
-
+    fileName =  p.getProperty( "user.home") + p.getProperty( "file.separator") + ".fts-stderr";
     try
       {
-	f = new FileOutputStream( p.getProperty( "user.home") + p.getProperty( "file.separator") + ".fts-stderr");
+	f = new FileOutputStream( fileName);
       }
     catch ( FileNotFoundException e)
       {
@@ -80,7 +82,6 @@ class FtsErrorStreamer implements Runnable
 
   public void run()
   {
-
     while (running)
       {
 	try
@@ -99,6 +100,15 @@ class FtsErrorStreamer implements Runnable
 	      }
 	    else
 	      {
+		  if(first)
+		      {
+			  System.out.println("************** An FTS error occurred ************");
+			  System.out.println("for more info see Fts Standard Error output");
+			  System.out.println("located in "+fileName);
+			  System.out.println("*************************************************");
+
+			  first = false;
+		      }
 		out.write(c);
 	      }
 	  }
