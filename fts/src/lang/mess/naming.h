@@ -2,12 +2,14 @@
 #define _NAMING_H_
 
 
-/* get patchers full name (returns pointer to local string!) */
-extern char *fts_patcher_get_full_name_string(fts_patcher_t *p);
+/* Only for compatibility with the ISPW Object set; don't use for new objects. */
+
+
 
 extern fts_object_t *fts_get_object_by_name(fts_symbol_t name);
 extern void fts_register_named_object(fts_object_t *obj, fts_symbol_t name);
 extern void fts_unregister_named_object(fts_object_t *obj, fts_symbol_t name);
 
+extern int fts_named_object_exists(fts_symbol_t name);
 
 #endif

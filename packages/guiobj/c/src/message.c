@@ -331,10 +331,8 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 
   enum {ev_get_dst, ev_get_first_arg, ev_get_args, ev_got_first, ev_end} ev_status; /* the ev machine  */
 
-  fts_object_t *ev_dest;
-  fts_symbol_t ev_dest_name;
-  int ev_dest_is_receive = 0;
-  int ev_dest_is_wrong = 0;
+  fts_symbol_t ev_dest_name = 0;
+  int ev_dest_is_name = 0;
   fts_atom_t   *ev_fp;		/* frame pointer */
   int           ev_argc;
   fts_symbol_t ev_sym;	/* the message symbol */
@@ -342,11 +340,9 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
   /* LOCAL MACRO for the evaluation engine */
 
 #define SEND_MESSAGE \
-  if (ev_dest_is_receive) \
-    fts_send_message_to_receives(ev_dest_name, ev_sym, ev_argc, ev_fp); \
- else if ((! ev_dest_is_wrong) && (ev_dest))       \
-    fts_message_send(ev_dest, 0, ev_sym, ev_argc, ev_fp); \
-  else if (! ev_dest_is_wrong)                            \
+  if (ev_dest_is_name) \
+    fts_named_object_send(ev_dest_name, ev_sym, ev_argc, ev_fp); \
+  else \
     fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
 
   /* Init the reader */
@@ -362,7 +358,6 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 
   ev_status = ev_get_first_arg;
   GET_ATOM_STACK_FRAME(ev_fp);
-  ev_dest = 0;
   ev_argc = 0;
 
   /* loop thru the reader, lexical machine and
@@ -548,34 +543,13 @@ fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts
 		    {
 		      fts_symbol_t target_name = fts_get_symbol(lex_out_value);
 
-		      ev_dest_is_receive = 0;
-		      ev_dest_is_wrong = 0;
+		      ev_dest_is_name = 1;
+		      ev_dest_name = target_name;
+		      ev_status = ev_get_first_arg;
 
-		      if (fts_receive_exists(target_name))
-			{
-			  ev_dest_is_receive = 1;
-			  ev_dest_name = target_name;
-			  ev_status = ev_get_first_arg;
-			}
-		      else
-			{
-			  fts_object_t *target;
-		      
-			  target = fts_get_object_by_name(target_name);
-			  
-			  if (target)
-			    {
-			      ev_dest = target;
-			      ev_status = ev_get_first_arg;
-			    }
-			  else
-			    {
-			      post("Invalid message destination \"%s\" after a ; in message box\n",
-				   fts_symbol_name(target_name)); /* ??? ERROR */
-			      ev_status = ev_get_first_arg;
-			      ev_dest_is_wrong = 1;
-			    }
-			}
+		      if (! fts_named_object_exists(target_name))
+			post("Invalid message destination \"%s\" after a ; in message box\n",
+			     fts_symbol_name(target_name));
 		    }
 		  else
 		    {
