@@ -262,12 +262,19 @@ array_iterator_next(fts_iterator_t *iter, fts_atom_t *a)
 void
 fts_array_get_values(fts_array_t *array, fts_iterator_t *iter)
 {
+  array_iterator_t* aiter = NULL;
+
   if(iterator_heap == NULL)
     iterator_heap = fts_heap_new(sizeof(array_iterator_t));
 
   iter->has_more = array_iterator_has_more;
   iter->next = array_iterator_next;
-  iter->data = (array_iterator_t *)fts_heap_alloc(iterator_heap);
+  iter->data = aiter = (array_iterator_t *)fts_heap_alloc(iterator_heap);
+
+  /* Let's not forget the array iterator */
+  aiter->index = 0;
+  aiter->array = array;
+
 }
 
 
