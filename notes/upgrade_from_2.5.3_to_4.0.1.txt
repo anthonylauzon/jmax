@@ -1,0 +1,44 @@
+-*-outline-*-
+
+* PACKAGE ESCHER
+
+* autoconfiscation
+** utilisation du template de compilation (futur Linux FTS SDK ?)
+** récupération de la liste des sources à compiler dans les fichiers sources.
+
+* modification des sources:
+** rename package_init in package.c into package_config
+** remove line with fts_module_t
+
+** fix vec.h and fvec.h include (certainly only in escher)
+
+* fts_class_init now takes constructor and destructor as argument:
+merge:
+      fts_class_init(cl, sizeof(esinter_t), n_ins, 1, 0);
+      
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, esinter_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, esinter_delete);
+into:
+      fts_class_init(cl, sizeof(esinter_t), esinter_init, esinter_delete)
+
+
+How to fix number of inlet/outlet ?
+
+* vec_atom_get;
+cette macro n'existe plus, c'était juste un cast du retour d'un fts_get_object
+
+s/ivec_atom_get/(ivec_t*)fts_get_object/g
+s/fvec_atom_get/(fvec_t*)fts_get_object/g
+s/vec_atom_get/(vec_t*)fts_get_object/g
+
+* instantiate method return void and take only fts_class_t as an argument...
+
+* fts_symbol_name doesn't exist anymmore
+Since fts_symbol_t are now const char* name, fts_symbol_name(sym) can be replaced by sym
+
+* fts_new_symbol_copy doesn't exist anymore
+Use fts_new_symbol(const char*) instead.
+
+* fts_alarm_t
+
+* fts_file_get_read_path ....
