@@ -67,19 +67,24 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   public void componentResized(ComponentEvent e) {
     if (itsPatcher == null) System.err.println("internal warning: patcher resized while FtsPatcher is null");     
     else {
+      /*      System.err.println("resize");
       itsPatcher.put("ww", getSize().width);
-      itsPatcher.put("wh", getSize().height);
+      itsPatcher.put("wh", getSize().height);*/
     }
   }
   public void componentMoved(ComponentEvent e) {
     if (itsPatcher == null) System.err.println("internal warning: patcher moved while FtsPatcher is null");    
     else {
+      System.err.println("moved");
       itsPatcher.put("wx", getLocation().x);
       itsPatcher.put("wy", getLocation().y);
     }
   }
-  public void componentShown(ComponentEvent e) {}
-  public void componentHidden(ComponentEvent e){}
+  public void componentShown(ComponentEvent e) {
+    System.err.println("shown");}
+  public void componentHidden(ComponentEvent e){
+    System.err.println("hidden");}  
+
   
   FtsSelection itsSelection;
   Vector ftsObjectsPasted = new Vector();
@@ -263,7 +268,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       else  height = height1.intValue();
       
       setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
-
       validate();
       itsSketchPad.InitFromFtsContainer(patcher);
 
