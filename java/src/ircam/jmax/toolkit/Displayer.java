@@ -22,34 +22,23 @@
 package ircam.jmax.toolkit;
 
 import java.awt.*;
+import java.text.*;
 
-/**
- * The set of functionalities offered by a statusbar.
- * @see InfoPanel
- */
-public interface StatusBar extends Displayer{
+public interface Displayer {
+  abstract public void display(String message);
 
-  /** write a message in the status bar
-   */
-  abstract public void post(StatusBarClient theClient, String message);
-
-  /**
-   * returns the size on screen
-   */
-  abstract public Dimension getSize();
-
-  /**
-   * add a controller in the status bar */
-  abstract public void addWidget(Component theWidget);
-
-  /**
-   * add a controller in the status bar in the given position*/
-  abstract public void addWidgetAt(Component theWidget, int position);
-
-  /**
-   * remove a controller in the status bar */
-  abstract public void removeWidget(Component theWidget);
-
+  static public Font displayFont = new Font("SansSerif", Font.PLAIN, 10);
+  static public DisplayNumberFormat numberFormat = new DisplayNumberFormat();
+  
+  class DisplayNumberFormat extends DecimalFormat
+  {
+    DisplayNumberFormat()
+    {
+      super();
+      setMaximumFractionDigits(3);
+      setGroupingUsed(false);
+    }
+  }
 }
 
 

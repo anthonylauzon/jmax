@@ -11,6 +11,7 @@ ComponentContextSwitcher.java\
 ContextSwitcher.java\
 DirectionChooser.java\
 DirectionListener.java\
+Displayer.java \
 DragListener.java\
 DynamicDragListener.java\
 Editor.java\

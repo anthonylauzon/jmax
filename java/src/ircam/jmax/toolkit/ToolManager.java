@@ -97,7 +97,7 @@ public class ToolManager implements SwitchListener, LockListener{
      * Add a Tool to the manager */
     public void addTool(Tool tool)
     {
-	tools.addElement(tool);
+      tools.addElement(tool);
     }
 
 
@@ -105,7 +105,7 @@ public class ToolManager implements SwitchListener, LockListener{
      * Returns an enumeration of the tools currently handled by this manager */
     public Enumeration getTools()
     {
-	return tools.elements();
+      return tools.elements();
     }
 
 
@@ -114,15 +114,15 @@ public class ToolManager implements SwitchListener, LockListener{
     // Implementation notes: an Hashtable?
     public Tool getToolByName(String name)
     {
-	Tool temp;
-	for (Enumeration e = getTools(); e.hasMoreElements();)
-	    {
-		temp = (Tool) e.nextElement();
-		if (temp.getName().equals(name))
-		    return temp;
-	    }
-
-	return null;
+      Tool temp;
+      for (Enumeration e = getTools(); e.hasMoreElements();)
+	{
+	  temp = (Tool) e.nextElement();
+	  if (temp.getName().equals(name))
+	    return temp;
+	}
+      
+      return null;
     }
 
     /**
@@ -137,20 +137,20 @@ public class ToolManager implements SwitchListener, LockListener{
     /**
      * Programmatically make the given tool the current one, on the same
      * graphic context then the old */
-    public void changeTool(Tool newTool)
-    {
-	if (currentTool != null)
-	    currentTool.deactivate();
-	if (currentContext != null)
-	    newTool.reActivate(currentContext);
-	
-	currentTool = newTool;
-	
-	if (currentTool != null)
-	    {
-		toolNotification(newTool);
-	    }
-    }
+  public void changeTool(Tool newTool)
+  {
+    if (currentTool != null)
+      currentTool.deactivate();
+    if (currentContext != null)
+      newTool.reActivate(currentContext);
+    
+    currentTool = newTool;
+ 
+    if (currentTool != null)
+      {
+	toolNotification(newTool);
+      }
+  }
 
     /**
      * utility function. Communicate the tool-change event to the listeners

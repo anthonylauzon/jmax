@@ -58,7 +58,13 @@ public class InfoPanel extends JPanel implements StatusBar{
     addWidget(itsLabel);
 
   }
-  
+
+  /** Displayer interface */
+  public void display(String message)
+  {
+    itsLabel.setText(message);
+  }
+
   /** Status bar interface */
   public void post(StatusBarClient theClient, String message) 
   {
