@@ -102,7 +102,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		  }
 			public void restoreEditorState(FtsTrackEditorObject editorState)
-		  {
+		  {				
 				geometry.setXZoomFactor(editorState.zoom);
 				gc.getScrollManager().scrollToValue(-editorState.transp);
 				if(!editorState.label.equals(""))

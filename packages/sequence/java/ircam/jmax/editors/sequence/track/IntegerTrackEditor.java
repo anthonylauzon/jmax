@@ -61,7 +61,7 @@ public class IntegerTrackEditor extends MonoTrackEditor
   {
     track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
     track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
-    track.setProperty("viewMode", new Integer(PEAKS_VIEW));
+		setViewMode(PEAKS_VIEW);
   }
 
   void updateRange(Object obj)

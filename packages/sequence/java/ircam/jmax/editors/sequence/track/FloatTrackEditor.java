@@ -60,7 +60,7 @@ public class FloatTrackEditor extends MonoTrackEditor
   {
     track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
     track.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
-    track.setProperty("viewMode", new Integer(PEAKS_VIEW));
+    setViewMode(PEAKS_VIEW);
   }
     
   void updateRange(Object obj)

@@ -675,7 +675,7 @@ public void requestSetSaveEditor(boolean save)
       send( FtsSymbol.get("save_editor"), args);
     }
     catch(IOException e)
-	{
+	  {
       System.err.println("FtsTrackObject: I/O Error sending save_editor Message!");
       e.printStackTrace();
 		}
@@ -1743,7 +1743,8 @@ void startUpload( int size)
 void endUpload()
 {
   uploading = false;
-  restoreEditorState();
+	if( saveEditor)
+		restoreEditorState();
   notifyUploadEnd();
 }
 

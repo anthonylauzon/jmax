@@ -50,7 +50,7 @@ public void setProperty(String name, Object value)
 	
 	if (value == null) 
 		return;
-	
+		
 	properties.put(name, value);
 	
 	propertySupport.firePropertyChange(name, old, value);

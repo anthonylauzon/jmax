@@ -236,7 +236,7 @@ public void setTransposition(int transp)
 }
 
 public void setViewMode(int view)
-{	
+{		
 		if(this.view != view)
 		{    
 			this.view = view;

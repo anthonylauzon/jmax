@@ -87,6 +87,13 @@ public void setAdapter(MonoDimensionalAdapter adapter)
   ad = adapter;
 }
 
+public void setViewMode(int viewType)
+{
+	super.setViewMode(viewType);
+	if(!gc.isInSequence())
+		((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
+}
+
 public void setRenderer(MonoTrackRenderer renderer)
 {
   this.renderer = renderer;
