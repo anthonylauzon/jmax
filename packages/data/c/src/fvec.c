@@ -1279,7 +1279,7 @@ fvec_ifft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int in_size = cvec_get_size(in);
   unsigned int fft_size = fts_get_fft_size(2 * in_size);
   float *fft_ptr;
-  unsigned int i;
+  int i;
 
   fvec_set_size(this, fft_size);
   fft_ptr = fvec_get_ptr(this);
@@ -1288,7 +1288,7 @@ fvec_ifft_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fft_ptr[i] = in_ptr[i];
 
   /* zero padding */
-  for(; i<fft_size; i++)
+  for(; i< (int)fft_size; i++)
     fft_ptr[i] = 0.0;
 
   fts_rifft_inplc(fft_ptr, fft_size);
