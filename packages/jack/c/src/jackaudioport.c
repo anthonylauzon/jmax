@@ -98,49 +98,75 @@ jackaudioport_output_copy_fun( fts_audioport_t *port, float *buff, int buffsize,
     out[i + nsample_consumed] = buff[i];
   }
 
-  fts_log("[jackaudioport_output_copy_fun] called  %s\n", ((jackaudioport_t*)port)->port_name);
 }
 
 
 
 
 static void
-jackaudioport_open(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
-  fts_atom_t at_m[2];
+  fts_symbol_t label_name = fts_get_symbol(at);
+  fts_symbol_t port_flag;
+  char* port_name;
+  int port_name_length = 0;
+  int char_written = 0;
 
-  post("[jackaudioport] symbol received : %s\n", fts_get_symbol(at));
-  /* send a mesage manager to tell him that jackaudioport is opening */
-  /* 
-     manager need to set jack callback
-     and suspend scheduler 
-  */
-  fts_set_object(at_m, o);
-  fts_set_symbol(at_m + 1, fts_get_symbol(at));
-  fts_send_message(jackaudiomanager_get_manager_object(), s, 2, at_m);
+  port_flag = fts_s_input;
+  port_name_length = strlen(label_name) + strlen("_in") + 1;
+  port_name = fts_malloc(sizeof(char) * port_name_length);
+  strncpy(port_name, label_name, strlen(label_name));
+  strncpy(port_name + strlen(label_name), "_in", strlen("_in"));
+  port_name[port_name_length - 1] = 0;
+  
+  
+  jackaudiomanager_open_port(o, fts_new_symbol(port_name), port_flag);
+
+  fts_free(port_name);
 }
 
 static void
-jackaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_symbol_t label_name = fts_get_symbol(at);
+  fts_symbol_t port_flag;
+  char* port_name;
+  int port_name_length = 0;
+  int char_written = 0;
+
+  port_flag = fts_s_output;
+  port_name_length = strlen(label_name) + strlen("_out") + 1;
+  port_name = fts_malloc(sizeof(char) * port_name_length);
+  strncpy(port_name, label_name, strlen(label_name));
+  strncpy(port_name + strlen(label_name), "_out", strlen("_out"));
+  port_name[port_name_length - 1] = 0;        
+  
+  jackaudiomanager_open_port(o, fts_new_symbol(port_name), port_flag);
+
+  fts_free(port_name);
+}
+
+static void
+jackaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   fts_audioport_t* port = (fts_audioport_t*)o;
-  fts_atom_t at_m;
+  fts_symbol_t port_flag = fts_s_input;
 
-  if (fts_s_close_input == s)
-  {
-    
-    fts_audioport_unset_open(port, FTS_AUDIO_INPUT);
-  }
-  else
-  {
-    fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
-  }
+  fts_audioport_unset_open(port, FTS_AUDIO_INPUT);
 
-  fts_set_object(&at_m, o);
-
-  fts_send_message(jackaudiomanager_get_manager_object(), s, 1, &at_m);
+  jackaudiomanager_close_port(o, port_flag);
 }
 
+
+static void
+jackaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  fts_audioport_t* port = (fts_audioport_t*)o;
+  fts_symbol_t port_flag = fts_s_output;
+  fts_audioport_unset_open(port, FTS_AUDIO_OUTPUT);
+
+  jackaudiomanager_close_port(o, port_flag);
+}
 
 static void
 jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -240,12 +266,12 @@ static void jackaudioport_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof( jackaudioport_t), jackaudioport_init, jackaudioport_delete);
     
   /* open method */
-  fts_class_message_varargs(cl, fts_s_open_input, jackaudioport_open);
-  fts_class_message_varargs(cl, fts_s_open_output, jackaudioport_open);
+  fts_class_message_varargs(cl, fts_s_open_input, jackaudioport_open_input);
+  fts_class_message_varargs(cl, fts_s_open_output, jackaudioport_open_output);
 
   /* close method */
-  fts_class_message_varargs(cl, fts_s_close_input, jackaudioport_close);
-  fts_class_message_varargs(cl, fts_s_close_output, jackaudioport_close);
+  fts_class_message_varargs(cl, fts_s_close_input, jackaudioport_close_input);
+  fts_class_message_varargs(cl, fts_s_close_output, jackaudioport_close_output);
 
   return;
 }
