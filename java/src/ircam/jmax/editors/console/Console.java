@@ -22,7 +22,19 @@ public class Console extends Panel{
     StringBuffer sSbuf = new StringBuffer();
     itsTextArea = new TextArea(40, 40);
     itsInterp = i;
+
+    GridBagLayout gridbag = new GridBagLayout();
+    GridBagConstraints c = new GridBagConstraints();
+    setLayout(gridbag);
+    c.weightx = 1.0;
+    c.weighty = 1.0;
+    c.gridwidth = 1;
+    c.gridheight = 1;
+    c.fill = GridBagConstraints.BOTH;
+    c.anchor = GridBagConstraints.NORTHWEST;
+    gridbag.setConstraints(itsTextArea, c);    
     add(itsTextArea);
+
     itsTextArea.addKeyListener(new ConsoleKeyListener(this));
     itsConsoleThread = new ConsoleThread(this);
     /*

@@ -19,17 +19,18 @@ public class ConsoleWindow extends MaxEditor {
   public ConsoleWindow(Console theConsole, String theTitle) {
     super(theTitle);
     itsConsole = theConsole;
-    //setLayout(new GridBagLayout());
     GridBagLayout gridbag = new GridBagLayout();
     GridBagConstraints c = new GridBagConstraints();
     setLayout(gridbag);
+    
+    c.weightx = 1.0;
+    c.weighty = 1.0;
+    c.gridwidth = 1;
+    c.gridheight = 1;
     c.fill = GridBagConstraints.BOTH;
-    c.anchor = GridBagConstraints.NORTHEAST;
+    c.anchor = GridBagConstraints.NORTHWEST;
     gridbag.setConstraints(theConsole, c);
     add(itsConsole);
-    //validate();
-    //setTitle(theTitle);
-    //setVisible(true);
   }
   
   public PrintWriter getPrintWriter() {
