@@ -57,6 +57,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    public void objectDeleted(Object whichObject, int oldIndex) {MonoTrackEditor.this.repaint();}
 	    public void objectAdded(Object whichObject, int index) {
 		updateNewObject(whichObject);
+		updateRange(whichObject);
 		MonoTrackEditor.this.repaint();			
 	    }
 	    public void objectsAdded(int maxTime) {
@@ -64,6 +65,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    }
 	    public void objectChanged(Object whichObject, String propName, Object propValue) {
 		updateEventProperties(whichObject, propName, propValue);
+		updateRange(whichObject);
 		MonoTrackEditor.this.repaint();
 	    }
 	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {
@@ -198,8 +200,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	listDialog = new ListDialog(track, gc.getFrame(), gc);
     }
 
+    public void updateNewObject(Object obj){};
+
     void updateEventProperties(Object whichObject, String propName, Object propValue){}
-    
+
+    void updateRange(Object whichObject){}    
     /**
      * Track editor interface */
 
@@ -238,8 +243,6 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     {
 	return track;
     }
-
-    public void updateNewObject(Object obj){};
 
 
     public void processKeyEvent(KeyEvent e)

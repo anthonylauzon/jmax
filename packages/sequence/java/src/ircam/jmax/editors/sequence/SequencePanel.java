@@ -101,14 +101,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     manager = new ToolManager(SequenceTools.instance);
     toolbar = new EditorToolbar(manager, EditorToolbar.HORIZONTAL);
-    toolbar.setSize(130, 25);    
-    toolbar.setPreferredSize(new Dimension(130, 25));    
+    toolbar.setSize(/*156*/180, 25);    
+    toolbar.setPreferredSize(new Dimension(/*156*/180, 25));    
     Tool arrow = manager.getToolByName("arrow");     
     manager.activate(arrow, null); //we do not have a gc yet...
     //------------------- prepare the track panel:
     trackPanel = new Box(BoxLayout.Y_AXIS);
     scrollTracks = new JScrollPane(trackPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 				   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    
     trackPanel.add(verticalGlue);
 
     ftsSequenceObject.requestTrackCreation("noteevt");
@@ -139,8 +140,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar.setSize(300, 30);
 
     JPanel toolbarPanel = new JPanel();
-    toolbarPanel.setSize(130, 25);
-    toolbarPanel.setPreferredSize(new Dimension(130, 25));
+    toolbarPanel.setSize(/*156*/180, 25);
+    toolbarPanel.setPreferredSize(new Dimension(/*156*/180, 25));
     toolbarPanel.setLayout(new BorderLayout());
     toolbarPanel.add(toolbar, BorderLayout.CENTER);
     toolbarPanel.validate();
@@ -520,6 +521,10 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     public void scrollIfNeeded(int time)
     {
 	resizePanelToTime(time);
+    }
+    public void scrollToValue(int value)
+    {
+	itsTimeScrollbar.setValue(value);
     }
 }
 

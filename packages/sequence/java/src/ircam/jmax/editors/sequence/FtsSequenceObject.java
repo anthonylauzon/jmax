@@ -64,6 +64,7 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
 	ValueInfoTable.registerInfo(AmbitusValue.info);
 	ValueInfoTable.registerInfo(IntegerValue.info);
 	ValueInfoTable.registerInfo(MessageValue.info);
+	ValueInfoTable.registerInfo(FloatValue.info);
 	//ValueInfoTable.registerInfo(LogicValue.info);
 	//ValueInfoTable.registerInfo(CueValue.info);
 	//ValueInfoTable.registerInfo(FricativeValue.info);

@@ -457,7 +457,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 			    repaint();
 			    return;
 			}
-			if(doubleValue<0) doubleValue = 0;
+			//if(doubleValue<0) doubleValue = 0;
 			currentEvent.move(doubleValue);
 		    }
 		else
@@ -488,8 +488,8 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		    repaint();
 		    return null;
 		}
-	 	if(intValue<0) intValue = 0;
-		 return new Integer(intValue);
+	 	//if(intValue<0) intValue = 0;
+		return new Integer(intValue);
 	
 	    case EventValue.FLOAT_TYPE:
 		try { 
@@ -500,7 +500,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		    repaint();
 		    return null;
 		}
-		if(floatValue<0) floatValue = (float)0.0;
+		//if(floatValue<0) floatValue = (float)0.0;
 		return new Float(floatValue);
 	    
 	    case EventValue.STRING_TYPE:
@@ -514,7 +514,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		    repaint();
 		    return null;
 		}
-		if(doubleValue<0) doubleValue = 0.0;
+		//if(doubleValue<0) doubleValue = 0.0;
 		return new Double(doubleValue);
 
 	    case EventValue.BOOLEAN_TYPE:

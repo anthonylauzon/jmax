@@ -42,39 +42,41 @@ import javax.swing.event.*;
  * This kind of editor use a MonoDimensionalAdapter
  * to map the y values. The value returned is always half of the panel,
  * and settings of y are simply ignored. */
-public class IntegerTrackEditor extends MonoTrackEditor
+public class FloatTrackEditor extends MonoTrackEditor
 {
-    public IntegerTrackEditor(Geometry g, Track track)
+    public FloatTrackEditor(Geometry g, Track track)
     {
 	super(g, track);
 
 	if(track.getProperty("maximumValue")==null)
-	    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+	    track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
 	if(track.getProperty("minimumValue")==null)
-	    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+	    track.setProperty("minimumValue", new Integer(FloatValue.DEFAULT_MIN_VALUE));
 	if(track.getProperty("viewMode")==null)
 	    track.setProperty("viewMode", new Integer(viewMode));
 
-	((MonoDimensionalAdapter)gc.getAdapter()).setLabelMapper(IntegerLabelMapper.getMapper());
+	//((MonoDimensionalAdapter)gc.getAdapter()).setLabelMapper(IntegerLabelMapper.getMapper());
 	setRenderer(new IntegerTrackRenderer(gc));
 
-	super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
+	super.setAdapter(new FloatAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
     }
     
     void updateRange(Object obj)
     {
 	int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
 	int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
-	int value = ((Integer)((TrackEvent)obj).getProperty("integer")).intValue();
+	float value = ((Float)((TrackEvent)obj).getProperty("float")).floatValue();
     
-	if(value>max) track.setProperty("maximumValue", new Integer(value));
-	if(value<min) track.setProperty("minimumValue", new Integer(value));
-    }
+	if(value>(float)max) track.setProperty("maximumValue", new Integer((int)value+1));
+	if(value<(float)min) track.setProperty("minimumValue", new Integer((int)value-1));
+   }
 
     int viewMode = PEAKS_VIEW;
     static public final int PEAKS_VIEW = 2;
     static public final int STEPS_VIEW = 3;
     static public final int BREAK_POINTS_VIEW = 4;
 }
+
+
 
 

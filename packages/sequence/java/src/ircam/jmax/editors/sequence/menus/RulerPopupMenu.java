@@ -85,7 +85,7 @@ public class RulerPopupMenu extends JPopupMenu
 	JCheckBoxMenuItem item;
 	String unitName = ruler.getUnityName();
 
-	for( int i = 0; i < countComponents(); i++)
+	for( int i = 0; i < getComponentCount(); i++)
 	    {
 		item = (JCheckBoxMenuItem)getComponentAtIndex(i);
 		

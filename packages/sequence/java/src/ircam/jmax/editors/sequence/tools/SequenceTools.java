@@ -50,16 +50,16 @@ public class SequenceTools implements ToolProvider{
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
       }
     catch(FileNotFoundException e){
-	//System.err.println("Couldn't locate sequence images");
 	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
     }
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    //tools[1] = new AdderTool(new ImageIcon(path+"plus.gif"));
     tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
     tools[2] = new DeleteTool(new ImageIcon(path+"delete.gif"));
     tools[3] = new ResizerTool(new ImageIcon(path+"hresize.gif"));
     tools[4] = new VResizerTool(new ImageIcon(path+"vresize.gif"));
+    tools[5] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+    tools[6] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
   }
 
   public Enumeration getTools()
@@ -89,7 +89,7 @@ public class SequenceTools implements ToolProvider{
   }
 
   //---
-  Tool tools[] = new Tool[5];
+  Tool tools[] = new Tool[7];
   public static SequenceTools instance = new SequenceTools();
 }
 

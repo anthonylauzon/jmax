@@ -38,12 +38,12 @@ import javax.swing.ImageIcon;
  * It uses just one user-interaction module:
  * a mouse tracker to choose the position.
  */ 
-public class ZoomTool extends Tool implements  DirectionListener, DynamicDragListener {
+public class ScrollerTool extends Tool implements  DirectionListener, DynamicDragListener {
 
   /** constructor */
-  public ZoomTool(ImageIcon theImageIcon) 
+  public ScrollerTool(ImageIcon theImageIcon) 
   {
-    super("zoomer", theImageIcon);
+    super("scroller", theImageIcon);
 
     itsDirectionChooser = new DirectionChooser(this);
     itsMouseTracker = new MouseDragTracker(this);
@@ -81,27 +81,26 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
     {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	Geometry geometry = egc.getAdapter().getGeometry();
-	if(egc.getAdapter().isVerticalZoomable())
+
+	if(egc.getAdapter().isVerticalScrollable())
 	{
 	    if((direction & SelectionMover.HORIZONTAL_MOVEMENT) != 0)
 	    {
-		geometry.incrXZoom(deltaX);
-		egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
+		int transp = geometry.getXTransposition()+egc.getAdapter().getInvWidth(deltaX);
+		egc.getScrollManager().scrollToValue(-transp);
 	    }	
 	    else
 		if((direction & SelectionMover.VERTICAL_MOVEMENT) != 0)
 		    {
-			//vertical zoom
-			((VerticalZoomable)egc.getAdapter()).incrYZoom(deltaY);
-			egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),
-						""+((VerticalZoomable)egc.getAdapter()).getYZoom()+"%");
+			//vertical scroll
+			((VerticalScrollable)egc.getAdapter()).incrYTransp(-deltaY);
 			egc.getGraphicDestination().repaint();
 		    }
 	}
 	else
 	    {
-		geometry.incrXZoom(deltaX);
-		egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),""+(int)(geometry.getXZoom()*100)+"%");
+		int transp = geometry.getXTransposition()+egc.getAdapter().getInvWidth(deltaX);
+		egc.getScrollManager().scrollToValue(-transp);
 	    }	
     }
     public void dragEnd(int x, int y){}

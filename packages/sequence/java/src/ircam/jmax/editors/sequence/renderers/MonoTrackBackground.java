@@ -33,13 +33,14 @@ import ircam.jmax.MaxApplication;
 import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.util.*;
 
 import javax.swing.*;
 import java.beans.*;
 
 /**
  * The background layer of a monodimensionalTrackeditor. It builds the background Image */
-public class MonoTrackBackground implements Layer{
+public class MonoTrackBackground implements Layer, ImageObserver{
   
   /** Constructor */
   public  MonoTrackBackground( SequenceGraphicContext theGc)
@@ -98,6 +99,12 @@ public class MonoTrackBackground implements Layer{
     g.setColor(Color.gray);
     g.setFont(ToggleBar.toggleBarFont);
     g.drawString(gc.getTrack().getName(), 10, 10);
+    Image image;
+    for(Enumeration en = ((FtsTrackObject)gc.getTrack().getTrackDataModel()).getTypes(); en.hasMoreElements();)
+	{
+	    image = ((ValueInfo)en.nextElement()).getIcon().getImage();
+	    g.drawImage(image , 10, 12, this);
+	}
 
     g.setColor(Color.black);
 
@@ -167,6 +174,11 @@ public class MonoTrackBackground implements Layer{
     return pow;
   }
 
+    /* ImageObserver interface*/
+    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+    {
+	return true;
+    }
 
   //--- Fields
   SequenceGraphicContext gc;

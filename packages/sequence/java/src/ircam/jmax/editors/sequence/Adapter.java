@@ -187,6 +187,15 @@ abstract public class Adapter implements MappingListener{
     return itsName;
   } 
 
+  public boolean isVerticalZoomable()
+  {
+      return false;
+  }
+  public boolean isVerticalScrollable()
+  {
+      return false;
+  }
+
   /**
    * MappingListener interface
    */
@@ -201,7 +210,7 @@ abstract public class Adapter implements MappingListener{
   public Mapper HeigthMapper;
   public StringMapper LabelMapper;
 
-    Geometry geometry; //package private
+  Geometry geometry; //package private
   String itsName;
 
   public final static int NOTE_DEFAULT_HEIGTH = 3;

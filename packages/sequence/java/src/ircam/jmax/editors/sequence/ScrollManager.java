@@ -7,4 +7,5 @@ public interface ScrollManager {
 
     public void scrollIfNeeded(int time);
     public int scrollBy(int x, int y);
+    public void scrollToValue(int value);
 }
