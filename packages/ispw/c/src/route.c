@@ -33,162 +33,198 @@ typedef struct
 static void
 route_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  route_t *this = (route_t *)o;
+  route_t *self = (route_t *)o;
 
-  if(this->ints != NULL)
+  if(self->ints != NULL)
+  {
+    /* int route */
+    int ns = self->ns;
+    int n = fts_get_int_arg(ac, at, 0, 0);
+    int match = 0;
+    int i;
+      
+    for(i=ns-1; i>=0; i--)
     {
-      /* int route */
-      int ns = this->ns;
-      int n = fts_get_int_arg(ac, at, 0, 0);
-      int match = 0;
-      int i;
-      
-      for(i=ns-1; i>=0; i--)
-	{
-	  if (this->ints[i] == n)
-	    {
-	      match = 1;
+      if (self->ints[i] == n)
+      {
+	match = 1;
 	      
-	      if(ac == 1)
-		fts_outlet_bang(o, i);
-	      else if (fts_is_symbol(at))
-                fts_outlet_send(o, i, fts_get_symbol(at), ac - 2, at + 2);
-	      else 
-		fts_outlet_varargs(o, i, ac - 1, at + 1);
-	    }
-	}
+	if(ac == 1)
+	  fts_outlet_bang(o, i);
+	else if (fts_is_symbol(at))
+	  fts_outlet_send(o, i, fts_get_symbol(at), ac - 2, at + 2);
+	else 
+	  fts_outlet_varargs(o, i, ac - 1, at + 1);
+      }
+    }
       
+    if (!match)
+      fts_outlet_varargs(o, ns, ac, at);
+  }
+  else
+  {
+    /* route single value or list */
+    int ns = self->ns;
+    int match = 0;
+    int i;
+
+    if(ac == 1)
+    {
+      /* route single value regarding its selector */
+      for(i=ns-1; i>=0; i--)
+      {
+	if (self->symbols[i] == fts_get_class_name(at))
+	{
+	  match = 1;
+	  fts_outlet_atom(o, i, at);
+	}
+      }
+
+      if (!match)
+	fts_outlet_atom(o, ns, at);
+    }
+    else if(ac > 0)
+    {
+      /* route "list" at "list" selector */
+      for(i=ns-1; i>=0; i--)
+      {
+	if (self->symbols[i] == fts_s_list)
+	{
+	  match = 1;
+	  fts_outlet_varargs(o, i, ac, at);
+	}
+      }
+	  
       if (!match)
 	fts_outlet_varargs(o, ns, ac, at);
     }
-  else
-    {
-      /* route single value or list */
-      int ns = this->ns;
-      int match = 0;
-      int i;
-
-      if(ac == 1)
-	{
-	  /* route single value regarding its selector */
-	  for(i=ns-1; i>=0; i--)
-	    {
-	      if (this->symbols[i] == fts_get_class_name(at))
-		{
-		  match = 1;
-		  fts_outlet_atom(o, i, at);
-		}
-	    }
-
-	  if (!match)
-	    fts_outlet_atom(o, ns, at);
-	}
-      else if(ac > 0)
-	{
-	  /* route "list" at "list" selector */
-	  for(i=ns-1; i>=0; i--)
-	    {
-	      if (this->symbols[i] == fts_s_list)
-		{
-		  match = 1;
-		  fts_outlet_varargs(o, i, ac, at);
-		}
-	    }
-	  
-	  if (!match)
-	    fts_outlet_varargs(o, ns, ac, at);
-	}
-    }
+  }
 }
 
 static void
 route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  route_t *this = (route_t *)o;
+  route_t *self = (route_t *)o;
 
-  if(this->symbols != NULL)
+  if(self->symbols != NULL)
+  {
+    int ns = self->ns;
+    int match = 0;
+    int i;
+
+    /* message */
+    for(i=ns-1; i>=0; i--)
     {
-      int ns = this->ns;
-      int match = 0;
-      int i;
-
-      /* message */
-      for(i=ns-1; i>=0; i--)
-	{
-	  if (this->symbols[i] == s)
-	    {
-	      match = 1;
+      if (self->symbols[i] == s)
+      {
+	match = 1;
 	      
-	      if (ac == 0)
-		fts_outlet_bang(o, i);
-	      else if (fts_is_symbol(at))
-                fts_outlet_send(o, i, fts_get_symbol(at), ac - 1, at + 1);
-	      else
-		fts_outlet_varargs(o, i, ac, at);
-	    }
-	}
-      
-      if (!match)
-	fts_outlet_send(o, ns, s, ac, at);
+	if (ac == 0)
+	  fts_outlet_bang(o, i);
+	else if (fts_is_symbol(at))
+	  fts_outlet_send(o, i, fts_get_symbol(at), ac - 1, at + 1);
+	else
+	  fts_outlet_varargs(o, i, ac, at);
+      }
     }
+      
+    if (!match)
+      fts_outlet_send(o, ns, s, ac, at);
+  }
   else
     fts_object_error(o, "don't understand %s", s);
+}
+
+static void
+route_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  route_t* self = (route_t*)o;
+  int ns = self->ns;
+  int match = 0;
+  int i;
+
+  if (NULL != self->symbols)
+  {
+    for (i = ns - 1; i >= 0; --i)
+    {
+      if (self->symbols[i] == fts_s_bang)
+      {
+	match = 1;
+	fts_outlet_bang(o, i);
+      }
+    }
+  }
+  if (0 == match)
+  {
+    fts_outlet_bang(o, ns);
+  }
 }
 
 static void
 route_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(s != NULL)
+  {
     route_message(o, winlet, s, ac, at);
+  }
   else
-    route_varargs(o, winlet, NULL, ac, at);    
+  {
+    if (0 == ac)
+    {
+      route_bang(o, winlet, NULL, 0, at);
+    }
+    else
+    {
+      route_varargs(o, winlet, NULL, ac, at);    
+    }
+  }
 }
 
 static void
 route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  route_t *this = (route_t *)o;
+  route_t *self = (route_t *)o;
 
   if(ac > 0)
+  {
+    int all_int = 1;
+    int all_symbol = 1;
+    int i;
+      
+    for(i=0; i<ac; i++)
     {
-      int all_int = 1;
-      int all_symbol = 1;
-      int i;
-      
-      for(i=0; i<ac; i++)
-	{
-	  if(!fts_is_int(at + i))
-	    all_int = 0;
+      if(!fts_is_int(at + i))
+	all_int = 0;
 	  
-	  if(!fts_is_symbol(at + i))
-	    all_symbol = 0;
-	}
-      
-      if(all_int)
-	{	  
-	  this->ns = ac;
-	  this->ints = (int *)fts_malloc(sizeof(int) * ac);
-	  this->symbols = NULL;
-	  
-	  for(i=0; i<ac; i++)
-	    this->ints[i] = fts_get_int(at + i);
-
-	  fts_object_set_outlets_number(o, ac + 1);
-	}
-      else if(all_symbol)
-	{
-	  this->ns = ac;
-	  this->ints = NULL;
-	  this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);
-	  
-	  for(i=0; i<ac; i++)
-	    this->symbols[i] = fts_get_symbol(at + i);
-	  
-	  fts_object_set_outlets_number(o, ac + 1);
-	}
-      else
-	fts_object_error(o, "bad arguments");
+      if(!fts_is_symbol(at + i))
+	all_symbol = 0;
     }
+      
+    if(all_int)
+    {	  
+      self->ns = ac;
+      self->ints = (int *)fts_malloc(sizeof(int) * ac);
+      self->symbols = NULL;
+	  
+      for(i=0; i<ac; i++)
+	self->ints[i] = fts_get_int(at + i);
+
+      fts_object_set_outlets_number(o, ac + 1);
+    }
+    else if(all_symbol)
+    {
+      self->ns = ac;
+      self->ints = NULL;
+      self->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);
+	  
+      for(i=0; i<ac; i++)
+	self->symbols[i] = fts_get_symbol(at + i);
+	  
+      fts_object_set_outlets_number(o, ac + 1);
+    }
+    else
+      fts_object_error(o, "bad arguments");
+  }
   else
     fts_object_error(o, "arguments missing");
 }
@@ -196,12 +232,12 @@ route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static void
 route_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  route_t *this = (route_t *)o;
+  route_t *self = (route_t *)o;
 
-  if(this->ints != NULL)
-    fts_free(this->ints);
-  else if(this->symbols != NULL)
-    fts_free(this->symbols);
+  if(self->ints != NULL)
+    fts_free(self->ints);
+  else if(self->symbols != NULL)
+    fts_free(self->symbols);
 }
 
 static void
@@ -220,3 +256,10 @@ route_config(void)
 {
   fts_class_install(fts_new_symbol("route"), route_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
