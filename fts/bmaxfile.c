@@ -195,7 +195,7 @@ static void
 fts_binary_file_dispose( fts_binary_file_descr_t *descr)
 {
   fts_free( descr->code);
-  fts_free( descr->symbols);
+  fts_free((void*)descr->symbols);
 }
 
 /* Return the top of the object stack, usually the last object created
@@ -1226,7 +1226,7 @@ static void fts_bmax_file_sync( fts_bmax_file_t *f)
 
   /* free the bmax file descriptor */
   if (f->symbol_table_static == 0)
-      fts_free(f->symbol_table);
+      fts_free((void*)f->symbol_table);
 }
 
 
@@ -1321,7 +1321,7 @@ fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
 	new_table[i] = f->symbol_table[i];
 
       if (f->symbol_table_static == 0)
-	fts_free(f->symbol_table);
+	fts_free((void*)f->symbol_table);
 
 
       f->symbol_table = new_table;
