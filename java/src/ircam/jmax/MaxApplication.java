@@ -248,10 +248,7 @@ public class MaxApplication extends Object
 
     ircam.jmax.dialogs.DialogsModule.initModule();
 
-    // than the builtin editors 
-
-    // (fd) hack to try the new console
-    String useNewConsole = jmaxProperties.getProperty( "jmaxNewConsole");
+    // then the builtin editors 
 
     ircam.jmax.editors.console.ConsoleModule.initModule();
 
@@ -261,6 +258,38 @@ public class MaxApplication extends Object
       ircam.jmax.editors.ermes.ErmesModule.initModule();
 
     ircam.jmax.editors.control.ControlModule.initModule();
+
+
+    // Open the register panel if needed
+    File registerFile = new File( "/u/worksta/dechelle", ".jmaxregister");
+    boolean alreadyRegistered = false;
+
+    try
+      {
+	alreadyRegistered = registerFile.exists();
+      }
+    catch( SecurityException e)
+      {
+      }
+
+    if ( !alreadyRegistered)
+      {
+	if (RegisterDialog.popup() == 0)
+	  try
+	  {
+	    FileOutputStream fos = new FileOutputStream( registerFile);
+	    fos.write( 42);
+	    fos.close();
+	  }
+	catch ( IOException e)
+	  {
+	  }
+	catch ( SecurityException e)
+	  {
+	  }
+
+      }
+
 
     // Before booting the server, check if it is asked to run in real-time mode,
     // and if yes, inform the application layer

@@ -15,6 +15,7 @@ SOURCES = \
            ErrorDialog.java \
            FileNotSavedDialog.java \
 	   QuitDialog.java \
+		RegisterDialog.java \
            SplashDialog.java \
 	   MaxFileChooser.java \
            StatisticsDialog.java  \
