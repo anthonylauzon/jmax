@@ -10,6 +10,22 @@ import ircam.jmax.fts.*;
 // (fd) Trying to fix the font mess !!!
 
 class FontCache {
+
+  private static String defaultFontName = null;
+
+  private static String getDefaultFontName()
+  {
+    if (defaultFontName == null)
+      {
+	defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
+
+	if (defaultFontName == null)
+	  defaultFontName = "SansSerif";
+      }
+
+    return defaultFontName;
+  }
+
   public static final Font lookupFont( int fontSize)
   {
     // DEBUG
@@ -26,7 +42,7 @@ class FontCache {
 	  }
 	else
 	  {
-	    Font font = new Font( "SansSerif", Font.PLAIN, fontSize);
+	    Font font = new Font( getDefaultFontName(), Font.PLAIN, fontSize);
 
 	    fontTable[fontSize] = font;
 	    fontMetricsTable[fontSize] = dummyPanel.getFontMetrics( font);
@@ -36,7 +52,7 @@ class FontCache {
       }
     else
       {
-	return new Font( "SansSerif", Font.PLAIN, fontSize);
+	return new Font( getDefaultFontName(), Font.PLAIN, fontSize);
       }
 
     // DEBUG
@@ -60,7 +76,7 @@ class FontCache {
 	  }
 	else
 	  {
-	    Font font = new Font( "SansSerif", Font.PLAIN, fontSize);
+	    Font font = new Font( getDefaultFontName(), Font.PLAIN, fontSize);
 	    FontMetrics fontMetrics = dummyPanel.getFontMetrics( font);
 
 	    fontTable[fontSize] = font;
@@ -71,7 +87,7 @@ class FontCache {
       }
     else
       {
-	Font font = new Font( "SansSerif", Font.PLAIN, fontSize);
+	Font font = new Font( getDefaultFontName(), Font.PLAIN, fontSize);
 	return dummyPanel.getFontMetrics( font);
       }
 
@@ -104,7 +120,7 @@ class FontCache {
       {
 	int fontSize = preferredFontSizes[i];
 
-	Font font = new Font( "SansSerif", Font.PLAIN, fontSize);
+	Font font = new Font( getDefaultFontName(), Font.PLAIN, fontSize);
 	fontTable[fontSize] = font;
 	fontMetricsTable[fontSize] = dummyPanel.getFontMetrics( font);
       }

@@ -116,12 +116,10 @@ public class MaxVector
     int j = fillPointer - index - 1;
 
     if (j > 0)
-      {
-	System.arraycopy(objects, index + 1, objects, index, j);
-      }
+      System.arraycopy(objects, index + 1, objects, index, j);
 
-    fillPointer--;
     objects[fillPointer] = null; /* to let gc do its work */
+    fillPointer--;
   }
 
   public final void addElement(Object obj)

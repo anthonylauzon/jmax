@@ -126,42 +126,25 @@ static void fts_patparse_set_range(fts_graphic_description_t *this, fts_patlex_t
 }
 
 
-static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_patlex_t *in)
+int fontIndexTable[8] = {9, 10, 12, 14, 16, 18, 20, 24};
+
+void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at)
 {
-  int n;
+  int i;
 
-  fts_patlex_next_token(in);
-  n = fts_get_int(&(in->val));
-
-  switch (n)
+  for (i = 0; (i < ac) && (i < 8); i++)
     {
-    case 0:
-      fts_set_int(&(this->fontSize), 9);
-      break;
-    case 1:
-      fts_set_int(&(this->fontSize), 10);
-      break;
-    case 2:
-      fts_set_int(&(this->fontSize), 12);
-      break;
-    case 3:
-      fts_set_int(&(this->fontSize), 14);
-      break;
-    case 4:
-      fts_set_int(&(this->fontSize), 16);
-      break;
-    case 5:
-      fts_set_int(&(this->fontSize), 18);
-      break;
-    case 6:
-      fts_set_int(&(this->fontSize), 20);
-      break;
-    case 7:
-      fts_set_int(&(this->fontSize), 24);
-      break;
+      if (fts_is_int(&at[i]))
+	fontIndexTable[i] = fts_get_int(&at[i]);
     }
 }
 
+
+static void fts_patparse_set_font_index(fts_graphic_description_t *this, fts_patlex_t *in)
+{
+  fts_patlex_next_token(in);
+  fts_set_int(&(this->fontSize), fontIndexTable[fts_get_int(&(in->val))]);
+}
 
 static void fts_patparse_set_text_graphic_properties(fts_graphic_description_t *this, fts_object_t *obj)
 {

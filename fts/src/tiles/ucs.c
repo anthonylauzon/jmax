@@ -562,6 +562,19 @@ fts_ucs_set_param(int argc, const fts_atom_t *argv)
   return fts_Success;
 }
 
+
+/*
+ * Command to set the index/font size translation table for .pat files 
+ */
+
+
+static fts_status_t fts_ucs_set_fonts(int argc, const fts_atom_t *argv)
+{
+  fts_patparse_set_font_size_table(argc, argv);
+
+  return fts_Success;
+}
+
 /* Install all of them */
 
 static void
@@ -661,6 +674,12 @@ fts_ucs_install_commands()
 
   fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("param"), fts_ucs_set_param,
 			 "set param <name> <value>",
+			 "set an FTS parameter");
+
+  /* Fonts */
+
+  fts_ucs_define_command(fts_new_symbol("set"), fts_new_symbol("fonts"), fts_ucs_set_fonts,
+			 "set fonts <int> <int> <int> <int> <int> <int> <int> <int>",
 			 "set an FTS parameter");
 }
 
