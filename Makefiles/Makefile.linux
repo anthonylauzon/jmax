@@ -49,3 +49,5 @@ lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
 
+ARCH_PACKAGES=alsa oss unixdtd
+

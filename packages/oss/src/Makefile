@@ -20,9 +20,12 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
+# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include $(JMAXDISTDIR)/Makefiles/Makefile.linux
+JMAXDISTDIR= ../../..
+PACKAGEROOT = ..
+PACKAGELIB=$(LIBDIR)/liboss.so
 
-# Compiling for a pentium (what about a i486 ? :-)))
-ARCH_OPT_CFLAGS := -O2 -mpentium -funroll-all-loops
+include $(JMAXDISTDIR)/Makefiles/Makefile.package
+

@@ -870,6 +870,11 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
   fts_audioport_delete( &this->head);
 
   alsastream_stop( &this->playback);
+
+  if (this->input_buffer)
+    fts_free( this->input_buffer);
+  if (this->output_buffer)
+    fts_free( this->output_buffer);
 }
 
 static void alsaaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)

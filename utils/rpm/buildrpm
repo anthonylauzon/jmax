@@ -23,6 +23,6 @@ DISTFILE=$ROOT_DIR/../jmax-$VERSION-src.tar.gz
 cp -fv $DISTFILE /usr/src/redhat/SOURCES
 cp -fv jmax.spec /usr/src/redhat/SPECS
 
-(cd /usr/src/redhat/SPECS ; rpm -ba --target $ARCH jmax.spec )
+(cd /usr/src/redhat/SPECS ; rpm -ba --target=$ARCH jmax.spec )
 cp /usr/src/redhat/RPMS/$ARCH/jmax-$VERSION*.$ARCH.rpm $ROOT_DIR/..
-
+chmod 644 $ROOT_DIR/../jmax-$VERSION*.$ARCH.rpm

@@ -66,10 +66,15 @@
    Hence the following macro...
 */
    
-#define SWAP_SHORT(S,C) \
-( C = ((unsigned char *)&S)[0], \
-  ((unsigned char *)&S)[0] = ((unsigned char *)&S)[1], \
-  ((unsigned char *)&S)[1] = C )
+#define SWAP_SHORT(S)						\
+do								\
+  {								\
+    unsigned char c;						\
+    c = ((unsigned char *)&(S))[0];				\
+    ((unsigned char *)&(S))[0] = ((unsigned char *)&(S))[1];	\
+    ((unsigned char *)&(S))[1] = c;				\
+  }								\
+while (0)
 
 /******************************************************************************/
 /*                                                                            */
