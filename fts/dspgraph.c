@@ -25,6 +25,9 @@
 #include <assert.h>
 
 #include <fts/fts.h>
+#include <fts/private/class.h>
+#include <fts/private/connection.h>
+#include <fts/private/sigconn.h>
 #include <fts/private/dspgraph.h>
 
 fts_symbol_t fts_s_sig_zero;
@@ -994,7 +997,7 @@ fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o)
 
 /*********************************************************
  *
- *  config 
+ * Initialization
  *
  */
 
@@ -1011,7 +1014,7 @@ dsp_graph_builtin_add(fts_word_t *argv)
     out[i] = in1[i] + in2[i];
 }
 
-void fts_dsp_graph_config(void)
+void fts_kernel_dsp_graph_init(void)
 {
   dsp_node_heap = fts_heap_new(sizeof(fts_dsp_node_t));
   dsp_descr_heap = fts_heap_new(sizeof(fts_dsp_descr_t));

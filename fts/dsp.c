@@ -18,18 +18,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-
-#include <fts/sys.h>
-#include <fts/lang/mess.h>
-#include <fts/lang/ftl.h>
-#include <fts/lang/dsp.h>
-#include <fts/runtime.h>
+#include <fts/fts.h>
+#include <fts/private/class.h>
+#include <fts/private/connection.h>
+#include <fts/private/sigconn.h>
+#include <fts/private/dspgraph.h>
 
 #define FTS_DSP_DEFAULT_SAMPLE_RATE 44100
 
@@ -42,10 +37,6 @@ fts_dsp_graph_t main_dsp_graph;
 fts_symbol_t fts_s_dsp_on = 0;
 fts_symbol_t fts_s_sample_rate = 0;
 
-extern void fts_dsp_graph_config(void);
-extern void fts_dsp_control_config(void);
-extern void fts_signal_bus_config(void);
-
 /* main DSP graph parameters */
 static double dsp_sample_rate;
 static int dsp_tick_size;
@@ -54,9 +45,6 @@ static double dsp_tick_duration_minus_one_sample;
 
 /* DSP time */
 double fts_dsp_time;
-
-static fts_symbol_t dsp_zero_fun_symbol = 0;
-static fts_symbol_t dsp_copy_fun_symbol = 0;
 
 void 
 fts_dsp_run_tick(void)
@@ -135,48 +123,6 @@ dsp_set_on(void *listener, fts_symbol_t name, const fts_atom_t *value)
 	fts_dsp_graph_reset(&main_dsp_graph);
     }
 }
-
-/**************************************************************************
- *
- *  DSP module
- *
- */
-
-static void
-dsp_module_init(void)
-{
-  fts_s_dsp_on = fts_new_symbol("dsp_on");
-  fts_s_sample_rate = fts_new_symbol("sample_rate");
-
-  fts_signal_bus_config();
-  fts_dsp_control_config();
-  fts_dsp_graph_config();
-
-  /* create main DSP graph */
-  fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
-
-  /* init sample rate */
-  dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
-  dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
-
-  dsp_tick_duration = (double)dsp_tick_size * 1000.0 / 44100.0;
-  dsp_tick_duration_minus_one_sample = (double)(FTS_DSP_DEFAULT_TICK_SIZE - 1) * 1000.0 / 44100.0;
-
-  /* init DSP time */
-  fts_dsp_time = 0.0;
-
-  fts_param_add_listener(fts_s_sample_rate, 0, dsp_set_sample_rate);
-  fts_param_add_listener(fts_s_dsp_on, 0, dsp_set_on);
-}
-
-static void
-dsp_module_shutdown(void)
-{
-  fts_param_set_int(fts_s_dsp_on, 0);
-}
-
-fts_module_t fts_dsp_module = {"Dsp", "Dsp compiler", dsp_module_init, dsp_module_shutdown, 0};
-
 
 /**************************************************************************
  *
@@ -309,20 +255,37 @@ dsp_get_current_dsp_chain( void)
   return main_dsp_graph.chain;
 }
 
-/*********************************************************************
+/**************************************************************************
  *
- * (fd) Wonderfull !!! Magnifique !!!
+ * Initialization and shutdown
  *
  */
 
-static fts_dev_t *dac_slip_device;
-
-void fts_dsp_set_dac_slip_dev(fts_dev_t *dev)
+void fts_kernel_dsp_init(void)
 {
-  dac_slip_device = dev;
+  fts_s_dsp_on = fts_new_symbol("dsp_on");
+  fts_s_sample_rate = fts_new_symbol("sample_rate");
+
+  /* create main DSP graph */
+  fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
+
+  /* init sample rate */
+  dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
+  dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
+
+  dsp_tick_duration = (double)dsp_tick_size * 1000.0 / 44100.0;
+  dsp_tick_duration_minus_one_sample = (double)(FTS_DSP_DEFAULT_TICK_SIZE - 1) * 1000.0 / 44100.0;
+
+  /* init DSP time */
+  fts_dsp_time = 0.0;
+
+  fts_param_add_listener(fts_s_sample_rate, 0, dsp_set_sample_rate);
+  fts_param_add_listener(fts_s_dsp_on, 0, dsp_set_on);
 }
 
-fts_dev_t * fts_dsp_get_dac_slip_dev(void)
+void fts_kernel_dsp_shutdown(void)
 {
-  return dac_slip_device;
+  fts_param_set_int(fts_s_dsp_on, 0);
 }
+
+

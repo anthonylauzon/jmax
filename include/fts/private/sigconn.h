@@ -18,14 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Francois Dechelle, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_SIGCONN_H_
-#define _FTS_SIGCONN_H_
+#ifndef _FTS_PRIVATE_SIGCONN_H_
+#define _FTS_PRIVATE_SIGCONN_H_
 
 typedef struct _fts_signal_connection_table_
 {
@@ -34,8 +30,8 @@ typedef struct _fts_signal_connection_table_
   int alloc;
 } fts_signal_connection_table_t;
 
-FTS_API void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
-FTS_API void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
-FTS_API void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
+extern void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
+extern void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
+extern void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
 
 #endif

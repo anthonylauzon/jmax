@@ -18,34 +18,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_DSPGRAPH_H_
-#define _FTS_DSPGRAPH_H_
+#ifndef _FTS_PRIVATE_DSPGRAPH_H_
+#define _FTS_PRIVATE_DSPGRAPH_H_
 
-#include <fts/lang/ftl.h>
-#include <fts/lang/dsp/signal.h>
-#include <fts/lang/dsp/sigconn.h>
+#include <fts/fts.h>
 
-FTS_API fts_symbol_t fts_s_sig_zero;
-FTS_API fts_symbol_t fts_s_dsp_upsampling;
-FTS_API fts_symbol_t fts_s_dsp_downsampling;
 FTS_API fts_symbol_t fts_s_dsp_outputsize;
 FTS_API fts_symbol_t fts_s_dsp_descr;
 
 FTS_API fts_dsp_signal_t *sig_zero;
-
-typedef struct 
-{
-  int ninputs;
-  int noutputs;
-  fts_dsp_signal_t **in;
-  fts_dsp_signal_t **out;
-} fts_dsp_descr_t;
 
 typedef struct _fts_dsp_node_ 
 {
@@ -79,12 +62,12 @@ typedef struct _fts_dsp_graph_
 #define fts_dsp_graph_get_sample_rate(g) ((g)->sample_rate)
 #define fts_dsp_graph_get_time(g) ((g)->time)
 
-void fts_dsp_graph_init(fts_dsp_graph_t *graph, int vector_size, double sample_rate);
-void fts_dsp_graph_compile(fts_dsp_graph_t *graph);
-void fts_dsp_graph_reset(fts_dsp_graph_t *graph);
-void fts_dsp_graph_run(fts_dsp_graph_t *graph);
+extern void fts_dsp_graph_init(fts_dsp_graph_t *graph, int vector_size, double sample_rate);
+extern void fts_dsp_graph_compile(fts_dsp_graph_t *graph);
+extern void fts_dsp_graph_reset(fts_dsp_graph_t *graph);
+extern void fts_dsp_graph_run(fts_dsp_graph_t *graph);
 
-void fts_dsp_graph_add_object(fts_dsp_graph_t *graph, fts_object_t *o);
-void fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o);
+extern void fts_dsp_graph_add_object(fts_dsp_graph_t *graph, fts_object_t *o);
+extern void fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_object_t *o);
 
 #endif

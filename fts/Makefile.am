@@ -12,6 +12,8 @@ class.c \
 clipboard.c \
 connection.c \
 doctor.c \
+dsp.c \
+dspgraph.c \
 errobj.c \
 expression.c \
 fpe.c \
@@ -32,12 +34,11 @@ patparser.c \
 property.c \
 saver.c \
 selection.c \
+sigconn.c \
 symbol.c \
 template.c \
 variable.c \
 version.c \
 vm.c 
-
-#dspgraph.c \
 
 INCLUDES=-I$(top_srcdir)/include
