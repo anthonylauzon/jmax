@@ -33,6 +33,7 @@ import ircam.jmax.script.scm.*;
 import java.awt.event.*;
 import java.io.*;
 import kawa.lang.*;
+import gnu.math.*;
 import kawa.standard.Scheme;
 import gnu.mapping.*;
 
@@ -68,6 +69,8 @@ public class KawaInterpreter extends SchemeInterpreter
 		define("jmax-interp-name", "kawa");
 		define("jmax-root", root);
 		define("slash", File.separator);
+		define("method", KawaJavaMethod.getProcedure());
+		define("constructor", KawaJavaConstructor.getProcedure());
 
 		/* Load the "jmaxboot.scm" file that will do whatever is needed to
 		 * create the startup configuration, included reading user files
@@ -138,7 +141,7 @@ public class KawaInterpreter extends SchemeInterpreter
 
     public Object eval(Script script) throws ScriptException 
     {
-	return script.eval(this);
+	return script.eval();
     }
 
     public Object eval(String expr) throws ScriptException 
@@ -176,8 +179,7 @@ public class KawaInterpreter extends SchemeInterpreter
 	} else if (script instanceof FString) {
 	    return new DefaultSchemeScript(this, ((FString) script).toString());
 	} else if (script instanceof Procedure) {
-	    // FIXME
-	    throw new ScriptException("Procedure script are coming up");
+	    return new KawaScript(this, (Procedure) script);
 	} else {
 	    throw new ScriptException("Can't convert " + script.getClass().getName() + " to a script");
 	}
@@ -204,6 +206,83 @@ public class KawaInterpreter extends SchemeInterpreter
 	return "scheme";
     }
 
+    public static Object[] convertToJava(Object[] a, Class[] c) {
+	if (a != null) {
+	    int len = a.length;
+	    for (int i = 0; i < len; i++) {
+		a[i] = convertToJava(a[i], c[i]);
+	    }
+	}
+	return a;
+    }
+
+    public static Object convertToJava(Object a, Class c) {
+	if (a instanceof FString) {
+	    return a.toString();
+	} else if (a instanceof IntNum) {
+	    if (c == Integer.TYPE) {
+		return new Integer(((IntNum) a).intValue());
+	    } else if (c == Long.TYPE) {
+		return new Long(((IntNum) a).longValue());
+	    } else {
+		return a;
+	    }
+	} else if (a instanceof DFloNum) {
+	    if (c == Float.TYPE) {
+		return new Float(((DFloNum) a).floatValue());
+	    } else if (c == Double.TYPE) {
+		return new Double(((DFloNum) a).doubleValue());
+	    } else {
+		return a;
+	    }
+	} else if (a instanceof Char) {
+	    return new Character(((Char) a).charValue());
+	} else {
+	    return a;
+	} 
+    }
+
+    public Object convertToScheme(String value, String type) {
+	try {
+	    if (type.equals("int")) {
+		return IntNum.make(Long.parseLong(value));
+	    } else if (type.equals("float")) {
+		return new DFloNum(new Double(value).doubleValue());
+	    } else if (type.equals("string")) {
+		return new FString(value);
+	    } else if (type.equals("symbol")) {
+		return value.intern();
+	    } else if (type.equals("boolean")) {
+		return (value.equals("true")) ? Boolean.TRUE : Boolean.FALSE;
+	    } else {
+		return new FString("Unknown type: " + type);
+	    }
+	} catch (Exception e) {
+	    String m = (e.getMessage() != null) ? e.getMessage() : e.getClass().getName();
+	    return new FString(m);
+	}
+    }
+
+    public static Object convertToKawa(Object a) {
+	if (a instanceof String) {
+	    return new FString((String)a);
+	} else if (a instanceof Integer) {
+	    return IntNum.make(((Integer)a).longValue());
+	} else if (a instanceof Long) {
+	    return IntNum.make(((Long)a).longValue());
+	} else if (a instanceof Float) {
+	    return new DFloNum(((Float)a).doubleValue());
+	} else if (a instanceof Double) {
+	    return new DFloNum(((Double)a).doubleValue());
+	} else if (a instanceof Character) {
+	    return Char.make(((Character)a).charValue());
+	} else if (a instanceof Boolean) {
+	    return (((Boolean)a).booleanValue()) ? Boolean.TRUE : Boolean.FALSE;
+	} else {
+	    return a;
+	}
+    }
+
     /** The main method starts a Scheme shell. Provided for testing purposes. */
     public static void main(String[] arg) throws ScriptException {
 	KawaInterpreter kawasaki = new KawaInterpreter();
@@ -211,3 +290,5 @@ public class KawaInterpreter extends SchemeInterpreter
 	kawa.Shell.run(kawasaki.itsInterp);
     }
 }
+
+
