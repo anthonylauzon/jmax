@@ -233,8 +233,10 @@ int fts_file_find_in_env( const char *root, fts_symbol_t env, const char *filena
       }
       if (end > start)
       {
-	buffer = fts_malloc(end - start + 1);
-	strncpy(buffer, start, end - start);	
+	buffer = fts_malloc((end - start + 1) * sizeof(char));
+	buffer = strncpy(buffer, start, end - start);
+	/* add null char */
+	buffer[end - start] = '\0';
 	buff_symbol = fts_new_symbol(buffer);
 	fts_set_symbol(&a, buff_symbol);
 	path_list = fts_list_append(path_list, &a);
