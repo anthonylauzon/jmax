@@ -33,6 +33,9 @@
 
 <ul>
 <li>
+<a href="#2.4.11">Release notes for <i>j</i>Max 2.4.11</a></li>
+
+<li>
 <a href="#2.4.10">Release notes for <i>j</i>Max 2.4.10</a></li>
 
 <li>
@@ -56,6 +59,91 @@
 
 <!------------------------------------------------------------------------------->
 <br>
+<hr>
+
+<a NAME="2.4.11">
+ <h1> Release notes for <i>j</i>Max 2.4.11 </h1>
+</a>
+
+<h3>Platforms</h3>
+
+<p>
+The following platforms are supported:
+<ul>
+<li>Irix 6.5 for R5000 and R10000 processors</li>
+<li>Linux for Intel processors</li>
+<li>Linux for PowerPC</li>
+</ul>
+
+
+<h3>Bugs</h3>
+
+<p>
+The following bugs were fixed:
+<ul>
+<li> cannot kill fts process as user on SGI platform
+<li> erroneous message "cannot lock memory" on SGI platform
+<li> missing Swing in binary packages
+</ul>
+
+<p>
+For a complete list of fixed and remaining bugs, please refer to the
+IRCAM's <a href="http://www.ircam.fr/bugs">bug tracking system</a>.
+
+<h3>Features</h3>
+
+<p>
+The various Tcl <code>open</code> commands now accept arguments that
+can be used to specify device parameters values. The affected commands are:
+<ul>
+<li> <code>openAudioIn</code>
+<li> <code>openDefaultAudioIn</code>
+<li> <code>openNamedDefaultAudioIn</code>
+<li> <code>openAudioOut</code>
+<li> <code>openDefaultAudioOut</code>
+<li> <code>openNamedDefaultAudioOut</code>
+<li> <code>openMidi</code>
+<li> <code>openDefaultMidi</code>
+</ul>
+
+<p>
+The parameters that are passed as the last argument (a list inside "")
+are passed to the device <code>open</code> function. The arguments that
+are accepted are device-dependent.
+
+<p>
+Example of use:
+<pre>
+openDefaultAudioIn stereoIn "device /dev/dsp8"
+openDefaultAudioOut stereoOut "channels 8"
+openDefaultMidi midi "device /dev/midi01"
+openDefaultAudioOut prof_dac "profile_interval 1000"
+</pre>
+
+
+<p>
+The Linux OSS MIDI device now accept a "mode" argument that is
+passed to the <code>open()</code> system call in order to be able to
+specify the file read/write mode of the device for device that
+can be opened in only one direction. This argument can be passed
+when opening the device with the <code>opendMidi</code> or
+<code>openDefaultMidi</code> Tcl commands. This argument
+can have the following value:
+<ul>
+<li> <code>r</code> for read-only
+<li> <code>w</code> for write-only
+<li> <code>rw</code> for read and write
+</ul>
+
+<p>
+Example of use:
+<pre>
+openDefaultMidi midi "mode w"
+</pre>
+
+
+<!------------------------------------------------------------------------------->
+<p>
 <hr>
 
 <a NAME="2.4.10">
@@ -110,7 +198,9 @@ ALSA device caused crash on some audio configurations
 ... crashing the server) were caused by bogus (or incompatible?) versions
 of the <i>libaudiofile</i> library required by <i>j</i>Max. Make sure that
 you are using a recent version of the library.
-<p>For a complete list of fixed and remaining bugs, please refer to the
+
+<p>
+For a complete list of fixed and remaining bugs, please refer to the
 IRCAM's <a href="http://www.ircam.fr/bugs">bug tracking system</a>.
 
 
