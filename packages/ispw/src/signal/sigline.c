@@ -6,20 +6,19 @@ static fts_symbol_t sigline_64_function = 0;
 
 typedef struct
 {
-  float val;
-  float target;
-  float steps;
-  float vecsize;
+  double value;
+  double target;
+  double incr;
+  int steps;
 } line_control_t;
 
 
 typedef struct
 {
   fts_object_t _o;
-  int in1;
+  double time;
   int set;
-  int vs;
-  int   vecsize;
+  int vecsize;
   float srate;
   ftl_data_t ftl_data;
 } sigline_t;
@@ -35,26 +34,27 @@ static void ftl_line(fts_word_t *argv)
   if (lctl->steps > 0)
     {
       int i;
-      float val = lctl->val, diff = (lctl->target - val)/lctl->steps;
+      double value = lctl->value;
+      double incr = lctl->incr;
 
-      for (i = 0; i < n; i ++)
+      for (i=0; i<n; i++)
 	{
-	  val += diff;
-	  fp[i] = val;
+	  value += incr;
+	  fp[i] = value;
 	}
 
-      lctl->val = val;
-      lctl->steps -= lctl->vecsize;
+      lctl->value = value;
+      lctl->steps -= n;
     }
   else
     {
       int i;
       float target = lctl->target;
 
-      for (i = 0; i < n; i ++)
+      for (i=0; i<n; i++)
 	fp[i] = target;
 
-      lctl->val = target;
+      lctl->value = target;
     }
 }
 
@@ -66,26 +66,27 @@ static void ftl_line_64(fts_word_t *argv)
   if (lctl->steps > 0)
     {
       int i;
-      float val = lctl->val, diff = (lctl->target - val)/lctl->steps;
+      double value = lctl->value;
+      double incr = lctl->incr;
 
-      for (i = 0; i < 64; i ++)
+      for (i=0; i<64; i++)
 	{
-	  val += diff;
-	  fp[i] = val;
+	  value += incr;
+	  fp[i] = value;
 	}
 
-      lctl->val = val;
-      lctl->steps -= lctl->vecsize;
+      lctl->value = value;
+      lctl->steps -= 64;
     }
   else
     {
       int i;
-      float target = lctl->target;
+      double target = lctl->target;
 
-      for (i = 0; i < 64; i ++)
+      for (i=0; i<64; i++)
 	fp[i] = target;
 
-      lctl->val = target;
+      lctl->value = target;
     }
 }
 
@@ -93,15 +94,14 @@ static void
 sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sigline_t *this = (sigline_t *)o;
-  fts_atom_t argv[3];
+  line_control_t* ctl = ftl_data_get_ptr(this->ftl_data);
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-  float f;
+  fts_atom_t argv[3];
 
   this->srate = fts_dsp_get_output_srate(dsp, 0);
   this->vecsize = fts_dsp_get_output_size(dsp, 0);
 
-  f = (float) this->vecsize;
-  ftl_data_set(line_control_t, this->ftl_data, vecsize, &f); 
+  
 
   if (this->vecsize == 64)
     {
@@ -124,9 +124,9 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   sigline_t *this = (sigline_t *)o;
   int down = (long) fts_get_number_arg(ac, at, 1, 0);
-  float f;
+  double f;
+  int i;
 
-  this->in1 = 0;
   this->vecsize = DEFAULTVS;
 
   this->set = 0;
@@ -135,9 +135,11 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->ftl_data = ftl_data_new(line_control_t);
 
   f = 0.0f;
-  ftl_data_set(line_control_t, this->ftl_data, steps, &f);
+  ftl_data_set(line_control_t, this->ftl_data, value, &f);
   ftl_data_set(line_control_t, this->ftl_data, target, &f);
-  ftl_data_set(line_control_t, this->ftl_data, val, &f);
+  ftl_data_set(line_control_t, this->ftl_data, incr, &f);
+  i = 0;
+  ftl_data_set(line_control_t, this->ftl_data, steps, &i);
 
   if (down > 0)
     {
@@ -153,26 +155,36 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-sigline_float_realize(sigline_t *this, float f)
+sigline_set_target(sigline_t *this, double target)
 {
-  float steps;
+  line_control_t* ctl = ftl_data_get_ptr(this->ftl_data);
 
-  if (!this->set || ((steps = (float)this->vecsize * this->in1) <= 0))
+  if(this->time > 0.0)
     {
-      steps = 0;
-      ftl_data_set(line_control_t, this->ftl_data, val, &f);
+      int n_ticks = this->time * 0.001f * this->srate / this->vecsize;
+      int steps = n_ticks * this->vecsize;
+
+      ctl->target = target;
+      ctl->incr = (target - ctl->value) / steps;
+      ctl->steps = steps;
+    }
+  else
+    {
+      ctl->value = ctl->target = target;
+      ctl->incr = 0.0;
+      ctl->steps = 0;
     }
 
-  ftl_data_set(line_control_t, this->ftl_data, target, &f);
-  ftl_data_set(line_control_t, this->ftl_data, steps, &steps);
-
-  this->set = 0;
+  this->time = 0.0;
 }
 
 static void
 sigline_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigline_float_realize((sigline_t *)o, (float) fts_get_number(at));
+  sigline_t *this = (sigline_t *)o;
+  double target = fts_get_number(at);
+
+  sigline_set_target((sigline_t *)o, target);
 }
 
 
@@ -181,22 +193,17 @@ sigline_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   sigline_t *this = (sigline_t *)o;
 
-  this->in1 = fts_get_number_arg(ac, at, 0, 0.0f) * 0.001f * this->srate / this->vecsize;
-
-  this->set = 1;
+  this->time = fts_get_number_arg(ac, at, 0, 0.0f);
 }
-
-
 
 static void
 sigline_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if ((ac >= 2) && fts_is_number(&at[1]))
-    sigline_number_1(o, winlet, fts_s_float, 1, at+1);
+    sigline_number_1(o, 0, 0, 1, at+1);
 
   if ((ac >= 1) && fts_is_number(&at[0]))
-    sigline_float_realize((sigline_t *)o,
-			  (float)fts_get_number_arg(ac, at, 0, 0));
+    sigline_set_target((sigline_t *)o, (float)fts_get_number_arg(ac, at, 0, 0));
 }
 
 static void
@@ -227,7 +234,6 @@ sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   a[0] = fts_s_int;
   fts_method_define(cl, 0, fts_s_int, sigline_number, 1, a);
-
   a[0] = fts_s_float;
   fts_method_define(cl, 0, fts_s_float, sigline_number, 1, a);
 
@@ -235,7 +241,6 @@ sigline_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   a[0] = fts_s_float;
   fts_method_define(cl, 1, fts_s_float, sigline_number_1, 1, a);
-
   a[0] = fts_s_int;
   fts_method_define(cl, 1, fts_s_int, sigline_number_1, 1, a);
   

@@ -1,6 +1,4 @@
 #include "fts.h"
-
-
 #include "fft_ftl.h"
 
 
@@ -79,7 +77,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   hop = fts_get_long_arg(ac, at, 1, size);
   phase = fts_get_long_arg(ac, at, 2, 0);
   
-  if(fts_fft_declaresize(size) != fts_Success)
+  if(!fts_fft_declaresize(size))
   {
     post("error: %s: no fft size: %d\n", fts_symbol_name(x->name), size);
     return;
