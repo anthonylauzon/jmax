@@ -1,5 +1,6 @@
 2004-03-01  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
+	* added \r in parallel to \n to tokenizer.l
 	* added fmat_set_m(), fmat_set_n(), et fmat_reshape() to fmat API
 	* redefined fmat_set_size()
 

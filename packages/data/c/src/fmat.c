@@ -441,7 +441,7 @@ fmat_copy(fmat_t *org, fmat_t *copy)
   int n = fmat_get_n(org);
   int i;
 
-  fmat_realloc(copy, org->m, org->n);
+  fmat_reshape(copy, org->m, org->n);
 
   for(i=0; i<m*n; i++)
     copy->values[i] = org->values[i];
@@ -469,7 +469,7 @@ fmat_grow(fmat_t *fmat, int size)
   while(size > alloc)
     alloc += FMAT_BLOCK_SIZE;
 
-  fmat_realloc(fmat, alloc, 1);
+  fmat_reshape(fmat, alloc, 1);
 }
 
 int
@@ -1366,7 +1366,7 @@ fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     for(i=0, j=0; i<m; i++, j+=n)
       ptr[i] = ptr[j];
       
-    fmat_realloc(self, m, 1);
+    fmat_reshape(self, m, 1);
   }
 }
 
@@ -1383,7 +1383,7 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   switch(id)
   {
     case fmat_format_id_vec:
-      fmat_realloc(self, m, 2);
+      fmat_reshape(self, m, 2);
       
       for(i=2*(m-1), j=m-1; i>=0; i-=2, j--)
       {
@@ -1414,7 +1414,7 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       }
       break;
           
-      fmat_realloc(self, m, 2);
+      fmat_reshape(self, m, 2);
       break;
   }
   
@@ -1434,7 +1434,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   switch(id)
   {
     case fmat_format_id_vec:
-      fmat_realloc(self, m, 2);
+      fmat_reshape(self, m, 2);
       
       for(i=2*(m-1), j=m-1; i>=0; i-=2, j--)
       {
@@ -1465,7 +1465,7 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       }
       break;
           
-      fmat_realloc(self, m, 2);
+      fmat_reshape(self, m, 2);
       break;
   }
   
@@ -1498,14 +1498,14 @@ fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
         ptr[i] = sqrtf(re * re + im * im);
       }
       
-      fmat_realloc(self, m, 1);
+      fmat_reshape(self, m, 1);
       break;
     
     case fmat_format_id_polar:
       for(i=0, j=0; i<m; i++, j+=2)
         ptr[i] = ptr[j];
 
-      fmat_realloc(self, m, 1);
+      fmat_reshape(self, m, 1);
       break;
     
     default:
@@ -1543,14 +1543,14 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] = 0.5 * logf(re * re + im * im);
       }
       
-      fmat_realloc(self, m, 1);
+      fmat_reshape(self, m, 1);
       break;
     
     case fmat_format_id_polar:
       for(i=0, j=0; i<m; i++, j+=2)
         ptr[i] = logf(ptr[j]);
 
-      fmat_realloc(self, m, 1);
+      fmat_reshape(self, m, 1);
       break;
     
     default:
@@ -1668,7 +1668,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       float *fft_ptr;
       int i;
 
-      fmat_realloc(self, fft_size/2, 2);
+      fmat_reshape(self, fft_size/2, 2);
       
       fft_ptr = fmat_get_ptr(self);
 
@@ -1691,7 +1691,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       complex *fft_ptr;
       int i;
 
-      fmat_realloc(self, fft_size, 2);
+      fmat_reshape(self, fft_size, 2);
       fft_ptr = (complex *)fmat_get_ptr(self);
 
       /* zero padding */      
@@ -1940,7 +1940,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_object_error(o, "bad column argument");
   }
   
-  fmat_realloc(self, m, n);
+  fmat_reshape(self, m, n);
   
   /* init from arguments */
   if(ac > 2)
