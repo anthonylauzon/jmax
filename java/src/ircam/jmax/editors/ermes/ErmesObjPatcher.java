@@ -88,11 +88,15 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     GetSketchWindow().itsPatcher.watch("deletedConnection",GetSketchWindow());
     //the children could destroy connections AND objects
     if (itsSubWindow != null) {
-    itsFtsObject.watch("deletedObject", itsSubWindow);
-    itsFtsObject.watch("deletedConnection", itsSubWindow);
+      itsFtsObject.watch("deletedObject", itsSubWindow);
+      itsFtsObject.watch("deletedConnection", itsSubWindow);
     }
     ((FtsPatcherObject)itsFtsObject).redefinePatcher(itsArgs);
-   if (itsSubWindow != null)  itsFtsObject.removeWatch(itsSubWindow);  
+    if (itsSubWindow != null)  {
+      itsFtsObject.removeWatch(itsSubWindow);
+      itsSubWindow.itsSketchPad.RedefineInChoice();
+      itsSubWindow.itsSketchPad.RedefineOutChoice();
+    }
   }
   
 	
@@ -175,6 +179,8 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
       else{	//this 'else' shouldn't be reached...
 	if(itsArgs.equals("")) return false;
 	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	itsSubWindow.itsSketchPad.PrepareInChoice();//???????
+	itsSubWindow.itsSketchPad.PrepareOutChoice();///?????????
 	MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
 	GetSketchWindow().AddToSubWindowList(itsSubWindow);
 	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);

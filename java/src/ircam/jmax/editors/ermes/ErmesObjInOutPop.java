@@ -33,6 +33,32 @@ public class ErmesObjInOutPop extends PopupMenu {
     }  
     //else = what???!
   }
+  
+  public void Redefine(int numbers){
+    MenuItem aMenuItem;
+    if(numbers==getItemCount()) return;
+    if(numbers>getItemCount()){
+      for (int i=getItemCount(); i<numbers; i++){
+	aMenuItem = new MenuItem(Integer.toString(i+1));
+	add(aMenuItem);
+	aMenuItem.addActionListener(new ActionListener(){
+	  public  void actionPerformed(ActionEvent e)
+	    { 
+	      MenuItem aMenuItem2 = (MenuItem) e.getSource();//always 'this'? :-)
+	      CommunicateChoice(itsOwner, aMenuItem2.getLabel()); 
+	    }
+	});
+      }
+    }
+    else {
+      int temp = getItemCount();
+      while(numbers<temp){
+	remove(temp-1);
+	temp--;
+      }
+    }
+  }
+
 
   /**
    * Constructor accepting the number of in/out to show in the popup
@@ -46,7 +72,6 @@ public class ErmesObjInOutPop extends PopupMenu {
       aMenuItem = new MenuItem(Integer.toString(i+1));
       add(aMenuItem);
       
-      
       aMenuItem.addActionListener(new ActionListener() {
 	public  void actionPerformed(ActionEvent e)
 	  { 
@@ -55,10 +80,9 @@ public class ErmesObjInOutPop extends PopupMenu {
 	    
 	  }
       });
-      
-	
     }
   }
+  
 }
 
 

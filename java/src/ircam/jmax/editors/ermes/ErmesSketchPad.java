@@ -1559,12 +1559,21 @@ Rectangle previousResizeRect = new Rectangle();
     add(itsInPop);
   }
 
+  public void RedefineInChoice() {
+    int temp = itsSketchWindow.itsPatcher.getNumberOfInlets();
+    itsInPop.Redefine(temp);
+  }
+
   void PrepareOutChoice() {
     if (itsOutPop != null) return; //it's OK, we did it already
     
     int temp = itsSketchWindow.itsPatcher.getNumberOfOutlets();
     itsOutPop = new ErmesObjInOutPop(temp);
     add(itsOutPop);
+  }
+  
+  public void RedefineOutChoice() {
+    itsOutPop.Redefine(itsSketchWindow.itsPatcher.getNumberOfOutlets());
   }
 
   //--------------------------------------------------------

@@ -37,7 +37,7 @@ class ErmesObjIn extends ErmesObject {
 
     super.Init(theSketchPad, theFtsObject); 
 
-    theSketchPad.PrepareInChoice();
+    //theSketchPad.PrepareInChoice();
 	
     return true;
   }
@@ -67,7 +67,7 @@ class ErmesObjIn extends ErmesObject {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
 
-    theSketchPad.PrepareInChoice();
+    //theSketchPad.PrepareInChoice();
     
     return true;
   }
@@ -166,3 +166,9 @@ class ErmesObjIn extends ErmesObject {
     }
 
 }
+
+
+
+
+
+

@@ -38,7 +38,7 @@ class ErmesObjOut extends ErmesObject {
     itsId = ((FtsOutletObject) theFtsObject).getPosition();
 
     super.Init(theSketchPad, theFtsObject); 
-    theSketchPad.PrepareOutChoice();
+    //theSketchPad.PrepareOutChoice();
 	
     return true;
   }
@@ -59,7 +59,7 @@ class ErmesObjOut extends ErmesObject {
     else itsId = temp-1;
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
 
-    theSketchPad.PrepareOutChoice();
+    //theSketchPad.PrepareOutChoice();
 	
     return true;
   }
