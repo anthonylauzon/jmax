@@ -509,9 +509,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
   // The following methods are not used by the interaction engine.
 
-  public void mouseClicked( MouseEvent e)
-  {
-  }
+  public void mouseClicked( MouseEvent e){}
 
   public void mouseEntered( MouseEvent e)
   {
@@ -524,18 +522,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   }
 
   public void keyTyped(KeyEvent e){}
-  public void keyPressed(KeyEvent e)
-  {
-
-      System.err.println("left "+KeyEvent.VK_LEFT);
-      System.err.println("right "+KeyEvent.VK_RIGHT);
-      System.err.println("up "+KeyEvent.VK_UP);
-
-      System.err.println("key char "+e.getKeyChar());
-      System.err.println("key code "+e.getKeyCode());
-      System.err.println("control "+e.isControlDown());
-
-  }
+  public void keyPressed(KeyEvent e){}
   public void keyReleased(KeyEvent e)
   {
     if( e.getKeyCode() == KeyEvent.VK_SHIFT)
