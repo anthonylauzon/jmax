@@ -10,6 +10,7 @@ audio.c \
 audioconfig.c \
 audiofile.c \
 autosave.c \
+binaryprotocol.c \
 bmaxfile.c \
 bytestream.c \
 class.c \

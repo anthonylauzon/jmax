@@ -269,7 +269,7 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_selection_config);
   _K_DECNCALL( fts_saver_config);
   _K_DECNCALL( fts_thread_manager_config);
-
+  _K_DECNCALL( fts_binary_protocol_config);
 }
 
 void fts_init( int argc, char **argv)
