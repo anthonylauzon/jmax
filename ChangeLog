@@ -1,3 +1,40 @@
+2003-03-07  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
+
+	* cleaned key bindings in patcher editor. 
+	The complete list of keybindings :
+	-) Cmd N : New patcher
+	-) Cmd O : Open patcher
+	-) Cmd S : Save patcher
+	-) Cmd W : Close patcher window
+	-) Cmd P : Print patcher window content
+	-) Cmd Enter : Activate/Desactivate DSP
+	-) Cmd Q : Quit jMax
+	-) Cmd X : Cut selection
+	-) Cmd C : Copy selection
+	-) Cmd V : Copy clipboard content in current window
+	-) Cmd Z : Undo
+	-) Cmd Y : Redo
+	-) Cmd I : Inspect selected objects
+	-) Cmd A : SelectAll
+	-) Cmd F : Find in opened patchers
+	-) Cmd U : Bring to Front selected objects
+	-) Cmd B : Send to Back selected obejcts
+	-) Cmd E : Lock/Unlock patcher window
+	-) Cmd T : Fit to Text selects objects
+	
+	-) Cmd R : Display Errors
+	-) Arrows : Move selected objects
+	-) Shift Arrows : Move by 10 pixels selected objects
+	-) + or - : resize width of selected objects
+	-) Shift + or - : resize width by 10 pixels of selected objects
+	-) Cmd Arrows : align (top, bottom, left, right) selected objects
+	-) Cmd + or - : change font size of selected objects
+	-) Cmd Shift ArrowUp (or ArrowDown) : align height of selected objects to the maximum height (or to the minimum height)
+	between selected objects
+	-) Cmd Shift ArrowLeft (or ArrowRight) : align width of selected objects to the maximum width (or to the minimum width)
+	between selected objects
+	-) Delete or Backspace : remove selected objects
+
 2003-03-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* 4.0.2 released 
