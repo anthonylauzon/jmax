@@ -129,17 +129,17 @@ NTAGS:
 # cvs-tag
 #
 cvs-tag: spec-files
-	if cvs -n update 2>&1 | egrep '^[ACMPRU] ' ; then \
-		echo "Not sync with cvs (do an update or commit)" ; \
-		exit 1 ; \
-	fi
-	if [ -f CVS/Tag ] ; \
-	then ; \
+	@if [ -f CVS/Tag ] ; \
+	then \
 		echo "Cannot do a non-branch tag on a branch" ; \
 		exit 1 ; \
 	fi
+	@if cvs -n update 2>&1 | egrep '^[ACMPRU] ' ; then \
+		echo "Not sync with cvs (do an update or commit)" ; \
+		exit 1 ; \
+	fi
 	echo "Tagging with tag $(JMAX_VERSION_TAG)"
-#	cvs tag -F $(JMAX_VERSION_TAG)
+	cvs tag -F $(JMAX_VERSION_TAG)
 .PHONY: cvs-tag
 
 #
