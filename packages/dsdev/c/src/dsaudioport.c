@@ -248,7 +248,7 @@ static BOOL
 dsaudioport_enum_callback(LPGUID lpGuid, LPCSTR lpcstrDescription, 
 			  LPCSTR lpcstrModule, LPVOID lpContext)
 {
-  fts_log("[dsaudioport]: %s: %s\n", lpcstrModule, lpcstrDescription);
+  fts_log("[dsaudioport]: %s\n", lpcstrDescription);
   return 1;
 }
 
