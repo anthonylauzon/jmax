@@ -30,21 +30,21 @@ import java.util.*;
 import java.io.*;
 
 /**
- *  PackageClassLoader
+ *  MaxPackageClassLoader
  * 
  *  The class loader for the package management system.
  */
-public class PackageClassLoader extends ClassLoader {
+public class MaxPackageClassLoader extends ClassLoader {
 
     /** The table containing all the classes the package handler
      *  loaded. */
     private Hashtable loadedClasses;
 
     /** The package this loader is working for. */
-    protected Package itsPackage;
+    protected MaxPackage itsPackage;
 
     /** Constructs a new package class loader. */
-    public PackageClassLoader(Package pkg) 
+    public MaxPackageClassLoader(MaxPackage pkg) 
     {
 	itsPackage = pkg;
 	loadedClasses = new Hashtable();
@@ -59,20 +59,16 @@ public class PackageClassLoader extends ClassLoader {
 	if (claz == null) {
 	    try {
 		File classfile;
-		if (MaxApplication.getProperty("use-def-files") != null) {
-		    classfile = itsPackage.locateClass(name);
-		} else {
-		    classfile = itsPackage.locateFile(name, ".class");
-		}
+		classfile = itsPackage.locateClass(name);
 		FileInputStream in = new FileInputStream(classfile);
 		byte[] data = new byte[in.available()];
 		in.read(data);
 		claz = defineClass(data, 0, data.length);
 		loadedClasses.put(name, claz);
 	    } catch (FileNotFoundException e) {
-		claz = findSystemClass(name);
+		claz = Class.forName(name);
 	    } catch (ClassNotFoundException e) {
-		claz = findSystemClass(name);
+		claz = Class.forName(name);
 	    } catch (IOException e) {
 		throw new ClassNotFoundException("IO exception while reading class data");
 	    }

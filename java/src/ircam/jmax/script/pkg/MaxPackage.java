@@ -26,19 +26,23 @@
 package ircam.jmax.script.pkg;
 import ircam.jmax.*;
 import ircam.jmax.script.*;
+import ircam.jmax.utils.*;
+import ircam.jmax.fts.*;
 import java.util.*;
 import java.io.*;
 
 /**
- *  Class Package
+ *  Class MaxPackage
  * 
  * Dummy class, for future use.
  */
-public class Package implements PackageListener {
-    /** Should we print out debugging information. */
-    protected boolean debug;
+public class MaxPackage {
+    /** The label of the package. The label is used the
+     *  required-package and provided-package setting. It is also used
+     *  by the package handler. */
+    protected String label;
 
-    /** The name of the package. */
+    /** The name of the package. The name is a user friendly name. */
     protected String name;
 
     /** The version of the package. */
@@ -47,47 +51,76 @@ public class Package implements PackageListener {
     /** Has the package been loaded. */
     protected boolean loaded = false;
 
-    /** The script to init the package. */
-    protected String initScript;
+    /** Has the package loaded its modules. */
+    protected boolean loadedModules = false;
 
-    /** The list of local paths along which the files of the package
-     *  may be found. */
-    // FIXME use properties? Could be handy. We'd benifit from
-    // application wide properties.
-    protected String localPaths = null;
+    /** The definition file of the package. */
+    protected String itsDef;
 
-    /** The path of this package. */
-    String path = null;
+    /** The directory of the package. */
+    protected String itsDir;
+
+    /** The document object representing the settingsfile */
+    protected MaxPackageDocument itsDocument;
 
     /** The package handler that loaded this package. */
-    protected PackageHandler packageHandler;
+    protected MaxPackageLoader itsPackageLoader;
+
+    /** The vector of packages this package depends on */
+    protected Vector packages;
 
     /** The loader in charge of loading all the classes of this
      *  package. Every package has its class loader. */
-    protected PackageClassLoader classLoader;
+    protected MaxPackageClassLoader itsClassLoader;
 
     /** The settings of the package */
     SettingsTable settings;
 
-    public SettingsTable getSettings() {
+    /** Return the settingstable */
+    public SettingsTable getSettings() 
+    {
 	return settings;
+    }
+
+    /** Return the value of a setting */
+    public String getSetting(String key) 
+    {
+	return settings.getSetting(key);
+    }
+
+    /** Set the value of a setting */
+    public void setSetting(String key, String value) 
+    {
+	settings.setSetting(key, value);
+    }
+
+    /** Return all values of a setting as an enumeration */
+    public Enumeration enumerateSetting(String key) 
+    {
+	return settings.enumerateSetting(key);
     }
 
     /** The workspace of the package */
     Object workSpace;
 
-    public Object getWorkSpace() {
+    /** Give the loaded Java classes a change to know their package */
+    public static MaxPackage loadingPackage = null;
+
+    public Object getWorkSpace() 
+    {
 	return workSpace;
     }
 
     /** Listeners for changes of this packages */
     Vector listeners;
 
-    public void addListener(PackageListener listener) {
+    public void addListener(MaxPackageListener listener) 
+    {
 	listeners.addElement(listener);
     }
 
-    public void removeListener(PackageListener listener) {
+    public void removeListener(MaxPackageListener listener) 
+    {
 	listeners.removeElement(listener);
     }
 
@@ -100,43 +133,50 @@ public class Package implements PackageListener {
     public final static int LOADSCRIPT = 7;
     public final static int FINISHEDSCRIPTS = 8;
 
-    public void fireListeners(int action, Object arg) {
+    public void fireListeners(int action, Object arg) 
+    {
 	int len = listeners.size();
 	for (int i = 0; i < len; i++) {
-	    PackageListener listener = (PackageListener) listeners.elementAt(i);
+	    MaxPackageListener listener = (MaxPackageListener) listeners.elementAt(i);
 	    switch (action) {
-	    case LOADSETTINGS: listener.loadingSettings((File) arg);
+	    case LOADSETTINGS: listener.loadingSettings(this, (File) arg);
 		break;
-	    case FINISHEDSETTINGS: listener.finishedSettings((SettingsTable) arg);
+	    case FINISHEDSETTINGS: listener.finishedSettings(this, (SettingsTable) arg);
 		break;
-	    case LOADPACKAGE: listener.loadingPackage((String) arg);
+	    case LOADPACKAGE: listener.loadingPackage(this, (String) arg);
 		break;
-	    case FINISHEDPACKAGES: listener.finishedPackages();
+	    case FINISHEDPACKAGES: listener.finishedPackages(this);
 		break;
-	    case LOADCLASS: listener.loadingClass((String) arg);
+	    case LOADCLASS: listener.loadingClass(this, (String) arg);
 		break;
-	    case FINISHEDCLASS: listener.finishedClasses();
+	    case FINISHEDCLASS: listener.finishedClasses(this);
 		break;
-	    case LOADSCRIPT: listener.loadingScript((File) arg);
+	    case LOADSCRIPT: listener.loadingScript(this, (File) arg);
 		break;
-	    case FINISHEDSCRIPTS: listener.finishedScripts();
+	    case FINISHEDSCRIPTS: listener.finishedScripts(this);
 		break;
 	    }
 	}
     }
 
     /** Creates a new package with the given name and version. */
-    public Package(PackageHandler handler, String name, String version) 
+    public MaxPackage(MaxPackageLoader handler, String name, String version) 
     {
-	packageHandler = handler;
+	itsPackageLoader = handler;
+	label = name;
 	this.name = name;
 	this.version = version;
-	initScript = name + ".scm"; // FIXME
-	classLoader = null;
+	itsDef = name + ".def";
+	itsClassLoader = null;
 	settings = MaxApplication.getInterpreter().makeSettings(this); 
 	/* it's important to call makeWorkSpace after makeSettings */
 	workSpace = MaxApplication.getInterpreter().makeWorkSpace(this);
 	listeners = new Vector();
+	packages = new Vector();
+
+
+	//FIXME debugging
+	addListener(new DefaultPackageListener(true));
     }
 
     /** Returns the name of the package. */
@@ -148,7 +188,7 @@ public class Package implements PackageListener {
     /** Returns a string representation of this package. */
     public String toString() 
     {
-	return "Package[" + name + ';' + version + ';' + loaded + ']';
+	return "MaxPackage[" + name + ';' + version + ';' + loaded + ']';
     }
 
     /** Returns the version of the package. */
@@ -169,11 +209,16 @@ public class Package implements PackageListener {
 	loaded = l;
     }
 
+    public String getDefinitionFile() 
+    {
+	return itsDef;
+    }
+
     /**
      *  Requires this package to have this or a higher version. Throws
      *  an exception if the package can't meet the requirements. 
      */
-    public void requireVersion(String version) throws Exception
+    public void requireVersion(String version) throws Exception 
     {
 	return;
     }
@@ -182,31 +227,33 @@ public class Package implements PackageListener {
      * Loads the package. 
      * 
      * @param pkgDir The path to the root directory of the
-     * package. See PackageHandler.locatePackage.
+     * package. See PackageLoader.locatePackage.
      * @param version The minimum version required for this package.
      * @param interp The interpreter in charge to load the init
      * file.
      */
-    public void load(File pkgDir, String version, Interpreter interp) throws Exception
+    public synchronized void load(File pkgDir, String version) throws Exception 
     {
-	interp.loadPackage(this, new File(pkgDir, initScript));
-	requireVersion(version);
+	File file = new File(pkgDir, itsDef);
+	loadFromFile(file, version);
     }
-    public void load(File pkgDir, String version) throws Exception
+
+    public synchronized void loadFromFile(File file, String version) throws Exception 
     {
+	MaxPackage prevLoadingPackage = loadingPackage;
+	loadingPackage = this;
+
 	try {
+	    itsDef = file.getName();
+	    itsDir = file.getParent();
+
 	    /* Start with clean settings */
-	    defaultSettings(pkgDir.getAbsolutePath());
+	    defaultSettings();
 
 	    /* Load the packages settings file */
-	    File file = new File(pkgDir, name + ".def");
 	    fireListeners(LOADSETTINGS, file);
-	    settings.loadSettings(new File(pkgDir, name + ".def"));
-
- 	    debug = settings.getSetting("debug").equals("true");
-	    if (debug) {
-		addListener(this);
-	    }
+	    itsDocument = new MaxPackageDocument(file);
+	    itsDocument.hash(settings);
 
 	    /* Load the remaining settings files */
 	    Enumeration settingFiles = settings.enumerateSetting("settings");
@@ -219,25 +266,39 @@ public class Package implements PackageListener {
 		    }
 		}
 	    }
+
+ 	    String s = settings.getSetting("name");
+	    if (s.length() > 0) {
+		name = s;
+	    }
+	    s = settings.getSetting("version");
+	    if (s.length() > 0) {
+		version = s;
+	    }
+	    s = settings.getSetting("provided-package");
+	    if (s.length() > 0) {
+	      itsPackageLoader.provide(s, version);
+	    }
+
 	    fireListeners(FINISHEDSETTINGS, settings);
 
 	    /* check the version */
 	    requireVersion(version);
 
 	    /* Load the packages */
-	    Enumeration packages = settings.enumerateSetting("required-package");
-	    if (packages != null) {
-		while (packages.hasMoreElements()) {
-		    String pkg = (String) packages.nextElement();
-		    StringTokenizer st = new StringTokenizer(pkg, "-");
-		    fireListeners(LOADPACKAGE, pkg);
-		    packageHandler.require(st.nextToken(), st.nextToken());
+	    Enumeration packageNames = settings.enumerateSetting("required-package");
+	    if (packageNames != null) {
+		while (packageNames.hasMoreElements()) {
+		    String pkgName = (String) packageNames.nextElement();
+		    fireListeners(LOADPACKAGE, pkgName);
+		    MaxPackage pkg = itsPackageLoader.require(pkgName, "0.0.0");
+		    packages.addElement(pkg);
 		}
 	    }
 	    fireListeners(FINISHEDPACKAGES, null);
 
 	    /* Load the classes */
-	    Enumeration claz = settings.enumerateSetting("class");
+	    Enumeration claz = settings.enumerateSetting("classes");
 	    if (claz != null) {
 		while (claz.hasMoreElements()) {
 		    String name = (String) claz.nextElement();
@@ -263,19 +324,25 @@ public class Package implements PackageListener {
 		interp.removeContext(this);
 	    }
 	    fireListeners(FINISHEDSCRIPTS, null);
+
 	} catch (NoSuchElementException n) {
 	    throw new Exception("The package name should be of the form <name>-<version>");
+	} finally {
+	    loadingPackage = prevLoadingPackage;
 	}
     }
 
     /** Set the settings to their default values */
-    public void defaultSettings(String dir) {
-	settings.setSetting("dir", dir);
+    public void defaultSettings() 
+    {
+	settings.setSetting("defition-file", itsDef);
+	settings.setSetting("dir", itsDir);
+	settings.setSetting("home", System.getProperty("user.home"));
 	settings.setSetting("settings", null);
 	settings.setSetting("provided-package", null);
 	settings.setSetting("required-package", null);
 	settings.setSetting("classpath", null);
-	settings.setSetting("class", null);
+	settings.setSetting("classes", null);
 	settings.setSetting("script", null);
 	settings.setSetting("debug", "false");
     }
@@ -286,58 +353,11 @@ public class Package implements PackageListener {
      */
     public Class loadClass(String classname) throws Exception
     {
-        if (classLoader == null) {
-	    classLoader = new PackageClassLoader(this);
+        if (itsClassLoader == null) {
+	    itsClassLoader = new MaxPackageClassLoader(this);
 	}
-	Class claz = classLoader.loadClass(classname, true);
-	Class[] interf = claz.getInterfaces();
-	for (int i = 0; i < interf.length; i++) {
-	    if (interf[i].getName().equals("ircam.jmax.script.pkg.JavaExtension")) {
-		JavaExtension extension = (JavaExtension) claz.newInstance();
-		extension.init(MaxApplication.getInterpreter());
-	    }
-	}
+	Class claz = itsClassLoader.loadClass(classname, true);
 	return claz;
-    }
-
-    /**
-     *  Locates a file with a given name within the package. The file
-     *  name should be it's full name, with extension and directories
-     *  separated with the path separator.
-     *  Ex. ircam/jmax/package/file.class. If you need to locate a
-     *  file "Java style", use locateFile(file, extension). 
-     */
-    public File locateFile(String filename) throws FileNotFoundException
-    {
-	if (path == null) {
-	    File filePath = packageHandler.locatePackage(name);
-	    path = filePath.getAbsolutePath();
-	}
-	File file = new File(path, filename);
-	if (file.exists()) {
-	    return file;
-	}
-	if (localPaths != null) {
-	    StringTokenizer st = new StringTokenizer(localPaths, File.pathSeparator);
-	    while (st.hasMoreTokens()) {
-		file = new File(path + File.separator + st.nextToken(), filename);
-		if (file.exists()) {
-		    return file;
-		}
-	    }
-	}
-	throw new FileNotFoundException(filename);
-    }
-
-    /** 
-     *  Locates a file with the given extension. Dots '.' are
-     *  considered file separators, and the extension is added to the
-     *  file name. 
-     */
-    public File locateFile(String filename, String extension) throws FileNotFoundException
-    {
-	filename = filename.replace('.', File.separatorChar) + extension;
-	return locateFile(filename);
     }
 
     /** 
@@ -358,45 +378,37 @@ public class Package implements PackageListener {
 	throw new ClassNotFoundException(classname);
     }
 
-    /**
-     *  Appends a local path to the list of paths along which the
-     *  package searches for files. 
-     */
-    public void appendLocalPath(String path)
+    public void loadModules(Fts fts) throws Exception 
     {
-	localPaths = (localPaths == null) ? path : localPaths + File.pathSeparator + path;
-    }
-
-    public void loadingSettings(File f) {
-	System.out.println("Loading settings file " + f);
-    }
-
-    public void finishedSettings(SettingsTable settings) {
-	System.out.println("Finished loading settings");
-    }
-
-    public void loadingPackage(String p) {
-	System.out.println("Loading package " + p);
-    }
-
-    public void finishedPackages() {
-	System.out.println("Finished loading packages");
-    }
-
-    public void loadingScript(File f) {
-	System.out.println("Loading script " + f);
-    }
-
-    public void finishedScripts() {
-	System.out.println("Finished loading packages");
-    }
-
-    public void loadingClass(String name) {
-	System.out.println("Loading class " + name);
-    }
-
-    public void finishedClasses() {
-	System.out.println("Finished loading classes");
+	if (!loadedModules) {
+	    /* Flag to avoid recursif calling */
+	    loadedModules = true;
+	    /* Load the modules of the required packages first */
+	    int len = packages.size();
+	    for (int i = 0; i < len; i++) {
+		MaxPackage pkg = (MaxPackage) packages.elementAt(i);
+		pkg.loadModules(fts);
+	    }
+	    String modulePath = settings.getSetting("module-path");
+	    Enumeration modules = settings.enumerateSetting("module");
+	    if (modules != null) {
+		MaxVector arg = new MaxVector();
+		arg.addElement("load");
+		arg.addElement("module");
+		arg.addElement("");
+		arg.addElement("");
+		while (modules.hasMoreElements()) {
+		    String module = (String) modules.nextElement();
+		    arg.setElementAt(module, 2);
+		    arg.setElementAt(modulePath + File.separator + "lib" + module + ".so", 3);  // FIXME platform dependent
+		    fts.ucsCommand(arg);
+		}
+ 	    }
+	}
     }
 }
+
+
+
+
 

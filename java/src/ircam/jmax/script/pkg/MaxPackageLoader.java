@@ -30,33 +30,20 @@ import java.util.*;
 import java.io.*;
 
 /**
- *  PackageHandler
+ *  MaxPackageLoader
  * 
- *  A very primitive implementation of a package system.
+ *  The package loader is in charge of locating and loading a
+ *  package. It keeps track of what packages has been loaded.  
  */
-public class PackageHandler {
+
+public class MaxPackageLoader {
     /** All the packages that the handler knows about are stored in the
      *  packageTable */
     private Hashtable packageTable;
 
-    /** A string containing all the paths used to locate a
-     *  package. Unfortunately, the file separator and the path
-     *  separator are system dependend. */
-    // FIXME should become an application property.
-    private String itsPkgPath;
-
     /** This script is executed as a last resort after the handler
      *  failed to load a package. */
     private Script unknownScript;
-
-    boolean useDefFiles;
-
-    /** Constructs a new PackageHandler. */
-    public PackageHandler() 
-    {
-	packageTable = new Hashtable();
-	useDefFiles = (MaxApplication.getProperty("use-def-files") != null);
-    }
 
     /** Set the unknown script. */
     public void setUnknownScript(Script script) 
@@ -70,14 +57,20 @@ public class PackageHandler {
 	return unknownScript;
     }
 
+    /** Constructs a new MaxPackageLoader. */
+    public MaxPackageLoader() 
+    {
+	packageTable = new Hashtable();
+    }
+
     /** Indicate that the package has been loaded and initialized. If
      *  the package is not yet known to the handler, a new entry in
      *  the table is created. */
     public void provide(String packageName, String version) 
     {
-	Package pkg = (Package) packageTable.get(packageName);
+	MaxPackage pkg = (MaxPackage) packageTable.get(packageName);
 	if (pkg == null) {
-	    pkg = new Package(this, packageName, version);
+	    pkg = new MaxPackage(this, packageName, version);
 	    packageTable.put(packageName, pkg);
 	}
 	pkg.setLoaded(true);
@@ -87,9 +80,9 @@ public class PackageHandler {
      *  package is not marked as being loaded. */
     public void insert(String packageName, String version) 
     {
-	Package pkg = (Package) packageTable.get(packageName);
+	MaxPackage pkg = (MaxPackage) packageTable.get(packageName);
 	if (pkg == null) {
-	    pkg = new Package(this, packageName, version);
+	    pkg = new MaxPackage(this, packageName, version);
 	    packageTable.put(packageName, pkg);
 	}
     }
@@ -112,49 +105,43 @@ public class PackageHandler {
 	try {
 	    require(packageName, version);
 	} catch (Exception e) {
-	    System.out.println("Error loading package " + packageName + " : package not found");
+	    System.out.println("Error loading package " + packageName + ": package not found");
 	}
     }
 
     /** Makes sure that a package is loaded. If the package is not
      *  loaded or known the package's load script and/or the unknown
      *  script are used to load the package. */
-    public void require(String packageName, String version) throws Exception
+    public MaxPackage require(String packageName, String version) throws Exception
     {
-	Package pkg = (Package) packageTable.get(packageName);
+	MaxPackage pkg = (MaxPackage) packageTable.get(packageName);
 	File pkgPath = null;
 	try {
 		    
 	    if (pkg != null) {
 		if (pkg.isLoaded()) {
 		    pkg.requireVersion(version);
-		    return;
+		    return pkg;
 		} else {
 		    
 		    pkgPath = locatePackage(packageName);
 		    
 		    if (pkgPath != null) {
-			if (useDefFiles) 
-			    pkg.load(pkgPath, version);
-			else
-			    pkg.load(pkgPath, version, MaxApplication.getInterpreter());
-			return;
+			pkg.load(pkgPath, version);
+			return pkg;
 		    } else if (unknownScript != null) {
 			
 			unknownScript.eval(packageName, version);
 			if (pkg.isLoaded()) {
 			    /* In case the unknown script loaded the package. */
 			    pkg.requireVersion(version);
-			    return;
+			    return pkg;
 			} else {
 			    /* In case the unknown script added a new package path. */
 			    pkgPath = locatePackage(packageName);
 			    if (pkgPath != null) {
-				if (useDefFiles) 
-				    pkg.load(pkgPath, version);
-				else
-				    pkg.load(pkgPath, version, MaxApplication.getInterpreter());
-				return;
+				pkg.load(pkgPath, version);
+				return pkg;
 			    }
 			}
 		    }
@@ -164,9 +151,7 @@ public class PackageHandler {
 		insert(packageName, version);
 
 		/* And start al over again. */
-		require(packageName, version);
-		
-		return;
+		return require(packageName, version);
 	    }
 	} catch (ScriptException e)  {
 	    throw new Exception(e.getMessage());
@@ -190,23 +175,14 @@ public class PackageHandler {
 	return null;
     }
 
-    public File locatePackage(String packageName) throws FileNotFoundException {
-	if (useDefFiles) {
-	    return locatePackageNew(packageName);
-	} else {
-	    return locatePackageOld(packageName);
-	}
-    }
-
     /** Locates a package using the package path. */
-    public File locatePackageNew(String packageName) throws FileNotFoundException
-    {
+    public File locatePackage(String packageName) throws FileNotFoundException {
 	Enumeration paths;
 	File pkg;
-	paths = NewMaxApplication.enumerateProperty("pkg-path");
+	paths = MaxApplication.enumerateProperty("pkg-path");
 	pkg = locatePackage(packageName, paths);
 	if (pkg == null) {
-	    paths = NewMaxApplication.enumerateProperty("sys-pkg-path");
+	    paths = MaxApplication.enumerateProperty("sys-pkg-path");
 	    pkg = locatePackage(packageName, paths);
 	    if (pkg == null) {
 		throw new FileNotFoundException(packageName);
@@ -215,30 +191,9 @@ public class PackageHandler {
 	return pkg;
     }
 
-    /** Locates a package using the package path. */
-    public File locatePackageOld(String packageName) throws FileNotFoundException
-    {
-	if (itsPkgPath != null) {
-	    StringTokenizer st = new StringTokenizer(itsPkgPath, File.pathSeparator);
-	    while (st.hasMoreTokens()) {
-		String path = st.nextToken() + File.separator + packageName;
-		File packageDir = new File(path);
-		if (packageDir.exists()) {
-		    return packageDir;
-		}
-	    }
-	}
-	throw new FileNotFoundException(packageName);
-    }
-
-    /** Appends a path to the package path. */
-    public void appendPath(String path) 
-    {
-	if (itsPkgPath == null) {
-	    itsPkgPath = path;
-	} else {
-	    itsPkgPath += File.pathSeparator + path;
-	}
+    /** Returns the package with the given name. */
+    public MaxPackage getPackage(String name) {
+	return (MaxPackage) packageTable.get(name);
     }
 
     /** Returns an enumeration of the names of the packages known to
