@@ -105,6 +105,10 @@ SOURCE=..\c\src\demux.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\fit.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\for.c
 # End Source File
 # Begin Source File
@@ -118,6 +122,10 @@ SOURCE=..\c\src\range.c
 # Begin Source File
 
 SOURCE=..\c\src\switch.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\c\src\sync.c
 # End Source File
 # End Target
 # End Project
