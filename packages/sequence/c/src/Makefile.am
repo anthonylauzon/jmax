@@ -1,8 +1,21 @@
-# $Id: Makefile.am,v 1.11 2002/12/02 12:10:04 diemo Exp $
+# $Id: Makefile.am,v 1.12 2002/12/02 15:38:17 diemo Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.12  2002/12/02 15:38:17  diemo
+# Avoid relative paths, because they don't work when configuring in a
+# different directory, e.g.:
+#
+# $ cd buildir
+# $ ../jmax/configure
+# $ make
+#
+# Thanks to Patrice Tisserand:
+# Les paths relatifs sont à éviter, cela ne fonctionne que pour les
+# fichiers générés par configure lors que l'on compile dans un répertoire
+# différent des sources.
+#
 # Revision 1.11  2002/12/02 12:10:04  diemo
 # Fixed include scheme for internal/external headers
 # (doc in c/src/Makefile.am)
@@ -84,6 +97,7 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/packages/sequence/c/include
 
 noinst_HEADERS= \
 seqmess.h \
-seqmidi.h
+seqmidi.h \
+seqsym.h 
 
 libsequence_la_LDFLAGS= -module
