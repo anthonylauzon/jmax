@@ -30,6 +30,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.utils.Platform;
 /**
  * A <code>ConsoleArea</code> Swing component is a component for
  * fast display of text lines.
@@ -123,7 +124,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
 	}
     });
 
-    setFont( new Font( "SansSerif", Font.PLAIN, 12));
+    setFont( new Font( Platform.FONT_NAME, Font.PLAIN, 12));
   }
 
   /*

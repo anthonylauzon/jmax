@@ -35,6 +35,7 @@ import ircam.jmax.mda.*;
 import javax.swing.*;
 import javax.swing.filechooser.*; // tmp !!
 import java.awt.*;
+import ircam.jmax.editors.patcher.PatcherFontManager;
 
 /**
  * Class implementing the proxy of an FTS object.
@@ -280,6 +281,9 @@ public class FtsObject implements Serializable
     else if (name == "font")
       {
 	font = (String) value;
+
+	if(PatcherFontManager.getInstance().isToRecoverFont(font))
+	    font = PatcherFontManager.getInstance().getRecoveringFont();
       }
     else if (name == "data")
       {
