@@ -1,4 +1,2 @@
-all		all		classes
-all		all	 	lib/jacl/jacl.jar
-all		all		lib/jacl/README
-all		all		lib/jacl/license.terms
+all	all	classes
+all	all	lib

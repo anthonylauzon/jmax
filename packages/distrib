@@ -1,5 +1,6 @@
 all	all	control
 all	all	explode
+all	all	generic
 all	all	guiobj
 all	all	io
 all	all	ispw
