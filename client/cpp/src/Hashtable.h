@@ -5,7 +5,7 @@
 #ifndef _HASHTABLE_H_
 #define _HASHTABLE_H_
 
-#include <iostream.h>
+#include <iostream>
 
 namespace ircam {
 namespace fts {
@@ -39,10 +39,12 @@ namespace client {
     return k1 == k2; 
   }
 
-  static inline int equals( const char *&s1, const char *&s2)
+
+  static inline int equals(const char* s1, const char* s2)
   {
-    return std::strcmp(s1, s2) == 0; 
+    return (std::strcmp(s1, s2) == 0); 
   }
+
 
 #define FTSHASHTABLE_DEFAULT_INITIAL_CAPACITY 101
 #define FTSHASHTABLE_STANDARD_LOAD_FACTOR 0.75
@@ -72,9 +74,9 @@ namespace client {
 
     void clear();
 
-    int put( KeyT key, ValT value);
-    int get( KeyT key, ValT &value);
-    int remove( KeyT key);
+    int put( const KeyT& key, ValT value);
+    int get( const KeyT& key, ValT &value);
+    int remove( const KeyT& key);
 
     void stats( ostream &os);
 
@@ -138,7 +140,7 @@ namespace client {
     }
 
   template <class KeyT, class ValT> 
-    int Hashtable< KeyT, ValT>::get( KeyT key, ValT &value)
+    int Hashtable< KeyT, ValT>::get( const KeyT& key, ValT &value)
     {
       HashtableCell< KeyT, ValT> **c = lookupCell( key);
 
@@ -187,7 +189,7 @@ namespace client {
 
 
   template <class KeyT, class ValT>
-    int Hashtable<KeyT,ValT>::put( KeyT key, ValT value)
+    int Hashtable<KeyT,ValT>::put( const KeyT& key, ValT value)
     {
       HashtableCell< KeyT, ValT> **c = lookupCell( key);
 
@@ -207,7 +209,7 @@ namespace client {
     }
 
   template <class KeyT, class ValT>
-    int Hashtable< KeyT, ValT>::remove( KeyT key)
+    int Hashtable< KeyT, ValT>::remove( const KeyT& key)
     {
       HashtableCell< KeyT, ValT> **c = lookupCell( key);
 
