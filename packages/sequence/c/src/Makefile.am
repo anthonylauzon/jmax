@@ -24,3 +24,5 @@ seqmidi.h \
 seqsym.h \
 sequence.h \
 track.h
+
+libsequence_la_LDFLAGS= -module
