@@ -61,6 +61,10 @@ AM_PROG_LEX
 AC_PROG_YACC
 
 dnl Check for Java compiler
+CLASSPATH=
+export CLASSPATH
+AC_PROG_JAVAC
+AC_PROG_JAVA
 AC_TRY_RUN_JAVA
 dnl Check for swing
 AC_CHECK_CLASS(javax.swing.JButton)
