@@ -30,9 +30,6 @@ typedef struct
   fts_object_t _o;
 } sysinfo_t;
 
-extern fts_class_t *fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
-extern void fts_class_instantiate(fts_class_t *cl);
-
 static void
 sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
