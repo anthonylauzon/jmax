@@ -76,6 +76,8 @@ class ErmesToolButton extends JToggleButton
     this.message = message;
     this.toolBar = toolBar;
     
+    setToolTipText(description+" object");
+    
     tracker = new MediaTracker(this); 
 
     if(Cursors.get(description) == null)

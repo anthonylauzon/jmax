@@ -42,26 +42,18 @@ public class ObjectSetViewer extends JPanel {
     private static ImageIcon patcherIcon = null;
     private static ImageIcon objectIcon = null;
     private static ImageIcon errorIcon = null;
-    private static ImageIcon commentIcon = null;
-    private static ImageIcon messageIcon = null;
-    private static ImageIcon messconstIcon = null;
     private static ImageIcon inletIcon = null;
     private static ImageIcon outletIcon = null;
-    private static ImageIcon forkIcon = null;
 
     private final static Color selectedColor = new Color( 51, 153, 204);
 
     private static void loadImages()
     {
-      patcherIcon = Icons.get("_patcher_");
-      objectIcon  = Icons.get("_object_");
-      errorIcon   = Icons.get("_error_object_");
-      commentIcon = Icons.get("_comment_");
-      messageIcon = Icons.get("_message_box_");
-      messconstIcon = Icons.get("_messconst_");
-      inletIcon = Icons.get("_inlet_");
-      outletIcon = Icons.get("_outlet_");
-      forkIcon = Icons.get("_fork_");
+      patcherIcon = SystemIcons.get("_patcher_");
+      objectIcon  = SystemIcons.get("_object_");
+      errorIcon   = SystemIcons.get("_error_object_");
+      inletIcon   = SystemIcons.get("_inlet_");
+      outletIcon  = SystemIcons.get("_outlet_");
     }
 
     public ObjectCellRenderer() 
@@ -81,48 +73,40 @@ public class ObjectSetViewer extends JPanel {
 	  else
 	    setBackground( jlist.getBackground());
 
-	  if (((FtsObject) obj).isError())
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( errorIcon);
-	    }
-	  /*else if (obj instanceof FtsPatcherObject)
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( patcherIcon);
-	    }
-	  else if (obj instanceof FtsMessageObject)
-	      {
-		  setText( ((FtsMessageObject) obj).getMessage());
-		  setIcon( messageIcon);
-	      }
-	  else if (obj instanceof FtsMessConstObject)
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( messconstIcon);
-	    }
-	  else if (obj instanceof FtsInletObject)
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( inletIcon);
-	    }
-	  else if (obj instanceof FtsOutletObject)
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( outletIcon);
-	    }
-	  else if (obj instanceof FtsCommentObject)
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( commentIcon);
-	      }*/
-	  else
-	    {
-	      setText( ((FtsObject) obj).getDescription());
-	      setIcon( objectIcon);
-	    }
-	}
+	  String className = ((FtsObject)obj).getClassName();
 
+	  if (((FtsObject) obj).isError())
+	      {
+		  setText( ((FtsObject) obj).getDescription());
+		  setIcon( errorIcon);
+	      }
+	  else if (obj instanceof FtsPatcherObject)
+	      {
+		  setText( ((FtsObject) obj).getDescription());
+		  setIcon( patcherIcon);
+	      }
+	  else if (obj instanceof FtsInletObject)
+	      {
+		  setText( ((FtsObject) obj).getDescription());
+		  setIcon( inletIcon);
+	      }
+	  else if (obj instanceof FtsOutletObject)
+	      {
+		  setText( ((FtsObject) obj).getDescription());
+		  setIcon( outletIcon);
+	      }
+	  else if(ObjectCreatorManager.containsClass(className))
+	      {
+		  setText(((FtsObject) obj).getDescription());
+		  setIcon(SystemIcons.get(className));		  
+	      }
+	  else
+	      {
+		  setText( ((FtsObject) obj).getDescription());
+		  setIcon( objectIcon);
+	      }
+	}
+      
       return this;
     }
   }
@@ -154,31 +138,31 @@ public class ObjectSetViewer extends JPanel {
   }
 
   public ObjectSetViewer()
-    {
-      jList = new JList();
+  {
+    jList = new JList();
 
-      jList.setBackground( Color.white);
+    jList.setBackground( Color.white);
 
-      // Create the cell renderer
-      jList.setCellRenderer( new ObjectCellRenderer());
+    // Create the cell renderer
+    jList.setCellRenderer( new ObjectCellRenderer());
 
-      jList.addMouseListener(new ObjectSetViewerMouseListener());
- 
-      JScrollPane scrollPane = new JScrollPane();
-      scrollPane.getViewport().setView( jList);
+    jList.addMouseListener(new ObjectSetViewerMouseListener());
+    
+    JScrollPane scrollPane = new JScrollPane();
+    scrollPane.getViewport().setView( jList);
 
-      scrollPane.setAlignmentX( LEFT_ALIGNMENT);
-      scrollPane.setAlignmentY( TOP_ALIGNMENT);
+    scrollPane.setAlignmentX( LEFT_ALIGNMENT);
+    scrollPane.setAlignmentY( TOP_ALIGNMENT);
 
-      setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
-
-      add( scrollPane);
-    }
+    setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
+    
+    add( scrollPane);
+  }
 
   public void setModel( ListModel model)
   {
-    jList.setModel( model);
-    repaint();  // sometimes, it seems that setModel() does not force a refresh ???
+      jList.setModel( model);
+      repaint();  // sometimes, it seems that setModel() does not force a refresh ???
   }
 
   public void setObjectSelectedListener(ObjectSelectedListener objectSelectedListener)
@@ -189,6 +173,7 @@ public class ObjectSetViewer extends JPanel {
   protected JList jList;
   private ObjectSelectedListener objectSelectedListener;
 }
+
 
 
 

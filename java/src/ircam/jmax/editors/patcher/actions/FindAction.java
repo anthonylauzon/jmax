@@ -51,7 +51,7 @@ public class FindAction extends EditorAction
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    { 
-	      FindPanel.open(container.getEditor().getFts()).findFriends(object.getFtsObject());
+		FindPanel.open(container.getEditor().getFts()).findFriends(object.getFtsObject());
 	    }});
       }
     else

@@ -37,6 +37,6 @@ public class FtsForkObject extends FtsObject
 {
     public FtsForkObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
     {
-	super(fts, parent, null, "fork", "");
+	super(fts, parent, null, className, className);
     }
 }

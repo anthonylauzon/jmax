@@ -49,7 +49,7 @@ public class FtsCommentObject extends FtsObject
    */
     public FtsCommentObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
     {
-	super(fts, parent, null, "jcomment", "");
+	super(fts, parent, null, className, "");
 
 	ninlets = 0;
 	noutlets = 0;

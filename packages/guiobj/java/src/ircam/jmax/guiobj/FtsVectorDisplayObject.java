@@ -49,7 +49,7 @@ public class FtsVectorDisplayObject extends FtsObject
 
   public FtsVectorDisplayObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
   {
-    super(fts, parent, null, className, "");
+    super(fts, parent, null, className, className);
     
     ninlets = 1;
     noutlets = 0;

@@ -173,10 +173,13 @@ public class FindPanel extends JFrame
   public void findFriends(FtsObject object)
   {
     Cursor temp = getCursor();
-
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     textField.setText("");
-    set.findFriends( object);
+
+    //waiting for a bug fix (findfriends doasen't work
+    set.find(fts.getRootObject(), object.getClassName());
+    //set.findFriends( object);
+
     setCursor(temp);
   }
 

@@ -106,9 +106,6 @@ public class PatcherClipboardManager implements ClipboardOwner
   public void Copy(EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
-
-    DataFlavor[] flavor = ErmesSelection.patcherSelection.getTransferDataFlavors();
-
     if (sketch.canCopyText())
       {
 	sketch.copyText();
@@ -140,7 +137,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 
     if (sketch.isLocked())
       sketch.setLocked(false);
-    
+
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
 
     if (clipboardContent == null)

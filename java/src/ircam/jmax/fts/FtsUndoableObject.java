@@ -101,3 +101,7 @@ public class FtsUndoableObject extends FtsObject implements UndoableData{
 
   boolean inGroup = false;
 }
+
+
+
+

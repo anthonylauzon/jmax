@@ -64,6 +64,10 @@ public class ObjectCreatorManager
   {
       return creatorManager.classNamesVector.elements();
   }  
+  static public boolean containsClass(String className)
+  {
+      return  creatorManager.ftsClasses.containsKey(className);
+  } 
 
   private Hashtable ftsClasses     = new Hashtable();
   private Hashtable graphicClasses = new Hashtable();
