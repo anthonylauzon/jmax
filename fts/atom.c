@@ -108,11 +108,11 @@ static int
 fts_atom_compare_classes (const fts_atom_t *a, const fts_atom_t *b)
 {
     if (fts_is_number(a)  &&  fts_is_number(b))
-	/* special case: numbers are comparable */
-	return 1;
-    else		
-	/* return arbitrary class distance (is type_id better?) */
-	return ((int) fts_get_class(a) - (int) fts_get_class(b));
+        /* special case: numbers are comparable -> distance zero */
+        return 0;
+    else                
+        /* return arbitrary class distance (is typeid better?) */
+        return (int) fts_get_class(a) - (int) fts_get_class(b);
 }
 
 
@@ -122,32 +122,32 @@ fts_atom_compare (const fts_atom_t *a, const fts_atom_t *b)
     int res = fts_atom_compare_classes(a, b);
 
     if (res != 0)
-	/* return arbitrary class distance */
-	return res;
-    else
-    {    /* comparable classes */
-	switch (fts_class_get_typeid(fts_get_class(a))) 
-	{
-	case FTS_TYPEID_VOID:
-	    return (1);
+        /* different classes, return arbitrary class distance */
+        return res;
 
-	case FTS_TYPEID_INT:
-	case FTS_TYPEID_FLOAT:
-	    return (fts_get_number_float(a) - fts_get_number_float(b));
+    /* comparable classes */
+    switch (fts_class_get_typeid(fts_get_class(a))) 
+    {
+    case FTS_TYPEID_VOID:
+        return 0;             /* two voids are always equal */
 
-	case FTS_TYPEID_SYMBOL:
-	    return (strcmp(fts_symbol_name(fts_get_symbol(a)),
-			   fts_symbol_name(fts_get_symbol(b))));
+    case FTS_TYPEID_INT:
+    case FTS_TYPEID_FLOAT:
+        return signbit(fts_get_number_float(a) - fts_get_number_float(b))
+               ?  1  :  -1;   /* returns 1 on equal, but who cares? */
 
-	case FTS_TYPEID_POINTER:
-	    return ((char *) fts_get_pointer(a) - (char *) fts_get_pointer(b));
+    case FTS_TYPEID_SYMBOL:
+        return strcmp(fts_symbol_name(fts_get_symbol(a)),
+                      fts_symbol_name(fts_get_symbol(b)));
 
-	case FTS_TYPEID_STRING :
-	    return (strcmp(fts_get_string(a), fts_get_string(b)));
+    case FTS_TYPEID_STRING :
+        return strcmp(fts_get_string(a), fts_get_string(b));
 
-	default:	/* TODO: call object comparison function */
-	    return fts_get_object(a) - fts_get_object(b);
-	}
+    case FTS_TYPEID_POINTER:
+        return (int) fts_get_pointer(a) - (int) fts_get_pointer(b);
+
+    default:    /* TODO: call object comparison function */
+        return (int) fts_get_object(a) - (int) fts_get_object(b);
     }
 }
 
