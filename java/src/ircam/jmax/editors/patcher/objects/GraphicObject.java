@@ -1259,4 +1259,31 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     return "GraphicObject<" + ftsObject.toString() + ">";
   }
+
+  /************** Undo/Redo *******************/
+  int ux, uy, uw, uh;
+  int rx, ry, rw, rh;
+
+  public void setUndo()
+  {
+    ux = getX(); uy = getY(); uw = getWidth(); uh = getHeight();
+  }
+  public void setRedo()
+  {
+    rx = getX(); ry = getY(); rw = getWidth(); rh = getHeight();
+  }
+  public void undo()
+  {
+    setX( ux); 
+    setY( uy); 
+    setWidth( uw); 
+    setHeight( uh); 
+  }
+  public void redo()
+  {
+    setX( rx); 
+    setY( ry); 
+    setWidth( rw); 
+    setHeight( rh);
+  }
 }

@@ -261,6 +261,24 @@ public class DisplayList
 	}
   }
 
+  public Enumeration getConnectionsFor( GraphicObject obj)
+  {
+    Object[] values = displayObjects.getObjectArray();
+    int size = displayObjects.size();
+    Vector connections = new Vector();
+
+    for ( int i = 0; i < size; i++)
+      if (values[i] instanceof GraphicConnection)
+	{
+	  GraphicConnection connection = (GraphicConnection) values[i];
+
+	  if ((connection.getSourceObject() == obj) || 
+	      (connection.getDestObject() == obj))
+	    connections.addElement( connection);
+	}
+    return connections.elements();
+  }
+
   public void updateConnectionsFor(GraphicObject obj)
   {
     Object[] values = displayObjects.getObjectArray();

@@ -49,14 +49,8 @@ class MoveInteraction extends Interaction
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack) && Squeack.onObject(squeack))
-      {
+      {	
 	object = (GraphicObject) area.getTarget();
-	//**********************
-	// "to front" feature removed in order to make faster mouseclick objects selection 
-	//**********************
-	//editor.getDisplayList().objectToFront(object);
-	//object.redraw();
-	//object.redrawConnections();
 
 	if (! object.isSelected())
 	  {
@@ -65,17 +59,18 @@ class MoveInteraction extends Interaction
 		ErmesSelection.patcherSelection.redraw();
 		ErmesSelection.patcherSelection.deselectAll();
 	      }
-
 	    ErmesSelection.patcherSelection.select(object);
-	    object.redraw();
+	    object.redraw();	    
 	  }
+
+	editor.setUndo( "Move", false);
 
 	editor.setCursor(Cursor.getDefaultCursor());
       }
     else if (Squeack.isDrag(squeack))
       {
-	  ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
-	  editor.fixSize(); 
+	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);
+	editor.fixSize(); 
       }
     else if (Squeack.isUp(squeack))
       {

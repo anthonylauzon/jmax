@@ -25,7 +25,11 @@
 
 package ircam.jmax.editors.patcher.objects;
 
-import javax.swing.*;
+//import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;

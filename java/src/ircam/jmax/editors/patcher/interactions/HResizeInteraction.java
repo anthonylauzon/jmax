@@ -57,14 +57,20 @@ class HResizeInteraction extends Interaction
 
 	if((!object.isSelected())||
 	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton())))
+	  {  
 	    object.resizing(true);
+	    editor.setUndo( "Resize", object, false);
+	  }
 	else
+	  {
 	    if(ErmesSelection.patcherSelection.ownedBy(editor))
-		ErmesSelection.patcherSelection.apply(new ObjectAction() {
-			public void processObject(GraphicObject obj)
-			{
-			    obj.resizing(true);
-			}});
+	      ErmesSelection.patcherSelection.apply(new ObjectAction() {
+		  public void processObject(GraphicObject obj)
+		  {
+		    obj.resizing(true);
+		  }});
+	    editor.setUndo( "Resize", false);
+	  }
       }
     else if (Squeack.isDrag(squeack))
       {	  

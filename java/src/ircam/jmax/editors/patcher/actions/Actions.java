@@ -27,6 +27,7 @@ package ircam.jmax.editors.patcher.actions;
 
 import java.awt.event.*;
 
+import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
@@ -120,6 +121,18 @@ public class Actions
       public void doAction(EditorContainer container)
       {
 	ObjectPopUp.getPopUpTarget().inspect();
+      }
+    };
+  public static EditorAction undoAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((ErmesSketchPad)container.getEditor()).undo();
+      }
+    };
+  public static EditorAction redoAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((ErmesSketchPad)container.getEditor()).redo();
       }
     };
 }

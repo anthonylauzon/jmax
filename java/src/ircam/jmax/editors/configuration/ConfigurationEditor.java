@@ -25,18 +25,8 @@
 
 package ircam.jmax.editors.configuration;
 
-// import javax.swing.*;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
-import javax.swing.WindowConstants;
-
-// import javax.swing.table.*;
+import javax.swing.*;
+import javax.swing.table.*;
 
 import java.util.*;
 import java.awt.*;

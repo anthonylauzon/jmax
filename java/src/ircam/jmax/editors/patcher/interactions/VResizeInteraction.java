@@ -55,16 +55,23 @@ class VResizeInteraction extends Interaction
       {
 	object = (GraphicObject) area.getTarget();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
+
+	if((!object.isSelected())||
+	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton())))
+	  editor.setUndo( "Resize", object, false);
+	else
+	  editor.setUndo( "Resize", false);
       }
     else if (Squeack.isDrag(squeack))
       {
 	if((!object.isSelected())||
 	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton()))){
+	  
 	  object.redraw();
 	  object.redrawConnections();
 	  object.setHeight(mouse.y - object.getY());
 	  object.redraw();
-	  object.redrawConnections();
+	  object.redrawConnections();	  
 	}
 	else{
 	  if (ErmesSelection.patcherSelection.ownedBy(editor))

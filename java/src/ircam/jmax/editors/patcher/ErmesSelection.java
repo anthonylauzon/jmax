@@ -52,11 +52,11 @@ public class ErmesSelection implements Transferable
   private MaxVector connections = new MaxVector();
   private ErmesSketchPad owner;
 
-  private FtsSelection ftsSelection;
+  FtsSelection ftsSelection;
 
   public static FtsSelection getFtsSelection()
   {
-      return patcherSelection.ftsSelection;
+    return patcherSelection.ftsSelection;
   }
 
   public static DataFlavor patcherSelectionFlavor = new DataFlavor(ircam.jmax.fts.FtsSelection.class, "PatcherSelection");
@@ -85,16 +85,21 @@ public class ErmesSelection implements Transferable
     flavors[0] = patcherSelectionFlavor;
   
     try
-	{
-	    ftsSelection = new FtsSelection();
-	}
+      {
+	ftsSelection = new FtsSelection();
+      }
     catch(IOException e)
-	{
-	    System.err.println("[ErmesSelection]: Error in FtsSelection creation!");
-	    e.printStackTrace();
-	}
+      {
+	System.err.println("[ErmesSelection]: Error in FtsSelection creation!");
+	e.printStackTrace();
+      }
   }
 
+  public void select( DisplayObject object)
+  {
+    if( object instanceof GraphicConnection) select( (GraphicConnection)object);
+    else select( (GraphicObject)object);
+  }
 
   public void select( GraphicObject object) 
   {
@@ -119,6 +124,32 @@ public class ErmesSelection implements Transferable
 	connections.addElement( connection);
 	ftsSelection.add( connection.getFtsConnection());
 	connection.setSelected(true);
+      }
+  }
+
+  public void add( DisplayObject object)
+  {
+    if( object instanceof GraphicConnection)
+      add( (GraphicConnection)object);
+    else
+      add( (GraphicObject)object);
+  }
+
+  public void add( GraphicObject object)
+  {
+    if (! objects.contains( object))
+      {
+	objects.addElement( object);
+	ftsSelection.add( object.getFtsObject());
+      }
+  }
+
+  public void add( GraphicConnection connection)
+  {
+    if (! connections.contains( connection))
+      {
+	connections.addElement( connection);
+	ftsSelection.add( connection.getFtsConnection());
       }
   }
 
@@ -167,6 +198,16 @@ public class ErmesSelection implements Transferable
   {
     return objects.elements();
   }
+  public Enumeration getSelectedConnections()
+  {
+    return connections.elements();
+  }
+
+  public int getSelectedObjectsSize()
+  {
+    return objects.size();
+  }
+  
   public void deselectAll() 
   {
     for (Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
@@ -229,7 +270,7 @@ public class ErmesSelection implements Transferable
 	    owner.redraw();
 	  }
       }
-
+    
     this.owner = owner;
   }
 
@@ -247,6 +288,8 @@ public class ErmesSelection implements Transferable
 
   public void deleteAll()
   {
+    getOwner().setUndo( "Remove", true);
+
     if( connections.size() > 0)
       {
 	for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
@@ -314,6 +357,8 @@ public class ErmesSelection implements Transferable
 
   public void resizeToMaxWidth()
   {
+    getOwner().setUndo( "Resize", false);
+
     int max = 0;
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
@@ -336,6 +381,8 @@ public class ErmesSelection implements Transferable
 
   public void resizeToMaxHeight()
   {
+    getOwner().setUndo( "Resize", false);
+
     int max = 0;
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
@@ -359,6 +406,8 @@ public class ErmesSelection implements Transferable
 
   public void alignTop()
   {
+    getOwner().setUndo( "Align", false);
+
     int value = minY();
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
@@ -375,6 +424,8 @@ public class ErmesSelection implements Transferable
 
   public void alignBottom()
   {
+    getOwner().setUndo( "Align", false);
+
     int value = maxY();
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
@@ -391,6 +442,8 @@ public class ErmesSelection implements Transferable
 
   public void alignLeft()
   {
+    getOwner().setUndo( "Align", false);
+
     int value = minX();
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
@@ -407,6 +460,8 @@ public class ErmesSelection implements Transferable
 
   public void alignRight()
   {
+    getOwner().setUndo( "Align", false);
+
     int value = maxX();
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )

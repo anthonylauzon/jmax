@@ -59,8 +59,7 @@ public class MouseTracker extends InteractionModule {
   }
 
   //------------- fields
-  PositionListener itsListener;
-
+  public PositionListener itsListener;
 }
 
 

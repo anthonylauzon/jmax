@@ -34,8 +34,9 @@ import java.awt.AWTEvent;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
+import java.awt.datatransfer.*;
 
-// import javax.swing.*; 
+//import javax.swing.*; 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
@@ -56,7 +57,7 @@ import ircam.jmax.toolkit.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JComponent implements  Editor, Printable, FtsUpdateGroupListener
+public class ErmesSketchPad extends JComponent implements  Editor, Printable, FtsUpdateGroupListener, ClipboardOwner
 {
   public static FtsUpdateGroup updateGroup;
   static
@@ -264,6 +265,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void addPastedObject(GraphicObject obj)
   {
     pastedObjects.addElement( obj);
+    if( undoing) addUndoRedoObject( obj);
   }
 
   public void addPastedConnection(GraphicConnection c)
@@ -305,6 +307,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void endPaste()
   {
     pasting = false;
+    undoing = false;
 
     ErmesSelection.patcherSelection.deselectAll();
     for(Enumeration e = pastedObjects.elements(); e.hasMoreElements();)
@@ -354,9 +357,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
     itsPatcher      = thePatcher;
 
-    // Initialize state
-    //itsPatcher.setPatcherListener(new ErmesPatcherListener(this));
-
     // Get the defaultFontName and Size
     defaultFontName = JMaxApplication.getProperty("jmaxDefaultFont");
 
@@ -395,6 +395,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     requestDefaultFocus(); 
 
     updateGroup.add( this);
+
+    initUndoStuff();
   }
   
   private float sx, sy;
@@ -1082,6 +1084,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   boolean fromToolbar = false;
   public void makeAddModeObject(int x, int y, boolean edit)
   {
+    resetUndoRedo();
+
     multiAdd = !edit;
     fromToolbar = true;
     itsPatcher.requestAddObject(newObjectDescription, x, y, edit);
@@ -1284,6 +1288,182 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void setDirty(boolean dirty)
   {
     getToolBar().setDirty(dirty);
+  }
+
+  
+  // -----------------------------------------------------------------
+  // Undo/Redo
+  // -----------------------------------------------------------------
+  Vector undoObjects;
+  boolean canUndo = false;
+  boolean canRedo = false;
+  boolean undoing = false;
+  boolean isRemoveUndo = false;
+  FtsClipboard ftsUndoClipboard;
+  ErmesSelection removeSelection;
+  String undoType = "";
+
+  void initUndoStuff()
+  {
+    removeSelection = new ErmesSelection();
+    undoObjects = new Vector();
+
+    try
+      {
+	ftsUndoClipboard = new FtsClipboard();	
+      }
+    catch(IOException e)
+      {
+	System.err.println("[ErmesSketchPad]: Error in FtsClipboard creation!");
+	e.printStackTrace();
+      }
+  }
+
+  public void setUndo( String type, boolean remove)
+  {
+    isRemoveUndo = remove;
+    undoType = type;
+
+    if( !remove)
+      {
+	undoObjects.removeAllElements();
+	for( Enumeration e = ErmesSelection.patcherSelection.getSelectedObjects(); e.hasMoreElements(); )
+	  addUndoRedoObject( (GraphicObject)e.nextElement());
+  
+	canUndo = (undoObjects.size() > 0);
+      }	
+    else
+      {
+	removeSelection.deselectAll();
+	for( Enumeration e = ErmesSelection.patcherSelection.getSelectedObjects(); e.hasMoreElements(); )
+	  addUndoRedoObject( (GraphicObject)e.nextElement());
+	
+	if( removeSelection.getSelectedObjectsSize() > 0)
+	  {
+	    ftsUndoClipboard.copy( removeSelection.getFtsSelection());
+	    canUndo = true;
+	  }
+	else canUndo = false;	  
+      }
+    canRedo = false;
+  }
+
+  public void setUndo( String type, GraphicObject obj, boolean remove)
+  {
+    isRemoveUndo = remove;
+    undoType = type;
+
+    if( !remove)
+      {
+	undoObjects.removeAllElements();
+	addUndoRedoObject( obj);
+	canUndo = true;
+      }	
+    else
+      {
+	removeSelection.deselectAll();
+	addUndoRedoObject( obj);	
+	ftsUndoClipboard.copy( removeSelection.getFtsSelection());
+	canUndo = true;
+      }
+    canRedo = false;
+  }
+
+  public void setRedo()
+  {
+    canRedo = true;
+    canUndo = false;
+
+    if( !isRemoveUndo)
+      for( Enumeration e = undoObjects.elements(); e.hasMoreElements();)
+	((GraphicObject)e.nextElement()).setRedo();
+  }
+
+  void addUndoRedoObject( GraphicObject obj)
+  {
+    if( isRemoveUndo)
+      {
+	removeSelection.add( obj);
+	// select all connections for this obj
+	for( Enumeration e = displayList.getConnectionsFor( obj); e.hasMoreElements();)
+	  removeSelection.add( (GraphicConnection)e.nextElement());
+      }
+    else
+      if( !undoObjects.contains( obj))
+	{
+	  obj.setUndo();
+	  undoObjects.addElement( obj);
+	}
+   }
+
+  public void undo()
+  {
+    setRedo();
+
+    undoing = true;
+    
+    if( isRemoveUndo)
+      getFtsPatcher().requestPaste( ftsUndoClipboard, 0, 0);
+    else
+      {
+	for( Enumeration e = undoObjects.elements(); e.hasMoreElements();)
+	  ((GraphicObject)e.nextElement()).undo();
+	
+	redraw();
+      }
+  }
+
+  public void redo()
+  {
+    if( isRemoveUndo)
+      {
+	if( removeSelection.getSelectedObjectsSize() > 0)
+	  {
+	    getFtsPatcher().requestDeleteObjects( removeSelection.getSelectedObjects());	
+	    for ( Enumeration e = removeSelection.getSelectedObjects(); e.hasMoreElements(); ) 
+	      ((DisplayObject) e.nextElement()).delete();
+	    removeSelection.deselectAll();
+	    getDisplayList().reassignLayers();
+	  }
+      }
+    else
+      for( Enumeration e = undoObjects.elements(); e.hasMoreElements();)
+	((GraphicObject)e.nextElement()).redo();
+
+    redraw();
+
+    canRedo = false;
+    canUndo = true;
+  }
+
+  public void resetUndoRedo()
+  {
+    removeSelection.deselectAll();
+    undoObjects.removeAllElements();
+    canRedo = false;
+    canUndo = false;
+    undoing = false;
+    undoType = "";
+  }
+
+  public boolean canUndo()
+  {
+    return canUndo;
+  }  
+
+  public boolean canRedo()
+  {
+    return canRedo;
+  } 
+
+  public String getUndoType()
+  {
+    return undoType;
+  }
+
+  /* ClipboardOwner interface */
+  public void lostOwnership( Clipboard c, Transferable t)
+  {
   }
 }
 

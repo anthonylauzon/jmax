@@ -27,7 +27,10 @@ package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
+
+//import javax.swing.*;
+import javax.swing.JSeparator;
+
 import java.util.*;
 
 import java.awt.image.*;

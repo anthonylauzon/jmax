@@ -60,6 +60,8 @@ public class EditMenu extends EditorMenu
   AlignMenu alignMenu;
   JMenuItem toFrontMenuItem;
   JMenuItem toBackMenuItem;
+  JMenuItem undoItem;
+  JMenuItem redoItem;
 
   public EditMenu(ErmesSketchPad sketch)
   {
@@ -73,6 +75,11 @@ public class EditMenu extends EditorMenu
     copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
     pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
     duplicateItem = add(Actions.duplicateAction, "Duplicate", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_D);
+
+    addSeparator();
+
+    undoItem = add( Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_U);
+    redoItem = add( Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_R);
 
     addSeparator();
 
@@ -181,6 +188,11 @@ public class EditMenu extends EditorMenu
 
 	selectAllItem.setEnabled(true);	
       }
+    
+    undoItem.setText("Undo "+sketch.getUndoType());
+    undoItem.setEnabled(  sketch.canUndo());	
+    redoItem.setText("Redo "+sketch.getUndoType());
+    redoItem.setEnabled( sketch.canRedo());
   }
 }
 

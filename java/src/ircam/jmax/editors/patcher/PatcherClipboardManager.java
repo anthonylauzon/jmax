@@ -60,15 +60,15 @@ public class PatcherClipboardManager implements ClipboardOwner
 
   public PatcherClipboardManager() 
   {
-      try
-	  {
-	    ftsClipboard = new FtsClipboard();
-	  }
-      catch(IOException e)
-	  {
-	      System.err.println("[PatcherClipboardManager]: Error in FtsClipboard creation!");
-	      e.printStackTrace();
-	  }
+    try
+      {
+	ftsClipboard = new FtsClipboard();
+      }
+    catch(IOException e)
+      {
+	System.err.println("[PatcherClipboardManager]: Error in FtsClipboard creation!");
+	e.printStackTrace();
+      }
   }
   
   public static void createManager() {

@@ -28,7 +28,6 @@ package ircam.jmax.editors.patcher.objects;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -73,7 +72,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
 	itsSketchPad.waiting();
 
 	if(ftsObject instanceof FtsPatcherObject)
-	   ((FtsPatcherObject)ftsObject).requestSubPatcherUpload();
+	  ((FtsPatcherObject)ftsObject).requestSubPatcherUpload();
 	else
 	  ((FtsObjectWithEditor)ftsObject).requestOpenEditor();
 

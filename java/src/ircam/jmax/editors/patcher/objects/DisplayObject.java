@@ -42,4 +42,5 @@ public interface DisplayObject
   abstract public void updatePaint(Graphics g);
   //  abstract public void redraw();
   abstract public boolean intersects(Rectangle r);
+  abstract public void delete();
 }
