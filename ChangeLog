@@ -1,5 +1,13 @@
 2003-10-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* bin/jmax.in: added check_java function for java checking.
+	  !! NOT TESTED ON MAC OS X !!
+	  - check_java: check if jMax could found a jvm which version at least REQUIRED_VERSION (currently 1.4.0).
+	  If no a such jvm is found, an error message is printed in terminal (if running in a terminal) and 
+	  with kdialog (if running KDE) or gdialog (if running GNOME) or dialog.
+	  We need to do this to provide a more informative message to user which install binary distribution of jMax.
+	  !! NOT TESTED ON MAC OS X !!
+	
 	* utils/m4/jmax.m4: fixed checking of jMax version in AC_CHECK_JMAX_VERSION.
 
 	* utils/rpm/jmax.spec.in: added stuff for AGNULA/RehMuDi rpm building.
