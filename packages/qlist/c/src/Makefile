@@ -29,7 +29,7 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libqlist.a $(LIBDIR)/libqlist.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libqlist.a $(LIBDIR)/libqlist.so
 
 $(LIBDIR)/libqlist.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libqlist.a $(OBJECTS)

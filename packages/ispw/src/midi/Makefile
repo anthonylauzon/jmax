@@ -29,7 +29,7 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libmidi.a $(LIBDIR)/libmidi.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libmidi.a $(LIBDIR)/libmidi.so
 
 $(LIBDIR)/libmidi.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libmidi.a $(OBJECTS)

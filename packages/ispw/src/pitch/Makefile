@@ -31,7 +31,7 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libpitch.a $(LIBDIR)/libpitch.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libpitch.a $(LIBDIR)/libpitch.so
 
 $(LIBDIR)/libpitch.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libpitch.a $(OBJECTS)

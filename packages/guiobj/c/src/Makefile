@@ -29,7 +29,7 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
 
 $(LIBDIR)/libguiobj.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libguiobj.a $(OBJECTS)

@@ -24,7 +24,7 @@ MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 #MORESOLIBS=$(PACKAGEROOT)/../../data/c/lib/$(ARCH)/$(MODE)/libdata.so
 MORESOLIBS=
 
-all: $(LIBDIR)/libmess.a $(LIBDIR)/libmess.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libmess.a $(LIBDIR)/libmess.so
 
 $(LIBDIR)/libmess.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libmess.a $(OBJECTS)

@@ -34,7 +34,7 @@ include Sources
 MODULE_CFLAGS= -I$(JMAXROOTDIR)/lib/protocol/c/src
 MORESOLIBS=$(JMAXROOTDIR)/lib/protocol/c/lib/$(ARCH)/libProtocol.a
 
-all: $(LIBDIR)/libio.a $(LIBDIR)/libio.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libio.a $(LIBDIR)/libio.so
 
 $(LIBDIR)/libio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libio.a $(OBJECTS)

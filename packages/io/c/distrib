@@ -1,3 +1,9 @@
-all	all	Makefile
-all	all	lib
-all	all	src
+all	all		Makefile
+all	sgi		lib/irix63r10k/opt/libio.so
+all	sgi		lib/irix63r5k/opt/libio.so
+all	sgi		lib/irix65r10k/opt/libio.so
+all	sgi		lib/irix65r4k/opt/libio.so
+all	sgi		lib/irix65r5k/opt/libio.so
+all	linuxpc		lib/linuxpc/opt/libio.so
+all	linuxppc	lib/linuxppc/opt/libio.so
+all	all		src

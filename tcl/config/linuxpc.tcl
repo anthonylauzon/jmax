@@ -31,8 +31,14 @@ defineDevice analogOut { oss_dac } "OSS audio out"
 defineDevice stereoIn  { oss_adc } "OSS audio in"
 defineDevice stereoIn1 { oss_adc } "OSS audio in"
 
+# This is kept for compatibility, but ADAT configurations must use adatIn/Out
 defineDevice studioOutA { oss_dac device /dev/dsp1 channels 8 } "StudI/O output ADAT port A"
 defineDevice studioInA { oss_adc device /dev/dsp11 channels 2 } "StudI/O input ADAT port A"
+
+# ADAT devices
+defineDevice adatOut  { oss_dac device /dev/dsp1 channels 8 } "StudI/O output ADAT port A"
+# Is "channels 2" correct ? Shouldn't it be 8 ?
+defineDevice adatIn { oss_adc device /dev/dsp11 channels 2 } "StudI/O input ADAT port A"
 
 defineDevice stereoOut  { oss_dac } "OSS audio out"
 defineDevice stereoOut1 { oss_dac } "OSS audio out"

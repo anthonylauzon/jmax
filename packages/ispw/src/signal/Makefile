@@ -29,7 +29,7 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libsignal.a $(LIBDIR)/libsignal.so
 
 $(LIBDIR)/libsignal.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libsignal.a $(OBJECTS)

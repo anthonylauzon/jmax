@@ -29,8 +29,7 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-
-all: $(LIBDIR)/libdebug.a $(LIBDIR)/libdebug.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libdebug.a $(LIBDIR)/libdebug.so
 
 $(LIBDIR)/libdebug.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libdebug.a $(OBJECTS)

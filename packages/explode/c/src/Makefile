@@ -29,7 +29,7 @@ PACKAGEROOT = ..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libexplode.a $(LIBDIR)/libexplode.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libexplode.a $(LIBDIR)/libexplode.so
 
 $(LIBDIR)/libexplode.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libexplode.a $(OBJECTS)

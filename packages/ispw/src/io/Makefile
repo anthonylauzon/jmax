@@ -33,7 +33,7 @@ ifeq ($(ARCH), solaris2)
 MORESOLIBS=/opt/LOCAL/sol/lib/libST.so /usr/demo/SOUND/lib/libaudio.a
 endif
 
-all: $(LIBDIR)/libio.a $(LIBDIR)/libio.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libio.a $(LIBDIR)/libio.so
 
 $(LIBDIR)/libio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libio.a $(OBJECTS)

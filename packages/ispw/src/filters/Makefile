@@ -29,7 +29,7 @@ PACKAGEROOT = ../..
 include $(DISTDIR)/Makefiles/Makefile.lib
 include Sources
 
-all: $(LIBDIR)/libfilters.a $(LIBDIR)/libfilters.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libfilters.a $(LIBDIR)/libfilters.so
 
 $(LIBDIR)/libfilters.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libfilters.a $(OBJECTS)

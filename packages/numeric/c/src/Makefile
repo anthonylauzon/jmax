@@ -36,7 +36,7 @@ MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 #MORESOLIBS=$(PACKAGEROOT)/../../data/c/lib/$(ARCH)/$(MODE)/libdata.so
 MORESOLIBS=
 
-all: $(LIBDIR)/libnumeric.a $(LIBDIR)/libnumeric.so
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libnumeric.a $(LIBDIR)/libnumeric.so
 
 $(LIBDIR)/libnumeric.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libnumeric.a $(OBJECTS)
