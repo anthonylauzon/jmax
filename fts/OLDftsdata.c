@@ -439,7 +439,7 @@ fts_data_t *fts_data_id_get( int id)
 void fts_kernel_oldftsdata_init()
 {
   fts_hashtable_init(&fts_data_class_table, 0, FTS_HASHTABLE_MEDIUM);
-  meta_data_init();
   fts_data_init_table();
+  meta_data_init();
 }
 

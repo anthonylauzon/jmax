@@ -52,7 +52,7 @@ noise_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
 
   fts_set_symbol (argv,   fts_dsp_get_output_name(dsp, 0));
-  fts_set_long   (argv+1, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int   (argv+1, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(noise_dsp_symbol, 2, argv);
 }
 

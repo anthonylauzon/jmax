@@ -185,7 +185,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 	      fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
 	      fts_set_ptr(argv + 1, buf);
 	      fts_set_ftl_data(argv + 2, this->vd_data);
-	      fts_set_long(argv + 3, n_tick);
+	      fts_set_int(argv + 3, n_tick);
 	      dsp_add_funcall(vd_inplace_dsp_symbol, 4, argv);
 	    }
 	  else
@@ -196,7 +196,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 	      fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	      fts_set_ptr(argv + 2, buf);
 	      fts_set_ftl_data(argv + 3, this->vd_data);
-	      fts_set_long(argv + 4, n_tick);
+	      fts_set_int(argv + 4, n_tick);
 	      dsp_add_funcall(vd_dsp_symbol, 5, argv);
 	    }
 	}
@@ -208,7 +208,7 @@ vd_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 	  fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
 	  fts_set_ptr(argv + 2, buf);
 	  fts_set_ftl_data(argv + 3, this->vd_data);
-	  fts_set_long(argv + 4, n_tick);
+	  fts_set_int(argv + 4, n_tick);
 	  fts_set_float(argv + 5, this->millers_fix_del * (float)n_tick); /* write tick size (hopefully) */
 	  dsp_add_funcall(vd_miller_dsp_symbol, 6, argv);
 	}

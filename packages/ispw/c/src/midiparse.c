@@ -84,8 +84,8 @@ midiparse_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else
 	{
 	  fts_outlet_int((fts_object_t *)this, 6, 1 + (this->status & 0xF));
-	  fts_set_long(av + 0, this->byte1);
-	  fts_set_long(av + 1, byte & 0x7F);
+	  fts_set_int(av + 0, this->byte1);
+	  fts_set_int(av + 1, byte & 0x7F);
 	  fts_outlet_send((fts_object_t *)this, 2, fts_s_list, 2, av);
 	  this->byte1 = 0;
 	}
@@ -97,8 +97,8 @@ midiparse_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else
 	{
 	  fts_outlet_int((fts_object_t *)this, 6, 1 + (this->status & 0xF));
-	  fts_set_long(av + 0, this->byte1);
-	  fts_set_long(av + 1, byte & 0x7F);
+	  fts_set_int(av + 0, this->byte1);
+	  fts_set_int(av + 1, byte & 0x7F);
 	  fts_outlet_send((fts_object_t *)this, 1, fts_s_list, 2, av);
 	  this->byte1 = 0;
 	}
@@ -126,8 +126,8 @@ midiparse_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else
 	{
 	  fts_outlet_int((fts_object_t *)this, 6, 1 + (this->status & 0xF));
-	  fts_set_long(av + 0, this->byte1);
-	  fts_set_long(av + 1, byte & 0x7F);
+	  fts_set_int(av + 0, this->byte1);
+	  fts_set_int(av + 1, byte & 0x7F);
 	  fts_outlet_send((fts_object_t *)this, 0, fts_s_list, 2, av);
 	  this->byte1 = 0;
 	}
@@ -144,8 +144,8 @@ midiparse_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else
 	{
 	  fts_outlet_int((fts_object_t *)this, 6, 1 + (this->status & 0xF));
-	  fts_set_long(av + 0, this->byte1);
-	  fts_set_long(av + 1, 0L);
+	  fts_set_int(av + 0, this->byte1);
+	  fts_set_int(av + 1, 0L);
 	  fts_outlet_send((fts_object_t *)this, 0, fts_s_list, 2, av);
 	  this->byte1 = 0;
 	}

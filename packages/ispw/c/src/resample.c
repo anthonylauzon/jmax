@@ -93,7 +93,7 @@ sigup_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
 
   fts_set_ftl_data(argv+2, this->up_ftl_data);
-  fts_set_long(argv+3, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
 
   dsp_add_funcall(sigup_function, 4, argv);
 }
@@ -136,7 +136,7 @@ sigup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   {
     fts_atom_t av;
 
-    fts_set_long(&av, 1);
+    fts_set_int(&av, 1);
     fts_class_put_prop(cl, fts_s_dsp_upsampling, &av);
   }
 
@@ -185,7 +185,7 @@ sigdown_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0) >> 1);
+  fts_set_int  (argv+2, fts_dsp_get_input_size(dsp, 0) >> 1);
 
   dsp_add_funcall(sigdown_function, 3, argv);
 }
@@ -222,7 +222,7 @@ sigdown_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   {
     fts_atom_t av;
 
-    fts_set_long(&av, 1);
+    fts_set_int(&av, 1);
     fts_class_put_prop(cl, fts_s_dsp_downsampling, &av);
   }
 

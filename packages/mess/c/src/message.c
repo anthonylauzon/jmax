@@ -35,7 +35,7 @@ is_token(fts_symbol_t s)
   return ((s == fts_s_dot) ||
 	  (s == fts_s_comma) ||
 	  (s == fts_s_semi) ||
-	  (s == fts_s_column) ||
+	  (s == fts_s_colon) ||
 	  (s == fts_s_double_colon) ||
 	  (s == fts_s_quote) ||
 	  (s == fts_s_comma));
@@ -60,7 +60,7 @@ message_clear(message_t *mess)
       for(i=0; i<mess->ac; i++)
 	fts_atom_void(mess->at + i);
 
-      fts_block_free(mess->at, sizeof(fts_atom_t) * mess->ac);
+      fts_free( mess->at);
   
       mess->ac = 0;
       mess->at = 0;
@@ -78,7 +78,7 @@ message_set(message_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
 
   if(ac > 0)
     {
-      mess->at = (fts_atom_t *)fts_block_alloc(sizeof(fts_atom_t) * ac);
+      mess->at = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * ac);
       mess->ac = ac;
 
       for(i=0; i<ac; i++)

@@ -289,7 +289,7 @@ sigthres_put_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 
   fts_set_ptr(&argv[DSP_ARG_ctl], &(this->ctl));
   fts_set_symbol(&argv[DSP_ARG_in0], fts_dsp_get_input_name(dsp, 0));
-  fts_set_long(&argv[DSP_ARG_n_tick], fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(&argv[DSP_ARG_n_tick], fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(sigthres_symbol, N_DSP_ARGS, argv);
 }
 

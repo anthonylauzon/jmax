@@ -104,7 +104,7 @@ Rreceive_set_atom(fts_object_t *o, int winlet, fts_symbol_t sym, int argc, const
 		{
 		case RSEND_LONG:
 		  sscanf(this->receiveBuff+i+2,"%ld",&l);
-		  fts_set_long(&av[ac], l);
+		  fts_set_int(&av[ac], l);
 		  break;
 		case RSEND_FLOAT:
 		  sscanf(this->receiveBuff+i+2,"%f",&f);

@@ -416,18 +416,18 @@ pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   pt_common_dsp_fun_put(&x->pt, dsp);
   
-  fts_set_long(a, x->ctl.vib_time);
+  fts_set_int(a, x->ctl.vib_time);
   fts_set_float(a+1, x->ctl.vib_depth);
   pitch_vibrato(o, 0, 0, 2, a);
   
   fts_set_float(a, x->ctl.reattack_thresh);
-  fts_set_long(a+1, x->ctl.reattack_time);
+  fts_set_int(a+1, x->ctl.reattack_time);
   pitch_reattack(o, 0, 0, 2, a);
   
   fts_set_ptr(a, (void *)o);
   fts_set_fun(a+1, (void (*)(void))analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
-  fts_set_long(a+3, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(a+3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(dsp_symbol, 4, a);
 }
 

@@ -252,7 +252,7 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(class == sym_fft)
   {
-    fts_set_long(dsp_arg + 1, sig_tick);
+    fts_set_int(dsp_arg + 1, sig_tick);
     
     if(type == sym_real)
     {
@@ -292,7 +292,7 @@ dsp_put_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
   else if(class == sym_ifft)
   {
-    fts_set_long(dsp_arg + 1, spec_tick);
+    fts_set_int(dsp_arg + 1, spec_tick);
     
     if(type == sym_real)
     {
@@ -382,7 +382,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       {
 	fts_atom_t av;
 
-	fts_set_long(&av, 1);
+	fts_set_int(&av, 1);
 	fts_class_put_prop(cl, fts_s_dsp_downsampling, &av);
       }
 
@@ -422,7 +422,7 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       {
 	fts_atom_t av;
 
-	fts_set_long(&av, 1);
+	fts_set_int(&av, 1);
 	fts_class_put_prop(cl, fts_s_dsp_upsampling, &av);
       }
 

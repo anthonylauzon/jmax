@@ -29,7 +29,7 @@
 typedef struct 
 {
   fts_object_t o;
-  fts_list_t list;
+  fts_array_t list;
 } listreverse_t;
 
 static void
@@ -39,8 +39,8 @@ listreverse_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_atom_t *ta;
   int i, j;
 
-  fts_list_set_size(&this->list, ac);
-  ta = fts_list_get_ptr(&this->list);
+  fts_array_set_size(&this->list, ac);
+  ta = fts_array_get_atoms(&this->list);
 
   for(i=0, j=ac-1; i<ac; i++, j--)
     fts_atom_assign(ta + i, at + j);
@@ -53,7 +53,7 @@ listreverse_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   listreverse_t *this = (listreverse_t *)o;
 
-  fts_list_init(&this->list, 0, 0);
+  fts_array_init(&this->list, 0, 0);
 }
 
 static void
@@ -61,7 +61,7 @@ listreverse_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   listreverse_t *this = (listreverse_t *)o;
 
-  fts_list_reset(&this->list);
+  fts_array_destroy(&this->list);
 }
 
 static fts_status_t

@@ -63,7 +63,7 @@ set_size(bpf_t *bpf, int size)
 	alloc += BPF_BLOCK_SIZE;
 
       if(bpf->alloc)
-	fts_free((void *)bpf->points);
+	fts_free( bpf->points);
       
       bpf->points = (bp_t *)fts_malloc(sizeof(bp_t) * alloc);
 

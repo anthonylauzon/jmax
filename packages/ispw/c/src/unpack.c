@@ -59,7 +59,7 @@ unpack_send(fts_object_t *o, int winlet, fts_symbol_t s,
 	fts_outlet_send(o, i, outlet_type, 1, &at[i]);
       else if ((outlet_type == fts_s_int) && fts_is_float(&at[i]))
 	{
-	  fts_set_long(&a, (long) fts_get_float(&at[i]));
+	  fts_set_int(&a, (long) fts_get_float(&at[i]));
 	  fts_outlet_send(o, i, outlet_type, 1, &a);
 	}
       else if ((outlet_type == fts_s_float) && fts_is_float(&at[i]))

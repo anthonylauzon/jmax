@@ -46,7 +46,7 @@ iaccum_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_atom_t a;
   ((accum_t *)o)->s_reg = fts_get_float(at);
-  fts_set_long(&a, ((accum_t *)o)->s_reg);
+  fts_set_int(&a, ((accum_t *)o)->s_reg);
   fts_outlet_send(o, 0, fts_s_int, 1, &a);
 }
 
@@ -54,7 +54,7 @@ static void
 iaccum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_atom_t a;
-  fts_set_long(&a, (long)((accum_t *)o)->s_reg);
+  fts_set_int(&a, (long)((accum_t *)o)->s_reg);
   fts_outlet_send(o, 0, fts_s_int, 1, &a);
 }
 

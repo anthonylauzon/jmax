@@ -23,7 +23,6 @@
 #include <fts/fts.h>
 
 
-
 typedef struct _v_t {
   fts_object_t head;
   fts_atom_t value;
@@ -56,12 +55,12 @@ static fts_status_t v_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-static void test_define( const char *s, int i)
+static void test_define( fts_symbol_t s, int i)
 {
   fts_atom_t a[4];
   fts_object_t *newobj;
 
-  fts_set_symbol( a+0, fts_new_symbol_copy( s));
+  fts_set_symbol( a+0, s);
   fts_set_symbol( a+1, fts_s_colon);
   fts_set_symbol( a+2, s___v);
   fts_set_int( a+3, i);
@@ -70,24 +69,43 @@ static void test_define( const char *s, int i)
 
   if (!newobj)
     {
-      fprintf( stderr, "Error instantiation v object\n");
+      fprintf( stderr, "Error instantiating v object\n");
     }
 }
 
-static void test_get( const char *s)
+static void test_get( fts_symbol_t s)
 {
+  fts_atom_t *p;
+
+  p = fts_variable_get_value( env_patcher, s);
+
+  if (p)
+    fprintf( stderr, "%s -> %d\n", fts_symbol_name( s), fts_get_int( p));
+  else
+    fprintf( stderr, "%s undef\n", fts_symbol_name( s));
 }
 
 static void test_variables( void)
 {
+  fts_atom_t a[2];
+
   s___v = fts_new_symbol( "__v");
   fts_class_install( s___v, v_instantiate);
 
-  test_define( "foo", 1);
-  test_define( "boo", 2);
-  test_get( "boo");
-  test_get( "foo");
-  test_get( "ttt");
+  fts_set_symbol( a+0, fts_s_patcher);
+  fts_set_symbol( a+1, fts_new_symbol("environnment"));
+  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, (fts_object_t **)&env_patcher);
+  if ( !env_patcher)
+    {
+      fprintf( stderr, "cannot create environnment patcher\n");
+      return;
+    }
+
+  test_define( fts_new_symbol( "foo"), 1);
+  test_define( fts_new_symbol( "boo"), 2);
+  test_get( fts_new_symbol( "boo"));
+  test_get( fts_new_symbol( "foo"));
+  test_get( fts_new_symbol( "ttt"));
 }
 
 
@@ -126,12 +144,16 @@ extern void fts_kernel_oldpatcherdata_init( void);
 void fts_init( void)
 {
   /* *** Attention !!! The order is important *** */
-  fts_kernel_symbol_init();
   fts_kernel_hashtable_init();
+  fts_kernel_symbol_init();
   fts_kernel_atom_init();
   fts_kernel_objtable_init();
   fts_kernel_class_init();
   fts_kernel_doctor_init();
+  fts_kernel_property_init();
+  fts_kernel_oldftsdata_init();
+  fts_kernel_oldpatcherdata_init();
+  fts_kernel_variable_init();
   fts_kernel_patcher_init();
 
   /* For the rest, the order is no longer important */
@@ -147,16 +169,12 @@ void fts_init( void)
   fts_kernel_objtable_init();
   fts_kernel_param_init();
   fts_kernel_patparser_init();
-  fts_kernel_property_init();
   fts_kernel_sched_init();
   fts_kernel_selection_init();
   fts_kernel_soundfile_init();
   fts_kernel_template_init();
-  fts_kernel_variable_init();
 
   fts_kernel_oldclient_init();
-  fts_kernel_oldftsdata_init();
-  fts_kernel_oldpatcherdata_init();
 
 #if 1
   test_variables();

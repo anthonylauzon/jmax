@@ -1070,11 +1070,11 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   else if(ac == 1 && fts_is_list(at))
     {
-      fts_list_t *aa = fts_get_list(at);
-      int size = fts_list_get_size(aa);
+      fts_array_t *aa = fts_get_list(at);
+      int size = fts_array_get_size(aa);
 
       ivec_alloc(this, size);
-      ivec_set_from_atom_list(this, 0, size, fts_list_get_ptr(aa));
+      ivec_set_from_atom_list(this, 0, size, fts_array_get_atoms(aa));
       this->keep = fts_s_args;
     }
   else if(ac > 1)

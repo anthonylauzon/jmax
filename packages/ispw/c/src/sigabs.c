@@ -62,7 +62,7 @@ sigabs_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv + 2, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int  (argv + 2, fts_dsp_get_input_size(dsp, 0));
 
   dsp_add_funcall(sigabs_function, 3, argv);
 }

@@ -40,7 +40,7 @@ random_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   extern int rand (void);
   fts_atom_t a;
 
-  fts_set_long(&a, (((random_t *)o)->r_n * (rand() & 0x7fffL)) >> 15);
+  fts_set_int(&a, (((random_t *)o)->r_n * (rand() & 0x7fffL)) >> 15);
   fts_outlet_send(o, 0, fts_s_int, 1, &a);
 }
 

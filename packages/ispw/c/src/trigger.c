@@ -105,7 +105,7 @@ trigger_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       else if (tot == trigger_outlet_list)
 	{
 	  fts_atom_t at;
-	  fts_set_long(&at, 0);
+	  fts_set_int(&at, 0);
 	  fts_outlet_list(o, outlet, 1, &at);
 	}
       else if (tot == trigger_outlet_thru)
@@ -499,7 +499,7 @@ trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 
 	  fts_atom_t a;
 
-	  fts_set_long(&a, 0);
+	  fts_set_int(&a, 0);
 
 	  return (trigger_atoms_conforms(&a, at1) &&
 		  trigger_atoms_conforms(&a, at1 + 1));
@@ -517,7 +517,7 @@ trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 
 	      fts_atom_t a;
 
-	      fts_set_long(&a, 0);
+	      fts_set_int(&a, 0);
 
 	      return (trigger_atoms_conforms(&a, at0) &&
 		      trigger_atoms_conforms(&a, at0 + 1));

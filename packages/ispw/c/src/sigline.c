@@ -136,7 +136,7 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     {
       fts_set_symbol (argv, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv+1, this->ftl_data);
-      fts_set_long   (argv+2, fts_dsp_get_output_size(dsp, 0));
+      fts_set_int   (argv+2, fts_dsp_get_output_size(dsp, 0));
       dsp_add_funcall(sigline_function, 3, argv);
     }
 }
@@ -170,7 +170,7 @@ sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       fts_atom_t a;
 
-      fts_set_long(&a, down);
+      fts_set_int(&a, down);
 
       fts_object_put_prop(o, fts_s_dsp_downsampling, &a);
     }

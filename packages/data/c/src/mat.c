@@ -203,8 +203,8 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
     {
       if(fts_is_list(at + i))
 	{
-	  fts_list_t *aa = fts_get_list(at + i);
-	  int size = fts_list_get_size(aa);
+	  fts_array_t *aa = fts_get_list(at + i);
+	  int size = fts_array_get_size(aa);
 
 	  if(size > n)
 	    size = n;
@@ -212,7 +212,7 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
 	  for(j=0; j<size; j++)
 	    {
 	      fts_atom_t *matp = mat->data + i * n + j;
-	      fts_atom_t *aap = &fts_list_get_element(aa, j);
+	      fts_atom_t *aap = fts_array_get_element(aa, j);
 	    
 	      fts_atom_assign(matp, aap);
 	    }
@@ -735,8 +735,8 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	{
 	  if(fts_is_list(at + i))
 	    {
-	      fts_list_t *aa = fts_get_list(at + i);
-	      int size = fts_list_get_size(aa);
+	      fts_array_t *aa = fts_get_list(at + i);
+	      int size = fts_array_get_size(aa);
 	      
 	      if(size > n)
 		n = size;

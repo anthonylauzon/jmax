@@ -35,7 +35,7 @@
 typedef struct 
 {
   fts_object_t o;
-  fts_list_t list;
+  fts_array_t list;
 } list_obj_t;
 
 static void
@@ -43,8 +43,8 @@ list_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   list_obj_t *this = (list_obj_t *)o;
 
-  fts_list_init(&this->list, 0, 0);
-  fts_list_set(&this->list, ac - 1, at + 1);
+  fts_array_init(&this->list, 0, 0);
+  fts_array_set(&this->list, ac - 1, at + 1);
 }
 
 static void
@@ -52,7 +52,7 @@ list_obj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   list_obj_t *this = (list_obj_t *)o;
 
-  fts_list_reset(&this->list);
+  fts_array_destroy(&this->list);
 }
 
 /************************************************
@@ -66,7 +66,7 @@ list_obj_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   list_obj_t *this = (list_obj_t *)o;
 
-  fts_outlet_send(o, 0, fts_s_list, fts_list_get_size(&this->list), fts_list_get_ptr(&this->list));
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 static void
@@ -74,7 +74,7 @@ list_obj_store_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 {
   list_obj_t *this = (list_obj_t *)o;
 
-  fts_list_set(&this->list, ac, at);
+  fts_array_set(&this->list, ac, at);
 }
 
 static void
@@ -82,8 +82,8 @@ list_obj_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   list_obj_t *this = (list_obj_t *)o;
 
-  fts_list_set(&this->list, ac, at);
-  fts_outlet_send(o, 0, fts_s_list, fts_list_get_size(&this->list), fts_list_get_ptr(&this->list));
+  fts_array_set(&this->list, ac, at);
+  fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->list), fts_array_get_atoms(&this->list));
 }
 
 /************************************************

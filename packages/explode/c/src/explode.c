@@ -153,11 +153,11 @@ explode_doappend(explode_t *this, long int time, long int pit, long int vel, lon
 	{
 	  fts_atom_t args[5];
 
-	  fts_set_long( &(args[0]), e->time);
-	  fts_set_long( &(args[1]), e->pit);
-	  fts_set_long( &(args[2]), e->vel);
-	  fts_set_long( &(args[3]), e->dur);
-	  fts_set_long( &(args[4]), e->chan);
+	  fts_set_int( &(args[0]), e->time);
+	  fts_set_int( &(args[1]), e->pit);
+	  fts_set_int( &(args[2]), e->vel);
+	  fts_set_int( &(args[3]), e->dur);
+	  fts_set_int( &(args[4]), e->chan);
 	  
 	  fts_data_remote_call((fts_data_t *) &(this->data), EXPLODE_APPEND, 5, args);
 	}
@@ -1410,11 +1410,11 @@ static void explode_data_export_fun(fts_data_t *d)
 
   for ( e = data->evt; e; e = e->next)
     {
-      fts_set_long( &(args[0]), e->time);
-      fts_set_long( &(args[1]), e->pit);
-      fts_set_long( &(args[2]), e->vel);
-      fts_set_long( &(args[3]), e->dur);
-      fts_set_long( &(args[4]), e->chan);
+      fts_set_int( &(args[0]), e->time);
+      fts_set_int( &(args[1]), e->pit);
+      fts_set_int( &(args[2]), e->vel);
+      fts_set_int( &(args[3]), e->dur);
+      fts_set_int( &(args[4]), e->chan);
 
       fts_data_remote_call((fts_data_t *) data, EXPLODE_LOAD_APPEND, 5, args);
     }

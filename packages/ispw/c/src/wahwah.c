@@ -81,7 +81,7 @@ wahwah_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_set_symbol(argv + 3, fts_dsp_get_output_name(dsp, 0));
   fts_set_ftl_data(argv + 4, this->state);
   fts_set_float(argv + 5, conv);
-  fts_set_long(argv + 6, n_tick);
+  fts_set_int(argv + 6, n_tick);
 
   dsp_add_funcall(wahwah_function, 7, argv);
 }

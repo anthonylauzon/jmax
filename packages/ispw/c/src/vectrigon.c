@@ -164,7 +164,7 @@ vectrigon_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 
   fts_set_symbol(argv + 0, fts_dsp_get_input_name(dsp, 0));
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
-  fts_set_long  (argv + 2, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int  (argv + 2, fts_dsp_get_input_size(dsp, 0));
   fts_dsp_add_function(name, 3, argv);
 }
 

@@ -56,7 +56,7 @@ sigsnapshot_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_set_symbol(argv,   fts_dsp_get_input_name(dsp, 0));
   fts_set_ptr   (argv+1, &(this->val));
-  fts_set_long  (argv+2, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int  (argv+2, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(sigsnapshot_function, 3, argv);
 }
 

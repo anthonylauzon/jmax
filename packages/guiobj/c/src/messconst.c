@@ -146,13 +146,13 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
       if(ac == fts_is_list(at))
 	{
-	  fts_list_t *list = fts_get_list(at);
+	  fts_array_t *list = fts_get_list(at);
 
 	  /* create empty message */
 	  mess = (message_t *)fts_object_create(message_class, 0, 0);
 	  
 	  /* set message to list */
-	  message_set(mess, fts_s_list, fts_list_get_size(list), fts_list_get_ptr(list));
+	  message_set(mess, fts_s_list, fts_array_get_size(list), fts_array_get_atoms(list));
 	}
       else
 	{

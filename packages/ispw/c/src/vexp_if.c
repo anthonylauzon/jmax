@@ -189,7 +189,7 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   switch(x->exp_res.ex_type)
     {
     case ET_INT:
-      fts_set_long(&a, x->exp_res.ex_int);
+      fts_set_int(&a, x->exp_res.ex_int);
       fts_outlet_send((fts_object_t *)x, 0, fts_s_int, 1, &a);
       break;
 

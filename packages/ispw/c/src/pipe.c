@@ -196,7 +196,7 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       this->ac = 1;
       this->at = fts_malloc(sizeof(fts_atom_t));
-      fts_set_long(this->at, 0);
+      fts_set_int(this->at, 0);
       if(ac == 0 || fts_is_long(at) || fts_is_float(at))
 	this->del_time = fts_get_double_arg(ac, at, 0, 0);
       else
@@ -315,14 +315,14 @@ pipe_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if (ac == 0)
     {
       ac = 2;
-      fts_set_long(sat, 0);
-      fts_set_long(sat + 1, 0);
+      fts_set_int(sat, 0);
+      fts_set_int(sat + 1, 0);
       at = sat;
     }
   else if (ac == 1)
     {
       ac = 2;
-      fts_set_long(sat, 0);
+      fts_set_int(sat, 0);
       sat[1] = at[0];
       at = sat;
     }

@@ -112,7 +112,7 @@ iir_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
   fts_set_symbol(argv + 1, fts_dsp_get_output_name(dsp, 0));
   fts_set_ftl_data(argv + 2, this->state);
   fts_set_ftl_data(argv + 3, this->coefs);
-  fts_set_long(argv + 4, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(argv + 4, fts_dsp_get_input_size(dsp, 0));
 
   dsp_add_funcall(iir_dsp_function[this->n_order], 5, argv);
 }

@@ -51,7 +51,7 @@ getlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   /* init output list to # of cols */
   if(n > 0)
     {
-      this->list = (fts_atom_t *)fts_block_alloc(n * sizeof(fts_atom_t));
+      this->list = (fts_atom_t *)fts_malloc(n * sizeof(fts_atom_t));
       this->alloc = n;
     }
   else
@@ -67,7 +67,7 @@ getlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   getlist_t *this = (getlist_t *)o;
 
   if(this->alloc)
-    fts_block_free(this->list, this->alloc);
+    fts_free( this->list);
 }
 
 static void
@@ -75,8 +75,8 @@ getlist_resize_buffer(getlist_t *this, int size)
 {
   if(size > this->alloc)
     {
-      fts_block_free(this->list, this->alloc);
-      this->list = (fts_atom_t *)fts_block_alloc(size * sizeof(fts_atom_t));
+      fts_free( this->list);
+      this->list = (fts_atom_t *)fts_malloc(size * sizeof(fts_atom_t));
       this->alloc = size;
     }
 

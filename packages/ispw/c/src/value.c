@@ -58,7 +58,7 @@ get_keeper(fts_symbol_t s)
       v = (struct value_keeper *) fts_malloc(sizeof(struct value_keeper));
       v->sym = s;
       v->count = 0;
-      fts_set_long(&(v->atom), 0);
+      fts_set_int(&(v->atom), 0);
 
       fts_set_ptr(&data, v);
       fts_hashtable_put(&value_table, &k, &data);
@@ -133,7 +133,7 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if (ac >= 3)
     x->v->atom = at[2];
   else
-    fts_set_long(&x->v->atom, 0);
+    fts_set_int(&x->v->atom, 0);
 
   x->name = sym;
 }

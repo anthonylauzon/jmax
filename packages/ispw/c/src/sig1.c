@@ -66,7 +66,7 @@ sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       fts_atom_t a;
 
-      fts_set_long(&a, down);
+      fts_set_int(&a, down);
       fts_object_put_prop(o, fts_s_dsp_downsampling, &a);
     }
 
@@ -129,7 +129,7 @@ sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     {
       fts_set_ftl_data(argv, this->sig_ftl_data);
       fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_long  (argv+2, fts_dsp_get_output_size(dsp, 0));
+      fts_set_int  (argv+2, fts_dsp_get_output_size(dsp, 0));
       dsp_add_funcall(sig_dsp_function, 3, argv);
     }
 

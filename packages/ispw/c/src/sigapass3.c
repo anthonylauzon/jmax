@@ -106,7 +106,7 @@ sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_set_ftl_data(argv + 4, this->biquad_state);
   fts_set_ftl_data(argv + 5, this->biquad_coefs);
   fts_set_float(argv + 6, conv);
-  fts_set_long(argv + 7, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(argv + 7, fts_dsp_get_input_size(dsp, 0));
 
   dsp_add_funcall(sigapass3_function, 8, argv);
 }

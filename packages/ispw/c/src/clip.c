@@ -136,9 +136,9 @@ clip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       if (fts_is_long(at))
 	{
 	  if (fts_get_long(at) > x->i_max)
-	    fts_set_long(ap, x->i_max);
+	    fts_set_int(ap, x->i_max);
 	  else if (fts_get_long(at) < x->i_min)
-	    fts_set_long(ap, x->i_min);
+	    fts_set_int(ap, x->i_min);
 	  else
 	    *ap = *at;
 	}
@@ -152,7 +152,7 @@ clip_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    *ap = *at;
 	}
       else
-	fts_set_long(ap, 0L);
+	fts_set_int(ap, 0L);
     }
 
   fts_outlet_send(o, 0, s, ac, temp);

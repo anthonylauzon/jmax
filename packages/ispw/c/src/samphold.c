@@ -83,7 +83,7 @@ sigsamphold_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_set_symbol(argv+1, fts_dsp_get_input_name(dsp, 1));
   fts_set_symbol(argv+2, fts_dsp_get_output_name(dsp, 0));
   fts_set_ftl_data(argv+3, this->samphold_ftl_data);
-  fts_set_long  (argv+4, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int  (argv+4, fts_dsp_get_input_size(dsp, 0));
 
   dsp_add_funcall(sigsamphold_function, 5, argv);
 }

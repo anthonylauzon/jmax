@@ -259,17 +259,17 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	
   pt_common_dsp_fun_put(&x->pt, dsp);
 
-  fts_set_long(a, x->ctl.gliss_time);
+  fts_set_int(a, x->ctl.gliss_time);
   pt_gliss_time(o, 0, 0, 1, a);
 
   fts_set_float(a, x->ctl.reattack_slope_thresh);
-  fts_set_long(a+1, x->ctl.reattack_time);
+  fts_set_int(a+1, x->ctl.reattack_time);
   pt_reattack(o, 0, 0, 2, a);
 	
   fts_set_ptr(a, (void *)o);
   fts_set_fun(a+1, (void (*)(void))analysis);
   fts_set_symbol(a+2, fts_dsp_get_input_name(dsp, 0));
-  fts_set_long(a+3, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int(a+3, fts_dsp_get_input_size(dsp, 0));
   dsp_add_funcall(dsp_symbol, 4, a);
 }
 

@@ -77,8 +77,8 @@ throw_bus_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(winlet < n_channels)
     {  
-      fts_channel_output_message_from_targets(bus_get_channel(bus, winlet), 0, s, ac, at);
-      fts_channel_output_message_from_targets(bus_get_channel(bus, BUS_CHANNEL), winlet, s, ac, at);
+      fts_channel_send(bus_get_channel(bus, winlet), 0, s, ac, at);
+      fts_channel_send(bus_get_channel(bus, BUS_CHANNEL), winlet, s, ac, at);
     }
 }
 
@@ -90,8 +90,8 @@ throw_channel_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   
   if(this->channel != BUS_NOWHERE)
     {
-      fts_channel_output_message_from_targets(bus_get_channel(bus, this->channel), 0, s, ac, at);
-      fts_channel_output_message_from_targets(bus_get_channel(bus, BUS_CHANNEL), this->channel, s, ac, at);
+      fts_channel_send(bus_get_channel(bus, this->channel), 0, s, ac, at);
+      fts_channel_send(bus_get_channel(bus, BUS_CHANNEL), this->channel, s, ac, at);
     }
 }
 
@@ -332,8 +332,8 @@ bus_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   bus_t *this = (bus_t *)o;
 
-  fts_channel_output_message_from_targets(bus_get_channel(this, winlet), 0, s, ac, at);
-  fts_channel_output_message_from_targets(bus_get_channel(this, BUS_CHANNEL), winlet, s, ac, at);
+  fts_channel_send(bus_get_channel(this, winlet), 0, s, ac, at);
+  fts_channel_send(bus_get_channel(this, BUS_CHANNEL), winlet, s, ac, at);
 }
 
 static void

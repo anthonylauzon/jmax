@@ -251,7 +251,7 @@ putmess_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static fts_atom_t *
 messtab_atom_buf_new(int size)
 {
-  fts_atom_t *buf = (fts_atom_t *)fts_block_zalloc(sizeof(fts_atom_t) * size);
+  fts_atom_t *buf = (fts_atom_t *)fts_calloc(sizeof(fts_atom_t) * size);
   return buf;
 }
 
@@ -259,20 +259,20 @@ static void
 messtab_atom_buf_free(fts_atom_t *buf, int size)
 {
   if(buf)
-    fts_block_free(buf, sizeof(fts_atom_t) * size);
+    fts_free( buf);
 }
 
 static fts_atom_t *
 messtab_atom_buf_grow(fts_atom_t *buf, int size, int more)
 {
   int new_size = size + more;
-  fts_atom_t *new_buf = (fts_atom_t *)fts_block_zalloc(sizeof(fts_atom_t) * size); /* double size */
+  fts_atom_t *new_buf = (fts_atom_t *)fts_calloc(sizeof(fts_atom_t) * size); /* double size */
   int i;
   
   for(i=0; i<size; i++)
     new_buf[i] = buf[i];
 
-  fts_block_free(buf, sizeof(fts_atom_t) * size);
+  fts_free( buf);
 
   return new_buf;
 }
@@ -460,9 +460,9 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       if(fts_is_list(at + i))
 	{
-	  fts_list_t *list = fts_get_list(at + i);
-	  int lac = fts_list_get_size(list);
-	  fts_atom_t *lat = fts_list_get_ptr(list);
+	  fts_array_t *list = fts_get_list(at + i);
+	  int lac = fts_array_get_size(list);
+	  fts_atom_t *lat = fts_array_get_atoms(list);
 	  
 	  if(fts_is_int(lat) || fts_is_symbol(lat))
 	    {

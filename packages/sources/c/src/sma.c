@@ -97,7 +97,7 @@ static void sma_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_set_symbol  (args+1, fts_dsp_get_input_name(dsp, 1));
   fts_set_symbol  (args+2, fts_dsp_get_output_name(dsp, 0));
   fts_set_ftl_data(args+3, this->data);
-  fts_set_long    (args+4, fts_dsp_get_input_size(dsp, 0));
+  fts_set_int    (args+4, fts_dsp_get_input_size(dsp, 0));
 
   dsp_add_funcall( sma_function, 5, args);
 }

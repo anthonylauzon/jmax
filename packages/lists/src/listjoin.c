@@ -35,8 +35,8 @@
 typedef struct 
 {
   fts_object_t o;
-  fts_list_t out;
-  fts_list_t right;
+  fts_array_t out;
+  fts_array_t right;
 } listjoin_t;
 
 static void
@@ -47,8 +47,8 @@ listjoin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   ac--;
   at++;
 
-  fts_list_init(&this->out, 0, 0);
-  fts_list_init(&this->right, ac, at);
+  fts_array_init(&this->out, 0, 0);
+  fts_array_init(&this->right, ac, at);
 }
 
 static void
@@ -56,8 +56,8 @@ listjoin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  fts_list_reset(&this->out);
-  fts_list_reset(&this->right);
+  fts_array_destroy(&this->out);
+  fts_array_destroy(&this->right);
 }
 
 /*********************************************
@@ -71,35 +71,35 @@ listjoin_set_right_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  fts_list_set(&this->right, ac, at);
+  fts_array_set(&this->right, ac, at);
 }
 
 static void
 listjoin_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listjoin_t *this = (listjoin_t *)o;
-  int right_size = fts_list_get_size(&this->right);
+  int right_size = fts_array_get_size(&this->right);
   int total_size = right_size + ac;
 
-  fts_list_set_size(&this->out, total_size);
-  fts_list_set(&this->out, ac, at);
-  fts_list_append(&this->out, right_size, fts_list_get_ptr(&this->right));
+  fts_array_set_size(&this->out, total_size);
+  fts_array_set(&this->out, ac, at);
+  fts_array_append(&this->out, right_size, fts_array_get_atoms(&this->right));
   
-  fts_outlet_send(o, 0, fts_s_list, total_size, fts_list_get_ptr(&this->out));
+  fts_outlet_send(o, 0, fts_s_list, total_size, fts_array_get_atoms(&this->out));
 }
 
 static void
 listjoin_prepend(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listjoin_t *this = (listjoin_t *)o;
-  int right_size = fts_list_get_size(&this->right);
+  int right_size = fts_array_get_size(&this->right);
   int total_size = right_size + ac;
 
-  fts_list_set_size(&this->out, total_size);
-  fts_list_set(&this->out, right_size, fts_list_get_ptr(&this->right));
-  fts_list_append(&this->out, ac, at);
+  fts_array_set_size(&this->out, total_size);
+  fts_array_set(&this->out, right_size, fts_array_get_atoms(&this->right));
+  fts_array_append(&this->out, ac, at);
 
-  fts_outlet_send(o, 0, fts_s_list, total_size, fts_list_get_ptr(&this->out));
+  fts_outlet_send(o, 0, fts_s_list, total_size, fts_array_get_atoms(&this->out));
 }
 
 /*********************************************

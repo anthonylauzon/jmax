@@ -62,9 +62,9 @@ message_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       if(ac != this->ac)
 	{
 	  if(this->at)
-	    fts_block_free(this->at, this->ac * sizeof(fts_atom_t));
+	    fts_free( this->at);
 	  
-	  this->at = (fts_atom_t *)fts_block_alloc(ac * sizeof(fts_atom_t));
+	  this->at = (fts_atom_t *)fts_malloc(ac * sizeof(fts_atom_t));
 	}
       
       this->ac = ac;
@@ -77,7 +77,7 @@ message_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       this->s = 0;
 
       if(this->at)
-	fts_block_free(this->at, this->ac * sizeof(fts_atom_t));
+	fts_free( this->at);
 	  
       this->ac = 0;
     }

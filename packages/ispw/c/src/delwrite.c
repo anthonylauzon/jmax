@@ -130,7 +130,7 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
   fts_set_ptr(argv + 1, this->buf);
-  fts_set_long(argv + 2, n_tick);
+  fts_set_int(argv + 2, n_tick);
   dsp_add_funcall(dsp_symbol, 3, argv);
 
   delay_table_delwrite_scheduled(this->name);

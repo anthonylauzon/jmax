@@ -45,9 +45,9 @@ static void
 argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   argument_t *this = (argument_t *)o;
-  fts_list_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
-  fts_atom_t *ptr = fts_list_get_ptr(args);
-  int size = fts_list_get_size(args);
+  fts_array_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
+  fts_atom_t *ptr = fts_array_get_atoms(args);
+  int size = fts_array_get_size(args);
   int index;
 
   ac--;

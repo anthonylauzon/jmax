@@ -192,7 +192,7 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_set_symbol(argv+1, fts_dsp_get_output_name(dsp, 0));
       fts_set_ftl_data(argv+2, this->ftl_data);
 
-      fts_set_long(argv+3, fts_dsp_get_input_size(dsp, 0));
+      fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
       dsp_add_funcall(sig2p2z_function, 4, argv);
     }
 }

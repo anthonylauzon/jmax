@@ -39,11 +39,11 @@ set_value_preserve_type(const fts_atom_t *src, fts_atom_t *dst)
   if (fts_is_long(dst))
     {
       if (fts_is_long(src))
-	fts_set_long(dst, fts_get_long(src));
+	fts_set_int(dst, fts_get_long(src));
       else if (fts_is_float(src))
-	fts_set_long(dst, (long) fts_get_float(src));
+	fts_set_int(dst, (long) fts_get_float(src));
       else 
-	fts_set_long(dst, 0);
+	fts_set_int(dst, 0);
     }
   else if (fts_is_float(dst))
     {
@@ -130,21 +130,21 @@ pack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if (! ac)
     {
       x->argc = 2;
-      x->argv = (fts_atom_t *) fts_block_alloc(x->argc * sizeof(fts_atom_t));
-      fts_set_long(&(x->argv[0]), 0);
-      fts_set_long(&(x->argv[1]), 0);
+      x->argv = (fts_atom_t *) fts_malloc(x->argc * sizeof(fts_atom_t));
+      fts_set_int(&(x->argv[0]), 0);
+      fts_set_int(&(x->argv[1]), 0);
     }
   else
     {
       x->argc = ac;
-      x->argv = (fts_atom_t *) fts_block_alloc(x->argc * sizeof(fts_atom_t));
+      x->argv = (fts_atom_t *) fts_malloc(x->argc * sizeof(fts_atom_t));
 
       for (i = 0; i < ac ; i++)
 	{
 	  /* Bizzarre compatibility hack .. */
 
 	  if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == pack_s_i))
-	    fts_set_long(&(x->argv[i]), 0);
+	    fts_set_int(&(x->argv[i]), 0);
 	  else if (fts_is_symbol(&at[i]) && (fts_get_symbol(&at[i]) == pack_s_f))
 	    fts_set_float(&(x->argv[i]), 0.0f);
 	  else
@@ -158,7 +158,7 @@ pack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   pack_t *x = (pack_t *)o;
 
-  fts_block_free((char *) x->argv, (x->argc * sizeof(fts_atom_t)));
+  fts_free( x->argv);
 }
 
 static fts_status_t
@@ -178,8 +178,8 @@ pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if (!ac)
     {
       ac = 2;
-      fts_set_long(sat, 0);
-      fts_set_long(sat + 1, 0);
+      fts_set_int(sat, 0);
+      fts_set_int(sat + 1, 0);
       at = sat;
     }
 
