@@ -6,7 +6,8 @@ import ircam.jmax.utils.*;
 
 /**
  * An abstract base class implementing the selection interface.
- * It takes care of the listener's mechanism.
+ * It takes care of the listener's mechanism. Actually, only the 
+ * selectAll() method needs to be implemented.
  */
 public abstract class AbstractSelection implements SelectionHandler {
   
@@ -55,6 +56,7 @@ public abstract class AbstractSelection implements SelectionHandler {
   {
     return selected.elements();
   }
+
 
   public int size()
   {

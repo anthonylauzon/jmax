@@ -797,12 +797,19 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     itsSketchPad = null;
     itsPatcher = null;
+    /*=======
+      itsPatcher.removeWatch(this);
+      itsPatcher = null;
+      setVisible( false);
+      >>>>>>> 1.139*/
+    dispose();
     itsDocument = null;
     keyEventClient = null;
     ftsObjectsPasted = null;
     ftsConnectionsPasted = null;
     itsScrollerView = null;
     super.Destroy();
+
   }
 
   public boolean ShouldSave()
@@ -1033,7 +1040,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
   public void focusLost( FocusEvent e)
   {
-    itsSketchPad.itsScrolled = false;
+    itsSketchPad.duringScrolling = false;
   }
 
   public void windowActivated( WindowEvent e)
@@ -1117,4 +1124,10 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if (itsPatcher != null)
       itsPatcher.startUpdates();
   }       
+
+  // @@@@ TEMPORARY !!!!
+  public void finalize()
+  {
+    System.err.println("ErmesSketchWindow say goodby");
+  }
 }

@@ -22,12 +22,9 @@ all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
-needed: 
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(NEEDED_SOURCES))
-.PHONY: needed
-
 MaxWindowMenu:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxWindowMenu.java)
 .PHONY: MaxWindowMenu
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+

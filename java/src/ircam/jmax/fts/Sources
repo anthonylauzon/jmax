@@ -31,6 +31,7 @@ SOURCES = \
 	FtsPropertyHandler.java		\
 	FtsReferenceURLTable.java	\
 	FtsRemoteData.java		\
+	FtsRemoteUndoableData.java		\
 	FtsRemoteDataID.java		\
 	FtsRemoteMetaData.java		\
 	FtsRexecDatagramPort.java	\

@@ -4,7 +4,7 @@ import java.util.Enumeration;
 
 /**
  * the interface implemented by the handlers of generic selections of objects.
- * It make no assumption on the kind of objects and on the model of data.
+ * It makes no assumption on the kind of objects and on the model of data.
  */
 public interface SelectionHandler {
 
@@ -53,3 +53,12 @@ public interface SelectionHandler {
   public abstract void removeSelectionListener(SelectionListener theListener);
 
 }
+
+
+
+
+
+
+
+
+

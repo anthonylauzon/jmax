@@ -1,10 +1,39 @@
 SOURCES = \
 	AbstractSelection.java	\
+	AbstractUndoableObject.java	\
 	MaxWindowMenu.java	\
-	SelectionHandler.java	\
+	DirectionChooser.java	\
+	DirectionListener.java		\
+	DragListener.java		\
+	ObjectRenderer.java		\
+	GraphicContext.java		\
+	GraphicSelectionListener.java	\
+	InfoPanel.java			\
+	InteractionModule.java		\
+	Layer.java			\
+	MouseTracker.java		\
+	NumericPropertyEditor.java	\
+	NumericalWidget.java		\
+	PositionListener.java		\
+	ProportionalLayout.java		\
+	RenderManager.java		\
+	Tool.java			\
+	EditorToolbar.java		\
+	Selecter.java			\
+	SelectionMover.java		\
+	SelectionResizer.java		\
+	StatusBar.java			\
+	StatusBarClient.java		\
+	ToolChangeEvent.java		\
+	ToolListener.java		\
+	ToolbarProvider.java		\
+	Widget.java			\
+	XORHandler.java			\
+	XORPainter.java			\
+	SelectionHandler.java		\
+	UndoableData.java		\
 	SelectionListener.java	
 
-NEEDED_SOURCES = \
-	AbstractSelection.java	\
-	SelectionHandler.java	\
-	SelectionListener.java	
+
+
+

@@ -225,6 +225,10 @@ FtsRemoteData:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsRemoteData.java)
 .PHONY: FtsRemoteData
 
+FtsRemoteUndoableData:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsRemoteUndoableData.java)
+.PHONY: FtsRemoteUndoableData
+
 FtsRemoteMetaData:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsRemoteMetaData.java)
 .PHONY: FtsRemoteMetaData

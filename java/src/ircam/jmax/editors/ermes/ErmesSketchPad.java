@@ -171,7 +171,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   private int oldEditStatus = DOING_NOTHING;
 
   private String itsAddObjectDescription;
-  boolean itsScrolled = false;
+  boolean duringScrolling = false;
   private MaxVector dirtyInOutlets;
   private MaxVector dirtyConnections;
   private MaxVector dirtyObjects;
@@ -745,8 +745,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 	objectX = fo.getX();
 	objectY = fo.getY();
 
-	fo.put( "x", objectX - minX + itsCurrentScrollingX + pasteDelta.x + numberOfPaste*incrementalPasteOffsetX);     
-	fo.put( "y", objectY - minY + itsCurrentScrollingY + pasteDelta.y + numberOfPaste*incrementalPasteOffsetY);
+	int newPosX = objectX - minX + itsCurrentScrollingX + pasteDelta.x + numberOfPaste*incrementalPasteOffsetX;
+	int newPosY = objectY - minY + itsCurrentScrollingY + pasteDelta.y + numberOfPaste*incrementalPasteOffsetY;
+
+	fo.put( "x", newPosX);     
+	fo.localPut("x", newPosX);
+	fo.put( "y", newPosY);
+	fo.localPut("y", newPosY);
        
 	aObject = AddObject( fo);
 	currentSelection.addObject( aObject);
@@ -1158,8 +1163,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     cleanAnnotations(); // MDC    
 
-    if ( itsScrolled)
-      itsScrolled=false;
+    if ( duringScrolling)
+      duringScrolling=false;
 
     if (itsRunMode || e.isControlDown())
       {
@@ -1459,26 +1464,58 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
   {
     Adjustable aHAdjustable = itsSketchWindow.itsScrollerView.getHAdjustable();
     Adjustable aVAdjustable = itsSketchWindow.itsScrollerView.getVAdjustable();
+    boolean hasScrolled = false;
 
     if ( theX >= aHAdjustable.getVisibleAmount() + aHAdjustable.getValue())
       {
+	hasScrolled = true;
+	eraseShadows();
 	aHAdjustable.setValue( aHAdjustable.getValue() + aHAdjustable.getUnitIncrement());
       }
 
     if ( theY >= aVAdjustable.getVisibleAmount() + aVAdjustable.getValue())
       {
+	hasScrolled = true;
+	eraseShadows();
 	aVAdjustable.setValue( aVAdjustable.getValue() + aVAdjustable.getUnitIncrement());
       }
 
     if ( theX <= aHAdjustable.getValue())
       {
+	hasScrolled = true;
+	eraseShadows();
 	aHAdjustable.setValue( aHAdjustable.getValue() - aHAdjustable.getUnitIncrement());
       }
 
     if ( theY <= aVAdjustable.getValue())
       {
+	hasScrolled = true;
+	eraseShadows();
 	aVAdjustable.setValue( aVAdjustable.getValue() - aVAdjustable.getUnitIncrement());
       }
+
+    if (hasScrolled)
+      {
+	duringScrolling = true;
+      }
+    else
+      {
+	if (duringScrolling)
+	  { 
+	    eraseShadows();
+	  }
+
+	duringScrolling = false;
+      }
+  }
+  
+  private void eraseShadows()
+  {
+    Graphics g = getGraphics();
+    CopyTheOffScreen(g);
+    g.dispose();
+    erased = true;
+    erased1 = true;
   }
 
   private Point startConnectPoint = new Point();
@@ -1885,10 +1922,10 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
   public void paint( Graphics g)
   {
-    if (deleted)
-      return;
+    if (deleted) //should be kept?
+      return;    // introduced by cvs update
 
-    if ( itsScrolled)
+    if ( duringScrolling)
       {
 	if (offScreenPresent)
 	  {
@@ -2122,7 +2159,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
     itsCurrentScrollingX = itsSketchWindow.itsScrollerView.getHAdjustable().getValue();
     itsCurrentScrollingY = itsSketchWindow.itsScrollerView.getVAdjustable().getValue();
     
-    itsScrolled = true;
+    duringScrolling = true;
   }
 
   void AlignSelectedObjects( String thePosition)
@@ -2925,5 +2962,11 @@ class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMotionLis
 
     if (waiting <= 0)
       setCursor( Cursor.getDefaultCursor());
+  }
+
+  // @@@@ TEMPORARY !!!!
+  public void finalize()
+  {
+    System.err.println("ErmesSketchPad say goodby");
   }
 }
