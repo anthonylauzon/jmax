@@ -241,6 +241,9 @@ static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, i
   fts_sched_add( o, FTS_SCHED_ALWAYS);
 }
 
+<<<<<<< macosxaudioport.c
+
+=======
 static void macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
@@ -267,6 +270,7 @@ static void macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, i
 }
 
 
+>>>>>>> 1.9
 static void
 log_buffer_info( macosxaudioport_t *self, int channels, int direction)
 {
