@@ -1,3 +1,24 @@
+2003-20-05	Diemo Schwarz  <schwarz@ircam.fr>
+
+	* Added fvec methods get(min|max) and get(min|max)index that
+	  return the value.
+
+	* Finished fmat methods getcol, getrow.
+
+	* Updated help patches.
+
+	older changes not yet logged:
+	
+	* class.c: Force class to be instantiated before adding message.
+
+	* Added track_remove_event_and_upload.
+
+	* Fixed bug in scoob_property_get_by_index: output argument atom
+	  pointer was fts_atom_assign'ed (i.e. old object is released!),
+	  now atom is copied.
+
+
+
 2003-05-19  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/audioconfig.c, fts/dsp.c, include/fts/dsp.h: added support for buffer size change in Audio Configuration Panel.
