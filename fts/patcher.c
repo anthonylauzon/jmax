@@ -1364,7 +1364,7 @@ fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj)
       else
 	fts_client_add_symbol( this, fts_object_get_class_name( obj));
       
-      /*fts_client_add_int( this, fts_object_is_template(obj));*/
+      fts_client_add_int( this, fts_object_is_template(obj));
 
       fts_client_add_atoms( this, obj->argc, obj->argv);
       fts_client_done_message( this);

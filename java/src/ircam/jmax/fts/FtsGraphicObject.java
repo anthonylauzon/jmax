@@ -633,10 +633,10 @@ public class FtsGraphicObject extends FtsObject {
   public void openFileDialog(int nArgs, FtsAtom a[])
   {
     parentFrame = null;
-    callbackMethod = a[0].stringValue;
-    dialogText = a[1].stringValue;
-    String defaultPath = a[2].stringValue;
-    String defaultName = a[3].stringValue;
+    callbackMethod = a[0].symbolValue.toString();
+    dialogText = a[1].symbolValue.toString();
+    String defaultPath = a[2].symbolValue.toString();
+    String defaultName = a[3].symbolValue.toString();
 
     fd = new JFileChooser(defaultPath);
     fd.setDialogTitle(dialogText);

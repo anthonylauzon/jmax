@@ -883,9 +883,8 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     String errorDescription = "";
     String className = null;
 
-    /*int offset = 11;
-      boolean isTemplate = (args[10].intValue == 1);*/
-    int offset = 10;
+    boolean isTemplate = (args[10].intValue == 1);
+    int offset = 11;
 
     if(error!=0)
       {
@@ -899,10 +898,10 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
     GraphicObject newObj;
     
-    /*if(isTemplate)
-      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, offset, nArgs-offset));
-      else*/
-    newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
+    if(isTemplate)
+      newObj = new Standard( new FtsTemplateObject( getServer(), this, objId, className, args, offset-1, nArgs-offset+1));
+    else
+      newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
 
     newObj.getFtsObject().setCurrentLayer( layer);
 

@@ -88,8 +88,6 @@ YACC = @YACC@
 SUBDIRS = c help
 
 packagedir = $(pkgdatadir)/packages/oss
-
-EXTRA_DIST = $(package_DATA)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
