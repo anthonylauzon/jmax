@@ -1,5 +1,7 @@
 2003-04-11  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* fts/jmax.c: use pie connection as default connection (windows port)
+	
 	* fts/file.c, fts/jmax.c, fts/thread.c, fts/win32.c, include/ftsconfig-win32.h, include/fts/thread.h : applied patches send by Jarek Myszewsky (windows port)
 
 2003-04-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
