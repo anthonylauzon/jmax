@@ -28,5 +28,6 @@
 #define _RUNTIME_DEVICES_H_
 
 #include "runtime/devices/devices.h"
+#include "runtime/devices/unixdev.h"
 
 #endif
