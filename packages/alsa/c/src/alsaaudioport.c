@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/time.h>
 #include <alsa/asoundlib.h>
 
 #include <fts/fts.h>
@@ -631,15 +632,26 @@ static int xrun( alsaaudioport_t *port, snd_pcm_t *handle)
 /*   fts_log("[alsaaudioport] xrun with alsaaudioport %s\n", port->device_name); */
   snd_pcm_status_alloca(&status);
   if ( (err = snd_pcm_status( handle, status)) < 0)
+  {
+    fts_log("[alsaaudioport] snd_pcm_status port %p, error:%d  (%s)\n", port, err, snd_strerror(err));
     return err;
-
+  }
   if ( snd_pcm_status_get_state( status) == SND_PCM_STATE_XRUN)
   {
+    struct timeval now, diff, tstamp;
+    gettimeofday(&now, 0);
+    snd_pcm_status_get_trigger_tstamp(status, &tstamp);
+    timersub(&now, &tstamp, &diff);
+    fts_log("[alsaaudioport] xrun of at least %.3f msecs\n", 
+	    diff.tv_sec * 1000 + diff.tv_usec / 1000.0);
     port->xrun = 1;
   }
 
   if (( err = snd_pcm_prepare( handle)) < 0)
+  {
+    fts_log("[alsaaudioport] snd_pcm_prepare port %p, error:%d  (%s)\n", port, err, snd_strerror(err));
     return err;
+  }
 
   return 0;
 }
