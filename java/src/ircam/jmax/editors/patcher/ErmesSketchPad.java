@@ -818,6 +818,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
     itsPatcher = null;
     itsEditField = null;
+    editedObject = null;
     anOldPastedObject = null;
     toolBar = null;
     editedObject = null;
@@ -828,6 +829,23 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     pastedConnections.removeAllElements();
 
     updateGroup.remove( this);
+  
+    ftsUndoClipboard.dispose();
+    ftsUndoClipboard = null;
+    undoObjects.removeAllElements();
+    
+    removeSelection.ftsSelection.dispose();
+    removeSelection = null;
+    itsMessageDisplayer = null;
+  
+    if( keyEventClient != null)
+      {
+	removeKeyListener( keyEventClient);
+	keyEventClient = null;
+      }
+    highlightedInletObject = null;
+    highlightedOutletObject = null;
+    connectingObject = null;
   }
 
 

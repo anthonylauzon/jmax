@@ -135,8 +135,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("removeObject"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  if(obj != JMaxApplication.getRootPatcher())
-	    ((FtsPatcherObject)obj).releaseObject( ( FtsObject)args.getObject( 0));	  
+	  ((FtsPatcherObject)obj).releaseObject( ( FtsObject)args.getObject( 0));	  
 	}
       });
     FtsObject.registerMessageHandler( FtsPatcherObject.class, FtsSymbol.get("addConnection"), new FtsMessageHandler(){
@@ -976,6 +975,18 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 	if( getEditorFrame() != null)
 	  ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove((FtsGraphicObject)obj);
       }
+
+    obj.dispose();
+  }
+
+  public void dispose()
+  {
+    for(Enumeration o = objects.elements(); o.hasMoreElements();)
+      ((FtsObject)o.nextElement()).dispose();
+    for(Enumeration c = connections.elements(); c.hasMoreElements();)
+      ((FtsObject)c.nextElement()).dispose();
+    
+    super.dispose();
   }
 
   /**************************************************************/
