@@ -81,7 +81,6 @@ extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_highlightEventsAndTime;
 extern fts_symbol_t seqsym_openFileDialog;
 extern fts_symbol_t seqsym_endPaste;
-extern fts_symbol_t seqsym_endUpdate;
 
 #endif
 

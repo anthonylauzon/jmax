@@ -1284,7 +1284,7 @@ static void
 track_end_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(track_editor_is_open((track_t *)o))
-    fts_client_send_message( o, /*seqsym_endUpdate*/  fts_new_symbol("endUpdate"), 0, 0);
+    fts_client_send_message( o, fts_new_symbol("endUpdate"), 0, 0);
 }
 
 /******************************************************
@@ -1540,7 +1540,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_export, track_export);
 
   fts_class_message_varargs(cl, seqsym_endPaste, track_end_paste);
-  fts_class_message_varargs(cl, /*seqsym_endUpdate*/ fts_new_symbol("endUpdate"), track_end_update);
+  fts_class_message_varargs(cl, fts_new_symbol("endUpdate"), track_end_update);
 
   fts_class_message_varargs(cl, fts_s_openEditor, track_open_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, track_destroy_editor);
