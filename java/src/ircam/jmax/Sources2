@@ -80,8 +80,8 @@ INCLUDE_PATH := $(IRCAM_JMAX_PATH)
 SOURCES := $(ACC) \
 	$(INCLUDE_PATH)/MaxApplication.java \
        	$(INCLUDE_PATH)/MaxEditor.java      \
-        $(INCLUDE_PATH)/MaxWhenHookTable.java \
+	$(INCLUDE_PATH)/MaxToolFinder.java \
 	$(INCLUDE_PATH)/MaxVersion.java \
+        $(INCLUDE_PATH)/MaxWhenHookTable.java \
 	$(INCLUDE_PATH)/MaxWindowManager.java \
-	$(INCLUDE_PATH)/MaxToolFinder.java
 

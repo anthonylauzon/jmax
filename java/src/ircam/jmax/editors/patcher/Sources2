@@ -42,33 +42,33 @@ include $(INCLUDE_PATH)/Sources2
 INCLUDE_PATH := $(LOCAL_PATH)
 
 SOURCES := $(SOURCES)\
-	$(INCLUDE_PATH)/DisplayList.java  \
-	$(INCLUDE_PATH)/ObjectAction.java  \
+	$(INCLUDE_PATH)/AddPopUp.java  \
 	$(INCLUDE_PATH)/ConnectionAction.java  \
+	$(INCLUDE_PATH)/DisplayList.java  \
+	$(INCLUDE_PATH)/EditField.java  \
 	$(INCLUDE_PATH)/ErmesDataEditor.java  \
 	$(INCLUDE_PATH)/ErmesModule.java  \
-	$(INCLUDE_PATH)/EditField.java  \
-	$(INCLUDE_PATH)/ObjectRenderer.java  \
-	$(INCLUDE_PATH)/TextRenderer.java  \
-	$(INCLUDE_PATH)/IconRenderer.java  \
-	$(INCLUDE_PATH)/AddPopUp.java  \
 	$(INCLUDE_PATH)/ErmesPatcherFactory.java  \
 	$(INCLUDE_PATH)/ErmesPatcherListener.java  \
 	$(INCLUDE_PATH)/ErmesSelection.java  \
 	$(INCLUDE_PATH)/ErmesSketchPad.java  \
 	$(INCLUDE_PATH)/ErmesSketchWindow.java  \
-	$(INCLUDE_PATH)/ErmesToolButton.java  \
 	$(INCLUDE_PATH)/ErmesToolBar.java  \
+	$(INCLUDE_PATH)/ErmesToolButton.java  \
 	$(INCLUDE_PATH)/FindPanel.java  \
 	$(INCLUDE_PATH)/FontCache.java  \
 	$(INCLUDE_PATH)/FpePanel.java  \
-	$(INCLUDE_PATH)/KeyMap.java      \
+	$(INCLUDE_PATH)/IconRenderer.java  \
 	$(INCLUDE_PATH)/KeyEventClient.java  \
-	$(INCLUDE_PATH)/Settings.java \
+	$(INCLUDE_PATH)/KeyMap.java      \
+	$(INCLUDE_PATH)/MaxRepaintManager.java \
+	$(INCLUDE_PATH)/ObjectAction.java  \
+	$(INCLUDE_PATH)/ObjectRenderer.java  \
 	$(INCLUDE_PATH)/PatcherClipboardManager.java \
-	$(INCLUDE_PATH)/PatcherSaveManager.java \
 	$(INCLUDE_PATH)/PatcherPrintManager.java \
-	$(INCLUDE_PATH)/MaxRepaintManager.java 
+	$(INCLUDE_PATH)/PatcherSaveManager.java \
+	$(INCLUDE_PATH)/Settings.java \
+	$(INCLUDE_PATH)/TextRenderer.java  \
 
 
 
