@@ -10,6 +10,7 @@ exscale.c \
 fit.c \
 for.c \
 logscale.c \
+ramp.c \
 random.c \
 range.c \
 rewrap.c \

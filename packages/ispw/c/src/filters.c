@@ -371,7 +371,7 @@ sig2p2z_instantiate(fts_class_t *cl)
   fts_dsp_declare_outlet(cl, 0);
 }
 
-static void 
+void 
 sig2p2z_config(void)
 {
   sym_sig2p2z = fts_new_symbol("2p2z~");

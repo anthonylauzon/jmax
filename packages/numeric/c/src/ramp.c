@@ -194,7 +194,6 @@ ramp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->steps = 0;
   this->inval = 0;
   this->running = 0;
-  this->is_int = is_int;
 
   switch(ac)
     {
