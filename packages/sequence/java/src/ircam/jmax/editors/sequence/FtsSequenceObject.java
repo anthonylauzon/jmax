@@ -67,6 +67,14 @@ public class FtsSequenceObject extends FtsObject implements SequenceDataModel
     sequence.toFront();
   }
 
+  public void destroyEditor()
+  {
+    if(sequence!=null)
+    {
+      sequence.dispose();
+      sequence = null;
+    }
+  }
 
 
   /**

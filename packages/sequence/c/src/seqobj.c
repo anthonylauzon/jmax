@@ -17,6 +17,7 @@
 #include "sequence.h"
 
 static fts_symbol_t sym_openEditor = 0;
+static fts_symbol_t sym_destroyEditor = 0;
 
 typedef struct seqevt_ 
 {
@@ -69,6 +70,7 @@ seqobj_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   seqobj_t *this = (seqobj_t *)o;
 
+  fts_client_message_send(o, sym_destroyEditor, 0, 0);
   sequence_empty(&this->seq);
 }
 
@@ -130,6 +132,7 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   if(ac == 1)
     {
       sym_openEditor = fts_new_symbol("openEditor");
+      sym_destroyEditor = fts_new_symbol("destroyEditor");
 
       fts_class_init(cl, sizeof(seqobj_t), 1, 0, 0); 
 
@@ -151,3 +154,4 @@ seqobj_config(void)
 {
   fts_class_install(fts_new_symbol("sequence"), seqobj_instantiate);
 }
+
