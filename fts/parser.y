@@ -131,7 +131,7 @@ comma_expression_list: comma_expression_list TK_COMMA toplevel_term_list
   | comma_expression_list TK_SEMI toplevel_term_list
     { $$ = fts_parsetree_new( TK_SEMI, 0, $1, $3); }
   | toplevel_term_list
-    { $$ = $1 }
+    { $$ = $1; }
   ;
  
  toplevel_term_list: toplevel_term_list toplevel_term  /*---*/ %prec TK_SPACE
