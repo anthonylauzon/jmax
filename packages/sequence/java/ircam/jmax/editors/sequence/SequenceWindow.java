@@ -108,7 +108,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     TrackEditorFactoryTable.setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
     TrackEditorFactoryTable.setFactoryFor(IntegerValue.info, IntegerTrackEditorFactory.instance);
     TrackEditorFactoryTable.setFactoryFor(FloatValue.info, FloatTrackEditorFactory.instance);
-    TrackEditorFactoryTable.setFactoryFor(MessageValue.info, MessageTrackEditorFactory.instance);
+    //TrackEditorFactoryTable.setFactoryFor(MessageValue.info, MessageTrackEditorFactory.instance);
     //TrackEditorFactoryTable.setFactoryFor(MidiValue.info, IntegerTrackEditorFactory.instance);
   }
   
