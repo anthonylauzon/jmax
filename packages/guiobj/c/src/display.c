@@ -37,7 +37,7 @@ typedef struct {
   fts_object_t o;
   fts_atom_t a;
   char string[STRING_SIZE];
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
   double period;
   int gate;
   int pending;
@@ -148,7 +148,8 @@ display_deliver(display_t *this)
 	  
 	  fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->a);
 	  
-	  fts_alarm_set_delay(&this->alarm, this->period);
+	  fts_timer_reset(this->timer);
+	  fts_timer_set_delay(this->timer, this->period, 0);
 	}
       else
 	this->pending = 1;
@@ -156,7 +157,7 @@ display_deliver(display_t *this)
 }
 
 static void
-display_alarm(fts_alarm_t *alarm, void *o)
+display_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
 
@@ -182,7 +183,7 @@ display_alarm(fts_alarm_t *alarm, void *o)
 	      
 	      this->absmax = MIN_FLOAT;
 	      
-	      fts_alarm_set_delay(&this->alarm, this->period);
+	      fts_timer_set_delay(this->timer, this->period, 0);
 	    }
 	}
       else if(this->pending)
@@ -192,7 +193,7 @@ display_alarm(fts_alarm_t *alarm, void *o)
 	  
 	  fts_client_send_message(o, fts_s_set, 1, &this->a);
 	  
-	  fts_alarm_set_delay(&this->alarm, this->period);
+	  fts_timer_set_delay(this->timer, this->period, 0);
 	}
       else
 	this->gate = 1;
@@ -228,7 +229,8 @@ display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->absmax = MIN_FLOAT;
       this->last = MIN_FLOAT;
       
-      fts_alarm_set_delay(&this->alarm, this->period);
+      fts_timer_reset(this->timer);
+      fts_timer_set_delay(this->timer, this->period, 0);
 
       fts_set_ptr(a + 0, this);
       fts_set_symbol(a + 1, fts_dsp_get_input_name(dsp, 0));
@@ -349,7 +351,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   dsp_list_insert(o);
 
   fts_set_string(&this->a, this->string);
-  fts_alarm_init(&this->alarm, 0, display_alarm, (void *)this);
+  this->timer = fts_timer_new(o, 0);
 
   this->period = 50.0;
   this->gate = 1;
@@ -364,7 +366,7 @@ display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   display_t * this = (display_t *)o;
 
-  fts_alarm_reset(&this->alarm);
+  fts_timer_delete(this->timer);
   dsp_list_remove(o);
 }
 
@@ -377,7 +379,8 @@ display_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, display_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, display_put);
-  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, display_alarm);
+
   fts_method_define_varargs(cl, 0, fts_s_int, display_int);
   fts_method_define_varargs(cl, 0, fts_s_float, display_float);
   fts_method_define_varargs(cl, 0, fts_s_symbol, display_symbol);

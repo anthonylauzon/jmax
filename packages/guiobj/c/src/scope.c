@@ -53,7 +53,7 @@ typedef struct _scope_ftl_
   int count;
   int start;
   int send;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } scope_ftl_t;
 
 typedef struct _scope_
@@ -79,7 +79,7 @@ scope_reset(scope_ftl_t *data)
   data->max = MIN_FLOAT;
 
   data->send = 0;
-  fts_alarm_reset(&data->alarm);
+  fts_timer_reset(data->timer);
 }
 
 static void 
@@ -204,7 +204,7 @@ scope_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
 /* alarm function */
 static void 
-scope_send_to_client(fts_alarm_t *alarm, void *o)
+scope_send_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scope_t *this = (scope_t *)o;
   fts_atom_t *a = this->a;  
@@ -253,7 +253,8 @@ scope_send_to_client(fts_alarm_t *alarm, void *o)
 	}
 
       data->send = 0;
-      fts_alarm_set_delay(&(data->alarm), this->period_msec);
+      fts_timer_reset(data->timer);
+      fts_timer_set_delay(data->timer, this->period_msec, 0);
       
       fts_client_send_message(o, sym_display, data->size, this->a);
     }
@@ -326,7 +327,7 @@ scope_ftl(fts_word_t *argv)
 	    {
 	      /* send recorded data */
 	      data->send = size;
-	      fts_alarm_set_delay(&(data->alarm), 0.0);
+	      fts_timer_set_delay(data->timer, 0.0, 0);
 	    }
 
 	  count++;
@@ -369,7 +370,7 @@ scope_ftl(fts_word_t *argv)
 
 		      /* clear display */
 		      data->send = 0;
-		      fts_alarm_set_delay(&(data->alarm), 0.0);
+		      fts_timer_set_delay(data->timer, 0.0, 0);
 
 		      /* reset threshold for auto trigger */
 		      if(data->trigger == scope_auto)
@@ -398,7 +399,7 @@ scope_ftl(fts_word_t *argv)
 		{
 		  /* send recorded data */
 		  data->send = size;
-		  fts_alarm_set_delay(&(data->alarm), 0.0);
+		  fts_timer_set_delay(data->timer, 0.0, 0);
 		  
 		  count++;
 		}
@@ -486,7 +487,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   data->pre = 0;
   data->start = 0;
 
-  fts_alarm_init(&(data->alarm), 0, scope_send_to_client, (void *)this);
+  data->timer = fts_timer_new(o, 0);
 
   scope_reset(data);
   
@@ -502,7 +503,7 @@ scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     {
       scope_ftl_t *data = ftl_data_get_ptr(this->data);
       
-      fts_alarm_reset(&data->alarm);
+      fts_timer_delete(data->timer);
 
       ftl_data_free(this->data);
       
@@ -520,7 +521,9 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, scope_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, scope_delete);      
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), scope_put);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, scope_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, scope_send_to_client);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("size"), scope_set_size_by_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("range"), scope_set_range_by_client);

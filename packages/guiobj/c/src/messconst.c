@@ -43,7 +43,7 @@ typedef struct
   
   /* blink when click */
   int value; 
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } messconst_t;
 
 /************************************************
@@ -60,7 +60,8 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->value = 1;
   fts_object_ui_property_changed(o, fts_s_value);
 
-  fts_alarm_set_delay(&this->alarm, MESSCONST_FLASH_TIME);
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, MESSCONST_FLASH_TIME, 0);
 
   fts_outlet_send(o, 0, message_get_selector(this->mess), message_get_ac(this->mess), message_get_at(this->mess));
 }
@@ -80,9 +81,9 @@ messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
  
 static void 
-messconst_tick(fts_alarm_t *alarm, void *calldata)
+messconst_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  messconst_t *this = (messconst_t *)calldata;
+  messconst_t *this = (messconst_t *)o;
 
   this->value = 0;
   fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
@@ -175,7 +176,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       this->mess = mess;
       this->value = 0;
 
-      fts_alarm_init(&(this->alarm), 0, messconst_tick, this);
+      this->timer = fts_timer_new(o, 0);
     }
   else
     fts_object_set_error(o, "Empty message or constant");
@@ -188,7 +189,7 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
   fts_object_release((fts_object_t *)this->mess);
 
-  fts_alarm_reset(&(this->alarm));
+  fts_timer_delete(this->timer);
 }
 
 static fts_status_t
@@ -198,7 +199,8 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messconst_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messconst_delete);
-  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, messconst_tick);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, messconst_send_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, messconst_send_ui_properties); 
   

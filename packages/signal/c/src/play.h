@@ -46,14 +46,14 @@ typedef struct _signal_play_
   enum play_mode {mode_stop, mode_pause, mode_play, mode_loop, mode_cycle} mode;
   int cycle_direction;
 
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } signal_play_t;
 
 #define signal_play_get_conv_position(p) ((p)->conv_position)
 #define signal_play_get_conv_step(p) ((p)->conv_step)
 
 extern void signal_play_init(signal_play_t *this, int ac, const fts_atom_t *at);
-extern void signal_play_reset(signal_play_t *this);
+extern void signal_play_delete(signal_play_t *this);
 extern void signal_play_class_register(fts_symbol_t name, fts_instantiate_fun_t fun);
 extern void signal_play_class_init(fts_class_t *cl, fts_symbol_t type);
 

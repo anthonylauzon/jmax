@@ -978,25 +978,25 @@ ivec_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-ivec_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
   int *values = ivec_get_ptr(this);
   int size = ivec_get_size(this);
   fts_array_t *array = fts_get_array(at);
-  fts_atom_t a;
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
   int i;
   
+  fts_array_set_size(array, onset + size);  
+  atoms = fts_array_get_atoms(array) + onset;
+
   for(i=0; i<size; i++)
-    {
-      fts_set_int(&a, values[i]);
-  
-      fts_array_append(array, 1, &a);
-    }
+    fts_set_int(atoms + i, values[i]);
 }
 
 static void
-ivec_restore_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ivec_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
 
@@ -1123,8 +1123,8 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ivec_delete);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, ivec_print); 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), ivec_get_state_as_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), ivec_restore_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, ivec_append_state_to_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, ivec_set_state_from_array);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), ivec_assist); 
 
       /* save and restore to/from bmax file */

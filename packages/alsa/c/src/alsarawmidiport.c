@@ -35,15 +35,7 @@
 static fts_symbol_t s_hw_0_0;
 
 /* MIDI status bytes */
-#define STATUS_BYTE_NOTE 0x90
-#define STATUS_BYTE_POLY_PRESSURE 0xa0
-#define STATUS_BYTE_CONTROL_CHANGE 0xb0
-#define STATUS_BYTE_PROGRAM_CHANGE 0xc0
-#define STATUS_BYTE_CHANNEL_PRESSURE 0xd0
-#define STATUS_BYTE_PITCH_BEND 0xe0
-
 #define STATUS_BYTE_SYSEX 0xf0
-#define STATUS_BYTE_SYSEX_REALTIME 0x7f
 #define STATUS_BYTE_SYSEX_END 0xf7
 
 #define BUFFER_LENGTH 512
@@ -56,12 +48,12 @@ typedef struct _alsarawmidiport_
   snd_rawmidi_t *handle_out;
   int fd;
 
-  unsigned char receive_buffer[BUFFER_LENGTH];
-  /* system exclusive output buffer */
+  unsigned char receive_buffer[BUFFER_LENGTH]; /* system exclusive output buffer */
   int sysex_head;
 } alsarawmidiport_t;
 
-static void alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
   fts_midiparser_t *parser = (fts_midiparser_t *)o;
@@ -75,145 +67,82 @@ static void alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s,
     }
 
   for ( i = 0; i < n; i++)
+    fts_midiparser_byte( parser, this->receive_buffer[i]);
+}
+
+static void
+alsarawmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
+{
+  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
+
+  if(fts_midievent_is_channel_message(event))
     {
-      fts_midiparser_byte( parser, this->receive_buffer[i]);
+      if(fts_midievent_channel_message_has_second_byte(event))
+	{
+	  unsigned char buffer[3];
+
+	  buffer[0] = (unsigned char)fts_midievent_channel_message_get_status_byte(event);
+	  buffer[1] = (unsigned char)(fts_midievent_channel_message_get_first(event) & 0x7f);
+	  buffer[2] = (unsigned char)(fts_midievent_channel_message_get_second(event) & 0x7f);
+
+	  snd_rawmidi_write( this->handle_out, buffer, 3);
+	}
+      else
+	{
+	  unsigned char buffer[2];
+
+	  buffer[0] = (unsigned char)fts_midievent_channel_message_get_status_byte(event);
+	  buffer[1] = (unsigned char)(fts_midievent_channel_message_get_first(event) & 0x7f);
+
+	  snd_rawmidi_write(this->handle_out, buffer, 2);
+	}
+    }
+  else 
+    {
+      switch(fts_midievent_system_get_type(event))
+	{
+	case midi_system_exclusive:
+	  {
+	    unsigned char buffer[BUFFER_LENGTH];
+	    int size = fts_midievent_system_exclusive_get_size(event);
+	    fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(event);
+	    int i, n;
+	    
+	    buffer[0] = STATUS_BYTE_SYSEX;
+	    
+	    for(i=0, n=1; i<size; i++)
+	      {
+		buffer[n++] = fts_get_int(atoms + i) & 0x7f;
+		
+		if(n == BUFFER_LENGTH)
+		  {
+		    snd_rawmidi_write( this->handle_out, buffer, BUFFER_LENGTH);
+		    n = 0;
+		  }
+	      }
+	    
+	    buffer[n++] = STATUS_BYTE_SYSEX_END;
+	    snd_rawmidi_write(this->handle_out, buffer, n);
+	  }
+	  break;
+	  
+	case midi_real_time:
+	  {
+	    unsigned char byte = (unsigned char)fts_midievent_real_time_get_status_byte(event);
+	    snd_rawmidi_write(this->handle_out, &byte, 1);
+	  }
+	  break;
+	  
+	default:
+	  break;
+	}
     }
 }
 
-
-static void alsarawmidiport_send_note(fts_object_t *o, int channel, int number, int value, double time)
+static void 
+alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-  int n;
-
-  buffer[0] = STATUS_BYTE_NOTE | ((channel - 1) & 0x0F);
-  buffer[1] = (unsigned char)(number & 127);
-  buffer[2] = (unsigned char)(value & 127);
-
-  n = snd_rawmidi_write( this->handle_out, buffer, 3);
-}
-
-static void
-alsarawmidiport_send_poly_pressure(fts_object_t *o, int channel, int number, int value, double time)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-  int n;
-
-  buffer[0] = STATUS_BYTE_POLY_PRESSURE | ((channel - 1) & 0x0F);
-  buffer[1] = (unsigned char)(number & 127);
-  buffer[2] = (unsigned char)(value & 127);
-
-  n = snd_rawmidi_write( this->handle_out, buffer, 3);
-}
-
-static void
-alsarawmidiport_send_control_change(fts_object_t *o, int channel, int number, int value, double time)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-  int n;
-
-  buffer[0] = STATUS_BYTE_CONTROL_CHANGE | ((channel - 1) & 0x0F);
-  buffer[1] = (unsigned char)(number & 127);
-  buffer[2] = (unsigned char)(value & 127);
-
-  n = snd_rawmidi_write( this->handle_out, buffer, 3);
-}
-
-static void
-alsarawmidiport_send_program_change(fts_object_t *o, int channel, int value, double time)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-  int n;
-
-  buffer[0] = STATUS_BYTE_PROGRAM_CHANGE | ((channel - 1) & 0x0F);
-  buffer[1] = (unsigned char)(value & 127);
-
-  n = snd_rawmidi_write( this->handle_out, buffer, 2);
-}
-
-static void
-alsarawmidiport_send_channel_pressure(fts_object_t *o, int channel, int value, double time)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-  int n;
-
-  buffer[0] = STATUS_BYTE_CHANNEL_PRESSURE | ((channel - 1) & 0x0F);
-  buffer[1] = (unsigned char)(value & 127);
-
-  n = snd_rawmidi_write( this->handle_out, buffer, 2);
-}
-
-static void
-alsarawmidiport_send_pitch_bend(fts_object_t *o, int channel, int value, double time)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-  int n;
-
-  buffer[0] = STATUS_BYTE_PITCH_BEND | ((channel - 1) & 0x0F);
-  buffer[1] = (unsigned char)(value & 127); /* LSB */
-  buffer[2] = (unsigned char)(value >> 7); /* MSB */
-
-  n = snd_rawmidi_write( this->handle_out, buffer, 3);
-}
-
-static void
-alsarawmidiport_send_system_exclusive_byte(fts_object_t *o, int value)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[2];
-  int n = 0;
-
-  if(this->sysex_head == 0)
-    {
-      buffer[0] = (unsigned char)STATUS_BYTE_SYSEX;
-      buffer[1] = (unsigned char)(value & 0x7f);
-      snd_rawmidi_write( this->handle_out, buffer, 2);
-
-      this->sysex_head = 1;
-    }
-  else
-    {
-      buffer[0] = (unsigned char)(value & 0x7f);
-      snd_rawmidi_write( this->handle_out, buffer, 1);
-    }
-}
-
-static void
-alsarawmidiport_send_system_exclusive_flush(fts_object_t *o, double time)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  unsigned char buffer[3];
-
-  buffer[0] = (unsigned char)STATUS_BYTE_SYSEX_END;
-  snd_rawmidi_write( this->handle_out, buffer, 1);
-
-  this->sysex_head = 0;
-}
-
-static fts_midiport_output_functions_t alsarawmidiport_output_functions =
-{
-  alsarawmidiport_send_note,
-  alsarawmidiport_send_poly_pressure,
-  alsarawmidiport_send_control_change,
-  alsarawmidiport_send_program_change,
-  alsarawmidiport_send_channel_pressure,
-  alsarawmidiport_send_pitch_bend,
-  alsarawmidiport_send_system_exclusive_byte,
-  alsarawmidiport_send_system_exclusive_flush,
-};
-
-
-
-static void alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  alsarawmidiport_t *this = (alsarawmidiport_t *)o;
-  fts_midiport_t *port = (fts_midiport_t *)o;
   fts_midiparser_t *parser = (fts_midiparser_t *)o;
   char name[256];
   int err, fd;
@@ -239,22 +168,24 @@ static void alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   this->fd = fds.fd;
 
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->fd);
+  fts_sched_add(o, FTS_SCHED_READ, this->fd);
 
-  fts_midiport_init( port);
   fts_midiparser_init( parser);
 
-  fts_midiport_set_input( port);
-  fts_midiport_set_output( port, &alsarawmidiport_output_functions);
+  fts_midiport_set_input((fts_midiport_t *)parser);
+  fts_midiport_set_output((fts_midiport_t *)parser, alsarawmidiport_output);
 
   this->sysex_head = 0;
 }
 
-static void alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void
+alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
+  fts_midiparser_t *parser = (fts_midiparser_t *)o;
 
-  fts_sched_remove( (fts_object_t *)this);
+  fts_sched_remove(o);
+  fts_midiparser_reset(parser);
 
   if (this->handle_in)
     {
@@ -269,7 +200,8 @@ static void alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s,
     }
 }
 
-static void alsarawmidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
+static void 
+alsarawmidiport_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
 
@@ -279,7 +211,8 @@ static void alsarawmidiport_get_state(fts_daemon_action_t action, fts_object_t *
     fts_set_void( value);
 }
 
-static fts_status_t alsarawmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t 
+alsarawmidiport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof( alsarawmidiport_t), 0, 0, 0);
 
@@ -294,12 +227,8 @@ static fts_status_t alsarawmidiport_instantiate(fts_class_t *cl, int ac, const f
   return fts_Success;
 }
 
-
-/* ********************************************************************** */
-/* init function                                                          */
-/* ********************************************************************** */
-
-void alsarawmidiport_config( void)
+void 
+alsarawmidiport_config( void)
 {
   fts_class_install( fts_new_symbol("alsarawmidiport"), alsarawmidiport_instantiate);
 

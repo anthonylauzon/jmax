@@ -66,7 +66,7 @@ enum{
  */
 
 static void
-clock_bang(fts_alarm_t *alarm, void *o)
+fft_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_bang((fts_object_t *)o, ((fft_t *)o)->bang_out);
 }
@@ -84,7 +84,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   complex *spec = 0;
   long spec_size;
 
-  fts_alarm_init(&x->ctl.alarm, 0, clock_bang, o);
+  x->ctl.timer = fts_timer_new(o, 0);
 
   x->name = fts_get_symbol_arg(ac, at, 0, sym_fft);
   x->bang_out = fft_class->bang_out;
@@ -154,7 +154,7 @@ fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fft_t *x = (fft_t *)o;
 
-  fts_alarm_reset(&x->ctl.alarm);
+  fts_timer_delete(x->ctl.timer);
 
   if(x->ctl.buf) 
     fts_free((void *)x->ctl.buf);
@@ -458,24 +458,18 @@ class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   }
 
   /* ... but everyone has these */
-  
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fft_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fft_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, dsp_put_all);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, fft_delete, 0, a);
-
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, dsp_put_all, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, fft_output_bang);
 
   /* user methods */
-
-  fts_method_define(cl, 0, fts_s_bang, fft_bang, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_new_symbol("setphase"), fft_setphase, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, fft_bang);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("setphase"), fft_setphase);
 
   /* bang outlet */
-
-  fts_outlet_type_define(cl, bang_out, fts_s_bang, 0, 0);
+  fts_outlet_type_define_varargs(cl, bang_out, fts_s_bang);
   
   fft_class->name = class;
   fft_class->type = type; /* default */

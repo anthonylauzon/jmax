@@ -42,7 +42,7 @@
 typedef struct {
   fts_object_t o;
   fts_atom_list_t *atom_list;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
   int value;
 } messbox_t;
 
@@ -554,9 +554,9 @@ static void messbox_update(fts_object_t *o)
  *
  */
 
-static void messbox_tick(fts_alarm_t *alarm, void *calldata)
+static void messbox_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  messbox_t *this = (messbox_t *)calldata;
+  messbox_t *this = (messbox_t *)o;
 
   this->value = 0;
   fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
@@ -575,7 +575,7 @@ static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
    this->atom_list = (fts_atom_list_t *)fts_object_create(fts_class_get_by_name(atomlist_symbol), 0, 0);
 
-  fts_alarm_init(&(this->alarm), 0, messbox_tick, this);
+  this->timer = fts_timer_new(o, 0);
   this->value = 0;
 }
 
@@ -585,7 +585,7 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   messbox_t *this = (messbox_t *) o;
 
   fts_send_message((fts_object_t *)this->atom_list, fts_SystemInlet, fts_s_delete, 0, 0);
-  fts_alarm_reset(&(this->alarm));
+  fts_timer_delete(this->timer);
 }
 
 
@@ -759,7 +759,8 @@ static void messbox_eval_and_update(fts_object_t *o, int winlet, fts_symbol_t s,
   this->value = 1;
   fts_object_ui_property_changed(o, fts_s_value);
 
-  fts_alarm_set_delay(&(this->alarm), DEFAULT_DURATION);
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, DEFAULT_DURATION, 0);
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
@@ -789,55 +790,38 @@ static void messbox_get_value(fts_daemon_action_t action, fts_object_t *obj, fts
   fts_set_int(value, this->value);
 }
 
-
 static fts_status_t messbox_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
   fts_class_init(cl, sizeof(messbox_t), 1, 1, 0);
 
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, messbox_init, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messbox_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messbox_delete);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, messbox_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, messbox_tick);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, messbox_set);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, messbox_find);
-  fts_method_define(cl, fts_SystemInlet, fts_s_bang, messbox_eval_and_update, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_bang, messbox_eval_and_update);
 
   /* Atom list saving/loading/update support */
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_upload, messbox_upload, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, messbox_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  messbox_append_noupdate);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  messbox_clear_noupdate);
 
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, messbox_save_bmax, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, messbox_save_bmax);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat); 
 
-  a[0] = fts_s_ptr;
-  fts_method_define( cl, fts_SystemInlet, fts_s_save_dotpat, messbox_save_dotpat, 1, a); 
-
-  /* Application methods */
-
-  fts_method_define(cl, 0, fts_s_bang, messbox_eval, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, messbox_eval, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, messbox_eval, 1, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, messbox_eval, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, messbox_eval);
+  fts_method_define_varargs(cl, 0, fts_s_int, messbox_eval);
+  fts_method_define_varargs(cl, 0, fts_s_float, messbox_eval);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, messbox_eval);
 
   fts_method_define_varargs(cl, 0, fts_s_list, messbox_eval);
-
   fts_method_define_varargs(cl, 0, fts_s_set, messbox_set);
-
   fts_method_define_varargs(cl, 0, fts_s_append,  messbox_append);
 
   /* value daemons */
-
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
   return fts_Success;

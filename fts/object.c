@@ -54,9 +54,6 @@ static fts_symbol_t fts_object_description_get_variable_name(int ac, const fts_a
 static void fts_object_unbind(fts_object_t *obj);
 static void fts_object_free(fts_object_t *obj);
 
-/*extern void fts_error_finder_recompute(void);*/
-
-
 /******************************************************************************
  *
  *  create object
@@ -66,13 +63,13 @@ static void fts_object_free(fts_object_t *obj);
 fts_object_t *
 fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_object_t *obj = (fts_object_t *)fts_calloc(cl->size);
+  fts_object_t *obj = (fts_object_t *)fts_heap_calloc(cl->heap);
 
   obj->head.cl = cl;
   obj->head.id = FTS_NO_ID;
-  obj->properties = 0;
-  obj->varname = 0;
-  obj->refcnt = 0;
+  /*obj->properties = 0;*/
+  /*obj->varname = 0;*/
+  /*obj->refcnt = 0;*/
   
   if (cl->noutlets)
     obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
@@ -80,8 +77,9 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   if (cl->ninlets)
     obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
   
-  /* &@#!@#$%*@#$ very nice hack to survive until jMax 3 (Merci Francois!) */
-  fts_message_send(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1);
+  /* &@#!@#$%*@#$ "at - 1": very nice hack to survive until this gets really fixed (Merci Francois!) */
+  if(fts_class_get_constructor(cl))
+    fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac + 1, at - 1);
 
   return obj;
 }
@@ -99,7 +97,7 @@ fts_new_status(const char *description)
 fts_status_t 
 fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret)
 {
-  fts_status_t status;
+  fts_symbol_t error;
   fts_class_t *cl;
   fts_object_t *obj;
 
@@ -126,7 +124,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
       return &fts_CannotInstantiate;
     }
 
-  obj = (fts_object_t *)fts_calloc(cl->size);
+  obj = (fts_object_t *)fts_heap_calloc(cl->heap);
 
   obj->patcher = patcher;
   obj->head.cl = cl;
@@ -141,45 +139,20 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   if (cl->ninlets)
     obj->in_conn = (fts_connection_t **) fts_calloc(cl->ninlets * sizeof(fts_connection_t *));
     
-  /* send the init message */
-  {
-    /* force type checking during new */
-    long save_check_status;
+  if(fts_class_get_constructor(cl))
+    fts_class_get_constructor(cl)(obj, fts_SystemInlet, fts_s_init, ac, at);
 
-    save_check_status = fts_mess_get_run_time_check();
-    fts_mess_set_run_time_check(1);
-
-    status = fts_message_send(obj, fts_SystemInlet, fts_s_init, ac, at);
-    fts_mess_set_run_time_check(save_check_status);
-  }
-
-  if(status != &fts_MethodNotFound)
+  error = fts_object_get_error(obj);
+  
+  if(error)
     {
-      if (status != fts_Success)
-	{
-	  /* free already allocated */
-	  fts_object_free(obj);
-
-	  /* return NULL */
-	  *ret = 0;
-	  
-	  return status;
-	}
-      else
-	{
-	  fts_symbol_t error = fts_object_get_error(obj);
-
-	  if(error)
-	    {
-	      /* free already allocated */
-	      fts_object_free(obj);
-	      
-	      /* return NULL */
-	      *ret = 0;
-
-	      return fts_new_status(fts_symbol_name(error));
-	    }
-	}
+      /* free already allocated */
+      fts_object_free(obj);
+      
+      /* return NULL */
+      *ret = 0;
+      
+      return fts_new_status(fts_symbol_name(error));
     }
 
   fts_patcher_add_object(patcher, obj);
@@ -525,17 +498,15 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
-  /* If object ID belongs to new client, do nothing */
-  if (OBJECT_ID_CLIENT( obj->head.id))
-    return;
-
-  /* tell the client to release the Java part */
-  if (obj->head.id != FTS_NO_ID)
-    fts_client_release_object(obj);
-
-  /* remove the object from the object table */
-  if (obj->head.id != FTS_NO_ID)
-    fts_object_table_remove(obj->head.id);
+  /* if no id or object ID belongs to new client, do nothing */
+  if (obj->head.id != FTS_NO_ID && !OBJECT_ID_CLIENT( obj->head.id))
+    {
+      /* tell the client to release the Java part */
+      fts_client_release_object(obj);
+      
+      /* remove the object from the object table */
+      fts_object_table_remove(obj->head.id);
+    }
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
@@ -556,15 +527,16 @@ fts_object_free(fts_object_t *obj)
     fts_free( obj->in_conn);
 
   /* free the object */
-  fts_free( obj);
+  fts_heap_free(obj, obj->head.cl->heap);
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
 void 
 fts_object_destroy(fts_object_t *obj)
 {
-  /* send delete message */
-  fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+  /* call deconstructor */
+  if(fts_class_get_deconstructor(fts_object_get_class(obj)))
+    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_SystemInlet, fts_s_delete, 0, 0);
 
   /* take the object away from the update queue (if there) and free it */
   fts_object_reset_changed(obj);
@@ -588,9 +560,9 @@ fts_object_delete_from_patcher(fts_object_t *obj)
   /* unreference by hand */
   obj->refcnt--;
 
-  /* send delete message */
-  if(obj->refcnt == 0)
-    fts_send_message(obj, fts_SystemInlet, fts_s_delete, 0, 0);
+  /* call deconstructor */
+  if(obj->refcnt == 0 && fts_class_get_deconstructor(fts_object_get_class(obj)))
+    fts_class_get_deconstructor(fts_object_get_class(obj))(obj, fts_SystemInlet, fts_s_delete, 0, 0);
 
   /* remove from patcher */
   if(obj->patcher)
@@ -688,8 +660,9 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
 
   /*if((old->head.id == new_id) && fts_object_description_variable_name_changed_only(fts_object_t *old, int ac, const fts_atom_t *at))*/
 
-  /* send delete message */
-  fts_send_message(old, fts_SystemInlet, fts_s_delete, 0, 0);  
+  /* call deconstructor */
+  if(fts_class_get_deconstructor(old->head.cl))
+    fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
 
   /* if old id and new id are the same, do the replace without telling the client */
   if ((old->head.id != FTS_NO_ID) && (old->head.id == new_id))
@@ -734,8 +707,6 @@ fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at)
 
   fts_object_reset_changed(old);
   fts_object_free(old);
-
-  /*fts_error_finder_recompute();*/
 
   return new;
 }

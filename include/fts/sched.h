@@ -36,26 +36,6 @@
 
 
 /** 
- * @name logical time
- */
-/*@{*/
-
-/**
- * Get logical time in milliseconds
- *
- * @fn double fts_get_time(void)
- * @return logical time in msecs
- *
- * @ingroup sched
- */
-FTS_API double fts_get_time(void);
-
-/* make alias */
-#define fts_get_time_in_msec() (fts_get_time())
-
-/*@}*/ /* logical time */
-
-/** 
  * @name Handling scheduler callbacks
  *
  * Functions to add callback methods to a scheduler.
@@ -118,45 +98,10 @@ FTS_API int fts_sched_remove( fts_object_t *obj);
 
 /*@}*/ /* Handling scheduler callbacks */
 
-/** 
- * @name Scheduler clock
- *
- * Functions to manipulate scheduler clock
- *
- * @{
- */
-
-/**
- * Get scheduler clock
- *
- * @fn fts_clock_t *fts_sched_get_clock()
- * @return a pointer to the scheduler clock
- */
-FTS_API fts_clock_t *fts_sched_get_clock( void);
-
-/**
- * Advance scheduler clock
- *
- * @fn void fts_sched_advance_clock( double time)
- * @param time given time 
- */
-FTS_API void fts_sched_advance_clock( double time);
-
-/**
- * Set scheduler time
- *
- * @fn void fts_sched_set_time( double time)
- * @param time given time 
- */
-FTS_API void fts_sched_set_time( double time);
-
-/**
- * @}
- */ /* Scheduler clock */
-
-
 /* system functions */
-FTS_API void fts_sched_run( void);
-FTS_API void fts_sched_halt( void);
+FTS_API void fts_sched_run(void);
+FTS_API void fts_sched_halt(void);
+
+FTS_API void fts_sleep(void);
 
 #endif

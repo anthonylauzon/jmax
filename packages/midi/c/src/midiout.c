@@ -26,16 +26,13 @@
 
 #include <fts/fts.h>
 
-static void midiout_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-static void midiout_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
 static fts_symbol_t sym_omni = 0;
 
 static int 
 midiout_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, int *number)
 {
   *port = 0;
-  *channel = 1;
+  *channel = 0;
   *number = 0;
 
   if(ac > 0)
@@ -65,7 +62,7 @@ midiout_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **po
 	      
 	      *number = (n < 0)? 0: ((n > 127)? 127: n);      
 	      
-	      /* skip port argument */
+	      /* skip number argument */
 	      ac--;
 	      at++;
 	    }
@@ -80,9 +77,9 @@ midiout_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **po
       
 	  if(fts_is_number(at))
 	    {
-	      int n = fts_get_number_int(at);
+	      int n = fts_get_number_int(at) - 1;
 	  
-	      *channel = (n < 1)? 1: ((n > 16)? 16: n);
+	      *channel = (n < 0)? 0: ((n > 15)? 15: n);
 	    }
 	  else
 	    return 0;
@@ -123,7 +120,10 @@ static void
 midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiout_t *this = (midiout_t *)o;
-  fts_midiport_t *port = 0;
+
+  this->port = 0;
+  this->channel = 0;
+  this->number = 0;
 
   midiout_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number);
 }
@@ -132,12 +132,12 @@ static void
 midiout_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *this = (midiout_t *)o;
-  int channel = fts_get_number_int(at);
+  int channel = fts_get_number_int(at) - 1;
   
-  if(channel < 1)
-    this->channel = 1;
-  else if(channel > 16)
-    this->channel = 16;
+  if(channel < 0)
+    this->channel = 0;
+  else if(channel > 15)
+    this->channel = 15;
   else
     this->channel = channel;
 }
@@ -146,8 +146,14 @@ static void
 midiout_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midiout_t *this = (midiout_t *)o;
+  int number = fts_get_number_int(at);
   
-  this->number = fts_get_number_int(at) & 127;
+  if(number < 0)
+    this->number = 0;
+  else if(number > 127)
+    this->number = 127;
+  else
+    this->number = number;
 }
 
 static void
@@ -155,29 +161,31 @@ noteout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   midiout_t *this = (midiout_t *)o;
 
-  if(this->port)
+  switch (ac)
     {
-      switch (ac)
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+	midiout_set_channel(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_number(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
 	{
-	default:
-	case 3:
-	  midiout_set_channel(o, 0, 0, 1, at + 2);
-	case 2:
-	  midiout_set_number(o, 0, 0, 1, at + 1);
-	case 1:
-	  {
-	    int value = fts_get_number_int(at);
+	  fts_midievent_t *event;
+	  int note = fts_get_number_int(at);
+
+	  if(note < 0)
+	    note = 0;
+	  else if(note > 127)
+	    note = 127;
 	    
-	    if(value < 0)
-	      value = 0;
-	    else if(value > 127)
-	      value = 127;
-	    
-	    fts_midiport_output_note(this->port, this->channel, value, this->number, 0.0);
-	  }
-	case 0:
-	  break;
+	  event = fts_midievent_note_new(this->channel, note, this->number);
+	  fts_midiport_output(this->port, event, 0.0);
 	}
+    case 0:
+      break;
     }
 }
 
@@ -186,29 +194,31 @@ polyout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   midiout_t *this = (midiout_t *)o;
 
-  if(this->port)
+  switch (ac)
     {
-      switch (ac)
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+	midiout_set_channel(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_number(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
 	{
-	default:
-	case 3:
-	  midiout_set_channel(o, 0, 0, 1, at + 2);
-	case 2:
-	  midiout_set_number(o, 0, 0, 1, at + 1);
-	case 1:
-	  {
-	    int value = fts_get_number_int(at);
+	  fts_midievent_t *event;
+	  int value = fts_get_number_int(at);
 	    
-	    if(value < 0)
-	      value = 0;
-	    else if(value > 127)
-	      value = 127;
+	  if(value < 0)
+	    value = 0;
+	  else if(value > 127)
+	    value = 127;
 	    
-	    fts_midiport_output_poly_pressure(this->port, this->channel, this->number, value, 0.0);
-	  }
-	case 0:
-	  break;
+	  event = fts_midievent_poly_pressure_new(this->channel, this->number, value);
+	  fts_midiport_output(this->port, event, 0.0);
 	}
+    case 0:
+      break;
     }
 }
 
@@ -217,29 +227,31 @@ ctlout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   midiout_t *this = (midiout_t *)o;
 
-  if(this->port)
+  switch (ac)
     {
-      switch (ac)
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+	midiout_set_channel(o, 0, 0, 1, at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_number(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
 	{
-	default:
-	case 3:
-	  midiout_set_channel(o, 0, 0, 1, at + 2);
-	case 2:
-	  midiout_set_number(o, 0, 0, 1, at + 1);
-	case 1:
-	  {
-	    int value = fts_get_number_int(at);
-	    
-	    if(value < 0)
-	      value = 0;
-	    else if(value > 127)
-	      value = 127;
-	    
-	    fts_midiport_output_control_change(this->port, this->channel, this->number, value, 0.0);
-	  }
-	case 0:
-	  break;
+	  fts_midievent_t *event;
+	  int value = fts_get_number_int(at);
+	  
+	  if(value < 0)
+	    value = 0;
+	  else if(value > 127)
+	    value = 127;
+	  
+	  event = fts_midievent_control_change_new(this->channel, this->number, value);
+	  fts_midiport_output(this->port, event, 0.0);
 	}
+    case 0:
+      break;
     }
 }
 
@@ -248,27 +260,28 @@ pgmout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   midiout_t *this = (midiout_t *)o;
 
-  if(this->port)
+  switch (ac)
     {
-      switch (ac)
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_channel(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
 	{
-	default:
-	case 2:
-	  midiout_set_channel(o, 0, 0, 1, at + 1);
-	case 1:
-	  {
-	    int value = fts_get_number_int(at);
+	  fts_midievent_t *event;
+	  int value = fts_get_number_int(at);
 	    
-	    if(value < 0)
-	      value = 0;
-	    else if(value > 127)
-	      value = 127;
+	  if(value < 0)
+	    value = 0;
+	  else if(value > 127)
+	    value = 127;
 	    
-	    fts_midiport_output_program_change(this->port, this->channel, fts_get_number_int(at) & 127, 0.0);
-	  }
-	case 0:
-	  break;
+	  event = fts_midievent_program_change_new(this->channel, value);
+	  fts_midiport_output(this->port, event, 0.0);
 	}
+    case 0:
+      break;
     }
 }
 
@@ -277,27 +290,28 @@ touchout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   midiout_t *this = (midiout_t *)o;
 
-  if(this->port)
+  switch (ac)
     {
-      switch (ac)
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_channel(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at + 0))
 	{
-	default:
-	case 2:
-	  midiout_set_channel(o, 0, 0, 1, at + 1);
-	case 1:
-	  {
-	    int value = fts_get_number_int(at);
+	  fts_midievent_t *event;
+	  int value = fts_get_number_int(at);
 	    
-	    if(value < 0)
-	      value = 0;
-	    else if(value > 127)
-	      value = 127;
+	  if(value < 0)
+	    value = 0;
+	  else if(value > 127)
+	    value = 127;
 	    
-	    fts_midiport_output_channel_pressure(this->port, this->channel, value, 0.0);
-	  }
-	case 0:
-	  break;
+	  event = fts_midievent_channel_pressure_new(this->channel, value);
+	  fts_midiport_output(this->port, event, 0.0);
 	}
+    case 0:
+      break;
     }
 }
 
@@ -306,27 +320,58 @@ bendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   midiout_t *this = (midiout_t *)o;
 
-  if(this->port)
+  switch (ac)
     {
-      switch (ac)
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_channel(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
 	{
-	default:
-	case 2:
-	  midiout_set_channel(o, 0, 0, 1, at + 1);
-	case 1:
-	  {
-	    int value = fts_get_number_int(at);
+	  fts_midievent_t *event;
+	  int value = fts_get_number_int(at);
 	    
-	    if(value < 0)
-	      value = 0;
-	    else if(value > 127)
-	      value = 127;
+	  if(value < 0)
+	    value = 0;
+	  else if(value > 127)
+	    value = 127;
 	    
-	    fts_midiport_output_pitch_bend(this->port, this->channel, value << 7, 0.0);
-	  }
-	case 0:
-	  break;
+	  event = fts_midievent_pitch_bend_new(this->channel, 0, value);
+	  fts_midiport_output(this->port, event, 0.0);
 	}
+    case 0:
+      break;
+    }
+}
+
+static void
+xbendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  midiout_t *this = (midiout_t *)o;
+
+  switch (ac)
+    {
+    default:
+    case 2:
+      if(fts_is_number(at + 1))
+	midiout_set_channel(o, 0, 0, 1, at + 1);
+    case 1:
+      if(fts_is_number(at))
+	{
+	  fts_midievent_t *event;
+	  int value = fts_get_number_int(at);
+	  
+	  if(value < 0)
+	    value = 0;
+	  else if(value > 16383)
+	    value = 16383;
+	  
+	  event = fts_midievent_pitch_bend_new(this->channel, value & 127, value >> 7);
+	  fts_midiport_output(this->port, event, 0.0);
+	}
+    case 0:
+      break;
     }
 }
 
@@ -490,6 +535,29 @@ bendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
+static fts_status_t
+xbendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_midiport_t *port;
+  int channel;
+  int number;
+
+  if(!midiout_check(0, ac - 1, at + 1, &port, &channel, &number))
+    return &fts_CannotInstantiate;    
+
+  fts_class_init(cl, sizeof(midiout_t), 2, 0, 0);
+
+  fts_method_define_varargs(cl, 0, fts_s_int, xbendout_send);
+  fts_method_define_varargs(cl, 0, fts_s_float, xbendout_send);
+  fts_method_define_varargs(cl, 0, fts_s_list, xbendout_send);
+  
+  fts_method_define_varargs(cl, 1, fts_s_int, midiout_set_channel);
+  fts_method_define_varargs(cl, 1, fts_s_float, midiout_set_channel);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midiout_init);
+
+  return fts_Success;
+}
 
 
 static int 
@@ -513,4 +581,5 @@ midiout_config(void)
   fts_metaclass_install(fts_new_symbol("pgmout"), pgmout_instantiate, midiout_equiv);
   fts_metaclass_install(fts_new_symbol("touchout"), touchout_instantiate, midiout_equiv);
   fts_metaclass_install(fts_new_symbol("bendout"), bendout_instantiate, midiout_equiv);
+  fts_metaclass_install(fts_new_symbol("xbendout"), xbendout_instantiate, midiout_equiv);
 }

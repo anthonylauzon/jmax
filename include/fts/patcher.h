@@ -43,9 +43,6 @@ struct fts_patcher
   /* If this patcher is a template, point to the template definition */
   fts_template_t *template;
 
-  /* The pointer to the patcher data  */
-  /*fts_patcher_data_t *data;*/
-
   /* Variables */
   fts_env_t env;
 };    

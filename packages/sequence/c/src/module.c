@@ -29,7 +29,7 @@
 extern void seqsym_config(void);
 
 extern void _sequence_config(void);
-extern void eventtrk_config(void);
+extern void track_config(void);
 extern void event_config(void);
 
 extern void note_config(void);
@@ -47,7 +47,7 @@ sequence_config(void)
   seqsym_config();
 
   _sequence_config();
-  eventtrk_config();
+  track_config();
   event_config();
 
   note_config();

@@ -29,14 +29,15 @@
 #include "sequence.h"
 #include "track.h"
 #include "event.h"
-#include "eventtrk.h"
-#include "seqref.h"
+#include "track.h"
 
 typedef struct _seqstep_
 {
-  seqref_t o; /* sequence reference object */
+  fts_object_t head;
+  track_t *track;
   event_t *prev;
   event_t *next;
+  fts_array_t array;
 } seqstep_t;
 
 /************************************************************
@@ -54,19 +55,30 @@ seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(event)
     {
       double time = event_get_time(event);
-      event_t *next = seqref_get_next_and_highlight(o, event, time);
+      event_t *next = track_get_next_and_highlight(this->track, event, time);
       
+      fts_object_release(event);
+
+      if(this->prev)
+	fts_object_release(this->prev);
+
       this->prev = event_get_prev(event);
       this->next = next;
+
+      if(this->prev)
+	fts_object_refer(this->prev);
+
+      if(this->next)
+	fts_object_refer(this->next);
       
       fts_outlet_float(o, 1, (float)time);
 
       do{
-	fts_atom_t atoms[64];
-	int n_atoms;
+	fts_array_clear(&this->array);
+	event_append_state_to_array(event, &this->array);
+	
+	fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
 
-	event_get_atoms(event, &n_atoms, atoms);
-	fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);	
 	event = event_get_next(event);
       }
       while(event != next);
@@ -82,19 +94,30 @@ seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(event)
     {
       double time = event_get_time(event);
-      event_t *prev = seqref_get_prev_and_highlight(o, event, time);
+      event_t *prev = track_get_prev_and_highlight(this->track, event, time);
       
+      fts_object_release(event);
+
+      if(this->next)
+	fts_object_release(this->next);
+
       this->prev = prev;
       this->next = event_get_next(event);
+      
+      if(this->prev)
+	fts_object_refer(this->prev);
+
+      if(this->next)
+	fts_object_refer(this->next);
       
       fts_outlet_float(o, 1, (float)time);
 
       do{
-	fts_atom_t atoms[64];
-	int n_atoms;
+	fts_array_clear(&this->array);
+	event_append_state_to_array(event, &this->array);
+	
+	fts_outlet_send(o, 0, fts_s_list, fts_array_get_size(&this->array), fts_array_get_atoms(&this->array));
 
-	event_get_atoms(event, &n_atoms, atoms);
-      	fts_outlet_send((fts_object_t *)o, 0, fts_s_list, n_atoms, atoms);
 	event = event_get_prev(event);
       }
       while(event != prev);
@@ -106,11 +129,15 @@ seqstep_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   seqstep_t *this = (seqstep_t *)o;
 
-  if(seqref_is_locked(o))
+  if(this->prev)
     {
-      seqref_unlock(o);
-
+      fts_object_release(this->prev);
       this->prev = 0;
+    }
+ 
+  if(this->next)
+    {
+      fts_object_release(this->next);
       this->next = 0;
     }
 }
@@ -119,8 +146,9 @@ static void
 seqstep_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqstep_t *this = (seqstep_t *)o;
-  eventtrk_t *track;
+  event_t *event;
   double locate;
+  double time;
 
   seqstep_stop(o, 0, 0, 0, 0);
   
@@ -129,29 +157,31 @@ seqstep_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   else
     locate = 0.0;
 
-  track = seqref_get_reference(o);
-
-  if(track)
+  event = track_get_event_by_time(this->track, locate);
+  
+  if(event)
     {
-      event_t *event = eventtrk_get_event_by_time(track, locate);
+      time = event_get_time(event);
       
-      if(event)
+      if(locate == time)
 	{
-	  double time = event_get_time(event);
-	  
-	  seqref_lock(o, track);
-	  
-	  if(locate == time)
-	    {
-	      this->next = event;
-	      this->prev = event;
-	      seqstep_next(o, 0, 0, 0, 0);
-	    }
-	  else
-	    {
-	      this->next = event;
-	      this->prev = event_get_prev(event);
-	    }
+	  this->next = event;
+	  this->prev = event;
+
+	  fts_object_refer(event);
+	  fts_object_refer(event);
+
+	  seqstep_next(o, 0, 0, 0, 0);
+	}
+      else
+	{
+	  this->next = event;
+	  this->prev = event_get_prev(event);
+
+	  fts_object_refer(event);
+
+	  if(this->prev)
+	    fts_object_refer(this->prev);
 	}
     }
 }
@@ -162,7 +192,10 @@ seqstep_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   seqstep_t *this = (seqstep_t *)o;
 
   seqstep_stop(o, 0, 0, 0, 0);
-  seqref_set_reference(o, ac, at);
+
+  fts_object_release(this->track);
+  this->track = track_atom_get(at);
+  fts_object_refer(this->track);
 }
 
 /************************************************************
@@ -176,39 +209,51 @@ seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 { 
   seqstep_t *this = (seqstep_t *)o;
 
-  seqref_init(o, ac, at);
+  ac--;
+  at++;
 
   this->prev = 0;
   this->next = 0;
+
+  if(track_atom_is(at))
+    {
+      this->track = (track_t *)fts_get_object(at);
+      fts_object_refer(this->track);
+      
+      fts_array_init(&this->array, 0, 0);
+    }
+  else
+    fts_object_set_error(o, "Argument of event track required");
 }
 
 static void 
 seqstep_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqstep_t *this = (seqstep_t *)o;
+
+  if(this->track)
+    {
+      fts_object_release(this->track);
+      fts_array_destroy(&this->array);
+    }
 }
 
 static fts_status_t
 seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
-    {
-      fts_class_init(cl, sizeof(seqstep_t), 2, 2, 0);
+  fts_class_init(cl, sizeof(seqstep_t), 2, 2, 0);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqstep_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqstep_delete);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqstep_locate);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqstep_stop);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("prev"), seqstep_prev);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("next"), seqstep_next);
-
-      fts_method_define_varargs(cl, 1, fts_s_list, seqstep_set_reference);
-
-      return fts_Success;
-    }
-  else
-    return &fts_CannotInstantiate;    
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqstep_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqstep_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqstep_locate);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqstep_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("prev"), seqstep_prev);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("next"), seqstep_next);
+  
+  fts_method_define_varargs(cl, 1, seqsym_track, seqstep_set_reference);
+  
+  return fts_Success;
 }
 
 void

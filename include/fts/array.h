@@ -125,6 +125,10 @@ FTS_API void fts_array_set( fts_array_t *array, int ac, const fts_atom_t *at);
  */
 FTS_API void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at);
 
+FTS_API void fts_array_append_int( fts_array_t *array, int i);
+FTS_API void fts_array_append_float( fts_array_t *array, float f);
+FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
+
 /**
  * Get the content of an array
  * 

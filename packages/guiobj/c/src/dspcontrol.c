@@ -60,7 +60,7 @@ typedef struct fts_dsp_control
 {
   fts_object_t o;
 
-  fts_alarm_t poll_alarm;
+  fts_timer_t *poll_timer;
   int poll_interval;
 
   /* Old state */
@@ -73,9 +73,10 @@ typedef struct fts_dsp_control
 } fts_dsp_control_t;
 
 
-static void fts_dsp_control_poll(fts_alarm_t *alarm, void *obj)
+static void 
+fts_dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_dsp_control_t *this = (fts_dsp_control_t *)obj;
+  fts_dsp_control_t *this = (fts_dsp_control_t *)o;
   fts_atom_t a[1];
   int dac_slip;
   int invalid_fpe;
@@ -138,7 +139,7 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *obj)
 /*        fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_DENORMALIZED_FPE_STATE, 1, &a); */
 /*      } */
 
-  fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
+  fts_timer_set_delay(this->poll_timer, this->poll_interval, 0);
 }
 
 
@@ -163,8 +164,8 @@ static void fts_dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, in
   this->prev_overflow_fpe = 0;
   this->prev_denormalized_fpe = 0;
 
-  fts_alarm_init(&(this->poll_alarm), 0, fts_dsp_control_poll, this);
-  fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
+  this->poll_timer = fts_timer_new(o, 0);
+  fts_timer_set_delay(this->poll_timer, this->poll_interval, 0);
 }
 
 static void fts_dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -186,7 +187,7 @@ static void fts_dsp_control_delete(fts_object_t *o, int winlet, fts_symbol_t s, 
 {
   fts_dsp_control_t *this = (fts_dsp_control_t *)o;
 
-  fts_alarm_reset(&(this->poll_alarm));
+  fts_timer_delete(this->poll_timer);
 }
 
 static void fts_dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -250,6 +251,8 @@ dsp_control_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_dsp_control_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_dsp_control_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, fts_dsp_control_poll);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, fts_dsp_control_upload);
 
   fts_method_define_varargs(cl, fts_SystemInlet, sym_dsp_on, fts_dsp_control_remote_dsp_on);
@@ -284,8 +287,3 @@ void dspcontrol_config( void)
 
   fts_class_install(dspcontrol_symbol, dsp_control_instantiate);
 }
-
-
-
-
-

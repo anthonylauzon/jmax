@@ -36,15 +36,15 @@ typedef struct sigprint_t {
   int alloc;
   int index;
   float *buf;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } sigprint_t;
 
 static fts_symbol_t print_dsp_function = 0;
 
 static void
-sigprint_tick(fts_alarm_t *alarm, void *o)
+sigprint_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  sigprint_t *x = ((sigprint_t *)o);
+  sigprint_t *x = (sigprint_t *)o;
 
   if(x->sym)
     post("%s:\n", fts_symbol_name(x->sym));
@@ -66,7 +66,7 @@ sigprint_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   x->size = 0;
   x->alloc = 0;
 
-  fts_alarm_init(&(x->alarm), 0, sigprint_tick, (void *)o);
+  x->timer = fts_timer_new(o, 0);
   dsp_list_insert(o);
 }
 
@@ -77,7 +77,7 @@ sigprint_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(x->buf) fts_free(x->buf);
 
-  fts_alarm_reset(&(x->alarm));
+  fts_timer_delete(x->timer);
   dsp_list_remove(o);
 }
 
@@ -115,7 +115,7 @@ static void ftl_sigprint(fts_word_t *argv)
       x->index = 0;
 
       if(x->n_print)
-	fts_alarm_set_delay(&(x->alarm), 0.0);
+	fts_timer_set_delay(x->timer, 0.0, 0);
     }
   else
     x->index = index;
@@ -155,29 +155,22 @@ sigprint_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 sigprint_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   fts_class_init(cl, sizeof(sigprint_t), 1, 0, 0);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_int;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, sigprint_init, 3, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigprint_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, sigprint_delete);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, sigprint_delete, 0, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, sigprint_tick);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, sigprint_put);
 
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, sigprint_put, 1, a);
-
-  fts_method_define(cl, 0, fts_s_bang, sigprint_bang, 0, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, sigprint_int, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_bang, sigprint_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, sigprint_int);
 
   print_dsp_function = fts_new_symbol("print");
   dsp_declare_function(print_dsp_function, ftl_sigprint);
 
   dsp_sig_inlet(cl, 0);
+
   return fts_Success;
 }
 

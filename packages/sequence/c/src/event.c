@@ -53,25 +53,19 @@ event_get_type(event_t *event)
 }
 
 void 
-event_get_atoms(event_t *event, int *n_atoms, fts_atom_t *atoms)
+event_append_state_to_array(event_t *event, fts_array_t *array)
 {
-  *n_atoms = 0;
 
   if(fts_is_object(&event->value))
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&event->value);
-      fts_atom_t a[2];
+      fts_atom_t a;
       
-      fts_set_ptr(a, n_atoms);
-      fts_set_ptr(a + 1, atoms);
-      
-      fts_send_message(obj, fts_SystemInlet, seqsym_get_atoms, 2, a);
+      fts_set_array(&a, array);
+      fts_send_message(obj, fts_SystemInlet, fts_s_append_state_to_array, 1, &a);
     }
   else if(!fts_is_void(&event->value))
-    {
-      *n_atoms = 1;
-      *atoms = event->value;
-    }
+    fts_array_append(array, 1, &event->value);
 }
 
 void
@@ -81,15 +75,17 @@ event_print(event_t *event)
 
   if(type)
     {
-      fts_atom_t atoms[64];
-      int n_atoms;
-
-      event_get_atoms(event, &n_atoms, atoms);
+      fts_array_t array;
       
+      fts_array_init(&array, 0, 0);
+      event_append_state_to_array(event, &array);
+
       post("  @%lf: ", event_get_time(event));
       post("<%s> ", fts_symbol_name(type));
-      post_atoms(n_atoms, atoms);
+      post_atoms(fts_array_get_size(&array), fts_array_get_atoms(&array));
       post("\n");
+
+      fts_array_destroy(&array);
     }
 }
 
@@ -100,15 +96,18 @@ event_upload(event_t *event)
 
   if(type)
     {
-      fts_atom_t atoms[64];
-      int n_atoms;
+      fts_array_t array;
+      fts_atom_t at[2];
+      
+      fts_set_float(at + 0, (float) event->time);
+      fts_set_symbol(at + 1, type);
+      fts_array_init(&array, 2, at);
 
-      fts_set_float(atoms + 0, (float) event->time);
-      fts_set_symbol(atoms + 1, type);
-  
-      event_get_atoms(event, &n_atoms, atoms + 2);
-  
-      fts_client_upload((fts_object_t *)event, seqsym_event, n_atoms + 2, atoms);
+      event_append_state_to_array(event, &array);
+
+      fts_client_upload((fts_object_t *)event, seqsym_event, fts_array_get_size(&array), fts_array_get_atoms(&array));
+
+      fts_array_destroy(&array);
     }
 }
 
@@ -119,15 +118,18 @@ event_save_bmax(fts_bmax_file_t *file, event_t *event)
 
   if(type)
     {
-      fts_atom_t atoms[64];
-      int n_atoms;
+      fts_array_t array;
+      fts_atom_t at[2];
+      
+      fts_set_float(at + 0, (float) event->time);
+      fts_set_symbol(at + 1, type);
+      fts_array_init(&array, 2, at);
 
-      fts_set_float(atoms + 0, (float) event->time);
-      fts_set_symbol(atoms + 1, type);
-  
-      event_get_atoms(event, &n_atoms, atoms + 2);
-  
-      fts_bmax_save_message(file, seqsym_bmax_add_event, n_atoms + 2, atoms);
+      event_append_state_to_array(event, &array);
+
+      fts_bmax_save_message(file, seqsym_bmax_add_event, fts_array_get_size(&array), fts_array_get_atoms(&array));
+
+      fts_array_destroy(&array);
     }
 }
 
@@ -173,11 +175,7 @@ event_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   event_t *this = (event_t *)o;  
 
-  if(fts_is_object(&this->value))
-    {
-      fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
-      fts_object_release(obj);
-    }
+  fts_atom_void(&this->value);
 }
 
 static fts_status_t

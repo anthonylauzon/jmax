@@ -63,9 +63,9 @@ typedef struct {
   readsf_state_t state;
   dtdserver_t *server;
   dtdfifo_t *fifo;
-  fts_alarm_t eof_alarm;
+  fts_timer_t eof_timer;
   int can_post_data_late;
-  fts_alarm_t post_data_late_alarm;
+  fts_timer_t post_data_late_timer;
   fts_symbol_t filename;
 } readsf_t;
 
@@ -215,18 +215,16 @@ static void readsf_state_machine( readsf_t *this, fts_symbol_t message, int ac, 
   }
 }
 
-static void readsf_eof_alarm( fts_alarm_t *alarm, void *p)
+static void 
+readsf_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t *o = (fts_object_t *)p;
+  readsf_t *this = (readsf_t *)o;
+  fts_timer_t *timer = (fts_timer_t *)fts_get_ptr(at);
 
-  fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
-}
-
-static void readsf_post_data_late_alarm( fts_alarm_t *alarm, void *p)
-{
-  readsf_t *this = (readsf_t *)p;
-
-  this->can_post_data_late = 1;
+  if(timer == this->eof_timer)
+    fts_outlet_bang( o, fts_object_get_outlets_number(o) - 1);
+  else
+    this->can_post_data_late = 1;
 }
 
 static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -261,8 +259,8 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   this->state = readsf_closed;
   this->can_post_data_late = 1;
 
-  fts_alarm_init( &(this->eof_alarm), 0, readsf_eof_alarm, this);	
-  fts_alarm_init( &(this->post_data_late_alarm), 0, readsf_post_data_late_alarm, this);	
+  this->eof_timer = fts_timer_new(o, 0);
+  this->post_data_late_timer = fts_timer_new(o, 0);	
 
   fts_dsp_add_object(o);
 }
@@ -273,8 +271,8 @@ static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
   dtdserver_remove_object( this->server, this);
 
-  fts_alarm_reset( &this->eof_alarm);	
-  fts_alarm_reset( &this->post_data_late_alarm);	
+  fts_timer_delete(this->eof_timer);	
+  fts_timer_delete(this->post_data_late_timer);	
 
   fts_dsp_remove_object(o);
 }
@@ -362,7 +360,7 @@ static void readsf_dsp( fts_word_t *argv)
 	if ( !dtdfifo_is_used( this->fifo, DTD_SIDE))
 	  {
 	    /* end of file */
-	    fts_alarm_set_delay( &this->eof_alarm, 0.0);
+	    fts_timer_set_delay(this->eof_timer, 0.0, 0);
 
 	    dtdfifo_set_used( this->fifo, FTS_SIDE, 0);
 
@@ -375,7 +373,8 @@ static void readsf_dsp( fts_word_t *argv)
 
 	    this->can_post_data_late = 0;
 
-	    fts_alarm_set_delay( &this->post_data_late_alarm, 200.0);
+	    fts_timer_reset(this->post_data_late_timer);
+	    fts_timer_set_delay(this->post_data_late_timer, 200.0, 0);
 	  }
 
 	clear_outputs( n, n_channels, outputs);
@@ -445,7 +444,9 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, readsf_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, readsf_delete);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, readsf_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, readsf_alarm);
 
   fts_method_define_varargs(cl, 0, s_open,  readsf_open);
 
@@ -492,7 +493,7 @@ typedef struct {
   dtdserver_t *server;
   dtdfifo_t *fifo;
   int can_post_fifo_overflow;
-  fts_alarm_t post_fifo_overflow_alarm;
+  fts_timer_t *post_fifo_overflow_timer;
   fts_symbol_t filename;
 } writesf_t;
 
@@ -594,14 +595,16 @@ static void writesf_state_machine( writesf_t *this, fts_symbol_t message, int ac
   }
 }
 
-static void writesf_post_fifo_overflow_alarm( fts_alarm_t *alarm, void *p)
+static void 
+writesf_post_fifo_overflow_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  writesf_t *this = (writesf_t *)p;
+  writesf_t *this = (writesf_t *)o;
 
   this->can_post_fifo_overflow = 1;
 }
 
-static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
   int n_channels;
@@ -631,7 +634,7 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   this->state = writesf_closed;
   this->can_post_fifo_overflow = 1;
 
-  fts_alarm_init( &(this->post_fifo_overflow_alarm), 0, writesf_post_fifo_overflow_alarm, this);	
+  this->post_fifo_overflow_timer = fts_timer_new(o, 0);
 
   fts_dsp_add_object(o);
 }
@@ -642,7 +645,7 @@ static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
   dtdserver_remove_object( this->server, this);
 
-  fts_alarm_reset( &this->post_fifo_overflow_alarm);	
+  fts_timer_delete(this->post_fifo_overflow_timer);
 
   fts_dsp_remove_object(o);
 }
@@ -705,7 +708,8 @@ static void writesf_dsp( fts_word_t *argv)
 
 	    this->can_post_fifo_overflow = 0;
 
-	    fts_alarm_set_delay( &this->post_fifo_overflow_alarm, 200.0);
+	    fts_timer_reset(this->post_fifo_overflow_timer);
+	    fts_timer_set_delay(this->post_fifo_overflow_timer, 200.0, 0);
 	  }
       }
   }
@@ -759,7 +763,8 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     writesf_state_machine( (writesf_t *)o, s_close, ac, at);
 }
 
-static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static fts_status_t 
+writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels = fts_get_int_arg(ac, at, 1, 1);
   int i;
@@ -771,7 +776,9 @@ static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, writesf_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, writesf_delete);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, writesf_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, writesf_post_fifo_overflow_alarm);
 
   fts_method_define_varargs(cl, 0, s_open, writesf_open);
 

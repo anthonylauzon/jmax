@@ -38,9 +38,6 @@
 #define DEF_n_points 256
 static float def_amp_coeffs[pt_common_N_AMP_COEFFS] = {1.0f, 0.9f, 0.8f, 0.7f, 0.7f, 0.6f, 0.6f, 0.6f};
 
-static int pt_common_debounce_timer_initialized = 0;
-static fts_timer_t pt_common_debounce_timer; /* periodic output timer (debounce timer) */
-
 /*************************************************
  *
  *      usefull
@@ -277,13 +274,6 @@ void pt_common_instantiate(fts_class_t *cl)
 {
    fts_symbol_t a[4];
 
-   if(!pt_common_debounce_timer_initialized){
-      fts_timer_init(&pt_common_debounce_timer, 0);
-      fts_timer_reset(&pt_common_debounce_timer);
-      fts_timer_start(&pt_common_debounce_timer);
-      pt_common_debounce_timer_initialized = 1;
-   }
-   
    a[0] = fts_s_number;
    fts_method_define_optargs(cl, 0, fts_new_symbol("reference-pitch"), pt_common_meth_ref_pitch, 1, a, 0);
 
@@ -417,9 +407,11 @@ void pt_common_print_ctl(pt_common_obj_t *x)
  
 int pt_common_debounce_time_is_up(pt_common_obj_t *x, float *time)
 {
-   int times_up = fts_timer_get_time(&pt_common_debounce_timer) > *time;
-   
-   *time = fts_timer_get_time(&pt_common_debounce_timer) + x->ctl.debounce_time;
-   return(times_up);
+  float now = fts_get_time();
+  int times_up = now > *time;
+  
+  *time = now + x->ctl.debounce_time;
+
+  return(times_up);
 }
 

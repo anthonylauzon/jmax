@@ -47,6 +47,9 @@ struct fts_class
   fts_metaclass_t *mcl;
   fts_inlet_decl_t *sysinlet;
 
+  fts_method_t constructor;
+  fts_method_t deconstructor;
+
   int ninlets;
   fts_inlet_decl_t *inlets;
 
@@ -54,6 +57,7 @@ struct fts_class
   fts_outlet_decl_t *outlets;
 
   int size;
+  fts_heap_t *heap;
 
   /* Class Instance Data Base support */
   int ac;
@@ -142,8 +146,8 @@ FTS_API fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbo
 
 #define fts_class_has_method(C,I,S) (fts_class_get_method((C),(I),(S))!=0)
 
-#define fts_class_get_user_data(c) ((cl)->user_data)
-#define fts_class_set_user_data(c, d) ((cl)->user_data = (d))
+#define fts_class_get_constructor(c) ((c)->constructor)
+#define fts_class_get_deconstructor(c) ((c)->deconstructor)
 
 FTS_API const int fts_SystemInlet;
 

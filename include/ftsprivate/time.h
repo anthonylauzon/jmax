@@ -20,13 +20,31 @@
  * 
  */
 
-#ifndef _FTS_PRIVATE_INOUT_H_
-#define _FTS_PRIVATE_INOUT_H_
+#ifndef _FTS_PRIVATE_TIME_H_
+#define _FTS_PRIVATE_TIME_H_
 
-extern fts_class_t *inlet_class;
-extern fts_class_t *outlet_class;
+typedef struct _alarm_
+{
+  fts_timer_t *timer; /* its timer */
+  double time; /* when to trigger this alarm */
+  fts_atom_t atom;
+  struct _alarm_ *next; /* next alarm for the same timebase */
+} alarm_t;
 
-#define fts_object_is_outlet(o) (fts_object_get_class(o) == outlet_class)
-#define fts_object_is_inlet(o) (fts_object_get_class(o) == inlet_class)
+struct fts_timebase
+{ 
+  fts_object_t head;
+  fts_timebase_t *master; /* master timebase */
+
+  double time; /* logical time */
+  double step; /* tick step */
+
+  fts_timer_t *silent; /* list of silent timers timers */
+  fts_timer_t *locate; /* list of silent locatable timers timers */
+  fts_timer_t *active; /* list of active timers */
+
+  alarm_t *alarms; /* list of alarms */
+};
 
 #endif
+

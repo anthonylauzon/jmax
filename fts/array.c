@@ -102,3 +102,28 @@ void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at)
       fts_atom_assign( ap, at + i);
     }
 }
+
+void fts_array_append_int( fts_array_t *array, int i)
+{
+  int size = array->size;
+ 
+  fts_array_set_size( array, size + 1);
+  fts_set_int(array->atoms + size, i);
+}
+
+void fts_array_append_float( fts_array_t *array, float f)
+{
+  int size = array->size;
+ 
+  fts_array_set_size( array, size + 1);
+  fts_set_float(array->atoms + size, f);
+}
+
+void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s)
+{
+  int size = array->size;
+ 
+  fts_array_set_size( array, size + 1);
+  fts_set_symbol(array->atoms + size, s);
+}
+

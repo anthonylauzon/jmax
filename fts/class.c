@@ -226,6 +226,9 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 
   cl = fts_zalloc(sizeof(fts_class_t));
   
+  cl->constructor = 0;
+  cl->deconstructor = 0;
+
   cl->properties  = 0;
   cl->daemons = 0;
   cl->user_data = 0;
@@ -245,14 +248,14 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       
       fts_set_int(&a, cl->noutlets);
       fts_class_put_prop(cl, fts_s_noutlets, &a);
+
+      return cl;
     }
   else
     {
       fts_free(cl);
       return 0;
     }
-
-  return cl;
 }
 
 fts_class_t *
@@ -304,6 +307,7 @@ fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, v
     return &fts_ClassAlreadyInitialized;
 
   cl->size = size;
+  cl->heap = fts_heap_new(size);
 
   cl->sysinlet = fts_zalloc(sizeof(fts_inlet_decl_t));
 
@@ -327,7 +331,20 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_metho
   fts_class_mess_t *msg;
 
   if (winlet == fts_SystemInlet)
-    in = cl->sysinlet;
+    {
+      if(s == fts_s_init)
+	{
+	  cl->constructor = mth;
+	  return fts_Success;
+	}
+      else if(s == fts_s_delete)
+	{
+	  cl->deconstructor = mth;
+	  return fts_Success;
+	}
+	
+      in = cl->sysinlet;
+    }
   else if (winlet < cl->ninlets && winlet >= 0)
     in = &cl->inlets[winlet];
   else

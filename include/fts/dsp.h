@@ -132,10 +132,11 @@ typedef struct _fts_dsp_descr_t {
 /*@}*/ /* DSP compiler structures */
 
 
-
 FTS_API void fts_dsp_run_tick(void);
 FTS_API int fts_dsp_is_running(void);
 FTS_API void fts_dsp_restart(void);
+
+FTS_API void fts_dsp_timebase_configure(void);
 
 /** 
  * @name Runtime parameters
@@ -174,26 +175,6 @@ FTS_API double fts_dsp_get_sample_rate(void);
  * @ingroup dsp
  */
 FTS_API int fts_dsp_get_tick_size(void);
-
-/**
- * Get current time of DSP subsystem in milliseconds
- *
- * While fts_get_time() returns the logical time of a thread
- * fts_dsp_get_time() gives the time of the DSP subsystem, which
- * is advancing in steps of the time equivalent to the tick size.
- * (This step size (in msecs) can be calculated as 0.001 * fts_dsp_get_tick_size() / fts_dsp_get_sample_rate().)
- *
- * A DSP object can compare the scheduler time from fts_get_time() and the current time of the DSP subsystem
- * in order to get for a starting DSP calculation a delay within the tick: fts_get_time() - fts_dsp_get_time().
- *
- * @fn double fts_dsp_get_time(void)
- * @return DSP time in msecs
- *
- * @see fts_get_time()
- *
- * @ingroup dsp
- */
-FTS_API double fts_dsp_get_time(void);
 
 /*@}*/ /* runtime parameters */
 

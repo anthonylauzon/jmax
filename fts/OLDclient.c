@@ -74,6 +74,7 @@ static fts_symbol_t s_tcp, s_udp;
  */
 
 static void fts_client_parse_char( char c);
+static void fts_client_updates_sched( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /***********************************************************************
  *
@@ -99,6 +100,7 @@ typedef struct _oldclient_t {
   /* Output */
   char sequence;
   fts_stack_t output_buffer;
+  fts_timer_t *update_timer;
 } oldclient_t;
 
 static void oldclient_flush( oldclient_t *this);
@@ -146,7 +148,6 @@ oldclient_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for ( i = 0; i < r; i++)
     fts_client_parse_char( this->input_buffer[i]);
 }
-
 
 static void
 oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -261,6 +262,8 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);
+
+  this->update_timer = fts_timer_new(o, 0);
 }
 
 static void
@@ -296,6 +299,9 @@ static fts_status_t oldclient_instantiate(fts_class_t *cl, int ac, const fts_ato
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, oldclient_init);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, oldclient_delete, 0, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, fts_client_updates_sched);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, oldclient_receive);
 
   return fts_Success;
@@ -1002,13 +1008,6 @@ void fts_client_release_object(fts_object_t *obj)
   fts_client_done_msg();
 }
 
-/*void fts_client_release_object_data(fts_object_t *obj)
-  {
-  fts_client_start_msg(OBJECT_RELEASE_DATA_CODE);
-  fts_client_add_object(obj);;
-  fts_client_done_msg();
-  }*/
-
 /***********************************************************************
  *
  * sync.c
@@ -1034,8 +1033,6 @@ static void fts_client_sync_init(void)
 {
   fts_client_install(SYNC_CODE, fts_sync_dispatch);
 }
-
-
 
 /***********************************************************************
  *
@@ -1076,8 +1073,6 @@ static void fts_client_sync_init(void)
 
 static int fts_updates_per_ticks = 40;
 static int fts_update_period = 10; /* every how many milliseconds we do an update */
-
-static fts_alarm_t update_alarm;
 
 struct changes
 {
@@ -1170,8 +1165,9 @@ static void update_group_end(void)
   fts_client_done_msg();
 }
 
-
-static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
+/* this is a method of the oldclient object above */
+static void 
+fts_client_updates_sched( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int update_count;
 
@@ -1194,7 +1190,7 @@ static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
 
       update_group_end();
 
-      fts_alarm_set_delay(&update_alarm, fts_update_period);
+      fts_timer_set_delay(oldclient->update_timer, fts_update_period, 0);
     }
 }
 
@@ -1273,7 +1269,6 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
   p->next = 0;
 
   /* add the new queue element to the end of the list */
-
   if (last)
     last->next = p;
   else
@@ -1282,10 +1277,8 @@ void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
   /* If the update timer is not armed, arm it with a zero period,
      so it will fire immediately */
 
-  if (! fts_alarm_is_armed(&update_alarm))
-    {
-      fts_alarm_set_delay(&update_alarm, 0);
-    }
+  if (!fts_timer_has_alarm(oldclient->update_timer))
+    fts_timer_set_delay(oldclient->update_timer, 0, 0);
 }
 
 
@@ -1333,10 +1326,10 @@ void fts_object_reset_changed(fts_object_t *obj)
 }
 
 
-void fts_client_updates_init(void)
+static void 
+fts_client_updates_init(void)
 {
   changes_heap = fts_heap_new(sizeof(struct changes));
-  fts_alarm_init(&update_alarm, 0, fts_client_updates_sched, 0);
 }
 
 

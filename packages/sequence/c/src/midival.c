@@ -26,7 +26,7 @@
 #include <fts/fts.h>
 #include "seqsym.h"
 #include "sequence.h"
-#include "eventtrk.h"
+#include "track.h"
 #include "midival.h"
 
 fts_class_t *midival_class = 0;
@@ -38,7 +38,7 @@ fts_class_t *midival_class = 0;
  */
 
 static void
-midival_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midival_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midival_t *this = (midival_t *)o;
   
@@ -56,17 +56,20 @@ midival_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 void 
-midival_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midival_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midival_t *this = (midival_t *)o;
-  int *n = fts_get_ptr(at);
-  fts_atom_t *a = fts_get_ptr(at + 1);
+  fts_array_t *array = fts_get_array(at);
+  int onset = fts_array_get_size(array);
+  fts_atom_t *atoms;
+  int i;
+  
+  fts_array_set_size(array, onset + 3);
+  atoms = fts_array_get_atoms(array) + onset;
 
-  *n = 3;
-
-  fts_set_int(a, this->value);
-  fts_set_int(a + 1, this->number);
-  fts_set_int(a + 2, this->channel);
+  fts_set_int(atoms + 0, this->value);
+  fts_set_int(atoms + 1, this->number);
+  fts_set_int(atoms + 2, this->channel);
 }
 
 /**************************************************************
@@ -92,8 +95,8 @@ midival_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midival_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set, midival_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_get_atoms, midival_get_atoms);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, midival_append_state_to_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, midival_set_state_from_array);
 
   return fts_Success;
 }

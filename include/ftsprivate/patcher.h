@@ -24,6 +24,8 @@
 #define _FTS_PRIVATE_PATCHER_H_
 
 extern fts_metaclass_t *patcher_metaclass;
+extern fts_class_t *inlet_class;
+extern fts_class_t *outlet_class;
 
 struct fts_inlet
 {
@@ -40,6 +42,8 @@ struct fts_outlet
 };
 
 #define fts_object_is_patcher(o) ((o)->head.cl->mcl == patcher_metaclass)
+#define fts_object_is_inlet(o) (fts_object_get_class(o) == inlet_class)
+#define fts_object_is_outlet(o) (fts_object_get_class(o) == outlet_class)
 
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)

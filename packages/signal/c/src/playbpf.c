@@ -245,7 +245,7 @@ play_bpf_ftl(fts_word_t *argv)
 			    
 			    play->mode = mode_stop;
 			    
-			    fts_alarm_set_delay(&play->alarm, 0.0);
+			    fts_timer_set_delay(play->timer, 0.0, 0);
 			  }
 			}
 		    }
@@ -301,7 +301,7 @@ play_bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 { 
   play_bpf_t *this = (play_bpf_t *)o;
 
-  signal_play_reset(&this->play);
+  signal_play_delete(&this->play);
 }
 
 static fts_status_t

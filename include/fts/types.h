@@ -32,7 +32,6 @@ typedef const struct fts_symbol_descr *fts_symbol_t;
 typedef void (*fts_fun_t)(void);
 typedef struct fts_object fts_object_t;
 typedef struct fts_connection fts_connection_t;
-typedef struct fts_data fts_data_t;
 
 typedef struct fts_metaclass fts_metaclass_t;
 typedef struct fts_class fts_class_t;
@@ -42,7 +41,6 @@ typedef struct fts_inlet fts_inlet_t;
 typedef struct fts_outlet fts_outlet_t;
 typedef struct fts_template fts_template_t;
 typedef struct fts_abstraction fts_abstraction_t;
-typedef struct fts_patcher_data fts_patcher_data_t;
 typedef struct _fts_package_t fts_package_t;
 
 
@@ -66,7 +64,6 @@ union fts_word
   char                *fts_str;
   fts_object_t        *fts_obj;
   fts_connection_t    *fts_connection;
-  fts_data_t          *fts_data;
   void                *fts_ptr;		/*  just a pointer somewhere */
   void                (*fts_fun)(void);     /*  just a pointer to some function */
 };

@@ -57,8 +57,6 @@ struct fts_outlet_decl
 #define fts_metaclass_get_package(m) ((m)->package)
 #define fts_metaclass_set_package(m, p) ((m)->package = (p))
 
-extern fts_metaclass_t *fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun);
-
 extern fts_metaclass_t *fts_metaclass_get_by_name(fts_symbol_t name);
 extern fts_class_mess_t *fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything);
 extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s, int *panything);

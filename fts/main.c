@@ -124,10 +124,14 @@ main( int argc, char **argv)
 {
   fts_init( argc, argv);
 
-  /* Run the scheduler */
+  fts_log("[main]: Run scheduler\n");
+
+  /* run scheduler */
   fts_sched_run();
 
-  /* When and if the scheduler exit, run the shutdown functions and return */
+  fts_log("[main]: Shutdown FTS\n");
+
+  /* when and if the scheduler exit, run the shutdown functions and return */
   fts_shutdown();
 
   return 0;

@@ -29,15 +29,13 @@
 
 #define DEFAULT_FLASH 125.0f
 
-static void button_tick(fts_alarm_t *alarm, void *calldata);
-
 typedef struct 
 {
   fts_object_t o;
   int value;
   float flash;
   int color;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } button_t;
 
 /************************************************
@@ -58,25 +56,6 @@ button_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_object_ui_property_changed(o, fts_s_value);
 }
  
-static void
-button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  button_t *this = (button_t *)o;
-
-  fts_alarm_init(&(this->alarm), 0, button_tick, this);
-  this->value = 0;
-  this->flash = DEFAULT_FLASH;
-  this->color = 1;
-}
-
-static void
-button_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  button_t *this = (button_t *)o;
-
-  fts_alarm_reset(&(this->alarm));
-}
-
 /************************************************
  *
  *  user methods
@@ -94,7 +73,8 @@ button_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_object_ui_property_changed(o, fts_s_value);
 
-  fts_alarm_set_delay(&this->alarm, this->flash);
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, this->flash, 0);
 }
 
 /************************************************
@@ -104,10 +84,9 @@ button_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
  
 static void 
-button_tick(fts_alarm_t *alarm, void *calldata)
+button_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  button_t *this = (button_t *)calldata;
-
+  button_t *this = (button_t *)o;
 
   this->value = 0;
   fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
@@ -139,7 +118,8 @@ button_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
   this->value = this->color;
   fts_object_ui_property_changed(obj, fts_s_value);
 
-  fts_alarm_set_delay(&(this->alarm), this->flash);
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, this->flash, 0);
 }
 
 /* Daemon for the color  propriety */
@@ -203,6 +183,25 @@ static void button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int 
  *
  */
  
+static void
+button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  button_t *this = (button_t *)o;
+
+  this->timer = fts_timer_new(o, 0);
+  this->value = 0;
+  this->flash = DEFAULT_FLASH;
+  this->color = 1;
+}
+
+static void
+button_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  button_t *this = (button_t *)o;
+
+  fts_timer_delete(this->timer);
+}
+
 static fts_status_t
 button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -213,6 +212,8 @@ button_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   t[0] = fts_t_symbol;
   fts_method_define(cl, fts_SystemInlet, fts_s_init, button_init, 1, t);
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, button_delete, 0, 0);
+
+  fts_method_define(cl, fts_SystemInlet, fts_s_timer_alarm, button_tick, 0, 0);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_send_properties, button_send_properties, 0, 0); 
   fts_method_define(cl, fts_SystemInlet, fts_s_send_ui_properties, button_send_ui_properties, 0, 0); 
@@ -249,9 +250,3 @@ button_config(void)
 {
   fts_class_install(fts_new_symbol("button"),button_instantiate);
 }
-
-
-
-
-
-

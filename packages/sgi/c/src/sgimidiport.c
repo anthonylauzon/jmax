@@ -341,7 +341,7 @@ sgimidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       sgimidiport_close(this);
     }
 
-  fts_midiport_delete(&this->head);
+  fts_midiport_reset(&this->head);
 }
 
 /************************************************************

@@ -34,11 +34,11 @@ typedef struct
   double time;
   int gate;
 
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } speedlim_t;
 
 static void
-speedlim_tick(fts_alarm_t *alarm, void *o)
+speedlim_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   speedlim_t *this = (speedlim_t *)o;
 
@@ -64,7 +64,10 @@ speedlim_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(this->gate)
     {
       this->gate = 0;
-      fts_alarm_set_delay(&this->alarm, this->time);
+
+      fts_timer_reset(this->timer);
+      fts_timer_set_delay(this->timer, this->time, 0);
+
       fts_outlet_send(o, 0, fts_get_selector(at), 1, at);      
     }
   else
@@ -91,7 +94,7 @@ speedlim_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->gate = 1;
   this->time = fts_get_double_arg(ac, at, 1, 0);    
 
-  fts_alarm_init(&this->alarm, 0, speedlim_tick, this);
+  this->timer = fts_timer_new(o, 0);
 }
 
 static void
@@ -99,7 +102,7 @@ speedlim_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   speedlim_t *this = (speedlim_t *)o;
 
-  fts_alarm_reset(&this->alarm);
+  fts_timer_delete(this->timer);
 }
 
 static fts_status_t
@@ -110,6 +113,8 @@ speedlim_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* define the system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, speedlim_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, speedlim_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, speedlim_tick);
 
   fts_method_define_varargs(cl, 0, fts_s_int, speedlim_atom);
   fts_method_define_varargs(cl, 0, fts_s_float, speedlim_atom);

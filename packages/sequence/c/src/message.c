@@ -26,7 +26,7 @@
 #include <fts/fts.h>
 #include "seqsym.h"
 #include "sequence.h"
-#include "eventtrk.h"
+#include "track.h"
 
 typedef struct _message_
 {
@@ -90,7 +90,7 @@ message_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
  */
 
 static void
-message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *)o;
   
@@ -99,16 +99,18 @@ message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 void 
-message_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   message_t *this = (message_t *)o;
-  int *n = fts_get_ptr(at);
-  fts_atom_t *a = fts_get_ptr(at + 1);
+  fts_array_t *array = fts_get_array(at);
+  fts_atom_t a;
+  int i;
+  
+  fts_set_symbol(&a, this->s);
+  fts_array_append(array, 1, &a);
 
-  fts_set_symbol(a + 0, this->s);
-  fts_set_int(a + 1, this->pos);
-
-  *n = 2;
+  fts_set_int(&a, this->pos);
+  fts_array_append(array, 1, &a);
 }
 
 /**************************************************************
@@ -139,8 +141,8 @@ message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, message_init);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_set, message_set);
-  fts_method_define_varargs(cl, fts_SystemInlet, seqsym_get_atoms, message_get_atoms);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, message_append_state_to_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, message_set_state_from_array);
 
   return fts_Success;
 }

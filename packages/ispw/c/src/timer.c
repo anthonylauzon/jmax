@@ -24,54 +24,61 @@
  *
  */
 
-/* "timer"  bang to save current time &
-   bang rite corner to send elapsed time message 
-*/
-
-
 #include <fts/fts.h>
 
 typedef struct 
 {
   fts_object_t ob;
-  fts_timer_t timer;
-} timer_obj_t;
+  int running;
+  double start;
+  double time;
+} timer_t;
 
 /* store time-now on default bang message */
 
 static void
 timer_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  timer_obj_t *x = (timer_obj_t *)o;
+  timer_t *this = (timer_t *)o;
 
-  fts_timer_reset(&x->timer);
+  this->time = 0.0;
+  this->start = fts_get_time();
 }
 
 static void
 timer_continue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  timer_obj_t *x = (timer_obj_t *)o;
+  timer_t *this = (timer_t *)o;
 
-  fts_timer_start(&x->timer);
+  if(!this->running)
+    {
+      this->running = 1;
+      this->start = fts_get_time();
+    }
 }
 
 static void
 timer_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  timer_obj_t *x = (timer_obj_t *)o;
+  timer_t *this = (timer_t *)o;
 
-  fts_timer_stop(&x->timer);
+  this->running = 0;
+  this->time += (fts_get_time() - this->start);
 }
-
-
 
 static void
 timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  timer_obj_t *x = (timer_obj_t *)o;
+  timer_t *this = (timer_t *)o;
+  double now = fts_get_time();
 
-  fts_timer_reset(&x->timer);
-  fts_timer_start(&x->timer);
+  this->time = now; 
+
+  if(!this->running)
+    {
+      this->running = 1;
+      this->start = now;
+    }
 }
 
 /* bang message into rite corner sends fix out  */
@@ -79,65 +86,43 @@ timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 timer_send_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  timer_obj_t *x = (timer_obj_t *)o;
+  timer_t *this = (timer_t *)o;
+  double time = this->time;
 
-  fts_outlet_float(o, 0, fts_timer_get_time(&x->timer));
+  if(this->running)
+    time += (fts_get_time() - this->start);
+
+  fts_outlet_float(o, 0, time);
 }
 
 static void
 timer_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  timer_obj_t *x = (timer_obj_t *)o;
+  timer_t *this = (timer_t *)o;
 
-  fts_timer_init(&x->timer, 0);
-  fts_timer_reset(&x->timer);
-  fts_timer_start(&x->timer);
+  this->running = 1;
+  this->start = fts_get_time();
+  this->time = 0.0;
 }
-
 
 static fts_status_t
 timer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[10];
+  fts_class_init(cl, sizeof(timer_t), 2, 1, 0); 
 
-  /* initialize the class */
-
-  fts_class_init(cl, sizeof(timer_obj_t), 2, 1, 0); 
-
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, timer_init, 2, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, timer_init);
 
   /* user methods */
+  fts_method_define_varargs(cl, 0, fts_new_symbol("zero"), timer_zero);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), timer_start);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), timer_stop);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), timer_continue);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("time"), timer_send_time);
 
-  fts_method_define(cl, 0, fts_s_bang, timer_zero, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, timer_zero);
+  fts_method_define_varargs(cl, 1, fts_s_bang, timer_send_time);
 
-  /* Messages added, keeping compatibility with the old timer:
-     zero: as bang, set the timer to zero.
-     pause: stop the timer, don't change the time.
-     continue: start the timer from the current time.
-     stop: stop the timer, put the time to zero.
-     start: start the timer from zero.
-     time: as bang on the right outlet.
-     */
-
-  fts_method_define(cl, 0, fts_new_symbol("zero"),  timer_zero, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("start"), timer_start, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("stop"),  timer_stop, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("continue"), timer_continue, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("time"),  timer_send_time, 0, 0);
-
-  fts_method_define(cl, 1, fts_s_bang, timer_send_time, 0, 0);
-
-  /*  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, timer_send_time, 1, a); */
-
-  /* Type the outlet */
-
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
 
   return fts_Success;
 }
@@ -145,5 +130,5 @@ timer_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 timer_config(void)
 {
-  fts_class_install(fts_new_symbol("timer"),timer_instantiate);
+  fts_class_install(fts_new_symbol("timer"), timer_instantiate);
 }

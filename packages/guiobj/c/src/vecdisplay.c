@@ -39,7 +39,7 @@ typedef struct
   int range;
   int n;
   fts_atom_t a[1024];
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
   double period;
   int gate;
   int pending;
@@ -73,7 +73,8 @@ vecdisplay_deliver(vecdisplay_t *this)
 	  
 	  this->n = 0;
 	  
-	  fts_alarm_set_delay(&this->alarm, this->period);
+	  fts_timer_reset(this->timer);
+	  fts_timer_set_delay(this->timer, this->period, 0);
 	}
       else
 	this->pending = 1;
@@ -83,7 +84,7 @@ vecdisplay_deliver(vecdisplay_t *this)
 }
 
 static void
-vecdisplay_alarm(fts_alarm_t *alarm, void *o)
+vecdisplay_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
@@ -99,7 +100,7 @@ vecdisplay_alarm(fts_alarm_t *alarm, void *o)
       
       this->n = 0;
       
-      fts_alarm_set_delay(&this->alarm, this->period);
+      fts_timer_set_delay(this->timer, this->period, 0);
     }
   else
     this->gate = 1;
@@ -389,7 +390,7 @@ vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   this->scroll = 0;
 
-  fts_alarm_init(&this->alarm, 0, vecdisplay_alarm, (void *)this);
+  this->timer = fts_timer_new(o, 0);
 }
 
 static void
@@ -397,7 +398,7 @@ vecdisplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
-  fts_alarm_reset(&this->alarm);
+  fts_timer_delete(this->timer);
 }
 
 static fts_status_t 
@@ -407,6 +408,9 @@ vecdisplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, vecdisplay_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, vecdisplay_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, vecdisplay_alarm);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, vecdisplay_upload);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, vecdisplay_save_bmax);
 

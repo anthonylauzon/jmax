@@ -332,7 +332,7 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
       while(event)
 	{
 	  double time = event->time;
-	  long time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * (double)time);
+	  long time_in_ticks = fts_midifile_time_to_ticks(file, time);
 	  long off_time = event->time + event->dur;
 	  int channel = (event->chan >= 1)? ((event->chan <= 16)? event->chan: 16): 1;
 	  int pitch = event->pit % 128;
@@ -342,10 +342,10 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
 	  stat = noteoffs;
 	  while(stat && stat->time <= time)
 	    {
-	      long off_time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * stat->time);
+	      long off_time_in_ticks = fts_midifile_time_to_ticks(file, stat->time);
 
 	      /* write note off */
-	      fts_midifile_write_note_off(file, off_time_in_ticks, stat->channel, stat->pitch, 0); 
+	      fts_midifile_write_channel_message(file, off_time_in_ticks, midi_type_note, stat->channel, stat->pitch, 0); 
 
 	      /* set note to off */
 	      stat->status = NOTESTAT_OFF;
@@ -363,18 +363,18 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
 	  if(stat->status == NOTESTAT_ON) /* if overlapping note of same pitch */
 	    {
 	      /* write note off of previous note */
-	      fts_midifile_write_note_off(file, time_in_ticks, channel, pitch, 0); 
+	      fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, channel, pitch, 0); 
 	      
 	      /* remove note off event from sequence */
 	      notestat_remove(&noteoffs, stat);
 	      
 	      /* write new note on */
-	      fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
+	      fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, channel, pitch, 0); 
 	    }
 	  else
 	    {
 	      /* write note on */
-	      fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
+	      fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, channel, pitch, 0); 
 	      
 	      /* set note status to on */
 	      stat->status = NOTESTAT_ON;
@@ -391,10 +391,10 @@ explode_export_midifile(explode_t *this, fts_symbol_t file_name)
       stat = noteoffs;
       while(stat)
 	{
-	  long time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * stat->time);
+	  long time_in_ticks = fts_midifile_time_to_ticks(file, stat->time);
 	  
 	  /* write note off */
-	  fts_midifile_write_note_off(file, time_in_ticks, stat->channel, stat->pitch, 0);
+	  fts_midifile_write_channel_message(file, time_in_ticks, midi_type_note, stat->channel, stat->pitch, 0); 
 	  
 	  /* set note to off */
 	  stat->status = NOTESTAT_OFF;

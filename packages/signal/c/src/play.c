@@ -60,7 +60,7 @@ signal_play_set_conv_step(signal_play_t *this, double c)
  */
 
 static void 
-signal_play_bang_at_end(fts_alarm_t *alarm, void *o)
+signal_play_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_bang((fts_object_t *)o, 1);
 }
@@ -258,15 +258,15 @@ signal_play_init(signal_play_t *this, int ac, const fts_atom_t *at)
   else
     fts_object_set_error((fts_object_t *)this, "Something to play required as first argument");
 
-  fts_alarm_init(&this->alarm, 0, signal_play_bang_at_end, this);    
+  this->timer = fts_timer_new((fts_object_t *)this, 0); 
 
   fts_dsp_add_object((fts_object_t *)this);
 }
 
 void
-signal_play_reset(signal_play_t *this)
+signal_play_delete(signal_play_t *this)
 { 
-  fts_alarm_reset(&this->alarm);
+  fts_timer_delete(this->timer);
 
   fts_dsp_remove_object((fts_object_t *)this);
 }
@@ -286,7 +286,9 @@ signal_play_class_init(fts_class_t *cl, fts_symbol_t type)
 {
   int i;
 
-  fts_class_init(cl, sizeof(signal_play_t), 4, 2, 0); 
+  fts_class_init(cl, sizeof(signal_play_t), 4, 2, 0);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, signal_play_bang_at_end);
   
   fts_method_define_varargs(cl, 0, fts_s_bang, signal_play_bang);
   fts_method_define_varargs(cl, 0, fts_new_symbol("play"), signal_play_play);

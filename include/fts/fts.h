@@ -96,10 +96,12 @@ extern "C" {
 #include <fts/message.h>
 #include <fts/doctor.h>
 #include <fts/errobj.h>
-#include <fts/inout.h>
+#include <fts/label.h>
 #include <fts/saver.h>
 #include <fts/param.h>
 #include <fts/package.h>
+
+#include <fts/time.h>
 
 #include <fts/ftl.h>
 #include <fts/ftlmem.h>
@@ -110,10 +112,9 @@ extern "C" {
 #include <fts/file.h>
 #include <fts/atomfile.h>
 #include <fts/soundfile.h>
+#include <fts/midi.h>
 #include <fts/midifile.h>
 #include <fts/post.h>
-#include <fts/midi.h>
-#include <fts/time.h>
 #include <fts/sched.h>
 #include <fts/audio.h>
 #include <fts/bytestream.h>

@@ -120,9 +120,6 @@ play_fvec_ftl(fts_word_t *argv)
       if(end > size)
 	end = size;
 
-      /*if((tick_end_position - (end - this->pre)) * step >= 0))*/
-      /*fts_alarm_set_delay(&this->alarm, 0.0);*/
-  
       if((end - tick_end_position) * step >= 0.0)
 	{
 	  int i;
@@ -207,6 +204,8 @@ play_fvec_ftl(fts_word_t *argv)
 			    
 			    fts_idefix_set_float(&index, position);
 			    this->mode = mode_stop;
+
+			    fts_timer_set_delay(this->timer, 0.0, 0);
 			  }
 			}
 		    }
@@ -242,7 +241,7 @@ play_fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 { 
   play_fvec_t *this = (play_fvec_t *)o;
 
-  signal_play_reset(&this->play);
+  signal_play_delete(&this->play);
 }
 
 static fts_status_t

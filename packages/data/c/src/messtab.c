@@ -228,7 +228,7 @@ messtab_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-messtab_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
   fts_array_t *array = fts_get_array(at);
@@ -277,7 +277,7 @@ messtab_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void
-messtab_restore_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtab_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messtab_t *this = (messtab_t *)o;
   int i;
@@ -705,8 +705,8 @@ messtab_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, messtab_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, messtab_delete);
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), messtab_get_state_as_array);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), messtab_restore_state_from_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, messtab_append_state_to_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, messtab_set_state_from_array);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("import"), messtab_import);
   fts_method_define_varargs(cl, 0, fts_new_symbol("export"), messtab_export);

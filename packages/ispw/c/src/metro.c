@@ -29,142 +29,115 @@
 typedef struct 
 {
   fts_object_t ob;
-  double cycle;
+  double period;
   long run;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } metro_t;
 
 
 static void
-metro_tick(fts_alarm_t *alarm, void *o)
+metro_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
 
-  fts_alarm_set_delay(&x->alarm, x->cycle);
+  fts_timer_set_delay(this->timer, this->period, 0);
   
   fts_outlet_bang((fts_object_t *)o, 0);
 }
 
 
 static void
-metro_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
 
-  x->run = 1;
-  fts_alarm_set_delay(&x->alarm, x->cycle);
+  this->run = 1;
+
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, this->period, 0);
+
   fts_outlet_bang((fts_object_t *)o, 0);
 }
-
 
 static void
 metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
 
-  x->run = 0;
-  fts_alarm_reset(&x->alarm);
+  this->run = 0;
+  fts_timer_reset(this->timer);
 }
-
 
 static void
 metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
   long n = (long) fts_get_int_arg(ac, at, 0, 0);
 
   if (n)
-    {
-      x->run = 1;
-      fts_alarm_set_delay(&x->alarm, x->cycle);
-      fts_outlet_bang((fts_object_t *)o, 0);
-    }
+    metro_start(o, 0, 0, 0, 0);
   else
-    {
-      x->run = 0;
-      fts_alarm_reset(&x->alarm);
-    }
+    metro_stop(o, 0, 0, 0, 0);
 }
 
-
-/* Installed as int method for inlet 1 */
-
 static void
-metro_set_metro(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
   double n = fts_get_double_arg(ac, at, 0, 0);
 
   if (n <= 0.0)
     n = 5.0;
 
-  x->cycle = n;
+  this->period = n;
 }
-
 
 static void
 metro_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
 
-  fts_alarm_reset(&x->alarm);
+  fts_timer_delete(this->timer);
 }
 
 static void
 metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  metro_t *x = (metro_t *)o;
+  metro_t *this = (metro_t *)o;
   float n;
 
   n = (float) fts_get_float_arg(ac, at, 1, 0.0f);    
   
-  fts_alarm_init(&x->alarm, 0, metro_tick, x);
+  this->timer = fts_timer_new(o, 0);
 
   if (n <= 0.0)
-    x->cycle = 5.0;
+    this->period = 5.0;
   else
-    x->cycle = n;
+    this->period = n;
 }
 
 
 static fts_status_t
 metro_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(metro_t), 2, 1, 0); 
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, metro_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, metro_delete);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_anything;
-  a[2] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, metro_init, 3, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, metro_tick);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, metro_delete, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, metro_start);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("start"), metro_start);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), metro_stop);
 
-  /* Metro args */
+  fts_method_define_varargs(cl, 0, fts_s_int, metro_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, metro_number);
 
-  fts_method_define(cl, 0, fts_s_bang, metro_bang, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("stop"), metro_stop, 0, 0);
+  fts_method_define_varargs(cl, 1, fts_s_int, metro_set_period);
+  fts_method_define_varargs(cl, 1, fts_s_float, metro_set_period);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, metro_number, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, metro_number, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, metro_set_metro, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, metro_set_metro, 1, a);
-
-  /* Type the outlet */
-
-  fts_outlet_type_define(cl, 0,	fts_s_bang, 0, 0);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_bang);
 
   return fts_Success;
 }

@@ -27,27 +27,17 @@ typedef struct _fts_midifile_ fts_midifile_t;
 
 typedef struct _fts_midifile_read_functions_
 {
-  int (*header) (struct _fts_midifile_ *file);
-  int (*track_start)(struct _fts_midifile_ *file);
-  int (*track_end)(struct _fts_midifile_ *file);
-  int (*note_on)(struct _fts_midifile_ *file, int chan, int pitch, int vol);
-  int (*note_off)(struct _fts_midifile_ *file, int chan, int pitch, int vol);
-  int (*poly_pressure)(struct _fts_midifile_ *file, int chan, int pitch, int press);
-  int (*control_change)(struct _fts_midifile_ *file, int chan, int control, int value);
-  int (*program_change)(struct _fts_midifile_ *file, int chan, int program);
-  int (*channel_pressure)(struct _fts_midifile_ *file, int chan, int  press);
-  int (*pitch_bend)(struct _fts_midifile_ *file, int chan, int msb, int lsb);
-  int (*system_exclusive)(struct _fts_midifile_ *file, int leng, char *mess);
-  int (*arbitrary)(struct _fts_midifile_ *file, int leng, char *mess);
-  int (*meta_misc)(struct _fts_midifile_ *file, int type, int leng, char *mess);
-  int (*sequence_number)(struct _fts_midifile_ *file, int num);
-  int (*end_of_track)(struct _fts_midifile_ *file);
-  int (*smpte)(struct _fts_midifile_ *file, int hr, int mn, int se, int fr, int ff);
-  int (*tempo)(struct _fts_midifile_ *file);
-  int (*time_signature)(struct _fts_midifile_ *file, int nn, int dd, int cc, int bb);
-  int (*key_signature)(struct _fts_midifile_ *file, int sf, int mi);
-  int (*sequencer_specific)(struct _fts_midifile_ *file, int type, int leng, char *mess);
-  int (*text)(struct _fts_midifile_ *file, int type, int leng, char *mess);
+  void (*header) (struct _fts_midifile_ *file);
+  void (*track_start)(struct _fts_midifile_ *file);
+  void (*track_end)(struct _fts_midifile_ *file);
+  void (*midi_event)(struct _fts_midifile_ *file, fts_midievent_t *event);
+  void (*sequence_number)(struct _fts_midifile_ *file, int number);
+  void (*end_of_track)(struct _fts_midifile_ *file);
+  void (*smpte)(struct _fts_midifile_ *file, int type, int hour, int minute, int second, int frame, int frac);
+  void (*tempo)(struct _fts_midifile_ *file);
+  void (*time_signature)(struct _fts_midifile_ *file, int numerator, int denominator, int clocks_per_metronome_click, int heals_per_quarter_note);
+  void (*key_signature)(struct _fts_midifile_ *file, int n_sharps_or_flats, int major_or_minor);
+  void (*text)(struct _fts_midifile_ *file, int type, int n, char *string);
 }fts_midifile_read_functions_t;
 
 struct _fts_midifile_
@@ -62,18 +52,24 @@ struct _fts_midifile_
 
   fts_midifile_read_functions_t *read;
 
-  long currtime; /* current time in delta-time units */
-  long bytes; /* writing: file offset at the beginning of the track, reading: bytes left to be read */
-  long size; /* writing: file size in bytes */
+  int ticks; /* current time in delta-time units */
+  int bytes; /* writing: file offset at the beginning of the track, reading: bytes left to be read */
+  int size; /* writing: file size in bytes */
 
-  char *Msgbuff; /* message buffer */
-  int Msgsize; /* Size of currently allocated Msg */
-  int Msgindex; /* index of next available location in Msg */
+  fts_midievent_t *system_exclusive;
+
+  char *string; /* message buffer */
+  int string_size;
+  int string_alloc;
 
   char *error; /* error message */
 
   void *user; /* user data */
 };
+
+#define fts_midifile_get_name(f) ((f)->name)
+#define fts_midifile_get_format(f) ((f)->format)
+#define fts_midifile_get_error(f) ((f)->error)
 
 #define fts_midifile_set_user_data(f, p) ((f)->user = (void *)(p))
 #define fts_midifile_get_user_data(f) ((f)->user)
@@ -83,10 +79,10 @@ struct _fts_midifile_
  *  time
  *
  */
-FTS_API long fts_midifile_seconds_to_ticks(fts_midifile_t *file, double seconds);
+FTS_API int fts_midifile_time_to_ticks(fts_midifile_t *file, double msecs);
 
-#define fts_midifile_get_current_time(f) ((f)->currtime)
-FTS_API double fts_midifile_get_current_time_in_seconds(fts_midifile_t *file);
+#define fts_midifile_get_ticks(f) ((f)->ticks)
+FTS_API double fts_midifile_get_time(fts_midifile_t *file);
 
 /*************************************************************
  *
@@ -111,15 +107,10 @@ FTS_API int fts_midifile_write_header(fts_midifile_t *file, int format, int n_tr
 FTS_API int fts_midifile_write_track_begin(fts_midifile_t *file);
 FTS_API int fts_midifile_write_track_end(fts_midifile_t *file);
 
+FTS_API void fts_midifile_write_channel_message(fts_midifile_t *file, int ticks, enum midi_type type, int channel, int byte1, int byte2);
+FTS_API void fts_midifile_write_midievent(fts_midifile_t *file, int ticks, fts_midievent_t *event);
+FTS_API int fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int type, unsigned char *data, int size);
 FTS_API void fts_midifile_write_tempo(fts_midifile_t *file, int tempo);
 
-FTS_API void fts_midifile_write_note_off(fts_midifile_t *file, long time, int channel, int number, int velocity);
-FTS_API void fts_midifile_write_note_on(fts_midifile_t *file, long time, int channel, int number, int velocity);
-FTS_API void fts_midifile_write_poly_pressure(fts_midifile_t *file, long time, int channel, int number, int value);
-FTS_API void fts_midifile_write_control_change(fts_midifile_t *file, long time, int channel, int number, int value);
-FTS_API void fts_midifile_write_program_change(fts_midifile_t *file, long time, int channel, int number);
-FTS_API void fts_midifile_write_channel_pressure(fts_midifile_t *file, long time, int channel, int value);
-FTS_API void fts_midifile_write_pitch_bend(fts_midifile_t *file, long time, int channel, int value);
-FTS_API int fts_midifile_write_meta_event(fts_midifile_t *file, long time, int type, unsigned char *data, int size);
 
 #endif

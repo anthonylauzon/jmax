@@ -88,7 +88,7 @@ typedef struct{
 
 typedef struct{
   int attack;
-  float midi_pitch;    /* pitch to send to outlet on clock tick */
+  float midi_pitch;    /* pitch to send to outlet on timer tick */
   float power;
   float micro_pitch;
   float time;
@@ -96,7 +96,7 @@ typedef struct{
 
 typedef struct{
   pt_common_obj_t pt;    /* the mandatory fts_object */
-  fts_alarm_t clock;
+  fts_timer_t *timer;
   float *wind;
   pitch_ctl_t ctl;
   pitch_hist_t hist;
@@ -311,7 +311,7 @@ analysis(pitch_t *x)
   x->out.micro_pitch = new_pitch;
   
   x->ctl.print_me = 0;
-  fts_alarm_set_delay(&x->clock, 0.0); /* output that stuff */
+  fts_timer_set_delay(x->timer, 0.0, 0);
 }
 
 /*************************************************
@@ -390,21 +390,24 @@ pitch_loud(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void 
-pitch_tick(fts_alarm_t *alarm, void *p)
+pitch_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t *o = (fts_object_t *)p;
-  pitch_t *x = (pitch_t *)p;
+  pitch_t *x = (pitch_t *)o;
 
   fts_outlet_float(o, OUTLET_micro_pitch, x->out.micro_pitch);
   fts_outlet_float(o, OUTLET_power, x->out.power + POWER_OUT_OFFSET);
-  if(x->out.midi_pitch > 0.0f){
-    fts_outlet_float(o, OUTLET_midi_pitch, x->out.midi_pitch);
-    x->out.midi_pitch = 0.0f;
-  }
-  if(x->out.attack){
-    fts_outlet_bang(o, OUTLET_attack);
-    x->out.attack = 0;
-  } 
+
+  if(x->out.midi_pitch > 0.0f)
+    {
+      fts_outlet_float(o, OUTLET_midi_pitch, x->out.midi_pitch);
+      x->out.midi_pitch = 0.0f;
+    }
+
+  if(x->out.attack)
+    {
+      fts_outlet_bang(o, OUTLET_attack);
+      x->out.attack = 0;
+    } 
 }
 
 static void 
@@ -439,11 +442,12 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   long pt_common_arg_1 = fts_get_int_arg(ac, at, 2, 0);
   int i;
   
-  fts_alarm_init(&(x->clock), 0, pitch_tick, x);  
+  if(!pt_common_init(&x->pt, pt_common_arg_0, pt_common_arg_1)) 
+    return;
 
-  if(!pt_common_init(&x->pt, pt_common_arg_0, pt_common_arg_1)) return;
+  for(i=0; i<N_HISTORY; i++) 
+    x->hist.ory[i].power = x->hist.ory[i].pitch = 0.0f;
 
-  for(i=0; i<N_HISTORY; i++) x->hist.ory[i].power = x->hist.ory[i].pitch = 0.0f;
   x->hist.idx = 0;
   x->hist.count = 1000;
   x->hist.n_pitch = x->hist.n_power = 0;
@@ -457,6 +461,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   x->ctl.loud = 0;
 
   x->wind = (float *)fts_malloc(x->pt.n_points * sizeof(float));
+
   if(!x->wind)
     {
       post("%s: can't allocate window: init failed\n", CLASS_NAME);
@@ -465,6 +470,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   else
     {
       float inv_n_points = 1.0f / x->pt.n_points;
+
       for(i=0; i<x->pt.n_points; i++)
 	x->wind[i] = inv_n_points * (1.0f - cos(i * inv_n_points * FTS_TWO_PI));
     }
@@ -480,6 +486,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   x->out.micro_pitch = 0.0f;
   x->out.time = 0.0;
   
+  x->timer = fts_timer_new(o, 0);
   dsp_list_insert(o);
 }
 
@@ -488,7 +495,7 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   pitch_t *x = (pitch_t *)o;
 
-  fts_alarm_reset(&x->clock);  
+  fts_timer_delete(x->timer);  
   pt_common_delete(&x->pt);
 
   if(x->wind) 
@@ -500,55 +507,36 @@ pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t 
 class_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-  
   fts_class_init(cl, sizeof(pitch_t), N_INLETS, N_OUTLETS, 0);
   pt_common_instantiate(cl);
 
   /* the system methods */
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_number;
-  a[2] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, pitch_init, 3, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pitch_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pitch_delete);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, pitch_delete, 0, 0);
-  a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, pitch_put, 1, a);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, pitch_put);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, pitch_tick);
   
   /* class' own methods */
-  a[0] = fts_s_number;
-  a[1] = fts_s_number;
-  fts_method_define(cl, 0, fts_new_symbol("vibrato"), pitch_vibrato, 2, a);
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_new_symbol("max-error"), pitch_max_error, 1, a);
-  a[0] = fts_s_number;
-  a[1] = fts_s_number;
-  fts_method_define(cl, 0, fts_new_symbol("reattack"), pitch_reattack, 2, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("vibrato"), pitch_vibrato);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("max-error"), pitch_max_error);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reattack"), pitch_reattack);
   
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_new_symbol("loud"), pitch_loud, 1, a);
-  a[0] = fts_s_number;
-  fts_method_define(cl, 0, fts_new_symbol("print"), pitch_print, 1, a);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("loud"), pitch_loud);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("print"), pitch_print);
 
   /* classes signal inlets and outlets */
   dsp_sig_inlet(cl, INLET_sig);
 
   /* classes outlets */
-  fts_outlet_type_define(cl, OUTLET_attack, fts_s_bang, 0, 0);
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, OUTLET_midi_pitch, fts_s_float, 1, a);
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, OUTLET_power, fts_s_float, 1, a);
-  a[0] = fts_s_float;
-  fts_outlet_type_define(cl, OUTLET_micro_pitch, fts_s_float, 1, a);
+  fts_outlet_type_define_varargs(cl, OUTLET_attack, fts_s_bang);
+  fts_outlet_type_define_varargs(cl, OUTLET_midi_pitch, fts_s_float);
+  fts_outlet_type_define_varargs(cl, OUTLET_power, fts_s_float);
+  fts_outlet_type_define_varargs(cl, OUTLET_micro_pitch, fts_s_float);
 
   dsp_symbol = fts_new_symbol(DSP_NAME);
   dsp_declare_function(dsp_symbol, pt_common_dsp_function);
 
-  /* DSP properties  */
-
-  /* fts_class_put_prop(cl, fts_s_dsp_is_sink, fts_true); */
-  
   return(fts_Success);
 }
 

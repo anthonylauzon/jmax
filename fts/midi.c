@@ -24,73 +24,278 @@
 /*
  * This files contains all things MIDI related:
  *
- *  - the declaration of the MIDI module
- *  - the MIDI parser 
- *  - the MIDI port
+ *  - MIDI events
+ *  - MIDI parser 
+ *  - MIDI port
+ *  - initialization of the MIDI module
  *
  * MIDI files are handled in midifile.c
  */
 
-/* 
- * Definition of the MIDI status bytes 
+/************************************************************
+ *
+ *  MIDI events
+ *
  */
-#define MASK_CHANNEL_MESSAGE 0x80
 
-#define STATUS_BYTE_SYSEX 0xf0
-#define STATUS_BYTE_QUARTER_FRAME 0xf1
-#define STATUS_BYTE_SONG_POSITION_POINTER 0xf2
-#define STATUS_BYTE_SONG_SELECT 0xf3
+fts_class_t *midievent_class = 0;
+fts_symbol_t fts_s_midievent = 0;
 
-#define STATUS_BYTE_TUNE_REQUEST 0xf7
-#define STATUS_BYTE_SYSEX_END 0xf7
-#define STATUS_BYTE_REALTIME_TIMING_CLOCK 0xf8
+fts_midievent_t *
+fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
 
-#define STATUS_BYTE_REALTIME_START 0xfa
-#define STATUS_BYTE_REALTIME_CONTINUE 0xfb
-#define STATUS_BYTE_REALTIME_STOP 0xfc
+  event->type = type;
+  event->id = channel;
+  event->data.channel_message.first = byte1;
+  event->data.channel_message.second = byte2;
 
-#define STATUS_BYTE_REALTIME_ACTIVE_SENSING 0xfe
-#define STATUS_BYTE_REALTIME_SYSTEM_RESET 0xff
+  return event;
+}
 
-#define STATUS_BYTE_SYSEX_NON_REALTIME 0x7e 
-#define STATUS_BYTE_SYSEX_REALTIME 0x7f
+fts_midievent_t *
+fts_midievent_note_new(int channel, int note, int velocity)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
 
-#define RANGE_CH(n) (((n) < 1)? 1: (((n) > 16)? 16: (n)))
-#define RANGE_VALUE(n) (((n) < 0)? 0: (((n) > 127)? 127: (n)))
+  event->type = midi_type_note;
+  event->id = channel;
+  event->data.channel_message.first = note;
+  event->data.channel_message.second = velocity;
 
-#define SYSEX_BLOCK_SIZE 512
+  return event;
+}
 
-/*
- *  Definition of the midiport structures
+fts_midievent_t *
+fts_midievent_poly_pressure_new(int channel, int note, int value)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_poly_pressure;
+  event->id = channel;
+  event->data.channel_message.first = note;
+  event->data.channel_message.second = value;
+
+  return event;
+}
+
+fts_midievent_t *
+fts_midievent_control_change_new(int channel, int number, int value)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_control_change;
+  event->id = channel;
+  event->data.channel_message.first = number;
+  event->data.channel_message.second = value;
+
+  return event;
+}
+
+fts_midievent_t *
+fts_midievent_program_change_new(int channel, int number)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_program_change;
+  event->id = channel;
+  event->data.channel_message.first = number;
+  event->data.channel_message.second = MIDI_EMPTY_BYTE;
+
+  return event;
+}
+
+fts_midievent_t *
+fts_midievent_channel_pressure_new(int channel, int value)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_channel_pressure;
+  event->id = channel;
+  event->data.channel_message.first = value;
+  event->data.channel_message.second = MIDI_EMPTY_BYTE;
+
+  return event;
+}
+
+fts_midievent_t * 
+fts_midievent_pitch_bend_new(int channel, int LSB, int MSB)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_pitch_bend;
+  event->id = channel;
+  event->data.channel_message.first = LSB;
+  event->data.channel_message.second = MSB;
+
+  return event;
+}
+
+fts_midievent_t * 
+fts_midievent_system_exclusive_new(void)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_system;
+  event->id = midi_system_exclusive;
+  fts_array_init(&event->data.system_exclusive, 0, 0);
+
+  return event;
+}
+
+void
+fts_midievent_system_exclusive_append(fts_midievent_t *event, int byte)
+{
+  fts_atom_t a;
+
+  fts_set_int(&a, byte & 0x7F);
+  fts_array_append(&event->data.system_exclusive, 1, &a);
+}
+
+fts_midievent_t * 
+fts_midievent_time_code_new(int type, int hour, int minute, int second, int frame)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_system;
+  event->id = midi_time_code;
+  event->data.time_code.type = type;
+  event->data.time_code.hour = hour;
+  event->data.time_code.minute = minute;
+  event->data.time_code.second = second;
+  event->data.time_code.frame = frame;
+
+  return event;
+}
+
+fts_midievent_t * 
+fts_midievent_real_time_new(enum midi_real_time_event tag)
+{
+  fts_midievent_t *event = (fts_midievent_t *)fts_object_create(midievent_class, 0, 0);
+
+  event->type = midi_type_system;
+  event->id = midi_real_time;
+  event->data.real_time = tag;
+
+  return event;
+}
+
+/**************************************************************
+ *
+ *  midievent class
+ *
  */
-static fts_symbol_t fts_s__superclass = 0;
-static fts_symbol_t fts_s_midiport = 0;
 
-union _fts_midiport_callback_
+static void
+midievent_set_state_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_midiport_poly_fun_t poly;
-  fts_midiport_channel_fun_t channel;
-  fts_midiport_sysex_fun_t sysex;
-};
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  int type = fts_get_int(at + 0);
+  
+  if(fts_midievent_is_system_exclusive(this))
+    fts_array_destroy(&this->data.system_exclusive);
 
-typedef struct fts_midiport_listener
+  /* set type */
+  fts_midievent_set_type(this, type);
+
+  /* set event data */
+  if(fts_midievent_is_channel_message(this) <= midi_type_system)
+    {
+      fts_midievent_channel_message_set_first(this, fts_get_int(at + 1));
+      fts_midievent_channel_message_set_second(this, fts_get_int(at + 2));
+      fts_midievent_channel_message_set_channel(this, fts_get_int(at + 3) - 1);
+    }
+  else if(fts_midievent_is_system_exclusive(this))
+    fts_array_init(&this->data.system_exclusive, ac - 1, at + 1);
+  else if(fts_midievent_is_time_code(this))
+    {
+      fts_midievent_time_code_set_type(this, fts_get_int(at + 1));
+      fts_midievent_time_code_set_hour(this, fts_get_int(at + 2));
+      fts_midievent_time_code_set_minute(this, fts_get_int(at + 3));
+      fts_midievent_time_code_set_second(this, fts_get_int(at + 4));
+      fts_midievent_time_code_set_frame(this, fts_get_int(at + 5));
+    }
+  else if(fts_midievent_is_real_time(this))
+    fts_midievent_real_time_set(this, fts_get_int(at + 1));
+}
+
+static void
+midievent_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  union _fts_midiport_callback_ callback;
-  fts_object_t *listener;
-  struct fts_midiport_listener *next;
-} fts_midiport_listener_t;
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  fts_array_t *array = fts_get_array(at);
 
-struct fts_midiport_listeners
+  /* set type */
+  fts_array_append_int(array, fts_midievent_get_type(this));
+
+  /* append event data */
+  if(fts_midievent_is_channel_message(this))
+    {
+      fts_array_append_int(array, fts_midievent_channel_message_get_first(this));
+	  
+      if(fts_midievent_channel_message_has_second_byte(this))
+	fts_array_append_int(array, fts_midievent_channel_message_get_second(this));
+
+      fts_array_append_int(array, fts_midievent_channel_message_get_channel(this) + 1);
+    }
+  else if(fts_midievent_is_system_exclusive(this))
+    {
+      int size = fts_midievent_system_exclusive_get_size(this);
+      fts_atom_t *atoms = fts_midievent_system_exclusive_get_atoms(this);
+      
+      fts_array_append(array, size, atoms);
+    }
+  else if(fts_midievent_is_time_code(this))
+    {
+      fts_array_append_int(array, fts_midievent_time_code_get_type(this));
+      fts_array_append_int(array, fts_midievent_time_code_get_hour(this));
+      fts_array_append_int(array, fts_midievent_time_code_get_minute(this));
+      fts_array_append_int(array, fts_midievent_time_code_get_second(this));
+      fts_array_append_int(array, fts_midievent_time_code_get_frame(this));
+    }
+  else if(fts_midievent_is_real_time(this))
+    fts_array_append_int(array, fts_midievent_real_time_get(this));
+}
+
+static void
+midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_midiport_listener_t *note[17][128]; /* channels 1..16 + 0 for omni */
-  fts_midiport_listener_t *poly_pressure[17][128];
-  fts_midiport_listener_t *control_change[17][128]; /* controller number 1..128 + 0 for omni */
-  fts_midiport_listener_t *program_change[17];
-  fts_midiport_listener_t *channel_pressure[17];
-  fts_midiport_listener_t *pitch_bend[17];
-  fts_midiport_listener_t *system_exclusive;
-};
+  fts_midievent_t *this = (fts_midievent_t *)o;
 
+  this->type = midi_type_any; /* event type */
+  this->id = midi_system_any; /* channel or system type id */
+}
+
+static void
+midievent_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midievent_t *this = (fts_midievent_t *)o;
+  
+  if(fts_midievent_is_system_exclusive(this))
+    fts_array_destroy(&this->data.system_exclusive);
+}
+
+static fts_status_t
+midievent_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_midievent_t), 0, 0, 0); 
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, midievent_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midievent_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, midievent_append_state_to_array);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, midievent_set_state_from_array);
+
+  return fts_Success;
+}
+
+void
+midievent_config(void)
+{
+  fts_class_install(fts_s_midievent, midievent_instantiate);
+  midievent_class = fts_class_get_by_name(fts_s_midievent);
+}
 
 /************************************************************
  *
@@ -98,49 +303,110 @@ struct fts_midiport_listeners
  *
  */
 
+enum midi_status 
+{
+  midi_status_note_off = 128,
+  midi_status_note = 144,
+  midi_status_poly_pressure = 160,
+  midi_status_control_change = 176,
+  midi_status_program_change = 192,
+  midi_status_channel_pressure = 208,
+  midi_status_pitch_bend = 224,
+  midi_status_system_exclusive = 240,
+  midi_status_quarter_frame,
+  midi_status_song_position_pointer,
+  midi_status_song_select,
+  midi_status_undefined_0,
+  midi_status_undefined_1,
+  midi_status_tune_request,
+  midi_status_system_exclusive_end,
+  midi_status_timing_clock,
+  midi_status_undefined_2,
+  midi_status_start,
+  midi_status_continue,
+  midi_status_stop,
+  midi_status_undefined_3,
+  midi_status_active_sensing,
+  midi_status_system_reset
+};
+
+#define MIDI_SYSTEM_EXCLUSIVE_NON_REALTIME 0x7e 
+#define MIDI_SYSTEM_EXCLUSIVE_REALTIME 0x7f
+
+#define RANGE_CH(n) (((n) < 1)? 1: (((n) > 16)? 16: (n)))
+#define RANGE_VALUE(n) (((n) < 0)? 0: (((n) > 127)? 127: (n)))
+
+#define SYSEX_BLOCK_SIZE 512
+
 void
 fts_midiparser_init(fts_midiparser_t *parser)
 {  
-  parser->status = status_normal;
-  parser->message = 0;
-  parser->channel = 0;	
-  parser->arg = NO_ARG;
+  fts_midiport_init(&parser->port);
 
-  parser->mtc_status = mtc_status_invalid;
-  parser->mtc_frame_count = 0;
+  parser->status = midiparser_status_reset;
+
+  parser->channel = 0;	
+  parser->store = MIDI_EMPTY_BYTE;
+  parser->system_exclusive;
+
+  parser->mtc_status = mtc_status_ready;
+  parser->mtc_frame_count = 99;
   parser->mtc_type = 0;
   parser->mtc_hour = 0;
-  parser->mtc_min = 0;
-  parser->mtc_sec = 0;
+  parser->mtc_minute = 0;
+  parser->mtc_second = 0;
   parser->mtc_frame = 0;
+}
 
-  parser->mtc_time = 0.0;
+void
+fts_midiparser_reset(fts_midiparser_t *parser)
+{  
+  if(parser->system_exclusive)
+    fts_object_release(parser->system_exclusive);
+
+  fts_midiport_reset(&parser->port);
 }
 
 static void
-midiparser_compute_time_code(fts_midiparser_t *parser)
+midiparser_system_exclusive_start(fts_midiparser_t *parser)
 {
-  fts_atom_t av[5];
-  float total_secs;
-  double new_time;
+  fts_midievent_t *sysex_event = parser->system_exclusive;
 
-  total_secs = (((parser->mtc_hour * 60) + parser->mtc_min) * 60) + parser->mtc_sec;
+  if(sysex_event)
+    fts_object_release(sysex_event);
 
-  /* add two to the frames to compensate the MTC delay */
-  new_time = total_secs * 1000.0 + 
-    (((float) parser->mtc_frame + 2) * (1000.0 / (float) (parser->mtc_type == 0? 24: (parser->mtc_type == 1 ? 25 : 30))));
+  sysex_event = fts_midievent_system_exclusive_new();
+  fts_object_refer(sysex_event);
+}
 
-  parser->mtc_time = new_time;
+static void
+midiparser_system_exclusive_byte(fts_midiparser_t *parser, int byte)
+{
+  fts_midievent_system_exclusive_append(parser->system_exclusive, byte);
+}
 
-  /* raise the midi action */
-  fts_set_int(&av[0], parser->mtc_type);
-  fts_set_int(&av[1], parser->mtc_hour);
-  fts_set_int(&av[2], parser->mtc_min);
-  fts_set_int(&av[3], parser->mtc_sec);
-  fts_set_int(&av[4], parser->mtc_frame);
+static void
+midiparser_system_exclusive_send(fts_midiparser_t *parser)
+{
+  fts_midievent_t *sysex_event = parser->system_exclusive;
 
-  /* send time code here */
-  /*fts_midiport_time_code(port, FTS_MIDI_MTC, 5 , av);*/
+  if(sysex_event)
+    {
+      if(fts_midievent_system_exclusive_get_size(sysex_event) > 0)
+	fts_midiport_input(&parser->port, sysex_event, 0.0);
+      
+      fts_object_release(sysex_event);
+      parser->system_exclusive = 0;
+    }
+}
+
+static void
+midiparser_mtc_send(fts_midiparser_t *parser)
+{
+  fts_midievent_t *mtc_event = 
+    fts_midievent_time_code_new(parser->mtc_type, parser->mtc_hour, parser->mtc_minute, parser->mtc_second, parser->mtc_frame);
+
+  fts_midiport_input(&parser->port, mtc_event, 0.0);  
 }
 
 void
@@ -148,298 +414,298 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
 {
   fts_midiport_t *port = (fts_midiport_t *)parser;
 
-  /* real-time not implemented */
-  if(byte >= STATUS_BYTE_REALTIME_TIMING_CLOCK)
-    return;
-
-  switch (parser->status)
+  if(byte >= midi_status_timing_clock)
     {
-    case status_normal:
+      /* system real-time messages */
+      fts_midievent_t *event = fts_midievent_real_time_new((int)byte - midi_status_timing_clock + 1);
       
+      fts_midiport_input(port, event, 0.0);
+    }
+  else if(byte >= midi_status_system_exclusive)
+    {
+      /* system common messages */
       switch (byte)
 	{
-	case STATUS_BYTE_QUARTER_FRAME:
-
-	  parser->status = status_mtc_quarter_frame;
+	case midi_status_system_exclusive:
+	  parser->status = midiparser_status_system_exclusive;
+	  break;
+	  
+	case midi_status_quarter_frame:
+	  parser->status = midiparser_status_quarter_frame;
+	  break;
+	  
+	case midi_status_song_position_pointer:
+	  parser->status = midiparser_status_song_position_pointer;
+	  break;
+	  
+	case midi_status_song_select:
+	  parser->status = midiparser_status_song_select;
 	  break;
 
-	case STATUS_BYTE_SYSEX:
-
-	  parser->status = status_sysex_head;
+	case midi_status_tune_request:
 	  break;
 
+	case midi_status_system_exclusive_end:
+	  midiparser_system_exclusive_send(parser);
+	  parser->status = midiparser_status_reset;
+	  break;
+	  
 	default:
-
-	  if(byte & MASK_CHANNEL_MESSAGE)
-	    {
-	      parser->message = (byte >> 4) & 7;
-	      parser->channel = (byte & 0xf) + 1;
-	      parser->arg = NO_ARG;
-	    }
+	  break;
+	}
+    }
+  else if(byte > 127)
+    {
+      /* channel message status byte */
+      parser->status = (byte >> 4) - 7;
+      parser->channel = (byte & 0xf);
+      parser->store = MIDI_EMPTY_BYTE;
+    }
+  else
+    {	      
+      /* channel message data bytes */
+      switch (parser->status)
+	{
+	case midiparser_status_note_off:
+	  
+	  if (parser->store == MIDI_EMPTY_BYTE)
+	    parser->store = byte;
 	  else
 	    {
-	      switch (parser->message)
-		{
-		case channel_message_note_off:
-		  
-		  if (parser->arg == NO_ARG)
-		    parser->arg = byte;
-		  else
-		    {
-		      fts_midiport_input_note(port, parser->channel, parser->arg, 0, 0.0);
-		      
-		      /* reset for running status */
-		      parser->arg = NO_ARG;
-		    }
+	      fts_midievent_t *event = fts_midievent_note_new(parser->channel, parser->store, 0);
 
-		  break;
-		  
-		case channel_message_note_on:
-	  
-		  if (parser->arg == NO_ARG)
-		    parser->arg = byte;
-		  else
-		    {
-		      fts_midiport_input_note(port, parser->channel, parser->arg, byte, 0.0);
-		      
-		      /* reset for running status */
-		      parser->arg = NO_ARG;
-		    }
-
-		  break;
-	  
-		case channel_message_poly_pressure:
-	  
-		  if (parser->arg == NO_ARG)
-		    parser->arg = byte;
-		  else
-		    {
-		      fts_midiport_input_poly_pressure(port, parser->channel, parser->arg, byte, 0.0);
-		      
-		      /* reset for running status */
-		      parser->arg = NO_ARG;
-		    }
-		  break;
-	  
-		case channel_message_control_change:
-	  
-		  if (parser->arg == NO_ARG)
-		    parser->arg = byte;
-		  else
-		    {
-		      fts_midiport_input_control_change(port, parser->channel, parser->arg, byte, 0.0);
-		      
-		      /* reset for running status */
-		      parser->arg = NO_ARG;
-		    }
-		  break;
-	  
-		case channel_message_program_change:
-	  
-		  fts_midiport_input_program_change(port, parser->channel, byte, 0.0);
-		  break;
-	  
-		case channel_message_channel_pressure:		
-	  
-		  fts_midiport_input_channel_pressure(port, parser->channel, byte, 0.0);
-		  break;
-	  
-		case channel_message_pitch_bend:
-	  
-		  if (parser->arg == NO_ARG)
-		    parser->arg = byte;
-		  else
-		    {
-		      fts_midiport_input_pitch_bend(port, parser->channel, parser->arg + (byte << 7), 0.0);
-		      
-		      /* reset for running status */
-		      parser->arg = NO_ARG;
-		    }
-		  break;
-		}
+	      fts_midiport_input(port, event, 0.0);
+	      
+	      /* reset for running status */
+	      parser->store = MIDI_EMPTY_BYTE;
 	    }
-	}
-      
-      break;
-      
-    case status_sysex_head:
-      
-      switch (byte)
-	{
-	case STATUS_BYTE_SYSEX_END:
-
-	  /* end of sysex */
-	  parser->status = status_normal;
 	  
 	  break;
 	  
-	case STATUS_BYTE_SYSEX_REALTIME:
-	  parser->status = status_sysex_realtime;
+	case midiparser_status_note_on:
+	  
+	  if (parser->store == MIDI_EMPTY_BYTE)
+	    parser->store = byte;
+	  else
+	    {
+	      fts_midievent_t *event = fts_midievent_note_new(parser->channel, parser->store, byte);
+
+	      fts_midiport_input(port, event, 0.0);
+	      
+	      /* reset for running status */
+	      parser->store = MIDI_EMPTY_BYTE;
+	    }
 	  
 	  break;
 	  
-	default:
-	  /* send vendor or sysex non real-time id */
-	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
-	  parser->status = status_sysex_byte;
-	}
+	case midiparser_status_poly_pressure:
+	  
+	  if (parser->store == MIDI_EMPTY_BYTE)
+	    parser->store = byte;
+	  else
+	    {
+	      fts_midievent_t *event = fts_midievent_poly_pressure_new(parser->channel, parser->store, byte);
 
-      break;
-	  
-    case status_sysex_realtime:
-      
-      switch (byte)
-	{
-	case STATUS_BYTE_SYSEX_END:
-	  
-	  /* end of sysex */
-	  parser->status = status_normal;
-	  
-	  /* send sysex block */
-	  fts_midiport_input_system_exclusive_call(port, 0.0);
-
+	      fts_midiport_input(port, event, 0.0);
+	      
+	      /* reset for running status */
+	      parser->store = MIDI_EMPTY_BYTE;
+	    }
 	  break;
-	  
-	case 0x01:
-	  
-	  /* start sysex mtc block */
-      	  parser->status = status_sysex_mtc;
+		      
+	case midiparser_status_control_change:
+		      
+	  if (parser->store == MIDI_EMPTY_BYTE)
+	    parser->store = byte;
+	  else
+	    {
+	      fts_midievent_t *event = fts_midievent_control_change_new(parser->channel, parser->store, byte);
+
+	      fts_midiport_input(port, event, 0.0);
+			  
+	      /* reset for running status */
+	      parser->store = MIDI_EMPTY_BYTE;
+	    }
 	  break;
-	  
-	default:
-
-	  /* send sysex real-time id and byte */
-	  fts_midiport_input_system_exclusive_byte(port, (int)STATUS_BYTE_SYSEX_REALTIME);
-	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
-      	  parser->status = status_sysex_byte;
-	}
-
-      break;
-      
-    case status_sysex_byte:
-      
-      switch (byte)
-	{
-	case STATUS_BYTE_SYSEX_END:
-
-	  /* end of sysex */
-	  parser->status = status_normal;
-	  
-	  /* send sysex block */
-	  fts_midiport_input_system_exclusive_call(port, 0.0);
-
-	  break;
-	  
-	default:
-	  /* send vendor or sysex non real-time id */
-	  fts_midiport_input_system_exclusive_byte(port, (int)byte);
-	}
-
-      break;
-	  
-    case status_sysex_mtc:
-      
-      switch (byte)
-	{
-	case 0x01:
-
-	  parser->mtc_frame_count  = 0;
-	  parser->status = status_sysex_mtc_frame;
-	  break;
-	  
-	default:
-	  /* MTC format error */
-	  parser->status = status_normal;
-
-	}
-
-      break;
-      
-    case status_sysex_mtc_frame:
-	  
-      switch (parser->mtc_frame_count)
-	{
-	case 0:
-	  parser->mtc_type = (byte & 0x60) >> 5;
-	  parser->mtc_hour = (byte & 0x1f);
-	  break;
-	case 1:
-	  parser->mtc_min = byte;
-	  break;
-	case 2:
-	  parser->mtc_sec = byte;
-	  break;
-	case 3:
-	  parser->mtc_frame = byte;
-	  break;
-	default:
-	  break;
-	}
-	  
-      parser->mtc_frame_count++;
-	  
-      if (byte == STATUS_BYTE_SYSEX_END)
-	{
-	  parser->mtc_status = mtc_status_valid;
-	  midiparser_compute_time_code(parser);
-
-	  /* end of sysex */
-	  parser->status = status_normal;
-	}
-	  
-      break;
-	  
-    case status_mtc_quarter_frame:
-      {
-	if ((byte & 0xf0) == 0x00)
-	  parser->mtc_status = mtc_status_coming;
-	    
-	switch ((byte & 0xf0) >> 4)
+		      
+	case midiparser_status_program_change:
 	  {
-	  case 0:
-	    if (parser->mtc_status == mtc_status_invalid)
-	      parser->mtc_status = mtc_status_coming;
-	    else if (parser->mtc_status == mtc_status_coming)
-	      parser->mtc_status = mtc_status_valid;
-		
-	    if (parser->mtc_status == mtc_status_valid)
-	      midiparser_compute_time_code(parser);
-		
-	    parser->mtc_frame = (parser->mtc_frame & 0xf0) | (byte & 0x0f);
-	    break;
-	  case 1:
-	    parser->mtc_frame = (parser->mtc_frame & 0x0f) | (byte & 0x0f) << 4;
-	    break;
-	  case 2:
-	    parser->mtc_sec = (parser->mtc_sec & 0xf0) | (byte & 0x0f);
-	    break;
-	  case 3:
-	    parser->mtc_sec = (parser->mtc_sec & 0x0f) | (byte & 0x0f) << 4;
-	    break;
-	  case 4:
-	    parser->mtc_min = (parser->mtc_min & 0xf0) | (byte & 0x0f);
-	    break;
-	  case 5:
-	    parser->mtc_min = (parser->mtc_min & 0x0f) | (byte & 0x0f) << 4;
-	    break;
-	  case 6:
-	    parser->mtc_hour = (parser->mtc_hour & 0xf0) | (byte & 0x0f);
-	    break;
-	  case 7:
-	    parser->mtc_hour = (parser->mtc_hour & 0x0f) | (byte & 0x01) << 4;
-	    parser->mtc_type = (byte & 0x60) >> 5;
-	    break;
-	  default:
-	    break;
+	    fts_midievent_t *event = fts_midievent_program_change_new(parser->channel, byte);
+	    
+	    fts_midiport_input(port, event, 0.0);
 	  }
-      
-	parser->status = status_normal;
-      }
-      
-      break;
-      
-    default:
-      break;
+	  
+	  break;
+		      
+	case midiparser_status_channel_pressure:		
+	  {
+	    fts_midievent_t *event = fts_midievent_channel_pressure_new(parser->channel, byte);
+	    
+	    fts_midiport_input(port, event, 0.0);
+	  }
+		      
+	  break;
+		      
+	case midiparser_status_pitch_bend:
+		      
+	  if (parser->store == MIDI_EMPTY_BYTE)
+	    parser->store = byte;
+	  else
+	    {
+	      fts_midievent_t *event = fts_midievent_pitch_bend_new(parser->channel, parser->store, byte);
+
+	      fts_midiport_input(port, event, 0.0);
+			  
+	      /* reset for running status */
+	      parser->store = MIDI_EMPTY_BYTE;
+	    }
+	  break;
+
+	case midiparser_status_system_exclusive:
+	  
+	  switch (byte)
+	    {
+	    case MIDI_SYSTEM_EXCLUSIVE_REALTIME:
+	      parser->status = midiparser_status_system_exclusive_realtime;
+	      break;
+	      
+	    default:
+	      /* start sysex block with vendor or sysex non real-time id */
+	      midiparser_system_exclusive_start(parser);
+	      midiparser_system_exclusive_byte(parser, (int)byte);
+	      parser->status = midiparser_status_system_exclusive_byte;
+	    }
+	  
+	  break;
+	  
+	case midiparser_status_system_exclusive_realtime:
+	  
+	  switch (byte)
+	    {
+	    case 0x01:
+	      /* start MTC full frame block */
+	      parser->status = midiparser_status_system_exclusive_full_frame;
+	      parser->mtc_frame_count = -1;
+	      break;
+	      
+	    default:
+	      /* sysex real-time id and byte */
+	      midiparser_system_exclusive_start(parser);
+	      midiparser_system_exclusive_byte(parser, (int)MIDI_SYSTEM_EXCLUSIVE_REALTIME);
+	      midiparser_system_exclusive_byte(parser, (int)byte);
+	      parser->status = midiparser_status_system_exclusive_byte;
+	      break;
+	    }
+	  
+	  break;
+	  
+	case midiparser_status_system_exclusive_byte:
+	  
+	  /* ordinary sysex byte */
+	  midiparser_system_exclusive_byte(parser, (int)byte);
+
+	  break;
+	  
+	case midiparser_status_system_exclusive_full_frame:
+	  
+	  /* handle MTC full frame */
+	  switch (parser->mtc_frame_count)
+	    {
+	    case -1:
+	      if(byte == 0x01)
+		parser->mtc_frame_count = 0;
+	      else
+		{
+		  /* oops was ordinary sysex message starting with 0x7f 0x01 */
+		  midiparser_system_exclusive_start(parser);
+		  midiparser_system_exclusive_byte(parser, (int)MIDI_SYSTEM_EXCLUSIVE_REALTIME);
+		  midiparser_system_exclusive_byte(parser, (int)0x01);
+		  midiparser_system_exclusive_byte(parser, (int)byte);
+
+		  parser->status = midiparser_status_system_exclusive_byte;
+		}
+	      break;
+	    case 0:
+	      parser->mtc_type = (byte & 0x60) >> 5;
+	      parser->mtc_hour = (byte & 0x1f);
+	      break;
+	    case 1:
+	      parser->mtc_minute = byte;
+	      break;
+	    case 2:
+	      parser->mtc_second = byte;
+	      break;
+	    case 3:
+	      parser->mtc_frame = byte;
+	      break;
+	    default:
+	      break;
+	    }
+	  
+	  parser->mtc_frame_count++;
+	  
+	  break;
+	  
+	case midiparser_status_quarter_frame:
+	  {
+	    switch ((byte & 0xf0) >> 4)
+	      {
+	      case 0:
+		parser->mtc_frame = (parser->mtc_frame & 0xf0) | (byte & 0x0f);
+
+		if(parser->mtc_status == mtc_status_backward)
+		  {
+		    midiparser_mtc_send(parser);
+		    parser->mtc_status = mtc_status_ready;
+		  }
+		else
+		  parser->mtc_status = mtc_status_forward;
+
+		break;
+	      case 1:
+		parser->mtc_frame = (parser->mtc_frame & 0x0f) | (byte & 0x0f) << 4;
+		break;
+	      case 2:
+		parser->mtc_second = (parser->mtc_second & 0xf0) | (byte & 0x0f);
+		break;
+	      case 3:
+		parser->mtc_second = (parser->mtc_second & 0x0f) | (byte & 0x0f) << 4;
+		break;
+	      case 4:
+		parser->mtc_minute = (parser->mtc_minute & 0xf0) | (byte & 0x0f);
+		break;
+	      case 5:
+		parser->mtc_minute = (parser->mtc_minute & 0x0f) | (byte & 0x0f) << 4;
+		break;
+	      case 6:
+		parser->mtc_hour = (parser->mtc_hour & 0xf0) | (byte & 0x0f);
+		break;
+	      case 7:
+		parser->mtc_hour = (parser->mtc_hour & 0x0f) | (byte & 0x01) << 4;
+		parser->mtc_type = (byte & 0x60) >> 5;
+
+		if(parser->mtc_status == mtc_status_forward)
+		  {
+		    midiparser_mtc_send(parser);
+		    parser->mtc_status = mtc_status_ready;
+		  }
+		else
+		  parser->mtc_status = mtc_status_backward;
+
+		break;
+
+	      default:
+		break;
+	      }
+	    
+	    parser->status = midiparser_status_reset;
+	  }
+	  
+	  break;
+	  
+	default:
+	  break;
+	}
     }
 }
 
@@ -448,6 +714,9 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
  *  MIDI port class
  *
  */
+
+static fts_symbol_t fts_s__superclass = 0;
+static fts_symbol_t fts_s_midiport = 0;
 
 void 
 fts_midiport_class_init(fts_class_t *cl)
@@ -462,55 +731,109 @@ fts_midiport_class_init(fts_class_t *cl)
 void
 fts_midiport_init(fts_midiport_t *port)
 {
-  port->listeners = 0;
+  int type;
+  
+  for(type=midi_type_any; type<n_midi_types; type++)
+    port->listeners[type + 1] = 0;
+  
   port->output = 0;
-
-  port->sysex_at = 0;
-  port->sysex_ac = 0;
-  port->sysex_alloc = 0;
 }
 
 void
-fts_midiport_delete(fts_midiport_t *port)
+fts_midiport_reset(fts_midiport_t *port)
 {
-  if(port->sysex_alloc)
-    fts_free( port->sysex_at);
+  /* free listeners */
+  if(port->listeners[midi_type_any])
+    {
+      int type;
 
-  if(port->listeners)
-    fts_free( port->listeners);
+      for(type=midi_type_any; type<n_midi_types; type++)
+	fts_free(port->listeners[type + 1]);
+    }
 }
 
 void
 fts_midiport_set_input(fts_midiport_t *port)
 {
-  fts_midiport_listeners_t *listeners = fts_malloc(sizeof(fts_midiport_listeners_t));
-  int i;
+  enum midi_type type;
 
-  for(i=0; i<=16; i++)
+  for(type=midi_type_any; type<n_midi_types; type++)
     {
-      int j;
+      int i;
 
-      for(j=0; j<=127; j++)
+      switch(type)
 	{
-	  listeners->note[i][j] = 0;
-	  listeners->poly_pressure[i][j] = 0;
-	  listeners->control_change[i][j] = 0;
+	case midi_type_any:
+	  {
+	    fts_midiport_listener_t **any_list;
+
+	    any_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *));
+	    *any_list = 0;
+
+	    port->listeners[type + 1] = any_list;
+	  }
+	  break;
+
+	case midi_type_note:
+	case midi_type_poly_pressure:
+	case midi_type_control_change:
+	  {
+	    /* channel and poly listeners */
+	    fts_midiport_listener_t **poly_list;
+	    int size = (n_midi_channels + 1) * (n_midi_controllers + 1);
+	    int i;
+
+	    poly_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * size);
+	    
+	    for(i=0; i<size; i++)
+	      poly_list[i] = 0;
+
+	    port->listeners[type + 1] = poly_list; 
+	  }
+	  break;
+
+	case midi_type_program_change:
+	case midi_type_channel_pressure:
+	case midi_type_pitch_bend:
+	  {
+	    /* channel listeners */
+	    fts_midiport_listener_t **chan_list;
+	    int i;
+
+	    chan_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * (n_midi_channels + 1));
+	    
+	    for(i=0; i<n_midi_channels; i++)
+	      chan_list[i] = 0;
+
+	    port->listeners[type + 1] = chan_list;
+	  }
+	  break;
+
+	case midi_type_system:
+	  {
+	    /* system message listeners */
+	    fts_midiport_listener_t **sys_list;
+	    int i;
+	    
+	    sys_list = (fts_midiport_listener_t **)fts_malloc(sizeof(fts_midiport_listener_t *) * n_midi_system_types);
+	    
+	    for(i=0; i<n_midi_system_types; i++)
+	      sys_list[i] = 0;
+
+	    port->listeners[type + 1] = sys_list;
+	  }
+	  break;
+
+	default:
+	  break;
 	}
-
-      listeners->program_change[i] = 0;
-      listeners->channel_pressure[i] = 0;
-      listeners->pitch_bend[i] = 0;
     }
-
-  listeners->system_exclusive = 0;
-
-  port->listeners = listeners;
 }
 
 void
-fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *functions)
+fts_midiport_set_output(fts_midiport_t *port, fts_midiport_function_t function)
 {
-  port->output = functions;
+  port->output = function;
 }
 
 int
@@ -533,23 +856,11 @@ fts_object_is_midiport(fts_object_t *obj)
  */
 
 static void 
-add_poly_listener(fts_midiport_listener_t **list, fts_object_t *object, fts_midiport_poly_fun_t fun)
+add_listener(fts_midiport_listener_t **list, fts_object_t *object, fts_midiport_function_t fun)
 {
   fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
 
-  l->callback.poly = fun;
-  l->listener = object;
-  l->next = *list;
-  
-  *list = l;
-}
-
-static void 
-add_channel_listener(fts_midiport_listener_t **list, fts_object_t *object, fts_midiport_channel_fun_t fun)
-{
-  fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
-
-  l->callback.channel = fun;
+  l->callback = fun;
   l->listener = object;
   l->next = *list;
   
@@ -592,281 +903,90 @@ remove_listener(fts_midiport_listener_t **list, fts_object_t *o)
     }
 }
 
-#define CLIP_CHANNEL(c) (c < 0)? 0: ((c > 16)? 16: c)
-#define CLIP_NUMBER(n) (n < 0)? 0: ((n > 128)? 128: n);
-
-static void
-call_poly_listeners(fts_midiport_listener_t *list[][128], int channel, int number, int value, double time)
+void 
+fts_midiport_add_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj, fts_midiport_function_t fun)
 {
+  fts_midiport_listener_t **list = &port->listeners[type + 1][(number + 1) * (n_midi_channels + 1) + (id + 1)];
+
+  add_listener(list, obj, fun);
+}
+
+void
+fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int id, int number, fts_object_t *obj)
+{
+  fts_midiport_listener_t **list = &port->listeners[type + 1][(number + 1) * (n_midi_channels + 1) + (id + 1)];
+
+  remove_listener(list, obj);
+}
+
+void
+fts_midiport_input(fts_midiport_t *port, fts_midievent_t *event, double time)
+{
+  int type = fts_midievent_get_type(event);
+  int id = fts_midievent_get_id(event);
+  fts_midiport_listener_t **type_list = port->listeners[type + 1]; 
   fts_midiport_listener_t *l; 
 
-  l = list[channel][number + 1];
-  while(l)
+  fts_object_refer((fts_object_t *)event);
+
+  if(type <= midi_type_control_change)
     {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
+      /* note, poly pressure, control_change */
+      int number = fts_midievent_channel_message_get_first(event); /* note or controller number */
+      int onset = (number + 1) * (n_midi_channels + 1);
 
-  l = list[channel][0];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-
-  l = list[0][number + 1];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-
-  l = list[0][0];
-  while(l)
-    {
-      l->callback.poly(l->listener, channel, number, value, time);
-      l = l->next;
-    }
-}
-
-static void
-call_channel_listeners(fts_midiport_listener_t **list, int channel, int value, double time)
-{
-  fts_midiport_listener_t *l; 
-
-  l = list[channel];
-  while(l)
-    {
-      l->callback.channel(l->listener, channel, value, time);
-      l = l->next;
-    }
-
-  l = list[0];
-  while(l)
-    {
-      l->callback.channel(l->listener, channel, value, time);
-      l = l->next;
-    }
-
-}
-
-/* add listeners */
-
-void
-fts_midiport_add_listener_note(fts_midiport_t *port, int channel, int number, fts_object_t *o, fts_midiport_poly_fun_t fun)
-{
-  add_poly_listener(&port->listeners->note[channel][number + 1], o, fun);
-}
-
-void
-fts_midiport_add_listener_poly_pressure(fts_midiport_t *port, int channel, int number, fts_object_t *o, fts_midiport_poly_fun_t fun)
-{
-  add_poly_listener(&port->listeners->poly_pressure[channel][number + 1], o, fun);
-}
-
-void
-fts_midiport_add_listener_control_change(fts_midiport_t *port, int channel, int number, fts_object_t *o, fts_midiport_poly_fun_t fun)
-{
-  add_poly_listener(&port->listeners->control_change[channel][number + 1], o, fun);
-}
-
-void
-fts_midiport_add_listener_program_change(fts_midiport_t *port, int channel, fts_object_t *o, fts_midiport_channel_fun_t fun)
-{
-  add_channel_listener(&port->listeners->program_change[channel], o, fun);
-}
-
-void
-fts_midiport_add_listener_channel_pressure(fts_midiport_t *port, int channel, fts_object_t *o, fts_midiport_channel_fun_t fun)
-{
-  add_channel_listener(&port->listeners->channel_pressure[channel], o, fun);
-}
-
-void
-fts_midiport_add_listener_pitch_bend(fts_midiport_t *port, int channel, fts_object_t *o, fts_midiport_channel_fun_t fun)
-{
-  add_channel_listener(&port->listeners->pitch_bend[channel], o, fun);
-}
-
-void
-fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts_object_t *o, fts_midiport_sysex_fun_t fun)
-{
-  fts_midiport_listener_t *l = (fts_midiport_listener_t *)fts_malloc(sizeof(fts_midiport_listener_t));
-
-  l->callback.sysex = fun;
-  l->listener = o;
-  l->next = port->listeners->system_exclusive;
-  
-  port->listeners->system_exclusive = l;
-}
-
-/* remove listeners */
-
-void
-fts_midiport_remove_listener_note(fts_midiport_t *port, int channel, int number, fts_object_t *o)
-{
-  remove_listener(&port->listeners->note[channel][number + 1], o);
-}
-
-void
-fts_midiport_remove_listener_poly_pressure(fts_midiport_t *port, int channel, int number, fts_object_t *o)
-{
-  remove_listener(&port->listeners->poly_pressure[channel][number + 1], o);
-}
-
-void
-fts_midiport_remove_listener_control_change(fts_midiport_t *port, int channel, int number, fts_object_t *o)
-{
-  remove_listener(&port->listeners->control_change[channel][number + 1], o);
-}
-
-void
-fts_midiport_remove_listener_program_change(fts_midiport_t *port, int channel, fts_object_t *o)
-{
-  remove_listener(&port->listeners->program_change[channel], o);
-}
-
-void
-fts_midiport_remove_listener_channel_pressure(fts_midiport_t *port, int channel, fts_object_t *o)
-{
-  remove_listener(&port->listeners->channel_pressure[channel], o);
-}
-
-void
-fts_midiport_remove_listener_pitch_bend(fts_midiport_t *port, int channel, fts_object_t *o)
-{
-  remove_listener(&port->listeners->pitch_bend[channel], o);
-}
-
-void
-fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, fts_object_t *o)
-{
-  remove_listener(&port->listeners->system_exclusive, o);
-}
-
-/* call listeners */
-
-void
-fts_midiport_input_note(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  call_poly_listeners(port->listeners->note, channel, number, value, time);
-}
-
-void
-fts_midiport_input_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  call_poly_listeners(port->listeners->poly_pressure, channel, number, value, time);
-}
-
-void
-fts_midiport_input_control_change(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  call_poly_listeners(port->listeners->control_change, channel, number, value, time);
-}
-
-void
-fts_midiport_input_program_change(fts_midiport_t *port, int channel, int value, double time)
-{
-  call_channel_listeners(port->listeners->program_change, channel, value, time);
-}
-
-void
-fts_midiport_input_channel_pressure(fts_midiport_t *port, int channel, int value, double time)
-{
-  call_channel_listeners(port->listeners->channel_pressure, channel, value, time);
-}
-
-void
-fts_midiport_input_pitch_bend(fts_midiport_t *port, int channel, int value, double time)
-{
-  call_channel_listeners(port->listeners->pitch_bend, channel, value, time);
-}
-
-void
-fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value)
-{
-  int index = port->sysex_ac;
-
-  if(index >= port->sysex_alloc)
-    {
-      int new_alloc = port->sysex_alloc + SYSEX_BLOCK_SIZE;
-      fts_atom_t *new_buf = fts_malloc(new_alloc * sizeof(fts_atom_t));
-      int i;
-      
-      if(port->sysex_alloc)
+      /* fire callbacks for given channel and number */
+      l = type_list[onset + id + 1];
+      while(l)
 	{
-	  for(i=0; i<port->sysex_alloc; i++)
-	    new_buf[i] = port->sysex_at[i];
-	  
-	  fts_free( port->sysex_at);
+	  l->callback(l->listener, event, time);
+	  l = l->next;
 	}
-      
-      port->sysex_at = new_buf;
-      port->sysex_alloc = new_alloc;
+
+      /* fire callbacks for any channel and given number*/
+      l = type_list[onset];
+      while(l)
+	{
+	  l->callback(l->listener, event, time);
+	  l = l->next;
+	}
     }
 
-  fts_set_int(port->sysex_at + index, value);
-  port->sysex_ac++;
-}
-
-void
-fts_midiport_input_system_exclusive_call(fts_midiport_t *port, double time)
-{
-  fts_midiport_listener_t *l = port->listeners->system_exclusive;
-
+  /* fire callbacks for given system type or given channel and any number */
+  l = type_list[id + 1];
   while(l)
     {
-      l->callback.sysex(l->listener, port->sysex_ac, port->sysex_at, time);
+      l->callback(l->listener, event, time);
       l = l->next;
     }
 
-  port->sysex_ac = 0;
+  /* fire callbacks for any system type or any channel and any number */
+  l = type_list[0];
+  while(l)
+    {
+      l->callback(l->listener, event, time);
+      l = l->next;
+    }
+
+  /* fire callbacks for any event */
+  l = port->listeners[0][0];
+  while(l)
+    {
+      l->callback(l->listener, event, time);
+      l = l->next;
+    }
+
+  fts_object_release((fts_object_t *)event);
 }
 
-/****************************************************
- *
- *  MIDI port output
- *
- */
-
-void fts_midiport_output_note(fts_midiport_t *port, int channel, int number, int value, double time)
+void 
+fts_midiport_output(fts_midiport_t *port, fts_midievent_t *event, double time)
 {
-  port->output->note((fts_object_t *)port, channel, number, value, time);
-}
+  fts_object_refer((fts_object_t *)event);
+  
+  port->output((fts_object_t *)port, event, time);
 
-void fts_midiport_output_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  port->output->poly_pressure((fts_object_t *)port, channel, number, value, time);
-}
-
-void fts_midiport_output_control_change(fts_midiport_t *port, int channel, int number, int value, double time)
-{
-  port->output->control_change((fts_object_t *)port, channel, number, value, time);
-}
-
-void fts_midiport_output_program_change(fts_midiport_t *port, int channel, int value, double time)
-{
-  port->output->program_change((fts_object_t *)port, channel, value, time);
-}
-
-void fts_midiport_output_channel_pressure(fts_midiport_t *port, int channel, int value, double time)
-{
-  port->output->channel_pressure((fts_object_t *)port, channel, value, time);
-}
-
-void fts_midiport_output_pitch_bend(fts_midiport_t *port, int channel, int value, double time)
-{
-  port->output->pitch_bend((fts_object_t *)port, channel, value, time);
-}
-
-void fts_midiport_output_system_exclusive_byte(fts_midiport_t *port, int value)
-{
-  port->output->sysex_byte((fts_object_t *)port, value);
-}
-
-void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double time)
-{
-  port->output->sysex_flush((fts_object_t *)port, time);
+  fts_object_release((fts_object_t *)event);
 }
 
 /****************************************************
@@ -927,8 +1047,9 @@ void fts_midiport_set_default_class( fts_symbol_t name)
 
 void fts_midi_config(void)
 {
+  fts_s_midievent = fts_new_symbol("midievent");
   fts_s_midiport = fts_new_symbol("midiport");
   fts_s__superclass = fts_new_symbol("_superclass");
+
+  midievent_config();
 }
-
-

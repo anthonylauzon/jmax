@@ -39,11 +39,11 @@ typedef struct _sysex_
  */
 
 static void
-sysexin_callback(fts_object_t *o, int ac, const fts_atom_t *at, double time)
+sysexin_callback(fts_object_t *o, fts_midievent_t *event, double time)
 {
   sysex_t *this = (sysex_t *)o;
 
-  fts_outlet_send(o, 0, fts_s_list, ac, at);
+  fts_outlet_send(o, 0, fts_s_list, fts_midievent_system_exclusive_get_size(event), fts_midievent_system_exclusive_get_atoms(event));
 }
 
 static void
@@ -80,7 +80,7 @@ sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* add call back to midi port */
   if(this->port)
-    fts_midiport_add_listener_system_exclusive(this->port, o, sysexin_callback);
+    fts_midiport_add_listener(this->port, midi_type_system, midi_system_exclusive, midi_controller_any, o, sysexin_callback);
 }
 
 static void 
@@ -89,7 +89,7 @@ sysexin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   sysex_t *this = (sysex_t *)o;
 
   if(this->port)
-    fts_midiport_remove_listener_system_exclusive(this->port, o);
+    fts_midiport_remove_listener(this->port, midi_type_system, midi_system_exclusive, midi_controller_any, o);
 }
 
 static fts_status_t
@@ -117,13 +117,20 @@ sysexout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->port)
     {
+      fts_midievent_t *event;
       int i;
       
-      for(i=0; i<ac; i++)
-	if(fts_is_int(at + i))
-	  fts_midiport_output_system_exclusive_byte(this->port, fts_get_int(at + i));
+      event = fts_midievent_system_exclusive_new();
 
-      fts_midiport_output_system_exclusive_flush(this->port, 0.0);
+      for(i=0; i<ac; i++)
+	{
+	  if(fts_is_number(at + i))
+	    fts_midievent_system_exclusive_append(event, fts_get_number_int(at + i));
+	  else
+	    fts_midievent_system_exclusive_append(event, 0);
+	}
+
+      fts_midiport_output(this->port, event, 0.0);
     }
 }
 

@@ -30,7 +30,7 @@ typedef struct _cut_ftl_
   fts_object_t o;
   fvec_t *fvec;
   int index;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } cut_ftl_t;
 
 
@@ -46,7 +46,7 @@ typedef struct _cut_
  *
  */
 
-static void cut_output(fts_alarm_t *alarm, void *o)
+static void cut_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cut_t *this = (cut_t *)o;
   cut_ftl_t *data = (cut_ftl_t *)ftl_data_get_ptr(this->data);
@@ -116,7 +116,7 @@ cut_ftl(fts_word_t *argv)
     n = n_tick;
   else if(n)
     {
-      fts_alarm_set_delay(&(data->alarm), 0.0);
+      fts_timer_set_delay(data->timer, 0.0, 0);
     }
 
   for(i=0; i<n; i++)
@@ -153,7 +153,7 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   data->index = fvec_get_size(data->fvec);
 
-  fts_alarm_init(&(data->alarm), 0, cut_output, (void *)this);
+  data->timer = fts_timer_new(o, 0);
 
   fts_dsp_add_object((fts_object_t *)this);
 }
@@ -167,7 +167,7 @@ cut_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(data->fvec)
     fts_object_release((fts_object_t *)data->fvec);    
 
-  fts_alarm_reset(&data->alarm);
+  fts_timer_delete(data->timer);
 
   ftl_data_free(this->data);
 
@@ -186,7 +186,9 @@ cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, cut_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), cut_put);
+
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, cut_output);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
     }
@@ -196,7 +198,9 @@ cut_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, cut_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, cut_delete);      
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("put"), cut_put);
+
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put, cut_put);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, cut_output);
 
       fts_method_define_varargs(cl, 0, fts_s_bang, cut_bang);
       fts_method_define_varargs(cl, 1, fvec_symbol, cut_set_fvec);

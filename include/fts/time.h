@@ -25,29 +25,49 @@
 /**
  * The FTS timing system
  *
- * An FTS clock is a monotonous time base. A clock can be created and advanced.
- * Alarms can be registered for a user created clock or the main clock of a thread
+ * An FTS timebase is a monotonous time base. A timebase can be created and advanced.
+ * Alarms can be registered for a user created timebase or the main timebase of a thread
  * with a given absolute time or a delay from the current time.
  *
- * Advancing a clock to a certain time will fire all pending alarms until the given time.
+ * Advancing a timebase to a certain time will fire all pending alarms until the given time.
  *
  * Time is a double and in milliseconds.
  *
- * @defgroup time clocks, alarms and timers
+ * @defgroup time the timing system
  */
 
+/** 
+ * @name logical time
+ */
+/*@{*/
+
 /**
- * The FTS clock structure.
+ * Get logical time in milliseconds
  *
- * @typedef fts_clock_t
+ * @fn double fts_get_time(void)
+ * @return logical time in msecs
  *
  * @ingroup time
  */
+FTS_API double fts_get_time(void);
+
+/*@}*/ /* logical time */
+
+/*********************************************************************
+ *
+ *  timebase
+ *
+ */
+
+/** 
+ * @name timebase and timers
+ */
+/*@{*/
 
 /**
- * The FTS alarm structure.
+ * The FTS timebase structure.
  *
- * @typedef fts_alarm_t
+ * @typedef fts_timebase_t
  *
  * @ingroup time
  */
@@ -60,214 +80,74 @@
  * @ingroup time
  */
 
-typedef struct fts_clock fts_clock_t;
-typedef struct fts_alarm fts_alarm_t;
+typedef struct fts_timebase fts_timebase_t;
 typedef struct fts_timer fts_timer_t;
 
-/*********************************************************************
- *
- *  clock
- *
- */
-
-/** 
- * @name clocks
- */
-/*@{*/
-
-struct fts_clock
-{
-  double time; /* logical time */
-  fts_alarm_t *alarms; /* list of alarms */
-};
-
 /**
- * Initializes clock structure.
+ * Initializes timebase structure.
  *
- * @fn void fts_clock_init(fts_clock_t *clock)
- * @param clock the clock
+ * @fn void fts_timebase_init(fts_timebase_t *timebase)
+ * @param timebase the timebase
  *
  * @ingroup time
  */
-FTS_API void fts_clock_init(fts_clock_t *clock);
+FTS_API void fts_timebase_init(fts_timebase_t *timebase, double tick);
 
 /**
- * Reset clock to zero and reset all active alarms.
+ * Reset timebase to zero and delete all active alarms and timers.
  *
- * @fn void fts_clock_reset(fts_clock_t *clock)
- * @param clock the clock
+ * @fn void fts_timebase_reset(fts_timebase_t *timebase)
+ * @param timebase the timebase
  *
  * @ingroup time
  */
-FTS_API void fts_clock_reset(fts_clock_t *clock);
+FTS_API void fts_timebase_reset(fts_timebase_t *timebase);
 
 /**
- * Get current clock time.
+ * Get current timebase time.
  *
- * @fn double fts_clock_get_time(fts_clock_t *clock)
- * @param clock the clock
+ * @fn double fts_timebase_get_time(fts_timebase_t *timebase)
+ * @param timebase the timebase
  * @return current (logical) time
  *
  * @ingroup time
  */
-FTS_API double fts_clock_get_time(fts_clock_t *clock);
+FTS_API double fts_timebase_get_time(fts_timebase_t *timebase);
 
 /**
- * Set current clock time (doesn't fire alarms).
+ * Set current timebase time.
  *
- * @fn void fts_clock_set_time(fts_clock_t *clock, double time)
- * @param clock the clock
+ * @fn void fts_timebase_set_time(fts_timebase_t *timebase, double time)
+ * @param timebase the timebase
  * @param time new time
  *
  * @ingroup time
  */
-FTS_API void fts_clock_set_time(fts_clock_t *clock, double time);
+FTS_API void fts_timebase_set_time(fts_timebase_t *timebase, double time);
 
 /**
- * Advance clock to given time and sequencially fire pending alarms set to the given time or earlier.
+ * Advance timebase one tick
  *
- * When firing an alarm the clock time is set to the alarm time so that all method calls have access 
- * to the current alarm time of the clock. After all alarms are fired the clock time is set to the
- * given value.
- *
- * @fn void fts_clock_advance(fts_clock_t *clock, double time)
- * @param clock the clock
- * @param time given time
- *
- * @ingroup time
- */
-FTS_API void fts_clock_advance(fts_clock_t *clock, double time);
-
-/*@}*/ /* clocks */
-
-/* clock functions defined as macros */
-#define fts_clock_set_time(c, t) ((c)->time = t)
-#define fts_clock_get_time(c) ((c)->time)
-
-
-/*********************************************************************
- *
- *  alarm
- *
- */
-
-/** 
- * @name alarms
- */
-/*@{*/
-
-struct fts_alarm
-{
-  double time; /* when to trigger this alarm */
-
-  void (* fun)(fts_alarm_t *, void *); /* the function to call when the alarm trigger */
-  void *arg; /* the argument to pass to the function */
-  fts_alarm_t *next; /* next alarm for the same clock */
-  int active; /* non zero when inserted in a list */
-  fts_clock_t *clock; /* a pointer to the clock to use with this alarm */
-};
-
-#define fts_alarm_get_clock(a) ((a)->clock)
-
-/**
- * Initialize alarm structure.
- *
- * @fn fts_alarm_t *fts_alarm_init(fts_alarm_t *alarm, fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg)
- * @param alarm the alarm structure (pointer to)
- * @param clock the clock the alarm is associcated to
- * @param fun the alarm callback function (called with the alarm and an argument when alarm goes off)
- * @param arg the argument given to the alarms callback function
- *
- * @ingroup time
- */
-FTS_API void fts_alarm_init(fts_alarm_t *alarm, fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg);
-
-/**
- * Create and initialize new alarm.
- *
- * @fn fts_alarm_t *fts_alarm_new(fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg)
- * @param clock the clock the alarm is associcated to
- * @param fun the alarm callback function (called with the alarm and an argument when alarm goes off)
- * @param arg the argument given to the alarms callback function
- * @return new alarm
- *
- * @ingroup time
- */
-FTS_API fts_alarm_t *fts_alarm_new(fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg);
-
-/**
- * Free alarm created with fts_alarm_new().
- *
- * @fn void fts_alarm_free(fts_alarm_t *alarm)
- * @param alarm the alarm
- *
- * @ingroup time
- */
-FTS_API void fts_alarm_free(fts_alarm_t *alarm);
-
-/**
- * Check if alarm is activated.
- *
- * @fn int fts_alarm_is_active(fts_alarm_t *alarm)
- * @param alarm the alarm
- * @return non-zero if alarm is active
+ * @fn void fts_timebase_tick(fts_timebase_t *timebased)
+ * @param timebase the timebase
+ * @param step time step to advance by
  *
  * @ingroup time
  */
 
-FTS_API int fts_alarm_is_active(fts_alarm_t *alarm);
+FTS_API void fts_timebase_tick(fts_timebase_t *timebase);
 
 /**
- * Activate alarm for given time.
+ * Set global master timebase
  *
- * If the function is called on an alarm which is already active the alarm is reset 
- * before it is reactivated for the given time.
- *
- * @fn int fts_alarm_set_time(fts_alarm_t *alarm, double time)
- * @param alarm the alarm
- * @param time absolute time when the alarm will go off
+ * @fn void fts_time_set_timebase(fts_timebase_t *timebase)
+ * @param timease the timebase
  *
  * @ingroup time
  */
-FTS_API void fts_alarm_set_time(fts_alarm_t *alarm, double time);
+FTS_API void fts_time_set_timebase(fts_timebase_t *timebase);
 
-/**
- * Activate alarm for given delay.
- *
- * If the function is called on an alarm which is already active the alarm is reset 
- * before it is reactivated for the given delay.
- *
- * @fn int fts_alarm_set_delay(fts_alarm_t *alarm, double delay)
- * @param alarm the alarm
- * @param delay delay time after which the alarm will go off
- *
- * @ingroup time
- */
-FTS_API void fts_alarm_set_delay(fts_alarm_t *alarm, double delay);
-
-/**
- * Reset and desactivate alarm.
- *
- * The function has no effect on non active alarms.
- *
- * @fn int fts_alarm_reset(fts_alarm_t *alarm)
- * @param alarm the alarm
- *
- * @ingroup time
- */
-FTS_API void fts_alarm_reset(fts_alarm_t *alarm);
-
-/*@}*/ /* alarms */
-
-/* function defined as macro */
-#define fts_alarm_is_active(a) ((a)->active == 1)
-
-/* deprecated */
-#define fts_alarm_arm(a) /* useless */
-#define fts_alarm_unarm(a) fts_alarm_reset(a)
-#define fts_alarm_is_in_future(a) (fts_alarm_is_active(a))
-#define fts_alarm_is_armed(a) (fts_alarm_is_active(a))
-
+/*@}*/ /* timebase */
 
 /*********************************************************************
  *
@@ -275,95 +155,29 @@ FTS_API void fts_alarm_reset(fts_alarm_t *alarm);
  *
  */
 
-/** 
- * @name timers
- */
-/*@{*/
-
 struct fts_timer
 {
-  fts_clock_t *clock;
-  int running;
-  double start;
-  double time;
+  fts_timebase_t *timebase; /* the timers timebase */
+  fts_object_t *object; /* its object */
+  fts_method_t tick; /* tick callback */
+  fts_method_t alarm; /* alarm callback */
+  fts_method_t locate; /* locate callback */
+  int active; /* timer is active */
+  int n_alarms; /* number of active alarms */
+  struct fts_timer *next; /* timebase list of timers */
 };
 
-/**
- * Initialize timer structure.
- *
- * @fn fts_timer_t *fts_timer_init(fts_timer_t *timer, fts_clock_t *clock)
- * @param timer the timer structure (pointer to)
- * @param clock the clock the timer is associcated to
- *
- * @ingroup time
- */
-FTS_API void fts_timer_init(fts_timer_t *timer, fts_clock_t *clock);
+#define fts_timer_get_timebase(t) ((t)->timebase)
+#define fts_timer_is_active(t) ((t)->active)
+#define fts_timer_has_alarm(t) ((t)->n_alarms > 0)
 
-/**
- * Create and initialize new timer.
- *
- * @fn fts_timer_t *fts_timer_new(fts_clock_t *clock)
- * @param clock the clock the timer is associcated to
- * @return new timer
- *
- * @ingroup time
- */
-FTS_API fts_timer_t *fts_timer_new(fts_clock_t *clock);
+FTS_API fts_timer_t *fts_timer_new(fts_object_t *object, fts_timebase_t *timebase);
+FTS_API void fts_timer_delete(fts_timer_t *timer);
 
-/**
- * Free timer created with fts_timer_new().
- *
- * @fn void fts_timer_free(fts_timer_t *timer)
- * @param timer the timer
- *
- * @ingroup time
- */
-FTS_API void fts_timer_free(fts_timer_t *timer);
-
-/**
- * Get current timer time.
- *
- * @fn double fts_timer_get_time(fts_timer_t *timer)
- * @param timer the timer
- * @return current time
- *
- * @ingroup time
- */
-FTS_API double fts_timer_get_time(fts_timer_t *timer);
-
-/**
- * Start timer.
- *
- * @fn double fts_timer_start(fts_timer_t *timer)
- * @param timer the timer
- *
- * @ingroup time
- */
-FTS_API void fts_timer_start(fts_timer_t *timer);
-
-/**
- * Stop timer.
- *
- * @fn double fts_timer_stop(fts_timer_t *timer)
- * @param timer the timer
- *
- * @ingroup time
- */
-FTS_API void fts_timer_stop(fts_timer_t *timer);
-
-/**
- * Reset timer to zero.
- *
- * @fn double fts_timer_reset(fts_timer_t *timer)
- * @param timer the timer
- *
- * @ingroup time
- */
+FTS_API void fts_timer_activate(fts_timer_t *timer);
+FTS_API void fts_timer_set_alarm(fts_timer_t *timer, double time, fts_atom_t *atom);
+FTS_API void fts_timer_set_delay(fts_timer_t *timer, double delay, fts_atom_t *atom);
 FTS_API void fts_timer_reset(fts_timer_t *timer);
-
-/*@}*/ /* timers */
-
-/* timer function defined as macros */
-#define fts_timer_get_time(t) (((t)->running)? ((t)->time + ((t)->clock->time - (t)->start)): ((t)->time))
+FTS_API void fts_timer_flush(fts_timer_t *timer);
 
 #endif

@@ -167,8 +167,6 @@ extern void fts_kernel_property_init( void);
 extern void fts_kernel_package_init( void);
 extern void fts_kernel_doctor_init( void);
 extern void fts_kernel_connection_init( void);
-/*extern void fts_kernel_oldftsdata_init( void);
-  extern void fts_kernel_oldpatcherdata_init( void);*/
 extern void fts_kernel_variable_init( void);
 extern void fts_kernel_patcher_init( void);
 extern void fts_kernel_expression_init( void);
@@ -199,8 +197,6 @@ static void fts_kernel_init( void)
   fts_kernel_package_init();
   fts_kernel_doctor_init();
   fts_kernel_connection_init();
-  /*fts_kernel_oldftsdata_init();*/
-  /*fts_kernel_oldpatcherdata_init();*/
   fts_kernel_variable_init();
   fts_kernel_patcher_init();
   fts_kernel_expression_init();
@@ -221,7 +217,7 @@ extern void fts_audio_config( void);
 extern void fts_bytestream_config( void);
 extern void fts_client_config( void);
 extern void fts_clipboard_config( void);
-extern void fts_inout_config( void);
+extern void fts_label_config( void);
 extern void fts_midi_config( void);
 extern void fts_objectset_config();
 extern void fts_oldclient_config( void);
@@ -237,7 +233,7 @@ static void fts_kernel_classes_config( void)
   fts_bytestream_config();
   fts_client_config();
   fts_clipboard_config();
-  fts_inout_config();
+  fts_label_config();
   fts_midi_config();
   fts_objectset_config();
   fts_oldclient_config();
@@ -260,6 +256,10 @@ void fts_init( int argc, char **argv)
 
   /* Platform dependant initialization */
   fts_platform_init();
+
+  fts_log("[fts]: Configure DSP timebase\n");
+
+  fts_dsp_timebase_configure();
 
   fts_log("[fts]: Initializing kernel classes\n");
 

@@ -52,7 +52,7 @@ typedef struct _wacom_
   int answer_index;
   int init_trials;
   int init_wait;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 
   /* tablet parameters */
   float version;
@@ -457,10 +457,9 @@ wacom_decode_V(fts_object_t *o, int n, const unsigned char *c)
 }
 
 static void
-wacom_reset_buttons(fts_alarm_t *alarm, void *p)
+wacom_reset_buttons(wacom_t *this)
 {
-  fts_object_t *o = (fts_object_t *)p;
-  wacom_t *this = (wacom_t *)p;
+  fts_object_t *o = (fts_object_t *)this;
 
   if(this->fun != 0)
     {
@@ -496,7 +495,7 @@ wacom_reset_buttons(fts_alarm_t *alarm, void *p)
 static void
 wacom_init_stop(wacom_t *this)
 {
-  fts_alarm_reset(&this->alarm);
+  fts_timer_reset(this->timer);
   fts_bytestream_remove_listener(this->stream, (fts_object_t *)this);
 }
 
@@ -690,11 +689,13 @@ wacom_init_start(wacom_t *this)
 
   /* wait for reset */
   this->init_wait = 1;
-  fts_alarm_set_delay(&this->alarm, WACOM_WAIT_RESET);
+
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, WACOM_WAIT_RESET, 0);
 }
 
 static void
-wacom_init_alarm(fts_alarm_t *alarm, void *o)
+wacom_init_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wacom_t *this = (wacom_t *)o;
 
@@ -707,7 +708,7 @@ wacom_init_alarm(fts_alarm_t *alarm, void *o)
       wacom_init_send_string(this, wacom_string_request_model);
       
       /* set init timeout (all the rest is handled by the init callback) */
-      fts_alarm_set_delay(&this->alarm, WACOM_REQUEST_TIMEOUT);
+      fts_timer_set_delay(this->timer, WACOM_REQUEST_TIMEOUT, 0);
     }
   else
     {
@@ -791,7 +792,7 @@ wacom_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  this->b3 = 0;
 	  this->fun = 0;
 
-	  fts_alarm_init(&this->alarm, 0, wacom_init_alarm, (void *)this);
+	  this->timer = fts_timer_new(o, 0);
 	  this->init_wait = 0;
 	  this->init_trials = 0;
 	  
@@ -811,7 +812,7 @@ wacom_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->stream)
     {
-      fts_alarm_reset(&this->alarm);
+      fts_timer_delete(this->timer);
       fts_bytestream_remove_listener(this->stream, o);
     }
 }
@@ -823,7 +824,9 @@ wacom_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, wacom_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, wacom_delete);
-  
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, wacom_init_alarm);
+
   fts_method_define_varargs(cl, 0, fts_new_symbol("reset"), wacom_reset);
   
   return fts_Success;

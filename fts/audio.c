@@ -36,10 +36,6 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#ifdef WIN32
-#include <windows.h>
-#include <mmsystem.h>
-#endif
 
 #include <fts/fts.h>
 #include <ftsprivate/connection.h>
@@ -56,8 +52,7 @@ static fts_symbol_t s_audioportin;
 static fts_symbol_t s_audioportout;
 static fts_symbol_t s_indispatcher;
 static fts_symbol_t s_outdispatcher;
-
-static fts_audioport_t *null_audioport;
+static fts_symbol_t s_audioport_guard;
 
 /*		   
 
@@ -258,16 +253,8 @@ void fts_audio_idle( void)
 	}
     }
 
-  if ( !at_least_one_io_fun_called && null_audioport)
-    {
-      ftl_wrapper_t fun;
-      fts_word_t at[1];
-
-      fun = fts_audioport_get_output_function( null_audioport);
-      fts_word_set_ptr( at+0, null_audioport);
-
-      (*fun)( at);
-    }
+  if ( !at_least_one_io_fun_called)
+    fts_sleep();
 }
 
 /* ********************************************************************** */
@@ -285,6 +272,12 @@ typedef struct _audioport_guard_t {
 } audioport_guard_t;
 
 static audioport_guard_t *audioport_guard;
+
+static void
+audio_guard_dsp_function(fts_word_t *argv)
+{
+  fts_sleep();
+}
 
 static void audioport_guard_arm( void)
 {
@@ -318,14 +311,8 @@ static void audioport_guard_put_prologue( fts_object_t *o, int winlet, fts_symbo
 
 static void audioport_guard_put_epilogue( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if ( audioport_guard_is_armed() && null_audioport)
-    {
-      fts_atom_t args[1];
-
-      /* schedule the null audioport */
-      fts_set_ptr( args+0, null_audioport);
-      fts_dsp_add_function( fts_audioport_get_output_function_name( null_audioport), 1, args);
-    }
+  if (audioport_guard_is_armed())
+    fts_dsp_add_function(s_audioport_guard, 0, 0);
 }
 
 static fts_status_t audioport_guard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -338,10 +325,10 @@ static fts_status_t audioport_guard_instantiate(fts_class_t *cl, int ac, const f
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_prologue, audioport_guard_put_prologue);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_put_epilogue, audioport_guard_put_epilogue);
 
+  fts_dsp_declare_function( s_audioport_guard, audio_guard_dsp_function);
+
   return fts_Success;
 }
-
-
 
 /* ********************************************************************** */
 /*                                                                        */
@@ -713,113 +700,6 @@ fts_audioport_t *fts_audioport_get_default( fts_object_t *obj)
 
 /***********************************************************************
  *
- * Null audio port: used to prevent from 100% CPU locking
- *
- */
-
-typedef struct {
-  fts_audioport_t head;
-#ifdef WIN32
-  int count;
-  DWORD sysstart;
-  double ftsstart;
-#else
-  fts_timer_t timer;
-#endif
-} nullaudioport_t;
-
-#define DEBUG_NULLAUDIODEVICE 1
-
-static void nullaudioport_output( fts_word_t *argv)
-{
-  nullaudioport_t *this = (nullaudioport_t *)fts_word_get_ptr( argv+0);
-
-#ifdef WIN32
-  if (this->count == -1) {
-    this->count = 0;
-    this->sysstart = GetTickCount();
-    this->ftsstart = fts_get_time();
-    return;
-  }
-  if ( ++this->count == 5) {
-    double ftstime = fts_get_time() - this->ftsstart;
-    double systime = GetTickCount() - this->sysstart;
-    double delta = ftstime - systime;
-
-#if DEBUG_NULLAUDIODEVICE
-    FILE* log = fopen("C:\\nullaudiolog.txt", "a");
-    fprintf(log, "fts time=%f, sys time=%f, delta=%f\n", ftstime, systime, delta);
-    fclose(log);
-#endif
-    
-    this->count = 0;
-    
-    if (delta > 0) {
-      Sleep((DWORD) delta);
-    }
-  }
-
-#else
-  if ( fts_timer_get_time( &this->timer) >= (double)100.0)
-    {
-      struct timespec pause_time;
-
-      pause_time.tv_sec = 0;
-      pause_time.tv_nsec = 100000000L;
-
-      nanosleep( &pause_time, 0);
-
-      fts_timer_reset( &this->timer);
-    }
-#endif
-}
-
-static void nullaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  nullaudioport_t *this = (nullaudioport_t *)o;
-
-  fts_audioport_init( &this->head);
-
-  fts_audioport_set_idle_function( (fts_audioport_t *)this, 0);
-  fts_audioport_set_output_function( (fts_audioport_t *)this, nullaudioport_output);
-  /*
-   * The nullaudioport does not defines channels, in order to avoid creating
-   * its DSP objects which would be scheduled...
-   */
-
-#ifdef WIN32
-  this->count = -1;
-#else
-  fts_timer_init( &this->timer, 0);
-  fts_timer_start( &this->timer);
-#endif
-}
-
-static void nullaudioport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  nullaudioport_t *this = (nullaudioport_t *)o;
-
-  fts_audioport_delete( (fts_audioport_t *) this);
-}
-
-static void nullaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_set_object( value, o);
-}
-
-static fts_status_t nullaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
-  fts_class_init( cl, sizeof( nullaudioport_t), 0, 0, 0);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, nullaudioport_init);
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, nullaudioport_delete);
-
-  fts_class_add_daemon( cl, obj_property_get, fts_s_state, nullaudioport_get_state);
-
-  return fts_Success;
-}
-
-/***********************************************************************
- *
  * Initialization
  *
  */
@@ -835,20 +715,16 @@ void fts_audio_config( void)
   s_audioportout = fts_new_symbol( "audioportout");
   s_indispatcher = fts_new_symbol( "indispatcher");
   s_outdispatcher = fts_new_symbol( "outdispatcher");
+  s_audioport_guard = fts_new_symbol( "audioport_guard");
 
   fts_class_install( s_indispatcher, indispatcher_instantiate);
   fts_class_install( s_outdispatcher, outdispatcher_instantiate);
   fts_metaclass_install( s_audioportin, audioportin_instantiate, fts_never_equiv);
   fts_metaclass_install( s_audioportout, audioportout_instantiate, fts_never_equiv);
-  fts_class_install( fts_new_symbol( "audioport_guard"), audioport_guard_instantiate);
-  fts_class_install( fts_new_symbol("nullaudioport"), nullaudioport_instantiate);
-
-  fts_set_symbol( &argv[0], fts_new_symbol("nullaudioport"));
-  fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, (fts_object_t **)&null_audioport);
-  if (!null_audioport)
-    fprintf( stderr, "[FTS] audioport internal error (cannot create null audio port)\n");
+  fts_class_install( s_audioport_guard, audioport_guard_instantiate);
 
   fts_set_symbol( &argv[0], fts_new_symbol("audioport_guard"));
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, argv, (fts_object_t **)&audioport_guard);
 }
+
 

@@ -32,9 +32,6 @@ fts_symbol_t preset_symbol = 0;
 fts_type_t preset_type = 0;
 fts_class_t *preset_class = 0;
 
-static fts_symbol_t sym_get_state_as_array = 0;
-static fts_symbol_t sym_restore_state_from_array = 0;
-
 static fts_symbol_t sym_add_state_from_bmax = 0;
 static fts_symbol_t sym_add_array_from_bmax = 0;
 
@@ -42,8 +39,8 @@ static int
 preset_check_object(preset_t *this, fts_object_t *obj)
 {
   fts_class_t *class = fts_object_get_class(obj);
-  fts_method_t get_meth = fts_class_get_method(class, fts_SystemInlet, sym_get_state_as_array);
-  fts_method_t restore_meth = fts_class_get_method(class, fts_SystemInlet, sym_restore_state_from_array);
+  fts_method_t get_meth = fts_class_get_method(class, fts_SystemInlet, fts_s_append_state_to_array);
+  fts_method_t restore_meth = fts_class_get_method(class, fts_SystemInlet, fts_s_set_state_from_array);
 
   return (get_meth != 0 && restore_meth != 0);
 }
@@ -164,7 +161,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 	      /* get object state as array */
 	      fts_set_array(&value, states + i);
-	      fts_message_send(this->objects[i], fts_SystemInlet, sym_get_state_as_array, 1, &value);
+	      fts_message_send(this->objects[i], fts_SystemInlet, fts_s_append_state_to_array, 1, &value);
 	    }
 	}
       else
@@ -177,7 +174,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 	      /* get object state as array */
 	      fts_set_array(&value, states + i);
-	      fts_message_send(this->objects[i], fts_SystemInlet, sym_get_state_as_array, 1, &value);
+	      fts_message_send(this->objects[i], fts_SystemInlet, fts_s_append_state_to_array, 1, &value);
 	    }
 
 	  fts_set_ptr(&value, (void *)states);
@@ -205,7 +202,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_atom_t *atoms = fts_array_get_atoms(states + i);
 	      int size = fts_array_get_size(states + i);
 
-	      fts_message_send(this->objects[i], fts_SystemInlet, sym_restore_state_from_array, size, atoms);
+	      fts_message_send(this->objects[i], fts_SystemInlet, fts_s_set_state_from_array, size, atoms);
 	    }
 
 	  fts_outlet_send(o, 0, fts_s_int, 1, at);
@@ -438,8 +435,8 @@ preset_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 preset_config(void)
 {
-  sym_get_state_as_array = fts_new_symbol("get_state_as_array");
-  sym_restore_state_from_array = fts_new_symbol("restore_state_from_array");
+  fts_s_append_state_to_array = fts_s_append_state_to_array;
+  fts_s_set_state_from_array = fts_s_set_state_from_array;
 
   sym_add_state_from_bmax = fts_new_symbol("add_state_from_bmax");
   sym_add_array_from_bmax = fts_new_symbol("add_array_from_bmax");

@@ -26,30 +26,31 @@
 typedef struct 
 {
   fts_object_t ob;
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
   double del;
 } delay_t;
 
 static void
 delay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  delay_t *x = (delay_t *)o;
+  delay_t *this = (delay_t *)o;
 
-  fts_alarm_set_delay(&x->alarm, x->del);
+  fts_timer_reset(this->timer);
+  fts_timer_set_delay(this->timer, this->del, 0);
 }
 
 static void
 delay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  delay_t *x = (delay_t *)o;
+  delay_t *this = (delay_t *)o;
 
-  fts_alarm_reset(&x->alarm);
+  fts_timer_reset(this->timer);
 }
 
 static void
 delay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  delay_t *x = (delay_t *)o;
+  delay_t *this = (delay_t *)o;
   double n = fts_get_double_arg(ac, at, 0, 0);
 
   if (n == (double) 0.0)
@@ -58,11 +59,11 @@ delay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   if (n <= (double) 0.0)
     n = 0.001;
 
-  x->del = n;
+  this->del = n;
 }
 
 static void
-delay_tick(fts_alarm_t *alarm, void *o)
+delay_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_bang((fts_object_t *)o, 0);
 }
@@ -70,61 +71,56 @@ delay_tick(fts_alarm_t *alarm, void *o)
 static void
 delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  delay_t *x = (delay_t *)o;
-  double n;
-
-
-  n = fts_get_double_arg(ac, at, 1, 0.0);    
-
-  if (n == (double) 0.0)
-    n = 0.001;
+  delay_t *this = (delay_t *)o;
   
-  if (n <= (double) 0.0)
-    n = 0.001;
+  ac--;
+  at++;
 
-  x->del = n;
+  this->del = 0.001;
 
-  fts_alarm_init(&x->alarm, 0, delay_tick, x);
+  if(fts_is_number(at))
+    {
+      double n = fts_get_number_float(at);    
+
+      if (n == (double)0.0)
+	n = 0.001;
+      
+      if (n <= (double)0.0)
+	n = 0.001;
+      
+      this->del = n;
+    }
+
+  this->timer = fts_timer_new(o, 0);
 }
 
 static void
 delay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  delay_t *x = (delay_t *)o;
+  delay_t *this = (delay_t *)o;
 
-  fts_alarm_reset(&x->alarm);
+  fts_timer_delete(this->timer);
 }
 
 static fts_status_t
 delay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   /* initialize the class */
-
   fts_class_init(cl, sizeof(delay_t), 2, 1, 0); 
 
   /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, delay_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, delay_delete);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_anything;
-  a[2] = fts_s_number;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, delay_init, 3, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, delay_tick);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, delay_delete, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, delay_bang);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), delay_stop);
 
-  /* Delay args */
+  fts_method_define_varargs(cl, 1, fts_s_int, delay_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, delay_number_1);
 
-  fts_method_define(cl, 0, fts_s_bang, delay_bang, 0, 0);
-  fts_method_define(cl, 0, fts_new_symbol("stop"), delay_stop, 0, 0);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, delay_number_1, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, delay_number_1, 1, a);
-/* Type the outlet */
-
+  /* Type the outlet */
   fts_outlet_type_define(cl, 0,	fts_s_bang, 0, 0);
 
   return fts_Success;
@@ -136,4 +132,3 @@ delay_config(void)
   fts_class_install(fts_new_symbol("delay"),delay_instantiate);
   fts_alias_install(fts_new_symbol("del"), fts_new_symbol("delay"));
 }
-

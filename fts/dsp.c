@@ -26,6 +26,7 @@
 #include <ftsprivate/sigconn.h>
 #include <ftsprivate/dspgraph.h>
 #include <ftsprivate/audio.h>
+#include <ftsprivate/time.h>
 
 #define FTS_DSP_DEFAULT_SAMPLE_RATE 44100
 
@@ -42,25 +43,22 @@ fts_symbol_t fts_s_sample_rate = 0;
 static double dsp_sample_rate;
 static int dsp_tick_size;
 static double dsp_tick_duration;
-static double dsp_tick_duration_minus_one_sample;
-
-/* DSP time */
-double fts_dsp_time;
 
 static fts_symbol_t dsp_zero_fun_symbol = 0;
 static fts_symbol_t dsp_copy_fun_symbol = 0;
 
-void 
-fts_dsp_run_tick(void)
-{
-  /* advance clock to end of the tick (fire alarms) */
-  fts_sched_advance_clock( fts_dsp_get_time() + dsp_tick_duration_minus_one_sample);
-  
-  /* increment dsp time to next tick */
-  fts_dsp_time += dsp_tick_duration;
+static fts_symbol_t dsp_timebase_symbol = 0;
+static fts_timebase_t *dsp_timebase = 0;
 
-  /* set scheduler time (cheating a little for the alarms set in the dsp code) */
-  fts_sched_set_time( fts_dsp_get_time());
+/*********************************************************
+ *
+ *  DSP timebase
+ *
+ */
+static void 
+dsp_timebase_advance( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_timebase_tick(dsp_timebase);
 
   /* run DSP chain (or idle) */
   if (fts_dsp_graph_is_compiled(&main_dsp_graph))
@@ -69,6 +67,45 @@ fts_dsp_run_tick(void)
     fts_audio_idle();
 }
 
+static void
+dsp_timebase_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_timebase_init((fts_timebase_t *)o, dsp_tick_duration);
+}
+
+static void
+dsp_timebase_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  fts_timebase_reset((fts_timebase_t *)o);
+}
+
+static fts_status_t
+dsp_timebase_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_timebase_t), 0, 0, 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, dsp_timebase_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, dsp_timebase_delete);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, dsp_timebase_advance);
+  
+  return fts_Success;
+}
+
+void
+fts_dsp_timebase_configure(void)
+{
+  fts_atom_t a;
+
+  /* create dsp timebase in root patcher (will be cleaned up with root patcher) */
+  fts_class_install(dsp_timebase_symbol, dsp_timebase_instantiate);
+  fts_set_symbol(&a, dsp_timebase_symbol);
+  fts_object_new_to_patcher( fts_get_root_patcher(), 1, &a, (fts_object_t **)&dsp_timebase);
+
+  /* set DSP time base as FTS master and add add it to the scheduler */  
+  fts_time_set_timebase(dsp_timebase);
+  fts_sched_add((fts_object_t *)dsp_timebase, FTS_SCHED_ALWAYS);
+}
 
 /*********************************************************************
  *
@@ -80,13 +117,11 @@ static void
 dsp_reset(void)
 {
   dsp_tick_duration = dsp_tick_size * 1000.0 / dsp_sample_rate;
-  dsp_tick_duration_minus_one_sample = (double)(dsp_tick_size - 1) * 1000.0 / dsp_sample_rate;
   
   fts_dsp_graph_reset(&main_dsp_graph);
   fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
 
   /* reset audio ports !!! */
-
   /* redefine global system variable $SampleRate (todo!) */
 }
 
@@ -160,12 +195,6 @@ double
 fts_dsp_get_sample_rate()
 {
   return fts_dsp_graph_get_sample_rate(&main_dsp_graph);
-}
-
-double
-fts_dsp_get_time(void)
-{
-  return fts_dsp_time;
 }
 
 void 
@@ -330,30 +359,23 @@ void fts_kernel_dsp_init(void)
 {
   fts_s_dsp_on = fts_new_symbol("dsp_on");
   fts_s_sample_rate = fts_new_symbol("sample_rate");
-
+  dsp_timebase_symbol = fts_new_symbol("dsp_timebase");
+  
   /* init sample rate */
   dsp_sample_rate = FTS_DSP_DEFAULT_SAMPLE_RATE;
   dsp_tick_size = FTS_DSP_DEFAULT_TICK_SIZE;
+  dsp_tick_duration = 1000.0 * (double)FTS_DSP_DEFAULT_TICK_SIZE / FTS_DSP_DEFAULT_SAMPLE_RATE;
+    
+  /* init DSP parameters */
+  fts_param_add_listener(fts_s_sample_rate, 0, dsp_set_sample_rate);
+  fts_param_add_listener(fts_s_dsp_on, 0, dsp_set_on);
 
   /* create main DSP graph */
   fts_dsp_graph_init(&main_dsp_graph, dsp_tick_size, dsp_sample_rate);
 
-  dsp_tick_duration = (double)dsp_tick_size * 1000.0 / 44100.0;
-  dsp_tick_duration_minus_one_sample = (double)(FTS_DSP_DEFAULT_TICK_SIZE - 1) * 1000.0 / 44100.0;
-
-  /* init DSP time */
-  fts_dsp_time = 0.0;
-
-  fts_param_add_listener(fts_s_sample_rate, 0, dsp_set_sample_rate);
-  fts_param_add_listener(fts_s_dsp_on, 0, dsp_set_on);
-
-   dsp_zero_fun_symbol = fts_new_symbol("dsp_zero_fun_symbol");
-   fts_dsp_declare_function( dsp_zero_fun_symbol, dsp_zero_fun);
- 
-   dsp_copy_fun_symbol = fts_new_symbol("dsp_copy_fun_symbol");
-   fts_dsp_declare_function( dsp_copy_fun_symbol, dsp_copy_fun);
+  dsp_zero_fun_symbol = fts_new_symbol("dsp_zero_fun_symbol");
+  fts_dsp_declare_function( dsp_zero_fun_symbol, dsp_zero_fun);
+  
+  dsp_copy_fun_symbol = fts_new_symbol("dsp_copy_fun_symbol");
+  fts_dsp_declare_function( dsp_copy_fun_symbol, dsp_copy_fun);
 }
-
-
-
-

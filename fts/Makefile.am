@@ -24,7 +24,7 @@ ftl.c \
 ftlmem.c \
 fts.c \
 hashtable.c \
-inout.c \
+label.c \
 list.c \
 loader.c \
 mem.c \

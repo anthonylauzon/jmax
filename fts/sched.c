@@ -57,21 +57,16 @@ typedef struct fts_sched
 {
   sched_callback_t *callback_head; 
   enum {sched_ready, sched_halted} status;
-  fts_clock_t clock; /* clock of logical time */
+  fts_timebase_t *timebase;
 } fts_sched_t;
-
 
 /* the global scheduler */
 static fts_sched_t main_sched;
 
-static fts_sched_t *fts_sched_get_current(void)
+static fts_sched_t *
+fts_sched_get_current(void)
 {
   return &main_sched;
-}
-
-double fts_get_time(void)
-{
-  return main_sched.clock.time;
 }
 
 /*****************************************************************************
@@ -235,56 +230,103 @@ static void fts_sched_do_select(fts_sched_t *sched)
   run_always( sched);
 }
 
-/*****************************************************************************
- *
- * Clocks
- *
- */
-
-fts_clock_t *fts_sched_get_clock( void)
-{
-  return &fts_sched_get_current()->clock;
-}
-
-void fts_sched_advance_clock( double time)
-{
-  fts_clock_advance( fts_sched_get_clock(), time);
-}
-
-void fts_sched_set_time( double time)
-{
-  fts_clock_set_time( fts_sched_get_clock(), time);
-}
-
 void
 fts_sched_init(fts_sched_t *sched)
 {
   sched->callback_head = 0;
-  fts_clock_init(&sched->clock);
   sched->status = sched_ready;
 }
 
-/* run the scheduler in a loop (note that the clock time is set inside fts_dsp_run_tick() */
-void fts_sched_run( void)
+/* run the scheduler in a loop */
+void 
+fts_sched_run(void)
 {
-  fts_sched_t *sched = fts_sched_get_current();
+  /* poll file descriptors and run functions inserted to the scheduler */
+  while(main_sched.status != sched_halted)
+    fts_sched_do_select(&main_sched);
+}
 
-  while(sched->status != sched_halted)
+void 
+fts_sched_halt(void)
+{
+  main_sched.status = sched_halted;
+}
+
+/************************************************************
+ *
+ *  platform dependent implementation of
+ *  fts_sleep()
+ *
+ */
+#ifdef WIN32
+#define DEBUG_SLEEP 1
+
+static struct _sleeper_
+{
+  int count;
+  DWORD sysstart;
+  double ftsstart;
+} sleeper;
+
+static void
+sleep_init(void)
+{
+  sleeper.count = 0;
+  sleeper.sysstart = GetTickCount();
+  sleeper.ftsstart = 0.0;
+}
+
+void
+fts_sleep(void)
+{
+  if ( ++sleeper.count == 5) 
     {
-      /* poll file descriptors and run functions inserted to the scheduler */
-      fts_sched_do_select(sched);
+      double ftstime = fts_get_time() - sleeper.ftsstart;
+      double systime = GetTickCount() - sleeper.sysstart;
+      double delta = ftstime - systime;
+      
+#if DEBUG_SLEEP
+      FILE* log = fopen("C:\\nullaudiolog.txt", "a");
+      fprintf(log, "fts time=%f, sys time=%f, delta=%f\n", ftstime, systime, delta);
+      fclose(log);
+#endif
+      
+      sleeper.count = 0;
+      
+      if (delta > 0)
+	Sleep((DWORD) delta);
+  }
+}
 
-      /* run dsp subsustem */
-      fts_dsp_run_tick();
+#else
+
+static double last_sleep = 0.0;
+
+static void
+sleep_init(void)
+{
+  last_sleep = 0.0;
+}
+
+void
+fts_sleep(void)
+{
+  double now = fts_get_time();
+
+
+  if (now - last_sleep >= (double)100.0)
+    {
+      struct timespec pause_time;
+
+      pause_time.tv_sec = 0;
+      pause_time.tv_nsec = 100000000L;
+
+      nanosleep( &pause_time, 0);
+
+      last_sleep = now;
     }
 }
-
-void fts_sched_halt( void)
-{
-  fts_sched_t *sched = fts_sched_get_current();
-
-  sched->status = sched_halted;
-}
+#endif
 
 /*****************************************************************************
  *
@@ -294,6 +336,6 @@ void fts_sched_halt( void)
 
 void fts_kernel_sched_init(void)
 {
+  sleep_init();
   fts_sched_init(&main_sched);
 }
-

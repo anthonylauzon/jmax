@@ -30,7 +30,7 @@ typedef struct{
   int gap_size; /* number of samples to wait before collecting new input */
   int gap_count; /* counts down gap_ticks */
   long size; /* number of complex points in buffer */
-  fts_alarm_t alarm;
+  fts_timer_t *timer;
 } fft_ctl_t;
 
 /* the dsp symbols */

@@ -1,3 +1,8 @@
+2001-11-20  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* rewrote timing system (doc needs to be added to time.h)
+	* rewrote classes using alarms, timers, and clocks (to be tested)
+
 2001-10-29  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* listelement.c: bug fixed (crashed for negative indices)

@@ -45,12 +45,12 @@ typedef struct {
   int samples_count;
   int estimated_sample_rate;
   double last_time;
-  fts_alarm_t output_alarm;
+  fts_timer_t *output_timer;
 } profileaudioport_t;
 
-static void profileaudioport_output_alarm( fts_alarm_t *alarm, void *p)
+static void profileaudioport_output_alarm( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  profileaudioport_t *this = (profileaudioport_t *)p;
+  profileaudioport_t *this = (profileaudioport_t *)o;
 
   fts_outlet_int( (fts_object_t *)this, 0, this->estimated_sample_rate);
 }
@@ -80,7 +80,8 @@ static void profileaudioport_output( fts_word_t *argv)
       this->estimated_sample_rate = (int)(this->samples_count / (now - this->last_time));
       this->last_time = now;
 
-      fts_alarm_set_delay( &this->output_alarm, 0.0f);
+      fts_timer_reset(this->output_timer);
+      fts_timer_set_delay(this->output_timer, 0.0f, 0);
 
       this->samples_count = 0;
     }
@@ -104,7 +105,7 @@ static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 
   this->profile_interval = fts_get_int_arg( ac, at, 0, DEFAULT_PROFILE_INTERVAL);
 
-  fts_alarm_init( &(this->output_alarm), 0, profileaudioport_output_alarm, this);	
+  this->output_timer = fts_timer_new(o, 0);	
 
 #ifdef WIN32
   this->last_time = GetTickCount() * 1000.0;
@@ -120,7 +121,7 @@ static void profileaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s,
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 
-  fts_alarm_reset(&this->output_alarm);	
+  fts_timer_delete(this->output_timer);	
   fts_audioport_delete( &this->head);
 }
 
@@ -134,7 +135,9 @@ static fts_status_t profileaudioport_instantiate(fts_class_t *cl, int ac, const 
   fts_class_init( cl, sizeof( profileaudioport_t), 0, 1, 0);
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, profileaudioport_init);
-  fts_method_define( cl, fts_SystemInlet, fts_s_delete, profileaudioport_delete, 0, 0);
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, profileaudioport_delete);
+
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_timer_alarm, profileaudioport_output_alarm);
 
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, profileaudioport_get_state);
 

@@ -24,124 +24,75 @@
  *
  */
 
-/* Make a note (note-on/note-off events). */
-
 #include <fts/fts.h>
-
-/* A simplified version of the Miller Puckette code */
-
-/* 
-   linknote is a structure used to keep a double linked list
-   of active notes (i.e. notes between their on and their off)
-*/
-
-struct linknote
-{
-  long pitch;
-  void *who;
-  fts_alarm_t alarm;
-
-  struct linknote *next;
-  struct linknote *prev;
-};
 
 typedef struct 
 {
-  fts_object_t ob;
-  long vel;
+  fts_object_t head;
+  int vel;
   float dur;
-
-  struct linknote *active_notes;
+  fts_timer_t *timer;
 } makenote_t;
 
-
 static void
-linknote_send_off(fts_alarm_t *alarm, void *o)
+makenote_alarm(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  struct linknote *l = o;
-  makenote_t *x = (makenote_t *) l->who;
+  makenote_t *this = (makenote_t *)o;
 
-  fts_outlet_int((fts_object_t *)x, 1, (long) 0);
-  fts_outlet_int((fts_object_t *)x, 0, l->pitch);
-
-  /* update the prev element; if the first in the list,
-     change also the active notes pointer */
-
-  if (l->prev)
-    l->prev->next = l->next;
-  else
-    x->active_notes = l->next;
-
-  /* update the next element, if any */
-
-  if (l->next)
-    l->next->prev = l->prev;
-
-  fts_free(l);
+  fts_outlet_int(o, 0, 0);
+  fts_outlet_send(o, 0, 0, 1, at);
 }
-
-/* The MakeNote object */
 
 static void
 makenote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
-  long n = fts_get_int_arg(ac, at, 0, 0);
-  struct linknote *newnote;
+  makenote_t *this = (makenote_t *)o;
 
-  /* send the output messages */
-
-  fts_outlet_int(o, 1, x->vel);
-  fts_outlet_int(o, 0, n);
-
-  /* Store the note in the active_notes list */
-
-  newnote = (struct linknote *)fts_malloc(sizeof(struct linknote));
-  newnote->who   = x;
-  newnote->pitch = n;
-
-  if (x->active_notes)
-    x->active_notes->prev = newnote;
-
-  newnote->next   = x->active_notes;
-  x->active_notes = newnote;
-  newnote->prev   = (struct linknote *) 0;
-
-  /* activate the alarm */
-
-  fts_alarm_init(&newnote->alarm, 0, linknote_send_off, newnote);
-  fts_alarm_set_delay(&newnote->alarm, x->dur);
+  if(fts_is_number(at) && this->dur > 0.0)
+    {
+      fts_timer_set_delay(this->timer, this->dur, at);
+      
+      /* send the output messages */
+      fts_outlet_int(o, 1, this->vel);
+      fts_outlet_int(o, 0, fts_get_number_int(at));
+    }
 }
 
 static void
 makenote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
+  makenote_t *this = (makenote_t *)o;
 
-  x->vel = fts_get_int_arg(ac, at, 0, 0);
+  this->vel = fts_get_number_int(at);
 }
 
 static void
 makenote_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
+  makenote_t *this = (makenote_t *)o;
 
-  x->dur = fts_get_float_arg(ac, at, 0, 0.0f);
+  this->dur = fts_get_number_float(at);
 }
 
 static void
 makenote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
+  makenote_t *this = (makenote_t *)o;
 
-  if ((ac >= 3) && fts_is_number(&at[2]))
-    x->dur = fts_get_float_arg(ac, at, 2, 0.0f);
-
-  if ((ac >= 2) && fts_is_number(&at[1]))
-    x->vel = fts_get_int_arg(ac, at, 1, 0);
-
-  if ((ac >= 1) && fts_is_number(&at[0]))
-    makenote_number(o, winlet, s, 1, at);
+  switch(ac)
+    {
+    default:
+    case 3:
+      if(fts_is_number(at + 2))
+	this->dur = fts_get_number_float(at + 2);
+    case 2:
+      if(fts_is_number(at + 1))
+	this->vel = fts_get_number_int(at + 1);
+    case 1:
+      makenote_number(o, winlet, s, 1, at);
+    case 0:
+      break;
+    }      
 }
 
 /* makenote stop method is also installed as method for the $delete message */
@@ -149,108 +100,67 @@ makenote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 makenote_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
-  struct linknote *p;
+  makenote_t *this = (makenote_t *)o;
 
-  p = x->active_notes; 
-
-  while (p)
-    {
-      struct linknote *freeme;
-      
-      freeme = p;
-      p = p->next;
-
-      fts_alarm_reset(&(freeme->alarm));
-
-      fts_outlet_int(o, 0, (long) 0);
-      fts_outlet_int(o, 1, freeme->pitch);
-
-      fts_free(freeme);
-    }
+  fts_timer_reset(this->timer);
 }
 
 static void
 makenote_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
-  struct linknote *p;
+  makenote_t *this = (makenote_t *)o;
 
-  p = x->active_notes; 
-
-  while (p)
-    {
-      struct linknote *freeme;
-
-      freeme = p;
-      p = p->next;
-      fts_free(freeme);
-    }
+  fts_timer_reset(this->timer);
 }
 
 
 static void
 makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  makenote_t *x = (makenote_t *)o;
+  makenote_t *this = (makenote_t *)o;
 
-  x->vel   = fts_get_int_arg(ac, at, 1, 0);
-  x->dur   =  fts_get_float_arg(ac, at, 2, 0.0f);
+  this->vel = fts_get_int_arg(ac, at, 1, 0);
+  this->dur = fts_get_float_arg(ac, at, 2, 0.0f);
 
-  x->active_notes = 0;
+  this->timer = fts_timer_new(o, 0);
+}
+
+static void
+makenote_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  makenote_t *this = (makenote_t *)o;
+  
+  fts_timer_delete(this->timer);  
 }
 
 
 static fts_status_t
 makenote_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[4];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(makenote_t), 3, 2, 0); 
 
-  /* system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, makenote_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, makenote_delete);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int  ;
-  a[2] = fts_s_int  ;
-  a[3] = fts_s_symbol;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, makenote_init, 4, a, 1);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_timer_alarm, makenote_alarm);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, makenote_stop, 0, 0); /* makenote_stop is
-										installed twice */
-  /* Makenote methods */
+  fts_method_define_varargs(cl, 0, fts_new_symbol("clear"), makenote_clear);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), makenote_stop);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, makenote_number, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, makenote_number);
+  fts_method_define_varargs(cl, 0, fts_s_float, makenote_number);
 
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, makenote_number, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, makenote_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, makenote_number_1);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, makenote_number_1, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 1, fts_s_float, makenote_number_1, 1, a);
-
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int, makenote_number_2, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 2, fts_s_float, makenote_number_2, 1, a);
+  fts_method_define_varargs(cl, 2, fts_s_int, makenote_number_2);
+  fts_method_define_varargs(cl, 2, fts_s_float, makenote_number_2);
 
   fts_method_define_varargs(cl, 0, fts_s_list, makenote_list);
 
-  fts_method_define(cl, 0, fts_new_symbol("clear"), makenote_clear, 0, 0);
-
-  fts_method_define(cl, 0, fts_new_symbol("stop"), makenote_stop, 0, 0);
-
   /* Type the outlet */
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
-  fts_outlet_type_define(cl, 1,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
+  fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
 
   return fts_Success;
 }

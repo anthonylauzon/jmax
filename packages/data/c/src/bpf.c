@@ -312,16 +312,17 @@ bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-bpf_get_state_as_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bpf_append_state_to_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
   int size = bpf_get_size(this);
   fts_array_t *array = fts_get_array(at);
+  int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(array, size * 2);  
-  atoms = fts_array_get_atoms(array);
+  fts_array_set_size(array, onset + size * 2);  
+  atoms = fts_array_get_atoms(array) + onset;
 
   for(i=0; i<size; i++)
     {
@@ -622,8 +623,8 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bpf_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, bpf_delete);
 
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("get_state_as_array"), bpf_get_state_as_array);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("restore_state_from_array"), bpf_set);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append_state_to_array, bpf_append_state_to_array);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set_state_from_array, bpf_set);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, bpf_print);
 
       fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("keep"), bpf_set_keep);

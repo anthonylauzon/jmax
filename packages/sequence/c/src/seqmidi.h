@@ -28,9 +28,11 @@
 #define _SEQMIDI_H_
 
 #include "sequence.h"
-#include "eventtrk.h"
+#include "track.h"
 
-extern int sequence_read_midifile(sequence_t *sequence, fts_symbol_t name);
-extern int seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name);
+extern int track_import_midifile(track_t *track, fts_midifile_t *file);
+extern int track_export_midifile(track_t *track, fts_midifile_t *file);
+
+extern int sequence_import_midifile(sequence_t *sequence, fts_midifile_t *file);
 
 #endif

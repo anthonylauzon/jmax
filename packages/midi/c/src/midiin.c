@@ -32,6 +32,7 @@ typedef struct _midiin_
 {
   fts_object_t o;
   fts_midiport_t *port;
+  int type;
   int channel;
   int number;
 } midiin_t;
@@ -43,93 +44,88 @@ typedef struct _midiin_
  */
 
 static void
-note_callback(fts_object_t *listener, int channel, int number, int value, double time)
+note_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_outlet_int(listener, 2, channel);
-  fts_outlet_int(listener, 1, value);
-  fts_outlet_int(listener, 0, number);
+  fts_outlet_int(listener, 2, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_second(event));
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-note_channel_callback(fts_object_t *listener, int channel, int number, int value, double time)
+note_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_outlet_int(listener, 1, value);
-  fts_outlet_int(listener, 0, number);
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_second(event));
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-note_number_callback(fts_object_t *listener, int channel, int number, int value, double time)
+note_channel_number_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
   midiin_t *this = (midiin_t *)listener;
 
-  fts_outlet_int(listener, 0, value);
-  fts_outlet_int(listener, 1, channel);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event) + 1);
 }
 
 static void
-note_number_channel_callback(fts_object_t *listener, int channel, int number, int value, double time)
+poly_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+{
+  fts_outlet_int(listener, 2, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_first(event));
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+}
+
+static void
+poly_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
+{
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_first(event));
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
+}
+
+static void
+poly_channel_number_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
   midiin_t *this = (midiin_t *)listener;
 
-  fts_outlet_int(listener, 0, value);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-poly_callback(fts_object_t *listener, int channel, int number, int value, double time)
+value_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_outlet_int(listener, 2, channel);
-  fts_outlet_int(listener, 1, number);
-  fts_outlet_int(listener, 0, value);
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-poly_channel_callback(fts_object_t *listener, int channel, int number, int value, double time)
+value_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_outlet_int(listener, 1, number);
-  fts_outlet_int(listener, 0, value);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event));
 }
 
 static void
-poly_number_callback(fts_object_t *listener, int channel, int number, int value, double time)
+bend_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  midiin_t *this = (midiin_t *)listener;
-
-  fts_outlet_int(listener, 1, channel);
-  fts_outlet_int(listener, 0, value);
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-poly_number_channel_callback(fts_object_t *listener, int channel, int number, int value, double time)
+bend_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  midiin_t *this = (midiin_t *)listener;
-
-  fts_outlet_int(listener, 0, value);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_second(event));
 }
 
 static void
-value_callback(fts_object_t *listener, int channel, int value, double time)
+xbend_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_outlet_int(listener, 1, channel);
-  fts_outlet_int(listener, 0, value);
+  fts_outlet_int(listener, 1, fts_midievent_channel_message_get_channel(event) + 1);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event) + (fts_midievent_channel_message_get_second(event) << 7));
 }
 
 static void
-value_channel_callback(fts_object_t *listener, int channel, int value, double time)
+xbend_channel_callback(fts_object_t *listener, fts_midievent_t *event, double time)
 {
-  fts_outlet_int(listener, 0, value);
-}
-
-static void
-bend_callback(fts_object_t *listener, int channel, int value, double time)
-{
-  fts_outlet_int(listener, 1, channel);
-  fts_outlet_int(listener, 0, value >> 7);
-}
-
-static void
-bend_channel_callback(fts_object_t *listener, int channel, int value, double time)
-{
-  fts_outlet_int(listener, 0, value >> 7);
+  fts_outlet_int(listener, 0, fts_midievent_channel_message_get_first(event) + (fts_midievent_channel_message_get_second(event) << 7));
 }
 
 /************************************************************
@@ -142,8 +138,8 @@ static int
 midiin_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **port, int *channel, int *number)
 {
   *port = 0;
-  *channel = MIDIPORT_ALL_CHANNELS;
-  *number = MIDIPORT_ALL_NUMBERS;
+  *channel = midi_channel_any;
+  *number = midi_controller_any;
 
   if(ac > 0)
     {
@@ -178,24 +174,24 @@ midiin_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **por
 	      at++;
 	    }
 	  else if(fts_is_symbol(at) && (fts_get_symbol(at) == sym_omni))
-	    *number = MIDIPORT_ALL_NUMBERS;
+	    *number = midi_controller_any;
 	  else
 	    return 0;
 	}	
       else
-	*number = MIDIPORT_ALL_NUMBERS;
+	*number = midi_controller_any;
 
       if(ac == 1)
 	{
       
 	  if(fts_is_number(at))
 	    {
-	      int n = fts_get_number_int(at);
+	      int n = fts_get_number_int(at) - 1;
 	  
-	      *channel = (n < 0)? 0: ((n > 16)? 16: n);
+	      *channel = (n < midi_channel_any)? 0: ((n > 15)? 15: n);
 	    }
 	  else if(fts_is_symbol(at) && (fts_get_symbol(at) == sym_omni))
-	    *channel = MIDIPORT_ALL_CHANNELS;
+	    *channel = midi_channel_any;
 	  else
 	    return 0;
 	}
@@ -217,32 +213,24 @@ midiin_check(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **por
   return 1;
 }
 
-/******************************************************
- *
- *  init
- *
- */
 static void
 notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiin_t *this = (midiin_t *)o;
 
-  if(midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number))
+  ac--;
+  at++;
+
+  this->type = midi_type_note;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
     {
-      if(this->number == MIDIPORT_ALL_NUMBERS)
-	{
-	  if(this->channel == MIDIPORT_ALL_CHANNELS)
-	    fts_midiport_add_listener_note(this->port, this->channel, this->number, o, note_callback);
-	  else
-	    fts_midiport_add_listener_note(this->port, this->channel, this->number, o, note_channel_callback);
-	}
+      if(this->number == midi_controller_any && this->channel == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, note_callback);
+      else if(this->number == midi_controller_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, note_channel_callback);
       else
-	{
-	  if(this->channel == MIDIPORT_ALL_CHANNELS)
-	    fts_midiport_add_listener_note(this->port, this->channel, this->number, o, note_number_callback);
-	  else
-	    fts_midiport_add_listener_note(this->port, this->channel, this->number, o, note_number_channel_callback); 
-	}
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, note_channel_number_callback); 
     }
 }
 
@@ -252,22 +240,19 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 { 
   midiin_t *this = (midiin_t *)o;
   
-  if(midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number))
+  ac--;
+  at++;
+
+  this->type = midi_type_poly_pressure;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
     {
-      if(this->number == MIDIPORT_ALL_NUMBERS)
-	{
-	  if(this->channel == MIDIPORT_ALL_CHANNELS)
-	    fts_midiport_add_listener_poly_pressure(this->port, this->channel, this->number, o, poly_callback);
-	  else
-	    fts_midiport_add_listener_poly_pressure(this->port, this->channel, this->number, o, poly_channel_callback);
-	}
+      if(this->number == midi_controller_any && this->channel == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_callback);
+      else if(this->number == midi_controller_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_channel_callback);
       else
-	{
-	  if(this->channel == MIDIPORT_ALL_CHANNELS)
-	    fts_midiport_add_listener_poly_pressure(this->port, this->channel, this->number, o, poly_number_callback);
-	  else
-	    fts_midiport_add_listener_poly_pressure(this->port, this->channel, this->number, o, poly_number_channel_callback); 
-	}
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_channel_number_callback); 
     }
 }
 
@@ -275,132 +260,108 @@ static void
 ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiin_t *this = (midiin_t *)o;
+  
+  ac--;
+  at++;
 
-  if(midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number))
+  this->type = midi_type_control_change;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
     {
-      if(this->number == MIDIPORT_ALL_NUMBERS)
-	{
-	  if(this->channel == MIDIPORT_ALL_CHANNELS)
-	    fts_midiport_add_listener_control_change(this->port, this->channel, this->number, o, poly_callback);
-	  else
-	    fts_midiport_add_listener_control_change(this->port, this->channel, this->number, o, poly_channel_callback);
-	}
+      if(this->number == midi_controller_any && this->channel == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_callback);
+      else if(this->number == midi_controller_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_channel_callback);
       else
-	{
-	  if(this->channel == MIDIPORT_ALL_CHANNELS)
-	    fts_midiport_add_listener_control_change(this->port, this->channel, this->number, o, poly_number_callback);
-	  else
-	    fts_midiport_add_listener_control_change(this->port, this->channel, this->number, o, poly_number_channel_callback); 
-	}
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_channel_number_callback); 
     }
 }
 
 static void
 pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
+{ 
   midiin_t *this = (midiin_t *)o;
+  
+  ac--;
+  at++;
 
-  if(midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number))
+  this->type = midi_type_program_change;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
     {
-      if(this->channel == MIDIPORT_ALL_CHANNELS)
-	fts_midiport_add_listener_program_change(this->port, this->channel, o, value_callback);
+      if(this->number == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_callback);
       else
-	fts_midiport_add_listener_program_change(this->port, this->channel, o, value_channel_callback);
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_channel_callback); 
     }
 }
 
 static void
 touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
+{ 
   midiin_t *this = (midiin_t *)o;
+  
+  ac--;
+  at++;
 
-  if(midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number))
+  this->type = midi_type_channel_pressure;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
     {
-      if(this->channel == MIDIPORT_ALL_CHANNELS)
-	fts_midiport_add_listener_channel_pressure(this->port, this->channel, o, value_callback);
+      if(this->number == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_callback);
       else
-	fts_midiport_add_listener_channel_pressure(this->port, this->channel, o, value_channel_callback);
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_channel_callback); 
     }
 }
 
 static void
 bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
+{ 
   midiin_t *this = (midiin_t *)o;
+  
+  ac--;
+  at++;
 
-  if(midiin_check(o, ac - 1, at + 1, &this->port, &this->channel, &this->number))
+  this->type = midi_type_pitch_bend;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
     {
-      if(this->channel == MIDIPORT_ALL_CHANNELS)
-	fts_midiport_add_listener_pitch_bend(this->port, this->channel, o, bend_callback);
+      if(this->number == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, bend_callback);
       else
-	fts_midiport_add_listener_pitch_bend(this->port, this->channel, o, bend_channel_callback);
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, bend_channel_callback); 
     }
 }
 
-/******************************************************
- *
- *  delete
- *
- */
+static void
+xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  midiin_t *this = (midiin_t *)o;
+  
+  ac--;
+  at++;
+
+  this->type = midi_type_pitch_bend;
+
+  if(midiin_check(o, ac, at, &this->port, &this->channel, &this->number))
+    {
+      if(this->number == midi_channel_any)
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, xbend_callback);
+      else
+	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, xbend_channel_callback); 
+    }
+}
+
 static void 
-notein_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   midiin_t *this = (midiin_t *)o;
 
   if(this->port)
-    fts_midiport_remove_listener_note(this->port, this->channel, this->number, o);
+    fts_midiport_remove_listener(this->port, this->type, this->channel, this->number, o);
 }
 
-static void 
-polyin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-
-  if(this->port)
-    fts_midiport_remove_listener_poly_pressure(this->port, this->channel, this->number, o);
-}
-
-static void 
-ctlin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-
-  if(this->port)
-    fts_midiport_remove_listener_control_change(this->port, this->channel, this->number, o);
-}
-
-static void 
-pgmin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-
-  if(this->port)
-    fts_midiport_remove_listener_program_change(this->port, this->channel, o);
-}
-
-static void 
-touchin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-
-  if(this->port)
-    fts_midiport_remove_listener_channel_pressure(this->port, this->channel, o);
-}
-
-static void 
-bendin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  midiin_t *this = (midiin_t *)o;
-
-  if(this->port)
-    fts_midiport_remove_listener_pitch_bend(this->port, this->channel, o);
-}
-
-/******************************************************
- *
- *  instantiate
- *
- */
 static fts_status_t
 notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -408,13 +369,16 @@ notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
-  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == MIDIPORT_ALL_NUMBERS) + (channel == MIDIPORT_ALL_CHANNELS), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == midi_controller_any) + (channel == midi_channel_any), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, notein_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, notein_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
 
   return fts_Success;
 }
@@ -426,13 +390,16 @@ polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
-  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == MIDIPORT_ALL_NUMBERS) + (channel == MIDIPORT_ALL_CHANNELS), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == midi_controller_any) + (channel == midi_channel_any), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, polyin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, polyin_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
 
   return fts_Success;
 }
@@ -444,13 +411,16 @@ ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
-  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == MIDIPORT_ALL_NUMBERS) + (channel == MIDIPORT_ALL_CHANNELS), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (number == midi_controller_any) + (channel == midi_channel_any), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, ctlin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, ctlin_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
 
   return fts_Success;
 }
@@ -462,13 +432,16 @@ pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
-  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == MIDIPORT_ALL_CHANNELS), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == midi_channel_any), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, pgmin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, pgmin_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
 
   return fts_Success;
 }
@@ -480,13 +453,16 @@ touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
-  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == MIDIPORT_ALL_CHANNELS), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == midi_channel_any), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, touchin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, touchin_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
 
   return fts_Success;
 }
@@ -498,13 +474,37 @@ bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   int channel;
   int number;
 
-  if(!midiin_check(0, ac - 1, at + 1, &port, &channel, &number))
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
     return &fts_CannotInstantiate;    
 
-  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == MIDIPORT_ALL_CHANNELS), 0);
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == midi_channel_any), 0);
   
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, bendin_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, bendin_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
+
+  return fts_Success;
+}
+
+static fts_status_t
+xbendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_midiport_t *port;
+  int channel;
+  int number;
+
+  ac--;
+  at++;
+
+  if(!midiin_check(0, ac, at, &port, &channel, &number))
+    return &fts_CannotInstantiate;    
+
+  fts_class_init(cl, sizeof(midiin_t), 0, 1 + (channel == midi_channel_any), 0);
+  
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, xbendin_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, midiin_delete);
 
   return fts_Success;
 }
@@ -524,9 +524,9 @@ midiin_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 
       midiin_check(0, ac0 - 1, at0 + 1, &port0, &channel0, &number0);
 
-      if((channel0 != MIDIPORT_ALL_CHANNELS) != (channel1 != MIDIPORT_ALL_CHANNELS))
+      if((channel0 != midi_channel_any) != (channel1 != midi_channel_any))
 	return 0;
-      else if((number0 != MIDIPORT_ALL_NUMBERS) != (number1 != MIDIPORT_ALL_NUMBERS))
+      else if((number0 != midi_controller_any) != (number1 != midi_controller_any))
 	return 0;
       else
 	return 1;
@@ -546,4 +546,5 @@ midiin_config(void)
   fts_metaclass_install(fts_new_symbol("pgmin"), pgmin_instantiate, midiin_equiv);
   fts_metaclass_install(fts_new_symbol("touchin"), touchin_instantiate, midiin_equiv);
   fts_metaclass_install(fts_new_symbol("bendin"), bendin_instantiate, midiin_equiv);
+  fts_metaclass_install(fts_new_symbol("xbendin"), xbendin_instantiate, midiin_equiv);
 }
