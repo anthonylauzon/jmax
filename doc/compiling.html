@@ -1,4 +1,9 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
 <html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.79 [en] (X11; U; Linux 2.4.18-3 i686) [Netscape]">
+   <title>jMax Documentation</title>
 <!--                                                                      -->
 <!-- jMax                                                                 -->
 <!--                                                                      -->
@@ -11,261 +16,144 @@
 <!-- This program is distributed WITHOUT ANY WARRANTY. See the LICENSE    -->
 <!-- for DISCLAIMER OF WARRANTY.                                          -->
 <!--                                                                      -->
-<head>
-<title>jMax Documentation</title>
 </head>
-
-<body bgcolor="white">
+<body bgcolor="#FFFFFF">
 
 <h4>
-  <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_icon.gif" border=0 alt="jMax" ALIGN=MIDDLE></A>
-  jMax documentation
-</h4>
+<a href="http://www.ircam.fr/jmax/"><img SRC="jmax_icon.gif" ALT="jMax" BORDER=0  align=CENTER></a>
+jMax documentation</h4>
+<!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- --><!-- End of header                                                          --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- -->
+<h1>
+Compiling jMax</h1>
 
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- End of header                                                          -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-
-<h1>Compiling jMax</h1>
-
-<p>
 <ul type=dot>
-  <li><a href="#introduction">Introduction</A>
-  <li><a href="#prerequisites">Prerequisites</A>
-  <li><a href="#compilation">Compilation</A>
-  <li><a href="#rpm">Building rpms</A>
+<li>
+<a href="#introduction">Introduction</a></li>
+
+<li>
+<a href="#prerequisites">Prerequisites</a></li>
+
+<li>
+<a href="#compilation">Compilation</a></li>
+
+<li>
+<a href="#rpm">Building rpms</a></li>
 </ul>
 
-<p>
-<hr size=1>
-
-<a name="introduction"> <H2>Introduction</H2> </a>
-
-<p>
+<hr size=1><a NAME="introduction"></a>
+<h2>
+Introduction</h2>
 This document explains how to recompile jMax from a source distribution.
-
+<p>Thanks to Michael Lechasseur (mlecha@music.mcgill.ca) for contributions
+to this document.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
-Thanks to Michael Lechasseur (mlecha@music.mcgill.ca) for contributions
-to this document.
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="prerequisites"> <h3>Prerequisites</h3> </a>
-
-<p>
+<hr><a NAME="prerequisites"></a>
+<h3>
+Prerequisites</h3>
 The following elements are needed to recompile jMax:
 <ul>
-<li> the Java Development Kit (JDK) version 1.2 or higher.
-<li> the C compiler
-<li> GNU make
+<li>
+the Java Development Kit (JDK) version 1.2 or higher.</li>
+
+<li>
+the C compiler</li>
+
+<li>
+GNU make</li>
 </ul>
-
-<p>
-Check <a href="installing.html">Installing jMax</a> documentation for 
-further information on JDK download and installation.
-
-
-<h4>SGI platform</h4>
-
-<p>
-On SGI platform, GNU make resides in <code>/usr/freeware/bin/gmake</code>.
-Makefiles will <strong>not</strong> work with standard make.
-
-
-
-<h4>Linux platform</h4>
-
-<p>
-You can install the JDK in the directory of your choice,
-as long as the JDK directory is defined in environment variables.
-The following place can be used for example: <code>/usr/local/java</code>.
-
-<p>
-Once you have defined installation directory, you must add environment 
-variables definition. This can be done by adding the following lines
-(modify <code>JAVA_HOME</code> to reflect
-the current settings of your system):
-<pre>
-JAVA_HOME="/usr/local/java"
-PATH="$JAVA_HOME/bin:$PATH"
-</pre>
-to your <code>.bashrc</code> file in your home directory (modify
-accordingly if you are using another shell).
-
-<p>
-Once this is done, you can check that the environment is correct by
+Check <a href="installing.html">Installing jMax</a> documentation for further
+information on JDK download and installation.
+<h4>
+SGI platform</h4>
+On SGI platform, GNU make resides in <tt>/usr/freeware/bin/gmake</tt>.
+Makefiles will <b>not</b> work with standard make.
+<h4>
+Linux platform</h4>
+You can install the JDK in the directory of your choice, as long as the
+JDK directory is defined in environment variables. The following place
+can be used for example: <tt>/usr/local/java</tt>.
+<p>Once you have defined installation directory, you must add environment
+variables definition. This can be done by adding the following lines (modify
+<tt>JAVA_HOME</tt> to reflect the current settings of your system):
+<pre>JAVA_HOME="/usr/local/java"
+PATH="$JAVA_HOME/bin:$PATH"</pre>
+to your <tt>.bashrc</tt> file in your home directory (modify accordingly
+if you are using another shell).
+<p>Once this is done, you can check that the environment is correct by
 running the Java VM:
-<pre>
-echo $PATH
+<pre>echo $PATH
 echo $CLASSPATH
-java -version
-</pre>
-
+java -version</pre>
+If the "Kaffe Java Virtual Machine" is installed on your system, you'll
+need to make sure that jMax finds the JDK binaries before it finds the
+Kaffe binaries. If you have Kaffe installed you'll get the output "Kaffe
+Virtual Machine" by typing "java -version" at the command line. You need
+to make the path to your JDK directory apprear first in your PATH statement,
+or you need to rename the Kaffe files to prevent their use:
+<pre>&nbsp; mv /usr/bin/java /usr/bin/java-kaffe
+&nbsp; mv /usr/bin/javac /usr/bin/javac-kaffe
+&nbsp; mv /usr/bin/jar /usr/bin/jar-kaffe</pre>
+<b>Note:</b> it has been reported that Kaffee does not currently run jMax.
+We recommend that you use JDK instead.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
-If the "Kaffe Java Virtual Machine" is installed on your system, you'll need
-to make sure that jMax finds the JDK binaries before it finds the Kaffe
-binaries.  If you have Kaffe installed you'll get the output "Kaffe Virtual
-Machine" by typing "java -version" at the command line.   You need to make
-the path to your JDK directory apprear first in your PATH statement, or you
-need to rename the Kaffe files to prevent their use:
-<pre>
-  mv /usr/bin/java /usr/bin/java-kaffe
-  mv /usr/bin/javac /usr/bin/javac-kaffe
-  mv /usr/bin/jar /usr/bin/jar-kaffe
-</pre>
+<hr><a NAME="compilation"></a>
+<h3>
+Compilation</h3>
 
-<p>
-<strong>Note:</strong> it has been reported that Kaffee does not currently run jMax. We recommend
-that you use JDK instead.
+<li>
+The compilation must be started in jMax sources root directory.</li>
 
+<h4>
+Compilation commands</h4>
+To compile both C and Java :
+<pre>./configure</pre>
+
+<pre>make</pre>
+
+<pre>make install</pre>
+To do a 'clean' :
+<pre>make clean</pre>
 <!-- ---------------------------------------------------------------------- -->
 <p>
-<hr>
-<a name="compilation"> <h3>Compilation</h3></A>
-
-<p>
-The compilation must be started in jMax sources root directory.
-Compilation command must specify both a target and an architecture which
-is passed in make variable <code>ARCH</code>.
-
-
-<h4>General compilation targets</h4>
-
-<p> 
-The following targets are defined in the top-level Makefile:
-<ul>
-<li> <code>all</code>: to recompile both C and Java part. The make variable <code>ARCH</code>
-must be defined
-<li> <code>clean</code>: to remove all C objects, executables, libraries and all Java .class and .jar files. 
-The make variable <code>ARCH</code> must be defined
-<li> <code>all_c</code>: to recompile only C part. The make variable <code>ARCH</code>
-must be defined
-<li> <code>clean_c</code>: to remove all C objects, libraries and executables. The make variable <code>ARCH</code> must be defined
-<li> <code>clean_java</code>: to remove all Java .class and .jar files. The make variable <code>ARCH</code> must be defined
-</ul>
-
-
-<h4>Compilation architecture</h4>
-
-<p>
-The following architecture names are defined:
-<ul>
-<li> <code>i386-linux</code>: Linux on Intel Pentium compatible processors
-<li> <code>i686-linux</code>: Linux on Intel Pentium-II compatible processors
-<li> <code>r10k-irix6.5</code>: Irix 6.5 on MIPS R10000 processors
-<li> <code>r4k-irix6.5</code>: Irix 6.5 on MIPS R4000 processors
-<li> <code>r5k-irix6.5</code>: Irix 6.5 on MIPS R5000 processors
-<li> <code>ppc-linux</code>: Linux on PowerPC processors
-<li> <code>ppc-macosx</code>: MacOS-X on PowerPC processors
-</ul>
-
-<p>
-These architecture names are passed to the makefiles by the <code>ARCH</code> variables, as in:
-<pre>
-make clean ARCH=i686-linux
-</pre>
-
-
-<h4>Platform specific targets</h4>
-
-<p>
-The following platform specific targets are defined:
-<ul>
-<li> <code>i386-linux</code>: compilation of C and Java parts for architecture i386-linux
-<li> <code>i686-linux</code>: compilation of C and Java parts for architecture i686-linux
-<li> <code>ppc-linux</code>: compilation of C and Java parts for architecture ppc-linux
-<li> <code>ppc-macosx</code>: compilation of C and Java parts for architecture ppc-macosx
-<li> <code>sgi</code>: compilation of C and Java parts for architectures r10k-irix6.5 and r5k-irix6.5
-<li> <code>r5k-irix6.5</code>: compilation of C and Java parts for architecture r5k-irix6.5
-<li> <code>r10k-irix6.5</code>: compilation of C and Java parts for architecture r10k-irix6.5
-</ul>
-
-<h4>Compilation commands</h4>
-
-<p>
-To compile both C and Java on Linux/Intel:
-<pre>
-make i686-linux
-</pre>
-or equivalent:
-<pre>
-make all ARCH=i686-linux
-</pre>
-
-<p>
-To do a 'clean' on Linux/Intel:
-<pre>
-make clean ARCH=i686-linux
-</pre>
-
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="rpm"> <h3>Building rpms</h3></A>
-
-<p>
-jMax sources can be used to build rpms, in order to ease installation
-and distribution on Linux platforms.
-
-<p>
-The necessary files for rpm building are included in the source rpm of jMax
-and in the jMax source distribution.
-
-
-<h4>Building rpms from source rpm</h4>
-
-<p>
-After installing the source rpm (<code>jMax-<i>&lt;VERSION&gt;</i>.src.rpm</code>), 
-just <code>cd</code> to the rpm spec directory (usually <code>/usr/src/redhat/SPECS</code>)
+<hr><a NAME="rpm"></a>
+<h3>
+Building rpms</h3>
+jMax sources can be used to build rpms, in order to ease installation and
+distribution on Linux platforms.
+<p>The necessary files for rpm building are included in the source rpm
+of jMax and in the jMax source distribution.
+<h4>
+Building rpms from source rpm</h4>
+After installing the source rpm (<tt>jMax-<i>&lt;VERSION></i>.src.rpm</tt>),
+just <tt>cd</tt> to the rpm spec directory (usually <tt>/usr/src/redhat/SPECS</tt>)
 and start building by:
-<pre>
-rpm -ba jmax.spec
-</pre>
+<pre>rpm -ba jmax.spec</pre>
 
-
-
-<h4>Building rpms from source distribution </h4>
-
-<p>
+<h4>
+Building rpms from source distribution</h4>
 This apply if you installed jMax sources from a .tar.gz file.
-
-<p>
-The file <code>jmax.spec</code> is in the source distribution, in
-subdirectory <code>pkg/rpm/jmax.spec</code>. For rpm building, the
-following files must be copied:
+<p>The file <tt>jmax.spec</tt> is in the source distribution, in subdirectory
+<tt>pkg/rpm/jmax.spec</tt>. For rpm building, the following files must
+be copied:
 <ul>
-<li> <code>jmax.spec</code> to the rpm spec directory, (usually <code>/usr/src/redhat/SPECS</code>)
-<li> <code>jmax-<i>&lt;VERSION&gt;</i>.tar.gz</code> to the rpm sources directory, (usually <code>/usr/src/redhat/SOURCES</code>)
+<li>
+<tt>jmax.spec</tt> to the rpm spec directory, (usually <tt>/usr/src/redhat/SPECS</tt>)</li>
+
+<li>
+<tt>jmax-<i>&lt;VERSION></i>.tar.gz</tt> to the rpm sources directory,
+(usually <tt>/usr/src/redhat/SOURCES</tt>)</li>
 </ul>
-
-<p>
-After copying those files, 
-just <code>cd</code> to the rpm spec directory and start building by:
-<pre>
-rpm -ba jmax.spec
-</pre>
-
-
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- Beginning of footer                                                    -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-
-<p>
-<table width=100% border=0 cellspacing=0 cellpadding=0>
-
+After copying those files, just <tt>cd</tt> to the rpm spec directory and
+start building by:
+<pre>rpm -ba jmax.spec</pre>
+<!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- --><!-- Beginning of footer                                                    --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- -->
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
 <tr>
 <td><spacer type="block" height="20" width="1"></td>
 </tr>
 
 <tr>
-<td bgcolor="#cccccc"><spacer type="block" height="1" width="1"></td>
+<td BGCOLOR="#CCCCCC"><spacer type="block" height="1" width="1"></td>
 </tr>
 
 <tr>
@@ -273,12 +161,9 @@ rpm -ba jmax.spec
 </tr>
 
 <tr>
-<td align=right><font size=-2>
-Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.<br>
-All rights reserved.
-</font></td>
+<td ALIGN=RIGHT><font size=-2>Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.</font>
+<br><font size=-2>All rights reserved.</font></td>
 </tr>
-
 </table>
 
 </body>

@@ -1,115 +1,89 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
 <html>
 <head>
-<title>jMax Documentation</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.79 [en] (X11; U; Linux 2.4.18-3 i686) [Netscape]">
+   <title>jMax Documentation</title>
 </head>
-
-<body bgcolor="white">
+<body bgcolor="#FFFFFF">
 
 <h4>
-  <a href="http://www.ircam.fr/jmax/"><img src="images/jmax_icon.gif" border=0 alt="jMax" ALIGN=MIDDLE></A>
-  jMax documentation
-</h4>
+<a href="http://www.ircam.fr/jmax/"><img SRC="jmax_icon.gif" ALT="jMax" BORDER=0  align=CENTER></a>
+jMax documentation</h4>
+<!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- --><!-- End of header                                                          --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- -->
+<h1>
+Debugging jMax</h1>
 
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- End of header                                                          -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-
-<h1>Debugging jMax</h1>
-
-<p>
 <ul type=dot>
-  <li><a href="#introduction">Introduction</A>
-  <li><a href="#running FTS under the debugger">Running FTS under the debugger</A>
+<li>
+<a href="#introduction">Introduction</a></li>
+
+<li>
+<a href="#running FTS under the debugger">Running FTS under the debugger</a></li>
 </ul>
 
+<hr size=1><a NAME="introduction"></a>
+<h2>
+Introduction</h2>
+This document explains how to run FTS (the real time engine of jMax) under
+a debugger. This is usefull for instance if you want to debug your objects.&nbsp;<!-- ---------------------------------------------------------------------- -->
 <p>
-<hr size=1>
-
-<a name="introduction"> <H2>Introduction</H2> </a>
-
-<p>
-This document explains how to run FTS (the real time engine of jMax) under a debugger.
-This is usefull for instance if you want to debug your objects.
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="running FTS under the debugger"><h3>Running FTS under the debugger</h3></a>
-
-<p>
-In order to run <code>FTS</code> under a debugger, the following steps must
+<hr><a NAME="running FTS under the debugger"></a>
+<h3>
+Running FTS under the debugger</h3>
+In order to run <tt>FTS</tt> under a debugger, the following steps must
 be taken:
 <dl>
+<dt>
+a) recompile FTS with debug options</dt>
 
-<p>
-<dt>a) recompile FTS with debug options
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ./configure --enable-debug</pre>
 
-<p>
-<dd> the make variable MODE must be set to <i>debug</i>, as in:
-<pre>
-make ARCH=i686-linux MODE=debug          # for a i686-linux arch
-</pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; make</pre>
 
-<p>
-<dt>b) start the Java GUI
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; make install</pre>
 
-<p>
-<dd> the following options must be used:<br>
-<pre>
-jmax -jmaxConnection udpclient -jmaxMode debug -jmaxPort <MY_PORT_NUMBER>
-</pre>
+<dt>
+b) start the Java GUI</dt>
+
+<dd>
+the following options must be used:</dd>
+
+<pre>jmax -jmaxConnection udpclient -jmaxMode debug -jmaxPort&nbsp;<MY_PORT_NUMBER></pre>
 The console window should appear, but remains almost empty.
+<p>Note: you can pass also a <tt>-jmaxHost HOST_NAME</tt> option to jmax.
+<dt>
+c) start the debuggger</dt>
 
-<p>
-Note: you can pass also a <code>-jmaxHost HOST_NAME</code> option to jmax.
+<dd>
+for instance with gdb:</dd>
 
-<p>
-<dt>c) start the debuggger<br>
+<pre>$ cd /home/francois/jmax/fts/bin/i686-linux/debug
+$ gdb fts</pre>
 
-<p>
-<dd> for instance with gdb:
-<pre>
-$ cd /home/francois/jmax/fts/bin/i686-linux/debug
-$ gdb fts
-</pre>
+<dt>
+d) start fts under the debugger</dt>
 
-<p>
-<dt>d) start fts under the debugger
+<dd>
+the following options must be passed to FTS:</dd>
 
-<p>
-<dd> the following options must be passed to FTS:
-<pre>
-run udp MY_MACHINE:MY_PORT_NUMBER
-</pre>
-where:<br>
-&nbsp; <code>MY_MACHINE</code> is the name of the host running FTS (can be 127.0.0.1)<br>
-&nbsp; <code>MY_PORT_NUMBER</code> is the port number that you gave to 
+<pre>run udp MY_MACHINE:MY_PORT_NUMBER</pre>
+where:
+<br>&nbsp; <tt>MY_MACHINE</tt> is the name of the host running FTS (can
+be 127.0.0.1)
+<br>&nbsp; <tt>MY_PORT_NUMBER</tt> is the port number that you gave to
 the -jmaxPort option when starting jmax.
-
-<p>
-The console window should now be filled with normal startup messages. You can
-then stop fts under the debugger, put breakpoints, continue, as usual in
-a debugger session.
-
-</dl>
-
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- Beginning of footer                                                    -->
-<!-- ---------------------------------------------------------------------- -->
-<!-- ---------------------------------------------------------------------- -->
-
-<p>
-<table width=100% border=0 cellspacing=0 cellpadding=0>
-
+<p>The console window should now be filled with normal startup messages.
+You can then stop fts under the debugger, put breakpoints, continue, as
+usual in a debugger session.</dl>
+<!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- --><!-- Beginning of footer                                                    --><!-- ---------------------------------------------------------------------- --><!-- ---------------------------------------------------------------------- -->
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
 <tr>
 <td><spacer type="block" height="20" width="1"></td>
 </tr>
 
 <tr>
-<td bgcolor="#cccccc"><spacer type="block" height="1" width="1"></td>
+<td BGCOLOR="#CCCCCC"><spacer type="block" height="1" width="1"></td>
 </tr>
 
 <tr>
@@ -117,14 +91,10 @@ a debugger session.
 </tr>
 
 <tr>
-<td align=right><font size=-2>
-Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.<br>
-All rights reserved.
-</font></td>
+<td ALIGN=RIGHT><font size=-2>Copyright &copy; 1995,1999 <a href="http://www.ircam.fr/">IRCAM</a>.</font>
+<br><font size=-2>All rights reserved.</font></td>
 </tr>
-
 </table>
 
 </body>
 </html>
-
