@@ -42,8 +42,8 @@
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
-#include <ftsprivate/config.h>
 #include <ftsprivate/audio.h>
+
 
 #define AUDIOPORT_DEFAULT_IDLE ((void (*)(fts_audioport_t *port))-1)
 

@@ -32,7 +32,9 @@
 #include <ftsprivate/client.h>
 #include <ftsprivate/variable.h>
 #include <ftsprivate/midi.h>
-#include <ftsprivate/config.h>
+#include <ftsprivate/audiolabel.h>
+#include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
+#include <ftsprivate/config.h> /* requires audioconfig.h */
 
 /*
  * This file contains everything related to MIDI:

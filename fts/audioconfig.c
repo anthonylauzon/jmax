@@ -29,10 +29,14 @@
 #include <sys/param.h>
 #endif
 
+#include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/audiolabel.h>
+#include <ftsprivate/audioconfig.h>
+#include <ftsprivate/midi.h>
 #include <ftsprivate/config.h>
 #include <ftsprivate/client.h>
 
-#include <ftsprivate/audio.h>
+
 
 #define AUDIO_CONFIG_DEFAULT_SAMPLE_RATE 44100.
 #define AUDIO_CONFIG_DEFAULT_BUFFER_SIZE 1024

@@ -23,8 +23,8 @@
 #include <fts/fts.h>
 #include <ftsconfig.h>
 
-#include <ftsprivate/config.h>
-#include <ftsprivate/audio.h>
+#include <ftsprivate/audiolabel.h>
+
 
 fts_class_t* audiolabel_type = NULL;
 

@@ -35,7 +35,10 @@
 #include <ftsprivate/tokenizer.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/errobj.h>
-#include <ftsprivate/config.h>
+#include <ftsprivate/audiolabel.h>
+#include <ftsprivate/audioconfig.h> /* requires audiolabel.h */
+#include <ftsprivate/midi.h>
+#include <ftsprivate/config.h> /* requires audioconfig.h and midi.h */
 
 #include <string.h>
 #include <stdlib.h>

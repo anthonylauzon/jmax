@@ -26,11 +26,13 @@
 #include <sys/param.h>
 #endif /* HAVE_SYS_PARAM_H */
 
-#include <ftsprivate/audio.h> /* audioconfig_t */
-#include <ftsprivate/midi.h> /* midiconfig_t */
-#include <ftsprivate/bmaxfile.h> 
+#include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/audiolabel.h> 
+#include <ftsprivate/audioconfig.h> /* require bmaxfile.h */
+#include <ftsprivate/midi.h> /* require bmaxfile.h */
+
 #include <ftsprivate/client.h> 
-#include <ftsprivate/config.h> 
+#include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
 
 /****************************************************
  *
