@@ -68,7 +68,7 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     {
       for ( i = 0; i < inlets; i++)
 	{
-	  this->dispatchers[0] = fts_audioport_get_out_object( port, i);
+	  this->dispatchers[i] = fts_audioport_get_out_object( port, i);
 	  fts_object_refer( this->dispatchers[i]);
 	}
     }
