@@ -202,7 +202,8 @@ alsaaudiomanager_scan_plugins(void)
       fts_log("[alsaaudiomanager] Id Configuration Node: %s\n", id_configuration_node);
 #endif /* ALSA_AUDIO_MANAGER_DEBUG */
       s_device_name = fts_new_symbol(id_configuration_node);
-      if (s_device_name != fts_new_symbol("dmix"))
+      if ((s_device_name != fts_new_symbol("dmix"))
+	  && (s_device_name != fts_new_symbol("dsnoop")))
       {
 	fts_set_symbol(&at, s_device_name);
 	port = (fts_audioport_t*)fts_object_create(alsaaudioport_type, 1, &at);
