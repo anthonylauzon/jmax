@@ -538,7 +538,7 @@ static void
 ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 {
   fts_symbol_t s;
-  fts_integer_vector_t *tw = 0;
+  fts_ivec_t *tw = 0;
   
   if (argv->ex_type != ET_SYM)
     {
@@ -549,12 +549,12 @@ ex_size(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   s = (fts_symbol_t ) argv->ex_ptr;
 
-  tw = table_integer_vector_get_by_name(s);
+  tw = table_ivec_get_by_name(s);
 
   if (tw)
     {
       optr->ex_type = ET_INT;
-      optr->ex_int = fts_integer_vector_get_size(tw);
+      optr->ex_int = fts_ivec_get_size(tw);
     }
   else
     {
@@ -574,7 +574,7 @@ static void
 ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 {
   fts_symbol_t s;
-  fts_integer_vector_t *tw = 0;
+  fts_ivec_t *tw = 0;
   
   if (argv->ex_type != ET_SYM)
     {
@@ -584,12 +584,12 @@ ex_sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     }
   s = (fts_symbol_t ) argv->ex_ptr;
 
-  tw = table_integer_vector_get_by_name(s);
+  tw = table_ivec_get_by_name(s);
 
   if (tw)
     {
       optr->ex_type = ET_INT;
-      optr->ex_int = fts_integer_vector_get_sum(tw);
+      optr->ex_int = fts_ivec_get_sum(tw);
     }
   else
     {
@@ -608,7 +608,7 @@ static void
 ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 {
   fts_symbol_t s;
-  fts_integer_vector_t *tw = 0;
+  fts_ivec_t *tw = 0;
   
   if (argv->ex_type != ET_SYM)
     {
@@ -619,7 +619,7 @@ ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   
   s = (fts_symbol_t ) (argv++)->ex_ptr;
 
-  tw = table_integer_vector_get_by_name(s);
+  tw = table_ivec_get_by_name(s);
 
   if (! tw)
     {
@@ -639,7 +639,7 @@ ex_Sum(long int argc, struct ex_ex *argv, struct ex_ex *optr)
     }
   
   optr->ex_type = ET_INT;
-  optr->ex_int = fts_integer_vector_get_sub_sum(tw, argv->ex_int, argv[1].ex_int);
+  optr->ex_int = fts_ivec_get_sub_sum(tw, argv->ex_int, argv[1].ex_int);
 }
 
 /*
@@ -650,7 +650,7 @@ static void
 ex_avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 {
   fts_symbol_t s;
-  fts_integer_vector_t *tw = 0;
+  fts_ivec_t *tw = 0;
   
   if (argv->ex_type != ET_SYM)
     {
@@ -661,16 +661,16 @@ ex_avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
   s = (fts_symbol_t ) argv->ex_ptr;
 
-  tw = table_integer_vector_get_by_name(s);
+  tw = table_ivec_get_by_name(s);
 
   if (tw)
     {
       optr->ex_type = ET_INT;
 
-      if (! fts_integer_vector_get_size(tw))
+      if (! fts_ivec_get_size(tw))
 	optr->ex_int = 0;
       else
-	optr->ex_int = fts_integer_vector_get_sum(tw) / fts_integer_vector_get_size(tw);
+	optr->ex_int = fts_ivec_get_sum(tw) / fts_ivec_get_size(tw);
     }
   else
     {
@@ -689,7 +689,7 @@ static void
 ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 {
   fts_symbol_t s;
-  fts_integer_vector_t *tw = 0;
+  fts_ivec_t *tw = 0;
   
   if (argv->ex_type != ET_SYM)
     {
@@ -700,7 +700,7 @@ ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
   s = (fts_symbol_t ) (argv++)->ex_ptr;
 
-  tw = table_integer_vector_get_by_name(s);
+  tw = table_ivec_get_by_name(s);
 
   if (! tw)
     {
@@ -723,7 +723,7 @@ ex_Avg(long int argc, struct ex_ex *argv, struct ex_ex *optr)
   if (argv[1].ex_int - argv->ex_int <= 0)
     optr->ex_int = 0;
   else
-    optr->ex_int = (fts_integer_vector_get_sub_sum(tw, argv->ex_int, argv[1].ex_int) /
+    optr->ex_int = (fts_ivec_get_sub_sum(tw, argv->ex_int, argv[1].ex_int) /
 		    (argv[1].ex_int - argv->ex_int));
 }
 
@@ -737,7 +737,7 @@ static void
 ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 {
   fts_symbol_t s;
-  fts_integer_vector_t *tw = 0;
+  fts_ivec_t *tw = 0;
   
   if (argv->ex_type != ET_SYM)
     {
@@ -746,7 +746,7 @@ ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
   s = (fts_symbol_t ) (argv++)->ex_ptr;
 
-  tw = table_integer_vector_get_by_name(s);
+  tw = table_ivec_get_by_name(s);
 
   if (! tw)
     {
@@ -763,7 +763,7 @@ ex_store(long int argc, struct ex_ex *argv, struct ex_ex *optr)
       optr->ex_int = 0;
     }
 
-  fts_integer_vector_set_element(tw, argv->ex_int < 0 ? 0 : argv->ex_int % fts_integer_vector_get_size(tw), argv[1].ex_int);
+  fts_ivec_set_element(tw, argv->ex_int < 0 ? 0 : argv->ex_int % fts_ivec_get_size(tw), argv[1].ex_int);
   *optr = argv[1]; 
 }
 

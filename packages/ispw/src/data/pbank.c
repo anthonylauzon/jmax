@@ -504,7 +504,7 @@ pbank_get_row_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       fts_atom_t *atom = row + j;
 
       this->data->buffer[j] = *atom;
-      fts_send_message_to_receives(this->receives[j], fts_type_get_selector(fts_get_type(atom)), 1, atom);
+      fts_send_message_to_receives(this->receives[j], fts_get_selector(atom), 1, atom);
     }
 }
 
@@ -577,7 +577,7 @@ pbank_recall_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       fts_atom_t *atom = row + j;
 
       this->data->buffer[j] = *atom;
-      fts_send_message_to_receives(this->receives[j], fts_type_get_selector(fts_get_type(atom)), 1, atom);
+      fts_send_message_to_receives(this->receives[j], fts_get_selector(atom), 1, atom);
     }
 }
 
@@ -684,7 +684,7 @@ pbank_set_and_get_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   if(ac == 2) 
     /* read atom from matrix and send to receives */
-    fts_send_message_to_receives(this->receives[j], fts_type_get_selector(fts_get_type(atom)), 1, atom);
+    fts_send_message_to_receives(this->receives[j], fts_get_selector(atom), 1, atom);
   else
     {
       /* write atom to matrix */
