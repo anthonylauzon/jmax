@@ -26,6 +26,7 @@ import java.awt.event.*;
 
 //import javax.swing.*;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 
 import java.util.*;
 
@@ -40,8 +41,7 @@ import ircam.jmax.editors.patcher.menus.*;
  * The "number box" graphic object base class
  */
 
-abstract public class NumberBox extends GraphicObject implements KeyEventClient {
-  private StringBuffer currentText;
+abstract public class NumberBox extends Editable implements KeyEventClient {
   private int nDecimals = 0;
   private String filter;
   public static final int DEFAULT_WIDTH = 40;
@@ -61,8 +61,6 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   public NumberBox(FtsGraphicObject theFtsObject, String filter) 
   {
     super(theFtsObject);
-
-    currentText = new StringBuffer();
 
     this.filter = filter;
 
@@ -88,13 +86,23 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     super.setHeight( getMinHeight());
   }
 
+  public String getArgs()
+  {
+    return getValueAsText();
+  }
+
   private int getMinWidth()
   {
     return getFontMetrics().stringWidth("0")*DEFAULT_VISIBLE_DIGIT + getFontMetrics().stringWidth("..") +17;
   }
 
+  public int getDefaultWidth()
+  {
+    return getMinWidth();
+  }
+
   private int getFullTextWidth(){
-    return (getFontMetrics().stringWidth("..")+ getFontMetrics().stringWidth(getValueAsText())+17);
+    return (getTextWidthOffset() + getFontMetrics().stringWidth(getValueAsText()) + 2);
   }
 
   private int getMinHeight()
@@ -146,7 +154,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     int full = getFullTextWidth();
     int min = getMinWidth();
 
-    if(full<min) super.setWidth(min);
+    if(full < min) super.setWidth(min);
     else  super.setWidth(full);
 
     super.setHeight(getMinHeight());
@@ -154,10 +162,62 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     updateOffScreenBuffer();
   }
 
-  public void redefined()
+  public void redefine( String text) 
   {
-    setDefaults();
-    //fitToText()
+    setValueAsText( text);
+    setEditMode( NumberBox.NOEDIT_MODE);
+  }
+
+  public void redefined()
+  {    
+    SwingUtilities.invokeLater(new Runnable(){
+	public void run()
+	{
+	  fitToText();
+	  redraw();
+	}
+      });
+  }
+  // ----------------------------------------
+  // Text area offset
+  // ----------------------------------------
+  
+  private static final int TEXT_X_OFFSET = 3;
+  private static final int TEXT_Y_OFFSET = 3;
+
+  public int getTextXOffset()
+  {
+    return getTextHeightOffset() + getTriangleWidth();
+  }
+
+  public int getTextYOffset()
+  {
+    return TEXT_Y_OFFSET;
+  }
+
+  public int getTextWidthOffset()
+  {
+    return  getTextHeightOffset() + getTriangleWidth() +4;
+  }
+
+  public int getTextHeightOffset()
+  {
+    return 5;
+  }
+    
+  public Color getTextForeground()
+  {
+    return Color.black;
+  }
+
+  public Color getTextBackground()
+  {
+    return Color.white;
+  }
+
+  public boolean isMultiline()
+  {
+    return false;
   }
 
   // ----------------------------------------
@@ -207,11 +267,7 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 	g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
       }
     
-    // Text
-    if( editMode == TEXT_MODE)
-      aString = getVisibleString(currentText.toString());
-    else
-      aString = getVisibleString(getValueAsText());
+    aString = getVisibleString(getValueAsText());
 
     if( editMode == INCR_MODE)
       g.setColor( Color.gray);
@@ -252,14 +308,14 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 	  g.fillRect( 0, 0, w, h);
       
 	// Get the value
-	aString = getVisibleString(getValueAsText());
+	aString = getVisibleString( getValueAsText());
       }
     else
       {
 	g.setColor( Color.white);
 	g.fillRect( 0, 0, w, h);
       
-	aString = getVisibleString(currentText.toString());
+	aString = getVisibleString( getValueAsText());
       }
       
     // Draw the value
@@ -305,138 +361,63 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     return aString;
   }
 
+  public int getTriangleWidth()
+  {
+    return getHeight()/2;
+  }
+
   abstract public int getIntZoneWidth();
 
   public void keyPressed( KeyEvent e) 
   {
-    if ( !e.isControlDown() && !e.isMetaDown()) 
+    switch (e.getKeyCode())
       {
-	if(e.getKeyCode()==109) return;//??????
-	// This stuff should be thrown away, and we should use
-	// a real text area for the number boxes !!!
-
-	switch (e.getKeyCode())
-	  {
-	  case KeyEvent.VK_ENTER:
-	    setValueAsText( currentText.toString());
-	    currentText.setLength(0);
-	    setEditMode( NOEDIT_MODE);
-	    itsSketchPad.setKeyEventClient(null);
-	    break;
-	  case KeyEvent.VK_UP:
-	    if( getEditMode() == INCR_MODE)
-	      increment( true, e.isShiftDown());
-	    break;
-	  case KeyEvent.VK_DOWN:
-	    if( getEditMode() == INCR_MODE)
-	      increment( false, e.isShiftDown());
-	    break;
-	  case KeyEvent.VK_DELETE:
-	  case KeyEvent.VK_BACK_SPACE:
-	    {
-	      int l = currentText.length();
-	      l = ( l > 0 ) ? l - 1 : 0;
-	      currentText.setLength( l);
-	    }
-            break;
-          case KeyEvent.VK_SHIFT:
-            break;
-	  case KeyEvent.VK_NUMPAD0:
-	    currentText.append("0");
-	    break;
-	  case KeyEvent.VK_NUMPAD1:
-	    currentText.append("1");
-	    break;
-	  case KeyEvent.VK_NUMPAD2:
-	    currentText.append("2");
-	    break;
-	  case KeyEvent.VK_NUMPAD3:
-	    currentText.append("3");
-	    break;
-	  case KeyEvent.VK_NUMPAD4:
-	    currentText.append("4");
-	    break;
-	  case KeyEvent.VK_NUMPAD5:
-	    currentText.append("5");
-	    break;
-	  case KeyEvent.VK_NUMPAD6:
-	    currentText.append("6");
-	    break;
-	  case KeyEvent.VK_NUMPAD7:
-	    currentText.append("7");
-	    break;
-	  case KeyEvent.VK_NUMPAD8:
-	    currentText.append("8");
-	    break;
-	  case KeyEvent.VK_NUMPAD9:
-	    currentText.append("9");
-	    break;
-	  case KeyEvent.VK_DECIMAL:
-	    currentText.append(".");
-	    break;
-	  default:
-	    currentText.append((char) e.getKeyCode());
-	    break;
-	  }
-
-	e.consume();
-	redraw();
+      case KeyEvent.VK_UP:
+	if( getEditMode() == INCR_MODE)
+	  increment( true, e.isShiftDown());
+	break;
+      case KeyEvent.VK_DOWN:
+	if( getEditMode() == INCR_MODE)
+	  increment( false, e.isShiftDown());
+	break;
+      default:
+	break;
       }
+    e.consume();
+    redraw();
   }
 
   abstract public void increment( boolean up, boolean shift);
 
-  public void keyReleased( KeyEvent e) 
-  {
-     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
-      {
-	if(e.getKeyChar()== '-') 
-	  currentText.append('-');
-
-	e.consume();
-	redraw();
-      }
-  }
-
+  public void keyReleased( KeyEvent e){}
   public void keyTyped( KeyEvent e){}
-
   public void keyInputGained() 
   {
     redraw();
   }
-
   public void keyInputLost() 
   {
-    //valueValid = true;
     setEditMode( NOEDIT_MODE);
-    currentText.setLength(0);
     redraw();
-  }
-
-  JSeparator mySeparator = new JSeparator();
-  public void popUpUpdate(boolean onInlet, boolean onOutlet, SensibilityArea area)
-  {
-    super.popUpUpdate(onInlet, onOutlet, area);
-    ObjectPopUp.getInstance().add( mySeparator);
-    TextPopUpMenu.update(this);
-    ObjectPopUp.addMenu(TextPopUpMenu.getInstance());
-  }
-  public void popUpReset()
-  {
-    super.popUpReset();
-    ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
-    ObjectPopUp.getInstance().remove( mySeparator);
   }
 
   public void setEditMode( int mode)
   {
     editMode = mode;
+    redraw();
   }
   public int getEditMode()
   {
     return editMode;
   }
   
+  public void setEditing(boolean v)
+  {
+    super.setEditing(v);
+    if( v) setEditMode( TEXT_MODE);
+    else setEditMode( NOEDIT_MODE);
+  }
+
   public boolean isOnArrow( Point p)
   {
     int x = getX();

@@ -129,6 +129,8 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
     value = up ? value + incr : value - incr;
     ((FtsFloatValueObject)ftsObject).setValue( value);
   }
+
+
   //--------------------------------------------------------
   // mouse handlers
   //--------------------------------------------------------
@@ -174,11 +176,13 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
 	if(!dragged)
 	  {
 	    if( isOnArrow( mouse))
-	      setEditMode( NumberBox.INCR_MODE);
+	      {	   
+		setEditMode( NumberBox.INCR_MODE);
+		itsSketchPad.setKeyEventClient(this);		
+	      }
 	    else
-	      setEditMode( NumberBox.TEXT_MODE);
+	      edit( mouse);		
 
-	    itsSketchPad.setKeyEventClient(this);
 	    return;
 	  }
       }    

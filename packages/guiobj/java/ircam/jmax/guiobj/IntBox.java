@@ -118,13 +118,16 @@ public class IntBox extends NumberBox implements FtsIntValueListener
 	if (! dragged)
 	  {
 	    if( isOnArrow( mouse))
-	      setEditMode( NumberBox.INCR_MODE);
+	      {
+		setEditMode( NumberBox.INCR_MODE);
+		itsSketchPad.setKeyEventClient( this);		
+	      }	    
 	    else
-	      setEditMode( NumberBox.TEXT_MODE);
+	      edit( mouse);
 
-	    itsSketchPad.setKeyEventClient( this);		
 	    return;
 	  }
       }
   }
 }
+

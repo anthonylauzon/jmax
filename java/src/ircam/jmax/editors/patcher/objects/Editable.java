@@ -192,8 +192,9 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void setWidthToText(String text)
   {
     int tLength = SwingUtilities.computeStringWidth(getFontMetrics(), text)+ getTextWidthOffset() + getVariableWidth() + 2; 	
-    if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
     
+    if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
+
     super.setWidth(tLength);
   }
 
