@@ -3,7 +3,7 @@
 */
 
 #ifdef DEBUG
-/*#define MESS_DEBUG*/
+#define MESS_DEBUG
 #endif
 
 #include <string.h>
@@ -33,6 +33,7 @@
 
    NEW  (obj) p (int)id [<args>]*
    REDEFINE (obj)old [<args>]*
+   REPLACE (obj)old (obj)new
    FREE (obj)obj
    CONNECT (obj)from (int)outlet (obj)to (int)inlet
    DISCONNECT (obj)from (int)outlet (obj)to (int)inlet
@@ -280,6 +281,46 @@ fts_mess_client_redefine(int ac, const fts_atom_t *av)
 
 
 /* 
+   REPLACE (obj)old  (obj)new
+*/
+
+static void
+fts_mess_client_replace(int ac, const fts_atom_t *av)
+{
+#ifdef MESS_DEBUG
+  print_mess("Received replace", ac, av);
+#endif
+
+  if (ac == 2 && fts_is_object(&av[0]) && fts_is_object(&av[0]))
+    {
+      int pid, id;
+      fts_object_t  *old;
+      fts_object_t  *new;
+
+      old =  fts_get_object(&av[0]);
+
+      if (! old)
+	{
+	  post_mess("System Error in FOS message REPLACE: redefining a non existing object", ac, av);
+	  return;
+	}
+
+      new =  fts_get_object(&av[1]);
+
+      if (! old)
+	{
+	  post_mess("System Error in FOS message REPLACE: redefining to a non existing object", ac, av);
+	  return;
+	}
+
+      fts_object_replace(old, new);
+    }
+  else
+    post_mess("System Error in FOS message REPLACE: bad args", ac, av);
+}
+
+
+/* 
    FREE (obj)obj
 
    Free (destroy) the object identified by id.
@@ -347,7 +388,8 @@ fts_mess_client_connect(int ac, const fts_atom_t *av)
 	  ret = fts_object_connect(from, outlet, to, inlet);
 
 	  if (ret)
-	    post("Error connecting objects: %s\n", ret->description);
+	    post("Error connecting object %d outlet %d to object %d inlet %d: %s\n",
+		 from->id, outlet, to->id, inlet, ret->description);
 	}
       else
 	post_mess("Error trying to connect non existing objects", ac, av);
@@ -573,6 +615,7 @@ fts_messtile_install_all()
   fts_client_mess_install(PATCHER_LOADED_CODE,  fts_mess_client_patcher_loaded);
   fts_client_mess_install(NEW_OBJECT_CODE,  fts_mess_client_new);
   fts_client_mess_install(REDEFINE_OBJECT_CODE,  fts_mess_client_redefine);
+  fts_client_mess_install(REPLACE_OBJECT_CODE,  fts_mess_client_replace);
   fts_client_mess_install(FREE_OBJECT_CODE,  fts_mess_client_free);
   fts_client_mess_install(CONNECT_OBJECTS_CODE,  fts_mess_client_connect);
   fts_client_mess_install(DISCONNECT_OBJECTS_CODE, fts_mess_client_disconnect);

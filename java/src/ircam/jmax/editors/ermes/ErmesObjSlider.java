@@ -47,8 +47,8 @@ class ErmesObjSlider extends ErmesObject {
   }
 
 		
-  public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic,FtsObject theFtsObject) {
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
+    super.Init(theSketchPad,  theFtsObject);
     itsThrottle = new ErmesObjThrottle(this);
     if(itsSliderDialog == null) itsSliderDialog = new ErmesObjSliderDialog(theSketchPad.GetSketchWindow(), this);
     return true;
@@ -130,7 +130,7 @@ class ErmesObjSlider extends ErmesObject {
       if (itsY+currentRect.height-y> BOTTOM_OFFSET && itsY+UP_OFFSET<y) {
 	//compute the value and send to FTS
 	itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
-	itsFtsObject.putProperty("value", new Integer(itsInteger));
+	itsFtsObject.put("value", new Integer(itsInteger));
 	itsThrottle.Move(itsThrottle.itsX, y);
 	DoublePaint();
       }

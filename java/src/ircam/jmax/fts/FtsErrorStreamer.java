@@ -57,7 +57,9 @@ class FtsErrorStreamer implements Runnable
 		out.println("FTS quitted/crashed !!!\n");
 	      }
 	    else
-	      out.write(c);
+	      {
+		out.write(c);
+	      }
 	  }
 	catch (IOException e)
 	  {

@@ -33,6 +33,22 @@ public class FtsConnection
     from.getParent().addConnection(this);
   }
 
+
+  /** Replace one object with the other in the connection
+   *  valid only if we are doing a replace on the FTS side, also,
+   *  this do not change the connections in FTS; this is why this method
+   * is not public
+   */
+
+  void replace(FtsObject oldObject, FtsObject newObject)
+  {
+    if (from == oldObject)
+      from = newObject;
+
+    if (to == oldObject)
+      to = newObject;
+  }
+
   /** Undo the connection. */
 
   public void delete()
@@ -106,4 +122,9 @@ public class FtsConnection
     return true;
   }
 }
+
+
+
+
+
 

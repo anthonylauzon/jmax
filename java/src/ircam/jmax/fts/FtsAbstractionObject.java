@@ -68,7 +68,7 @@ public class FtsAbstractionObject  extends FtsContainerObject
 	System.out.println("I/O Error " + e + " in reading abstraction " + className);
       }
 
-    setName("unnamed");
+    setObjectName("unnamed");
     assignInOutlets();
 
     loaded();	// activate the post-load init, like loadbangs
@@ -76,9 +76,6 @@ public class FtsAbstractionObject  extends FtsContainerObject
     if (parent.isOpen())
       {
 	updated = true;
-	getProperty("ninlets");
-	getProperty("noutlets");
-
 	MaxApplication.getFtsServer().syncToFts();
       }
   }

@@ -12,6 +12,63 @@ import ircam.jmax.fts.*;
 
 public class FtsDotPatParser
 {
+  /** auxiliary class: store the graphic information for
+   *  an object 
+   */
+
+  static class FtsGraphicDescription
+  {
+    int x = 0;
+    int y = 0;
+    int width = 0;
+    int fontSize = 12;
+
+    void setFontIndex(FtsDotPatTokenizer in) throws java.io.IOException
+    {
+      int n;
+
+      n = in.getNVal();
+      in.nextToken();
+
+      switch (n)
+	{
+	case 0:
+	  fontSize = 9;
+	  break;
+	case 1:
+	  fontSize = 10;
+	  break;
+	case 2:
+	  fontSize = 12;
+	  break;
+	case 3:
+	  fontSize = 14;
+	  break;
+	case 4:
+	  fontSize = 16;
+	  break;
+	case 5:
+	  fontSize = 18;
+	  break;
+	case 6:
+	  fontSize = 20;
+	  break;
+	case 7:
+	  fontSize = 24;
+	  break;
+	}
+    }
+
+    void setGraphicProperties(FtsObject obj)
+    {
+      obj.put("pos.x", x);
+      obj.put("pos.y", y);
+      obj.put("size.w", width);
+      obj.put("size.h", 0);
+      obj.put("fontSize", fontSize);
+    }
+  }
+
   /**
    * Create a new patcher from a .pat file.
    * The patcher is always a top level patcher.
@@ -30,7 +87,7 @@ public class FtsDotPatParser
 
     FtsContainerObject obj;
 
-    obj = new FtsPatcherObject(server.getRootObject(), "unnamed", 0, 0);
+    obj = new FtsPatcherObject(server.getRootObject());
 
     try
       {
@@ -47,7 +104,7 @@ public class FtsDotPatParser
 
     readFromFtsDotPatTokenizer(obj, in);
 
-    obj.setName("unnamed");
+    obj.setObjectName("unnamed");
     obj.assignInOutlets();
 
     obj.loaded();	// activate the post-load init, like loadbangs
@@ -112,7 +169,7 @@ public class FtsDotPatParser
 
 	in.nextToken(); // Skip the 'vpatcher'
 
-	parent.setWindowDescription(parseWindow(in)); 
+	parseWindowProperties(parent, in); 
 
 	// skip the optional processor number
 
@@ -141,7 +198,7 @@ public class FtsDotPatParser
 		  {
 		    in.pushBack();
 
-		    lastNObject = new FtsPatcherObject(parent, "unnamed", 0, 0);
+		    lastNObject = new FtsPatcherObject(parent);
 
 		    parsePatcher((FtsContainerObject) lastNObject, in);
 
@@ -371,16 +428,16 @@ public class FtsDotPatParser
     objects = parent.getObjects();
 
     in.nextToken(); 
-    from = (FtsObject) objects.elementAt(objects.size() - (int) in.nval - 1);
+    from = (FtsObject) objects.elementAt(objects.size() - (int) in.getNVal() - 1);
 
     in.nextToken(); 
-    outlet = (int) in.nval;
+    outlet = (int) in.getNVal();
+
+    in.nextToken();
+    to = (FtsObject) objects.elementAt(objects.size() - (int) in.getNVal() - 1);
 
     in.nextToken(); 
-    to = (FtsObject) objects.elementAt(objects.size() - (int) in.nval - 1);
-
-    in.nextToken(); 
-    inlet  = (int) in.nval;
+    inlet  = (int) in.getNVal();
 
     return new FtsConnection(from, outlet, to, inlet);
   }
@@ -406,11 +463,11 @@ public class FtsDotPatParser
 	    break;
 
 	  case FtsDotPatTokenizer.TT_NUMBER:
-	    args.addElement(new Integer(in.nval));
+	    args.addElement(new Integer(in.getNVal()));
 	    break;
 	    
 	  case FtsDotPatTokenizer.TT_FLOAT:
-	    args.addElement(new Float(in.fval));
+	    args.addElement(new Float(in.getFVal()));
 	    break;
 	  }
 
@@ -479,19 +536,17 @@ public class FtsDotPatParser
 
     if (objclass.equals("slider"))
       {
-
-	in.nextToken();//skip 'unknown' (may be range)
+	graphicDescr.setFontIndex(in);
 
 	obj = FtsObject.makeFtsObject(parent, "slider");
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("newex"))
       {
 	StringBuffer description = new StringBuffer();
 
-
-	in.nextToken();//skip 'unknown'
+	graphicDescr.setFontIndex(in);
 	in.nextToken();//get the object name
 
 	// Abstraction are handled directly by the makeFtsObject function now.
@@ -515,7 +570,7 @@ public class FtsDotPatParser
 	readObjectArguments(description, in);
 
 	obj = FtsObject.makeFtsObject(parent, description.toString()); 
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("newobj"))
@@ -524,7 +579,7 @@ public class FtsDotPatParser
 
 	Vector args = new Vector();
 
-	in.nextToken();//skip 'unknown'
+	graphicDescr.setFontIndex(in);
 	readObjectArguments(args, in);
 
 	// Check if it is the patcher, otherwise just skip it
@@ -533,16 +588,16 @@ public class FtsDotPatParser
 	  {
 	    /* add the two ninlet and noutlet arguments to description */
 
-	    ((FtsContainerObject)lastNObject).setGraphicDescription(graphicDescr);
+	    graphicDescr.setGraphicProperties((FtsContainerObject)lastNObject);
 
 	    if (args.size() > 1)
 	      {
-		((FtsContainerObject)lastNObject).setName((String) args.elementAt(1));
+		((FtsContainerObject)lastNObject).setObjectName((String) args.elementAt(1));
 		((FtsContainerObject)lastNObject).assignInOutlets();
 	      }
 	    else
 	      {
-		((FtsContainerObject)lastNObject).setName("unnamed");
+		((FtsContainerObject)lastNObject).setObjectName("unnamed");
 		((FtsContainerObject)lastNObject).assignInOutlets();
 	      }
 
@@ -550,19 +605,18 @@ public class FtsDotPatParser
 	  }
 	else if (args.elementAt(0).equals("qlist") && lastNObjectType.equals("qlist"))
 	  {
-	    lastNObject.setGraphicDescription(graphicDescr);
+	    graphicDescr.setGraphicProperties(lastNObject);
 
 	    return lastNObject;
 	  }
 	else if (args.elementAt(0).equals("table") && lastNObjectType.equals("table"))
 	  {
-	    lastNObject.setGraphicDescription(graphicDescr);
-
+	    graphicDescr.setGraphicProperties(lastNObject);
 	    return lastNObject;
 	  }
 	else if (args.elementAt(0).equals("explode") && lastNObjectType.equals("explode"))
 	  {
-	    lastNObject.setGraphicDescription(graphicDescr);
+	    graphicDescr.setGraphicProperties(lastNObject);
 
 	    return lastNObject;
 	  }
@@ -583,7 +637,7 @@ public class FtsDotPatParser
 	  in.pushBack();
 
 	obj = new FtsInletObject(parent);
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("outlet"))
@@ -596,57 +650,57 @@ public class FtsDotPatParser
 	  in.pushBack();
 
 	obj = new FtsOutletObject(parent);
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("number"))
       {
-	in.nextToken();//skip 'unknown'
+	graphicDescr.setFontIndex(in);
 
 	obj = FtsObject.makeFtsObject(parent, "intbox");
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("flonum"))
       {
-	in.nextToken();//skip 'unknown'
+	graphicDescr.setFontIndex(in);
 
 	obj = FtsObject.makeFtsObject(parent, "floatbox");
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("button"))
       {
 	obj = FtsObject.makeFtsObject(parent, "button");
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("toggle"))
       {
 	obj = FtsObject.makeFtsObject(parent, "toggle");
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("message"))
       {
 	StringBuffer description = new StringBuffer();
 
-	in.nextToken();//skip 'unknown'
+	graphicDescr.setFontIndex(in);
 	readObjectArguments(description, in);
 
 	obj = new FtsMessageObject(parent, description.toString());
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else if (objclass.equals("comment"))
       {
 	StringBuffer description = new StringBuffer();
 
-	in.nextToken();//skip 'unknown'
+	graphicDescr.setFontIndex(in);
 	readObjectArguments(description, in);
 
 	obj = new FtsCommentObject(parent, description.toString());
-	obj.setGraphicDescription(graphicDescr);
+	graphicDescr.setGraphicProperties(obj);
 	return obj;
       }
     else
@@ -672,7 +726,7 @@ public class FtsDotPatParser
     in.nextToken();
 
     if (in.ttype == FtsDotPatTokenizer.TT_NUMBER)
-      g.x = in.nval;
+      g.x = in.getNVal();
     else
       {
 	in.pushBack();
@@ -682,7 +736,7 @@ public class FtsDotPatParser
     in.nextToken();
 
     if (in.ttype == FtsDotPatTokenizer.TT_NUMBER)
-      g.y = in.nval;
+      g.y = in.getNVal();
     else
       {
 	in.pushBack();
@@ -692,7 +746,7 @@ public class FtsDotPatParser
     in.nextToken();
 
     if (in.ttype == FtsDotPatTokenizer.TT_NUMBER)
-      g.width = in.nval;
+      g.width = in.getNVal();
     else
       {
 	in.pushBack();
@@ -709,37 +763,37 @@ public class FtsDotPatParser
    * or the file contains an unimplemented construct.
    */
 
-  static FtsWindowDescription parseWindow(FtsDotPatTokenizer in) throws java.io.IOException, FtsException
+  static void parseWindowProperties(FtsContainerObject parent, FtsDotPatTokenizer in) throws java.io.IOException, FtsException
   {
-    FtsWindowDescription ret;
     int x2, y2;
     int x, y, height, width;
 
     // We don't try to do many checks, for the moment
 
     in.nextToken();
-    x = in.nval;
+    x = in.getNVal();
     
     in.nextToken();
-    y = in.nval;
+    y = in.getNVal();
 
     in.nextToken();
-    x2 = in.nval;
+    x2 = in.getNVal();
 
     in.nextToken();
-    y2 = in.nval;
+    y2 = in.getNVal();
 
     width = x2 - x;
     height = y2 - y;
 
-    ret = new FtsWindowDescription(x, y, width, height);
-
-    return ret;
+    parent.put("win.pos.x", x);
+    parent.put("win.pos.y", y);
+    parent.put("win.size.w", width);
+    parent.put("win.size.h", height);
   }
 
   private static void syntaxError(String description) throws FtsException
     {
-      throw new FtsException(new FtsError(FtsError.FTS_DOTPAT_ERROR, description));
+      throw new FtsException(new FtsError(FtsError.DOTPAT_ERROR, description));
     }
 }
 

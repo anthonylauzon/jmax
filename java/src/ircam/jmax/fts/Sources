@@ -4,11 +4,12 @@ SOURCES = \
           FtsClientProtocol.java \
           FtsConnection.java \
           FtsErrorStreamer.java \
-          FtsGraphicDescription.java \
           FtsHelpPatchTable.java \
           FtsMessage.java \
           FtsMessageHandler.java \
-          FtsObject.java \
+	  FtsPropertyDescriptor.java  \
+	  FtsTclPropertyParser.java  \
+	  FtsObject.java \
 	  FtsPatcherObject.java \
 	  FtsInletObject.java \
 	  FtsOutletObject.java \
@@ -19,10 +20,10 @@ SOURCES = \
 	  FtsMessageObject.java \
 	  FtsCommentObject.java \
           FtsDeclarationObject.java \
+	  FtsValueObject.java \
           FtsParse.java \
           FtsPort.java \
           FtsPropertyHandler.java \
-          FtsPropertyHandlerTable.java \
           FtsReferenceURLTable.java \
           FtsServer.java \
           FtsSocketClientServer.java \
@@ -32,7 +33,6 @@ SOURCES = \
           FtsSubProcessPort.java \
           FtsSubProcessServer.java \
           FtsTemplateTable.java \
-          FtsWindowDescription.java \
 	  FtsLocator.java  \
 	  FtsDotPatFileDataHandler.java  \
 	  FtsPatchData.java  \

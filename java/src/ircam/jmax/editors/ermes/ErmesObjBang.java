@@ -61,8 +61,8 @@ class ErmesObjBang extends ErmesObject {
 
   //The "fts_related" Init is reimplemented here because we need to create the flashing thread
   //also when we are loading from a file
-  public boolean Init(ErmesSketchPad theSketchPad,FtsGraphicDescription theFtsGraphic,FtsObject theFtsObject) {
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+  public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
+    super.Init(theSketchPad, theFtsObject);
     itsFlashingThread = new FlashingThread("aFlash");
     return true;
   }
@@ -87,7 +87,7 @@ class ErmesObjBang extends ErmesObject {
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if (itsSketchPad.itsRunMode) {
-      //itsFtsObject.putProperty("value", new Integer(1));//?????
+      //itsFtsObject.put("value", new Integer(1));//?????
       itsFtsObject.sendMessage(0, "bang", null);
       DoublePaint();
     }

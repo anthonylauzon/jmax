@@ -36,7 +36,7 @@ public class FtsPatcherObject extends FtsContainerObject
 
     obj.className = "patcher";
 
-    obj.name = "root";
+    obj.objectName = "root";
     obj.ninlets = 0;
     obj.noutlets = 0;
 
@@ -73,6 +73,8 @@ public class FtsPatcherObject extends FtsContainerObject
 
   public FtsPatcherObject(FtsContainerObject parent, String description)
   {
+    super(parent, "patcher", description);
+
     String name;
     Vector args;
 
@@ -80,9 +82,10 @@ public class FtsPatcherObject extends FtsContainerObject
     
     name = FtsParse.parseObject(description, args);
 
-    setName((String) args.elementAt(1));
+    setObjectName((String) args.elementAt(1));
     setNumberOfInlets(((Integer) args.elementAt(2)).intValue());
     setNumberOfOutlets(((Integer) args.elementAt(3)).intValue());
+    updateDescription();
 
     MaxApplication.getFtsServer().newPatcherObject(parent, this,
 						   name,
@@ -93,20 +96,22 @@ public class FtsPatcherObject extends FtsContainerObject
   }
 
   /**
-   * Create a FtsPatcherObject object.
+   * Create a FtsPatcherObject object: real constructor;
+   * a patcher name nins and nouts are actually taken from
+   * properties, and are not arguments !
    */
 
-
-  public FtsPatcherObject(FtsContainerObject parent, String name, int ninlets, int noutlets)
+  public FtsPatcherObject(FtsContainerObject parent)
   {
-    super(parent, "patcher", "patcher " + name + " " + ninlets + " " + noutlets);
+    super(parent, "patcher", "patcher unnamed 0 0");
 
-    setName(name);
-    setNumberOfInlets(ninlets);
-    setNumberOfOutlets(noutlets);
+    setObjectName("unnamed");
+    setNumberOfInlets(0);
+    setNumberOfOutlets(0);
+    updateDescription();
 
     MaxApplication.getFtsServer().newPatcherObject(parent, this,
-						   name,
+						   objectName,
 						   ninlets,
 						   noutlets);
     if (parent.isOpen())
@@ -114,11 +119,28 @@ public class FtsPatcherObject extends FtsContainerObject
   }
 
 
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                      CLIENT API and  PROPERTIES                           */
-  /*                                                                           */
-  /*****************************************************************************/
+  /** Overwrite the Update FTS object;
+   * a pure patcher, for now, change its description every time
+   * the number of inlets/outlets is changed; for the moment is done
+   * directly, because there is no description property (and we don't
+   * want it for the moment); also, this behaviour should disappear
+   * when the patcher will have its own representation.
+   */
+
+  public void updateFtsObject()
+  {
+    super.updateFtsObject();
+
+    updateDescription();
+  }
+
+
+  /** update the description */
+
+  void updateDescription()
+  {
+    description = objectName + " " + ninlets + " " + noutlets;
+  }
 
   /** Save the object to a TCL stream. 
    * We use object id to index local variables,
@@ -129,8 +151,6 @@ public class FtsPatcherObject extends FtsContainerObject
   public void saveAsTcl(PrintWriter writer)
   {
     // Save as "patcher <properties> { <body> }
-
-    // Save as "object ..."
 
     writer.print("patcher ");
     savePropertiesAsTcl(writer);
@@ -187,6 +207,10 @@ public class FtsPatcherObject extends FtsContainerObject
     writer.print("}");
   }
 }
+
+
+
+
 
 
 

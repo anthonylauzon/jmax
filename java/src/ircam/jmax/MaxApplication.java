@@ -436,7 +436,12 @@ public class MaxApplication extends Object {
   
 
   public static ErmesSketchWindow NewDefaultSubPatcher( FtsContainerObject theFtsPatcher) {//to use just for 'patcher' externals
-    theFtsPatcher.setWindowDescription(new FtsWindowDescription(100, 100, 300, 300));
+
+    theFtsPatcher.put("win.pos.x", 100);
+    theFtsPatcher.put("win.pos.y", 100);
+    theFtsPatcher.put("win.size.w", 300);
+    theFtsPatcher.put("win.size.h", 300);
+
     ErmesSketchWindow aSketchWindow = NewSubPatcherWindow(theFtsPatcher);
     aSketchWindow.isSubPatcher = true;
     return aSketchWindow;

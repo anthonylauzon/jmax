@@ -17,6 +17,8 @@ import ircam.jmax.fts.*;
  *     setProperty  <i>obj property value</i>
  * </code>
  * 
+ * This command is obsolete, the method "put" should be used
+ * directly from tcl.
  * @see FtsObject#putProperty
  */
 
@@ -55,7 +57,7 @@ class FtsSetPropertyCmd implements Command
 	      }
 	  }
 
-	object.putProperty(prop, value);
+	object.put(prop, value);
       }
     else
       {

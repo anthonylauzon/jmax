@@ -39,6 +39,7 @@ are the same, so the users can add as many message type as they want.
 
 #define NEW_OBJECT_CODE         'n'
 #define REDEFINE_OBJECT_CODE    'N'
+#define REPLACE_OBJECT_CODE     'R'
 #define FREE_OBJECT_CODE        'f'
 #define CONNECT_OBJECTS_CODE    'c'
 #define DISCONNECT_OBJECTS_CODE 'd'

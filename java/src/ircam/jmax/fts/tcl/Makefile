@@ -47,10 +47,6 @@ FtsHelpPatchCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsHelpPatchCmd.java)
 .PHONY: FtsHelpPatchCmd
 
-FtsInitCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsInitCmd.java)
-.PHONY: FtsInitCmd
-
 FtsMessCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsMessCmd.java)
 .PHONY: FtsMessCmd
@@ -62,6 +58,18 @@ FtsObjectCmd:
 FtsPatcherCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsPatcherCmd.java)
 .PHONY: FtsPatcherCmd
+
+FtsCommentCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsCommentCmd.java)
+.PHONY: FtsCommentCmd
+
+FtsOutletCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsOutletCmd.java)
+.PHONY: FtsOutletCmd
+
+FtsInletCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsInletCmd.java)
+.PHONY: FtsInletCmd
 
 FtsReferenceURLCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsReferenceURLCmd.java)

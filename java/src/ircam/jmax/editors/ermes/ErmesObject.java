@@ -27,7 +27,6 @@ public class ErmesObject implements FtsPropertyHandler {
   public Rectangle currentRect;
   public ErmesSketchPad	itsSketchPad;
   FtsContainerObject 	itsFtsPatcher;
-  FtsGraphicDescription itsFtsGraphicDescription;
   public FtsObject	itsFtsObject = null;
   public Vector itsInletList = new Vector();
   public Vector itsOutletList = new Vector();	
@@ -77,15 +76,13 @@ public class ErmesObject implements FtsPropertyHandler {
   /*abstract */Dimension getPreferredSize() {return new Dimension(0,0);};
   
   //
-  public void propertyChanged(String name, Object value) {
+  public void propertyChanged(FtsObject obj, String name, Object value) {
     //the ipothesys is that value is of the correct type...
     FtsValueChanged(value);
   }
 
   protected void FtsValueChanged(Object value) {
-    int a = 1;
-    
-    a = a/(a*a);
+    // do nothing
   }
   
   /*abstract*/ public void Paint_specific(Graphics g) {};  
@@ -231,10 +228,11 @@ public class ErmesObject implements FtsPropertyHandler {
       }
       if(offGraphics!= null) itsSketchPad.repaint();//???????
     }
+
     //prepare to be waked up when values change
+
     if(NeedPropertyHandler()){
-      itsFtsObject.installPropertyHandler("value", this);
-      itsFtsObject.getProperty("value");
+      itsFtsObject.watch("value", this);
     }
   }
   
@@ -267,30 +265,28 @@ public class ErmesObject implements FtsPropertyHandler {
   public void makeFtsObject() {  }
   public void redefineFtsObject() {  }
   
-  public boolean Init(ErmesSketchPad theSketchPad,FtsGraphicDescription theFtsDescription, FtsObject theFtsObject) {
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     int i;
     int width, height;
     itsSelected = false;
     itsSketchPad = theSketchPad;
-    itsFtsGraphicDescription = theFtsDescription;
     itsFont = itsSketchPad.sketchFont;
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
     laidOut = false;
-    itsX = itsFtsGraphicDescription.x;
-    itsY =itsFtsGraphicDescription.y;
-    if((itsFtsGraphicDescription.width<10)||(itsFtsGraphicDescription.height<10)){
+    itsX = ((Integer)theFtsObject.get("pos.x")).intValue();
+    itsY = ((Integer)theFtsObject.get("pos.y")).intValue();
+
+    width  = ((Integer)theFtsObject.get("size.w")).intValue();
+    height = ((Integer)theFtsObject.get("size.h")).intValue();
+    
+    if((width<10)||(height<10)){
        width  = getPreferredSize().width;
        height  = getPreferredSize().height;
-    }
-    else{
-      width = itsFtsGraphicDescription.width;
-      height = itsFtsGraphicDescription.height;
-    }
-    currentRect = new Rectangle(itsFtsGraphicDescription.x, itsFtsGraphicDescription.y, width, height);
-    //Reshape(itsX, itsY, width, height);
-    if((itsFtsGraphicDescription.width != getPreferredSize().width)||
-       (itsFtsGraphicDescription.height != getPreferredSize().height))
       itsResized = true;
+    }
+
+    currentRect = new Rectangle(itsX, itsY, width, height);
+
     itsFtsObject = theFtsObject;
     update(itsFtsObject);
     itsFtsPatcher = ((ErmesSketchWindow) (itsSketchPad.itsSketchWindow)).itsDocument.itsPatcher;

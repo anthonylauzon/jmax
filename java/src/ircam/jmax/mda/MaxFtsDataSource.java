@@ -15,4 +15,9 @@ class MaxFtsDataSource extends MaxDataSource
   {
     return locator;
   }
+
+  public String toString()
+  {
+    return "MaxFtsDataSource(" + locator.toString() + ")";
+  }
 }

@@ -47,8 +47,8 @@ class ErmesObjInt extends ErmesObject {
     return true;
   }
 
-   public boolean Init(ErmesSketchPad theSketchPad,FtsGraphicDescription theFtsDescription, FtsObject theFtsObject) {
-     super.Init(theSketchPad, theFtsDescription, theFtsObject);
+   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
+     super.Init(theSketchPad,  theFtsObject);
     //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
@@ -187,7 +187,7 @@ class ErmesObjInt extends ErmesObject {
 	firstClick = false;
       }
       else itsStartingY = itsInteger;
-      itsFtsObject.putProperty("value", new Integer(itsInteger));
+      itsFtsObject.put("value", new Integer(itsInteger));
       Trust(itsInteger);
     }
     else 
@@ -239,7 +239,7 @@ class ErmesObjInt extends ErmesObject {
 
     if(itsSketchPad.itsRunMode){
       itsInteger = itsStartingY+(itsFirstY-y);
-      itsFtsObject.putProperty("value", new Integer(itsInteger));
+      itsFtsObject.put("value", new Integer(itsInteger));
       //((FtsInteger) itsFtsActive).setValue(itsInteger);	ENZOOO
       DoublePaint();
       Trust(itsInteger);

@@ -80,6 +80,7 @@ class FtsClientProtocol
 
   static final int fts_new_object_cmd = 'n';
   static final int fts_redefine_object_cmd = 'N';
+  static final int fts_replace_object_cmd = 'R';
   static final int fts_free_object_cmd = 'f';
   static final int fts_connect_objects_cmd = 'c';
   static final int fts_disconnect_objects_cmd = 'd';

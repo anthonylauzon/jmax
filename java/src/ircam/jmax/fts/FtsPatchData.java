@@ -56,6 +56,16 @@ public class FtsPatchData extends MaxTclData
 
     patcher.saveAsTcl(pw);
   }
+
+  /** This method provide the subclasses of MaxTclData a way to specify
+    what to bind to the this Tcl variable; for the FtsPatchData, the 
+    Tcl "this" identity  is the patcher stored in the instance
+      */
+
+  protected Object tclTarget()
+  {
+    return patcher;
+  }
 }
 
 

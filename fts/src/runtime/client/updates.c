@@ -60,7 +60,6 @@ fts_client_send_prop(fts_object_t *obj, fts_symbol_t name)
     }
 }
 
-#include <stdio.h> /* @@@@ */
 
 static int period_count = 0;
 

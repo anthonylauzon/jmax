@@ -540,7 +540,7 @@ public class FtsParse
 
   // Extract the class name from a description (assume a blank as separator)
 
-  static String parseClassName(String description)
+  static public String parseClassName(String description)
   {
     int idx;
 

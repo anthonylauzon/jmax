@@ -9,8 +9,8 @@ package ircam.jmax.fts;
  * methods.
  *
  * @author mdc
- * @see  FtsObject#putProperty
- * @see  FtsObject#getProperty
+ * @see  FtsObject#put
+ * @see  FtsObject#get
  */
 
 public interface FtsPropertyHandler
@@ -22,5 +22,5 @@ public interface FtsPropertyHandler
    * @param value the new property value.
    */
 
-  void propertyChanged(String name, Object value);
+  void propertyChanged(FtsObject object, String name, Object value);
 }

@@ -33,15 +33,16 @@ public class TclFtsPackage
 
   static public void installPackage(Interp interp)
   {
-    // Patcher creation
+    // File Format
 
-    interp.createCommand("patcher",  new FtsPatcherCmd());
-    interp.createCommand("object",   new FtsObjectCmd());
-    interp.createCommand("declare",  new FtsDeclareCmd());
-    interp.createCommand("connection",  new FtsConnectionCmd());
+    interp.createCommand("_patcher",  new FtsPatcherCmd());
+    interp.createCommand("_object",   new FtsObjectCmd());
+    interp.createCommand("_declare",  new FtsDeclareCmd());
+    interp.createCommand("_comment",   new FtsObjectCmd());
+    interp.createCommand("_inlet",    new FtsInletCmd());
+    interp.createCommand("_outlet",   new FtsOutletCmd());
+    interp.createCommand("connection", new FtsConnectionCmd());
 
-    interp.createCommand("init",  new FtsInitCmd());
-    interp.createCommand("sync", new FtsSyncCmd());
 
     // Abstraction and templates declaration, help and blah blah
 
@@ -66,7 +67,12 @@ public class TclFtsPackage
     interp.createCommand("addListener", new FtsAddListenerCmd());
 
     // version control ?
+
     interp.createCommand("version", new FtsVersionCmd());
+
+    // Sync
+
+    interp.createCommand("sync", new FtsSyncCmd());
   }
 }
 

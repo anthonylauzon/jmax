@@ -35,9 +35,6 @@ public class FtsStandardObject extends FtsObject
     if (parent.isOpen())
       {
 	updated = true;
-	getProperty("ninlets");
-	getProperty("noutlets");
-
 	MaxApplication.getFtsServer().syncToFts();
       }
   }

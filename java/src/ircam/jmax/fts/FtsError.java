@@ -10,8 +10,9 @@ package ircam.jmax.fts;
 
 class FtsError
 {
-  final static int FTS_INSTANTIATION_ERROR = 1;
-  final static int FTS_DOTPAT_ERROR = 2;
+  final static int INSTANTIATION_ERROR = 1;
+  final static int DOTPAT_ERROR = 2;
+  final static int TPA_ERROR = 3;
 
   String description;
   int    code;
@@ -26,9 +27,11 @@ class FtsError
   {
     switch (code)
       {
-      case FTS_INSTANTIATION_ERROR:
+      case INSTANTIATION_ERROR:
 	return "Instantiation Error " + ((description == null) ? "" : description);
-      case FTS_DOTPAT_ERROR:
+      case DOTPAT_ERROR:
+	return "Syntax Error " + ((description == null) ? "" : description);
+      case TPA_ERROR:
 	return "Syntax Error " + ((description == null) ? "" : description);
       default:
 	return "FTS error";

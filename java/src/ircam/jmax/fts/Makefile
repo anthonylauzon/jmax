@@ -39,9 +39,6 @@ FtsErrorStreamer:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsErrorStreamer.java)
 .PHONY: FtsErrorStreamer
 
-FtsGraphicDescription:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsGraphicDescription.java)
-.PHONY: FtsGraphicDescription
 
 FtsHelpPatchTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsHelpPatchTable.java)
@@ -99,6 +96,9 @@ FtsDeclarationObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDeclarationObject.java)
 .PHONY: FtsDeclarationObject
 
+FtsValueObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsValueObject.java)
+.PHONY: FtsValueObject
 
 FtsParse:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParse.java)
@@ -111,10 +111,6 @@ FtsPort:
 FtsPropertyHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyHandler.java)
 .PHONY: FtsPropertyHandler
-
-FtsPropertyHandlerTable:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyHandlerTable.java)
-.PHONY: FtsPropertyHandlerTable
 
 FtsReferenceURLTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsReferenceURLTable.java)
@@ -156,10 +152,6 @@ FtsTemplateTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateTable.java)
 .PHONY: FtsTemplateTable
 
-FtsWindowDescription:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsWindowDescription.java)
-.PHONY: FtsWindowDescription
-
 FtsDotPatParser:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatParser.java)
 .PHONY: FtsDotPatParser
@@ -187,6 +179,16 @@ FtsPatchData:
 FtsPatchDataType:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatchDataType.java)
 .PHONY: FtsPatchDataType
+
+FtsPropertyDescriptor:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyDescriptor.java)
+.PHONY: FtsPropertyDescriptor
+
+FtsTclPropertyParser:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTclPropertyParser.java)
+.PHONY: FtsTclPropertyParser
+
+
 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

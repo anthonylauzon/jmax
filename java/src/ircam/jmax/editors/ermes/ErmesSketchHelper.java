@@ -38,16 +38,20 @@ class ErmesSketchHelper extends Object{
   //	AddObject
   //  adding an object of the given class name in the given location
   //--------------------------------------------------------
-  ErmesObject AddObject(FtsGraphicDescription theFtsDescription, String theName, FtsObject theFtsObject) {
+  ErmesObject AddObject(String theName, FtsObject theFtsObject) {
 
     ErmesObject aObject = null;	//wasting time...
     Rectangle aRect;
     ErmesObjOutlet aOutlet;
     
     if(itsSketchPad.doSnapToGrid){
-      Point aPoint = SnapToGrid(theFtsDescription.x, theFtsDescription.y);
-      theFtsDescription.x = aPoint.x;
-      theFtsDescription.y = aPoint.y;
+      int x, y;
+
+      x = ((Integer)theFtsObject.get("pos.x")).intValue();
+      y = ((Integer)theFtsObject.get("pos.y")).intValue();
+      Point aPoint = SnapToGrid(x, y);
+      theFtsObject.put("pos.x", x);
+      theFtsObject.put("pos.y", y);
     }
 
     try
@@ -56,26 +60,26 @@ class ErmesSketchHelper extends Object{
       // Yes, because if the following statement raise an exception,
       // the fi
       aObject = (ErmesObject) Class.forName(theName).newInstance();
-      aObject.Init(itsSketchPad, theFtsDescription, theFtsObject);
+      aObject.Init(itsSketchPad, theFtsObject);
       }
     catch(ClassNotFoundException e)
       {
 	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
-			   theFtsDescription + ","  + theName + "," + theFtsObject +
+			   theName + "," + theFtsObject +
 			   ") : class not found " + e);
 	return null;
       }
     catch(IllegalAccessException e)
       {
 	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
-			   theFtsDescription + ","  + theName + "," + theFtsObject +
+			   theName + "," + theFtsObject +
 			   ") : illegal access" + e);
 	return null;
       }
     catch(InstantiationException e) 
       {
 	System.out.println("Internal Error: ErmesSketchHelper.AddObject(" +
-			   theFtsDescription + ","  + theName + "," + theFtsObject +
+			   theName + "," + theFtsObject +
 			   ") : instantiation exception " + e);
 	return null;
       }
@@ -209,7 +213,7 @@ class ErmesSketchHelper extends Object{
     DeleteObjectConnections(theObject);
     //removes theObject from the selected elements list	
     if(theObject.NeedPropertyHandler())
-      if(theObject.GetFtsObject()!=null) theObject.GetFtsObject().removePropertyHandler("value",theObject);
+      if(theObject.GetFtsObject()!=null) theObject.GetFtsObject().removeWatch(theObject);
     itsSketchPad.itsSelectedList.removeElement(theObject);
     //removes theObject from the element list (delete)
     itsSketchPad.itsElements.removeElement(theObject);

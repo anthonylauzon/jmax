@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 
 /**
  * Class implementing the proxy of an FTS object.
@@ -14,8 +15,39 @@ import ircam.jmax.*;
  * FTS instantiation 
  */
 
-abstract public class FtsObject 
+abstract public class FtsObject implements MaxTclInterpreter
 {
+  /* code to set generic properties meta-properties */
+
+  static
+  {
+    // Ins and outs
+
+    FtsPropertyDescriptor.setPersistent("nIns", true);
+    FtsPropertyDescriptor.setPersistent("nOuts", true);
+
+    // Name
+
+    FtsPropertyDescriptor.setPersistent("name", true);
+
+    // Graphic information
+
+    FtsPropertyDescriptor.setPersistent("pos.x", true);
+    FtsPropertyDescriptor.setPersistent("pos.y", true);
+    FtsPropertyDescriptor.setPersistent("size.w", true);
+    FtsPropertyDescriptor.setPersistent("size.h", true);
+
+    FtsPropertyDescriptor.setPersistent("win.pos.x", true);
+    FtsPropertyDescriptor.setPersistent("win.pos.y", true);
+    FtsPropertyDescriptor.setPersistent("win.size.w", true);
+    FtsPropertyDescriptor.setPersistent("win.size.h", true);
+
+    // fonts 
+
+    FtsPropertyDescriptor.setPersistent("font", true);
+    FtsPropertyDescriptor.setPersistent("fontSize", true);
+  }
+
   /******************************************************************************/
   /*                                                                            */
   /*              STATIC FUNCTION                                               */
@@ -49,6 +81,14 @@ abstract public class FtsObject
 
     className = FtsParse.parseClassName(description);
 
+    return makeFtsObject(parent, className, description);
+  }
+  
+  /** Version with className as explicit argument (possibly doubled in the description) */
+
+  static public FtsObject makeFtsObject(FtsContainerObject parent, String className, String description)
+       throws FtsException
+  {
     // Add check for declarations, when they exists,
     // comments and message box when description and argument description
     // are merged
@@ -59,13 +99,21 @@ abstract public class FtsObject
     if (className.equals("patcher"))
       return new FtsPatcherObject(parent, description);
     else if (className.equals("inlet"))
-      throw new FtsException(new FtsError(FtsError.FTS_INSTANTIATION_ERROR, "inlet"));
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "inlet"));
     else if (className.equals("outlet"))
-      throw new FtsException(new FtsError(FtsError.FTS_INSTANTIATION_ERROR, "outlet"));
-    else if (className.equals("message"))
-      throw new FtsException(new FtsError(FtsError.FTS_INSTANTIATION_ERROR, "message"));
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "outlet"));
+    else if (className.equals("messbox"))
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "messbox"));
     else if (className.equals("comment"))
-      throw new FtsException(new FtsError(FtsError.FTS_INSTANTIATION_ERROR, "comment"));
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "comment"));
+    else if (className.equals("slider"))
+      return new FtsValueObject(parent, className, description);
+    else if (className.equals("intbox"))
+      return new FtsValueObject(parent, className, description);
+    else if (className.equals("floatbox"))
+      return new FtsValueObject(parent, className, description);
+    else if (className.equals("toggle"))
+      return new FtsValueObject(parent, className, description);
     else if (FtsAbstractionTable.exists(className))
       return new FtsAbstractionObject(parent, className, description);
     else if (FtsTemplateTable.exists(className))
@@ -80,22 +128,35 @@ abstract public class FtsObject
    * similarity with the constructors, because it can produce 
    * a different Java object from the argument, so logically they are not method of the object.
    *
-   * You cannot redefine a message, comment, inlet and outlet object.
+   * It just produce a new object (calling makeFtsObject), and replace the old with it in the 
+   * container of the old, and in FTS.
    *
-   * DO NOT WORK: MORE WORK TO BE DONE, otherwise is not compatible with abstractions and templates,
-   * and multiclass; the object must always be rebuilt and substituted in the connections.
+   * You cannot redefine a message, comment, inlet and outlet object, only object that makeFtsObject
+   * can actually create.
+   *
    * @param obj the object to redefine.
-   * @param className the name of the FTS class of the object we want to instantiate.
-   * @param description  a Vector containing the description.
-   * @return obj or a new object, conforming to the new definition, but with the same FTS
-   * identity, and connections.
+   * @param description  a string containing the description.
+   * @return a new object, conforming to the new definition, but with the same FTS
+   * identity, and connections; it always create a new object, also if the description
+   * is the same
    */
 
-  public static FtsObject redefineFtsObject(FtsObject obj, String description)
+  public static FtsObject redefineFtsObject(FtsObject oldObject, String description) throws FtsException
   {
-    // To be completely rewritten 
+    FtsObject newObject;
+    FtsContainerObject parent;
 
-    return obj;
+    parent = oldObject.getParent();
+    
+    newObject = makeFtsObject(parent, description);
+
+    parent.replace(oldObject, newObject);
+
+    MaxApplication.getFtsServer().replaceObject(oldObject, newObject);
+
+    oldObject.delete();
+
+    return newObject;
   }
 
   /******************************************************************************/
@@ -110,33 +171,67 @@ abstract public class FtsObject
      only by need, and is an inner class of FtsObject
      */
 
-  abstract class PropertyTable
+  class PropertyHandlerTable
   {
-    class Property
-    {
-      String name;
-      Object value;
-    }
+    Vector table = new Vector();
 
-    class Watch
+    class PropertyHandlerEntry
     {
       String name;
       FtsPropertyHandler handler;
+	
+      PropertyHandlerEntry(String name, FtsPropertyHandler handler)
+      {
+	this.name    = name;
+	this.handler = handler;
+	table.addElement(this);
+      }
+
+      void callHandler(String name, Object value)
+      {
+	if (name.equals(this.name))
+	  handler.propertyChanged(FtsObject.this, name, value);
+      }
+
+      public void removeHandler(FtsPropertyHandler handler)
+      {
+	if (this.handler == handler)
+	  table.removeElement(this);
+      }
     }
 
-    Property properties = null;
-    Watch watcher = null;
+    public void removeWatch(FtsPropertyHandler handler)
+    {
+      for (int i = 0; i < table.size(); i++)
+	((PropertyHandlerEntry) table.elementAt(i)).removeHandler(handler);
+    }
 
-    abstract public void   put(String name, Object value);
-    abstract public Object get(String name, Object value);
-    abstract public FtsPropertyHandler  watch(String property, FtsPropertyHandler handler);
-    abstract public FtsPropertyHandler  patcherWatch(String property, FtsPropertyHandler handler);
-    abstract public void   removeWatch(FtsPropertyHandler id);
-    abstract public Enumeration properties();
+    public void watch(String property, FtsPropertyHandler handler)
+    {
+      new PropertyHandlerEntry(property, handler);
+    }
+
+    synchronized void callHandlers(String name, Object value)
+    {
+      for (int i = 0; i < table.size(); i++)
+	((PropertyHandlerEntry) table.elementAt(i)).callHandler(name, value);
+    }
   }
-   
 
-  /* PropertyTable  propertyTable = null; */
+  PropertyHandlerTable propertyHandlerTable = null;
+
+  class Property
+  {
+    String name;
+    Object value;
+
+    Property(String name, Object value)
+    {
+      this.name = name;
+      this.value = value;
+    }
+  }
+
 
   /**
    * Store and access the properties, activating
@@ -149,23 +244,219 @@ abstract public class FtsObject
    * 
    */
 
-  /*
+  Vector properties = null;
+
+  public void put(String name, int value)
+  {
+    put(name, new Integer(value));
+  }
+
+
+  public void put(String name, float value)
+  {
+    put(name, new Float(value));
+  }
+
+
+
   public void put(String name, Object value)
   {
-    if (propertyTable == null)
-      propertyTable = new PropertyTable();
+    if (! FtsPropertyDescriptor.isClientOnly(name))
+      MaxApplication.getFtsServer().putObjectProperty(this, name, value);
 
-    propertyTable.put(name, value);
+    localPut(name, value);
   }
 
-  public void get(String name)
+  /** Check if a property correspond to a Java builtin property
+   * (Java bean like) and set it; return true in this case.
+   * in a far (?) future, this can use BeanInfos instead of handcoded 
+   * checks.
+   * Subclasses should specialize this method, and finish the else chain by 
+   * "return super.builtinPut(name, value)".
+   * Handlers are called also for builtin properties.
+   *
+   * @return true if the property has been set, and should not be stored
+   *         in the property list.
+   */
+
+  protected boolean builtinPut(String name, Object value)
   {
-    if (propertyTable == null)
-      propertyTable = new PropertyTable();
-
-    return propertyTable.get(name);
+    if (name.equals("nIns"))
+      {
+	setNumberOfInlets(((Integer)value).intValue());
+	return true;
+      }
+    else if (name.equals("nOuts"))
+      {
+	setNumberOfOutlets(((Integer)value).intValue());
+	return true;
+      }
+    else if (name.equals("name"))
+      {
+	// whatever passed, get it as a string
+	setObjectName(value.toString());
+	return true;
+      }
+    else
+      return false;
   }
-  */
+
+  /** Check if a property correspond to a Java builtin property
+   * (Java bean like) and get it.
+   * in a far (?) future, this can use BeanInfos instead of handcoded 
+   * checks.
+   * Subclasses should specialize this method, and finish the else chain by 
+   * "return super.builtinGet(name)".
+   *
+   * @return the value, or null if the property is not builtin
+   *
+   */
+
+  protected Object builtinGet(String name)
+  {
+    if (name.equals("nIns"))
+      return new Integer(getNumberOfInlets());
+    else if (name.equals("nOuts"))
+      return new Integer(getNumberOfOutlets());
+    if (name.equals("name"))
+      return getObjectName();
+    else
+      return null;
+  }
+
+
+  /** Get the names of the "builtin" properties.
+   *  Subclasses should add names to the names vector, and 
+   *  then call super.builtinPropertyNames(names).
+   */
+
+  protected void builtinPropertyNames(Vector names)
+  {
+    names.addElement("nIns");
+    names.addElement("nOuts");
+    names.addElement("name");
+  }
+
+  /** Local put is a version of put that do not send
+    values to FTS.
+    */
+
+  void localPut(String name, Object value)
+  {
+    // local and hardcoded properties
+
+    if (! builtinPut(name, value))
+      {
+	if (properties == null)
+	  properties = new Vector();
+
+	search :
+	  {
+	    for (int i = 0; i < properties.size(); i++)
+	      {
+		Property p = (Property)(properties.elementAt(i));
+
+		if (p.name.equals(name))
+		  {
+		    // property found, change the value
+
+		    p.value = value;
+
+		    break search;
+		  }
+	      }
+
+	    // Nothing found, make a new one
+
+	    properties.addElement(new Property(name, value));
+	  }
+      }
+
+    // Call the handlers 
+
+    if (propertyHandlerTable != null)
+      propertyHandlerTable.callHandlers(name, value);
+  }
+
+
+  /** Get a propery value */
+
+  public Object get(String name)
+  {
+    Object v;
+
+    v = builtinGet(name);
+
+    if (v != null)
+      return v;
+    else
+      {
+	if (properties == null)
+	  return null;
+
+	for (int i = 0; i < properties.size(); i++)
+	  {
+	    Property p = (Property)(properties.elementAt(i));
+
+	    if (p.name.equals(name))
+	      return p.value;
+	  }
+
+	return null;
+      }
+  }
+
+  /** Remove a propery value; not all the properties can
+   *  be removed; in particular, remove will not be propagated
+   * to FTS, will have no effect on builtin properties, but will
+   * anyhow delete the property from the object, and if the property
+   * is persistent, it will not be saved.
+   */
+
+  public void remove(String prop)
+  {
+    if (properties != null)
+      {
+	for (int i = 0; i < properties.size(); i++)
+	  {
+	    Property p = (Property)(properties.elementAt(i));
+
+	    if (p.name.equals(prop))
+	      properties.removeElement(p);
+	  }
+      }
+  }
+
+  public void watch(String property, FtsPropertyHandler handler)
+  {
+    if (propertyHandlerTable == null)
+      propertyHandlerTable = new PropertyHandlerTable();
+    
+    propertyHandlerTable.watch(property, handler);
+  }
+
+  public void removeWatch(FtsPropertyHandler handler)
+  {
+    if (propertyHandlerTable != null)
+      propertyHandlerTable.removeWatch(handler);
+  }
+
+  public void getPropertyNames(Vector names)
+  {
+    builtinPropertyNames(names);
+
+    // special properties missing here
+
+    if (properties != null)
+      {
+	for (int i = 0; i < properties.size(); i++)
+	  {
+	    Property p = (Property)(properties.elementAt(i));
+
+	    names.addElement(p.name);
+	  }
+      }
+  }
 
 
   /******************************************************************************/
@@ -188,7 +479,7 @@ abstract public class FtsObject
 
   /** The object name, if exists */
 
-  String name;
+  String objectName;
 
   /** The number of inlets of this object. */
 
@@ -218,15 +509,11 @@ abstract public class FtsObject
 
   /** The property Handler Table for this object */
 
-  FtsPropertyHandlerTable propertyTable = null;
+
 
   /** The message Handler Table for this object */
 
   Vector messageTable = null;
-
-  /** The graphic description for this object, if any. */
-
-  FtsGraphicDescription graphicDescription = null;
 
   /** on screen representation of the Fts Object */
 
@@ -293,18 +580,32 @@ abstract public class FtsObject
     return className;
   }
 
-  /** Get the name */
+  /** Set the objectName */
 
-  final public String getName()
+  void setObjectName(String name)
   {
-    return name;
+    this.objectName = name;
   }
 
-  /** Set the name */
+  /** Get the objectName */
 
-  final void setName(String name)
+  public String getObjectName()
   {
-    this.name = name;
+    return objectName;
+  }
+
+  /** Set the number of inlets */
+
+  public void setNumberOfInlets(int ninlets)
+  {
+    this.ninlets = ninlets;
+  }
+
+  /** Set the number of inlets */
+
+  public void setNumberOfOutlets(int noutlets)
+  {
+    this.noutlets = noutlets;
   }
 
   /** Get the complete textual description of the object. */
@@ -371,73 +672,6 @@ abstract public class FtsObject
   }
 
 
-  // Property handling
-
-  /**
-   * Called by the application to change an object property.
-   */
-
-  public void putProperty(String name, Object value)
-  {
-    // Should check for local properties in the subclasses
-
-    MaxApplication.getFtsServer().putObjectProperty(this, name, value);
-  }
-
-  /**
-   * Ask fts to send back the current value of a property.
-   * The value will be delivered thru the installed property handler.
-   *
-   * @see FtsObject#installPropertyHandler
-   * @see FtsPropertyHandler
-   */
-
-  public void getProperty(String name)
-  {
-    MaxApplication.getFtsServer().getObjectProperty(this, name);
-  }
-
-
-  /** Install a property handler. */
-
-  public void installPropertyHandler(String property, FtsPropertyHandler handler)
-  {
-    if (propertyTable == null)
-      propertyTable = new FtsPropertyHandlerTable();
-
-    propertyTable.addPropertyHandler(property, handler);
-  }
-
-  /** Remove a property handler. */
-
-  public void removePropertyHandler(String property, FtsPropertyHandler handler)
-  {
-    if (propertyTable != null)
-      propertyTable.removePropertyHandler(property, handler);
-  }
-
-  /**
-   * Get the graphic description of the object.
-   * The graphic description is
-   * stored here by the editor, or a parser.
-   */
-
-  public final  FtsGraphicDescription getGraphicDescription()
-  {
-    return graphicDescription;
-  }
-
-  /**
-   * Set the graphic description of the object.
-   * The graphic description is stored here by the editor 
-   * or a parser.
-   */
-
-  public final void setGraphicDescription(FtsGraphicDescription g)
-  {
-    graphicDescription = g;
-  }
-
   /** Get the representation of this object in the editor. */
 
   public final Object getRepresentation()
@@ -475,32 +709,6 @@ abstract public class FtsObject
     ftsId = id;
   }
 
-  /**
-    Called by the FTS server when a FTS object change a property value.
-    Invoke the correct property dispatcher.
-
-    It handle directly the object properties (ninlets and noutlets)
-    and call a propertyChanged handler.
-   */
-
-  void serverSetProperty(String name, Object value)
-  {
-    // local properties
-
-    if (name.equals("ninlets") && value instanceof Integer)
-      {
-	ninlets = ((Integer)value).intValue();
-      }
-    else if (name.equals("noutlets") && value instanceof Integer)
-      {
-	noutlets = ((Integer)value).intValue();
-      }
-
-    // calling handlers 
-
-    if (propertyTable != null)
-      propertyTable.callHandlers(name, value);
-  }
 
   /** Handle a direct message from an FTS object. 
    * Call the installed handlers.
@@ -529,13 +737,105 @@ abstract public class FtsObject
 
   abstract public void saveAsTcl(PrintWriter writer);
 
-  /** Save the object properties as tcl code; should not print any new line;
-   *  this function save the basic properties; other objects that want to save
-   *  other properties should define a specialization, and call *super* in the code.
+
+  // May be this two functions should go elsewhere, so that
+  // can be used also for connections.
+
+  /** Save the object properties as tcl code; should not print any new line.
    */
 
   void savePropertiesAsTcl(PrintWriter writer)
   {
+    Vector names;
+    boolean firstDone = false;
+
+    names = new Vector();
+
+    getPropertyNames(names);
+
+    if (names.size() > 0)
+      {
+	writer.print(" {");
+
+	for (int i = 0; i < names.size(); i++)
+	  {
+	    String property;
+
+	    property = (String) names.elementAt(i);
+
+	    if (FtsPropertyDescriptor.isPersistent(property))
+	      {
+		if (! firstDone)
+		  firstDone = true;
+		else
+		  writer.print(" ");
+
+		writer.print(property);
+		writer.print(" ");
+		writer.print(FtsPropertyDescriptor.unparse(property, this.get(property)));
+	      }
+	  }
+	
+	writer.print("}");
+      }
+  }
+
+  /**  Take a property list list in the form of a 
+   *   TclList, and parse and set all the properties
+   */
+
+  public void parseTclProperties(Interp interp, TclObject list) throws FtsException
+  {
+    try
+      {
+	int length;
+
+	length = TclList.getLength(interp, list);
+
+	if ((length % 2) == 1)
+	  throw new FtsException(new FtsError(FtsError.TPA_ERROR, "in property list"));
+
+	for (int i = 0; i < length; i++)
+	  {
+	    String prop;
+	    TclObject obj;
+
+	    prop =  (TclList.index(interp, list, i + 0)).toString();
+	    obj  =  TclList.index(interp, list, i + 1);
+
+	    put(prop, FtsPropertyDescriptor.parse(interp, prop, obj));
+	  }
+      }
+    catch (TclException e)
+      {
+	throw new FtsException(new FtsError(FtsError.TPA_ERROR, "in property list"));
+      }
+  }
+
+  /** The Tcl eval for an object; just eval the script defining
+   *  a local variable "this" pointing to this object
+   */
+
+
+  public void eval(Interp interp, String  script) throws tcl.lang.TclException
+  {
+    eval (interp, TclString.newInstance(script));
+  }
+
+  /** as the previous one, getting the script as tclObject */
+
+  public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
+  {
+    // Call the tcl function maxTclDataEval, with this as first argument,
+    // and the script as second
+
+    TclObject list = TclList.newInstance();
+
+    TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
+    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
+    TclList.append(interp, list, script);
+
+    interp.eval(list, 0);
   }
 }
 

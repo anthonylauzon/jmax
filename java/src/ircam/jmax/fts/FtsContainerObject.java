@@ -13,10 +13,6 @@ import ircam.jmax.*;
 
 abstract public class FtsContainerObject extends FtsObject
 {
-  /** The window description for the container */
-
-  FtsWindowDescription windowDescription = null;
-
   /** The objects contained in the patcher */
 
   Vector objects     = new Vector();
@@ -51,17 +47,17 @@ abstract public class FtsContainerObject extends FtsObject
 
   /** Set the number of inlets */
 
-  final void setNumberOfInlets(int ninlets)
+  public void setNumberOfInlets(int ninlets)
   {
-    this.ninlets = ninlets;
+    super.setNumberOfInlets(ninlets);
     this.inlets.setSize(ninlets);
   }
 
   /** Set the number of inlets */
 
-  final void setNumberOfOutlets(int noutlets)
+  public void setNumberOfOutlets(int noutlets)
   {
-    this.noutlets = noutlets;
+    super.setNumberOfOutlets(noutlets);
     this.outlets.setSize(noutlets);
   }
 
@@ -71,9 +67,9 @@ abstract public class FtsContainerObject extends FtsObject
    * is always a patcher.
    */
 
-  final void updateFtsObject()
+  public void updateFtsObject()
   {
-    MaxApplication.getFtsServer().redefinePatcherObject(this, name, ninlets, noutlets);
+    MaxApplication.getFtsServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
   }
 
   /** Add an object to this container  */
@@ -89,6 +85,26 @@ abstract public class FtsContainerObject extends FtsObject
   {
     objects.removeElement(obj);
   }
+
+
+  /** Replace an object with an other one; 
+   * Cannot be called for inlets and outlets, only
+   * for real standard object
+   */
+
+  void replace(FtsObject oldObject, FtsObject newObject)
+  {
+    // replace it in the object list
+
+    removeObject(oldObject);
+    addObject(newObject);
+
+    // replace it in all the connections
+
+    for (int i = 0; i < connections.size(); i++)
+      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
+  }
+
 
   /** Add an connection to this container. */
 
@@ -154,12 +170,6 @@ abstract public class FtsContainerObject extends FtsObject
     outlets.addElement(in);
   }
 
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CLIENT API                                  */
-  /*                                                                           */
-  /*****************************************************************************/
-
 
   /** Get the connections. */
 
@@ -210,20 +220,6 @@ abstract public class FtsContainerObject extends FtsObject
     MaxApplication.getFtsServer().patcherLoaded(this);
   }
 
-  /** Get the window description. */
-
-  public final FtsWindowDescription getWindowDescription()
-  {
-    return windowDescription;
-  }
-
-  /** Set the window description. */
-
-  public final void setWindowDescription(FtsWindowDescription w)
-  {
-    windowDescription = w;
-  }
-
   /*****************************************************************************/
   /*                                                                           */
   /*                    Special support for .pat files                         */
@@ -253,8 +249,8 @@ abstract public class FtsContainerObject extends FtsObject
     for (int i = 1; i < ninlets; i++)
       for (int j = 0; j < i; j++)
 	{
-	  int ix = ((FtsObject) inlets.elementAt(i)).getGraphicDescription().x;
-	  int jx = ((FtsObject) inlets.elementAt(j)).getGraphicDescription().x;
+	  int ix = ((Integer) ((FtsObject) inlets.elementAt(i)).get("pos.x")).intValue();
+	  int jx = ((Integer) ((FtsObject) inlets.elementAt(j)).get("pos.x")).intValue();
 
 	  if (jx > ix)
 	    {
@@ -269,8 +265,8 @@ abstract public class FtsContainerObject extends FtsObject
     for (int i = 1; i < noutlets; i++)
       for (int j = 0; j < i; j++)
 	{
-	  int ix = ((FtsObject) outlets.elementAt(i)).getGraphicDescription().x;
-	  int jx = ((FtsObject) outlets.elementAt(j)).getGraphicDescription().x;
+	  int ix = ((Integer) ((FtsObject) outlets.elementAt(i)).get("pos.x")).intValue();
+	  int jx = ((Integer) ((FtsObject) outlets.elementAt(j)).get("pos.x")).intValue();
 
 	  if (jx > ix)
 	    {

@@ -40,7 +40,7 @@ abstract public class MaxFileDataHandler extends MaxDataHandler
       {
 	File file = ((MaxFileDataSource)source).getFile();
 
-	return file.canWrite() && canSaveTo(file);
+	return ((! file.exists()) || file.canWrite()) && canSaveTo(file);
       }
     else
       return false;

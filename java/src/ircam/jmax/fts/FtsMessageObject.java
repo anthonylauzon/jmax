@@ -28,9 +28,9 @@ public class FtsMessageObject extends FtsObject
 
   public FtsMessageObject(FtsContainerObject parent, String description)
   {
-    super(parent, "message", description);
+    super(parent, "messbox", description);
 
-    MaxApplication.getFtsServer().newObject(parent, this, "message", description);
+    MaxApplication.getFtsServer().newObject(parent, this, "messbox", description);
 
     ninlets = 1;
     noutlets = 1;
@@ -47,6 +47,7 @@ public class FtsMessageObject extends FtsObject
     MaxApplication.getFtsServer().redefineMessageObject(this, description);
   }
 
+
   /*****************************************************************************/
   /*                                                                           */
   /*                      CLIENT API and  PROPERTIES                           */
@@ -57,7 +58,7 @@ public class FtsMessageObject extends FtsObject
   {
     // Save as "declare ..."
 
-    writer.print("object {message {" + description + "}}");
+    writer.print("object {messbox {" + description + "}}");
 
     savePropertiesAsTcl(writer);
 

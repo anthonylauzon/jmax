@@ -19,14 +19,15 @@ import ircam.jmax.fts.*;
  */
 
 
-class FtsVersionCmd implements Command {
+class FtsVersionCmd implements Command
+{
   /**
    * This procedure is invoked to execute a "version" operation in Ermes
    */
   
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    // Nop, for now
+    throw new TclException(interp, "Old .tpa format not supported anymore, Sorry !");
   }
 }
 

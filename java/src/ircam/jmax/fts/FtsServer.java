@@ -95,7 +95,7 @@ public class FtsServer
 
   /** Send a "open patcher" messages to FTS.*/
 
-  synchronized void openPatcher(FtsObject patcher)
+  final void openPatcher(FtsObject patcher)
   {
     try
       {
@@ -110,7 +110,7 @@ public class FtsServer
 
   /** Send a "close patcher" messages to FTS.*/
 
-  synchronized void closePatcher(FtsObject patcher)
+  final void closePatcher(FtsObject patcher)
   {
     try
       {
@@ -126,7 +126,7 @@ public class FtsServer
 
   /** Send a "patcher loaded" messages to FTS.*/
 
-  synchronized void patcherLoaded(FtsObject patcher)
+  final void patcherLoaded(FtsObject patcher)
   {
     try
       {
@@ -145,7 +145,7 @@ public class FtsServer
    *  i.e. messages and (temporarly) comments.
    */
 
-  synchronized void newObject(FtsObject patcher, FtsObject obj, String className, String description)
+  final  void newObject(FtsObject patcher, FtsObject obj, String className, String description)
   {
     Vector args;
 
@@ -176,7 +176,7 @@ public class FtsServer
    *   Used for all the objects that have the class identity in the string description
    */
 
-  synchronized void newObject(FtsObject patcher, FtsObject obj, String description)
+  final  void newObject(FtsObject patcher, FtsObject obj, String description)
   {
     String className;
     Vector args;
@@ -206,7 +206,7 @@ public class FtsServer
   /** Send a "new object" messages to FTS,  specialized version to define a patcher
    */
 
-  synchronized void newPatcherObject(FtsObject patcher, FtsObject obj, String name, int ninlets, int noutlets)
+  final  void newPatcherObject(FtsObject patcher, FtsObject obj, String name, int ninlets, int noutlets)
   {
     try
       {
@@ -228,7 +228,7 @@ public class FtsServer
 
   /** Send a "new inlet object" messages to FTS, without the inlet number */
 
-  synchronized void newInletObject(FtsObject patcher, FtsInletObject obj)
+  final void newInletObject(FtsObject patcher, FtsInletObject obj)
   {
     try
       {
@@ -246,7 +246,7 @@ public class FtsServer
 
   /** Send a "new inlet object" messages to FTS, with the inlet number */
 
-  synchronized void newInletObject(FtsObject patcher, FtsInletObject obj, int pos)
+  final void newInletObject(FtsObject patcher, FtsInletObject obj, int pos)
   {
     try
       {
@@ -266,7 +266,7 @@ public class FtsServer
 
   /** Send a "new outlet object" messages to FTS, without the outlet number */
 
-  synchronized void newOutletObject(FtsObject patcher, FtsOutletObject obj)
+  final void newOutletObject(FtsObject patcher, FtsOutletObject obj)
   {
     try
       {
@@ -284,7 +284,7 @@ public class FtsServer
 
   /** Send a "new outlet object" messages to FTS, with the outlet number */
 
-  synchronized void newOutletObject(FtsObject patcher, FtsOutletObject obj, int pos)
+  final void newOutletObject(FtsObject patcher, FtsOutletObject obj, int pos)
   {
     try
       {
@@ -302,20 +302,26 @@ public class FtsServer
   }
 
 
-  /** Send a "redefine object" messages to FTS.*/
+  /** Send a "replace object" messages to FTS.*/
 
-  synchronized void redefineObject(FtsObject obj, String className, Vector args)
+  final void replaceObject(FtsObject oldObject, FtsObject newObject)
   {
     try
       {
-	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
-	connection.sendObject(obj);
-	connection.sendString(className);
-
-	if (args != null)
-	  connection.sendVector(args);
-
+	connection.sendCmd(FtsClientProtocol.fts_replace_object_cmd);
+	connection.sendObject(oldObject);
+	connection.sendObject(newObject);
 	connection.sendEom();
+
+	// In FTS, they exchanged their ID identity; 
+	// we exchange their IDs on the client side to keep
+	// consistency
+
+	int idx;
+
+	idx = oldObject.getObjId();
+	oldObject.setObjId(newObject.getObjId());
+	newObject.setObjId(idx);
       }
     catch (java.io.IOException e)
       {
@@ -326,7 +332,7 @@ public class FtsServer
    *  Special optimized version for patcher loading/editing
    */
 
-  synchronized void redefinePatcherObject(FtsObject obj, String name, int ninlets, int noutlets)
+  final void redefinePatcherObject(FtsObject obj, String name, int ninlets, int noutlets)
   {
     try
       {
@@ -345,7 +351,7 @@ public class FtsServer
 
   /** Specialized version for inlets */
 
-  synchronized void redefineInletObject(FtsObject obj, int pos)
+  final void redefineInletObject(FtsObject obj, int pos)
   {
     try
       {
@@ -362,7 +368,7 @@ public class FtsServer
 
   /** Specialized version for outlets */
 
-  synchronized void redefineOutletObject(FtsObject obj, int pos)
+  final void redefineOutletObject(FtsObject obj, int pos)
   {
     try
       {
@@ -380,7 +386,7 @@ public class FtsServer
 
   /** Specialized version for message objects */
 
-  synchronized void redefineMessageObject(FtsObject obj, String description)
+  final void redefineMessageObject(FtsObject obj, String description)
   {
     Vector args;
     
@@ -392,7 +398,7 @@ public class FtsServer
       {
 	connection.sendCmd(FtsClientProtocol.fts_redefine_object_cmd);
 	connection.sendObject(obj);
-	connection.sendString("message");
+	connection.sendString("messbox");
 
 	if (args != null)
 	  connection.sendVector(args);
@@ -407,7 +413,7 @@ public class FtsServer
 
   /** Send a "free object" messages to FTS.*/
 
-  synchronized void freeObject(FtsObject obj)
+  final void freeObject(FtsObject obj)
   {
     try
       {
@@ -424,7 +430,7 @@ public class FtsServer
 
   /** Send an "object message" messages to FTS.*/
 
-  synchronized void sendObjectMessage(FtsObject dst, int inlet, String selector, Vector args)
+  final void sendObjectMessage(FtsObject dst, int inlet, String selector, Vector args)
   {
     try
       {
@@ -447,7 +453,7 @@ public class FtsServer
     @deprecated
    */
 
-  public synchronized void sendNamedObjectMessage(String dst, int inlet, String selector, Vector args)
+  final public void sendNamedObjectMessage(String dst, int inlet, String selector, Vector args)
   {
     try
       {
@@ -470,7 +476,7 @@ public class FtsServer
 
   /** Send a "connect objects" messages to FTS. */
 
-  synchronized void connectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
+  final void connectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
   {
     try
       {
@@ -491,7 +497,7 @@ public class FtsServer
 
   /** Send a "disconnect objects" messages to FTS. */
 
-  synchronized void disconnectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
+  final void disconnectObjects(FtsObject from, int outlet, FtsObject to, int inlet)
   {
     try
       {
@@ -512,7 +518,7 @@ public class FtsServer
 
   /** Send a "put property" messages to FTS. */
 
-  synchronized void putObjectProperty(FtsObject object, String name, Object value)
+  final void putObjectProperty(FtsObject object, String name, Object value)
   {
     try
       {
@@ -530,7 +536,7 @@ public class FtsServer
 
   /** Send a "get property" messages to FTS. */
 
-  synchronized void getObjectProperty(FtsObject object, String name)
+  final void getObjectProperty(FtsObject object, String name)
   {
     try
       {
@@ -547,7 +553,7 @@ public class FtsServer
 
   /** Send a "ucs" messages to FTS. */
 
-  public synchronized void ucsMessage(Vector args)
+  final public void ucsMessage(Vector args)
   {
     try
       {
@@ -569,7 +575,7 @@ public class FtsServer
    * Should probabily be available elsewhere, and not in this class.
    */
 
-  public synchronized void syncToFts()
+  final public synchronized void syncToFts()
   {
     try
       {
@@ -586,7 +592,7 @@ public class FtsServer
 
   /** Send a generic message to FTS. May be this is not used.*/
 
-  synchronized void sendMessage(FtsMessage msg)
+  final void sendMessage(FtsMessage msg)
   {
     connection.sendMessage(msg);
   }
@@ -610,8 +616,8 @@ public class FtsServer
 	  FtsObject obj;
 
 	  obj = (FtsObject) msg.getArguments().elementAt(0);
-	  obj.serverSetProperty((String) msg.getArguments().elementAt(1), 
-				msg.getArguments().elementAt(2));
+	  obj.localPut((String) msg.getArguments().elementAt(1), 
+		       msg.getArguments().elementAt(2));
 	}
       break;
 

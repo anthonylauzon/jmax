@@ -83,7 +83,7 @@ public class ErmesToolBarLayout implements LayoutManager {
 	//preferredHeight should be the sum of the heights
 	//-----note: if Horizontal, should be the inverse!
 	int preferredWidth = (itsType == VERTICAL)?maxWidth(parent):sumWidths(parent);
-	int preferredHeigth = (itsType == VERTICAL)?sumHeights(parent):maxHeight(parent);
+	int preferredHeight = (itsType == VERTICAL)?sumHeights(parent):maxHeight(parent);
         dim.width = preferredWidth + insets.left + insets.right;
         dim.height = preferredHeight + insets.top + insets.bottom;
 
@@ -156,7 +156,7 @@ public class ErmesToolBarLayout implements LayoutManager {
     public Dimension minimumLayoutSize(Container parent) {
         Dimension dim = new Dimension(0, 0);
 	int minWidth = 0;
-	int minHeigth = 0;
+	int minHeight = 0;
 
         //Always add the container's insets!
         Insets insets = parent.insets();
@@ -169,7 +169,7 @@ public class ErmesToolBarLayout implements LayoutManager {
 	  aComponent = parent.getComponent(i);	  
 	  aDimension = aComponent.getSize();
 	  minWidth = Math.max(aComponent.minimumSize().width, minWidth); 
-	  minHeigth = Math.max(aComponent.minimumSize().height, minHeigth);
+	  minHeight = Math.max(aComponent.minimumSize().height, minHeight);
 	}
         dim.width = minWidth + insets.left + insets.right;
         dim.height = minHeight + insets.top + insets.bottom;

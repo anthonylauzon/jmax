@@ -93,6 +93,16 @@ public class FtsMessage
 
     outputStream.sendEom();
   }
+
+  /** 
+   * print 
+   */
+
+  public String toString()
+  {
+    return " " + command + args.toString();
+  }
+
 }
 
 

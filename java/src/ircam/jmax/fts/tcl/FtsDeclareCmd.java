@@ -15,7 +15,7 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *    declare <i>patcher description graphic_data</i>
+ *    _declare <i>patcher description</i>
  * </code>
  */
 
@@ -26,7 +26,7 @@ class FtsDeclareCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if ((argv.length >= 3) && (argv.length <= 4))
+    if (argv.length == 3)
       {
 	FtsObject object;
 	FtsContainerObject parent;
@@ -35,18 +35,23 @@ class FtsDeclareCmd implements Command
 	// Retrieve the arguments
 
 	parent = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
-	description = new String(argv[2].toString());
+	description = argv[2].toString();
 
-	// object = FtsObject.makeFtsObject(parent, description);
+	try
+	  {
+	    object = FtsObject.makeFtsObject(parent, description);
+	  }
+	catch (FtsException e)
+	  {
+	    // Should actually post an error to the FTS queue ??
+	    throw new TclException(interp, e.toString());
+	  }	
 
-// 	if (argv.length == 4)
-// 	  object.setGraphicDescription(new FtsGraphicDescription(argv[3].toString()));
-
-// 	interp.setResult(ReflectObject.newInstance(interp, object));
+	interp.setResult(ReflectObject.newInstance(interp, object));
       }
     else
       {
-	throw new TclNumArgsException(interp, 1, argv, "<parent> <description> [<graphic>]");
+	throw new TclNumArgsException(interp, 1, argv, "<description> ");
       }
   }
 }

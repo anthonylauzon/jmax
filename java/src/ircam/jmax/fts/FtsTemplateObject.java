@@ -71,8 +71,6 @@ public class FtsTemplateObject extends FtsContainerObject
     if (parent.isOpen())
       {
 	updated = true;
-	getProperty("ninlets");
-	getProperty("noutlets");
 
 	MaxApplication.getFtsServer().syncToFts();
       }

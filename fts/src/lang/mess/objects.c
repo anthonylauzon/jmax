@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.1 $ IRCAM $Date: 1997/12/08 16:50:42 $
+ *      $Revision: 1.2 $ IRCAM $Date: 1998/02/06 17:19:34 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -144,6 +144,18 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
       fts_object_table_remove(id);
 
       return 0;
+    }
+
+  /* If the object have an ID (i.e. was created by the client),
+     ask the object to send the ninlets and noutlets  properties,
+     and name and declaration if any. */
+
+  if ((obj->id != FTS_NO_ID) && (! fts_object_is_patcher(obj)))
+    {
+      fts_object_property_changed(obj, fts_new_symbol("nIns"));
+      fts_object_property_changed(obj, fts_new_symbol("nOuts"));
+      fts_object_property_changed(obj, fts_new_symbol("name"));
+      fts_object_property_changed(obj, fts_new_symbol("declaration"));
     }
 
   return obj;

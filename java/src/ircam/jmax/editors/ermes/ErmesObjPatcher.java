@@ -50,13 +50,13 @@ public class ErmesObjPatcher extends ErmesObject {
   
   // This Init(...FtsClass) is called when a FtsClass is available for the Object.
   // this happens, now, just when we are loading from a file
-  public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     String theString;
 
     // modified by MDC to get the name of the patcher
     // ???
 
-    theString = theFtsObject.getName();
+    theString = theFtsObject.getObjectName();
 
     if (theString.length() != 0)
       itsNameString = theString;
@@ -64,13 +64,10 @@ public class ErmesObjPatcher extends ErmesObject {
       itsNameString = "patcher...";
 
     // preferredSize = new Dimension(80, 20);	//vergogna
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
-    if((theFtsGraphic.width<10)||(theFtsGraphic.height<10)){
-      preferredSize = new Dimension(SetDimension(itsNameString));
-      //currentRect = new Rectangle(theFtsGraphic.x,theFtsGraphic.y, preferredSize.width, preferredSize.height);
-    }
-    else  preferredSize = new Dimension(80, 20);	//vergogna
-    //super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+    super.Init(theSketchPad, theFtsObject);
+
+    preferredSize = new Dimension(SetDimension(itsNameString));
+
     return true;
   }
 

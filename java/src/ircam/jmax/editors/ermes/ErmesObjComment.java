@@ -56,13 +56,13 @@ class ErmesObjComment extends ErmesObject {
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad,FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
     //itsFontMetrics = theSketchPad.GetTextArea().getFontMetrics(itsFont);
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
     itsArgs = theFtsObject.getDescription();
     preferredSize = new Dimension(temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+    super.Init(theSketchPad,  theFtsObject);
     itsSketchPad.GetTextArea().setBackground(Color.white);
     // MDC:
     //itsArgs = theFtsObject.getArgumentsDescription().trim();

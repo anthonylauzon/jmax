@@ -16,7 +16,7 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *  _patcher <i>patcher ninlets noutlets [graphic_data window_data]</i>
+ *  _patcher <i>patcher properties body</i>
  * </code> <p>
  *
  * The first form (without inlets, patcher and graphic data) 
@@ -31,78 +31,41 @@ class FtsPatcherCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if ((argv.length == 1) || (argv.length == 2))
-      {
-	// Building a root patcher
-
-	Vector args;
-	FtsContainerObject object;
-	String    windowDescription = null;
-
-	// Retrieve the arguments
-	// this call should be substituted by a registration service call
-
-	if (argv.length == 2)
-	  windowDescription = new String(argv[1].toString());
-
-	args = new Vector();
-	args.addElement("unnamed");
-	args.addElement(new Integer(0));
-	args.addElement(new Integer(0));
-    
-	// The Patcher command will change in the new file format
-	// object = (FtsContainerObject) FtsObject.makeFtsObject(MaxApplication.getFtsServer().getRootObject(),
-	// "patcher", args);
-	
-	//	if (windowDescription != null)
-	// object.setWindowDescription(new FtsWindowDescription(windowDescription));
-
-	// interp.setResult(ReflectObject.newInstance(interp, object));
-      }
-    else if (argv.length >= 5) 
+    if (argv.length == 4) 
       {
 	Vector args;
-	FtsContainerObject object;
+	FtsPatcherObject object;
 	FtsContainerObject parent;
-	int       ninlets;
-	int       noutlets;
-	String    name;
-	String    windowDescription = null;
-	String    graphicDescription = null;
+	TclObject properties;
+	TclObject body;
 
-	// Retrieve the arguments
-	// this call should be substituted by a registration service call
+	parent     = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
+	properties = argv[2];
+	body       = argv[3];
 
-	parent    = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
-	name      = new String(argv[2].toString());
-	ninlets   = TclInteger.get(interp, argv[3]);
-	noutlets  = TclInteger.get(interp, argv[4]);
+	try
+	  {
+	    object = new FtsPatcherObject(parent);
 
+	    object.parseTclProperties(interp, properties);
+	    object.updateFtsObject(); //neede to update ins/outs and name
+	    object.eval(interp, body);
 
-	if (argv.length > 5) 
-	  graphicDescription = new String(argv[5].toString());
+	    // Run the after load init of the patcher
 
-	if (argv.length > 6) 
-	  windowDescription = new String(argv[6].toString());
+	    object.loaded();
 
-	args = new Vector();
-	args.addElement(name);
-	args.addElement(new Integer(ninlets));
-	args.addElement(new Integer(noutlets));
-
-	// object = (FtsContainerObject) FtsObject.makeFtsObject(parent, "patcher", args);    
-
-	// if (graphicDescription != null)
-	// object.setGraphicDescription(new FtsGraphicDescription(graphicDescription));
-
-	// if (windowDescription != null)
-	// object.setWindowDescription(new FtsWindowDescription(windowDescription));
-
-	// interp.setResult(ReflectObject.newInstance(interp, object));
+	    interp.setResult(ReflectObject.newInstance(interp, object));
+	  }
+	catch (FtsException e)
+	  {
+	    // Should actually post an error to the FTS queue ??
+	    throw new TclException(interp, e.toString());
+	  }
       }
     else
       {
-	throw new TclNumArgsException(interp, 1, argv, "<patcher> <name> <ninlets> <noutlets> [<graphic_data> <window_data>], patcher [<window_data>]");
+	throw new TclNumArgsException(interp, 1, argv, "<patcher> <properties> <body>");
       }
   }
 }

@@ -15,4 +15,9 @@ class MaxFileDataSource extends MaxDataSource
   {
     return file;
   }
+
+  public String toString()
+  {
+    return "MaxFileDataSource(" + file.toString() + ")";
+  }
 }

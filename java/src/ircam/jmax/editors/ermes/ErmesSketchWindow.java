@@ -124,12 +124,20 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     public void InitFromDocument(MaxDocument theDocument) {
 		
       Object aObject;
-      
-      itsDocument = (ErmesPatcherDoc)theDocument;
+      int x, y, width, height;
 
-      FtsWindowDescription aFtsWindow = (FtsWindowDescription) itsDocument.GetFtsPatcher().getWindowDescription();
-      //get the FtsWindowDescription, and use it for: reshape to the right dimensions
-      setBounds(aFtsWindow.x, aFtsWindow.y, aFtsWindow.width, aFtsWindow.height+80);
+      itsDocument = (ErmesPatcherDoc)theDocument;
+      FtsContainerObject patcher =  itsDocument.GetFtsPatcher();
+
+      x = ((Integer) patcher.get("win.pos.x")).intValue();
+      y = ((Integer) patcher.get("win.pos.y")).intValue();
+      width  = ((Integer) patcher.get("win.size.w")).intValue();
+      height = ((Integer) patcher.get("win.size.h")).intValue();
+
+      //get the window dimension use it for: reshape to the right dimensions
+
+      setBounds(x, y, width, height+80);
+
       //assigning the right name to the window.
 
       if((!isSubPatcher)&&(! MaxApplication.doAutorouting)) SetAutorouting();//???
@@ -558,7 +566,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
       aObject = (ErmesObject)e.nextElement();
       if(aObject.NeedPropertyHandler()){
 	aFtsObject = aObject.GetFtsObject();
-	if(aFtsObject!=null) aFtsObject.removePropertyHandler("value", aObject);
+	if(aFtsObject!=null) aFtsObject.removeWatch(aObject);
       }
     }
     CloseAllSubWindows();//?????

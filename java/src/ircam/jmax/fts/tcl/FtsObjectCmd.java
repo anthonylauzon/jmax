@@ -15,7 +15,7 @@ import ircam.jmax.fts.*;
  * The Command Syntax is : <p>
  *
  * <code>
- *      object <i>patcher description graphic_data</i>
+ *      _object <i> parent <description> <properties> <i>
  * </code>
  */
 
@@ -25,27 +25,50 @@ class FtsObjectCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if ((argv.length >= 3) && (argv.length <= 4))
+    if (argv.length == 4)
       {
 	FtsObject object;
 	FtsContainerObject parent;
 	String    description;
+	TclObject properties;
+	String    className;
 
 	// Retrieve the arguments
 
 	parent = (FtsContainerObject) ReflectObject.get(interp, argv[1]);
-	description = new String(argv[2].toString());
+	description = argv[2].toString();
+	properties = argv[3];
 
-	// object = FtsObject.makeFtsObject(parent, description);
+	className = FtsParse.parseClassName(description);
 
-// 	if (argv.length == 4)
-// 	  object.setGraphicDescription(new FtsGraphicDescription(argv[3].toString()));
+	try
+	  {
+	    if (className.equals("messbox"))
+	      {
+		String content = description.substring(description.indexOf('{'),
+						       description.lastIndexOf('}'));
 
-// 	interp.setResult(ReflectObject.newInstance(interp, object));
+		object = new FtsMessageObject(parent, content);
+		object.parseTclProperties(interp, properties);
+
+		interp.setResult(ReflectObject.newInstance(interp, object));
+	      }
+	    else
+	      {
+		object = FtsObject.makeFtsObject(parent, className, description);
+		object.parseTclProperties(interp, properties);
+		interp.setResult(ReflectObject.newInstance(interp, object));
+	      }
+	  }
+	catch (FtsException e)
+	  {
+	    // Should actually post an error to the FTS queue ??
+	    throw new TclException(interp, e.toString());
+	  }
       }
     else
       {
-	throw new TclNumArgsException(interp, 1, argv, "<patcher> <description> [<graphic>]");
+	throw new TclNumArgsException(interp, 1, argv, "<object> <description> <properties>");
       }
   }
 }

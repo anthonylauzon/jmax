@@ -43,8 +43,8 @@ class ErmesObjFloat extends ErmesObject {
     return true;
   }
   
-  public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic,FtsObject theFtsObject) {
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+  public boolean Init(ErmesSketchPad theSketchPad,FtsObject theFtsObject) {
+    super.Init(theSketchPad, theFtsObject);
     if(itsFloatDialog == null) itsFloatDialog = new ErmesObjFloatDialog(theSketchPad.GetSketchWindow(), this);
     //ca parce-que dans le chargement d'un patch .pat, les Int sont trop petits et
     //le valeur affiche risque de sortir de la boite
@@ -95,7 +95,8 @@ class ErmesObjFloat extends ErmesObject {
 	
   public void FromDialogValueChanged(Float theFloat){
     itsFloat = theFloat.floatValue();
-    itsFtsObject.putProperty("value", theFloat);
+
+    itsFtsObject.put("value", theFloat);
     DoublePaint();
   }
 	
@@ -180,7 +181,8 @@ class ErmesObjFloat extends ErmesObject {
 	firstClick = false;
       }
       else itsStartingValue = itsFloat;
-      itsFtsObject.putProperty("value", new Float(itsFloat));
+      itsFtsObject.put("value", itsFloat);
+
       DoublePaint();
       if(evt.getClickCount()>1) fastMode = true;
       else fastMode = false;	//ENZOOOOOO!
@@ -231,7 +233,7 @@ class ErmesObjFloat extends ErmesObject {
       if (fastMode)
 	itsFloat = (float)(itsStartingValue+ itsFirstY-y);
       else itsFloat = (float)(itsStartingValue+ (float)(itsFirstY-y)/1000.0);
-      itsFtsObject.putProperty("value", new Float(itsFloat));
+      itsFtsObject.put("value", new Float(itsFloat));
       DoublePaint();
       //((FtsFloat) itsFtsActive).setValue(itsFloat);	//ENZOOOOO!
       return true;

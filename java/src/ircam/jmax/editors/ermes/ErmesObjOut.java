@@ -21,14 +21,19 @@ class ErmesObjOut extends ErmesObject {
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
+  public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
 
     Dimension d = getPreferredSize();
-    currentRect = new Rectangle(theFtsGraphic.x, theFtsGraphic.y,theFtsGraphic.width,theFtsGraphic.height);
+
+
+    currentRect = new Rectangle(((Integer)theFtsObject.get("pos.x")).intValue(),
+				((Integer)theFtsObject.get("pos.y")).intValue(),
+				((Integer)theFtsObject.get("size.w")).intValue(),
+				((Integer)theFtsObject.get("size.h")).intValue());
 
     itsId = ((FtsOutletObject) theFtsObject).getPosition();
 
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject); 
+    super.Init(theSketchPad, theFtsObject); 
     theSketchPad.PrepareOutChoice();
 	
     return true;

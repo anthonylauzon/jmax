@@ -83,7 +83,7 @@ import ircam.jmax.fts.*;
   //--------------------------------------------------------
   // Init
   //--------------------------------------------------------
-  public boolean Init(ErmesSketchPad theSketchPad, FtsGraphicDescription theFtsGraphic, FtsObject theFtsObject) {
+  public boolean Init(ErmesSketchPad theSketchPad,  FtsObject theFtsObject) {
   	//the Fontmetrics problem: the ErmesObject.Init function need the currentRect already set, 
   	// but for editable objects this depends from itsFontMetrics.
   	// malheureusement, the itsFontMetrics field is built... in ErmesObject.Init !
@@ -94,7 +94,7 @@ import ircam.jmax.fts.*;
     FIELD_HEIGHT = temporaryFM.getHeight();
     int lenght = temporaryFM.stringWidth(itsArgs);	//*
     preferredSize = new Dimension(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
-    super.Init(theSketchPad, theFtsGraphic, theFtsObject);
+    super.Init(theSketchPad, theFtsObject);
     return true;
   }
 	

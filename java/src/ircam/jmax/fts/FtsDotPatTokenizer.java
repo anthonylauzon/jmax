@@ -24,8 +24,6 @@ class FtsDotPatTokenizer
 
   int ttype;
   String sval;
-  float fval;
-  int   nval;
   Vector env;
 
   InputStream in;
@@ -324,7 +322,6 @@ class FtsDotPatTokenizer
 		if (isSemi(c))
 		  {
 		    sval = buf.toString();
-		    nval = Integer.parseInt(sval);
 		    ttype = TT_NUMBER;
 		    lookahead = c;
 		    lookahead_valid = true;
@@ -333,7 +330,6 @@ class FtsDotPatTokenizer
 		else if (isBlank(c) || isEof(c))
 		  {
 		    sval = buf.toString();
-		    nval = Integer.parseInt(sval);
 		    ttype = TT_NUMBER;
 		    return;
 		  }
@@ -391,7 +387,6 @@ class FtsDotPatTokenizer
 		if (isSemi(c))
 		  {
 		    sval = buf.toString();
-		    fval = Float.valueOf(sval).floatValue();
 		    ttype = TT_FLOAT;
 		    lookahead = c;
 		    lookahead_valid = true;
@@ -400,7 +395,6 @@ class FtsDotPatTokenizer
 		else if (isBlank(c) || isEof(c))
 		  {
 		    sval = buf.toString();
-		    fval = Float.valueOf(sval).floatValue();
 		    ttype = TT_FLOAT;
 		    return;
 		  }
@@ -421,6 +415,16 @@ class FtsDotPatTokenizer
 	    registerInHistory((char) c);
 	  }
       }
+  }
+
+  final int getNVal()
+  {
+    return  Integer.parseInt(sval);
+  }
+
+  final float getFVal()
+  {
+    return Float.valueOf(sval).floatValue();
   }
 }
     

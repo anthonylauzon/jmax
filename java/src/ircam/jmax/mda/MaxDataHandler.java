@@ -15,7 +15,10 @@ abstract public class MaxDataHandler
 
   static Vector allHandlers = new Vector();
 
-  /** Static method to find a Data Handler for a given Data Source */
+  /** Static method to find a Data Handler for a given Data Source;
+   *  Use canSaveTo because in general we cannot load from a data source
+   * that correspond to an empty file ...
+   */
 
   public static MaxDataHandler findDataHandlerFor(MaxDataSource source)
   {
@@ -25,7 +28,7 @@ abstract public class MaxDataHandler
 
 	dataHandler = (MaxDataHandler) allHandlers.elementAt(i);
 
-	if (dataHandler.canLoadFrom(source))
+	if (dataHandler.canSaveTo(source))
 	  return dataHandler;
       }
 

@@ -38,7 +38,7 @@ public class ErmesPatcherDoc implements MaxDocument {
   public ErmesPatcherDoc() {
     // create an empty ErmesPatcherDoc
 
-    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject(), "unnamed", 0, 0);
+    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
   }
 
   public ErmesPatcherDoc(FtsContainerObject theFtsPatcher) {
@@ -50,7 +50,7 @@ public class ErmesPatcherDoc implements MaxDocument {
       }
     else if (((FtsObject)theFtsPatcher).getClassName().equals("patcher"))
       {
-	itsTitle = theFtsPatcher.getName();
+	itsTitle = theFtsPatcher.getObjectName();
       }
     else
       itsTitle  =  ((FtsObject) theFtsPatcher).getClassName();
@@ -65,7 +65,7 @@ public class ErmesPatcherDoc implements MaxDocument {
     itsTitle  = "untitled" + (untitledCounter++);
     itsDocumentType = "patcher";
     itsSketchWindow = theSketchWindow;
-    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject(), "unnamed", 0, 0);
+    itsPatcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
   }
 
   FtsContainerObject GetFtsPatcher() {
@@ -218,31 +218,32 @@ public class ErmesPatcherDoc implements MaxDocument {
     //create the graphic descriptions for the FtsObjects, before saving them
     ErmesObject aErmesObject = null;
     FtsObject aFObject = null;
-    FtsGraphicDescription aGDescription = null;
     Rectangle aRect = itsSketchWindow.getBounds();
     String ermesInfo = new String();
     
-    itsPatcher.setWindowDescription(new FtsWindowDescription(aRect.x, aRect.y, aRect.width, aRect.height));
+    itsPatcher.put("win.pos.x", aRect.x);
+    itsPatcher.put("win.pos.y", aRect.y);
+    itsPatcher.put("win.size.w", aRect.width);
+    itsPatcher.put("win.size.h", aRect.height);
 
-    //itsPatcher.setWindowDescription(new FtsWindowDescription(aRect.x, aRect.y, aRect.width, aRect.height));
-    
     for (Enumeration e=theSketchWindow.itsSketchPad.itsElements.elements(); e.hasMoreElements();) {
       aErmesObject = (ErmesObject) e.nextElement();
       aFObject = aErmesObject.itsFtsObject;
-      
            
-      // if (!(aErmesObject.itsFont.getName().equals(aErmesObject.itsSketchPad.sketchFont.getName()))||
-      // ( aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize()))
-      // ermesInfo = "(font:"+aErmesObject.itsFont.getName()+", "+aErmesObject.itsFont.getSize()+")";
-
-      // Note that ermesInfo is not used anymore; a new function will come soon !! MDC
+      // Set geometrical properties
       
-      
-      aGDescription = new FtsGraphicDescription(aErmesObject.itsX, aErmesObject.itsY,
-						aErmesObject.currentRect.width,
-						aErmesObject.currentRect.height);
+      aFObject.put("pos.x", aErmesObject.itsX);
+      aFObject.put("pos.y", aErmesObject.itsY);
+      aFObject.put("pos.w", aErmesObject.currentRect.width);
+      aFObject.put("pos.h", aErmesObject.currentRect.height);
 
-      aFObject.setGraphicDescription(aGDescription);
+      // Set the font properties
+
+      if (! aErmesObject.itsFont.getName().equals(aErmesObject.itsSketchPad.sketchFont.getName()))
+	aFObject.put("font", aErmesObject.itsFont.getName());
+
+      if (aErmesObject.itsFont.getSize() != aErmesObject.itsSketchPad.sketchFont.getSize())
+	aFObject.put("fontSize", aErmesObject.itsFont.getSize());
 
       if (aErmesObject instanceof ircam.jmax.editors.ermes.ErmesObjExternal &&
 	  ((ErmesObjExternal)aErmesObject).itsSubWindow != null)

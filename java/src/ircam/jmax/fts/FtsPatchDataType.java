@@ -32,7 +32,7 @@ public class FtsPatchDataType extends MaxDataType
 
     FtsObject patcher;
 
-    patcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject(), "unnamed", 0, 0);
+    patcher = new FtsPatcherObject(MaxApplication.getFtsServer().getRootObject());
 
     FtsPatchData obj = new FtsPatchData();
 
