@@ -158,6 +158,10 @@ SOURCE=..\fts\connection.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\define.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\dsp.c
 # End Source File
 # Begin Source File
@@ -226,6 +230,10 @@ SOURCE=..\fts\midi.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\midievent.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\midifile.c
 # End Source File
 # Begin Source File
@@ -239,6 +247,10 @@ SOURCE=..\fts\objectlist.c
 # Begin Source File
 
 SOURCE=..\fts\objectset.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\outlet.c
 # End Source File
 # Begin Source File
 
@@ -258,7 +270,15 @@ SOURCE=..\fts\patcher.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\fts\patcherobject.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\fts\patfile.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\fts\pipestream.c
 # End Source File
 # Begin Source File
 
