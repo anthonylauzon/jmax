@@ -79,6 +79,7 @@ dnl ###########################################################################
 dnl JAVA
 dnl ###########################################################################
 dnl Check for Java compiler
+
 AC_ARG_WITH(javac,
   [  --with-javac=JAVAC       give java compiler (optional)],
   [JAVAC="$withval"])
@@ -107,6 +108,7 @@ fi
 AC_SUBST(JAR_SUPPORT_UPDATE)
 
 AC_SUBST(JAVAC)
+AC_SUBST(JAVA)
 
 dnl Check for classpath
 AC_ARG_WITH(classpath,
