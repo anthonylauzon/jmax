@@ -1,0 +1,11 @@
+# package declaration
+package provide debug
+
+# load modules
+
+#global jmaxArch jmaxMode
+#ucs load module debug $dir/lib/$jmaxArch/$jmaxMode/libdebug.so
+
+loadModule debug $dir/lib
+
+puts "Debug package loaded"
