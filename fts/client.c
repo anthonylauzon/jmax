@@ -22,9 +22,9 @@
 
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 /* Define this if you want logs of symbol cache hit */
-#define CACHE_REPORT
-#define CLIENT_LOG
-/* #define CLIENT_DEBUG */
+/*#define CACHE_REPORT
+  #define CLIENT_LOG
+  #define CLIENT_DEBUG */
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
