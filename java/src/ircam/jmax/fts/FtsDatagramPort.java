@@ -57,7 +57,7 @@ class FtsDatagramPort extends FtsPort
 
     try
       {
-	command = ("rsh " + host + " " + path + "/" + ftsName
+	command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
 		   + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort()) ;
       }
     catch (UnknownHostException e)

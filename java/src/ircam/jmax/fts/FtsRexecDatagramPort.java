@@ -55,8 +55,8 @@ class FtsRexecDatagramPort extends FtsPort
 
 	rexec.connect(InetAddress.getByName(host));
 
-	command = (path + "/" + ftsName + " udp " +
-		   InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort());
+	command = (path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
+		   + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort());
       }
     catch (UnknownHostException e)
       {

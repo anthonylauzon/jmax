@@ -39,6 +39,7 @@ public class Fts
 
     server.setParameter("ftsdir", theFtsdir);
     server.setParameter("ftsname", theFtsname);
+
     server.start();
   }
 
@@ -304,6 +305,21 @@ public class Fts
   {
     return userPassword;
   }
+
+
+  // Handling of non real-time mode
+  private static boolean noRealTime = false;
+
+  public static void setNoRealTime( boolean noRealTime)
+  {
+    Fts.noRealTime = noRealTime;
+  }
+
+  public static boolean getNoRealTime()
+  {
+    return noRealTime;
+  }
+
 
   /* Sync command */
 

@@ -46,7 +46,7 @@ class FtsSocketServerPort extends FtsPort
 
     try
       {
-	command = ("rsh " + host + " " + path + "/" + ftsName
+	command = ("rsh " + host + " " + path + "/" + ftsName + ( Fts.getNoRealTime() ? " -norealtime" : "")
 		   + " socket " + InetAddress.getLocalHost().getHostAddress() + ":" + port) ;
       }
     catch (UnknownHostException e)
