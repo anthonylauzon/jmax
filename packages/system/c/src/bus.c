@@ -53,18 +53,6 @@ typedef struct _access_
 #define BUS_NOWHERE -2
 #define BUS_CHANNEL -1
 
-static void
-access_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  access_t *this = (access_t *)o;
-
-  if(this->bus)
-    fts_object_release((fts_object_t *)this->bus);
-
-  this->bus = (bus_t *)fts_get_object(at + 0);
-  fts_object_refer((fts_object_t *)this->bus);
-}
-
 static int
 clip_channel(int channel, int n_channels)
 {
@@ -105,6 +93,20 @@ throw_channel_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       fts_channel_output_message_from_targets(bus_get_channel(bus, this->channel), 0, s, ac, at);
       fts_channel_output_message_from_targets(bus_get_channel(bus, BUS_CHANNEL), this->channel, s, ac, at);
     }
+}
+
+static void
+throw_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  access_t *this = (access_t *)o;
+
+  fts_channel_remove_origin(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+  fts_object_release((fts_object_t *)this->bus);
+
+  this->bus = (bus_t *)fts_get_object(at + 0);
+
+  fts_object_refer((fts_object_t *)this->bus);
+  fts_channel_add_origin(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
 }
 
 static void
@@ -185,7 +187,7 @@ throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  for(i=0; i<n_channels; i++)
 	    fts_method_define_varargs(cl, i, fts_s_anything, throw_bus_input);
 	  
-	  fts_method_define_varargs(cl, n_channels, bus_symbol, access_set_bus);
+	  fts_method_define_varargs(cl, n_channels, bus_symbol, throw_set_bus);
 	}
       else
 	{
@@ -210,6 +212,20 @@ throw_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  *  catch
  *
  */
+
+static void
+catch_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  access_t *this = (access_t *)o;
+
+  fts_channel_remove_target(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+  fts_object_release((fts_object_t *)this->bus);
+
+  this->bus = (bus_t *)fts_get_object(at + 0);
+
+  fts_object_refer((fts_object_t *)this->bus);
+  fts_channel_add_target(bus_get_channel(this->bus, BUS_CHANNEL), (fts_access_t *)this);
+}
 
 static void
 catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -286,7 +302,7 @@ catch_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, catch_init);
 	  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, catch_delete);
 	  
-	  fts_method_define_varargs(cl, 0, bus_symbol, access_set_bus);
+	  fts_method_define_varargs(cl, 0, bus_symbol, catch_set_bus);
 	}
       else
 	{
