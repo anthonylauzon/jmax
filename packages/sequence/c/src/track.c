@@ -446,7 +446,19 @@ track_highlight_event(track_t *track, event_t *event)
       fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, 1, &a);
     }
 }
-  
+
+void track_highlight_time(track_t *track, double time)
+{
+    if (track_editor_is_open(track))
+    {
+	fts_atom_t a;
+
+	fts_set_float(&a, time);
+	fts_client_send_message((fts_object_t *) track, 
+				seqsym_highlightEventsAndTime, 1, &a);
+    }
+}
+
 void track_highlight_events(track_t *track, int n, event_t *event[])
 {
     if (track_editor_is_open(track))

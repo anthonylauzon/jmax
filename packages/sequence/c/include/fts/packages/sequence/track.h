@@ -109,6 +109,14 @@ extern void track_highlight_event(track_t *track, event_t *event);
 extern void track_highlight_events(track_t *track, int n, event_t *event[]);
 
 /**
+ * Set cursor to arbitrary time in track editor.
+ * Previous highlighting is removed.
+ *
+ * @param time	time to display in editor
+ */
+extern void track_highlight_time(track_t *track, double time);
+
+/**
  * Highlight events in track editor (up to 64) and set cursor to arbitrary time.
  * Set n to 0 and event to NULL to only display time.
  * Previous highlighting is removed.

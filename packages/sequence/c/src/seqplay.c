@@ -350,9 +350,12 @@ seqplay_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     seqplay_reset(this);  
 
   seqplay_position(this, time);
-  seqplay_go(this);
+
+  /* show located position */
+  if(this->track)
+      track_highlight_time(this->track, time);
 }
-  
+
 static void 
 seqplay_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
