@@ -561,11 +561,11 @@ asio_audioport_output(fts_audioport_t* port, float** buffers, int buffsize)
 
       if(fts_audioport_is_channel_used((fts_audioport_t*)current_port, FTS_AUDIO_OUTPUT, channelIndex))
       {
-          for(int ii=0; ii < buffsize; ii++)
+         /* for(int ii=0; ii < buffsize; ii++)
           {
             if(buff[ii]!=0.0) fts_post("Not zero !!!\n");
             buff[ii] = *(float*)(current_port + ii);
-          }
+          }*/
 
           //fts_post("Type %d Channel Index: %d\n",current_port->channelInfos[0].type,channelIndex);
 

@@ -247,13 +247,6 @@ unsigned int asio_util_scan_drivers()
 		        fts_log("[asio] put port : %s\n", port->driver->name);
 		        fts_post("[asio] found port : %s\n", port->driver->name);
             count++;
-///////////////
-  if(regKeyEnum)
-  {
-    RegCloseKey(regKeyEnum);
-  }
-return count;
-///////////////
   		    }
           else
           {
