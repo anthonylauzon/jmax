@@ -317,6 +317,14 @@ public class ErmesObject implements FtsPropertyHandler {
     return itsSketchPad.GetSketchWindow();
   }
 
+  public int GetX(){
+    return itsX;
+  }
+
+  public int GetY(){
+    return itsY;
+  }
+
   public /*abstract*/ boolean ConnectionRequested(ErmesObjInOutlet theRequester) {return true;};
   public /*abstract*/ boolean ConnectionAbort(ErmesObjInOutlet theRequester) {return true;};
   
@@ -365,8 +373,18 @@ public class ErmesObject implements FtsPropertyHandler {
     if (itsSketchPad.itsRunMode) return false;		
     if(itsDragging) {
       itsSketchPad.RemoveElementRgn(this);
-      if(IsResizeTextCompat(x-itsInitX, y-itsInitY)) Resize(x-itsInitX, y-itsInitY);
-      else ResizeToText(x-itsInitX, y-itsInitY);
+      if(itsSketchPad.itsResizeMode == itsSketchPad.BOTH_RESIZING){
+	if(IsResizeTextCompat(x-itsInitX, y-itsInitY)) Resize(x-itsInitX, y-itsInitY);
+	else ResizeToText(x-itsInitX, y-itsInitY);
+      }
+      else if(itsSketchPad.itsResizeMode == itsSketchPad.HORIZONTAL_RESIZING){
+	if(IsResizeTextCompat(x-itsInitX, 0)) Resize(x-itsInitX, 0);
+	else ResizeToText(x-itsInitX, 0);
+      }
+      else if(itsSketchPad.itsResizeMode == itsSketchPad.VERTICAL_RESIZING){
+	if(IsResizeTextCompat(0, y-itsInitY)) Resize(0, y-itsInitY);
+	else ResizeToText(0, y-itsInitY);
+      }
       itsSketchPad.SaveOneElementRgn(this);
       itsDragging = false;
       itsResized = true;

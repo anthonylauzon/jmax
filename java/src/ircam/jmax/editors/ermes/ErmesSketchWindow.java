@@ -42,7 +42,9 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public Menu itsFileMenu;	
   public Menu itsEditMenu;	
   public Menu itsJustificationMenu;
-  public Menu itsFontMenu;	
+  public Menu itsResizeObjectMenu;
+  public Menu itsAlignObjectMenu;
+  public Menu itsTextMenu;	
   public Menu itsSizesMenu;	
   public Menu itsProjectMenu;	
   public Menu itsWindowsMenu;	
@@ -50,6 +52,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   CheckboxMenuItem itsCurrentSizesMenu;
   CheckboxMenuItem itsCurrentFontMenu;
   CheckboxMenuItem itsCurrentJustificationMenu;
+  CheckboxMenuItem itsCurrentResizeMenu;
 
   boolean itsClosing = false;
   boolean itsChangingRunEditMode = false;
@@ -76,6 +79,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       //if(isSubPatcher){
       //if(itsTopWindow!=null)itsSketchPad.doAutorouting = itsTopWindow.itsSketchPad.doAutorouting;
       //}
+      
+      SetupMenu();
 
       addKeyListener(this);
       addFocusListener(this);
@@ -132,8 +137,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     itsEditMenu = CreateEditMenu();
     mb.add(itsEditMenu);
       
-    itsFontMenu = CreateFontMenu();	//this assigns also the itsSizesMenu...
-    mb.add(itsFontMenu);
+    itsTextMenu = CreateTextMenu();	//this assigns also the itsSizesMenu...
+    mb.add(itsTextMenu);
       
     itsProjectMenu = CreateProjectMenu();
     mb.add(itsProjectMenu);
@@ -169,7 +174,16 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     gridbag.setConstraints(itsScrollerView, c);
     add(itsScrollerView);
   }
-	
+  
+  public void SetupMenu(){
+    itsEditMenu.getItem(0).setEnabled(false);
+    itsEditMenu.getItem(1).setEnabled(false);
+    itsEditMenu.getItem(2).setEnabled(false);
+    itsEditMenu.getItem(3).setEnabled(false);
+  }
+
+
+
   private Menu CreateFileMenu() {
     MenuItem aMenuItem;
     Menu fileMenu = new Menu("File");
@@ -219,24 +233,53 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     aCheckItem.addItemListener(this);
     editMenu.add(new MenuItem("-"));
     aCheckItem = new CheckboxMenuItem("Autorouting", true);
-    //aCheckItem.setState(true);
     editMenu.add(aCheckItem);
     aCheckItem.addItemListener(this);
-    editMenu.getItem(0).setEnabled(false);
-    editMenu.getItem(1).setEnabled(false);
-    editMenu.getItem(2).setEnabled(false);
-    editMenu.getItem(3).setEnabled(false);
+
+    editMenu.add(new MenuItem("-"));
+    itsResizeObjectMenu = new Menu("Resize Object");
+    itsResizeObjectMenu.add(aCheckItem = new CheckboxMenuItem("Both"));
+    aCheckItem.addItemListener(this);	   
+    aCheckItem.setState(true);
+    itsCurrentResizeMenu = aCheckItem;
+    itsResizeObjectMenu.add(aCheckItem = new CheckboxMenuItem("Horizontal"));
+    aCheckItem.addItemListener(this);	
+    itsResizeObjectMenu.add(aCheckItem = new CheckboxMenuItem("Vertical"));
+    aCheckItem.addItemListener(this);	   
+    editMenu.add(itsResizeObjectMenu);
+
+    editMenu.add(new MenuItem("-"));
+    itsAlignObjectMenu = new Menu("Align Objects");
+    itsAlignObjectMenu.add(aMenuItem = new MenuItem("Align Top"));
+    aMenuItem.addActionListener(this);
+    itsAlignObjectMenu.add(aMenuItem = new MenuItem("Align Left"));
+    aMenuItem.addActionListener(this);
+    itsAlignObjectMenu.add(aMenuItem = new MenuItem("Align Bottom"));
+    aMenuItem.addActionListener(this);
+    itsAlignObjectMenu.add(aMenuItem = new MenuItem("Align Right"));
+    aMenuItem.addActionListener(this);
+    editMenu.add(itsAlignObjectMenu);
     return editMenu;
+  }
+  
+  private boolean IsInResizeObjectMenu(String theName) {
+    return(theName.equals("Both") || theName.equals("Horizontal") || theName.equals("Vertical"));
+  }
+  
+  private boolean IsInAlignObjectsMenu(String theName) {
+    return(theName.equals("Align Top") || theName.equals("Align Left") || 
+	   theName.equals("Align Right")||theName.equals("Align Bottom"));
   }
 
   private boolean IsInEditMenu(String theName) {
     return(theName.equals("Cut") || theName.equals("Copy") || theName.equals("Paste") 
 	   || theName.equals("Clear") || theName.equals("Select All") 
-	   || theName.equals("Snap to Grid") || theName.equals("Autorouting"));
+	   || theName.equals("Snap to Grid") || theName.equals("Autorouting") 
+	   || IsInResizeObjectMenu(theName));
   }
   
-  private Menu CreateFontMenu() {
-    Menu fontMenu = new Menu("Fonts");
+  private Menu CreateTextMenu() {
+    Menu fontMenu = new Menu("Text");
     String aString;
     CheckboxMenuItem aCheckItem;
 
@@ -281,7 +324,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     return fontMenu;
   }
 
-  private boolean IsInFontMenu(String theName) {
+  private boolean IsInTextMenu(String theName) {
     for (int i = 0;i<itsFontList.length;i++) {
       if (theName.equals(itsFontList[i])) return true;
     }
@@ -424,7 +467,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     CheckboxMenuItem aCheckboxMenuItem;
     String aFont = itsSketchPad.getFont().getName();
     for(int i=2; i<itsFontList.length+2; i++){
-      aCheckboxMenuItem = (CheckboxMenuItem)itsFontMenu.getItem(i);
+      aCheckboxMenuItem = (CheckboxMenuItem)itsTextMenu.getItem(i);
       if(aCheckboxMenuItem.getLabel().toLowerCase().compareTo(aFont.toLowerCase()) == 0){
 	itsCurrentFontMenu = aCheckboxMenuItem;
 	itsCurrentFontMenu.setState(true);
@@ -691,7 +734,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       String itemName = aCheckItem.getLabel();
       
       if (IsInEditMenu(itemName)) EditMenuAction(aCheckItem, itemName);
-      if (IsInFontMenu(itemName)) FontMenuAction(aCheckItem, itemName);
+      if (IsInTextMenu(itemName)) TextMenuAction(aCheckItem, itemName);
       if (IsInSizesMenu(itemName)) SizesMenuAction(aCheckItem, itemName);
       if (IsInJustificationMenu(itemName)) JustificationMenuAction(aCheckItem, itemName);
     }
@@ -710,9 +753,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     
       if (IsInFileMenu(itemName)) FileMenuAction(aMenuItem, itemName);
       if (IsInEditMenu(itemName)) EditMenuAction(aMenuItem, itemName);
-      if (IsInFontMenu(itemName)) FontMenuAction(aMenuItem, itemName);
+      if (IsInTextMenu(itemName)) TextMenuAction(aMenuItem, itemName);
       if (IsInProjectMenu(itemName)) ProjectMenuAction(aMenuItem, itemName);
       if (IsInWindowsMenu(itemName)) WindowsMenuAction(aMenuItem, itemName);
+      if (IsInAlignObjectsMenu(itemName)) AlignObjectsMenuAction(aMenuItem, itemName);
     }
   }
 
@@ -849,9 +893,18 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       if(aCheckItem.getState())aCheckItem.setState(false);
       else aCheckItem.setState(true);
     }
+    else ResizeObjectMenuAction(theMenuItem, theString);
   }
 
-  private void FontMenuAction(MenuItem theMenuItem, String theString) {
+  private void AlignObjectsMenuAction(MenuItem theMenuItem, String theString){
+    if (theString.equals("Align Top")) itsSketchPad.AlignSelectedObjects("Top");
+    else if (theString.equals("Align Left")) itsSketchPad.AlignSelectedObjects("Left");
+    else if (theString.equals("Align Right")) itsSketchPad.AlignSelectedObjects("Right");
+    else if (theString.equals("Align Bottom")) itsSketchPad.AlignSelectedObjects("Bottom");
+  }
+
+
+  private void TextMenuAction(MenuItem theMenuItem, String theString) {
     //if we are here, a font name have been choosen from the menu
     itsCurrentFontMenu.setState(false);
     itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
@@ -949,6 +1002,14 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     itsSketchPad.ChangeJustification(theString);
     itsCurrentJustificationMenu = (CheckboxMenuItem)theMenuItem;
     itsCurrentJustificationMenu.setState(true);
+    return true;
+  }
+
+  private boolean ResizeObjectMenuAction(MenuItem theMenuItem, String  theString){
+    itsCurrentResizeMenu.setState(false);
+    itsSketchPad.ChangeResizeMode(theString);
+    itsCurrentResizeMenu = (CheckboxMenuItem)theMenuItem;
+    itsCurrentResizeMenu.setState(true);
     return true;
   }
 

@@ -39,6 +39,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   final static int CENTER_JUSTIFICATION = 20;
   final static int LEFT_JUSTIFICATION = 21;
   final static int RIGHT_JUSTIFICATION = 22;
+  final static int BOTH_RESIZING = 23;
+  final static int HORIZONTAL_RESIZING = 24;
+  final static int VERTICAL_RESIZING = 25;
   public static int debug_count_update = 1;
   public static int debug_count_paint  = 1;
   public final static int DEBUG_COUNT  = 50;
@@ -51,6 +54,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int SKETCH_HEIGHT = 1200/*800*/;
 
   int itsJustificationMode = CENTER_JUSTIFICATION;
+  int itsResizeMode = BOTH_RESIZING;
 
   int inCount = 0;   //ref count of ErmesObjIn objects (used if this is a subpatcher)
   int outCount = 0;  //the same for ErmesObjOut objects
@@ -281,11 +285,13 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     }
     ToSave();
     repaint();
-
   }
 
-
-
+  public void ChangeResizeMode(String theResizeMode){
+    if(theResizeMode.equals("Both")) itsResizeMode = BOTH_RESIZING;
+    else if(theResizeMode.equals("Horizontal")) itsResizeMode = HORIZONTAL_RESIZING;
+    else if(theResizeMode.equals("Vertical")) itsResizeMode = VERTICAL_RESIZING;
+  }
   //--------------------------------------------------------
   //	ClickOnConnection
   //--------------------------------------------------------
@@ -1050,7 +1056,12 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     if(editStatus == RESIZING_OBJECT) {
       if((java.lang.Math.abs(x-currentResizeRect.x)<5)||
 	 (java.lang.Math.abs(y-currentResizeRect.y)<5)) return;
-      currentResizeRect.setSize(x-currentResizeRect.x, y-currentResizeRect.y);
+      if(itsResizeMode == BOTH_RESIZING)
+	currentResizeRect.setSize(x-currentResizeRect.x, y-currentResizeRect.y);
+      else if(itsResizeMode == HORIZONTAL_RESIZING)
+	currentResizeRect.setSize(x-currentResizeRect.x, currentResizeRect.height);
+      else if(itsResizeMode == VERTICAL_RESIZING)
+	currentResizeRect.setSize(currentResizeRect.width, y-currentResizeRect.y);
       update(getGraphics());
       return;
     } 
@@ -1553,6 +1564,81 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public void adjustmentValueChanged(AdjustmentEvent e){
     itsScrolled = true;
   }
+
+  public void AlignSelectedObjects(String thePosition){
+    ErmesObject aObject;
+    int aValue;
+    if(thePosition.equals("Top")){
+      aValue = MinYSelected();
+      for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject)e.nextElement();
+	aObject.MoveBy(0, aValue-aObject.GetY());
+      }
+    }
+    else if(thePosition.equals("Left")){
+      aValue = MinXSelected();
+      for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject)e.nextElement();
+	aObject.MoveBy(aValue-aObject.GetX(), 0);
+      }
+    }
+    else if(thePosition.equals("Bottom")){
+      aValue = MaxYSelected();
+      for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject)e.nextElement();
+	aObject.MoveBy(0, aValue-aObject.GetY());
+      }
+    }
+    else if(thePosition.equals("Right")){
+      aValue = MaxXSelected();
+      for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+	aObject = (ErmesObject)e.nextElement();
+	aObject.MoveBy(aValue-aObject.GetX(), 0);
+      }
+    }
+    repaint();
+  }
+  
+  public int MinYSelected(){
+    ErmesObject aObject;
+    int aMinY = 10000;
+    for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject)e.nextElement();
+      if(aMinY >= aObject.GetY()) aMinY = aObject.GetY();
+    }
+    return aMinY;
+  }
+  
+  public int MinXSelected(){
+    ErmesObject aObject;
+    int aMinX = 10000;
+    for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject)e.nextElement();
+      if(aMinX >= aObject.GetX()) aMinX = aObject.GetX();
+    }
+    return aMinX;
+  }
+
+  public int MaxYSelected(){
+    ErmesObject aObject;
+    int aMaxY = -10000;
+    for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject)e.nextElement();
+      if(aMaxY<aObject.GetY()) aMaxY = aObject.GetY();
+    }
+    return aMaxY;
+  }
+
+   public int MaxXSelected(){
+    ErmesObject aObject;
+    int aMaxX = -10000;
+    for(Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject)e.nextElement();
+      if(aMaxX < aObject.GetX()) aMaxX = aObject.GetX();
+    }
+    return aMaxX;
+  }
+
 }
 
 
