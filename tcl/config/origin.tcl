@@ -47,4 +47,6 @@ defineDevice adatOut6 { SgiALOut ALdevice RAD6.ADATOut channels 8 } "RAD 6.ADAT 
 defineDevice midi  { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
 defineDevice midi1 { sgi_midi port SerialPort1 } "MIDI on startmidi port SerialPort1"
 defineDevice midi2 { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialPort2"
+defineDevice midi3 { sgi_midi port SerialPort3 } "MIDI on startmidi port SerialPort3"
+defineDevice midi4 { sgi_midi port SerialPort4 } "MIDI on startmidi port SerialPort4"
 
