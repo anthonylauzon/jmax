@@ -262,7 +262,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void endTrackUpload( TrackDataModel track)
   {
     uploading = false;
-    resizePanelToEventTimeWithoutScroll( track.getLastEvent());
+    if( track.length() > 0)
+      resizePanelToEventTimeWithoutScroll( track.getLastEvent());
     progressBar.setVisible( false);
   }
   public void startPaste(){}
