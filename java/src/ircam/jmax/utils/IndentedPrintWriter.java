@@ -16,6 +16,10 @@ public class IndentedPrintWriter extends PrintWriter
   boolean lineDone = false;
   int indentation = 0;
 
+  public IndentedPrintWriter(Writer stream) {
+    super(stream); //EM
+  }
+
   public IndentedPrintWriter(OutputStream stream)
   {
     super(stream);
