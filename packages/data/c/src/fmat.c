@@ -3635,26 +3635,30 @@ static void
 fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
-  int size = 0;
   
   fmat_initialize(self);
   
-  if(ac > 0 && fts_is_number(at))
-    size = fts_get_number_int(at);
-  
-  if(ac > 1)
+  if(ac == 0)
+    fmat_set_size(self, 0, 1);
+  else if(ac == 1)
   {
-    ac -= 1;
-    at += 1;
+    int size = 0;
     
-    if(ac > size)
-      ac = size;
+    if(fts_is_number(at))
+    {
+      size = fts_get_number_int(at);
+     
+      if(size < 0)
+        size = 0;
+    }
     
-    fmat_reshape(self, size, 1);
+    fmat_set_size(self, size, 1);
+  }  
+  else
+  {
+    fmat_reshape(self, ac, 1);
     fmat_set_from_atoms(self, 0, 1, ac, at);
   }
-  else
-    fmat_set_size(self, size, 1);
   
   /* hack: there won't actually be any object of fvec_class */
   o->cl = fmat_class;
@@ -3889,6 +3893,7 @@ void
 fmat_config(void)
 {
   fmat_symbol = fts_new_symbol("fmat");
+  fvec_symbol = fts_new_symbol("fvec");
 
   sym_getcol = fts_new_symbol("getcol");
   sym_getrow = fts_new_symbol("getrow");
