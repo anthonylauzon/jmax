@@ -702,28 +702,27 @@ mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *		       will be clipped to width of matrix
  */
 static void
-mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, 
-		 int ac, const fts_atom_t *at)
+mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_t	     *self    = (mat_t *) o;
+  mat_t	*self = (mat_t *) o;
   fts_atom_t *newptr;
-  int         m       = mat_get_m(self);
-  int	      n       = mat_get_n(self);
-  int	      pos     = 0;	/* row position at which to insert */
-  int         numrows = 1;	/* number of rows to insert */
-  int         num, tomove, i;
+  int m = mat_get_m(self);
+  int	n = mat_get_n(self);
+  int	pos = 0;	/* row position at which to insert */
+  int numrows = 1;	/* number of rows to insert */
+  int num, tomove, i;
 
   /* check and test args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
 
-  if      (pos < 0)		pos = 0;
-  else if (pos > m)		pos = m;
+  if(pos < 0)	pos = 0;
+  else if(pos > m) pos = m;
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if      (numrows <= 0)	return;	/* nothing to append */
+  if(numrows <= 0)	return;	/* nothing to append */
 
   /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m + numrows, n);
@@ -733,15 +732,15 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s,
   num    = n * numrows;		/* atoms to insert */
   tomove = n * (m - pos);	/* atoms to move */
 
-  if (pos < m)	/* don't move when appending behind last row */
+  if(pos < m)	/* don't move when appending behind last row */
     memmove(newptr + num, newptr, tomove * sizeof(fts_atom_t));
 
   /* initialise inserted atoms (don't leave void atoms around) */
-  for (i = 0; i < num; i++)
+  for(i = 0; i < num; i++)
     fts_set_int(newptr + i, 0);
 
   /* update editor if open */
-  if (mat_editor_is_open(self))
+  if(mat_editor_is_open(self))
   {
     fts_client_send_message(o, sym_mat_insert_rows, 0, 0);
     mat_upload_from_index(self, pos, 0, tomove + num);
@@ -757,29 +756,28 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s,
  * @param  int: num    number of rows to delete, default 1
  */
 static void
-mat_delete_rows (fts_object_t *o, int winlet, fts_symbol_t s, 
-		 int ac, const fts_atom_t *at)
+mat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_t	     *self    = (mat_t *) o;
+  mat_t	*self = (mat_t *) o;
   fts_atom_t *killptr;
-  int         m       = mat_get_m(self);
-  int	      n       = mat_get_n(self);
-  int	      pos     = 0;
-  int         numrows = 1;
-  int         num, tomove, i;
+  int m = mat_get_m(self);
+  int	n = mat_get_n(self);
+  int	pos = 0;
+  int numrows = 1;
+  int num, tomove, i;
   
   /* get and check args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
     
-  if      (pos <  0)		pos = 0;
-  else if (pos >= m)		return;	/* nothing to delete */
+  if(pos <  0) pos = 0;
+  else if (pos >= m) return;	/* nothing to delete */
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1);
 
-  if      (numrows <= 0)	return;	/* nothing to delete */
-  else if (numrows >  m - pos)	numrows = m - pos;
+  if(numrows <= 0) return;	/* nothing to delete */
+  else if (numrows >  m - pos) numrows = m - pos;
   
   killptr = mat_get_ptr(self) + n * pos;
   num     = n * numrows;	/* number of atoms to insert */
@@ -795,14 +793,10 @@ mat_delete_rows (fts_object_t *o, int winlet, fts_symbol_t s,
 
   /* update editor if open */
   if (mat_editor_is_open(self))
-  {
-    fts_client_send_message(o, sym_mat_delete_rows, 0, 0);
-    mat_upload_from_index(self, pos, 0, tomove);
-  }
+    mat_upload(self);
+
   fts_object_set_state_dirty(o);
 }
-
-
 
 static void
 mat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1061,11 +1055,6 @@ mat_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   mat_set_editor_close(this);
 }
-
-
-
-
-
 
 /********************************************************************
 *

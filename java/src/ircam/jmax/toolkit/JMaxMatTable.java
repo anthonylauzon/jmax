@@ -56,6 +56,7 @@ public class JMaxMatTable extends JTable
     
     setGridColor( matGridColor);
 		setShowGrid(true);
+    setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
   }
   
   public TableCellEditor getCellEditor(int row,int col)

@@ -135,6 +135,7 @@ public class MatWindow extends JMaxEditor {
     fileMenu.setEnabled( false, 4);
     fileMenu.setEnabled( false, 7);
     mb.add( fileMenu);
+    mb.add( new MatEditMenu( this));
     mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
     
     setJMenuBar(mb);
@@ -144,7 +145,7 @@ public class MatWindow extends JMaxEditor {
   public EditorMenu getSimpleMenu()
   {
     if(simpleMenu == null)
-      simpleMenu = new MatSimpleMenu(this);
+      simpleMenu = new MatSimpleMenu(this, matData.getType());
     
     return simpleMenu; 
   }  

@@ -162,6 +162,15 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   {
     return matData;
   }
+  
+  public void addTableSelectionListener(ListSelectionListener l)
+  {
+    table.getSelectionModel().addListSelectionListener(l);
+  }
+  public void removeTableSelectionListener(ListSelectionListener l)
+  {
+    table.getSelectionModel().removeListSelectionListener(l);
+  }
   //------------------- MaxDataListener interface ---------------
   public void matCleared()
   {

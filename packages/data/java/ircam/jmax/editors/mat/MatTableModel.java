@@ -33,17 +33,16 @@ import ircam.jmax.fts.*;
 
 class MatTableModel extends AbstractTableModel
 {
-  
   MatTableModel(MatDataModel model)
-  {
+ {
     super();
     this.model = model;
-  }
+ }
 
-public int getColumnCount() 
-{ 
-  return model.getColumns();
-}
+  public int getColumnCount() 
+  { 
+    return model.getColumns();
+  }
 
 public void setValueAt(Object aValue, int rowIndex, int columnIndex) 
 {	    
@@ -59,9 +58,9 @@ public void setValueAt(Object aValue, int rowIndex, int columnIndex)
         obj = Double.valueOf((String)aValue);
       }
       catch(NumberFormatException e1)
-      {
+    {
         obj = aValue;
-      }
+    }
     } 
     
     model.requestSetValue( obj, rowIndex, columnIndex);

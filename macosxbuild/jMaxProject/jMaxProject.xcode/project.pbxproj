@@ -73,6 +73,7 @@
 		};
 		3B513E2806A4274500F1664A = {
 			children = (
+				3B56498006F729CB0065C807,
 				3BA9870506AD60A600D18F4E,
 				3B8B4B8906AFC7E90067B1E0,
 				3B513E2906A4277B00F1664A,
@@ -161,6 +162,21 @@
 			isa = PBXTargetDependency;
 			target = 5C5427F905AB0B900042B7A2;
 			targetProxy = 3B55A6740626F711004953A4;
+		};
+		3B56498006F729CB0065C807 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = MatEditMenu.java;
+			path = ../../packages/data/java/ircam/jmax/editors/mat/MatEditMenu.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B56498106F729CC0065C807 = {
+			fileRef = 3B56498006F729CB0065C807;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		3B5AB8950610995A00412ACC = {
 			fileEncoding = 30;
@@ -9521,6 +9537,7 @@
 				3B8B4B8A06AFC7E90067B1E0,
 				3BA55E0706B2CCE800418694,
 				3B1A919406D352DF009882D6,
+				3B56498106F729CC0065C807,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

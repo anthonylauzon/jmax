@@ -35,7 +35,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
+public class MatEditMenu extends EditorMenu implements ListSelectionListener
 {
   EditorContainer container;
   EditorAction deleteAction;
@@ -43,9 +43,9 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
   int selIndex = -1;
   int selSize = 0;
   
-  public MatSimpleMenu(EditorContainer container, String type)
+  public MatEditMenu(EditorContainer container)
   {
-    super(type);
+    super("Edit");
 
     this.container = container;
     model = ((MatPanel)container.getEditor()).getMatModel();
@@ -80,29 +80,6 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
         }
       });
     }	    
-    
-    addSeparator();
-            
-    add( new EditorAction("Close", "close", KeyEvent.VK_C, KeyEvent.VK_W, true){
-      public void doAction(EditorContainer container)
-      {
-        container.getEditor().close(true);
-        System.gc();
-      }
-    });
-  }
-  
-  public void setFont(Font font)
-  {
-    super.setFont(font);
-    
-    JMenuItem item;
-    for(int i=0; i<getItemCount(); i++)
-    {
-      item = getItem(i);
-      if(item != null)
-        item.setFont(font);
-    }
   }
   
   /* ListSelectionListener interface */
