@@ -96,14 +96,12 @@ AM_CONDITIONAL(COND_COMPILE_JAVA, test "$want_java_compilation" = "yes")
 if test "$want_java_compilation" = "yes" 
 then
 dnl Check for Java compiler
-
 AC_ARG_WITH(javac,
   [  --with-javac=JAVAC       give java compiler (optional)],
   [JAVAC="$withval"])
 AC_ARG_WITH(java,
   [  --with-java=JAVA         give java virtual machine (optional)],
   [JAVA="$withval"])
-
 AC_ARG_WITH(jar,
   [  --with-jar=JAR	      give jar executable (optional)],
   [ JAR="$withval"],
@@ -122,7 +120,28 @@ else
   JAR_SUPPORT_UPDATE="no"
 fi
 
-dnl Check if version of java 
+
+dnl Check if we have additionnal classpath
+ADD_CLASSPATH=""
+AC_ARG_WITH(classpath,
+  [  --with-classpath=CLASSPATH	additionnal classpath (optionnal)],
+  [ ADD_CLASSPATH="$withval"])
+
+dnl Here we buld the content of classpath, which will be:
+dnl current directory
+dnl additionnal classpath
+dnl classpath defined in environment variable
+if test "x$ADD_CLASSPATH" = "x"; then
+   JAVAFLAGS="$JAVAFLAGS -classpath ."
+else
+   JAVAFLAGS="$JAVAFLAGS -classpath .:$ADD_CLASSPATH"
+fi
+if test "x$CLASSPATH" != "x"; then
+   JAVAFLAGS="$JAVAFLAGS:$CLASSPATH"
+fi
+
+
+dnl Check if version of java is enough
 AC_CHECK_JAVA_VERSION("1.4.0")
 if test "$ac_cv_check_java_version" = "no"; then
    AC_MSG_ERROR([jMax requires at least java 1.4.0])
@@ -132,14 +151,6 @@ AC_SUBST(JAR_SUPPORT_UPDATE)
 
 AC_SUBST(JAVAC)
 AC_SUBST(JAVA)
-
-dnl Check for classpath
-AC_ARG_WITH(classpath,
-  [  --with-classpath=CLASSPATH	additionnal classpath (optionnal)],
-  [ CLASSPATH="$withval"])
-dnl CLASSPATH=
-export CLASSPATH
-
 AC_PROG_JAVAC
 AC_PROG_JAVA
 AC_TRY_RUN_JAVA
