@@ -63,9 +63,8 @@ public class MessageTrackEditor extends MonoTrackEditor
 	area.setFont(MessageEventRenderer.stringFont);
 	area.addKeyListener(new KeyListener(){
 	    public void keyPressed(KeyEvent e){
-		//if(!e.isActionKey())
 		if(isEditKey(e))
-		   resizeIfNeeded(e.getKeyChar());
+		    resizeIfNeeded(e, area.getCaretPosition());
 	    }
 	    public void keyReleased(KeyEvent e){}
 	    public void keyTyped(KeyEvent e){}
@@ -77,9 +76,16 @@ public class MessageTrackEditor extends MonoTrackEditor
     boolean isEditKey(KeyEvent e)
     {
 	return ((!e.isActionKey())&&
-		(e.getKeyCode()!=KeyEvent.VK_SHIFT)&&(e.getKeyCode()!=KeyEvent.VK_CONTROL)&&
-		(e.getKeyCode()!=KeyEvent.VK_DELETE)&&(e.getKeyCode()!=KeyEvent.VK_BACK_SPACE)&&
-		(e.getKeyCode()!=KeyEvent.VK_ENTER));
+		(e.getKeyCode()!=KeyEvent.VK_SHIFT)&&(e.getKeyCode()!=KeyEvent.VK_CONTROL));
+    }
+
+    boolean isDeleteKey(KeyEvent e)
+    {
+	return ((e.getKeyCode() == KeyEvent.VK_DELETE)||(e.getKeyCode() == KeyEvent.VK_BACK_SPACE));
+    }
+    boolean isReturnKey(KeyEvent e)
+    {
+	return (e.getKeyCode() == KeyEvent.VK_ENTER);
     }
 
     public JPopupMenu getMenu()
@@ -88,53 +94,91 @@ public class MessageTrackEditor extends MonoTrackEditor
 	return MessageTrackPopupMenu.getInstance();
     }
 
-    void resizeIfNeeded(char val)
+    void resizeIfNeeded(KeyEvent e, int pos)
     {
-	String text = area.getText()+val;
-	FontMetrics fm = gc.getGraphicDestination().getFontMetrics(MessageEventRenderer.stringFont);
-	int width = fm.stringWidth(text);
-	Dimension d = area.getSize();
-	if(width > d.width)
-	    {
-		d.width = width;
-		area.setSize(d);
-		//tempEvent.setProperty("message", text);
-		//((TrackEvent)currentEvt).getRenderer().render(tempEvent, gc.getGraphicDestination().getGraphics(), true, gc);
+	String text = area.getText();
+	char newChar = e.getKeyChar();
 
-		int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);
+	String str1, str2;
+
+	if(isDeleteKey(e)&&(pos>0))
+	    {
+		str1 = text.substring(0, pos-1);  
+		str2 = text.substring(pos);  
+		text = str1+str2;
+	    }
+	else
+	    {
+		str1 = text.substring(0, pos);  
+		str2 = text.substring(pos);  
+		if(isReturnKey(e))
+		    text = str1+newChar+" "+str2;
+		else
+		    text = str1+newChar+str2;
+	    }
+	int width = TextRenderer.getRenderer().getTextWidth(text, gc);
+	int height = TextRenderer.getRenderer().getTextHeight(text, gc);
+	Dimension d = area.getSize();
+	  
+	if((width > d.width)||(height > d.height)||(height<d.height-10))
+	    {
+		if(width < MessageEventRenderer.MINIMUM_WIDTH) 
+		   width  = MessageEventRenderer.MINIMUM_WIDTH;
+		d.width = width;
+
+		if(height < MessageValue.DEFAULT_HEIGHT) 
+		    height = MessageValue.DEFAULT_HEIGHT;		
+		d.height = height;
+
+		area.setSize(d);
+
+		int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
 		currentEvt.setProperty("duration", new Integer(lenght));
+		currentEvt.setProperty("height", new Integer(height));
 	    }
     }
 
-    void doEdit(Event evt)
+    void doEdit(Event evt, int x, int y)
     {
 	isEditing = true;
 	currentEvt = evt;
 	PartitionAdapter a = ((PartitionAdapter)gc.getAdapter());
 
-	/*tempEvent.setTime(currentEvt.getTime());
-	  a.setY(tempEvent, a.getY(currentEvt));*/
-	//tempEvent.setLocalProperties(currentEvt);
-
-	FontMetrics fm = gc.getGraphicDestination().getFontMetrics(MessageEventRenderer.stringFont);
-	String mess = a.getLabel(evt);
+	String text = a.getLabel(evt);
 
 	int evtx = a.getX(evt)+MessageEventRenderer.BUTTON_WIDTH+2+1;
 	int evty = a.getY(evt)+1;
 
-	int evtLenght;
-	if(!mess.equals(""))
-	    evtLenght = fm.stringWidth(mess);
+	int evtLenght, evtHeight;
+
+	if(!text.equals(""))
+	    {
+		evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc);
+		evtHeight = TextRenderer.getRenderer().getTextHeight(text, gc);
+	    }	
 	else
-	    evtLenght = MessageEventRenderer.DEFAULT_TEXT_WIDTH-5;
-	    
-	int evtHeight = fm.getHeight()-1;
+	    {
+		evtLenght = MessageEventRenderer.DEFAULT_TEXT_WIDTH-5;
+		evtHeight = MessageValue.DEFAULT_HEIGHT;
+	    }
 
 	area.setBounds(evtx, evty, evtLenght, evtHeight);
 	area.requestFocus();
 
-	area.setText(a.getLabel(evt));
-	area.setVisible(true);	
+	area.setText(text);
+	area.setVisible(true);
+
+	setCaretPosition(text, x-evtx, y-evty);
+    }
+
+    void setCaretPosition(String text, int x, int y)
+    {
+	int pos = area.viewToModel(new Point(x, y));
+	
+	if ((pos >= 0) && (pos <= text.length()))
+	    area.setCaretPosition(pos);
+	else
+	    area.setCaretPosition(text.length());
     }
 
     void setMessage()
@@ -153,16 +197,72 @@ public class MessageTrackEditor extends MonoTrackEditor
 	isEditing = false;
     }
 
+    int pressX, pressY;
     protected void processMouseEvent(MouseEvent e)
     {
 	if (e.getClickCount() == 1)
 	    if(isEditing) setMessage();
+	
 	super.processMouseEvent(e);
+
+	int id = e.getID();
+	if(id==MouseEvent.MOUSE_PRESSED)
+	    {
+		pressX = e.getX();
+		pressY = e.getY();
+	    }
+	else 
+	    if(id==MouseEvent.MOUSE_RELEASED)
+		startEditIfNeeded(e);
+    }
+
+    TrackEvent editEvt;
+    void startEditIfNeeded(MouseEvent e)
+    {
+	int x = e.getX();
+	int y = e.getY();
+	if((pressX <= x+2)&&(pressX >= x-2)&&(pressY <= y+2)&&(pressY >= y-2))
+	    {
+		editEvt = (TrackEvent) gc.getRenderManager().
+		    firstObjectContaining(pressX, pressY);
+		
+		if (editEvt != null) 
+		    { 
+			if(!((MessageValue)editEvt.getValue()).isOnTheButton(editEvt, pressX, gc))
+			    SwingUtilities.invokeLater(new Runnable(){
+				public void run()
+				    {
+					doEdit(editEvt, pressX, pressY);
+				    }
+			    });
+		    }
+	    }
+    }
+
+    void updateEventProperties(Object whichObject, String propName, Object propValue)
+    {
+	if(propName.equals("message"))
+	{
+	    String text = (String)propValue;
+	    TrackEvent evt = (TrackEvent)whichObject;
+	    int width = TextRenderer.getRenderer().getTextWidth(text, gc);
+	    int height = TextRenderer.getRenderer().getTextHeight(text, gc);
+	  
+	    if(width < MessageEventRenderer.MINIMUM_WIDTH) 
+		width  = MessageEventRenderer.MINIMUM_WIDTH;
+
+	    if(height < MessageValue.DEFAULT_HEIGHT) 
+		height = MessageValue.DEFAULT_HEIGHT;		
+		    
+	    int lenght = gc.getAdapter().getInvWidth(width+4+MessageEventRenderer.BUTTON_WIDTH);		
+	    evt.setProperty("duration", new Integer(lenght));
+	    evt.setProperty("height", new Integer(height));
+	}
     }
 
     JTextArea area;
     boolean isEditing = false;
     Event currentEvt = null;
-    //UtilTrackEvent tempEvent = new UtilTrackEvent(new MessageValue());
 }
+
 

@@ -77,9 +77,11 @@ public class MessageEventRenderer implements ObjectRenderer {
 	int x = gc.getAdapter().getX(e);
 	int y = gc.getAdapter().getY(e);
 
-	int width = ((PartitionAdapter)gc.getAdapter()).getLenght(e);
-
-	int height = fm.getHeight()+2;
+	int width = ((PartitionAdapter)gc.getAdapter()).getLenght(e)-BUTTON_WIDTH;	
+	
+	int height = ((Integer)e.getProperty("height")).intValue()+2;
+	if(height==0)
+	    height = fm.getHeight();
 
 	if (selected) 
 	    g.setColor(Color.pink);
@@ -106,11 +108,11 @@ public class MessageEventRenderer implements ObjectRenderer {
 		    g.setColor(Color.red);
 		else 
 		    g.setColor(Color.darkGray);
-		
+
 		g.drawRect(x+BUTTON_WIDTH+1, y, width, height);
-		g.setFont(stringFont);
-		g.drawString(mess, x+BUTTON_WIDTH+1+2, y+height-/*2*/5);
-		g.setFont(backupFont);
+
+		if(e instanceof TrackEvent)
+		    TextRenderer.getRenderer().render(g, mess, x+BUTTON_WIDTH+1+2, y+1, width-2, height-2);
 	    }
     }
   
@@ -131,20 +133,12 @@ public class MessageEventRenderer implements ObjectRenderer {
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 	Adapter a = gc.getAdapter();
     
-	FontMetrics fm = gc.getGraphicDestination().getFontMetrics(stringFont);
-	String mess = (String) e.getProperty("message");
-
 	int evtx = a.getX(e);
 	int evty = a.getY(e);
 
-	int evtLenght;
-	if(!mess.equals(""))
-	    evtLenght = fm.stringWidth(mess)+4+BUTTON_WIDTH;
-	else
-	    evtLenght = DEFAULT_WIDTH;
-		
-	int evtHeight = fm.getHeight()+2;
-
+	int evtLenght = ((PartitionAdapter)gc.getAdapter()).getLenght(e);
+	int evtHeight = ((Integer)e.getProperty("height")).intValue()+2;
+	
 	tempRect.setBounds(evtx, evty, evtLenght, evtHeight);
 
 	return  tempRect.contains(x, y);
@@ -171,19 +165,11 @@ public class MessageEventRenderer implements ObjectRenderer {
 	SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
 	Adapter a = gc.getAdapter();
 
-	FontMetrics fm = gc.getGraphicDestination().getFontMetrics(stringFont);
-	String mess = (String) e.getProperty("message");
-
 	int evtx = a.getX(e);
 	int evty = a.getY(e);
 	
-	int evtLenght;
-	if(!mess.equals(""))
-	    evtLenght = fm.stringWidth(mess)+4+BUTTON_WIDTH;
-	else
-	    evtLenght = DEFAULT_WIDTH;
-	
-	int evtHeight = fm.getHeight()+2;
+	int evtLenght = ((PartitionAdapter)gc.getAdapter()).getLenght(e);
+	int evtHeight = ((Integer)e.getProperty("height")).intValue()+2;
 
 	eventRect.setBounds(evtx, evty, evtLenght, evtHeight);
 	tempRect.setBounds(x, y, w, h);
@@ -203,11 +189,13 @@ public class MessageEventRenderer implements ObjectRenderer {
     SequenceGraphicContext gc;
     public static MessageEventRenderer staticInstance;
 
-    public final static int DEFAULT_TEXT_WIDTH = 48;
+    public final static int DEFAULT_TEXT_WIDTH = 48; 
+    public final static int MINIMUM_WIDTH = 30;
     public static int BUTTON_WIDTH = 10; 
     public final static int DEFAULT_WIDTH = DEFAULT_TEXT_WIDTH+BUTTON_WIDTH;
 
-    public static Font stringFont = new Font("SansSerif", Font.BOLD, 12); 
+    //public static Font stringFont = new Font("SansSerif", Font.BOLD, 12); 
+    public static Font stringFont = new Font("SansSerif", Font.PLAIN, 10); 
     private Font backupFont;
 }
 

@@ -373,7 +373,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
      * Call this function to signal the parameters changing of the event, except
      * the initial time and the duration parameters. Use moveEvent and resizeEvent for that.
      */
-    public void changeEvent(TrackEvent event)
+    public void changeEvent(TrackEvent event, String propName, Object propValue)
     {
 	int index;
 	
@@ -384,7 +384,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 
 	//????????????????
 	
-	notifyObjectChanged(event);
+	notifyObjectChanged(event, propName, propValue);
     }
     
     /**
@@ -499,10 +499,10 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	    ((TrackDataListener) e.nextElement()).objectDeleted(spec, oldIndex);
     }
     
-    private void notifyObjectChanged(Object spec)
+    private void notifyObjectChanged(Object spec, String propName, Object propValue)
     {
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-	    ((TrackDataListener) e.nextElement()).objectChanged(spec);
+	    ((TrackDataListener) e.nextElement()).objectChanged(spec, propName, propValue);
     }
     
     private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)

@@ -14,7 +14,7 @@ import ircam.jmax.editors.sequence.menus.*;
 
 class ListDialog extends JDialog implements TrackDataListener, TrackListListener, PopupProvider, ListContainer{
     
-    ListDialog(Track track, Frame frame)
+    ListDialog(Track track, Frame frame, SequenceGraphicContext gc)
     {
 	super(frame, "list dialog", false);
 	this.frame = frame;
@@ -25,7 +25,7 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 	
 	panel.add(initLabelsPanel());
 	
-	list = new ListPanel(track, this, this);
+	list = new ListPanel(track, this, this, gc);
 	scroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 					     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	scroll.setBackground(Color.white);
@@ -76,7 +76,7 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
     /**
      * TrackDataListener interface
      */
-    public void objectChanged(Object spec) 
+    public void objectChanged(Object spec, String propName, Object propValue) 
     {
 	scroll.validate();
     }

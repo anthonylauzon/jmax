@@ -59,8 +59,13 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 	    public void objectsAdded(int maxTime) {
 		MonoTrackEditor.this.repaint();
 	    }
-	    public void objectChanged(Object whichObject) {MonoTrackEditor.this.repaint();}
-	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {MonoTrackEditor.this.repaint();}
+	    public void objectChanged(Object whichObject, String propName, Object propValue) {
+		updateEventProperties(whichObject, propName, propValue);
+		MonoTrackEditor.this.repaint();
+	    }
+	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) {
+		MonoTrackEditor.this.repaint();
+	    }
 	});
 
 	geometry.addTranspositionListener(new TranspositionListener() {
@@ -180,9 +185,11 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     private void createListDialog()
     {
-	listDialog = new ListDialog(track, gc.getFrame());
+	listDialog = new ListDialog(track, gc.getFrame(), gc);
     }
 
+    void updateEventProperties(Object whichObject, String propName, Object propValue){}
+    
     /**
      * Track editor interface */
 

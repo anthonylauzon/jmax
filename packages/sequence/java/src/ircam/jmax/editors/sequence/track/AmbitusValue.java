@@ -95,6 +95,8 @@ public class AmbitusValue extends AbstractEventValue
       {
 	  return new ArrayEnumeration(defNamesArray);
       }
+
+
     public int getPropertyCount()
       {
 	  return defPropertyCount;
@@ -124,6 +126,13 @@ public class AmbitusValue extends AbstractEventValue
   public int getPropertyCount()
   {
     return propertyCount;
+  }
+
+  public int getPropertyType(int index)
+  {
+      if(index < propertyCount)
+	  return propertyTypes[index];
+      else return UNKNOWN_TYPE;
   }
 
   public Object[] getPropertyValues()
@@ -164,6 +173,7 @@ public class AmbitusValue extends AbstractEventValue
   }
 
     static String nameArray[] = {"pitch", "duration"};
+    static int propertyTypes[] = {INTEGER_TYPE, INTEGER_TYPE};
     static int propertyCount = 2;
 }
 

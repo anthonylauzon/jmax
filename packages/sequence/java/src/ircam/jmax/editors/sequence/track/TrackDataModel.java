@@ -122,8 +122,10 @@ public interface TrackDataModel {
      * Call this function to signal the parameters changing of the event, except
      * the initial time and the duration parameters. Use moveEvent and resizeEvent for that.
      * @param theEvent the TrackEvent to be changed
+     * @param propertyName the name of the changed property
+     * @param propertyValue the new property value
      */
-    public abstract void changeEvent(TrackEvent event);
+    public abstract void changeEvent(TrackEvent event, String popertyName, Object propertyValue);
     
     /**
      * move an event in the database

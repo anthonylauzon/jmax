@@ -46,7 +46,7 @@ import java.text.NumberFormat;
  * a Midi value) */
 public class ListPanel extends PopupToolbarPanel implements TrackDataListener, MouseListener, ListSelectionListener, KeyListener
 {
-    public ListPanel(Track track, PopupProvider provider, ListContainer container)
+    public ListPanel(Track track, PopupProvider provider, ListContainer container, SequenceGraphicContext gc)
     {
       super(provider);
 
@@ -57,6 +57,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       this.track = track;
       this.container = container;
       data = track.getTrackDataModel();	
+      this.gc = gc;
 
       data.addListener(this);
 
@@ -74,17 +75,11 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
       area = new JTextArea();
       area.setCursor( Cursor.getPredefinedCursor( Cursor.TEXT_CURSOR));
       area.setEditable(true);
+      area.setBorder(BorderFactory.createEtchedBorder());
       area.setLineWrap(true);
       area.setWrapStyleWord(true);
       area.setBackground(Color.white);
-      area.addKeyListener(new KeyListener(){
-	  public void keyPressed(KeyEvent e){
-	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
-		     setEventValue();
-	  }
-	  public void keyReleased(KeyEvent e){}
-	  public void keyTyped(KeyEvent e){}
-      });
+
       add(area);
       validate();
     }
@@ -92,7 +87,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     /**
      * TrackDataListener interface
      */    
-    public void objectChanged(Object spec) 
+    public void objectChanged(Object spec, String propName, Object propValue) 
     {
 	select((TrackEvent)spec, data.indexOf((TrackEvent)spec), currentParamInEvent);
 	repaint();
@@ -132,6 +127,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     public void paintComponent(Graphics g) 
     {
 	TrackEvent evt;
+	String text;
 	Dimension d = getSize();
 	Rectangle r = g.getClipBounds();
 
@@ -141,27 +137,31 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	drawSelection(g, r);
 
 	g.setColor(Color.black);
-	
+
 	int first = getEventIndex(r.y);
 	int last = getEventIndex(r.y+r.height+3*ystep);
 
 	int y = ystep*(first+1);	    
 
+	g.setFont(listFont);
+
 	for(Enumeration e = data.getEvents(first, last); e.hasMoreElements();)
 	    {
 		evt = (TrackEvent) e.nextElement();
 	  
-		g.drawString(""+numberFormat.format(evt.getTime()), 5, y-2);
+		g.drawString(""+numberFormat.format(evt.getTime()), 5, y-6);
 		
 		//for on the property names
 		int i = 1;
 		for(Enumeration e1 = track.getTrackDataModel().getPropertyNames(); e1.hasMoreElements();)
 		    {
-			g.drawString(getPropertyAsString(evt.getProperty((String)e1.nextElement())), 5+i*xstep, y-2);
+			text = getPropertyAsString(evt.getProperty((String)e1.nextElement()));
+			if(text.length() > 10) text = text.substring(0, 10)+"...";
+			g.drawString(text, 5+i*xstep, y-6);
 			i++;
 		    }
 		y = y+ystep;
-	    }
+	    }	
 	  
 	g.setColor(Color.lightGray);
 
@@ -242,19 +242,22 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		{
 		    if(!e.isShiftDown())
 			{
-			    if(isEditing) endEdit();
+			    if(isEditing)
+				setEventValue();
 			    select(evt, index, getEventParamIndex(x));
 			    doEdit(index, currentParamInEvent, currentEvent);			    
 			}
 		    else
 			{
-			    if(isEditing) endEdit();
+			    if(isEditing)
+				setEventValue();
 			    SequenceSelection.getCurrent().deSelect(evt);
 			}
 		}
 		else
 		    {
-			if(isEditing) endEdit();
+			if(isEditing)
+			    setEventValue();
 			if(!e.isShiftDown())
 			    SequenceSelection.getCurrent().deselectAll();
 			SequenceSelection.getCurrent().select(data.getEventAt(index));
@@ -350,15 +353,24 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
     void doEdit(int index, int param, TrackEvent evt)
     {
+	String text;
+
 	isEditing = true;
-	area.setBounds(xstep*param+1, index*ystep+2, xstep-10, ystep-4);
-	area.requestFocus();
-
+	
 	if(param == 0)
-	    area.setText(""+evt.getTime());
+	    text = ""+evt.getTime();
 	else
-	    area.setText(getPropertyAsString(evt.getProperty(getPropNameByIndex(param-1))));
+	    text = getPropertyAsString(evt.getProperty(getPropNameByIndex(param-1)));
 
+	int width  = txtRenderer.getTextWidth(text, gc);
+	if(width < xstep-10) width = xstep-10;
+	
+	int height = txtRenderer.getTextHeight(text, gc)+4;
+	if(height < ystep-4) height = ystep-4;
+
+	area.setBounds(xstep*param+1, index*ystep+2-1, width, height);	
+	area.requestFocus();
+	area.setText(text);
 	area.setVisible(true);	
     }
 
@@ -405,21 +417,65 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 			currentEvent.move(doubleValue);
 		    }
 		else
-		    {
-			//qui devo capire il tipo del parametro non dal valore ma altrove!!!!!!!!!
-			try { 
-			    value = Integer.valueOf(area.getText()).intValue(); // parse int
-			} catch (NumberFormatException exc) {
-			    System.err.println("Error:  invalid number format!");
-			    endEdit();
-			    repaint();
-			    return;
-			}
-			if(value<0) value=0;
-			currentEvent.setProperty(getPropNameByIndex(currentParamInEvent-1), new Integer(value));
+		    {			
+			Object objVal = getEditValueObject();
+			if(objVal!=null)
+			    currentEvent.setProperty(getPropNameByIndex(currentParamInEvent-1), objVal);
 		    }
 	    }
 	endEdit();
+    }
+
+    Object getEditValueObject()
+    {
+	int intValue;
+	float floatValue;
+	double doubleValue;
+	switch(currentEvent.getValue().getPropertyType(currentParamInEvent-1))
+	    {
+	    case EventValue.INTEGER_TYPE:
+		try { 
+		    intValue = Integer.valueOf(area.getText()).intValue(); // parse int
+		} catch (NumberFormatException exc) {
+		    System.err.println("Error:  invalid number format!");
+		    endEdit();
+		    repaint();
+		    return null;
+		}
+	 	if(intValue<0) intValue = 0;
+		 return new Integer(intValue);
+	
+	    case EventValue.FLOAT_TYPE:
+		try { 
+		    floatValue = Float.valueOf(area.getText()).floatValue(); // parse int
+		} catch (NumberFormatException exc) {
+		    System.err.println("Error:  invalid number format!");
+		    endEdit();
+		    repaint();
+		    return null;
+		}
+		if(floatValue<0) floatValue = (float)0.0;
+		return new Float(floatValue);
+	    
+	    case EventValue.STRING_TYPE:
+		return area.getText(); 
+	    case EventValue.DOUBLE_TYPE:
+		try { 
+		    doubleValue = Double.valueOf(area.getText()).doubleValue(); // parse int
+		} catch (NumberFormatException exc) {
+		    System.err.println("Error:  invalid number format!");
+		    endEdit();
+		    repaint();
+		    return null;
+		}
+		if(doubleValue<0) doubleValue = 0.0;
+		return new Double(doubleValue);
+
+	    case EventValue.BOOLEAN_TYPE:
+		return Boolean.valueOf(area.getText());
+	    default:
+		return null;
+	    }
     }
 
     public JTextArea getTextArea()
@@ -489,15 +545,19 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     final public static int ystep = 20;
     TrackDataModel data;
     Track track;
+    SequenceGraphicContext gc;
     ListContainer container;
     TrackEvent currentEvent = null;
     int currentIndex = -1;
     Vector selectedIndexVector = new Vector();
+    public static final Font listFont = new Font("Dialog", Font.PLAIN, 12);
 
     int currentParamInEvent = 0;
 
     Rectangle selRect = new Rectangle();
     Vector listeners = new Vector();
+
+    TextRenderer txtRenderer = new TextRenderer(listFont, Color.white, Color.black);
 
     JTextArea area;
     boolean isEditing = false;

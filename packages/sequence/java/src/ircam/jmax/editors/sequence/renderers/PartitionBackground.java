@@ -79,6 +79,11 @@ public class PartitionBackground implements Layer, ImageObserver{
     g.fillRect(0, 0 -delta, d.width, maxPitch);
     g.fillRect(0, minPitch -delta, d.width, d.height-minPitch+delta);
     
+    // the track name
+    g.setColor(Color.gray);
+    g.setFont(ToggleBar.toggleBarFont);
+    g.drawString(gc.getTrack().getName(), 10, 10);
+
     int positionY = SC_BOTTOM;
     g.setFont(gridSubdivisionFont);
 

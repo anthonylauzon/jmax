@@ -75,53 +75,70 @@ public class MessageValue extends AbstractEventValue
 
     public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc)
     {
-	if(x-gc.getAdapter().getX(evt) <= MessageEventRenderer.BUTTON_WIDTH)
-	    {//doubleClick on the button then open or close the object
-		int size;
+	if(isOnTheButton(evt, x, gc))
+	    {
+		int width, height;
 		boolean open = ((Boolean)getProperty("open")).booleanValue();
 		setProperty("open", new Boolean(!open));
 		
-		if(open) size = gc.getAdapter().getInvWidth(MessageEventRenderer.BUTTON_WIDTH);
+		String text = gc.getAdapter().getLabel(evt);
+		
+		if(!text.equals(""))
+		    height = TextRenderer.getRenderer().getTextHeight(text, gc);
+		else
+		    height = DEFAULT_HEIGHT;
+		
+		if(open) 
+		    width = gc.getAdapter().getInvWidth(MessageEventRenderer.BUTTON_WIDTH);
 		else 
 		    {
-			FontMetrics fm = gc.getGraphicDestination().getFontMetrics(MessageEventRenderer.stringFont);
-			String mess = (String) getProperty("message");
 			int evtLenght;
-			if(!mess.equals(""))
-			    evtLenght = fm.stringWidth(mess)+4+MessageEventRenderer.BUTTON_WIDTH;
+		
+			if(!text.equals(""))
+			    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
 			else
 			    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
-
-			size = gc.getAdapter().getInvWidth(evtLenght);
+			
+			width = gc.getAdapter().getInvWidth(evtLenght);
 		    }
-		setProperty("duration", new Integer(size));
+		setProperty("duration", new Integer(width));
+		setProperty("height", new Integer(height));
 	    }
-	else
-	    {
-		//edit the text in the object SPORCOOOOOOOOOOOOOOOOOOOOOO!!!!!!!
-		((MessageTrackEditor)gc.getGraphicDestination()).doEdit(evt);
-	    }
+    }
+
+    public boolean isOnTheButton(Event evt, int x, SequenceGraphicContext gc)
+    {
+    	return (x-gc.getAdapter().getX(evt) <= MessageEventRenderer.BUTTON_WIDTH);
+
     }
 
     public void setText(String text, TrackEvent evt, SequenceGraphicContext gc)
     {	
-	int width, evtLenght;
+	int width, evtLenght, height;
 	if(gc!=null)
 	    {
-		FontMetrics fm = gc.getGraphicDestination().getFontMetrics(MessageEventRenderer.stringFont);		
 		if(!text.equals(""))
-		    evtLenght = fm.stringWidth(text)+4+MessageEventRenderer.BUTTON_WIDTH; 
+		    {
+			evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
+			height = TextRenderer.getRenderer().getTextHeight(text, gc);
+		    }		
 		else
-		    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
+		    {
+			evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
+			height = DEFAULT_HEIGHT;
+		    }
 
 		width = gc.getAdapter().getInvWidth(evtLenght);
 	    }
 	else 
-	    width = DEFAULT_WIDTH;
-
+	    {
+		width = DEFAULT_WIDTH;
+		height = DEFAULT_HEIGHT;
+	    }
 	setProperty("message", text);
 	setProperty("duration", new Integer(width));
-
+	setProperty("height", new Integer(height));
+	
 	if(evt!=null)
 	    evt.sendSetMessage(info.getName(), getPropertyCount(), getPropertyValues());
     }
@@ -184,6 +201,13 @@ public class MessageValue extends AbstractEventValue
 	return propertyCount;
     }
 
+    public int getPropertyType(int index)
+    {
+	if(index < propertyCount)
+	    return propertyTypes[index];
+	else return UNKNOWN_TYPE;
+    }
+
     public String[] getLocalPropertyNames()
     {
 	return localNameArray;
@@ -228,12 +252,14 @@ public class MessageValue extends AbstractEventValue
     public static final String MESSAGE_PUBLIC_NAME = "message";
     public static MessageValueInfo info = new MessageValueInfo();
     public static final int DEFAULT_WIDTH = 290;
+    public static final int DEFAULT_HEIGHT = /*15*/13;
     static String path;
     public static ImageIcon MESSAGE_ICON;
     static String nameArray[] = {"message", "integer"};
-    static String localNameArray[] = {"duration", "open"};
+    static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};
+    static String localNameArray[] = {"duration", "open", "height"};
     static int propertyCount = 2;
-    static int localPropertyCount = 2;
+    static int localPropertyCount = 3;
 
     static 
     {

@@ -315,7 +315,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
      * called when the database is changed: DataTrackListener interface
      */
     
-    public void objectChanged(Object spec) {}
+    public void objectChanged(Object spec, String propName, Object propValue) {}
     public void objectAdded(Object spec, int index) 
     {
 	resizePanelToEventTime((TrackEvent)spec);	

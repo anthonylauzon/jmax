@@ -12,7 +12,7 @@ import ircam.jmax.MaxApplication;
 
 /**
  * A graphic component that contains a single track editor*/
-class TrackContainer extends JPanel {
+public class TrackContainer extends JPanel {
 
   public TrackContainer(Track t, TrackEditor trackEditor)
   {
@@ -39,6 +39,18 @@ class TrackContainer extends JPanel {
     activationButton.setSelectedIcon(new ImageIcon(path+"selected_track.gif"));
     activationButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 70));
     add(activationButton, BorderLayout.WEST);
+
+    /////////////////////////
+    openButton = new JButton(new ImageIcon(path+"opened_track_arrow.gif"));
+    openButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 20));
+
+    buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BorderLayout());
+    buttonPanel.add(openButton, BorderLayout.NORTH);
+    buttonPanel.add(activationButton, BorderLayout.CENTER);
+
+    add(buttonPanel, BorderLayout.WEST);
+
     add(trackEditor.getComponent(), BorderLayout.CENTER);
     
     // --- set the "active" property of the track when the button is pressed
@@ -48,6 +60,17 @@ class TrackContainer extends JPanel {
 	  track.setProperty("active", Boolean.TRUE);
 	}
     });
+
+    openButton.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	    {
+		track.setProperty("opened", Boolean.FALSE);
+	    }
+    });
+
+    toggleBar = new ToggleBar(track);
+    add(toggleBar, BorderLayout.NORTH);
+    toggleBar.setVisible(false);
     
     // --- change the selected state of the button when the "active" property of the track changes
     track.getPropertySupport().addPropertyChangeListener( new ActiveListener(activationButton));
@@ -78,12 +101,23 @@ class TrackContainer extends JPanel {
     public void propertyChange(PropertyChangeEvent evt)
     {
       boolean active = false;	    
+      boolean opened = true;	    
       String name = evt.getPropertyName();
 
       if (name.equals("active"))
 	  {
 	      active = ((Boolean) evt.getNewValue()).booleanValue();
 	      b.setSelected(active);
+	  }
+      else if (name.equals("opened"))
+	  {
+	      opened = ((Boolean) evt.getNewValue()).booleanValue();
+
+	      trackEditor.getComponent().setVisible(opened);
+	      buttonPanel.setVisible(opened);
+	      toggleBar.setVisible(!opened);
+
+	      validate();
 	  }
       else 
 	  if(name.equals("maximumPitch") || name.equals("minimumPitch"))
@@ -123,7 +157,10 @@ class TrackContainer extends JPanel {
   TrackEditor trackEditor;
   Track track;
   JToggleButton activationButton;
-  public static final int BUTTON_WIDTH = 30;
+  JButton openButton;
+  ToggleBar toggleBar;
+  JPanel buttonPanel; 
+  public static final int BUTTON_WIDTH = 25;
 }
 
 

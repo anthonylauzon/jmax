@@ -88,8 +88,8 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     
 	if (aTrackEvent != null) 
 	    { //click on event
-		//aTrackEvent.getValueEditor().startEdit(aTrackEvent);
 		aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);
+
 		gc.getGraphicDestination().repaint();
 	    }
     }

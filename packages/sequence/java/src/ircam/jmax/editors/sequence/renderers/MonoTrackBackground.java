@@ -94,6 +94,11 @@ public class MonoTrackBackground implements Layer{
     g.setColor(Color.white);
     g.fillRect(0, 0, w, h);
 
+    // the track name
+    g.setColor(Color.gray);
+    g.setFont(ToggleBar.toggleBarFont);
+    g.drawString(gc.getTrack().getName(), 10, 10);
+
     g.setColor(Color.black);
 
     int y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
@@ -172,6 +177,7 @@ public class MonoTrackBackground implements Layer{
   public static final int KEYWIDTH = 24;
   public static final int KEYEND = KEYX + KEYWIDTH;
 }
+
 
 
 

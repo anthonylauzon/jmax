@@ -22,7 +22,6 @@ public interface EventValue
    /**
      * Set the named property */
     public abstract void setProperty(String name, Object value);
-
     /**
      * Get the given property */
     public abstract Object getProperty(String name);
@@ -49,6 +48,8 @@ public interface EventValue
     public abstract Enumeration getPropertyNames();
     
     public abstract String[] getLocalPropertyNames();
+
+    public abstract int getPropertyType(int index);
 
     /**
      * Returns the number of properties known by this
@@ -81,6 +82,13 @@ public interface EventValue
      * here is suited to be represented in Renderer that handle (at least) midi-like
      * values */
     public Object DEFAULT_PROPERTY = new Integer(64);
+
+    public static int UNKNOWN_TYPE = -1;
+    public static int INTEGER_TYPE =  0;
+    public static int FLOAT_TYPE   =  1;
+    public static int STRING_TYPE  =  2;
+    public static int BOOLEAN_TYPE =  3;
+    public static int DOUBLE_TYPE  =  4;
 }
 
 

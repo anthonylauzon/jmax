@@ -29,7 +29,7 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     {
 	properties.put(name, value);
     }
-    
+
     /**
      * Get the given property */
     public Object getProperty(String name)
@@ -55,6 +55,11 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     public int getPropertyCount()
     {
 	return 0;
+    }
+
+    public int getPropertyType(int index)
+    {
+	return UNKNOWN_TYPE;
     }
 
     public String[] getLocalPropertyNames()
@@ -116,6 +121,8 @@ public class AbstractEventValue extends FtsRemoteData implements EventValue
     private String name;
     protected Hashtable properties = new Hashtable();
 }
+
+
 
 
 

@@ -108,6 +108,13 @@ public class IntegerValue extends AbstractEventValue
     {
 	return new ArrayEnumeration(nameArray);
     }
+
+    public int getPropertyType(int index)
+    {
+	if(index < propertyCount)
+	    return propertyTypes[index];
+	else return UNKNOWN_TYPE;
+    }
     
     public int getPropertyCount()
     {
@@ -137,6 +144,7 @@ public class IntegerValue extends AbstractEventValue
     public static final int DEFAULT_MIN_VALUE = 0;
 
     static String nameArray[] = {"integer"};
+    static int propertyTypes[] = {INTEGER_TYPE};
     static int propertyCount = 1;
 }
 

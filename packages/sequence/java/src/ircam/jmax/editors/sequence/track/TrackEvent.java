@@ -128,10 +128,9 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	else if (value != null)
 	    value.setProperty(name, theValue); //unknow not-Integer property, delegate it to the value object
 	
-
 	if (itsTrackDataModel != null)
 	    {
-		itsTrackDataModel.changeEvent(this);
+		itsTrackDataModel.changeEvent(this, name, theValue);
 	    }
 
 	//send the set message to the fts event object
@@ -261,5 +260,10 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	    sendArgs[i]= new FtsAtom();
     }
 }
+
+
+
+
+
 
 

@@ -110,6 +110,10 @@ public class ScoreBackground implements Layer{
       // the last (127) number
       g.drawString(""+127, 10, SC_TOP+3-delta);
       
+      // the track name
+      g.setFont(ToggleBar.toggleBarFont);
+      g.drawString(gc.getTrack().getName(), 10, 10);
+
       // the piano keys...
       for (int i = 0; i <= 127; i++)
 	  {
@@ -131,7 +135,7 @@ public class ScoreBackground implements Layer{
       g.drawLine(KEYX, SC_BOTTOM+1-delta, KEYEND,SC_BOTTOM+1-delta);
       // the vertical line at the end of keyboard
       g.drawLine(KEYEND, SC_TOP-3-delta, KEYEND, SC_BOTTOM+1-delta);
-      g.drawLine(KEYX-1, SC_TOP-3-delta, KEYX-1, SC_BOTTOM+1-delta);
+      g.drawLine(KEYX-1, SC_TOP-3-delta, KEYX-1, SC_BOTTOM+1-delta); 
   }
 
   public static boolean isAlteration(int note)

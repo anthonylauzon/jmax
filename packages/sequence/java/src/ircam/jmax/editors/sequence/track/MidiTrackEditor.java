@@ -148,7 +148,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
      * called when the database is changed: DataTrackListener interface
      */
     
-    public void objectChanged(Object spec) 
+    public void objectChanged(Object spec, String propName, Object propValue) 
     {
 	repaint();
     }
@@ -282,7 +282,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
     private void createListDialog()
     {
-	listDialog = new ListDialog(track, gc.getFrame());
+	listDialog = new ListDialog(track, gc.getFrame(), gc);
     }
 
     public boolean isDisplayLabels()

@@ -119,35 +119,34 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
   }
   public void objectAdded(Object whichObject, int index){}
   public void objectsAdded(int maxTime){}
-  public void objectChanged(Object whichObject){
-    if (target == whichObject) refresh();
+  public void objectChanged(Object whichObject, String propName, Object propValue){
+      if (target == whichObject) refresh();
   }
   public void objectMoved(Object whichObject, int oldIndex, int newIndex){
-    objectChanged(whichObject);
+      objectChanged(whichObject, "time", null);
   }
 
   /** set the target TrackEvent to edit.
    * null means no objects */
   public void setTarget(TrackEvent e)
   {
-
     target = e;
 
     if (e!= null)
       {
 	  timeEditor.setValue((int)e.getTime());//??
-	pitchEditor.setValue(((Integer)e.getProperty("pitch")).intValue());
-	durationEditor.setValue(((Integer)e.getProperty("duration")).intValue());
-	velocityEditor.setValue(((Integer)e.getProperty("velocity")).intValue());
-	channelEditor.setValue(((Integer)e.getProperty("channel")).intValue());
+	  pitchEditor.setValue(((Integer)e.getProperty("pitch")).intValue());
+	  durationEditor.setValue(((Integer)e.getProperty("duration")).intValue());
+	  velocityEditor.setValue(((Integer)e.getProperty("velocity")).intValue());
+	  channelEditor.setValue(((Integer)e.getProperty("channel")).intValue());
       }
     else 
       {
-	timeEditor.setValue("");
-	pitchEditor.setValue("");
-	durationEditor.setValue("");
-	velocityEditor.setValue("");
-	channelEditor.setValue("");
+	  timeEditor.setValue("");
+	  pitchEditor.setValue("");
+	  durationEditor.setValue("");
+	  velocityEditor.setValue("");
+	  channelEditor.setValue("");
       }
   }
 
@@ -237,5 +236,4 @@ public class ScrEventWidget extends Box implements ListSelectionListener, TrackD
   NumericalWidget durationEditor;
   NumericalWidget velocityEditor;
   NumericalWidget channelEditor;
-
 }
