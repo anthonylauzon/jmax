@@ -645,23 +645,17 @@ static int duplicate_std_in_out( fts_pipestream_t *this)
 #else
 static int duplicate_std_in_out( fts_pipestream_t *this)
 {
-  int _stdout;
-
   if ( (this->in = dup( 0)) < 0 || (this->out = dup( 1)) < 0)
     {
       fts_object_error( (fts_object_t *)this, "failed to duplicate standard input or output");
       return -1;
     }
 
-  close( 0);
+  if ( dup2( open( "/dev/null", O_RDONLY), 0) < 0)
+    fts_log( "[pipe] cannot redirect standard input. Stdin will not be available.\n");
 
-  if ( (_stdout = open( "/tmp/fts.stdout", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0
-       || dup2( _stdout, 1) < 0)
-    {
-      fts_log( "[pipe] cannot redirect standard output. Stdout will not be available.\n");
-    }
-
-  close( _stdout);
+  if ( dup2( open( "/dev/null", O_WRONLY), 1) < 0)
+    fts_log( "[pipe] cannot redirect standard output. Stdout will not be available.\n");
 
   return 0;
 }
