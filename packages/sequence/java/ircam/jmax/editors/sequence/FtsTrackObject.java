@@ -389,10 +389,13 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
     for(int i=0; i<nArgs; i++)
       {
-	if(arguments[i] instanceof Double)
+	if( arguments[i] instanceof Double)
 	  args.addFloat(((Double)arguments[i]).floatValue());
 	else
-	  args.add(arguments[i]);
+	  if(  arguments[i] instanceof String)
+	    args.addSymbol( FtsSymbol.get( (String)arguments[i]));
+	  else
+	    args.add(arguments[i]);
       }
     try{
       send( FtsSymbol.get("addEvent"), args);
@@ -414,7 +417,10 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       if(arguments[i] instanceof Double)
 	args.addFloat(((Double)arguments[i]).floatValue());
       else
-	args.add(arguments[i]);
+	if( arguments[i] instanceof String)
+	  args.addSymbol( FtsSymbol.get( (String)arguments[i]));
+	else
+	  args.add(arguments[i]);
 
     try{
       send( FtsSymbol.get("makeEvent"), args);
@@ -1091,22 +1097,35 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 
 	      beginUpdate();  //the paste is undoable
 
-	      requestEventCreationWithoutUpload((float)event.getTime(), 
-						event.getValue().getValueInfo().getName(), 
-						event.getValue().getDefinedPropertyCount()*2, 
-						event.getValue().getDefinedPropertyNamesAndValues());
+	      /*requestEventCreationWithoutUpload((float)event.getTime(), 
+		event.getValue().getValueInfo().getName(), 
+		event.getValue().getDefinedPropertyCount()*2, 
+		event.getValue().getDefinedPropertyNamesAndValues());
+		
+		while (objectsToPaste.hasMoreElements())
+		{
+		event = (Event) objectsToPaste.nextElement();
+		requestEventCreationWithoutUpload((float)event.getTime(), 
+		event.getValue().getValueInfo().getName(), 
+		event.getValue().getDefinedPropertyCount()*2, 
+		event.getValue().getDefinedPropertyNamesAndValues());
+		}
+		    
+		requestUpload();*/
+	      requestEventCreation((float)event.getTime(), 
+				   event.getValue().getValueInfo().getName(), 
+				   event.getValue().getDefinedPropertyCount()*2, 
+				   event.getValue().getDefinedPropertyNamesAndValues());
 	      
 	      while (objectsToPaste.hasMoreElements())
 		{
 		  event = (Event) objectsToPaste.nextElement();
-		  requestEventCreationWithoutUpload((float)event.getTime(), 
-						    event.getValue().getValueInfo().getName(), 
-						    event.getValue().getDefinedPropertyCount()*2, 
-						    event.getValue().getDefinedPropertyNamesAndValues());
+		  requestEventCreation((float)event.getTime(), 
+				       event.getValue().getValueInfo().getName(), 
+				       event.getValue().getDefinedPropertyCount()*2, 
+				       event.getValue().getDefinedPropertyNamesAndValues());
 		}
-		    
-	      requestUpload();
-
+	      
 	      requestEndPaste();
 	    }
 	    catch (Exception e) {}
@@ -1405,7 +1424,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       {
 	evt = events[index];	
 		
-	if(e.getValue().samePropertyValues(evt.getValue().getPropertyValues()))
+	if(e.getValue().samePropertyValues( evt.getValue().getDefinedPropertyCount()*2, 
+					    evt.getValue().getDefinedPropertyNamesAndValues()))
 	  retEvt = evt;
 	else
 	  {
@@ -1413,7 +1433,8 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
 			
 	    while((evt!=null)&&(evt.getTime()==e.getTime()))
 	      {
-		if(e.getValue().samePropertyValues(evt.getValue().getPropertyValues()))
+		if(e.getValue().samePropertyValues( evt.getValue().getDefinedPropertyCount()*2, 
+						    evt.getValue().getDefinedPropertyNamesAndValues()))
 		  {					
 		    retEvt = evt;
 		    break;

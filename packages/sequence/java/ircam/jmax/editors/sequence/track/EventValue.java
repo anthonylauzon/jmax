@@ -94,7 +94,7 @@ public interface EventValue
   
     public abstract Object[] getLocalPropertyValues();
 
-    public abstract boolean samePropertyValues(Object args[]);
+    public abstract boolean samePropertyValues(int nArgs, Object args[]);
    
 
   public int getDefinedPropertyCount();

@@ -111,10 +111,10 @@ public class IntegerValue extends AbstractEventValue
       super.setPropertyValues(nArgs, args);
   }
 
-  public boolean samePropertyValues(Object args[])
-  {
+  /*public boolean samePropertyValues(Object args[])
+    {
     return (((Integer)propertyValuesArray[0]).intValue() == ((Integer)args[0]).intValue());
-  }
+    }*/
 
   //--- Fields
   public static final String fs = File.separator;

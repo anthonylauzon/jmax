@@ -114,10 +114,10 @@ public class FloatValue extends AbstractEventValue
       super.setPropertyValues(nArgs, args);
   }
 
-  public boolean samePropertyValues(Object args[])
-  {
+  /*public boolean samePropertyValues(Object args[])
+    {
     return (((Float)propertyValuesArray[0]).floatValue() == ((Float)args[0]).floatValue());
-  }
+    }*/
 
   //--- Fields
   public static final String fs = File.separator;

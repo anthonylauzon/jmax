@@ -230,32 +230,44 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
     if( varName!= null)
       {	  
-	if( ftsObject.isPersistent() == 1)
+	if (ftsObject.isError())
 	  if (isSelected())
-	    g.setColor( selVarPersistColor);
+	    g.setColor( selVarErrorColor);
 	  else
-	    g.setColor( varPersistColor);
+	    g.setColor( varErrorColor);	  
 	else
-	  if( isSelected())
-	    g.setColor( selVarColor);
+	  if( ftsObject.isPersistent() == 1)
+	    if (isSelected())
+	      g.setColor( selVarPersistColor);
+	    else
+	      g.setColor( varPersistColor);
 	  else
-	    g.setColor( varColor);
+	    if( isSelected())
+	      g.setColor( selVarColor);
+	    else
+	      g.setColor( varColor);
 
 	g.fillRect( x+w, y+1, varWidth-1, h-2);
 
-	if( ftsObject.isPersistent() == 1)
-	  if (isSelected())
-	    g.setColor( selPersistColor);
+	if (ftsObject.isError())
+	  if ( isSelected())
+	    g.setColor( Color.gray);
 	  else
-	    g.setColor( persistColor);
+	    g.setColor( Color.lightGray);	  
 	else
-	  if( isSelected())
-	    g.setColor( Settings.sharedInstance().getObjColor().darker());
+	  if( ftsObject.isPersistent() == 1)
+	    if (isSelected())
+	      g.setColor( selPersistColor);
+	    else
+	      g.setColor( persistColor);
 	  else
-	    g.setColor( Settings.sharedInstance().getObjColor());
+	    if( isSelected())
+	      g.setColor( Settings.sharedInstance().getObjColor().darker());
+	    else
+	      g.setColor( Settings.sharedInstance().getObjColor());
 
 	g.drawLine( x+w-2, y+1, x+w-2, y+h-2);
-	g.setColor( Color.black);
+	g.setColor( getTextForeground());
 	g.drawLine( x+w-1, y+1, x+w-1, y+h-2);
 	g.setFont( getFont());
 	g.drawString( varName, x+w+2, y + getFontMetrics().getAscent() + (h - getFontMetrics().getHeight())/2);
@@ -280,6 +292,8 @@ public class Standard extends Editable implements FtsObjectErrorListener
   Color selPersistColor = new Color( 178, 178, 40);
   Color varPersistColor = new Color( 230, 230, 40, 100);
   Color selVarPersistColor = new Color( 178, 178, 40, 100);
+  Color varErrorColor = new Color( 192, 192, 192, 100);
+  Color selVarErrorColor = new Color( 128, 128, 128, 100);
 }
 
 

@@ -94,7 +94,7 @@ event_dumper_instantiate(fts_class_t *cl)
 
 /* create event value and make a new event */
 static event_t *
-create_event(int ac, const fts_atom_t *at)
+track_create_event_by_client_request(int ac, const fts_atom_t *at)
 {
   event_t *event = NULL;
   fts_symbol_t class_name;
@@ -107,6 +107,8 @@ create_event(int ac, const fts_atom_t *at)
   }
 
   class_name = fts_get_symbol(at);
+  ac--;
+  at++;
 
   if(class_name == fts_s_int || class_name == fts_s_float || class_name == fts_s_symbol)
     event = (event_t *)fts_object_create(event_class, 1, at + 1);
@@ -116,17 +118,63 @@ create_event(int ac, const fts_atom_t *at)
 
     if(type)
     {
-      fts_object_t *obj = fts_object_create(type, ac - 1, at + 1);
+      fts_object_t *obj = fts_object_create(type, 0, 0);
 
       if(obj)
       {
         fts_atom_t a;
-
+	int i;
+	
+	for(i=0; i<ac-1; i+=2)
+	  {
+	    if(fts_is_symbol(at + i))
+	      {
+		fts_symbol_t prop = fts_get_symbol(at + i);
+		
+		fts_send_message(obj, prop, 1, at + i + 1);
+	      }
+	  }
+	
+	
         fts_set_object(&a, obj);
         event = (event_t *)fts_object_create(event_class, 1, &a);
       }
     }
   }
+  
+  return event;
+}
+
+static event_t *
+track_event_new(int ac, const fts_atom_t *at)
+{
+  event_t *event = NULL;
+  fts_symbol_t class_name;
+  fts_class_t * type;
+
+  if(fts_is_symbol(at) && fts_get_symbol(at) == fts_s_colon)
+  {
+    /* skip colon before class name */
+    ac--;
+    at++;
+  }
+
+  class_name = fts_get_symbol(at);
+  
+  type = fts_class_get_by_name(NULL, class_name);
+  
+  if(type)
+    {
+      fts_object_t *obj = fts_object_create(type, ac - 1, at + 1);
+      
+      if(obj)
+	{
+	  fts_atom_t a;
+	  
+	  fts_set_object(&a, obj);
+	  event = (event_t *)fts_object_create(event_class, 1, &a);
+	}
+    }
 
   return event;
 }
@@ -950,7 +998,7 @@ track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
 {
   track_t *this = (track_t *)o;
   double time = fts_get_float(at + 0);
-  event_t *event = create_event(ac - 1, at + 1);
+  event_t *event = track_create_event_by_client_request(ac - 1, at + 1);
 
   if(event)
     track_add_event_and_upload( this, time, event);
@@ -965,7 +1013,7 @@ track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
   event_t *event;
 
   /* make new event object */
-  event = create_event(ac - 1, at + 1);
+  event = track_create_event_by_client_request(ac - 1, at + 1);
 
   /* add event to track */
   if(event)
@@ -1229,7 +1277,7 @@ track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   else
   {
     /* create event with object from description */
-    event = create_event(ac - 1, at + 1);
+    event = track_event_new(ac - 1, at + 1);
 
     /* set current event loading */
     this->load_obj = fts_get_object(event_get_value(event));

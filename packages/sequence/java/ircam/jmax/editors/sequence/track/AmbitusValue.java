@@ -146,13 +146,13 @@ public class AmbitusValue extends AbstractEventValue
       super.setPropertyValues( nArgs, args);
   }
 
-  public boolean samePropertyValues(Object args[])
-  {
+  /*public boolean samePropertyValues(int nArgs, Object args[])
+    {
     return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
-	    (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()) &&
-	    (((Integer)getProperty("velocity")).intValue() == ((Integer)args[2]).intValue()) &&
-	    (((Integer)getProperty("channel")).intValue() == ((Integer)args[3]).intValue()));
-  }
+    (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()) &&
+    (((Integer)getProperty("velocity")).intValue() == ((Integer)args[2]).intValue()) &&
+    (((Integer)getProperty("channel")).intValue() == ((Integer)args[3]).intValue()));
+    }*/
 
   //--- Fields
   public static final int DEFAULT_MAX_PITCH = 127;

@@ -154,9 +154,18 @@ public class AbstractEventValue implements EventValue
       }
     return i;
   }
-  public boolean samePropertyValues(Object args[])
+  public boolean samePropertyValues(int nArgs, Object args[])
   {
-    return false;
+    String name;
+    Object myValue;
+    for( int i = 0; i < nArgs - 1; i+=2)
+      {
+	name = (String)args[i];
+	myValue = getProperty( name);
+	if(( myValue == null) || ( myValue != args[i+1]))
+	  return false;
+      }
+    return true;
   }
 
   public Object[] getLocalPropertyValues()

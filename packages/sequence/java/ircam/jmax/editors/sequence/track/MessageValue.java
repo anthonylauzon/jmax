@@ -259,11 +259,11 @@ public class MessageValue extends AbstractEventValue
       setProperty(localNameArray[i], args[i]);
   }
   
-  public boolean samePropertyValues(Object args[])
-  {
+  /*public boolean samePropertyValues(Object args[])
+    {
     return (((String)getProperty("message")).equals((String)args[0]) &&
-	    (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
-  }
+    (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
+    }*/
 
   //--- Fields
   public static final String fs = File.separator;

@@ -124,45 +124,10 @@ public class AnythingValue extends AbstractEventValue
     return AnythingEventRenderer.getRenderer();
   }
   
-  /*public Enumeration getPropertyNames()
+  /*public boolean samePropertyValues(Object args[])
     {
-    return new ArrayEnumeration(nameArray);
-    }
-    public int getPropertyCount()
-    {
-    return propertyCount;
-    }
-
-    public int getPropertyType(int index)
-    {
-    if(index < propertyCount)
-    return propertyTypes[index];
-    else return UNKNOWN_TYPE;
+    return true;
     }*/
-
-  /*public Object[] getPropertyValues()
-    {
-    //for(int i = 0; i < dataModel.propertyCount; i++)
-    //propertyValuesArray[i] = getProperty(nameArray[i]);
-    int i = 0;
-    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-    propertyValuesArray[i++] = getProperty( (String)e.nextElement());
-    return propertyValuesArray;
-    }
-
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-    //for(int i = 0; i<nArgs; i++)
-    //setProperty(nameArray[i], args[i]);
-    int i = 0;
-    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-    setProperty( (String)e.nextElement(), args[i++]);
-    }*/
-
-  public boolean samePropertyValues(Object args[])
-  {
-      return true;
-  }
 
   //--- Fields
   public static final String fs = File.separator;
