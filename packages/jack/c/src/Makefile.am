@@ -9,6 +9,7 @@ CFLAGS = @CFLAGS@ @JACK_CFLAGS@
 libjmax_jack_la_LDFLAGS= @LDFLAGS@ @JACK_LDFLAGS@
 INCLUDES=-I$(top_srcdir)/include
 
+noinst_HEADERS = jackaudio.h
 install-data-hook:
 	-rm $(DESTDIR)$(packagedir)/libjack.so
 	ln $(DESTDIR)$(packagedir)/libjmax-jack.so $(DESTDIR)$(packagedir)/libjack.so
