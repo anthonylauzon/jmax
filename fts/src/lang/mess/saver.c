@@ -37,7 +37,7 @@ struct fts_bmax_file
 
 
 union swap_union_t {
-  long l;
+  unsigned long l;
   char c[4];
 };
 
@@ -49,7 +49,7 @@ static int has_to_swap(void)
   return u.c[0] != 0x11;
 }
 
-static void swap_long( long *p)
+static void swap_long( unsigned long *p)
 {
   union swap_union_t *pu;
   char tmp;
@@ -779,6 +779,9 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_min_value);
   fts_bmax_code_new_property(f, obj, fts_s_max_value);
 
+  fts_bmax_code_new_property(f, obj, fts_s_comment);
+  fts_bmax_code_new_property(f, obj, fts_s_layer);
+
   if (fts_object_is_patcher(obj))
     {
       fts_bmax_code_new_property(f, obj, fts_s_wx);
@@ -854,6 +857,9 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_ww);
   fts_bmax_code_new_property(f, obj, fts_s_ninlets);
   fts_bmax_code_new_property(f, obj, fts_s_noutlets);
+
+  fts_bmax_code_new_property(f, obj, fts_s_comment);
+  fts_bmax_code_new_property(f, obj, fts_s_layer);
 
   /* pop the argument */
 

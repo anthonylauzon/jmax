@@ -265,8 +265,8 @@ struct fts_connection
 
 struct fts_inlet_decl
 {
-  int nmess;
-  int nalloc;
+  unsigned int nmess;
+  unsigned int nalloc;
   fts_class_mess_t **messlist;
 };
 

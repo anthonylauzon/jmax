@@ -117,7 +117,7 @@ void
 argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 {
   char *p = buf;
-  char *s;
+  const char *s;
   int i;
   
   if (size <= 0)
@@ -164,7 +164,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	  char c;
 	  int quoted = 0;
 
-	  s = (const char *)fts_symbol_name(fts_get_symbol(argv));
+	  s = fts_symbol_name(fts_get_symbol(argv));
 
 	  while ((c = *s++))
 	    {

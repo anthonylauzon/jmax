@@ -25,7 +25,7 @@
 */
 
 typedef struct fts_binary_file_header_t {
-  long magic_number;
+  unsigned long magic_number;
   unsigned long code_size;
   unsigned long n_symbols;
 } fts_binary_file_header_t;

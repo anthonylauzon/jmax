@@ -1048,6 +1048,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
 		{
 		  fts_object_property_changed(obj, fts_s_name);
 		  fts_object_property_changed(obj, fts_s_error);
+		  fts_object_property_changed(obj, fts_s_error_description);
 		}
 
 	      return this;
@@ -1140,6 +1141,7 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
     {
       fts_object_property_changed(obj, fts_s_name);
       fts_object_property_changed(obj, fts_s_error);
+      fts_object_property_changed(obj, fts_s_error_description);
     }
 
   return this;

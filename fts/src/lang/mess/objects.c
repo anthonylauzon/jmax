@@ -974,6 +974,12 @@ fts_object_send_properties(fts_object_t *obj)
       fts_client_send_property(obj, fts_s_ninlets);
       fts_client_send_property(obj, fts_s_noutlets);
       fts_client_send_property(obj, fts_s_error);
+      fts_client_send_property(obj, fts_s_error_description);
+
+      /* Usefull for comment or object with comments */
+      
+      fts_client_send_property(obj, fts_s_comment);
+      fts_client_send_property(obj, fts_s_layer);
 
       /* Ask the object to send to the client object specific properties */
 
@@ -1011,6 +1017,7 @@ fts_object_send_kernel_properties(fts_object_t *obj)
       fts_client_send_property(obj, fts_s_ninlets);
       fts_client_send_property(obj, fts_s_noutlets);
       fts_client_send_property(obj, fts_s_error);
+      fts_client_send_property(obj, fts_s_error_description);
 
       /* Ask the object to send to the client object specific properties */
 

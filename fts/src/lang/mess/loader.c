@@ -41,7 +41,7 @@ static int has_to_swap(void)
   return u.c[0] != 0x11;
 }
 
-static void swap_long( long *p)
+static void swap_long( unsigned long *p)
 {
   union swap_union_t *pu;
   char tmp;

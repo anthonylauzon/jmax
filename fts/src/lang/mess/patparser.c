@@ -52,7 +52,6 @@ static fts_symbol_t fts_s_messbox;
 static fts_symbol_t fts_s_button;
 static fts_symbol_t fts_s_toggle;
 static fts_symbol_t fts_s_message;
-static fts_symbol_t fts_s_comment;
 static fts_symbol_t fts_s_connect;
 static fts_symbol_t fts_s_pop;
 static fts_symbol_t fts_s_load_init;
@@ -110,7 +109,6 @@ void fts_patparser_init()
   fts_s_button = fts_new_symbol("button");
   fts_s_toggle = fts_new_symbol("toggle");
   fts_s_message = fts_new_symbol("message");
-  fts_s_comment = fts_new_symbol("comment");
   fts_s_connect = fts_new_symbol("connect");
   fts_s_pop = fts_new_symbol("pop");
   fts_s_load_init = fts_new_symbol("load_init");

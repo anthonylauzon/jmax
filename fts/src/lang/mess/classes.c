@@ -72,7 +72,7 @@ fts_classes_init(void)
 /******************************************************************************/
 
 static void
-fts_array_alloc(void **array, int size, unsigned int *nalloc, unsigned int wanted)
+fts_array_alloc(void **array, unsigned int size, unsigned int *nalloc, unsigned int wanted)
 {
 #define ALLOC_INC 8
   if (*nalloc < wanted)
