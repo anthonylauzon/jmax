@@ -51,13 +51,10 @@ public class FindAction extends EditorAction
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    { 
-		ToolsPanel.find(container.getEditor().getFts(), object.getFtsObject());
+		ToolsPanel.find(object.getFtsObject());
 	    }});
       }
     else
-	{
-	    ToolsPanel.find(container.getEditor().getFts(), null);
-	    
-	}
+	ToolsPanel.find(null);
   }
 }

@@ -30,13 +30,14 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 /**
  * The proxy of an FTS comment object.
  * The comment is stored in the comment property.
  */
 
-public class FtsCommentObject extends FtsObject
+public class FtsCommentObject extends FtsGraphicObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -47,9 +48,9 @@ public class FtsCommentObject extends FtsObject
   /**
    * Create a FtsObject object;
    */
-    public FtsCommentObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+    public FtsCommentObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, null, className, "");
+	super(server, parent, className, nArgs, args, id);
 
 	ninlets = 0;
 	noutlets = 0;

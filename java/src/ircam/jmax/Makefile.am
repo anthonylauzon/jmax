@@ -1,21 +1,24 @@
-SUBDIRS=dialogs editors fts mda script toolkit widgets
+SUBDIRS=dialogs editors fts toolkit widgets
 
 noinst_PROGRAMS = package
 package_SOURCES = \
-RecentFileHistory.java\
+DefaultIcons.java\
+DefaultPackages.java\
+JMaxPackage.java\
+JMaxVersion.java\
 MaxApplication.java\
 MaxToolFinder.java\
 MaxVector.java\
-JMaxVersion.java\
-MaxWhenHookTable.java\
 MaxWindowManager.java\
 ObjectCreatorManager.java\
-Platform.java
+PackageClassLoader.java\
+Platform.java\
+RecentFileHistory.java
 
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
 JAVAROOTX=@top_srcdir@/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
 SUFFIXES = .java .class
 

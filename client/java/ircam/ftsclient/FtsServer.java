@@ -42,8 +42,8 @@ public class FtsServer {
     encoder = new FtsBinaryProtocolEncoder( this);
     decoder = new FtsBinaryProtocolDecoder( this);
 
-    root = new FtsObject( this, 0);
-    remote = new FtsObject( this, 1);
+    root = new FtsObject( this, null, 0);
+    remote = new FtsObject( this, root, 1);
 
     receiveThread = new Thread() {
 	public void run()

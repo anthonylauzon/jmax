@@ -30,6 +30,7 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 /**
  * Class implementing the proxy of a message box.
@@ -41,76 +42,102 @@ import ircam.jmax.fts.*;
 
 public class FtsMessageObject extends FtsIntValueObject
 {
+    static
+    {
+	FtsObject.registerMessageHandler( FtsMessageObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsMessageObject)obj).setCurrentMessage(argc, argv);
+		}
+	    });
+    }
+
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
   /*                                                                           */
   /*****************************************************************************/
 
-  String message; // the message content
+    String message; // the message content
   
-  public FtsMessageObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+    public FtsMessageObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, "messbox",  FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args)));
-    
+	super(server, parent, className, nArgs, args, id);
+	
 	ninlets = 1;
 	noutlets = 1;
-    
+	
 	message =  FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
   }
 
-  /** Set the message content. Tell the server, too */
+    /** Set the message content. Tell the server, too */
 
-  public void setMessage(String message)
-  {
-    this.message = message;
-    getFts().getServer().sendSetMessage(this, message);
-    setDirty();
-  }
+    public void setMessage(String message)
+    {
+	this.message = message;
 
-  /** Get the message content. */
+	MaxVector vec = new MaxVector();
+	FtsParse.parseAtoms(message, vec);
+	
+	args.clear();
+	for(int i=0; i<vec.size(); i++)
+	    args.add(vec.elementAt(i));
+	
+	try{
+	    send(FtsSymbol.get("set"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsMessageObject: I/O Error sending set Message!");
+		e.printStackTrace(); 
+	    }
+	
+	setDirty();
+    }
 
-  public String getMessage()
-  {
-    return message;
-  }
+    /** Get the message content. */
+
+    public String getMessage()
+    {
+	return message;
+    }
        
-  /** Over write the handle message to handle message box changes. */
+    /** Over write the handle message to handle message box changes. */
 
-  public void handleMessage(String selector, int nArgs, FtsAtom args[])
-       throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-  {
-    this.message = FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
-    setDirty();
+    public void setCurrentMessage(int nArgs, FtsAtom args[])
+    {
+	this.message = FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
+	
+	setDirty();
 
-    if (listener instanceof FtsMessageListener)
-      ((FtsMessageListener) listener).messageChanged(message);
-  }
+	if (listener instanceof FtsMessageListener)
+	    ((FtsMessageListener) listener).messageChanged(message);
+    }
 
-  private static String preParseMessage(String text)
-  {
-      int index = text.indexOf(';', 0);
-      int size = text.length();
-      while(index >= 0)
-      { 
-	  if(index<size-2)
-	      {
-		  if(!text.substring(index+1, index+2).equals("\n"))
-		      if(text.substring(index+1, index+2).equals(" "))
-			  text = text.substring(0, index+1)+"\n"+text.substring(index+2);
-		      else
-			  text = text.substring(0, index+1)+"\n"+text.substring(index+1);
-	      }
-	  else
-	      {
-		  if((index == size-2)&&(text.endsWith(" ")))
-		      text = text.substring(0, index);
-	      }
+    private static String preParseMessage(String text)
+    {
+	int index = text.indexOf(';', 0);
+	int size = text.length();
+	while(index >= 0)
+	    { 
+		if(index<size-2)
+		    {
+			if(!text.substring(index+1, index+2).equals("\n"))
+			    if(text.substring(index+1, index+2).equals(" "))
+				text = text.substring(0, index+1)+"\n"+text.substring(index+2);
+			    else
+				text = text.substring(0, index+1)+"\n"+text.substring(index+1);
+		    }
+		else
+		    {
+			if((index == size-2)&&(text.endsWith(" ")))
+			    text = text.substring(0, index);
+		    }
 	  
-	  index = text.indexOf(';', index+1);
-      }
-      return text;
-  }
+		index = text.indexOf(';', index+1);
+	    }
+	return text;
+    }
 }
 
 

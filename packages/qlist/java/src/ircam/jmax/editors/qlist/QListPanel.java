@@ -26,7 +26,6 @@
 package ircam.jmax.editors.qlist;
 
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 
 import java.awt.*;
@@ -307,23 +306,15 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
       }
   }
   //------------------- Editor interface ---------------
-  final public Fts getFts()
-  {
-    return MaxApplication.getFts();
-  }
   EditorContainer itsEditorContainer;
 
   public EditorContainer getEditorContainer(){
     return itsEditorContainer;
   }
 
-  public MaxDocument getDocument(){
-    return itsData.getAtomList().getDocument() ;
-  }
-
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
-    itsData.closeEditor();
+    itsData.requestDestroyEditor();
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
   // ----------ClipboardOwner interface methods

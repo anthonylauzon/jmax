@@ -31,6 +31,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -50,11 +51,11 @@ public class ObjectSetViewer extends JPanel {
 
       if (obj != null)
 	{
-	  String text = ((FtsObject)obj).getDescription();	   
+	  String text = ((FtsGraphicObject)obj).getDescription();	   
 	  if(text.equals(""))
-	      text = ((FtsObject)obj).getComment();
+	      text = ((FtsGraphicObject)obj).getComment();
 	  setText( text);
-	  setIcon(ObjectSetViewer.getObjectIcon((FtsObject)obj));
+	  setIcon(ObjectSetViewer.getObjectIcon((FtsGraphicObject)obj));
 	}
       
       return this;
@@ -78,7 +79,7 @@ public class ObjectSetViewer extends JPanel {
 	    {
 	      if (objectSelectedListener != null)
 		{
-		  FtsObject object = (FtsObject) jList.getModel().getElementAt(index);
+		  FtsGraphicObject object = (FtsGraphicObject) jList.getModel().getElementAt(index);
 
 		  objectSelectedListener.objectSelected(object);
 		}
@@ -133,10 +134,10 @@ public class ObjectSetViewer extends JPanel {
       jList.addListSelectionListener(l);
   }
 
-  public static ImageIcon getObjectIcon(FtsObject obj)
+  public static ImageIcon getObjectIcon(FtsGraphicObject obj)
   {
       ImageIcon icon;
-      String className = ((FtsObject)obj).getClassName();
+      String className = obj.getClassName();
 
       if (obj instanceof FtsTemplateObject)
 	  icon = objectIcon;

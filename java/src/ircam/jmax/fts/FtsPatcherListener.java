@@ -25,23 +25,18 @@
 
 package ircam.jmax.fts;
 
+import ircam.ftsclient.*;
+
 /** This interface define a listener of the changes
   inside a patcher. It is installed on a FtsPatcherData instance
   */
 
 public interface FtsPatcherListener
 {
-    /*public void objectAdded(FtsPatcherData data, FtsObject object);
-      public void objectRemoved(FtsPatcherData data, FtsObject object);
-      
-      public void connectionAdded(FtsPatcherData data, FtsConnection connection);
-      public void connectionRemoved(FtsPatcherData data, FtsConnection connection);
-
-      public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins);
-      public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts);
-      public void patcherChanged(FtsPatcherData data);*/
-    public void objectAdded(FtsPatcherObject patch, FtsObject object);
-    public void objectRemoved(FtsPatcherObject patch, FtsObject object);
+    //public void objectAdded(FtsPatcherObject patch, FtsObject object);
+    public void objectAdded(FtsPatcherObject patch, FtsGraphicObject object, boolean doedit);
+    public void objectRedefined(FtsPatcherObject patch, FtsGraphicObject newObject);
+    public void objectRemoved(FtsPatcherObject patch, FtsGraphicObject object);
       
     public void connectionAdded(FtsPatcherObject patch, FtsConnection connection);
     public void connectionRemoved(FtsPatcherObject patch, FtsConnection connection);

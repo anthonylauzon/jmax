@@ -29,12 +29,13 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.ftsclient.*;
 
 /**
  * Proxy of an Inlet FTS object.
  */
 
-public class FtsInletObject extends FtsObject
+public class FtsInletObject extends FtsGraphicObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -46,9 +47,9 @@ public class FtsInletObject extends FtsObject
    * Create a FtsInletObject object.
    */
   
-  public FtsInletObject(Fts fts, FtsObject parent, String description)
+  public FtsInletObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom[] args, int id)
   {
-      super(fts, parent, null, "inlet", description);
+      super(server, parent, className, nArgs, args, id);
 
       ninlets = 0;
       noutlets = 1;

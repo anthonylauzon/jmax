@@ -47,42 +47,58 @@ class ErmesPatcherListener implements FtsPatcherListener
     this.sketch = sketch;
   }
 
-    //public void objectAdded(FtsPatcherData data, FtsObject object)
-  public void objectAdded(FtsPatcherObject patch, FtsObject object)
+  public void objectAdded(FtsPatcherObject patch, FtsGraphicObject object, boolean doedit)
   {
     // We handle only the case of object added thru 
     // pasting;
     // in reality, this should be the only way to add objects
     // to the sketch.
     if(PatcherClipboardManager.getManager().isPasting())
-      PatcherClipboardManager.getManager().addPastedObject(object);
+      PatcherClipboardManager.getManager().addPastedObject(object);    
+    /***************************************************************/
+    /*************** ASYNCRONOUS OBJECT CREATION *******************/
+    else
+	sketch.addNewObject(object, doedit);
+    /***************************************************************/
+    /***************************************************************/
   }
 
-    //public void objectRemoved(FtsPatcherData data, FtsObject object)
-  public void objectRemoved(FtsPatcherObject patch, FtsObject object)
+  public void objectRedefined(FtsPatcherObject patch, FtsGraphicObject obj)
   {
-    // In general, objects are never really removed under the
-    // FTS initiative, so you do not needed to implement
-    // this method.
-    // You should know that an object is removed and then re-added
-    // each time is redefined; this is currently handled in the 
-    // redefinition code in GraphicObject; if you decide to implement
-    // this method, you must take care of this.
+      sketch.getDisplayList().getGraphicObjectFor(obj).redefined();
   }
 
-    //public void connectionAdded(FtsPatcherData data, FtsConnection connection)
+  public void objectRemoved(FtsPatcherObject patch, FtsGraphicObject object)
+  {
+      // In general, objects are never really removed under the
+      // FTS initiative, so you do not needed to implement
+      // this method.
+      // You should know that an object is removed and then re-added
+      // each time is redefined; this is currently handled in the 
+      // redefinition code in GraphicObject; if you decide to implement
+      // this method, you must take care of this.
+
+      /*sketch.getDisplayList().getGraphicObjectFor(object).delete();     
+	sketch.getDisplayList().reassignLayers();*/
+  }
+
   public void connectionAdded(FtsPatcherObject patch, FtsConnection connection)
   {
     // We handle only the case of connection added thru 
     // pasting;
     // in reality, this should be the only way to add connections 
     // to the sketch.
-
+      
     if(PatcherClipboardManager.getManager().isPasting())
 	PatcherClipboardManager.getManager().addPastedConnection(connection);
+    /***************************************************************/
+    /*************** ASYNCRONOUS CONNECTION CREATION *******************/
+    else
+	sketch.addNewConnection(connection);
+    /***************************************************************/
+    /***************************************************************/
   }
 
-  //public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
   public void connectionRemoved(FtsPatcherObject patch, FtsConnection connection)
   {
     final FtsConnection c = connection;
@@ -116,22 +132,19 @@ class ErmesPatcherListener implements FtsPatcherListener
     });
   }
 
-    //public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins)
   public void patcherChangedNumberOfInlets(FtsPatcherObject patch, int nins)
   {
     sketch.redraw(); // ??? Why
   }
 
-    //public void patcherChangedNumberOfOutlets(FtsPatcherData data, int nouts)
   public void patcherChangedNumberOfOutlets(FtsPatcherObject patch, int nouts)
   {
     sketch.redraw(); // ??? Why
   }
 
-    //public void patcherChanged(FtsPatcherData data)
   public void patcherChanged(FtsPatcherObject patch)
   {
-    // not implemented yet; it should redo the sketch content.
+      sketch.getDisplayList().getGraphicObjectFor(patch).redefined();
   }
 
   public void patcherHaveMessage(String msg)

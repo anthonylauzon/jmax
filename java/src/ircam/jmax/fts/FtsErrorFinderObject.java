@@ -26,10 +26,12 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
+import ircam.ftsclient.*;
 
 /** Object set class.
  *  
@@ -37,16 +39,31 @@ import ircam.jmax.*;
 
 public class FtsErrorFinderObject extends FtsObject
 {
-  public FtsErrorFinderObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  protected FtsArgs args = new FtsArgs();
+
+  public FtsErrorFinderObject() throws IOException
   {
-      super(fts, parent, variableName, classname, "");
+      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__errorfinder"));
   }
-  
+
+  public void findErrors(FtsObjectSet set)
+  {
+      findErrors(getRoot(), set);
+  }
+
   public void findErrors(FtsObject context, FtsObjectSet set)
   {
-      sendArgs[0].setObject(set);
-      sendArgs[1].setObject(context);
-      sendMessage(FtsObject.systemInlet, "error_finder_find", 2, sendArgs);
+      args.clear();
+      args.add(set);
+      args.add(context);
+      try{
+	  send( FtsSymbol.get("error_finder_find"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("[FtsErrorFinderObject]: I/O Error sending error_find message!");
+	      e.printStackTrace(); 
+	  }
   }
 }
 

@@ -32,6 +32,7 @@ import java.util.*;
 import javax.swing.*;
 
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.editors.patcher.*;
@@ -49,7 +50,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   int defaultWidth = -1;
   public ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
-  public Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Editable( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
@@ -77,37 +78,29 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     super.setHeightNoConnections(renderer.getHeight() + getTextHeightOffset());
   }
 
-  // By default, get an image renderer if there is an icon named as the class name,
-  // otherwise text.
-
   protected void computeRenderer()
   {
     Renderer r;
-    // Change the renderer if needed
-
-    /*Icon icon = Icons.get(ftsObject.getClassName());
-      
-      if (icon != null)
-      renderer = new IconRenderer(this, icon);
-      else if (! (renderer instanceof TextRenderer))*/
     renderer = new TextRenderer(this);
   }
 
-  public void redefine( String text) 
-  {
-    computeRenderer();
-
-    updateDimensions();
-    
-    if(itsSketchPad.isAutomaticFitToText()){
-      redraw();
-      fitToText();
+    /* it's still there only to redefine Patcher object */
+    /* when will be asynchronous remove them and use "redefined" */
+    public void redefine(String text) 
+    {
+	computeRenderer();
+      
+	updateDimensions();
+      
+	if(itsSketchPad.isAutomaticFitToText()){
+	    redraw();
+	    fitToText();
+	}
+	else
+	    redraw();
+	
+	super.redefine(text);    
     }
-    else
-      redraw();
-
-    super.redefine(text);
-  }
 
 
   public int getMinimumWidth(){
@@ -222,6 +215,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   public void setEditing(boolean v)
   {
     editing = v;
+  }
+  public boolean isEditing()
+  {
+    return editing;
   }
 
    // ----------------------------------------

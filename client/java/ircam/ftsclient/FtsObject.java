@@ -53,6 +53,7 @@ public class FtsObject {
   public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
   {
     this.server = server;
+    this.parent = parent;
     encoder = server.getEncoder();
 
     id = server.getNewObjectID();
@@ -69,6 +70,7 @@ public class FtsObject {
   public FtsObject( FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
   {
     this.server = server;
+    this.parent = parent;
     encoder = server.getEncoder();
 
     id = server.getNewObjectID();
@@ -83,9 +85,10 @@ public class FtsObject {
     encoder.flush();
   }
 
-  public FtsObject( FtsServer server, int id)
+  public FtsObject( FtsServer server, FtsObject parent, int id)
   {
     this.server = server;
+    this.parent = parent;
     encoder = server.getEncoder();
 
     this.id = id;
@@ -180,6 +183,21 @@ public class FtsObject {
   {
     return server.getRoot();
   }
+
+  public FtsObject getParent()
+  {
+    return parent;
+  }
+
+  public void setParent(FtsObject parent)
+  {
+    this.parent = parent;
+  }
+
+  public boolean isARootPatcher()
+  {
+    return (getParent() == getServer().getRoot());
+  }
     
   public FtsServer getServer()
   {
@@ -189,6 +207,8 @@ public class FtsObject {
   private int id;
   private FtsServer server;
   private FtsProtocolEncoder encoder;
+
+  private FtsObject parent;
 
   private FtsSymbol selectorCache;
   private FtsMessageHandler messageHandlerCache;

@@ -41,20 +41,26 @@ public class SequenceImages {
     {
 	String path;
 	Image image;
+	String fs = File.separator;
 	ImageObserver observer =  new ImageObserver(){
 	    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
 	    {
 		return true;
 	    }
 	};
-	
+	/*
+	  WARNING:
+	  Waiting for a method to get the packagePath from the package name
+	*/
 	//Create the backgrounds images????
-	try{
+	/*try{
 	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+File.separator+"images"+File.separator;
-	}
-	catch(FileNotFoundException e){
+	  }
+	  catch(FileNotFoundException e){
 	  path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	}
+	  }*/
+	path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+	/*************************************************************/
 
 	image = Toolkit.getDefaultToolkit().getImage(path+"violinClef.gif");
 	Toolkit.getDefaultToolkit().prepareImage(image, 20, 51, observer);

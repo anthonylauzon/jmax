@@ -221,14 +221,21 @@ public class AmbitusValue extends AbstractEventValue
 
   static 
   {
-    try
-      {
+      /*
+	WARNING:
+	Waiting for a method to get the packagePath from the package name
+      */
+      /*try
+	{
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-    catch(FileNotFoundException e){
-      path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-    }
-    AMBITUS_ICON = new ImageIcon(path+"note.gif");
+	}
+	catch(FileNotFoundException e){
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	}*/
+      path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+      /*************************************************************/
+      
+      AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
 
   static String nameArray[] = {"pitch", "duration", "midi_velocity", "midi_channel"};

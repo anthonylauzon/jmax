@@ -188,12 +188,6 @@ java/src/ircam/jmax/editors/patcher/interactions/Makefile
 java/src/ircam/jmax/editors/patcher/menus/Makefile
 java/src/ircam/jmax/editors/patcher/objects/Makefile
 java/src/ircam/jmax/fts/Makefile
-java/src/ircam/jmax/mda/Makefile
-java/src/ircam/jmax/script/Makefile
-java/src/ircam/jmax/script/pkg/Makefile
-java/src/ircam/jmax/script/scm/Makefile
-java/src/ircam/jmax/script/scm/silk/Makefile
-java/src/ircam/jmax/script/tcl/Makefile
 java/src/ircam/jmax/toolkit/Makefile
 java/src/ircam/jmax/toolkit/actions/Makefile
 java/src/ircam/jmax/toolkit/menus/Makefile
@@ -240,6 +234,13 @@ packages/explode/java/src/ircam/jmax/editors/explode/actions/Makefile
 packages/explode/java/src/ircam/jmax/editors/explode/menus/Makefile
 packages/explode/help/Makefile
 packages/explode/images/Makefile
+packages/genesis/Makefile
+packages/genesis/c/Makefile
+packages/genesis/c/src/Makefile
+packages/genesis/java/Makefile
+packages/genesis/java/src/Makefile
+packages/genesis/help/Makefile
+packages/genesis/images/Makefile
 packages/guiobj/Makefile
 packages/guiobj/c/Makefile
 packages/guiobj/c/src/Makefile

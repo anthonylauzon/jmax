@@ -1,7 +1,7 @@
 # Generated automatically from Makefile.in by configure.
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-prefix = /u.livorno/worksta/borghesi/jmax
+prefix = /u/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -62,24 +62,48 @@ host_triplet = i686-pc-linux-gnu
 AS = @AS@
 CC = gcc
 DLLTOOL = @DLLTOOL@
+ECHO = echo
+EXEEXT = 
 FTSDIR = ${exec_prefix}/bin
 FTS_SYS_LIBS = -ldl -laudiofile -lpthread
-JAVACFLAGSX = 
+JAVACFLAGSX = -g
 JAVACX = javac
-JMAX_VERSION = 3.0.1_latest_cvs
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 MAKEINFO = makeinfo
 OBJDUMP = @OBJDUMP@
+OBJEXT = o
 PACKAGE = jmax
+PLATFORM = linux
 PLATFORM_PACKAGES = alsa oss unixdtd
 RANLIB = ranlib
 ROOTDIR = ${prefix}/share/jmax
-VERSION = 3.0.1_latest_cvs
+STRIP = strip
+VERSION = 3.1.0_latest_cvs
 
 tutorialdir = $(pkgdatadir)/tutorials/basics
-tutorial_DATA =   BASICS.jmax  bang.tutorial.jmax  comment.tutorial.jmax  coucou.jmax  labels.tutorial.jmax  lists.tutorial.jmax  message.tutorial.jmax  metro.tutorial.jmax  numbers.tutorial.jmax  order.tutorial.jmax  order1.tutorial.jmax  order2.tutorial.jmax  order3.tutorial.jmax  patchers.tutorial.jmax  project.env  recursion.tutorial.jmax  system.summary.jmax  variables.tutorial.jmax 
+tutorial_DATA = \
+ BASICS.jmax \
+ bang.tutorial.jmax \
+ comment.tutorial.jmax \
+ coucou.jmax \
+ labels.tutorial.jmax \
+ lists.tutorial.jmax \
+ message.tutorial.jmax \
+ metro.tutorial.jmax \
+ numbers.tutorial.jmax \
+ order.tutorial.jmax \
+ order1.tutorial.jmax \
+ order2.tutorial.jmax \
+ order3.tutorial.jmax \
+ patchers.tutorial.jmax \
+ project.env \
+ recursion.tutorial.jmax \
+ system.summary.jmax \
+ variables.tutorial.jmax 
 
+
+EXTRA_DIST = $(tutorial_DATA)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

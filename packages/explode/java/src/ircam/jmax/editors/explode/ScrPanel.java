@@ -292,14 +292,20 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolProvide
     tools = new Vector();
     String path = null;
     String fs = File.separator;
-    try
-	{
-	    path  = MaxApplication.getPackageHandler().locatePackage("explode").getPath()+fs+"images"+fs;
-	}
-    catch(FileNotFoundException e){
-	//System.err.println("Can't locate explode images");
-	path = MaxApplication.getProperty("explodePackageDir")+fs+"images" +fs;
-    }
+    /*
+      WARNING:
+      Waiting for a method to get the packagePath from the package name
+    */
+    /*try
+      {
+      path  = MaxApplication.getPackageHandler().locatePackage("explode").getPath()+fs+"images"+fs;
+      }
+      catch(FileNotFoundException e){
+      //System.err.println("Can't locate explode images");
+      path = MaxApplication.getProperty("explodePackageDir")+fs+"images" +fs;
+      }*/
+    path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"explode"+fs+"images"+fs;//??????????????????	 
+    /*************************************************************/
 
     itsDefaultTool = new ArrowTool(new ImageIcon(path+"selecter.gif"));
     tools.addElement( itsDefaultTool);

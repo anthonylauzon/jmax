@@ -190,7 +190,7 @@ public class LinerTool extends Tool implements LineListener{
 									   value.getPropertyValues());
 	    i+=itsXStep;
 	}	  
-	egc.getTrack().getFtsTrack().sendMessage(FtsObject.systemInlet, "upload", 0, null);
+	egc.getTrack().getFtsTrack().requestUpload();
     }
 
 

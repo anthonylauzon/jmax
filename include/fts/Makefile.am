@@ -45,5 +45,4 @@ status.h \
 symbol.h \
 time.h \
 types.h \
-variable.h \
-word.h
+variable.h

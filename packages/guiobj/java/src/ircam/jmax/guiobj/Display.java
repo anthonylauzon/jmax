@@ -46,7 +46,7 @@ public class Display extends GraphicObject implements FtsMessageListener
   int underWidth = 0;
   int underWidthMax = 0;
 
-  public Display(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Display(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
 
@@ -56,9 +56,9 @@ public class Display extends GraphicObject implements FtsMessageListener
     int h = getFontMetrics().getHeight() + 4;
 
     if(w < minWidth)
-      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(minWidth));
+      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(minWidth));
     else
-      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(w));
+      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(w));
 
     if(w < underWidthMax)
       underWidth = w;
@@ -77,6 +77,11 @@ public class Display extends GraphicObject implements FtsMessageListener
     return display;
   }
 
+  public void redefined()
+  {
+      messageChanged(display);
+  } 
+
   // Set the text when FTS change the display content
   public void messageChanged(String text)
   {
@@ -88,9 +93,9 @@ public class Display extends GraphicObject implements FtsMessageListener
     display = text;
 
     if(w < minWidth)
-      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(minWidth));
+      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(minWidth));
     else
-      ftsObject.setWidthSilently(ScaleTransform.getInstance().invScaleX(w));
+      ftsObject.setCurrentWidth(ScaleTransform.getInstance().invScaleX(w));
 
     if(w < underWidthMax)
       underWidth = w;
@@ -179,9 +184,7 @@ public class Display extends GraphicObject implements FtsMessageListener
     paintInlets(g);
     
     g.setFont(getFont());      
-    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
     g.drawString(display, x + 2, y + h - getFontMetrics().getDescent() - 2);
-    //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);	
   }
 
   public void updatePaint(Graphics g) 

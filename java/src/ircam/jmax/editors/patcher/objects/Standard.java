@@ -33,7 +33,6 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.editors.patcher.*;
 
 //
@@ -44,7 +43,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  Standard( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  Standard( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
   }
@@ -54,7 +53,6 @@ public class Standard extends Editable implements FtsObjectErrorListener
   // ----------------------------------------
   public String getArgs()
   {
-    // get the correct String from the object
     return ftsObject.getDescription();
   }
     
@@ -71,31 +69,18 @@ public class Standard extends Editable implements FtsObjectErrorListener
 
   public void redefine( String text) 
   {
-    try 
-      {
-	//ignoreError = false;
-	ftsObject = ftsObject.getFts().redefineFtsObject( ftsObject, text);
-
-	if (ftsObject.isError())
-	  {
-	    itsSketchPad.showMessage(ftsObject.getErrorDescription());
-	  }
-      } 
-    catch (FtsException e) 
-      {
-	System.err.println("Error in redefining object, action cancelled");
-      }
-
-    super.redefine(text);
+      ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, text);
+      itsSketchPad.getDisplayList().remove(this);
+      dispose();
   }
 
   public void editContent()
   {
-      if(!ftsObject.isError())
+      if(!ftsObject.isError() && (ftsObject instanceof FtsObjectWithEditor))
 	  {
 	      itsSketchPad.waiting();
-	      ftsObject.sendMessage(FtsObject.systemInlet, "openEditor");
-	      ftsObject.getParent().requestStopWaiting(null);
+	      ((FtsObjectWithEditor)ftsObject).requestOpenEditor();
+	      ((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);
 	  }
   }
 
@@ -103,11 +88,6 @@ public class Standard extends Editable implements FtsObjectErrorListener
   {
     return true;
   }
-
-  //public void setIgnoreError(boolean v)
-  //{
-  //ignoreError = v;
-  //}
 
   // ----------------------------------------
   // Text area offset
@@ -147,14 +127,15 @@ public class Standard extends Editable implements FtsObjectErrorListener
   public Color getTextBackground()
   {
     if (isSelected())
-      if (ftsObject.isError())
-	return Color.lightGray;
-      else if(ftsObject.hasErrorsInside())
-	return Color.pink;
-      else
-	return Settings.sharedInstance().getObjColor();
-    else
-      return Color.white;
+	if (ftsObject.isError())
+	    return Color.lightGray;
+	else
+	    return Settings.sharedInstance().getObjColor();
+    else	
+	if(isEditing())
+	    return Settings.sharedInstance().getEditBackgroundColor();
+	else
+	    return Color.white;	    
   }
 
   public boolean isMultiline()
@@ -175,19 +156,12 @@ public class Standard extends Editable implements FtsObjectErrorListener
 	else
 	  g.setColor( Color.lightGray);
       }
-    else if(ftsObject.hasErrorsInside())
-      {
-	if (isSelected())
-	  g.setColor( Color.pink.darker());
-	else
-	  g.setColor( Color.pink);
-      }
     else
       {
-	if (isSelected())
-	  g.setColor( Settings.sharedInstance().getObjColor().darker());
-	else
-	  g.setColor( Settings.sharedInstance().getObjColor());
+	  if (isSelected())
+	      g.setColor( Settings.sharedInstance().getObjColor().darker());
+	  else
+	      g.setColor( Settings.sharedInstance().getObjColor());
       }
 
     int x = getX();
@@ -198,11 +172,6 @@ public class Standard extends Editable implements FtsObjectErrorListener
     g.fill3DRect( x+1, y+1, w-2, h-2, true);
 
     drawContent( g);
-
-    //MAX style double line borders
-    //g.setColor( Color.black);
-    //g.drawLine(x+1, y+2, x+w-2, y+2);
-    //g.drawLine(x+1, y+h-3, x+w-2, y+h-3);
 
     super.paint( g);
   }

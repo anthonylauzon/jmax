@@ -26,7 +26,6 @@
 package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.*;
@@ -88,9 +87,6 @@ public class Tabler extends JFrame implements EditorContainer {
 
   private final void makeTitle(FtsTableObject data)
   { 
-      /*if (data.getName() != null)
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table "+data.getName()));
-	else*/
       setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table"));
     
       MaxWindowManager.getWindowManager().windowChanged(this);
@@ -110,10 +106,6 @@ public class Tabler extends JFrame implements EditorContainer {
     // Build the view menu
     itsViewMenu = new ViewMenu(this);
     mb.add( itsViewMenu);
-
-    // New Tool menu 
-    /*itsToolsMenu = new ircam.jmax.toolkit.menus.MaxToolsJMenu("Tools"); 
-      mb.add(itsToolsMenu);*/
 
     // New Window Manager based Menu
     itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 

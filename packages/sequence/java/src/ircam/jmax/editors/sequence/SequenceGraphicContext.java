@@ -108,7 +108,7 @@ public class SequenceGraphicContext extends GraphicContext {
      */
   public Rectangle getTrackClip()
   {
-      return new Rectangle(ScoreBackground.KEYEND, 0, ((Sequence)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
+      return new Rectangle(ScoreBackground.KEYEND, 0, ((SequenceWindow)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
   }
 
   public void setToolManager(ToolManager t)
@@ -152,17 +152,17 @@ public class SequenceGraphicContext extends GraphicContext {
      * (in our case, the tracks...*/
     public StatusBar getStatusBar()
     {
-	return ((Sequence) getFrame()).itsSequencePanel.statusBar;
+	return ((SequenceWindow) getFrame()).itsSequencePanel.statusBar;
     }
 
     public FtsSequenceObject getFtsSequenceObject()
     {
-	return ((Sequence) getFrame()).sequenceData;
+	return ((SequenceWindow) getFrame()).sequenceData;
     }
 
     public  EditorToolbar getToolbar()
     {
-	return ((Sequence) getFrame()).itsSequencePanel.toolbar;
+	return ((SequenceWindow) getFrame()).itsSequencePanel.toolbar;
     }
 
     public void setScrollManager(ScrollManager manager)

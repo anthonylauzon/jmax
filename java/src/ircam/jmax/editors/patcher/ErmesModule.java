@@ -29,7 +29,6 @@ import java.awt.*;
 import javax.swing.*; 
 
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 

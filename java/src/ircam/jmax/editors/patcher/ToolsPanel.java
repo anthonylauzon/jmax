@@ -34,8 +34,8 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import ircam.jmax.*;
+import ircam.ftsclient.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
@@ -46,17 +46,15 @@ import ircam.jmax.widgets.*;
 
 public class ToolsPanel extends JFrame implements FtsActionListener
 {
-    Fts fts;
-
     class FtsMutableTreeNode extends DefaultMutableTreeNode
     { 
-	FtsObject ftsObj;
-	public FtsMutableTreeNode(FtsObject obj, String name)
+	FtsGraphicObject ftsObj;
+	public FtsMutableTreeNode(FtsGraphicObject obj, String name)
 	{
 	    super(name);
 	    ftsObj = obj;
 	}
-	public FtsObject getFtsObject()
+	public FtsGraphicObject getFtsObject()
 	{
 	    return ftsObj;
 	}
@@ -66,24 +64,24 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     {
 	MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
 		public String getToolName() { return "Tools Panel";}
-		public void open() { ToolsPanel.open(MaxApplication.getFts());}
+		public void open() { ToolsPanel.open();}
 	    });
     }
 
-    public static ToolsPanel open(Fts fts)
+    public static ToolsPanel open()
     {
 	if (toolsPanel == null)
-	    toolsPanel = new ToolsPanel(fts);
+	    toolsPanel = new ToolsPanel();
 	
 	toolsPanel.setVisible(true);
 	
 	return toolsPanel;
     }
 
-    public static ToolsPanel find(Fts fts, FtsObject obj)
+    public static ToolsPanel find(FtsGraphicObject obj)
     {
 	if (toolsPanel == null)
-	    toolsPanel = new ToolsPanel(fts);
+	    toolsPanel = new ToolsPanel();
 	
 	toolsPanel.tabbedPane.setSelectedComponent(toolsPanel.getFinder());
 	toolsPanel.setVisible(true);
@@ -93,23 +91,21 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	return toolsPanel;
     }
 
-  public static ToolsPanel getInstance(Fts fts)
+  public static ToolsPanel getInstance()
   {
     if (toolsPanel == null)
-      toolsPanel = new ToolsPanel(fts);
+      toolsPanel = new ToolsPanel();
 
     return toolsPanel;
   }
 
-  protected ToolsPanel(Fts f)
+  protected ToolsPanel()
   {
     super( "Tools Panel");
 
-    this.fts = f;
-
     /* #############    listeners    ######################################## */
     objSelListener = new ObjectSelectedListener(){
-	    public void objectSelected(FtsObject object)
+	    public void objectSelected(FtsGraphicObject object)
 	    {
 		ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 		((FtsPatcherObject)object.getParent()).requestShowObject(object);
@@ -128,17 +124,17 @@ public class ToolsPanel extends JFrame implements FtsActionListener
     /* ################################################################ */
 
     /* Error Panel */
-    errorTable = new ErrorTablePanel(fts);
+    errorTable = new ErrorTablePanel();
     errorTable.setObjectSelectedListener(objSelListener);
     errorTable.setSelectionListener(listSelListener);
 
     /* RuntimeErrors Panel */
-    runErrorTable = new RuntimeErrorsTablePanel(fts);
+    runErrorTable = new RuntimeErrorsTablePanel();
     runErrorTable.setObjectSelectedListener(objSelListener);
     runErrorTable.setSelectionListener(listSelListener);
 
     /* Finder Panel */
-    finderTable = new FinderTablePanel(fts);
+    finderTable = new FinderTablePanel();
     finderTable.setObjectSelectedListener(objSelListener);
     finderTable.setSelectionListener(listSelListener);
 
@@ -186,13 +182,13 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 		if (e.getClickCount() == 2)
 		    {
 			TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-			FtsObject obj = (FtsObject)((FtsMutableTreeNode)path.getLastPathComponent()).getFtsObject();
+			FtsGraphicObject obj = ((FtsMutableTreeNode)path.getLastPathComponent()).getFtsObject();
 
 			ToolsPanel.this.setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
 			if(obj instanceof FtsPatcherObject)
 			    {
-				obj.sendMessage(FtsObject.systemInlet, "openEditor");
+				((FtsPatcherObject)obj).requestOpenEditor();
 				((FtsPatcherObject)obj).requestStopWaiting(ToolsPanel.toolsPanel);
 			    }
 			else
@@ -239,21 +235,23 @@ public class ToolsPanel extends JFrame implements FtsActionListener
 	      int selRow = lsm.getMinSelectionIndex();
 	      DefaultMutableTreeNode top, node, start;
 	      top = start = node = null;
-	      FtsObject ftsObj;			
+	      FtsGraphicObject ftsObj;			
 	      String nodeText;
 	      ////////????????????????? comment eviter ca?????????
 	      if(currentTableModel instanceof RuntimeErrorsTableModel)
 		  ftsObj = ((RuntimeError)currentTableModel.getListModel().getElementAt(selRow)).getObject();
 	      else
-		  ftsObj = (FtsObject)currentTableModel.getListModel().getElementAt(selRow);
+		  ftsObj = (FtsGraphicObject)currentTableModel.getListModel().getElementAt(selRow);
 	      
 	      for(Enumeration enum = ftsObj.getGenealogy(); enum.hasMoreElements(); )
 		  {
-		      ftsObj = (FtsObject)enum.nextElement();
+		      ftsObj = (FtsGraphicObject)enum.nextElement();
 		      if(top==null)
 			  {
-			      top = new FtsMutableTreeNode(ftsObj, (ftsObj.getDocument()!=null) ? 
-							   ftsObj.getDocument().getName() : ftsObj.getDescription());
+			      /* WARNING: decomment when reimplemented document stuffs */
+			      /*top = new FtsMutableTreeNode(ftsObj, (ftsObj.getDocument()!=null) ? 
+				ftsObj.getDocument().getName() : ftsObj.getDescription());*/
+			      top = new FtsMutableTreeNode(ftsObj, ftsObj.getDescription());
 			      start = top;
 			  }				
 		      else

@@ -46,7 +46,7 @@ public class IntBox extends NumberBox implements FtsIntValueListener
 
   private int itsStartingValue, itsFirstY;
 
-  public IntBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public IntBox( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject, "-0123456789");
 

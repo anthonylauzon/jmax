@@ -120,7 +120,7 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
 		      setVisible(false);
 		      return;
 		  }
-	      ((FtsVectorDisplayObject)target.getFtsObject()).requestSetBounds(min, max);
+	      ((FtsVectorDisplayObject)target.getFtsObject()).setBounds(min, max);
 	  }
   }
 }

@@ -30,6 +30,7 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 /**
  * Class implementing the proxy of a message box.
@@ -45,10 +46,10 @@ public class FtsMessConstObject extends FtsIntValueObject
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
   /*                                                                           */
-    /*****************************************************************************/
-    public FtsMessConstObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+  /*****************************************************************************/
+    public FtsMessConstObject(FtsServer fts, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, "messconst", FtsParse.unparseArguments(nArgs, args));
+	super(fts, parent, className, nArgs, args, id);
 	ninlets = 1;
 	noutlets = 1;
     }

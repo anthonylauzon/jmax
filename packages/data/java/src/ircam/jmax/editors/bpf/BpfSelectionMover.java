@@ -84,7 +84,7 @@ public class BpfSelectionMover extends SelectionMover  implements XORPainter {
 
     void autoScrollIfNeeded(int x, int y)
     {
-	BpfPanel panel = (BpfPanel)((Bpf)gc.getFrame()).getEditor();
+	BpfPanel panel = (BpfPanel)((BpfWindow)gc.getFrame()).getEditor();
 	
 	if (! panel.pointIsVisible(x , y) && panel.pointIsScrollable(x, y))
 	{

@@ -31,14 +31,13 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.menus.*;
+import ircam.ftsclient.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
 
-import ircam.jmax.script.ScriptMenu;
 //
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
 // It handles all the sketch menus, it knows how to load from a ftspatcher.
@@ -53,7 +52,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private FileMenu itsFileMenu;
   private EditMenu itsEditMenu;	
-  private ScriptMenu itsScriptMenu;	
   private JMenu itsWindowsMenu;
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
@@ -95,14 +93,14 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     return (! gotMessage);
   }
   
-  public static void touch(Fts fts)
+  public static void touch(FtsServer server)
   {	
-     MaxDocument doc = Mda.getDocumentTypeByName("patcher").newDocument(fts);
-     FtsPatcherObject patch = (FtsPatcherObject)doc.getRootData();
-     ErmesSketchWindow win = new ErmesSketchWindow(patch);
-     MaxWindowManager.getWindowManager().removeWindow(win);
-     win.itsSketchPad.Close(false);
-     win.dispose();
+      /*MaxDocument doc = Mda.getDocumentTypeByName("patcher").newDocument(fts);
+	FtsPatcherObject patch = (FtsPatcherObject)doc.getRootData();
+	ErmesSketchWindow win = new ErmesSketchWindow(fts.getRootObject());
+	MaxWindowManager.getWindowManager().removeWindow(win);
+	win.itsSketchPad.Close(false);
+	win.dispose();*/
   }
 
   // -----------------------------------------------
@@ -159,7 +157,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     itsSketchPad.InitLock();
     itsSketchPad.setMessageDisplayer(this);
     
-    itsPatcher.getFts().addUpdateGroupListener(itsSketchPad);
+    /* WARNING : re-add when graphic update reimplemented */
+    //itsPatcher.getServer().addUpdateGroupListener(itsSketchPad);
 
     // Finally, activate the updates
     itsPatcher.startUpdates();
@@ -174,6 +173,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(itsSketchPad.getTitle()));
     MaxWindowManager.getWindowManager().windowChanged(this);
+  }
+
+  public void updateTitle()
+  {
+      makeTitle(); 
   }
 
   private final void makeMenuBar(){
@@ -291,6 +295,12 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     setVisible(false);
     MaxWindowManager.getWindowManager().removeWindow(this);
   }
+
+    public void setCursor(Cursor cursor)
+    {
+	super.setCursor(cursor);
+	itsSketchPad.setCursor(cursor);
+    }
   /****************************************************************************/
   /*                                                                          */
   /*           LISTENERS                                                      */

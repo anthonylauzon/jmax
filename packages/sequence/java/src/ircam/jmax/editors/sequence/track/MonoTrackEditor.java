@@ -291,7 +291,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(Sequence.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
+	return new Dimension(SequenceWindow.DEFAULT_WIDTH-TrackContainer.BUTTON_WIDTH, DEFAULT_HEIGHT);
     }
 
     public Track getTrack()

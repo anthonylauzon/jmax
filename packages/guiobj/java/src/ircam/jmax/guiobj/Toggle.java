@@ -42,14 +42,14 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class Toggle extends GraphicObject implements FtsIntValueListener
 {
-  private static final int DEFAULT_WIDTH = 20;
+  static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;
 
   private static final Color itsCrossColor = new Color(0, 0, 128);
 
   private boolean isToggled = false;
 
-  public Toggle( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Toggle( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
@@ -85,7 +85,7 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-      ftsObject.sendMessage( -1, "bang", null);
+	((FtsToggleObject)ftsObject).sendBang();
   }
 
   public void valueChanged(int value) 

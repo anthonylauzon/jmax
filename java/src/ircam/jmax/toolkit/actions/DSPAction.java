@@ -33,6 +33,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.editors.console.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -40,9 +41,8 @@ public class DSPAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
-      FtsDspControl control = container.getEditor().getFts().getDspController();
-      boolean on = control.getDspOn().booleanValue();
-      control.setDspOn(new Boolean(!on));
+      FtsDspControl control = ConsoleWindow.getInstance().getDspControl();
+      control.requestSetDspOn(!control.getDspOn());
   }
 }
 

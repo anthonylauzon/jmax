@@ -36,6 +36,7 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -97,7 +98,7 @@ public class DisplayList
     displayObjects.removeElement( object);
   }
 
-  GraphicObject getGraphicObjectFor(FtsObject obj)
+  GraphicObject getGraphicObjectFor(FtsGraphicObject obj)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
@@ -645,9 +646,7 @@ public class DisplayList
       {
       case DRAG_RECTANGLE:
 	g.setColor( Color.black);
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	g.drawRect( dragRectangle.x, dragRectangle.y, dragRectangle.width, dragRectangle.height);
-	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	break;
 
       case DRAG_LINE:

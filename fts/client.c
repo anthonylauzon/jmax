@@ -275,6 +275,7 @@ struct _state_t {
 typedef struct {
   int length;
   fts_symbol_t *symbols;
+  int naccess, nhit;
 } symbol_cache_t;
 
 /* The protocol decoder state */
@@ -364,6 +365,9 @@ static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
   cache->symbols[index] = s;
 }
 
+#define symbol_cache_hit(C) ((C)->nhit++)
+#define symbol_cache_access(C) ((C)->naccess++)
+
 /*----------------------------------------------------------------------
  * Binary protocol encoder
  */
@@ -391,13 +395,19 @@ static void protocol_encoder_write_float( protocol_encoder_t *encoder, float val
 
 static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symbol_t s)
 {
-  int index;
+  unsigned int index;
   symbol_cache_t *cache = &encoder->to_client_cache;
 
-  index = (int)s % cache->length;
+  symbol_cache_access(cache);
+
+  index = (unsigned int)s % cache->length;
+
+  fts_log( "sending symbol %s index %u cache %p\n", s, index, cache->symbols[index]);
 
   if (cache->symbols[index] == s)
     {
+      symbol_cache_hit(cache);
+
       /* just send the index */
       push_char( encoder, FTS_PROTOCOL_SYMBOL_INDEX);
       push_int( encoder, index);
@@ -417,9 +427,11 @@ static void protocol_encoder_write_symbol( protocol_encoder_t *encoder, fts_symb
 
       push_char( encoder, 0);
     }
+
+  fts_log( "symbol cache hit %d access %d\n", cache->nhit, cache->naccess);
 }
 
-static void protocol_encoder_string( protocol_encoder_t *encoder, const char *s)
+static void protocol_encoder_write_string( protocol_encoder_t *encoder, const char *s)
 {
   push_char( encoder, FTS_PROTOCOL_STRING);
 
@@ -445,6 +457,8 @@ static void protocol_encoder_write_atoms( protocol_encoder_t *encoder, int ac, c
 	protocol_encoder_write_float( encoder, fts_get_float( at));
       else if ( fts_is_symbol( at))
 	protocol_encoder_write_symbol( encoder, fts_get_symbol( at));
+      else if ( fts_is_string( at))
+	protocol_encoder_write_string( encoder, fts_get_string( at));
       else if ( fts_is_object( at))
 	protocol_encoder_write_object( encoder, fts_get_object( at));
 
@@ -452,15 +466,13 @@ static void protocol_encoder_write_atoms( protocol_encoder_t *encoder, int ac, c
     }
 }
 
-static int protocol_encoder_flush( protocol_encoder_t *encoder)
+static void protocol_encoder_flush( protocol_encoder_t *encoder)
 {
   push_char( encoder, FTS_PROTOCOL_END_OF_MESSAGE);
   
   fts_bytestream_output( encoder->stream, fts_stack_get_top( &encoder->buffer), fts_stack_get_base( &encoder->buffer));
 
   fts_stack_clear( &encoder->buffer);
-
-  return 0;
 }
 
 static void protocol_encoder_init( protocol_encoder_t *encoder, fts_bytestream_t *stream)
@@ -856,9 +868,6 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
   client_put_object( this, id, newobj);
 
   newobj->head.id = OBJECT_ID( id, this->client_id);
-
-  /* WARNING: UPLOAD mechanism to reimplement!!!!!! (added for the moment)*/
-  fts_send_message( newobj, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
 static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1163,6 +1172,10 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
 void fts_client_send_message( fts_object_t *o, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
   client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( o)) );
+
+  fts_log( "[client]: Send message dest=0x%x selector=%s ac=%d args=", o, selector, ac);
+  fts_log_atoms( ac, at);
+  fts_log( "\n");
 
   if (!client)
     return;

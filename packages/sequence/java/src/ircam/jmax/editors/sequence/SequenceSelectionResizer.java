@@ -89,7 +89,7 @@ public class SequenceSelectionResizer extends SelectionResizer {
 
     void autoScrollIfNeeded(int x, int y)
     {
-	SequencePanel panel = (SequencePanel)((Sequence)gc.getFrame()).getEditor();
+	SequencePanel panel = (SequencePanel)((SequenceWindow)gc.getFrame()).getEditor();
 	if (! panel.pointIsVisible(x , y))
 	{
 	    scroller.setXY(x, y);

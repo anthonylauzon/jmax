@@ -29,12 +29,12 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-
+import ircam.ftsclient.*;
 /**
  * Proxy of an Outlet FTS object.
  */
 
-public class FtsOutletObject  extends FtsObject
+public class FtsOutletObject  extends FtsGraphicObject
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -46,9 +46,9 @@ public class FtsOutletObject  extends FtsObject
    * Create a FtsOutletObject object.
    */
 
-    public FtsOutletObject(Fts fts, FtsObject parent, String description)
+    public FtsOutletObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom[] args, int id)
     {
-      super(fts, parent, null, "outlet", description);
+      super(server, parent, className, nArgs, args, id);
 
       ninlets = 1;
       noutlets = 0;

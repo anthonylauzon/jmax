@@ -36,12 +36,11 @@ import javax.swing.plaf.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-public class ErmesToolBar extends JPanel implements MaxDocumentListener, ComponentListener{
+public class ErmesToolBar extends JPanel implements /*MaxDocumentListener,*/ ComponentListener{
 
   ErmesSketchPad sketch;
 
@@ -64,7 +63,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
   {
     sketch = theSketchPad;
 
-    sketch.getDocument().addListener(this);
+    //sketch.getDocument().addListener(this);
 
     setDoubleBuffered( false);
 
@@ -125,7 +124,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 	  public void actionPerformed( ActionEvent e)
 	    {
 		sketch.waiting();
-		sketch.getFtsPatcher().getParent().sendMessage(FtsObject.systemInlet, "openEditor");
+		((FtsPatcherObject)sketch.getFtsPatcher().getParent()).requestOpenEditor();
 		sketch.getFtsPatcher().requestStopWaiting(null);
 	    }});
 
@@ -204,13 +203,20 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
 
   private void addButton(String className, String pname)
   {
-      String path;
-      try{
-	  path = MaxApplication.getPackageHandler().locatePackage(pname).getPath();	 
-      }
-      catch(FileNotFoundException e){
-	  path = MaxApplication.getProperty(pname+"PackageDir");    
-      }
+      /*
+	WARNING:
+	Waiting for a method to get the packagePath from the package name
+       */
+      /*String path;
+	try{
+	path = MaxApplication.getPackageHandler().locatePackage(pname).getPath();	 
+	}
+	catch(FileNotFoundException e){
+	path = MaxApplication.getProperty(pname+"PackageDir");    
+	}*/
+      String path = MaxApplication.getProperty("jmaxRoot")+"/packages/"+pname;//??????????????????	 
+      /*************************************************************/
+
       if(path != null) path = path+File.separator+"images"+File.separator;
 
       if(SystemIcons.get(className) == null)
@@ -245,17 +251,17 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener, Compone
   }
 
   //MaxDocumentListener interface
-  boolean isSaved = true;
-  public void documentChanged(boolean saved)
-  {
-    if(isSaved!=saved)
+    /*boolean isSaved = true;
+      public void documentChanged(boolean saved)
       {
-	toSaveButton.setEnabled(!saved);
-	toSaveButton.setVisible(!saved);
-	if(saved) repaint();
-	isSaved = saved;
+      if(isSaved!=saved)
+      {
+      toSaveButton.setEnabled(!saved);
+      toSaveButton.setVisible(!saved);
+      if(saved) repaint();
+      isSaved = saved;
       }
-  }
+      }*/
 
    // Component Listener Interface
   Vector removedButtons = new Vector();

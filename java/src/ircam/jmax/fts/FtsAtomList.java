@@ -29,6 +29,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
+import ircam.ftsclient.*;
 
 /** 
  * The Java Implementation for the atom list remote data class.
@@ -36,13 +37,35 @@ import ircam.jmax.*;
 
 public class FtsAtomList extends FtsObject
 {
+  static
+  {
+      FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setValues"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsAtomList)obj).setValues(argc, argv);
+	      }
+	  });
+      FtsObject.registerMessageHandler( FtsAtomList.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsAtomList)obj).setName(argv[0].stringValue);
+	      }
+	  });
+  }
+
   String name; // the list name (read only)
   MaxVector values = new MaxVector();
   MaxVector listeners = new MaxVector();
 
-  public FtsAtomList(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  protected FtsArgs args = new FtsArgs();
+
+  public FtsAtomList(FtsServer server, FtsObject parent, FtsSymbol classname, FtsArgs args) throws IOException
   { 
-    super(fts, parent, variableName, classname, "");
+    super(server, parent, classname, args);
+  }
+  public FtsAtomList(FtsServer server, FtsObject parent, FtsSymbol classname) throws IOException
+  { 
+    super(server, parent, classname);
   }
 
   /** Return the size of the atom list */
@@ -87,7 +110,14 @@ public class FtsAtomList extends FtsObject
 
   public void forceUpdate()
   {
-    sendMessage(FtsObject.systemInlet, "atomlist_update", 0, null);
+      try{
+	  send( FtsSymbol.get("atomlist_update"));
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsAtomList: I/O Error sending update Message!");
+	      e.printStackTrace(); 
+	  }
   }
 
 
@@ -97,10 +127,18 @@ public class FtsAtomList extends FtsObject
 
   public void changed()
   {
-    int i;
-    for(i = 0; i < values.size(); i++)
-      sendArgs[i].setValue(values.elementAt(i));
-    sendMessage(FtsObject.systemInlet, "atomlist_set", i+1, sendArgs);
+      args.clear();
+      for(int i = 0; i < values.size(); i++)
+	  args.add(values.elementAt(i));
+      
+      try{
+	  send( FtsSymbol.get("atomlist_set"), args);
+      }
+      catch(IOException e)
+	  {
+	     System.err.println("FtsAtomList: I/O Error sending set Message!");
+	     e.printStackTrace(); 
+	  }
   }
 
   /* Server call-back */
@@ -109,14 +147,14 @@ public class FtsAtomList extends FtsObject
   {
     values.removeAllElements();
     
-    for(int i = 0; i < nArgs; i++)
-      values.addElement(args[i].getValue());
-    
+    for(int i = 0; i < nArgs; i++)	
+	values.addElement(args[i].getValue());
+
     fireContentChanged();
   }
-  public void setName(int nArgs , FtsAtom args[])
+  public void setName(String newName)
   {
-    name = args[0].getString();
+      name = newName;
   }
     
   void fireContentChanged()
@@ -132,7 +170,6 @@ public class FtsAtomList extends FtsObject
   {
       listeners.removeElement(listener);
   }
-    
 }
 
 

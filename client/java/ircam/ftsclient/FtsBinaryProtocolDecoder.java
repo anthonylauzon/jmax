@@ -22,7 +22,7 @@
 package ircam.ftsclient;
 
 interface TransitionAction {
-  public void fire( byte input);
+  public void fire( int input);
 }
 
 class SymbolCache {
@@ -53,7 +53,7 @@ class SymbolCache {
 
 class State {
   class Transition {
-    Transition( byte input, State targetState, TransitionAction action, Transition next)
+    Transition( int input, State targetState, TransitionAction action, Transition next)
     {
       this.input = input; 
       this.targetState = targetState;
@@ -61,7 +61,7 @@ class State {
       this.next = next;
     }
 
-    byte input;
+    int input;
     State targetState;
     TransitionAction action;
     Transition next;
@@ -72,7 +72,7 @@ class State {
     this.name = name;
   }
 
-  void addTransition( byte input, State targetState, TransitionAction action)
+  void addTransition( int input, State targetState, TransitionAction action)
   {
     transitions = new Transition( input, targetState, action, transitions);
   }
@@ -82,7 +82,7 @@ class State {
     defaultTransition = new Transition( (byte)0, targetState, action, null);
   }
 
-  final State next( byte input)
+  final State next( int input)
   {
     Transition transition = transitions;
 
@@ -121,28 +121,28 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
   private State buildStateMachine()
   {
     TransitionAction clearAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = 0;
 	}
       };
 
     TransitionAction shiftAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = ival << 8 | input;
 	}
       };
 
     TransitionAction bufferClearAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  buffer.setLength( 0);
 	}
       };
 
     TransitionAction clearAllAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = 0;
 	  buffer.setLength( 0);
@@ -150,16 +150,17 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction bufferShiftAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  buffer.append( (char)input);
 	}
       };
 
     TransitionAction endIntAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = ival << 8 | input;
+
 	  if (argsCount >= 2)
 	    args.add( ival);
 	  argsCount++;
@@ -167,9 +168,10 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction endFloatAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = ival << 8 | input;
+
 	  if (argsCount >= 2)
 	    args.add( Float.intBitsToFloat(ival) );
 	  argsCount++;
@@ -177,9 +179,10 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction endSymbolIndexAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = ival << 8 | input;
+
 	  FtsSymbol s = symbolCache.cache[ival];
 
 	  if (argsCount == 1)
@@ -192,7 +195,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction endSymbolCacheAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  FtsSymbol s = FtsSymbol.get( buffer.toString());
 
@@ -208,7 +211,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction endStringAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  if (argsCount >= 2)
 	    args.add( buffer.toString());
@@ -217,7 +220,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction endObjectAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
 	  ival = ival << 8 | input;
 
@@ -233,7 +236,7 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
       };
 
     TransitionAction endMessageAction = new TransitionAction() {
-	public void fire( byte input)
+	public void fire( int input)
 	{
   	  FtsObject.invokeMessageHandler( target, selector, args);
 	  args.clear();
@@ -329,10 +332,15 @@ class FtsBinaryProtocolDecoder extends FtsProtocolDecoder {
   {
     for ( int i = offset; i < length; i++)
       {
-	currentState = currentState.next( data[i]);
+	int c = data[i];
+
+	if(c < 0)
+	  c += 256;
+
+	currentState = currentState.next( c);
 
 	if (currentState == null)
-	  throw new FtsClientException( "Invalid data in protocol : state=" + currentState + " input=" + data[i]);
+	  throw new FtsClientException( "Invalid data in protocol : state=" + currentState + " input=" + c);
       }
   }
 

@@ -38,7 +38,7 @@ import ircam.jmax.fts.*;
 //
 
 public class Inlet extends InOutlet {
-  public Inlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Inlet(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
   }

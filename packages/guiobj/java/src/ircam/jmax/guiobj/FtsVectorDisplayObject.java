@@ -31,9 +31,32 @@ import java.text.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
-public class FtsVectorDisplayObject extends FtsObject
+public class FtsVectorDisplayObject extends FtsGraphicObject
 {
+  static
+  {
+      ircam.ftsclient.FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("display"), new FtsMessageHandler(){
+	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+	      {
+		  ((FtsVectorDisplayObject)obj).display(argc, argv);
+	      }
+	  });
+      ircam.ftsclient.FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("scroll"), new FtsMessageHandler(){
+	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+	      {
+		  ((FtsVectorDisplayObject)obj).scroll(argc, argv);
+	      }
+	  });
+      ircam.ftsclient.FtsObject.registerMessageHandler( FtsVectorDisplayObject.class, FtsSymbol.get("setBounds"), new FtsMessageHandler(){
+	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+	      {
+		  ((FtsVectorDisplayObject)obj).setCurrentBounds(argv[0].floatValue, argv[1].floatValue);
+	      }
+	  });
+  }
+
   public static final int MAX_SIZE = 1024;
   private static final float defaultMin = (float)0.0;
   private static final float defaultMax = (float)127.0;
@@ -47,12 +70,18 @@ public class FtsVectorDisplayObject extends FtsObject
   int zero = 0; /* y position of zero axis */
   int wrap = 0;
 
-  public FtsVectorDisplayObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+  public FtsVectorDisplayObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
   {
-    super(fts, parent, null, className, className);
+    super(server, parent, className, nArgs, args, id);
     
     ninlets = 1;
     noutlets = 0;
+  }
+
+  public void setDefaults()
+  {
+      setWidth(VectorDisplay.DEFAULT_WIDTH);
+      setHeight(VectorDisplay.DEFAULT_HEIGHT);
   }
 
   public void computeZero()
@@ -70,13 +99,18 @@ public class FtsVectorDisplayObject extends FtsObject
 
   public void setSize(int n)
   {
-    //    nValues = 0;
-    //    wrap = 0;
-
     size = n;
 
-    sendArgs[0].setInt(n); 
-    sendMessage(FtsObject.systemInlet, "size", 1, sendArgs);
+    args.clear();
+    args.add(n);
+    try{
+	send( FtsSymbol.get("size"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsVectorDisplayObject: I/O Error sending size Message!");
+	    e.printStackTrace(); 
+	}
   }  
 
   public int getRange()
@@ -91,8 +125,16 @@ public class FtsVectorDisplayObject extends FtsObject
 
     range = n;
 
-    sendArgs[0].setInt(n); 
-    sendMessage(FtsObject.systemInlet, "range", 1, sendArgs);
+    args.clear();
+    args.add(n);
+    try{
+	send( FtsSymbol.get("range"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsVectorDisplayObject: I/O Error sending range Message!");
+	    e.printStackTrace(); 
+	}
 
     computeZero();
   }  
@@ -124,7 +166,7 @@ public class FtsVectorDisplayObject extends FtsObject
     wrap = 0;
 
     for(i=0; i<nArgs; i++)
-      values[i] = args[i].getInt();
+      values[i] = args[i].intValue;
     
     nValues = nArgs;
 
@@ -138,17 +180,17 @@ public class FtsVectorDisplayObject extends FtsObject
 	wrap -= nArgs;
 	
 	for(int i=0; i<nArgs; i++)
-	  values[wrap + i] = args[nArgs - i - 1].getInt();
+	  values[wrap + i] = args[nArgs - i - 1].intValue;
       }
     else
       {
 	for(int i=0; i<wrap; i++)
-	  values[wrap - i - 1] = args[i].getInt();
+	  values[wrap - i - 1] = args[i].intValue;
 	
 	int tail = nArgs - wrap;
 
 	for(int i=0; i<tail; i++)
-	  values[MAX_SIZE - i - 1] = args[wrap + i].getInt();
+	  values[MAX_SIZE - i - 1] = args[wrap + i].intValue;
 	
 	wrap = MAX_SIZE - tail;
       }
@@ -160,13 +202,13 @@ public class FtsVectorDisplayObject extends FtsObject
     ((FtsDisplayListener) listener).display();
   }
 
-  public void setBounds(int nArgs, FtsAtom args[])
+  public void setCurrentBounds(float min, float max)
   {
     nValues = 0;
     wrap = 0;
 
-    min = args[0].getFloat();
-    max = args[1].getFloat();
+    this.min = min;
+    this.max = max;
 
     computeZero();
 
@@ -174,11 +216,20 @@ public class FtsVectorDisplayObject extends FtsObject
       ((FtsDisplayListener) listener).display();
   }
 
-  public void requestSetBounds(float min, float max)
+  public void setBounds(float min, float max)
   {
-    sendArgs[0].setFloat(min); 
-    sendArgs[1].setFloat(max); 
-    sendMessage(FtsObject.systemInlet, "setBounds", 2, sendArgs);
+      args.clear();
+      args.add(min);
+      args.add(max);
+
+      try{
+	  send( FtsSymbol.get("setBounds"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsVectorDisplayObject: I/O Error sending setBounds Message!");
+	      e.printStackTrace(); 
+	  }
   }
 
   public float getMinimum()
@@ -188,15 +239,5 @@ public class FtsVectorDisplayObject extends FtsObject
   public float getMaximum()
   {
       return max;
-  }
-    
-  /* argument vector for sending messages to server */
-  public final static int NUM_ARGS = 2;
-  public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
-  
-  static
-  {
-    for(int i=0; i<NUM_ARGS; i++)
-      sendArgs[i]= new FtsAtom();
   }
 }

@@ -48,7 +48,7 @@ import ircam.jmax.editors.patcher.objects.*;
 public class Bang extends GraphicObject implements FtsIntValueListener, ImageObserver
 {
     private Color itsFlashColor = Settings.sharedInstance().getUIColor();
-    private static final int DEFAULT_WIDTH = 20;
+    static final int DEFAULT_WIDTH = 20;
     private static final int MINIMUM_WIDTH = 15;
     private static final int CIRCLE_ORIGIN = 3;
     private static final int DEFAULT_FLASH_DURATION = 125;
@@ -74,7 +74,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     }
     public static BangControlPanel controlPanel = new BangControlPanel();
 
-    public Bang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+    public Bang( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
     {
 	super( theSketchPad, theFtsObject);
 
@@ -113,7 +113,7 @@ public class Bang extends GraphicObject implements FtsIntValueListener, ImageObs
     public void gotSqueack(int squeack, Point mouse, Point oldMouse)
     {
 	if (Squeack.isDown(squeack))
-	    ftsObject.sendMessage( -1, "bang", null);
+	    ((FtsBangObject)ftsObject).sendBang();
     }
 
     public void resizing(boolean isRes)

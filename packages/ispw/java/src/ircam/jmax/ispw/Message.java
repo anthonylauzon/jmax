@@ -42,7 +42,7 @@ public class Message extends Editable implements FtsMessageListener, FtsIntValue
 {
   boolean isFlashing = false;
 
-  public Message(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Message(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
   }
@@ -77,7 +77,7 @@ public class Message extends Editable implements FtsMessageListener, FtsIntValue
 
   public int getTextWidthOffset()
   {
-    return /*6*/8;
+    return 8;
   }
 
   public int getTextHeightOffset()
@@ -93,6 +93,11 @@ public class Message extends Editable implements FtsMessageListener, FtsIntValue
   public void redefine( String text) 
   {
     ((FtsMessageObject)ftsObject).setMessage( text);
+  }
+
+  public void redefined()
+  {
+      messageChanged( ((FtsMessageObject)ftsObject).getMessage());
   }
 
   // Set the text when FTS change the message content
@@ -112,7 +117,7 @@ public class Message extends Editable implements FtsMessageListener, FtsIntValue
   {          
     // Send a bang message to the system inlet
     if (Squeack.isDown(squeack))
-      ftsObject.sendMessage( -1, "bang", null);
+	((FtsMessageObject)ftsObject).sendBang();
   }
 
   public void valueChanged(int value) 

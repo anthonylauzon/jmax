@@ -27,6 +27,9 @@ package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
+
+import java.io.*;
 
 /**
  * A generic FTS object with an int value.
@@ -38,6 +41,16 @@ import ircam.jmax.fts.*;
 
 public class FtsBangObject extends FtsIntValueObject
 {
+    static
+    {
+	ircam.ftsclient.FtsObject.registerMessageHandler( FtsBangObject.class, FtsSymbol.get("setFlash"), new FtsMessageHandler(){
+		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+		{
+		    ((FtsBangObject)obj).setFlash(argv[0].intValue);
+		}
+	    });
+    }
+
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -45,16 +58,34 @@ public class FtsBangObject extends FtsIntValueObject
   /*****************************************************************************/
 
   int flashDuration;
+  protected FtsArgs args = new FtsArgs();
 
   /* for the message box */
-    public FtsBangObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[]) {
-	super( fts, parent, variable, className, nArgs, args);
+  public FtsBangObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id) 
+  {
+      super( server, parent, className, nArgs, args, id);
+  }
+
+    public void setDefaults()
+    {
+	setWidth(Bang.DEFAULT_WIDTH);
+	setHeight(Bang.DEFAULT_WIDTH);
     }
 
     public void setFlashDuration(int fd)
     {
 	flashDuration = fd;
-	getFts().getServer().putObjectProperty(this, "flash", fd);
+	args.clear();
+	args.add(fd);
+	try{
+	    send( FtsSymbol.get("setFlashDuration"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsBangObject: I/O Error sending setFlashDuration Message!");
+		e.printStackTrace(); 
+	    }
+	
 	setDirty();
     }
 
@@ -66,13 +97,10 @@ public class FtsBangObject extends FtsIntValueObject
     /* Over write the localPut message to handle value changes;
      */
 
-    protected void localPut(String name, int newValue)
+    protected void setFlash(int newValue)
     {
-	if (name == "flash")
-	    flashDuration = newValue;
-	else
-	    super.localPut(name, newValue);
-    }
+	flashDuration = newValue;
+    }    
 }
 
 

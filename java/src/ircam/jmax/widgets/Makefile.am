@@ -16,7 +16,7 @@ JAVACX=@JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
 JAVAC=@JAVAC@
 JAVAROOTX=@top_srcdir@/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
 
 SUFFIXES= .java .class
 

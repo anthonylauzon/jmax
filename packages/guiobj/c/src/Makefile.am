@@ -4,8 +4,9 @@ libguiobj_la_SOURCES= \
 button.c \
 comment.c \
 comment_doctor.c \
-display.c \
-dspcontrol.c \
+console.c \
+#display.c \
+dspcontrol.c\
 errorfinder.c \
 runtimeerrors.c \
 finder.c \
@@ -17,7 +18,7 @@ key.c \
 keyserver.c \
 messconst.c \
 panel.c \
-scope.c \
+#scope.c \
 slider.c \
 toggle.c 
 

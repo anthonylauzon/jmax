@@ -34,7 +34,6 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.table.*;
@@ -83,8 +82,6 @@ public class EditMenu extends EditorMenu
 
   public void updateMenu()
   {
-      //Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
-      //DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
     if(TableSelection.current.isSelectionEmpty())
       {
 	//Empty selection	
@@ -97,10 +94,6 @@ public class EditMenu extends EditorMenu
 	copyItem.setEnabled(true);
 	cutItem.setEnabled(true);
       }
-    /*pasteItem.setEnabled((flavors != null) &&
-      clipboardContent.isDataFlavorSupported(TableSelection.tableSelection));
-      insertItem.setEnabled((flavors != null) &&
-      clipboardContent.isDataFlavorSupported(TableSelection.tableSelection));*/
     
     pasteItem.setEnabled(ftsObject.thereIsACopy());
     insertItem.setEnabled(ftsObject.thereIsACopy());

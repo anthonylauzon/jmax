@@ -38,7 +38,7 @@ import ircam.jmax.editors.patcher.*;
 
 public class Outlet extends InOutlet
 {
-  public Outlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Outlet(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
   }

@@ -100,7 +100,7 @@ public class BpfGraphicContext extends GraphicContext {
      */
    public Rectangle getEditorClip()
     {
-	return new Rectangle(0, 0, ((Bpf)getFrame()).getViewRectangle().width - 2, 
+	return new Rectangle(0, 0, ((BpfWindow)getFrame()).getViewRectangle().width - 2, 
 			     getGraphicDestination().getSize().height);
     }
 
@@ -126,7 +126,7 @@ public class BpfGraphicContext extends GraphicContext {
 
   public FtsBpfObject getFtsObject()
   {
-      return ((Bpf) getFrame()).bpfData;
+      return ((BpfWindow) getFrame()).bpfData;
   }
 
     public void setScrollManager(ScrollManager manager)

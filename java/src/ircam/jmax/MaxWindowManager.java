@@ -155,6 +155,15 @@ public class MaxWindowManager implements WindowListener
     return topFrame;
   }
 
+  private static Frame currentFrame = null;
+  public static Frame getCurrentFrame()
+  {
+      if(currentFrame!=null)
+	  return currentFrame;
+      else
+	  return topFrame;
+  }
+
   /** Produce a unique window title for the Name 
    *  the technique is the following (naive, but usefull)
    *  it look all the window titles, and count those
@@ -201,16 +210,26 @@ public class MaxWindowManager implements WindowListener
   
   public void windowClosed(WindowEvent e)
   {
+    if(currentFrame == e.getWindow()) currentFrame=null;
     removeWindow((Frame) e.getWindow());
   }
 
-  public void windowIconified(WindowEvent e){}
+  public void windowIconified(WindowEvent e)
+  {
+      if(currentFrame == e.getWindow()) currentFrame=null;
+  }
 
   public void windowDeiconified(WindowEvent e){}
 
-  public void windowActivated(WindowEvent e){}
+  public void windowActivated(WindowEvent e)
+  {
+      currentFrame = (Frame)e.getWindow();
+  }
 
-  public void windowDeactivated(WindowEvent e){}
+  public void windowDeactivated(WindowEvent e)
+  {
+      if(currentFrame == e.getWindow()) currentFrame=null;
+  }
 
   public void TileWindows()
   {

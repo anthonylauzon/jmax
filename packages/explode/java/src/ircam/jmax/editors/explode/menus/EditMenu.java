@@ -33,9 +33,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.explode.*;
 import ircam.jmax.editors.explode.actions.*;
@@ -86,7 +83,7 @@ public class EditMenu extends EditorMenu
 	copyItem.setEnabled(false);
 	duplicateItem.setEnabled(false);
       }
-    else /*if(ErmesSelection.patcherSelection.getOwner() == container)*/
+    else 
       {
 	// Object selection
 	cutItem.setEnabled(true);

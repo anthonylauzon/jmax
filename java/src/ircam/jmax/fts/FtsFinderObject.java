@@ -26,9 +26,11 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 
 /** Object set class.
@@ -37,53 +39,89 @@ import ircam.jmax.*;
 
 public class FtsFinderObject extends FtsObject
 {
-  public FtsFinderObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  public FtsFinderObject() throws IOException
   {
-      super(fts, parent, variableName, classname, "");
+    super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__finder"));
   }
   
   /* Client to server queries */
 
   public void find(FtsObject context, FtsObjectSet set, String name)
   {
-      sendArgs[0].setObject(set);
-      sendArgs[1].setObject(context);
-      sendArgs[2].setString(name);
-      sendMessage(FtsObject.systemInlet, "finder_find", 3, sendArgs);
+    args.clear();
+    args.add(set);
+    args.add(context);
+    args.add(name);
+    
+    try{
+      send( FtsSymbol.get("finder_find"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsFinderObject]: I/O Error sending find message!");
+	e.printStackTrace(); 
+      }
   }
 
   public void find(FtsObject context, FtsObjectSet set, Object values[])
   {
-      sendArgs[0].setObject(set);
-      sendArgs[1].setObject(context);
-
-      int i=0;
-      for(i=0; i<values.length && i<sendArgs.length-1; i++)
-	  sendArgs[i+2].setString((String)values[i]);
+    args.clear();
+    args.add(set);
+    args.add(context);
+    int i=0;
+    for(i=0; i<values.length ; i++)
+      args.add((String)values[i]);
       
-      sendMessage(FtsObject.systemInlet, "finder_find", i+2, sendArgs);
+    try{
+      send( FtsSymbol.get("finder_find"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsFinderObject]: I/O Error sending find message!");
+	e.printStackTrace(); 
+      }
   }
 
-
+  public void find(FtsObjectSet set, MaxVector values)
+  {
+    find(getRoot(), set, values);
+  }
   public void find(FtsObject context, FtsObjectSet set, MaxVector values)
   {
-      sendArgs[0].setObject(set);
-      sendArgs[1].setObject(context);
-
-      int i=0;
-   
-      for(i=0; i<values.size() && i<sendArgs.length-1; i++)
-	  sendArgs[i+2].setString((String)values.elementAt(i));
-
-      sendMessage(FtsObject.systemInlet, "finder_find", i+2, sendArgs);
+    args.clear();
+    args.add(set);
+    args.add(context);
+    int i=0;
+    for( i = 0; i < values.size(); i++)
+      args.add((String)values.elementAt(i));
+      
+    try{
+      send( FtsSymbol.get("finder_find"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsFinderObject]: I/O Error sending find message!");
+	e.printStackTrace(); 
+      }
   }
 
   public void findFriends(FtsObject target, FtsObjectSet set)
   {
-    sendArgs[0].setObject(set);
-    sendArgs[1].setObject(target);
-    sendMessage(FtsObject.systemInlet, "finder_find_friends", 2, sendArgs);
+    args.clear();
+    args.add(set);
+    args.add(target);
+      
+    try{
+      send( FtsSymbol.get("finder_friends"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsFinderObject]: I/O Error sending find_friends message!");
+	e.printStackTrace(); 
+      }
   }
+
+  protected FtsArgs args = new FtsArgs();
 }
 
 

@@ -25,10 +25,10 @@
 
 package ircam.jmax.editors.sequence;
 
+import ircam.ftsclient.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
+import ircam.jmax.fts.FtsUndoableObject;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;
@@ -45,20 +45,85 @@ import javax.swing.*;
 
 public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel, ClipableData, ClipboardOwner
 {
+  static
+  {
+      FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("addEvent"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTrackObject)obj).addEventFromServer((TrackEvent)argv[0].objectValue);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("addEvents"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTrackObject)obj).addEvents(argc, argv);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("removeEvents"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTrackObject)obj).removeEvents(argc, argv);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTrackObject)obj).clear();
+	      }
+	  });
+      FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("moveEvents"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTrackObject)obj).moveEvents(argc, argv);
+	      }
+	  });
+      FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  String name = null;
+		  if(argc>0) name = argv[0].stringValue;
+		  
+		  ((FtsTrackObject)obj).setName(name);		  
+	      }
+	  });
+       FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("lock"), new FtsMessageHandler(){
+	       public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	       {
+		   ((FtsTrackObject)obj).lock();		  
+	       }
+	  });
+       FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("unlock"), new FtsMessageHandler(){
+	       public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	       {
+		   ((FtsTrackObject)obj).unlock();		  
+	       }
+	   });
+       FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("active"), new FtsMessageHandler(){
+	       public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	       {
+		   ((FtsTrackObject)obj).active((argv[0].intValue == 1));		  
+	       }
+	   });
+       FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("highlightEvents"), new FtsMessageHandler(){
+	       public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	       {
+		   ((FtsTrackObject)obj).highlightEvents(argc, argv);		  
+	       }
+	   });
+  }
 
     /**
      * Create an AbstractSequence and initialize the type vector
      * with the given type.
      */
-    //public FtsTrackObject(Fts fts, String name, ValueInfo info)
-  public FtsTrackObject(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
+  public FtsTrackObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
   {
-      super(fts, null, null, "seqtrack", "seqtrack");
+      super(server, parent, className, nArgs, args, id);
 
-      this.info = ValueInfoTable.getValueInfo(args[0].getString());
+      this.info = ValueInfoTable.getValueInfo(args[0].stringValue);
 
       if(nArgs>1)
-	  this.trackName = args[1].getString();
+	  this.trackName = args[1].stringValue;
       else
 	 this.trackName  = "untitled";
 
@@ -85,10 +150,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
      * Fts callback: add a TrackEvent(first arg) in a track (second arg). 
      * 
      */
-    public void addEvent(int nArgs , FtsAtom args[])
+    public void addEventFromServer(TrackEvent evt)
     {
-	TrackEvent evt = (TrackEvent)(args[0].getObject());
-
 	// beginUpdate is called in adderTool
     
 	addEvent(evt);
@@ -106,7 +169,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
 	//begin update is called in adderTool 
 	for(int i=0; i<nArgs; i++)
-	    addEvent((TrackEvent)(args[i].getObject()));
+	    addEvent((TrackEvent)(args[i].objectValue));
 
 	// ends the undoable transition
 	endUpdate();
@@ -121,7 +184,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     for(int i=0; i<nArgs; i++)
       {
-	event = (TrackEvent)(args[i].getObject());
+	event = (TrackEvent)(args[i].objectValue);
 	removeIndex = indexOf(event);
 	deleteEventAt(removeIndex);
       }
@@ -131,7 +194,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     setDirty();
   }
 
-  public void clear(int nArgs , FtsAtom args[])
+  public void clear()
   {
     while(events_fill_p != 0)
 	{
@@ -148,19 +211,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
   public void moveEvents(int nArgs , FtsAtom args[])
   {
-      /*TrackEvent evt;
-	double time;
-
-	for(int i=0; i<nArgs; i+=2)
-	{
-	evt  = (TrackEvent)(args[i].getObject());
-	time = (double)(args[i+1].getFloat());
-	evt.moveTo(time);
-	}
-	endUpdate();      
-	setDirty();
-      */     
-
       TrackEvent evt;
       int oldIndex, newIndex;
       double time;
@@ -169,10 +219,10 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       int maxOldIndex = 0; int maxNewIndex = 0;
       for(int i=0; i<nArgs; i+=2)
 	  {
-	      evt  = (TrackEvent)(args[i].getObject());
+	      evt  = (TrackEvent)(args[i].objectValue);
 	      oldIndex = indexOf(evt);
 	      deleteRoomAt(oldIndex);
-	      time = (double)(args[i+1].getFloat());
+	      time = (double)(args[i+1].floatValue);
 
 	      if (isInGroup())
 		  postEdit(new UndoableMove(evt, time));
@@ -204,10 +254,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       setDirty();
   }  
 
-  public void setName(int nArgs , FtsAtom args[])
-  {
-    
-      if(nArgs <= 0)
+  public void setName(String name)
+  {    
+      if(name == null)
 	  {
 	      //here will be the sequence frame , not null but.....
 	      JOptionPane.showMessageDialog(null,
@@ -218,8 +267,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	  }
       else
 	  {
-	      String name = args[0].getString();
-    
 	      if(trackName == name)
 		  {
 		      JOptionPane.showMessageDialog(null,
@@ -238,21 +285,20 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   }  
 
 
-  public void lock(int nArgs , FtsAtom args[])
+  public void lock()
   {
       locked = true;
       notifyLock(true);
   }
 
-  public void unlock(int nArgs, FtsAtom args[])
+  public void unlock()
   {
       locked = false;
       notifyLock(false);
   }
 
-  public void active(int nArgs, FtsAtom args[])
+  public void active(boolean active)
   {
-      boolean active = (args[0].getInt() == 1);
       notifyActive(active);
   }
 
@@ -265,98 +311,159 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     for(int i=0; i<nArgs; i++)
     {
-	event = (TrackEvent)(args[i].getObject());
+	event = (TrackEvent)(args[i].objectValue);
 	events.addElement(event);
     }
     
-    double time = ((TrackEvent)args[0].getObject()).getTime();
+    double time = ((TrackEvent)args[0].objectValue).getTime();
     notifyHighlighting(events, time);
   }
-  public void requestEventCreation(float time, String type, int nArgs, Object args[])
+  public void requestEventCreation(float time, String type, int nArgs, Object arguments[])
   {
-    sendArgs[0].setFloat(time); 
-    sendArgs[1].setString(type);
-      
-    for(int i=0; i<nArgs; i++)
-      {
-	if(args[i] instanceof Double)
-	    sendArgs[2+i].setFloat(((Double)args[i]).floatValue());
+      args.clear();
+      args.add(time);
+      args.add(type);
+
+      for(int i=0; i<nArgs; i++)
+	  if(arguments[i] instanceof Double)
+	      args.add(((Double)arguments[i]).floatValue());
 	else
-	  sendArgs[2+i].setValue(args[i]);
-      }
-    sendMessage(FtsObject.systemInlet, "addEvent", 2+nArgs, sendArgs);
+	    args.add(arguments[i]);
+
+    try{
+	send( FtsSymbol.get("addEvent"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsTrackObject: I/O Error sending addEvent Message!");
+	    e.printStackTrace(); 
+	}
   }
   
-  public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object args[])
+  public void requestEventCreationWithoutUpload(float time, String type, int nArgs, Object arguments[])
   {
-    sendArgs[0].setFloat(time); 
-    sendArgs[1].setString(type);
-      
-    for(int i=0; i<nArgs; i++)
-      {
-	if(args[i] instanceof Double)
-	  sendArgs[2+i].setFloat(((Double)args[i]).floatValue());
-	else
-	  sendArgs[2+i].setValue(args[i]);
-      }
+      args.clear();
+      args.add(time);
+      args.add(type);
 
-    sendMessage(FtsObject.systemInlet, "makeEvent", 2+nArgs, sendArgs);
+      for(int i=0; i<nArgs; i++)
+	  if(arguments[i] instanceof Double)
+	      args.add(((Double)arguments[i]).floatValue());
+	  else
+	      args.add(arguments[i]);
+
+      try{
+	  send( FtsSymbol.get("makeEvent"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending makeEvent Message!");
+	      e.printStackTrace(); 
+	  }   
   }
 
   public void requestEventMove(TrackEvent evt, double newTime)
   {
-    sendArgs[0].setObject(evt); 
-    sendArgs[1].setDouble(newTime);
-    sendMessage(FtsObject.systemInlet, "moveEvents", 2, sendArgs);
+      args.clear();
+      args.add(evt);
+      args.add((float)newTime);
+      
+      try{
+	  send( FtsSymbol.get("moveEvents"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending moveEvents Message!");
+	      e.printStackTrace(); 
+	  }   
   }
 
   public void requestEventsMove(Enumeration events, int deltaX, Adapter a)
   {
       TrackEvent aEvent;
-      int i = 0;
+
+      args.clear();
       for (Enumeration e = events; e.hasMoreElements();) 
 	  {	  
 	      aEvent = (TrackEvent) e.nextElement();		    
-	      if(i<NUM_ARGS-1)
-		  {
-		      sendArgs[i].setObject(aEvent);
-		      sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));
-		      i+=2;
-		  }
-	      else
-		  {
-		      sendMessage(FtsObject.systemInlet, "moveEvents", i, sendArgs);
-		      i=0;
-		      sendArgs[i].setObject(aEvent);
-		      sendArgs[i+1].setDouble(a.getInvX(a.getX(aEvent)+deltaX));		      
-		      i+=2;
-		  }
+	      args.add(aEvent);
+	      args.add((float)a.getInvX(a.getX(aEvent)+deltaX));
 	  }
       
-      if(i!=0)
-	  sendMessage(FtsObject.systemInlet, "moveEvents", i, sendArgs);
+      try{
+	  send( FtsSymbol.get("moveEvents"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending moveEvents Message!");
+	      e.printStackTrace(); 
+	  }   
   }
-
+    
   public void requestSetName(String newName)
   {
-    sendArgs[0].setString(newName); 
-    sendMessage(FtsObject.systemInlet, "setName", 1, sendArgs);
+      args.clear();
+      args.add(newName);
+      
+      try{
+	  send( FtsSymbol.get("setName"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending setName Message!");
+	      e.printStackTrace(); 
+	  }   
   }    
 
   public void requestClearTrack()
   {
-    sendMessage(FtsObject.systemInlet, "clear", 0, null);
+      try{
+	  send( FtsSymbol.get("clear"));
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending clear Message!");
+	      e.printStackTrace(); 
+	  }   
   }    
 
   public void export()
   {
-      sendMessage(FtsObject.systemInlet, "export_midi_dialog", 0, null);
+      try{
+	  send( FtsSymbol.get("export_midi_dialog"));
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending export_midi_dialog Message!");
+	      e.printStackTrace(); 
+	  }  
   }
 
   public void requestSetActive(boolean active)
   {
-      sendArgs[0].setInt((active)? 1 : 0); 
-      sendMessage(FtsObject.systemInlet, "active", 1, sendArgs);
+      args.clear();
+      args.add((active)? 1 : 0);
+
+      try{
+	  send( FtsSymbol.get("active"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending active Message!");
+	      e.printStackTrace(); 
+	  }  
+  }
+
+  public void requestUpload()
+  {
+      try{
+	  send( FtsSymbol.get("upload"));
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending upload Message!");
+	      e.printStackTrace(); 
+	  }  
   }
 
     /**
@@ -650,26 +757,32 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
      */
     public void deleteEvent(TrackEvent event)
     {
-	sendArgs[0].setObject(event);
-	sendMessage(FtsObject.systemInlet, "removeEvents", 1, sendArgs);
+	args.clear();
+	args.add(event);
+
+	try{
+	    send( FtsSymbol.get("removeEvents"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTrackObject: I/O Error sending removeEvents Message!");
+		e.printStackTrace(); 
+	    }  
     }
     public void deleteEvents(Enumeration events)
     {
-      int i = 0;
+      args.clear();
       for (Enumeration e = events; e.hasMoreElements();) 
-	  {	      
-	      if(i<NUM_ARGS)
-		  sendArgs[i++].setObject((TrackEvent) e.nextElement());
-	      else
-		  {
-		      sendMessage(FtsObject.systemInlet, "removeEvents", NUM_ARGS, sendArgs); 
-		      i = 0;
-		  }
-	  }
+	  args.add((TrackEvent) e.nextElement());
       
-      if(i!=0)
-	  sendMessage(FtsObject.systemInlet, "removeEvents", i, sendArgs);
-      
+      try{
+	  send( FtsSymbol.get("removeEvents"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsTrackObject: I/O Error sending removeEvents Message!");
+	      e.printStackTrace(); 
+	  }  
     }
 
     public void deleteAllEvents()
@@ -828,11 +941,13 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		} catch (UnsupportedFlavorException ufe)
 		    {
 			// this should never happen, but...
-			System.err.println("Clipboard error in paste: content does not support "+SequenceDataFlavor.getInstance().getHumanPresentableName());
+			System.err.println("Clipboard error in paste: content does not support "+
+					   SequenceDataFlavor.getInstance().getHumanPresentableName());
 		    } 
 		catch (IOException ioe)
 		    {
-			System.err.println("Clipboard error in paste: content is no more an "+SequenceDataFlavor.getInstance().getHumanPresentableName());
+			System.err.println("Clipboard error in paste: content is no more an "+
+					   SequenceDataFlavor.getInstance().getHumanPresentableName());
 		    }		
 	    }
 
@@ -848,7 +963,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 			
 			if(event.getValue().getValueInfo() != getType())
 			    {
-				System.err.println("Clipboard error in paste: attempt to copy <"+event.getValue().getValueInfo().getPublicName()+"> events in <"+getType().getPublicName()+"> track!");
+				System.err.println("Clipboard error in paste: attempt to copy <"+
+						   event.getValue().getValueInfo().getPublicName()+
+						   "> events in <"+getType().getPublicName()+"> track!");
 				return;
 			    }
 
@@ -871,7 +988,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 								      event.getValue().getPropertyValues());
 				}
 		    
-			    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
+			    requestUpload();
 			}
 			catch (Exception e) {}
 		    }
@@ -926,10 +1043,8 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	    return min;
 	else if (time > events[max].getTime())
 	    return max+1;
-	else return max;
-	
+	else return max;	
     }
-    
     
     /**
      * utility function to make the event vector bigger
@@ -1101,9 +1216,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		}
 	    return null;
 	}
-	
-	
-	
+		
 	//--- Inclusion internal class fields
 	double endTime;
 	int index;
@@ -1131,7 +1244,15 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 						      event.getValue().getPropertyCount(), 
 						      event.getValue().getPropertyValues());
 		}	    
-	    sendMessage(FtsObject.systemInlet, "upload", 0, sendArgs);
+
+	    try{
+		send( FtsSymbol.get("upload"));
+	    }
+	    catch(IOException e)
+		{
+		    System.err.println("FtsBpfObject: I/O Error sending upload Message!");
+		    e.printStackTrace(); 
+		}
 	}
 	catch (Exception e) {}
     }
@@ -1213,14 +1334,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 
-    public final static int NUM_ARGS = 256;
-    public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
-
-    static
-    {
-	for(int i=0; i<NUM_ARGS; i++)
-	    sendArgs[i]= new FtsAtom();
-    }
+    protected FtsArgs args = new FtsArgs();
 }
 
 

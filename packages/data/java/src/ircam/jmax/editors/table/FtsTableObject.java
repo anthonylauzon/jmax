@@ -25,9 +25,9 @@
 
 package ircam.jmax.editors.table;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;
@@ -41,13 +41,64 @@ import javax.swing.*;
  */
 public class FtsTableObject extends FtsObjectWithEditor implements TableDataModel
 {
+  static
+  {
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setSize"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).setSize(argv[0].intValue);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setVisibles"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).setVisibles(argc, argv);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendVisibles"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).appendVisibles(argc, argv);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("startEdit"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).startEdit();
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("endEdit"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).endEdit();
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setPixels"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).setPixels(argc, argv);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendPixels"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).appendPixels(argc, argv);
+	      }
+      });
+      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("addPixels"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsTableObject)obj).addPixels(argc, argv);
+	      }
+      });
+  }
 
   /**
    * constructor.
    */
-    public FtsTableObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+    public FtsTableObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, variableName, classname, classname + " " + FtsParse.unparseArguments(nArgs, args));
+	super(server, parent, classname, nArgs, args, id);
 
 	listeners = new MaxVector();
     }
@@ -56,59 +107,53 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     //// MESSAGES called from fts.
     //////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Fts callback: open the editor associated with this FtsSequenceObject.
-     * If not exist create them else show them.
-     */
-    public void openEditor(int nArgs, FtsAtom args[])
+    public void openEditor(int argc, FtsAtom[] argv)
     {
 	if(getEditorFrame() == null)
 	    setEditorFrame( new Tabler(this));
 
 	showEditor();
     }
-    /**
-     * Fts callback: destroy the editor associated with this FtsSequenceObject.
-     */
-  public void destroyEditor(int nArgs, FtsAtom args[])
-  {
-      disposeEditor();
-  }
 
-  public void setSize(int nArgs, FtsAtom args[])
-  {
-    if(size != args[0].getInt())
+    public void destroyEditor()
     {
-      size = args[0].getInt();
-    
-      int[] temp =  new int[size];
-      if(lastIndex > size-1) lastIndex = size-1; 
-      for(int i = 0; i< lastIndex; i++)
-	temp[i] = visibles[i];
-
-      visibles = temp;
-
-      notifySizeChanged(size);
+	disposeEditor();
     }
-  }
+
+    public void setSize(int newSize)
+    {
+	if(size != newSize)
+	    {
+		size = newSize;
+		
+		int[] temp =  new int[size];
+		if(lastIndex > size-1) lastIndex = size-1; 
+		for(int i = 0; i< lastIndex; i++)
+		    temp[i] = visibles[i];
+
+		visibles = temp;
+		
+		notifySizeChanged(size);
+	    }
+    }
 
   private int lastIndex = 0;
   public void setVisibles(int nArgs , FtsAtom args[])
   {
     int i = 0;
-    size = args[0].getInt();    
-    visibleSize = args[1].getInt();    
+    size = args[0].intValue;    
+    visibleSize = args[1].intValue;    
     visibles = new int[size];
 
     if (isInGroup()) 
 	for(i = 0; i<nArgs-2; i++)
         {
 	  postEdit(new UndoableValueSet(this, i, visibles[i]));
-	  visibles[i] = args[i+2].getInt();
+	  visibles[i] = args[i+2].intValue;
 	}
     else
 	for(i = 0; i<nArgs-2; i++)
-	    visibles[i] = args[i+2].getInt();
+	    visibles[i] = args[i+2].intValue;
     
     lastIndex = i;
     
@@ -126,18 +171,18 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 
   public void appendVisibles(int nArgs , FtsAtom args[])
   {
-    int startIndex = args[0].getInt();
+    int startIndex = args[0].intValue;
     int i=0;
 
     if (isInGroup()) 
 	for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
 	{      
 	  postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i]));
-	  visibles[startIndex+i] = args[i+1].getInt();
+	  visibles[startIndex+i] = args[i+1].intValue;
 	}
     else
 	for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
-	  visibles[startIndex+i] = args[i+1].getInt();
+	  visibles[startIndex+i] = args[i+1].intValue;
     
     if(startIndex+i > lastIndex)
 	lastIndex = startIndex+i;
@@ -145,11 +190,11 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     setDirty();
   }  
   
-  public void startEdit(int nArgs , FtsAtom args[])
+  public void startEdit()
   {
     beginUpdate();
   }
-  public void endEdit(int nArgs , FtsAtom args[])
+  public void endEdit()
   {
     endUpdate();
   }
@@ -166,11 +211,11 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   public void setPixels(int nArgs , FtsAtom args[])
   {
       int i = 0;      
-      pixelsSize = args[0].getInt();    
+      pixelsSize = args[0].intValue;    
       pixels = new int[pixelsSize];
 
       for(i = 0; i<nArgs-1; i++)
-	  pixels[i] = args[i+1].getInt();
+	  pixels[i] = args[i+1].intValue;
 
       if(pixelsSize <= nArgs-1)
 	  notifySet();
@@ -178,11 +223,11 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     
   public void appendPixels(int nArgs , FtsAtom args[])
   {
-    int startIndex = args[0].getInt();
+    int startIndex = args[0].intValue;
     int i=0;
 
     for(i = 0; i<nArgs-1; i++)
-	pixels[startIndex+i] = args[i+1].getInt();
+	pixels[startIndex+i] = args[i+1].intValue;
 
     if(pixelsSize <= startIndex+nArgs-1)
 	notifySet();
@@ -190,7 +235,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 
   public void addPixels(int nArgs , FtsAtom args[])
   {
-    int startIndex = args[0].getInt();
+    int startIndex = args[0].intValue;
     int i=0;
     int newp = nArgs-1;
     int[] temp = new int[pixelsSize];    
@@ -198,7 +243,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     if(startIndex==0)
     {
 	for(i = 0; i < newp; i++)
-	    temp[i] = args[i+1].getInt();
+	    temp[i] = args[i+1].intValue;
 	for(i = newp; i< pixelsSize; i++)
 	    temp[i] = pixels[i-newp];
     }
@@ -207,7 +252,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	for(i = 0; i<pixelsSize-newp; i++)
 	  temp[i] = pixels[i+newp];
 	for(i = 1; i<= newp; i++)
-	    temp[pixelsSize-newp-1+i] = args[i].getInt();
+	    temp[pixelsSize-newp-1+i] = args[i].intValue;
     }
     pixels = temp;
     notifySet();
@@ -218,50 +263,78 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   */
     public void requestSetValue(int index, int value)
     {
-      sendArgs[0].setInt(index); 
-      sendArgs[1].setInt(value); 
-      sendMessage(FtsObject.systemInlet, "set_from_client", 2, sendArgs);
+	args.clear();
+	args.add(index);
+	args.add(value);
+      
+	try{
+	    send( FtsSymbol.get("set_from_client"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending set_from_client Message!");
+		e.printStackTrace(); 
+	    }
     }
-    int countSetRequests = 0;
     public void requestSetValues(int[] values, int startIndex, int size)
     {
-	int send;
-	int current = 0;
-	int num = size;
+	args.clear();
+	args.add(startIndex);
+		
+	for(int i=0; i < size; i++)
+	    args.add(values[i]);
 
-	while(num > 0)
+	try{
+	    send( FtsSymbol.get("set_from_client"), args);
+	}
+	catch(IOException e)
 	    {
-		sendArgs[0].setInt(startIndex+current); 
-		send = (num > NUM_ARGS-1)? NUM_ARGS-1 : num;
-		
-		for(int i=0; i < send; i++)
-		    sendArgs[i+1].setInt(values[current+i]); 
-
-		sendMessage(FtsObject.systemInlet, "set_from_client", send+1, sendArgs);
-		
-		current += send;
-		num -= send;
+		System.err.println("FtsTableObject: I/O Error sending set_from_client Message!");
+		e.printStackTrace(); 
 	    }
     }
 
     public void requestSetVisibleWindow(int size, int startIndex, float zoom, int sizePixels)
     {
-      sendArgs[0].setInt(size+10); 
-      sendArgs[1].setInt(startIndex); 
-      sendArgs[2].setFloat(zoom); 
-      sendArgs[3].setInt(sizePixels); 
-
-      sendMessage(FtsObject.systemInlet, "set_visible_window", 4, sendArgs);
+	args.clear();
+	args.add(size+10);
+	args.add(startIndex);
+	args.add(zoom);
+	args.add(sizePixels);
+	
+	try{
+	    send( FtsSymbol.get("set_visible_window"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending set_visible_window Message!");
+		e.printStackTrace(); 
+	    }
     }
     public void requestEndEdit()
     {
-      sendMessage(FtsObject.systemInlet, "end_edit", 0, null);
+	try{
+	    send( FtsSymbol.get("end_edit"));
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending end_edit Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     private boolean firstTime = false;
     public void requestGetValues()
     {
-	sendMessage(FtsObject.systemInlet, "get_from_client", 0, null);
+	try{
+	    send( FtsSymbol.get("get_from_client"));
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending get_from_client Message!");
+		e.printStackTrace(); 
+	    }
+
 	firstTime = true;
     } 
     public void requestGetValues(int first, int last)
@@ -269,20 +342,45 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	if(!firstTime) requestGetValues();
 	else
 	    {
-		sendArgs[0].setInt(first); 
-		sendArgs[1].setInt(last); 
-		sendMessage(FtsObject.systemInlet, "get_from_client", 2, sendArgs);
+		args.clear();
+		args.add(first);
+		args.add(last);
+		
+		try{
+		    send( FtsSymbol.get("get_from_client"), args);
+		}
+		catch(IOException e)
+		    {
+			System.err.println("FtsTableObject: I/O Error sending get_from_client Message!");
+			e.printStackTrace(); 
+		    }
 	    }
     }
     public void requestGetPixels(int deltax, int deltap)
     { 
 	if(deltax==0)	    
-	    sendMessage(FtsObject.systemInlet, "get_pixels_from_client", 0, null);
+	    try{
+		send( FtsSymbol.get("get_pixels_from_client"));
+	    }
+	    catch(IOException e)
+		{
+		    System.err.println("FtsTableObject: I/O Error sending get_pixels_from_client Message!");
+		    e.printStackTrace(); 
+		}
 	else
 	    {
-		sendArgs[0].setInt(deltax); 
-		sendArgs[1].setInt(deltap); 
-		sendMessage(FtsObject.systemInlet, "get_pixels_from_client", 2, sendArgs);
+		args.clear();
+		args.add(deltax);
+		args.add(deltap);
+		
+		try{
+		    send( FtsSymbol.get("get_pixels_from_client"), args);
+		}
+		catch(IOException e)
+		    {
+			System.err.println("FtsTableObject: I/O Error sending get_pixels_from_client Message!");
+			e.printStackTrace(); 
+		    }
 	    }
 	firstTime = false;
     }
@@ -293,36 +391,77 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     }
     public void requestCopy(int startIndex, int size)
     {
-	sendArgs[0].setInt(startIndex); 
-	sendArgs[1].setInt(size); 
-	sendMessage(FtsObject.systemInlet, "copy_from_client", 2, sendArgs);
+	args.clear();
+	args.add(startIndex);
+	args.add(size);
+	
+	try{
+	    send( FtsSymbol.get("copy_from_client"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending copy_from_client Message!");
+		e.printStackTrace(); 
+	    }
 	thereIsAcopy = true;
     }
     public void requestCut(int startIndex, int size, int vsize, int pixsize)
     {
-	sendArgs[0].setInt(vsize); 
-	sendArgs[1].setInt(pixsize); 
-	sendArgs[2].setInt(startIndex); 
-	sendArgs[3].setInt(size); 
-	sendMessage(FtsObject.systemInlet, "cut_from_client", 4, sendArgs);
-	thereIsAcopy = true;
+	/*sendArgs[0].setInt(vsize); 
+	  sendArgs[1].setInt(pixsize); 
+	  sendArgs[2].setInt(startIndex); 
+	  sendArgs[3].setInt(size); 
+	  sendMessage(FtsObject.systemInlet, "cut_from_client", 4, sendArgs);*/
+	args.clear();
+	args.add(vsize);
+	args.add(pixsize);
+	args.add(startIndex);
+	args.add(size);
 	
+	try{
+	    send( FtsSymbol.get("cut_from_client"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending cut_from_client Message!");
+		e.printStackTrace(); 
+	    }
+	
+	thereIsAcopy = true;	
 	clearAllUndoRedo();
     }
     public void requestPaste(int startIndex, int size)
     {
-	sendArgs[0].setInt(startIndex);
-	sendArgs[1].setInt(size);  
-	sendMessage(FtsObject.systemInlet, "paste_from_client", 2, sendArgs);
+	args.clear();
+	args.add(startIndex);
+	args.add(size);
+	
+	try{
+	    send( FtsSymbol.get("paste_from_client"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending paste_from_client Message!");
+		e.printStackTrace(); 
+	    }
 		
 	clearAllUndoRedo();
     }
     public void requestInsert(int startIndex, int vsize, int pixsize)
     {
-	sendArgs[0].setInt(vsize); 
-	sendArgs[1].setInt(pixsize); 
-	sendArgs[2].setInt(startIndex); 
-	sendMessage(FtsObject.systemInlet, "insert_from_client", 3, sendArgs);
+	args.clear();
+	args.add(vsize);
+	args.add(pixsize);
+	args.add(startIndex);
+	
+	try{
+	    send( FtsSymbol.get("insert_from_client"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsTableObject: I/O Error sending insert_from_client Message!");
+		e.printStackTrace(); 
+	    }
     	
 	clearAllUndoRedo();
     }
@@ -349,11 +488,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
 	if(index >= pixelsSize) return 0;
 	else
 	    return pixels[index];
-    }
-
-    public void closeEditor()
-    {
-	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
     private int[] values;
@@ -392,38 +526,6 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
     {
 	return values[index];
     }
-    /* public void setValue(int index, int value)
-       {
-       if (index < 0 || index >= getSize()) return;
-       if (values[index] != value)
-       {
-       if (isInGroup()) 
-       postEdit(new UndoableValueSet(this, index, values[index]));
-       values[index] = value;
-		
-       //itsData.changed(index);
-       }
-       }
-       public void setValues(int vals[], int startIndex, int lenght)
-       {
-       if (startIndex > getSize()) return;
-       if (startIndex < 0) startIndex = 0;
-       if (startIndex + lenght > getSize()) lenght = getSize()-startIndex;
-       
-       
-       for (int i = 0; i < lenght; i++)
-       {
-       if (values[startIndex + i] != vals[i])
-       {
-	  
-       if (isInGroup()) 
-       postEdit(new UndoableValueSet(this, startIndex+i, values[startIndex+i]));    
-       values[startIndex+i] = vals[i];
-       
-       //itsData.changed(startIndex+i);
-       }		
-       }
-       }*/
 
     public void interpolate(int start, int end, int startValue, int endValue)
     {
@@ -495,17 +597,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   ///////////////////////////////////////////////////////////
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
-  
-  /*public final static int NUM_ARGS = 256;
-    public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];*/
-  
   private int size = 0;
-
-  /*static
-    {
-    for(int i=0; i<NUM_ARGS; i++)
-    sendArgs[i]= new FtsAtom();
-    }*/
 }
 
 

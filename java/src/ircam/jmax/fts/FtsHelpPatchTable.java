@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
-import ircam.jmax.mda.*;
+import ircam.ftsclient.*;
 
 /**
  * This class provide a registration service for help Patches.
@@ -93,50 +93,50 @@ public class FtsHelpPatchTable
 
   static public boolean openHelpPatch(FtsObject obj)
   {
-    if (exists(obj.getClassName()))
-      {
+      /*if (exists(obj.getClassName()))
+	{
 	try
-	  {
-	    File file = new File(getHelpPatch(obj.getClassName()));
-	    MaxDocument document;
-
-	    document = Mda.loadDocument(obj.getFts(), file);
-	    document.edit();
-	  }
+	{
+	File file = new File(getHelpPatch(obj.getClassName()));
+	MaxDocument document;
+	    
+	document = Mda.loadDocument(obj.getFts(), file);
+	document.edit();
+	}
 	catch (MaxDocumentException e)
-	  {
-	    return false;
-	  }
+	{
+	return false;
+	}
 
 	return true;
-      }
-    else
+	}
+	else*/
       return false;
   }
 
 
   /** Open an help summary patch */
 
-  static public boolean openHelpSummary(MaxContext context, String name)
+  static public boolean openHelpSummary(/*MaxContext context, */String name)
   {
-    if (summaryExists(name))
-      {
+      /*if (summaryExists(name))
+	{
 	try
-	  {
-	    File file = new File(getHelpSummaryPatch(name));
-	    MaxDocument document;
-
-	    document = Mda.loadDocument(context, file);
-	    document.edit();
-	  }
+	{
+	File file = new File(getHelpSummaryPatch(name));
+	MaxDocument document;
+	
+	document = Mda.loadDocument(context, file);
+	document.edit();
+	}
 	catch (MaxDocumentException e)
-	  {
-	    return false;
-	  }
+	{
+	return false;
+	}
 
 	return true;
-      }
-    else
+	}
+	else*/
       return false;
   }
 

@@ -77,11 +77,16 @@ FTS_API void fts_object_delete_from_patcher(fts_object_t *obj);
 
 /* properties */
 FTS_API void fts_object_send_properties(fts_object_t *obj);
+FTS_API void fts_object_send_properties_immediately(fts_object_t *obj);
 FTS_API void fts_object_send_ui_properties(fts_object_t *obj);
 
 /* object description (system functions) */
 FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
 FTS_API void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name, int argc, const fts_atom_t *argv);
+
+#define fts_object_get_description_size(o) ((o)->argc)
+#define fts_object_get_description_atoms(o) ((o)->argv)
+
 FTS_API void fts_object_reset_description(fts_object_t *obj);
 FTS_API int fts_object_description_defines_variable(int ac, const fts_atom_t *at);
 

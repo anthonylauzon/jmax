@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
+import java.io.*;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -55,17 +56,16 @@ public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
       }
   }
 
-  public RuntimeErrorsTablePanel(Fts fts)
+  public RuntimeErrorsTablePanel()
   {
-    this.fts = fts;
-    
     try
 	{
-	    runtimeErrorsSource  = (FtsRuntimeErrors) fts.makeFtsObject(fts.getRootObject(), "__runtimeerrors");
+	   runtimeErrorsSource = new FtsRuntimeErrors();
 	}
-    catch (FtsException e)
+    catch(IOException e)
 	{
-	    System.out.println("System error: cannot get runtimeErrors object");
+	    System.err.println("[RuntimeErrorsTablePanel]: Error in FtsRuntimeErrors creation!");
+	    e.printStackTrace();
 	}
 
     tableModel = new RuntimeErrorsTableModel(runtimeErrorsSource);
@@ -93,8 +93,8 @@ public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
 			    {
 				if (objectSelectedListener != null)
 				{
-				    FtsObject object = ((RuntimeError)tableModel.
-						      getListModel().getElementAt(index)).getObject();
+				    FtsGraphicObject object = ((RuntimeError)tableModel.
+							       getListModel().getElementAt(index)).getObject();
 				    
 				    objectSelectedListener.objectSelected(object);
 				}
@@ -156,7 +156,6 @@ public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
   }
 
   protected JTable table;
-  protected Fts fts;
   protected RuntimeErrorsTableModel tableModel;
   protected FtsRuntimeErrors runtimeErrorsSource;
   private ObjectSelectedListener objectSelectedListener;

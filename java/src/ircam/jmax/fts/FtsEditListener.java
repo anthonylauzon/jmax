@@ -25,6 +25,7 @@
 
 package ircam.jmax.fts;
 
+import ircam.ftsclient.*;
 /**
   This interface define a listener of the changes
   at the server level; for now, only objectRemoved is actually

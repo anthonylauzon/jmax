@@ -24,7 +24,6 @@ saver.h \
 selection.h \
 sigconn.h \
 srconv.h \
-symbol.h \
 template.h \
 time.h \
 variable.h \

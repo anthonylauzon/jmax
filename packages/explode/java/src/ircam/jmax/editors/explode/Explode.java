@@ -25,128 +25,27 @@
 
 package ircam.jmax.editors.explode;
 
-import java.io.*;
-import java.awt.event.*;
-import java.awt.*;
-
 import ircam.jmax.*;
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
-
-import javax.swing.*;
-
-import ircam.jmax.editors.explode.menus.*;
 
 /**
- * The main class of the explode package.
- * It inherits from MaxEditor, and implements the MaxDataEditor Interface.
- * This implementation builds a ScrPanel and a ExplodeTablePanel to represent the data.
+ * The explode extension; install the explode data type,
+ * register the remote data class, installs
+ * the explode editor factory
  */
-public class Explode extends JFrame implements EditorContainer, AAAReadme {
-
-  //------------------- fields
-  FtsExplodeObject explodeObject;
-  ExplodePanel itsExplodePanel;
-  JMenu itsFileMenu;
-  EditMenu itsEditMenu;
-  OptionsMenu itsOptionsMenu;
-    //JMenu itsToolsMenu;
-  JMenu itsWindowsMenu;
-
-  /**
-   * constructor.
-   * It creates the panels that will display the datas in maxData
-   */
-  public Explode(FtsExplodeObject ftsObj)
-  { 
-    super();
-
-    explodeObject = ftsObj;
-    MaxWindowManager.getWindowManager().addWindow(this);
-
-    makeTitle(ftsObj);
-
-
-    // Build The Menus and Menu Bar
-    makeMenuBar();
-
-    addWindowListener(new WindowListener(){
-        public void windowOpened(WindowEvent e){}
-	public void windowClosed(WindowEvent e){}
-	public void windowClosing(WindowEvent e)
-	{
-	    MaxWindowManager.getWindowManager().removeWindow(getFrame());
-	}
-	public void windowDeiconified(WindowEvent e){}
-	public void windowIconified(WindowEvent e){}
-	public void windowActivated(WindowEvent e){}
-	public void windowDeactivated(WindowEvent e){}
-    });
-
-    itsExplodePanel = new ExplodePanel(this, ftsObj);
-    getContentPane().add(itsExplodePanel);
-    pack();
-    validate();
-    setVisible(true);
+public class Explode extends JMaxPackage
+{
+  public Explode()
+  {
+      super("explode");
   }
 
-    /** This function is an example on how to translate an explode DB into an agrep form.*/
-    void translateToAgrep(Writer w)
-    {
-	PrintWriter pw = new PrintWriter(w);
-	
-	try {
-	    for (int i = 0; i<explodeObject.length(); i++)
-		{
-		    pw.print((char) (128+explodeObject.getEventAt(i).getPitch()));
-		}
-	}
-	catch(Exception e){}
-	pw.println();
-    }
-    
-    
-    // Build The Menus and Menu Bar
-
-  private final void makeTitle(FtsExplodeObject ftsObj){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Explode " + ftsObj.getName()));
-    MaxWindowManager.getWindowManager().windowChanged(this);
-  } 
-
-  private final void makeMenuBar(){
-    JMenuBar mb = new JMenuBar();
-
-    // Build the file menu
-    itsFileMenu = new DefaultFileMenu();
-    mb.add(itsFileMenu); 
-    
-    // Build the edit menu
-    itsEditMenu = new EditMenu(this); 
-    mb.add( itsEditMenu); 
-    
-    // Build the options menu
-    itsOptionsMenu = new OptionsMenu(this); 
-    mb.add( itsOptionsMenu); 
-
-    // New Window Manager based Menu
-    itsWindowsMenu = new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this); 
-    mb.add(itsWindowsMenu);
-
-    setJMenuBar(mb);  
-  }
-
-  // ------ editorContainer interface ---------------
-  public Editor getEditor(){
-    return itsExplodePanel;
-  }
-  public Frame getFrame(){
-    return this;
-  }
-  public Point getContainerLocation(){
-    return getLocation();
-  }
-  public Rectangle getViewRectangle(){
-    return getContentPane().getBounds();
+  public void load()
+  {
+      ObjectCreatorManager.registerFtsClass("explode", ircam.jmax.editors.explode.FtsExplodeObject.class);
+  
+      ircam.jmax.editors.console.ConsoleWindow.append("package Explode loaded");	 
   }
 }
+
+
 

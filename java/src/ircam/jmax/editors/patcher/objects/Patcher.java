@@ -31,7 +31,6 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.editors.patcher.*;
 
 //
@@ -44,9 +43,16 @@ public class Patcher extends Editable implements FtsObjectErrorListener
   // Constructor
   // ----------------------------------------
 
-  Patcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  Patcher( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
+
+    theFtsObject.setGraphicListener(new FtsGraphicListener(){
+	    public void redefined(FtsGraphicObject obj)
+	    {
+		Patcher.this.redefined();
+	    }
+	});
   }
 
   // ----------------------------------------
@@ -68,17 +74,19 @@ public class Patcher extends Editable implements FtsObjectErrorListener
 
   public void redefine( String text) 
   {
-    ( (FtsPatcherObject)ftsObject).redefinePatcher( text);
-    
-    super.redefine(text);
+    ( (FtsPatcherObject)ftsObject).redefinePatcher( text);    
   }
-	
+  
+  public void redefined() 
+  {
+      super.redefine(ftsObject.getDescription());
+  }
 
   public void editContent()
   {
-    itsSketchPad.waiting();
-    ftsObject.sendMessage(FtsObject.systemInlet, "openEditor");
-    ftsObject.getParent().requestStopWaiting(null);
+      itsSketchPad.waiting();
+      ((FtsPatcherObject)ftsObject).requestOpenEditor();
+      ((FtsPatcherObject)ftsObject.getParent()).requestStopWaiting(null);		  
   }
 
   public boolean hasContent()
@@ -120,12 +128,6 @@ public class Patcher extends Editable implements FtsObjectErrorListener
 
   public Color getTextBackground()
   {
-      /*if (errorsInside)
-	if (isSelected()) 
-	return Color.pink.darker();
-	else
-	return Color.pink;
-	else*/
       if (isSelected()) 
 	  return Settings.sharedInstance().getObjColor().darker();
       else 
@@ -151,12 +153,6 @@ public class Patcher extends Editable implements FtsObjectErrorListener
 
   public void paint( Graphics g) 
   {
-      /*if (errorsInside)
-	if (isSelected())
-	g.setColor( Color.pink.darker());
-	else
-	g.setColor( Color.pink);
-	else*/
       if (isSelected())
 	  g.setColor( Settings.sharedInstance().getObjColor().darker());
       else 
@@ -170,3 +166,4 @@ public class Patcher extends Editable implements FtsObjectErrorListener
       super.paint( g);
   }
 }
+

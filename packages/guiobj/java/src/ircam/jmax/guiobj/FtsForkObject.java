@@ -30,12 +30,33 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
+import ircam.ftsclient.*;
 
-public class FtsForkObject extends FtsObject
+public class FtsForkObject extends FtsGraphicObject
 {
-    public FtsForkObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+    public FtsForkObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, null, className, className);
+	super(server, parent, className, nArgs, args, id);
+    }
+
+    public void setDefaults()
+    {
+	setWidth(Fork.DEFAULT_WIDTH);
+	setHeight(Fork.CONST_HEIGHT);
+    }
+    
+    public void requestSetOutlets(int nOuts)
+    {
+	args.clear();
+	args.add(nOuts);
+	
+	try{
+	    send( FtsSymbol.get("set_outlets"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsForkObject: I/O Error sending set_outlets Message!");
+		e.printStackTrace(); 
+	    }  
     }
 }

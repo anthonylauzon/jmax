@@ -12,7 +12,6 @@ Explode.java \
 ExplodeDataFlavor.java \
 ExplodeDataListener.java \
 ExplodeDataModel.java \
-ExplodeExtension.java \
 ExplodeGraphicContext.java \
 ExplodePanel.java \
 ExplodeSelection.java \
@@ -20,6 +19,7 @@ ExplodeSelectionMover.java \
 ExplodeSelectionResizer.java \
 ExplodeTableModel.java \
 ExplodeTablePanel.java \
+ExplodeWindow.java \
 FtsExplodeObject.java \
 Mapper.java \
 MappingListener.java \
@@ -51,7 +51,7 @@ ZoomTool.java
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
 JAVAROOTX=@top_srcdir@/packages/explode/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/packages/explode/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/explode/java/src
 
 SUFFIXES = .java .class
 

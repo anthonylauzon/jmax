@@ -244,7 +244,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
 
     public Dimension getPreferredSize()
     {
-	return new Dimension(Bpf.DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	return new Dimension(BpfWindow.DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     /**
@@ -293,7 +293,7 @@ public class BpfEditor extends PopupToolbarPanel implements ListSelectionListene
     FtsBpfObject model;
     BpfPopupMenu bpfPopupMenu;
     static int MONODIMENSIONAL_TRACK_OFFSET = 0;
-    static public int DEFAULT_HEIGHT = Bpf.DEFAULT_HEIGHT - 30;
+    static public int DEFAULT_HEIGHT = BpfWindow.DEFAULT_HEIGHT - 30;
     BpfRenderer renderer;
     BpfAdapter ad;
 

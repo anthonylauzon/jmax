@@ -25,9 +25,9 @@
 
 package ircam.jmax.editors.bpf;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;
@@ -41,14 +41,58 @@ import javax.swing.*;
  */
 public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 {
+  static
+  {
+      FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("addPoint"), new FtsMessageHandler(){
+	      public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	      {
+		  ((FtsBpfObject)obj).addPoint(argv[0].intValue, argv[1].floatValue, argv[2].floatValue);
+	      }
+      });
+    FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("removePoints"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    {
+		((FtsBpfObject)obj).removePoints(argc, argv);
+	    }
+      });
+    FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("setPoint"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    {
+		((FtsBpfObject)obj).setPoint(argv[0].intValue, argv[1].floatValue, argv[2].floatValue);
+	    }
+      });
+    FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("setPoints"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    {
+		((FtsBpfObject)obj).setPoints(argc, argv);
+	    }
+      });
+    FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    {
+		((FtsBpfObject)obj).clear();
+	    }
+      });
+    FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    {
+		((FtsBpfObject)obj).set(argc, argv);
+	    }
+      });
+    FtsObject.registerMessageHandler( FtsBpfObject.class, FtsSymbol.get("append"), new FtsMessageHandler(){
+	    public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	    {
+		((FtsBpfObject)obj).append(argc, argv);
+	    }
+      });
+  }
 
   /**
    * constructor.
    */
-    public FtsBpfObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+    public FtsBpfObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, variableName, classname, 
-	      (nArgs > 0) ? classname + " " + FtsParse.unparseArguments(nArgs, args) : classname);
+	super(server, parent, classname, nArgs, args, id); 
 
 	listeners = new MaxVector();
     }
@@ -57,31 +101,22 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     //// MESSAGES called from fts.
     //////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Fts callback: open the editor associated with this FtsSequenceObject.
-     * If not exist create them else show them.
-     */
-    public void openEditor(int nArgs, FtsAtom args[])
+    public void openEditor(int argc, FtsAtom[] argv)
     {
 	if(getEditorFrame() == null)
-	    setEditorFrame( new Bpf(this));
+	    setEditorFrame( new BpfWindow(this));
 
 	showEditor();
     }
 
-    /**
-     * Fts callback: destroy the editor associated with this FtsSequenceObject.
-     */
-    public void destroyEditor(int nArgs, FtsAtom args[])
+    public void destroyEditor()
     {
 	disposeEditor();
     }
     
-    public void addPoint(int nArgs , FtsAtom args[])
+    public void addPoint(int index , float time, float value)
     {
-	int index = args[0].getInt();
-	
-	addPoint(index, new BpfPoint(args[1].getFloat(), args[2].getFloat()));
+	addPoint(index, new BpfPoint(time, value));
 	
 	notifyPointAdded(index);
 	
@@ -94,20 +129,16 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 
       for(int i=0; i<nArgs; i++)
 	  {
-	      indxs[i] = args[i].getInt();
+	      indxs[i] = args[i].intValue;
 	      removePoint(indxs[i]);	
 	  }
       notifyPointsDeleted(indxs);
       setDirty();
   }
  
-  public void setPoint(int nArgs , FtsAtom args[])
+  public void setPoint(int oldIndex, float newTime, float newValue)
   {
-      int oldIndex = args[0].getInt();
       int newIndex = oldIndex;
-      float newTime = args[1].getFloat();
-      float newValue = args[2].getFloat();
-     
       BpfPoint point = getPointAt(oldIndex);
       point.setValue(newValue);
       point.setTime(newTime);
@@ -118,13 +149,13 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   public void setPoints(int nArgs , FtsAtom args[])
   {
       BpfPoint point;
-      int firstIndex = args[0].getInt();
+      int firstIndex = args[0].intValue;
       int n = (nArgs - 1) / 2;
 
       for(int i=0; i<n; i++)
 	  {
-	      float time = args[i * 2 + 1].getFloat();
-	      float value = args[i * 2 + 2].getFloat();
+	      float time = args[i * 2 + 1].floatValue;
+	      float value = args[i * 2 + 2].floatValue;
 	      point = getPointAt(firstIndex + i);
 	      point.setValue(value);
 	      point.setTime(time);	      
@@ -134,7 +165,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
       setDirty();
   }
 
-  public void clear(int nArgs , FtsAtom args[])
+  public void clear()
   {
       removeAllPoints();
   }
@@ -147,7 +178,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
 	    {
 		int j=0;
 		for(int i = 0; i<nArgs; i+=2)
-		    addPoint(j++, new BpfPoint(args[i].getFloat(), args[i+1].getFloat()));
+		    addPoint(j++, new BpfPoint(args[i].floatValue, args[i+1].floatValue));
 
 		notifyPointAdded(j-1);
 		setDirty();	
@@ -158,7 +189,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     {
 	int j=0;
 	for(int i = length(); i<length()+nArgs; i+=2)
-	    addPoint(j++, new BpfPoint(args[i].getFloat(), args[i+1].getFloat()));
+	    addPoint(j++, new BpfPoint(args[i].floatValue, args[i+1].floatValue));
 	
 	notifyPointAdded(j);
 	setDirty();
@@ -169,81 +200,125 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   */
     public void requestPointCreation(int index, float time, float value)
     {
-	sendArgs[0].setInt(index); 
-	sendArgs[1].setFloat(time); 
-	sendArgs[2].setFloat(value); 
-	sendMessage(FtsObject.systemInlet, "add_point", 3, sendArgs);
+	args.clear();
+	args.add(index);
+	args.add(time);
+	args.add(value);
+      
+	try{
+	    send( FtsSymbol.get("add_point"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsBpfObject: I/O Error sending add_point Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     public void requestSetPoint(int index, float time, float value)
     {
-	sendArgs[0].setInt(index); 
-	sendArgs[1].setFloat(time); 
-	sendArgs[2].setFloat(value); 
-	sendMessage(FtsObject.systemInlet, "set_points", 3, sendArgs);
+	args.clear();
+	args.add(index);
+	args.add(time);
+	args.add(value);
+      
+	try{
+	    send( FtsSymbol.get("set_point"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsBpfObject: I/O Error sending set_point Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     public void requestSetPoints(int index, float[] times, float[] values)
     {
-	sendArgs[0].setInt(index); 
+	args.clear();
+	args.add(index);
 	for(int i=0; i<times.length; i++)
 	    {
-		sendArgs[i*2+1].setFloat(times[i]); 
-		sendArgs[i*2+2].setFloat(values[i]);
-	    } 
-	sendMessage(FtsObject.systemInlet, "set_points", times.length*2+1, sendArgs);
+		args.add(times[i]); 
+		args.add(values[i]);
+	  } 
+	try{
+	    send( FtsSymbol.get("set_points"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsBpfObject: I/O Error sending set_points Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     public void requestPointRemove(int index)
     {
-	sendArgs[0].setInt(index); 
-	sendMessage(FtsObject.systemInlet, "remove_points", 1, sendArgs);
+	args.clear();
+	args.add(index);
+
+	try{
+	    send( FtsSymbol.get("remove_points"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsBpfObject: I/O Error sending remove_points Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     public void requestPointsRemove(int[] indexs)
     {
+	bubbleSort(indexs);
+
+	args.clear();
 	for(int i =0; i<indexs.length; i++)
+	    args.add(indexs[i]);
+
+	try{
+	    send( FtsSymbol.get("remove_points"), args);
+	}
+	catch(IOException e)
 	    {
-		sendArgs[i].setInt(indexs[i]);
+		System.err.println("FtsBpfObject: I/O Error sending remove_points Message!");
+		e.printStackTrace(); 
 	    }
-	bubbleSort(sendArgs, indexs.length);
-	
-	sendMessage(FtsObject.systemInlet, "remove_points", indexs.length, sendArgs);
     }
 
-    public void requestPointsRemove(Enumeration en)
+    public void requestPointsRemove(Enumeration en, int size)
     {
+	int[] ids = new int[size];
 	int i = 0;
 	for(Enumeration e = en;en.hasMoreElements();)
-	    {
-		sendArgs[i++].setInt(indexOf((BpfPoint)e.nextElement())); 
-	    }
-	bubbleSort(sendArgs, i);
+	    ids[i++] = indexOf((BpfPoint)e.nextElement()); 
+	 
+	bubbleSort(ids);
 	
-	sendMessage(FtsObject.systemInlet, "remove_points", i, sendArgs);
+	try{
+	    send( FtsSymbol.get("remove_points"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsBpfObject: I/O Error sending remove_points Message!");
+		e.printStackTrace(); 
+	    }
     }
 
-    void bubbleSort(FtsAtom a[], int nArgs)
+    void bubbleSort(int ids[])
     {
 	boolean flag = true;
-	FtsAtom temp;
+	int temp;
 
 	while(flag) {
 	    flag = false;
-	    for (int i = 0; i<nArgs-1; i++)
-		if (a[i].getInt() < a[i+1].getInt())
+	    for (int i = 0; i<ids.length-1; i++)
+		if (ids[i] < ids[i+1])
 		    {
-			temp = a[i];
-			a[i] = a[i+1];
-			a[i+1] = temp;
+			temp = ids[i];
+			ids[i] = ids[i+1];
+			ids[i+1] = temp;
 			flag = true;
 		    }
 	} 
-    }
-
-    public void closeEditor()
-    {
-	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
     public void addPoint(int index, BpfPoint pt)
@@ -499,6 +574,8 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
     ////////////////////////////////////////////////////////
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
+
+  protected FtsArgs args = new FtsArgs();
 }
 
 

@@ -49,7 +49,7 @@ public class FloatBox extends NumberBox implements FtsFloatValueListener
   private double valInc;  
   private int itsLastY;
 
-  public FloatBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public FloatBox( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject, "-0123456789.");
 

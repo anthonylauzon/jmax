@@ -32,6 +32,7 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.editors.console.*;
 
 /**
  * The "system statistics" dialog.
@@ -48,7 +49,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
 
     parent = (Frame)dw;
   
-    control = MaxApplication.getFts().getDspController();
+    control = ConsoleWindow.getInstance().getDspControl();
     
     // Do a gc before giving statistics (added by mdc).    
     System.gc();
@@ -132,9 +133,9 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
     JPanel pValues2 = new JPanel();
     pValues2.setLayout(new BoxLayout(pValues2, BoxLayout.Y_AXIS));
     pValues2.setPreferredSize(new Dimension(prefWidth, fm.getHeight()*2));
-    JLabel value6 = new JLabel(control.getSamplingRate().toString());
+    JLabel value6 = new JLabel(""+control.getSamplingRate());
     pValues2.add(value6);
-    JLabel value7 = new JLabel(control.getFifoSize().toString());
+    JLabel value7 = new JLabel(""+control.getFifoSize());
     pValues2.add(value7);
     
     p12.add(pValues2);

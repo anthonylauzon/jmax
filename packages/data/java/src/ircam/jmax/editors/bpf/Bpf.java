@@ -25,116 +25,24 @@
 
 package ircam.jmax.editors.bpf;
 
-import java.io.*;
-import java.lang.*;
-import java.awt.event.*;
-import java.awt.*;
-
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.dialogs.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
-
-import javax.swing.*;
-import javax.swing.table.*;
-
 /**
- * This implementation builds a SequencePanel to represent the data.
+ * install the bpf data type,
  */
-public class Bpf extends JFrame implements EditorContainer{
+public class Bpf extends JMaxPackage
+{
+  public Bpf()
+  {
+      super("bpf");
+  }
 
-    //------------------- fields
-    BpfPanel itsBpfPanel;
-    FtsBpfObject bpfData;
-
-    public final static int DEFAULT_WIDTH  = 300;
-    //public final static int DEFAULT_HEIGHT = 210;
-    public final static int DEFAULT_HEIGHT = 150;
-    public final static int MAX_HEIGHT     = 800;
-    public final static int EMPTY_HEIGHT   = 78;
-  /**
-   * Constructor with FtsSequenceObject
-   */
-    public Bpf(FtsBpfObject data)
-    {
-	super();
-
-	MaxWindowManager.getWindowManager().addWindow(this);
-
-	bpfData = data;
-
-	makeTitle();
-
-	// Build The Menus and Menu Bar
-	makeMenuBar();
-
-	setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-
-	//... then the SequencePanel
-	itsBpfPanel = new BpfPanel(this, data);
-	getContentPane().add(itsBpfPanel);
-
-	addWindowListener(new WindowListener(){
-		public void windowOpened(WindowEvent e){}
-		public void windowClosed(WindowEvent e){}
-		public void windowClosing(WindowEvent e)
-		{
-		    MaxWindowManager.getWindowManager().removeWindow(getFrame());
-		}
-		public void windowDeiconified(WindowEvent e){}
-		public void windowIconified(WindowEvent e){}
-		public void windowActivated(WindowEvent e){}
-		public void windowDeactivated(WindowEvent e){}
-	    });
-	
-	validate();
-	pack();
-	setVisible(true);
-    }
-
-    private final void makeTitle(){
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf"));
-	MaxWindowManager.getWindowManager().windowChanged(this);
-    } 
-
-    public void setName(String name)
-    {
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf " + name));
-	MaxWindowManager.getWindowManager().windowChanged(this);
-    }
-
-    private final void makeMenuBar(){
-	JMenuBar mb = new JMenuBar();
-	
-	// Build the file menu	
-	mb.add( new DefaultFileMenu());
-	
-	// New Window Manager based Menu
-	mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
-	
-	setJMenuBar(mb);
-    }
-    
-    // ------ editorContainer interface ---------------
-    public Editor getEditor(){
-	return itsBpfPanel;
-    }
-    public Frame getFrame(){
-	return this;
-    }
-    public Point getContainerLocation(){
-	return getLocation();
-    }
-    public Rectangle getViewRectangle(){
-	return itsBpfPanel.getViewRectangle();
-    }
+ public void load()
+ {
+     ObjectCreatorManager.registerFtsClass("bpf", ircam.jmax.editors.bpf.FtsBpfObject.class);
+     
+     ircam.jmax.editors.console.ConsoleWindow.append("package Bpf loaded");	    
+ }
 }
-
-
-
-
 
 
 

@@ -41,7 +41,6 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.Geometry;
 
@@ -143,8 +142,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    }
 	});
  
-    statusBar.setSize(Sequence.DEFAULT_WIDTH, 30);
-    //statusBar.setPreferredSize(new Dimension(Sequence.DEFAULT_WIDTH, 30));
+    statusBar.setSize(SequenceWindow.DEFAULT_WIDTH, 30);
+    //statusBar.setPreferredSize(new Dimension(SequenceWindow.DEFAULT_WIDTH, 30));
 
     JPanel toolbarPanel = new JPanel();
     toolbarPanel.setSize(228, 25);
@@ -155,8 +154,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar.addWidgetAt(toolbarPanel, 2);
     statusBar.validate();
 
-    ruler.setSize(Sequence.DEFAULT_WIDTH, 20);
-    //ruler.setPreferredSize(new Dimension(Sequence.DEFAULT_WIDTH, 30));
+    ruler.setSize(SequenceWindow.DEFAULT_WIDTH, 20);
 
     northSection.add(statusBar);
     northSection.add(ruler);	
@@ -239,21 +237,21 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//resize the frame //////////////////////////////////////////////////////////////
 	int height;	
 	Dimension dim = itsContainer.getFrame().getSize();
-	if(dim.height < Sequence.MAX_HEIGHT)
+	if(dim.height < SequenceWindow.MAX_HEIGHT)
 	{
 	    int tcHeight = trackContainer.getSize().height;
 	    
 	    if(sequenceData.trackCount() == 1)
 		itsContainer.getFrame().
-		    setSize(dim.width, Sequence.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
+		    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
 	    else
-		if(dim.height + tcHeight <= Sequence.MAX_HEIGHT)
+		if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
 		    itsContainer.getFrame().
 			setSize(dim.width, dim.height + tcHeight);
 		else 
-		    if(dim.height < Sequence.MAX_HEIGHT)
+		    if(dim.height < SequenceWindow.MAX_HEIGHT)
 			itsContainer.getFrame().
-			    setSize(dim.width, Sequence.MAX_HEIGHT);
+			    setSize(dim.width, SequenceWindow.MAX_HEIGHT);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -292,11 +290,11 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//resize of the frame
 	Dimension dim = itsContainer.getFrame().getSize();
  	if(sequenceData.trackCount() == 0)
-	     itsContainer.getFrame().setSize(dim.width, Sequence.EMPTY_HEIGHT);	
+	     itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT);	
 	else
 	    if(!scrollTracks.getVerticalScrollBar().isVisible())		
 		itsContainer.getFrame().setSize(dim.width, 
-						Sequence.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
+						SequenceWindow.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
     
 	itsContainer.getFrame().validate();
 	
@@ -311,11 +309,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	trackContainer.validate();
 	trackPanel.validate();
 	scrollTracks.validate();
-
-	/*Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
-	  scrollTracks.getViewport().scrollRectToVisible(absBounds);
-	  
-	  itsContainer.getFrame().validate();*/
     }
 
     public void trackMoved(Track track, int oldPosition, int newPosition)
@@ -549,22 +542,12 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	return ftsSequenceObject;
     }
   //------------------- Editor interface ---------------
-  final public Fts getFts()
-  {
-    return MaxApplication.getFts();
-  }
-    
-    public MaxDocument getDocument()
-    {
-	return ftsSequenceObject.getDocument();
-    }
-
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    ftsSequenceObject.closeEditor(); 
+    ftsSequenceObject.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
     

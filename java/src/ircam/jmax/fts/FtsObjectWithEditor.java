@@ -25,6 +25,7 @@
 
 package ircam.jmax.fts;
 
+import ircam.ftsclient.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
 import javax.swing.undo.*;
@@ -33,16 +34,42 @@ import java.awt.*;
 import javax.swing.*;
 
 import java.lang.*;
+import java.io.*;
 
 /**
  * An fts remote data that offers a built-in undo support.
  * 
  */
-public class FtsObjectWithEditor extends FtsUndoableObject {
+public abstract class FtsObjectWithEditor extends FtsUndoableObject {
+
+    static{
+	FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("openEditor"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsObjectWithEditor)obj).openEditor(argc, argv);
+		}
+	    });
+	FtsObject.registerMessageHandler( FtsObjectWithEditor.class, FtsSymbol.get("destroyEditor"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsObjectWithEditor)obj).destroyEditor();
+		}
+	    });  
+    }
   
-  public FtsObjectWithEditor(Fts fts, FtsObject parent, String variableName, String className, String description)
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom[] args, int id)
   {
-    super(fts, parent, variableName, className, description);
+    super(server, parent, className, nArgs, args, id);
+  }
+
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
+  {
+      super(server, parent, ftsClassName, args);
+  }
+  
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
+  {
+      super(server, parent, ftsClassName);
   }
 
   public Frame getEditorFrame()
@@ -95,11 +122,49 @@ public class FtsObjectWithEditor extends FtsUndoableObject {
   }
 
   void releaseData()
-    {
-	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
-	super.releaseData();
-    }
+  {
+      requestDestroyEditor();
+  }
+
+  public void requestDestroyEditor()
+  {
+      try{
+	  send(FtsSymbol.get("destroyEditor"));
+      }
+      catch(IOException e)
+      {
+	  System.err.println("FtsObjectWithEditor: I/O Error sending destroyEditor Message!");
+	  e.printStackTrace(); 
+      }
+  }
+
+  public void requestOpenEditor()
+  {
+      try{
+	  send(FtsSymbol.get("openEditor"));
+      }
+      catch(IOException e)
+      {
+	  System.err.println("FtsObjectWithEditor: I/O Error sending openEditor Message!");
+	  e.printStackTrace(); 
+      }
+  }
+
+  public abstract void openEditor(int argc, FtsAtom[] argv);
+  public abstract void destroyEditor();
 
   private Frame editorFrame = null;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -95,6 +95,7 @@ public class Platform
       {
 	setDefaultValues();
       }
+    //setDefaultUIColors(Color.red);
   }
 
   static protected void setDefaultUIComponentsFont(String defFont)

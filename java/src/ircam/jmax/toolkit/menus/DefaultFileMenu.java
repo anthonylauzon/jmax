@@ -34,6 +34,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
+import ircam.jmax.editors.console.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
@@ -81,11 +82,11 @@ public class DefaultFileMenu extends EditorMenu
 
   public void updateMenu()
   {
-      if(MaxApplication.getFts()!=null)
+      if(MaxApplication.getServer() != null)
 	  {
 	      dspMenuItem.setEnabled(true);
 
-	      boolean dspOn = MaxApplication.getFts().getDspController().getDspOn().booleanValue();
+	      boolean dspOn = ConsoleWindow.getInstance().getDspControl().getDspOn();
       
 	      if(dspOn) dspMenuItem.setText("Desactivate DSP");
 	      else dspMenuItem.setText("Activate DSP");

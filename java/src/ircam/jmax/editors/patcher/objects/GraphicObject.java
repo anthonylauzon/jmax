@@ -35,6 +35,7 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -146,7 +147,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   protected transient ErmesSketchPad itsSketchPad;
 
-  protected transient FtsObject ftsObject = null;
+  protected transient FtsGraphicObject ftsObject = null;
 
   private transient boolean selected = false;
 
@@ -167,7 +168,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
 
-  static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsObject object) 
+  static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsGraphicObject object) 
   {
     GraphicObject gobj = null;
     String theName = object.getClassName();
@@ -211,19 +212,19 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     return gobj;
   }
 
-  protected GraphicObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  protected GraphicObject( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     String fontName;
     int fontSize;
     int fontStyle;
 
-    if(assistArgs == null)
+    /*if(assistArgs == null)
       {
-	assistArgs = new FtsAtom[2];
-	
-	for(int i = 0; i < assistArgs.length; i++)
-	  assistArgs[i] = new FtsAtom();
-      }
+      assistArgs = new FtsAtom[2];
+      
+      for(int i = 0; i < assistArgs.length; i++)
+      assistArgs[i] = new FtsAtom();
+      }*/
     
     itsSketchPad = theSketchPad;
     ftsObject = theFtsObject;
@@ -254,7 +255,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     itsSketchPad.getDisplayList().remove(this);
     dispose();
-    ftsObject.delete();
+    //ftsObject.delete();
   }
   
   public final int getX() 
@@ -593,8 +594,10 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public void redefine(String text) 
   {
-    updateInOutlets();
+      updateInOutlets();
   }
+
+  public void redefined(){}
 
   final public void setSelected(boolean v) 
   {
@@ -606,7 +609,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     return selected;
   }
 
-  public final FtsObject getFtsObject() 
+  public final FtsGraphicObject getFtsObject() 
   {
     return ftsObject;
   }
@@ -1159,7 +1162,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   // Assist code
   // Protected against repetitions of assist messages
 
-  private static FtsAtom assistArgs[] = null;
+    //private static FtsAtom assistArgs[] = null;
 
   static FtsObject lastAssistedObject;
   static int lastPosition;
@@ -1194,8 +1197,8 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (canDoAssist(ASSIST_OBJECT, 0))
       {
-	assistArgs[0].stringValue = "object";
-	ftsObject.sendMessage(-1, "assist", 1, assistArgs);
+	  /*assistArgs[0].stringValue = "object";
+	    ftsObject.sendMessage(-1, "assist", 1, assistArgs);*/
       }
   }
 
@@ -1203,9 +1206,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (canDoAssist(ASSIST_INLET, n))
       {
-	assistArgs[0].setString("inlet");
-	assistArgs[1].setInt(n);
-	ftsObject.sendMessage(-1, "assist", 2, assistArgs);
+	  /*assistArgs[0].setString("inlet");
+	    assistArgs[1].setInt(n);
+	    ftsObject.sendMessage(-1, "assist", 2, assistArgs);*/
       }
   }
 
@@ -1213,9 +1216,9 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   {
     if (canDoAssist(ASSIST_OUTLET, n))
       {
-	assistArgs[0].setString("outlet");
-	assistArgs[1].setInt(n);
-	ftsObject.sendMessage(-1, "assist", 2, assistArgs);
+	  /*assistArgs[0].setString("outlet");
+	    assistArgs[1].setInt(n);
+	    ftsObject.sendMessage(-1, "assist", 2, assistArgs);*/
       }
   }
 

@@ -913,6 +913,8 @@ static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_atom_t a[1];
   fts_object_t *p;
 
+  fts_log("[patcher]: upload 1\n");
+
   if(!fts_object_is_error((fts_object_t *)this))
     {
       fts_client_send_message((fts_object_t *)this, sym_redefineStart, 0, 0);
@@ -982,6 +984,8 @@ static void fts_patcher_upload( fts_object_t *o, int winlet, fts_symbol_t s, int
        */
 
       fts_client_send_message((fts_object_t *)this, sym_setRedefined, 0, 0);
+    
+      fts_log("[patcher]: upload 2\n");
     }
 }
 

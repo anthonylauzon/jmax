@@ -16,8 +16,9 @@ FtsForkObject.java \
 FtsMessConstObject.java \
 FtsScopeObject.java \
 FtsSliderObject.java \
+FtsToggleObject.java \
 FtsVectorDisplayObject.java \
-GuiObjExtension.java \
+Guiobj.java \
 IntBox.java \
 MessConst.java \
 ObjectControlPanel.java \
@@ -34,7 +35,7 @@ VectorDisplay.java
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
 JAVAROOTX=@top_srcdir@/packages/guiobj/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/packages/guiobj/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/guiobj/java/src
 
 SUFFIXES = .java .class
 

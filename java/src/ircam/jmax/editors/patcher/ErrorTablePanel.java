@@ -26,12 +26,14 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
+import java.io.*;
 import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -54,20 +56,28 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
       }
   }
 
-  public ErrorTablePanel(Fts fts)
+  public ErrorTablePanel()
   {
-    this.fts = fts;
-    
     try
 	{
-	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
+	    set = new FtsObjectSet();
 	}
-    catch (FtsException e)
+    catch(IOException e)
 	{
-	    System.out.println("System error: cannot get objectSet object");
+	    System.err.println("[ErrorTablePanel]: Error in FtsObjectSet creation!");
+	    e.printStackTrace();
 	}
-    
-    //tableModel = model;
+
+    try
+	{
+	    errorFinder = new FtsErrorFinderObject();
+	}
+    catch(IOException e)
+	{
+	    System.err.println("[ErrorTablePanel]: Error in FtsErrorFinderObject creation!");
+	    e.printStackTrace();
+	}
+
     tableModel = new ErrorTableModel(set);
     table = new JTable(tableModel);
     table.setPreferredScrollableViewportSize(new Dimension(400, 200));
@@ -75,6 +85,7 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
     table.getColumnModel().getColumn(0).setPreferredWidth(150);
     table.getColumnModel().getColumn(0).setMaxWidth(150);
     table.getColumnModel().getColumn(0).setCellRenderer(new ErrorTableCellRenderer());
+    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     table.addMouseListener(new MouseListener(){
 	    public void mouseEntered(MouseEvent e) {} 
@@ -91,7 +102,7 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 			    {
 				if (objectSelectedListener != null)
 				    {
-					FtsObject object = (FtsObject) set.getElementAt(index);
+					FtsGraphicObject object = (FtsGraphicObject) set.getElementAt(index);
 					
 					objectSelectedListener.objectSelected(object);
 				    }
@@ -120,7 +131,7 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 	    public void intervalAdded(ListDataEvent e){};
 	});
     
-    fts.addEditListener(new FtsEditListener(){	    
+    FtsPatcherObject.addGlobalEditListener(new FtsEditListener(){	    
 	    public void objectAdded(FtsObject object)
 	    {
 		if(!atomic) 
@@ -146,14 +157,14 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 		atomic = active;
 		if(!atomic) findErrors();
 	    };
-	});
+      });
 
     findErrors();
   }
 
   public void findErrors()
   {
-      fts.getErrorFinder().findErrors(fts.getRootObject(), set);
+      errorFinder.findErrors(set);
   }
 
   public void setObjectSelectedListener(ObjectSelectedListener objectSelectedListener)
@@ -178,10 +189,10 @@ public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
   
   private boolean atomic = false;
   
-  protected JTable table;
-  protected Fts fts;
+  private JTable table;
   private FtsObjectSet set;
-  protected ErrorTableModel tableModel;
+  private FtsErrorFinderObject errorFinder;
+  private ErrorTableModel tableModel;
   private ObjectSelectedListener objectSelectedListener;
   public static ImageIcon errorIcon = SystemIcons.get("_error_object_");
   public static ImageIcon patcherIcon = SystemIcons.get("_patcher_");

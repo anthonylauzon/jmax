@@ -26,9 +26,11 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 
 /** Object set class.
@@ -53,21 +55,63 @@ public class FtsObjectSet extends FtsObject implements ListModel
     public void atomicAction(boolean active){}      
   }
 
-  public FtsObjectSet(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  static
   {
-      super(fts, parent, variableName, classname, "");
+      FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	  {
+	      ((FtsObjectSet)obj).clear();
+	  }
+	});
+      FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("append"), new FtsMessageHandler(){
+	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	  {
+	      ((FtsObjectSet)obj).append(argc, argv);
+	  }
+	});
+      FtsObject.registerMessageHandler( FtsObjectSet.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
+	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	  {
+	      ((FtsObjectSet)obj).removeObject(argv[0].objectValue);
+	  }
+	});
+  }
+
+
+  public FtsObjectSet() throws IOException
+  {
+      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__objectset"));
 
       list = new MaxVector();
       dataListeners = new MaxVector();
       
       editListener = new ObjectSetEditListener();
-      getFts().addEditListener(editListener);
+      FtsPatcherObject.addGlobalEditListener(editListener);
   }
   
   public void release()
   {
-      getFts().removeEditListener(editListener);
-      super.release();
+      FtsPatcherObject.removeGlobalEditListener(editListener);
+  }
+
+  public void append(int nArgs, FtsAtom[] args)
+  {
+      for(int i=0; i<nArgs; i++)
+	  list.addElement(args[i].objectValue);
+
+      fireListChanged();
+  }
+
+  public void clear()
+  {
+      list.removeAllElements();
+      fireListChanged();
+  }
+
+  public void removeObject(FtsObject obj)
+  {
+      list.removeElement(obj);
+      fireListChanged();
   }
 
   /** listmodel interface */
@@ -93,24 +137,6 @@ public class FtsObjectSet extends FtsObject implements ListModel
 	for(Enumeration e = dataListeners.elements(); e.hasMoreElements();)
 	    ((ListDataListener)e.nextElement()).contentsChanged(evt);
     }
-
-  /* SERVER CALLBACK */
-  public void clear(int nArgs , FtsAtom args[])
-  {
-    list.removeAllElements();
-    fireListChanged();
-  }
-  public void append(int nArgs , FtsAtom args[])
-  {
-      for(int i=0; i<nArgs; i++)	  
-	  list.addElement((FtsObject)args[i].getObject());
-
-      fireListChanged();
-  }
-  public void remove(int nArgs , FtsAtom args[])
-  {
-      list.removeElement((FtsObject)args[0].getObject());
-  }
 }
 
 

@@ -45,8 +45,8 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
   private static final int maxHeight = 500;
 
   /* silent agreement with client */
-  private static final int defaultWidth = 130;
-  private static final int defaultHeight = 130;
+  static final int DEFAULT_WIDTH = 130;
+  static final int DEFAULT_HEIGHT = 130;
 
   private static final Color displayYellow = new Color((float)1.0, (float)0.98, (float)0.9);
   private static final Color markerYellow = new Color((float)0.9, (float)0.88, (float)0.8);
@@ -56,7 +56,7 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
   public static VecDispControlPanel controlPanel = new VecDispControlPanel();
 
-  public VectorDisplay(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public VectorDisplay(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
 
@@ -65,8 +65,8 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 
     if(w < 0 || h < 0)
       {
-	w = defaultWidth;
-	h = defaultHeight;
+	w = DEFAULT_WIDTH;
+	h = DEFAULT_HEIGHT;
       }
 
     maxWidth = FtsVectorDisplayObject.MAX_SIZE + 2;
@@ -247,8 +247,6 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
     int orgY = y + h - 2;
     int i;
 
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-
     /* draw background */
     g.setColor(getBackgroundColor());
     g.fillRect( x, y, w - 1, h - 1);
@@ -272,8 +270,6 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
 	else
 	  drawVector(g, orgX, orgY, values, n);
       }
-
-    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
   }
 
   public void updatePaint(Graphics g) 

@@ -25,31 +25,48 @@
 
 package ircam.jmax.fts;
 
+import ircam.ftsclient.*;
 import ircam.jmax.toolkit.*;
+
 import javax.swing.undo.*;
 import javax.swing.event.*;
+import java.io.*;
 
 /**
  * An fts remote data that offers a built-in undo support.
  * 
  */
-public class FtsUndoableObject extends FtsObject implements UndoableData{
+public class FtsUndoableObject extends FtsGraphicObject implements UndoableData{
   
-  public FtsUndoableObject(Fts fts, FtsObject parent, String variableName, String className, String description)
-  {
+    public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, int nArgs, FtsAtom[] args, int id)
+    {
+	super(server, parent, ftsClassName, nArgs, args, id);
+	init();
+    }
 
-    super(fts, parent, variableName, className, description);
+    public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName, FtsArgs args) throws IOException
+    {
+	super(server, parent, ftsClassName, args);
+	init();
+    }
 
-    undoM = new UndoManager();
-    undo = new UndoableEditSupport();
-    undo.addUndoableEditListener(new UndoableEditListener() {
-      public void undoableEditHappened(UndoableEditEvent e)
-	{
-	  undoM.addEdit(e.getEdit());
-	} 
-    });
-    
-  }
+    public FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol ftsClassName) throws IOException
+    {
+	super(server, parent, ftsClassName);
+	init();
+    }
+
+    void init()
+    {
+	undoM = new UndoManager();
+	undo = new UndoableEditSupport();
+	undo.addUndoableEditListener(new UndoableEditListener() {
+		public void undoableEditHappened(UndoableEditEvent e)
+		{
+		    undoM.addEdit(e.getEdit());
+		} 
+	    });		
+    }
 
   /** NOTE: the begin update - endUpdate methods acts also as a
    * controller for the actions to undo. If no

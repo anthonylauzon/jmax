@@ -157,14 +157,21 @@ public class AnythingValue extends AbstractEventValue
 
   static 
   {
-    try
-      {
+      /*
+	WARNING:
+	Waiting for a method to get the packagePath from the package name
+      */
+      /*try
+	{
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-    catch(FileNotFoundException e){
-      path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-    }
-    ANYTHING_ICON = new ImageIcon(path+"anything.gif");
+	}
+	catch(FileNotFoundException e){
+	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	}*/
+      path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+      /*************************************************************/
+      
+      ANYTHING_ICON = new ImageIcon(path+"anything.gif");
   }
 
   static String nameArray[] = {};

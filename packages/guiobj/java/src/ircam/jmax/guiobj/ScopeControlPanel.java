@@ -75,7 +75,7 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 	  if(!source.getValueIsAdjusting())
 	    {
 	      if((target!=null)&&(((FtsScopeObject)target.getFtsObject()).getPeriod()!=period))
-		((FtsScopeObject)target.getFtsObject()).requestSetPeriod(period);
+		((FtsScopeObject)target.getFtsObject()).setPeriod(period);
 	    }
       
 	  periodLabel.setText(""+(int)period);
@@ -110,7 +110,7 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 	    {
 		if(e.getStateChange() == ItemEvent.SELECTED)
 		    ((FtsScopeObject)target.getFtsObject()).
-			requestSetThreshold(FtsScopeObject.THRESHOLD_AUTO);
+			setThreshold(FtsScopeObject.THRESHOLD_AUTO);
 	    }
 	});
     thresholdButtonGroup.add(autoItem);
@@ -127,7 +127,7 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 	    {
 		if(e.getStateChange() == ItemEvent.SELECTED)
 		    ((FtsScopeObject)target.getFtsObject()).
-			requestSetThreshold(FtsScopeObject.THRESHOLD_OFF);
+			setThreshold(FtsScopeObject.THRESHOLD_OFF);
 	    }
 	});
     thresholdButtonGroup.add(offItem);    
@@ -147,7 +147,7 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 			thresholdSlider.setEnabled(true);
 			float th = thresholdSlider.getValue()/(float)100.0;
 			thresholdLabel.setText(""+th);
-			((FtsScopeObject)target.getFtsObject()).requestSetThreshold(th);
+			((FtsScopeObject)target.getFtsObject()).setThreshold(th);
 		    }		
 		else
 		    {
@@ -182,7 +182,7 @@ public class ScopeControlPanel extends JPanel implements ObjectControlPanel
 	  if(!source.getValueIsAdjusting())
 	    {
 		if((target!=null))
-		    ((FtsScopeObject)target.getFtsObject()).requestSetThreshold(th);
+		    ((FtsScopeObject)target.getFtsObject()).setThreshold(th);
 	    }      
 	  thresholdLabel.setText(""+th);
 	}

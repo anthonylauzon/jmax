@@ -34,7 +34,6 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.qlist.*;
@@ -89,8 +88,6 @@ public class EditMenu extends EditorMenu
     }
     pasteItem.setEnabled((flavors != null) &&
 			 clipboardContent.isDataFlavorSupported(DataFlavor.plainTextFlavor));
-    /*pasteItem.setEnabled((flavors != null) &&
-      clipboardContent.isDataFlavorSupported(DataFlavor.getTextPlainUnicodeFlavor()));*/
   }
 }
 

@@ -42,7 +42,7 @@ public class PrintAction extends EditorAction
   public void doAction(EditorContainer container)
   {
       //SequencePanel panel = (SequencePanel)container.getEditor();
-      Sequence panel = (Sequence)container;
+      SequenceWindow panel = (SequenceWindow)container;
 
     RepaintManager.currentManager(panel).setDoubleBufferingEnabled(false);
 

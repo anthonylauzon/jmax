@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.io.*;
 import java.util.*;
 
-
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 
 /**
@@ -48,25 +48,46 @@ public class FtsClipboard  extends FtsObject
    * Create a Fts clipboard;
    */
 
-  boolean empty = true; // Empty only before its first copy
+  protected FtsArgs args = new FtsArgs();
+  protected boolean empty = true; // Empty only before its first copy
+  protected int copyCount = 0;
 
-  int copyCount = 0;
-
-  public FtsClipboard(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  public FtsClipboard() throws IOException
   {
-      super(fts, parent, null, classname, classname);
+      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__clipboard"));
   }
 
   public void copy(FtsSelection sel)
   {
+    args.clear();
+    args.add(sel);
+      
+    try{
+      send( FtsSymbol.get("copy"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsClipboard]: I/O Error sending copy message!");
+	e.printStackTrace(); 
+      }
+
     empty = false;
     copyCount++;
-    getFts().getServer().sendObjectMessage(this, -1, "copy", sel);
   }
 
   public void paste(FtsObject patcher)
   {
-    getFts().getServer().sendObjectMessage(this, -1, "paste", patcher);
+    args.clear();
+    args.add(patcher);
+
+    try{
+      send( FtsSymbol.get("paste"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("[FtsClipboard]: I/O Error sending paste message!");
+	e.printStackTrace(); 
+      }
   }
 
   public int getCopyCount()

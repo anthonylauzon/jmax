@@ -41,7 +41,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   int cornerSize = 0;
   int cornerSizeMax = 0;
 
-  public MessConst( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public MessConst( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
     cornerSizeMax = minWidth;
@@ -92,7 +92,7 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
   {          
     // Send a bang message to the system inlet
     if (Squeack.isDown(squeack))
-      ftsObject.sendMessage( -1, "bang", null);
+	((FtsMessConstObject)ftsObject).sendBang();
   }
 
   // redefined from base class
@@ -108,22 +108,14 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
 
   public void redefine( String text) 
   {
-    try 
-      {
-	//ignoreError = false;
-	ftsObject = ftsObject.getFts().redefineFtsObject( ftsObject, "messconst " + text);
+      ((FtsPatcherObject)ftsObject.getParent()).requestRedefineObject(ftsObject, "messconst " +text);
+      itsSketchPad.getDisplayList().remove(this);
+      dispose();
+  }
 
-	if (ftsObject.isError())
-	  itsSketchPad.showMessage(ftsObject.getErrorDescription());
-      } 
-    catch (FtsException e) 
-      {
-	System.err.println("Error in redefining object, action cancelled");
-      }
-
-    setWidthToText(getArgs());
-
-    super.redefine(text); 
+  public void redefined()
+  {
+      fitToText();
   }
 
   /* Inspector */    

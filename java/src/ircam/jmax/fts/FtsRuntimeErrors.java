@@ -26,10 +26,12 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.editors.patcher.*;
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 
 /** Object set class.
@@ -38,16 +40,26 @@ import ircam.jmax.*;
 
 public class FtsRuntimeErrors extends FtsObject implements ListModel
 {
-  MaxVector list, dataListeners;
+  Vector list, dataListeners;
 
-  public FtsRuntimeErrors(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  static
   {
-      super(fts, parent, variableName, classname, "");
+      FtsObject.registerMessageHandler( FtsRuntimeErrors.class, FtsSymbol.get("postError"), new FtsMessageHandler(){
+	  public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+	  {
+	      ((FtsRuntimeErrors)obj).postError((FtsGraphicObject)argv[0].objectValue, argv[1].stringValue);
+	  }
+	});
+  }
+
+  public FtsRuntimeErrors() throws IOException
+  {
+      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__runtimeerrors"));
       
-      list = new MaxVector();
-      dataListeners = new MaxVector();
+      list = new Vector();
+      dataListeners = new Vector();
   
-      fts.addEditListener(new FtsEditListener()
+      FtsPatcherObject.addGlobalEditListener(new FtsEditListener()
 	  {
 	      public void objectAdded(FtsObject object){}
 	      public void objectRemoved(FtsObject object)
@@ -61,9 +73,9 @@ public class FtsRuntimeErrors extends FtsObject implements ListModel
 	  });
   }
   
-  public void postError(int nArgs , FtsAtom args[])
+  public void postError(FtsGraphicObject obj, String description)
   {
-      RuntimeError err = new RuntimeError(args[0].getObject(), args[1].getString());
+      RuntimeError err = new RuntimeError(obj, description);
       
       RuntimeError oldErr = getSamePostedError(err);
       if(oldErr!=null)

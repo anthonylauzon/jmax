@@ -62,31 +62,39 @@ class MoveConnectInteraction extends Interaction
 	return;
       }
 
-    try
-      {
-	FtsConnection fc;
-	GraphicConnection connection;
+    /*******************************************************************/
+    /*************** ASYNCRONOUS CONNECTION CREATION *******************/
 
-	fc = editor.getFts().makeFtsConnection(src.getFtsObject(), outlet, 
-					       dst.getFtsObject(), inlet);
-		    
-	connection = new GraphicConnection(editor,
-					   src, outlet,
-					   dst, inlet,
-					   fc.getType(), fc);
+    editor.getFtsPatcher().requestAddConnection(src.getFtsObject(), outlet, dst.getFtsObject(), inlet);
+
+    /*try
+      {
+      FtsConnection fc;
+      GraphicConnection connection;
+      
+      fc = editor.getFts().makeFtsConnection(src.getFtsObject(), outlet, 
+      dst.getFtsObject(), inlet);
+      
+      connection = new GraphicConnection(editor,
+      src, outlet,
+      dst, inlet,
+      fc.getType(), fc);
 		
-	editor.getDisplayList().add(connection);
-	editor.getDisplayList().sortDisplayList();
-	connection.updateDimensions();
-	ErmesSelection.patcherSelection.select( connection);	
-	connection.redraw();
+      editor.getDisplayList().add(connection);
+      editor.getDisplayList().sortDisplayList();
+      connection.updateDimensions();
+      ErmesSelection.patcherSelection.select( connection);	
+      connection.redraw();
       }
-    catch (FtsException e)
+      catch (FtsException e)
       {
-	// Just don't do the connection in case of troubles.
+      // Just don't do the connection in case of troubles.
+      
+      // editor.showMessage("Cannot connect");
+      }*/
 
-	// editor.showMessage("Cannot connect");
-      }
+    /*******************************************************************/
+    /*******************************************************************/
   }
 
   public void setSrc(GraphicObject obj, int out){

@@ -27,12 +27,14 @@ package ircam.jmax.editors.patcher;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import ircam.ftsclient.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -40,7 +42,6 @@ import ircam.jmax.widgets.*;
 
 public class FinderTablePanel extends JPanel implements JMaxToolPanel{
 
-  /*private final static Color selectedColor = new Color(204, 204, 255);*/
   static class FinderTableCellRenderer extends DefaultTableCellRenderer
   {
     public Component getTableCellRendererComponent(JTable table, Object obj, 
@@ -49,26 +50,35 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
 	  super.getTableCellRendererComponent(table, obj, selected, hasFocus, row, column);
 	  
 	  setText((String) obj);
-	  setIcon(ObjectSetViewer.getObjectIcon((FtsObject)((FinderTableModel)table.getModel()).
+	  setIcon(ObjectSetViewer.getObjectIcon((FtsGraphicObject)((FinderTableModel)table.getModel()).
 						getListModel().getElementAt(row)));
 	  
 	  return this;
       }
   }
 
-  public FinderTablePanel(Fts fts)
+  public FinderTablePanel()
   {
-    this.fts = fts;
-
     setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
     
     try
 	{
-	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
+	    set = new FtsObjectSet();
 	}
-    catch (FtsException e)
+    catch(IOException e)
 	{
-	    System.out.println("System error: cannot get objectSet object");
+	    System.err.println("[FinderTablePanel]: Error in FtsObjectSet creation!");
+	    e.printStackTrace();
+	}
+
+    try
+	{
+	    ftsFinder = new FtsFinderObject();
+	}
+    catch(IOException e)
+	{
+	    System.err.println("[FinderTablePanel]: Error in FtsFinderObject creation!");
+	    e.printStackTrace();
 	}
 
     /* ############ TextField ###################### */
@@ -105,6 +115,7 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     table.setPreferredScrollableViewportSize(new Dimension(400, 200));
     table.setRowHeight(17);
     table.getColumnModel().getColumn(0).setCellRenderer(new FinderTableCellRenderer());
+    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     table.addMouseListener(new MouseListener(){
 	    public void mouseEntered(MouseEvent e) {} 
@@ -121,7 +132,7 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
 			    {
 				if (objectSelectedListener != null)
 				    {
-					FtsObject object = (FtsObject) set.getElementAt(index);
+					FtsGraphicObject object = (FtsGraphicObject) set.getElementAt(index);
 					
 					objectSelectedListener.objectSelected(object);
 				    }
@@ -160,12 +171,12 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     FtsParse.parseAtoms(query, args);
     
     if(args.size()>0)
-	fts.getFinder().find(fts.getRootObject(), set, args);
+	ftsFinder.find(set, args);
 
     setCursor(temp);
   }
 
-  public void findFriends(FtsObject object)
+  public void findFriends(FtsGraphicObject object)
   {
     if(object.isError()) return;
 
@@ -173,7 +184,7 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
     setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
     textField.setText("");
 
-    fts.getFinder().findFriends(object, set);    
+    ftsFinder.findFriends(object, set);    
 
     setCursor(temp);
   }
@@ -202,8 +213,8 @@ public class FinderTablePanel extends JPanel implements JMaxToolPanel{
   
   protected JTable table;  
   private JTextField textField;
-  protected Fts fts;
   private FtsObjectSet set;
+  private FtsFinderObject ftsFinder;
   protected FinderTableModel tableModel;
   private ObjectSelectedListener objectSelectedListener;
 }

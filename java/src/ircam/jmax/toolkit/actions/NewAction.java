@@ -20,7 +20,7 @@
 // 
 // Based on Max/ISPW by Miller Puckette.
 //
-// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
 // 
 
 package ircam.jmax.toolkit.actions;
@@ -33,40 +33,38 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.actions.*;
 
 public class NewAction extends EditorAction
 {
   Frame frame;
   public void doAction(EditorContainer container)
   {
+    frame = container.getFrame();
+    frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    FtsPatcherObject patcher = null;
+    
     try
       {
-	MaxDocument doc = Mda.getDocumentTypeByName( "patcher").newDocument( container.getEditor().getFts());
-	frame = container.getFrame();
-	if(doc!=null) 
-	    {
-		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		doc.edit();
-		//((FtsPatcherData)doc.getRootData()).getContainerObject().requestStopWaiting(new FtsActionListener(){
-		((FtsPatcherObject)doc.getRootData()).requestStopWaiting(new FtsActionListener(){
-			public void ftsActionDone()
-			{
-			  frame.setCursor(Cursor.getDefaultCursor());
-			}
-		    });
-	    }
-	//container.getFrame().setCursor(temp);	
+	patcher = new FtsPatcherObject();
       }
-    catch (MaxDocumentException ex)
+    catch(IOException e)
       {
-	container.getFrame().setCursor(Cursor.getDefaultCursor());
-	JOptionPane.showMessageDialog(container.getFrame(), ex.toString(), 
-				      "Error", JOptionPane.ERROR_MESSAGE); 
+	System.err.println("[NewAction]: Error in FtsPatcherObject creation!");
+	e.printStackTrace();
+      }
+
+    if(patcher != null)
+      {
+	patcher.requestOpenEditor();
+	patcher.requestStopWaiting(new FtsActionListener(){
+	    public void ftsActionDone()
+	    {
+	      frame.setCursor(Cursor.getDefaultCursor());
+	    }
+	  });
       }
   }
 }

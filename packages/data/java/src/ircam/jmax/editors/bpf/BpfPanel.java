@@ -37,7 +37,6 @@ import java.io.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 
 import ircam.jmax.editors.bpf.tools.*;
@@ -84,10 +83,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	geometry.setYInvertion(true);
 	geometry.setYTransposition(136);
     }
-    //------------------------------------------------
-    // Create the ruler
-    //ruler = new BpfRuler(geometry, this);
-
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
     manager = new BpfToolManager(BpfTools.instance);    
@@ -99,8 +94,8 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     ///prepare the bpfEditor
     JPanel container_panel = new JPanel();
     container_panel.setLayout(new BorderLayout());
-    container_panel.setPreferredSize(new Dimension(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-30*/));
-    container_panel.setSize(Bpf.DEFAULT_WIDTH, Bpf.DEFAULT_HEIGHT/*-30*/);
+    container_panel.setPreferredSize(new Dimension(BpfWindow.DEFAULT_WIDTH, BpfWindow.DEFAULT_HEIGHT/*-30*/));
+    container_panel.setSize(BpfWindow.DEFAULT_WIDTH, BpfWindow.DEFAULT_HEIGHT/*-30*/);
 
     editor = new BpfEditor(geometry, bpfData, manager);
     editor.setBorder(new EtchedBorder());
@@ -111,13 +106,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     manager.addContextSwitcher(new WindowContextSwitcher(editor.getGraphicContext().getFrame(), editor.getGraphicContext()));
 
     editor.getGraphicContext().getSelection().addListSelectionListener(this);
-    //------------------     
-    /*Box northSection = new Box(BoxLayout.Y_AXIS);
-
-      ruler.setSize(300, 20);
-      northSection.add(ruler);	
-      container_panel.add(northSection, BorderLayout.NORTH);*/
-
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
@@ -151,13 +139,6 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     add(container_panel, BorderLayout.CENTER);
     validate();
   }
-
-    /*boolean isVisible(int y)
-      {
-      Rectangle r = scrollTracks.getViewport().getViewRect();
-      return ((y >= r.y)&&(y <= r.y +r.height));
-      }*/
-
    /**
      * called when the database is changed: BpfDataListener interface
      */    
@@ -235,22 +216,13 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
 	return editor;
     }
   //------------------- Editor interface ---------------
-  final public Fts getFts()
-  {
-    return MaxApplication.getFts();
-  }
-    
-    public MaxDocument getDocument()
-    {
-	return bpfData.getDocument();
-    }
 
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
   public void Close(boolean doCancel){
     itsContainer.getFrame().setVisible(false);
-    bpfData.closeEditor(); 
+    bpfData.requestDestroyEditor(); 
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
     

@@ -47,7 +47,7 @@ public class Scope extends VectorDisplay
   int onset = 0;
   int last = 0;
 
-  public Scope(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Scope(ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
   }

@@ -29,9 +29,11 @@ package ircam.jmax.editors.sequence.track;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 
-import ircam.jmax.fts.*;
-import javax.swing.undo.*;
+import ircam.ftsclient.*;
 import ircam.jmax.toolkit.*;
+
+import java.io.*;
+import javax.swing.undo.*;
 
 /**
  * The class representing an event in a track. These objects have a time 
@@ -40,14 +42,13 @@ import ircam.jmax.toolkit.*;
 
 public class TrackEvent extends FtsObject implements Event, Drawable, UndoableData, Cloneable
 {
-    //public TrackEvent(Fts fts, double time, EventValue value)
-    public TrackEvent(Fts fts, FtsObject parent, String variableName, String className, int nArgs, FtsAtom args[])
+    public TrackEvent(FtsServer server, FtsObject parent, String className, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, null, null, "seqevent", "seqevent");
+	super(server, id);
 	
-	this.time = (double)args[0].getFloat();
+	this.time = (double)args[0].floatValue;
 
-	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].getString()).newInstance());
+	EventValue evtValue = (EventValue)(ValueInfoTable.getValueInfo(args[1].stringValue).newInstance());
 
 	for(int i = 0; i< nArgs-2; i++)
 	  {
@@ -158,12 +159,20 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	((FtsTrackObject)itsTrackDataModel).setDirty();
     }
 
-    void sendSetMessage(String type, int nArgs, Object args[])
+    void sendSetMessage(String type, int nArgs, Object arguments[])
     {
+	args.clear();
 	for(int i=0; i<nArgs; i++)
-	    FtsTrackObject.sendArgs[i].setValue(args[i]);
+	    args.add(arguments[i]);
 
-	sendMessage(FtsObject.systemInlet, "set", nArgs, FtsTrackObject.sendArgs);
+	try{
+	    send( FtsSymbol.get("set"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("TrackEvent: I/O Error sending set Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     /**
@@ -281,6 +290,8 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 
     private TrackDataModel itsTrackDataModel;
     static Object[] evtArgs = new Object[128];
+
+    protected FtsArgs args = new FtsArgs();
 }
 
 

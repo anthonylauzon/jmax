@@ -113,14 +113,20 @@ public class AbstractValueInfo implements ValueInfo {
 
   static 
   {
-     try
-      {
+      /*
+	WARNING:
+	Waiting for a method to get the packagePath from the package name
+      */
+      /*try
+	{
 	path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-    catch(FileNotFoundException e){
+	}
+	catch(FileNotFoundException e){
 	//System.err.println("Can't locate sequence images");
 	path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-    }
+	}*/
+      path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+      /*************************************************************/
     GENERIC_ICON = new ImageIcon(path+"genericAdder.gif");
   }
 

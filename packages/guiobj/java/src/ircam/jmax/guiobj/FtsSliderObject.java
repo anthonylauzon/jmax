@@ -27,6 +27,9 @@ package ircam.jmax.guiobj;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
+
+import java.io.*;
 
 /**
  * A Proxy for FTS  sliders.
@@ -34,6 +37,28 @@ import ircam.jmax.fts.*;
 
 public class FtsSliderObject extends FtsIntValueObject
 {
+   static
+    {
+	ircam.ftsclient.FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMinValue"), new FtsMessageHandler(){
+		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+		{
+		    ((FtsSliderObject)obj).minValue = argv[0].intValue;
+		}
+	    });
+	ircam.ftsclient.FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setMaxValue"), new FtsMessageHandler(){
+		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+		{
+		    ((FtsSliderObject)obj).maxValue = argv[0].intValue;
+		}
+	    });
+	ircam.ftsclient.FtsObject.registerMessageHandler( FtsSliderObject.class, FtsSymbol.get("setOrientation"), new FtsMessageHandler(){
+		public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+		{
+		    ((FtsSliderObject)obj).orientation = argv[0].intValue;
+		}
+	    });
+    }
+
   /*****************************************************************************/
   /*                                                                           */
   /*                               CONSTRUCTORS                                */
@@ -43,17 +68,24 @@ public class FtsSliderObject extends FtsIntValueObject
   int minValue;
   int maxValue;
   int orientation;
-
+  protected FtsArgs args = new FtsArgs();
+    
   /**
    * Create a FtsObject object;
    */
-  public FtsSliderObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+  public FtsSliderObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
   {
-      super(fts, parent, variable, className, nArgs, args);
-      localPut("maxValue", 127);
-      localPut("minValue", 0);
+      super(server, parent, className, nArgs, args, id);
+
+      maxValue = 127;
+      minValue = 0;
   }
 
+  public void setDefaults()
+  {
+      setWidth(20);
+      setHeight(137);
+  }
 
   /** Set the Min Value for the slider.
     Tell the server.
@@ -62,7 +94,17 @@ public class FtsSliderObject extends FtsIntValueObject
   public void setMinValue(int value)
   {
     minValue = value;
-    getFts().getServer().putObjectProperty(this, "minValue", minValue);
+
+    args.clear();
+    args.add(value);
+    try{
+	send( FtsSymbol.get("setMinValue"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsSliderObject: I/O Error sending setMinValue Message!");
+	    e.printStackTrace(); 
+	}
   }
 
   /** Set the Max Value for the slider.
@@ -72,7 +114,17 @@ public class FtsSliderObject extends FtsIntValueObject
   public void setMaxValue(int value)
   {
     maxValue = value;
-    getFts().getServer().putObjectProperty(this, "maxValue", maxValue);
+
+    args.clear();
+    args.add(value);
+    try{
+	send( FtsSymbol.get("setMaxValue"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsSliderObject: I/O Error sending setMaxValue Message!");
+	    e.printStackTrace(); 
+	}
   }
 
   /** Set the orientation */
@@ -80,7 +132,17 @@ public class FtsSliderObject extends FtsIntValueObject
   public void setOrientation(int or)
   {
     orientation = or;
-    getFts().getServer().putObjectProperty(this, "orientation", orientation);
+
+    args.clear();
+    args.add(or);
+    try{
+	send( FtsSymbol.get("setOrientation"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsSliderObject: I/O Error sending setOrientation Message!");
+	    e.printStackTrace(); 
+	}
   }
 
   /** Get the Min Value for the slider. */
@@ -100,29 +162,6 @@ public class FtsSliderObject extends FtsIntValueObject
   public int getOrientation()
   {
     return orientation;
-  }
-
-  /** Over write the localPut message to handle the min/max properties;
-     It does *not* call the listener on max and min values.
-     There is no listener for max/min changes.
-   */
-
-  protected void localPut(String name, int value)
-  {
-    if (name == "minValue")
-      {
-	minValue = value;
-      }
-    else if (name == "maxValue")
-      {
-	maxValue = value;
-      }
-    else if (name == "orientation")
-      {
-	orientation = value;
-      }
-    else
-      super.localPut(name, value);
   }
 }
 

@@ -44,11 +44,11 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
   private StringBuffer currentText;
   private int nDecimals = 0;
   private String filter;
-  private static final int DEFAULT_WIDTH = 40;
-  private static final int DEFAULT_HEIGHT = 15;
+  public static final int DEFAULT_WIDTH = 40;
+  public static final int DEFAULT_HEIGHT = 15;
   private static final int DEFAULT_VISIBLE_DIGIT = 3;
 
-  public NumberBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject, String filter) 
+  public NumberBox( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject, String filter) 
   {
     super( theSketchPad, theFtsObject);
 
@@ -118,6 +118,10 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     super.setHeight(getMinHeight());
   }
 
+  public void redefined()
+  {
+      fitToText();
+  }
 
   // ----------------------------------------
   // ValueAsText property
@@ -152,12 +156,10 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
     // Fill the background
     if ( !isSelected())
-      //g.setColor( Settings.sharedInstance().getUIColor());
       g.setColor( Color.white);
     else
       g.setColor( Settings.sharedInstance().getUIColor().darker());
 
-    //g.fill3DRect( x+1, y+1, w-2 , h-2, true);
     g.fillRect( x+1, y+1, w-2 , h-2);
 
     g.setColor( Color.black);
@@ -166,7 +168,6 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
 
     if ( valueValid) 
       {
-	//g.setColor( Settings.sharedInstance().getUIColor().brighter());
 	g.drawLine( xp1, y, xp1 + hd2, y + hd2);
 	g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
       }
@@ -202,8 +203,6 @@ abstract public class NumberBox extends GraphicObject implements KeyEventClient 
     int w = getWidth();
     int h = getHeight();
     int hd2 = h / 2;
-
-    //g.setClip(x+hd2+2, y+2, w-(hd2+2)-2, h-4);
 
     // Fill the background
     g.setColor( Color.white);

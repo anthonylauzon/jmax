@@ -32,6 +32,7 @@ import java.util.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 /**
  * A table model used to represent the content of an objectset of error objects

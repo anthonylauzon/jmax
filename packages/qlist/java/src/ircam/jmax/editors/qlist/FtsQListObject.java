@@ -26,6 +26,9 @@
 package ircam.jmax.editors.qlist;
 
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
+
+import java.io.*;
 
 /**
  * A concrete implementation of the SequenceDataModel,
@@ -33,54 +36,66 @@ import ircam.jmax.fts.*;
  */
 public class FtsQListObject extends FtsObjectWithEditor {
 
+    static{
+	FtsObject.registerMessageHandler( FtsQListObject.class, FtsSymbol.get("setAtomList"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsQListObject)obj).setAtomList((FtsAtomList)argv[0].objectValue);
+		}
+	    });
+     }
+
   /**
    * constructor.
    */
-    public FtsQListObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+    public FtsQListObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
     {
-	super(fts, parent, variableName, classname, 
-	      (nArgs > 0) ? classname + " " + FtsParse.unparseArguments(nArgs, args) : classname);	
+	super(server, parent, classname, nArgs, args, id);		
+    }
+
+    public void requestOpenEditor()
+    {
+	requestUpload();
+	super.requestOpenEditor();
+    }
+
+    public void requestUpload()
+    {
+	try{
+	    send(FtsSymbol.get("upload"));
+	}
+	catch(IOException e)
+	    {
+		System.err.println("FtsQlistObject: I/O Error sending upload Message!");
+		e.printStackTrace(); 
+	    }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
     //// MESSAGES called from fts.
     //////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Fts callback: open the editor associated with this FtsSequenceObject.
-     * If not exist create them else show them.
-     */
-    public void openEditor(int nArgs, FtsAtom args[])
+    public void openEditor(int argc, FtsAtom[] argv)
     {
 	if(getEditorFrame() == null)	    
-	    setEditorFrame( new QList(this));
+	    setEditorFrame( new QListWindow(this));
 	
 	showEditor();
     }
 
-    /**
-     * Fts callback: destroy the editor associated with this FtsSequenceObject.
-     */
-    public void destroyEditor(int nArgs, FtsAtom args[])
+    public void destroyEditor()
     {
 	disposeEditor();
     }
 
-    public void setAtomList(int nArgs, FtsAtom args[])
+    public void setAtomList(FtsAtomList list)
     {
-      list = (FtsAtomList)args[0].getObject();
+      this.list = list;
     }
 
     public FtsAtomList getAtomList()
     {
 	return list;
-    }
-
-    /* messages to the server */
-
-    public void closeEditor()
-    {
-	sendMessage(FtsObject.systemInlet, "destroyEditor", 0, null);
     }
 
     FtsAtomList list;

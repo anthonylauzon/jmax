@@ -44,14 +44,19 @@ public class BpfTools implements ToolProvider{
   {
     String path = null;
     String fs = File.separator;
-
-    try
+    /*
+      WARNING:
+      Waiting for a method to get the packagePath from the package name
+    */
+    /*try
       {
-	path  = MaxApplication.getPackageHandler().locatePackage("data").getPath()+fs+"images"+fs;
+      path  = MaxApplication.getPackageHandler().locatePackage("data").getPath()+fs+"images"+fs;
       }
-    catch(FileNotFoundException e){
-	path = MaxApplication.getProperty("dataPackageDir")+File.separator+"images"+File.separator;
-    }
+      catch(FileNotFoundException e){
+      path = MaxApplication.getProperty("dataPackageDir")+File.separator+"images"+File.separator;
+      }*/
+    path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;	 
+    /*************************************************************/
 
     tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
     tools[1] = new ScrollZoomTool(new ImageIcon(path+"scroller.gif"));

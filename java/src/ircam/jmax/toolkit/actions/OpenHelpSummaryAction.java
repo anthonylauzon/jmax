@@ -33,6 +33,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 import ircam.jmax.toolkit.*;
 
@@ -48,7 +49,7 @@ public class OpenHelpSummaryAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-    FtsHelpPatchTable.openHelpSummary( container.getEditor().getFts(), argument);
+      //FtsHelpPatchTable.openHelpSummary( container.getEditor().getFts(), argument);
   }
 }
 

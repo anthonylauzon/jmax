@@ -61,7 +61,7 @@ endif
 
 ## includes
 
-include $(JMAXROOTDIR)/java/Makefiles/Makefile.$(MODE)
+# include $(JMAXROOTDIR)/java/Makefiles/Makefile.$(MODE)
 
 JAVA_MAX_CLASSES_ROOT =  $(JMAXROOTDIR)/java/classes
 

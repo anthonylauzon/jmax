@@ -363,10 +363,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
   public void paintComponent( Graphics g)
   {
-    /*****************/
-    //jdk117-->jdk1.3//
     ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-    /*****************/
 
     Rectangle clip = g.getClipBounds();
     int clipWidth = clip.width;
@@ -399,6 +396,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
 	lineToPaint++;
       }
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
   
   public void print( Graphics g)
@@ -434,6 +432,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
 	lineToPaint++;
       }
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 }
 

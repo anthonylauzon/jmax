@@ -29,7 +29,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-
+import ircam.ftsclient.*;
 /**
  * Implement the selection.
  * Only one instance for server is built.
@@ -45,19 +45,21 @@ public class FtsSelection extends FtsObject
 
   /** The objects contained in the patcher */
 
-    private MaxVector objects     = new MaxVector();
+  private MaxVector objects     = new MaxVector();
 
   /** All the connections between these objects */
 
-    private MaxVector connections = new MaxVector();
+  private MaxVector connections = new MaxVector();
+
+  protected FtsArgs args = new FtsArgs();
 
   /**
    * Create a Fts selection;
    */
   
-  public FtsSelection(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  public FtsSelection() throws IOException
   {
-      super(fts, parent, null, classname, "");
+      super(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__selection")); 
   }
 
   /** Add an object to this container  */
@@ -66,7 +68,17 @@ public class FtsSelection extends FtsObject
   {
     objects.addElement(obj);
 
-    getFts().getServer().sendObjectMessage(this, -1, "add_object", obj);
+    args.clear();
+    args.add(obj);
+      
+    try{
+	send( FtsSymbol.get("add_object"), args);
+    }
+    catch(IOException e)
+    {
+	System.err.println("[FtsSelection]: I/O Error sending addObject message!");
+	e.printStackTrace(); 
+    } 
   }
 
   /** Remove an object from this container. */
@@ -76,13 +88,24 @@ public class FtsSelection extends FtsObject
     if (objects.contains(obj))
       {
 	objects.removeElement(obj);
-	getFts().getServer().sendObjectMessage(this, -1, "remove_object", obj);
+
+	args.clear();
+	args.add(obj);
+      
+	try{
+	    send( FtsSymbol.get("remove_object"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("[FtsSelection]: I/O Error sending removeObject message!");
+		e.printStackTrace(); 
+	    }      
       }
   }
 
   /** Get the objects */
 
-    final public MaxVector getObjects()
+  final public MaxVector getObjects()
   {
     return objects;
   }
@@ -93,7 +116,17 @@ public class FtsSelection extends FtsObject
   {
     connections.addElement(obj);
 
-    getFts().getServer().sendObjectMessage(this, -1, "add_connection", obj);
+    args.clear();
+    args.add(obj);
+      
+    try{
+	send( FtsSymbol.get("add_connection"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("[FtsSelection]: I/O Error sending addConnection message!");
+	    e.printStackTrace(); 
+	}   
   }
 
   /** Remove an connection from this container. */
@@ -103,13 +136,23 @@ public class FtsSelection extends FtsObject
     if (connections.contains(obj))
       {
 	connections.removeElement(obj);
-	getFts().getServer().sendObjectMessage(this, -1, "remove_connection", obj);
+	args.clear();
+	args.add(obj);
+      
+	try{
+	    send( FtsSymbol.get("remove_connection"), args);
+	}
+	catch(IOException e)
+	    {
+		System.err.println("[FtsSelection]: I/O Error sending removeConnection message!");
+		e.printStackTrace(); 
+	    }
       }
   }
 
   /** Get the connections */
 
-    final public MaxVector getConnections()
+  final public MaxVector getConnections()
   {
     return connections;
   }
@@ -118,10 +161,17 @@ public class FtsSelection extends FtsObject
 
   final public void clean()
   {
-    sendMessage(-1, "clear");
+      objects.removeAllElements();
+      connections.removeAllElements();
 
-    objects.removeAllElements();
-    connections.removeAllElements();
+      try{
+	  send( FtsSymbol.get("clear"));
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("[FtsSelection]: I/O Error sending clean message!");
+	      e.printStackTrace(); 
+	  }
   }
 }
 

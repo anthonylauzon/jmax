@@ -32,9 +32,26 @@ import java.text.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 public class FtsScopeObject extends FtsVectorDisplayObject
 {
+  static
+  {
+      ircam.ftsclient.FtsObject.registerMessageHandler(FtsScopeObject.class, FtsSymbol.get("setThreshold"), new FtsMessageHandler(){
+	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+	      {
+		  ((FtsScopeObject)obj).setCurrentThreshold(argv[0]);
+	      }
+	  });
+      ircam.ftsclient.FtsObject.registerMessageHandler(FtsScopeObject.class, FtsSymbol.get("setPeriod"), new FtsMessageHandler(){
+	      public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+	      {
+		  ((FtsScopeObject)obj).setCurrentPeriod(argv[0].floatValue);
+	      }
+	  });
+  }
+
   public static float DEFAULT_PERIOD = (float)100.0;
   public static float DEFAULT_THRESHOLD = (float)0.5;
   float period    = DEFAULT_PERIOD;
@@ -43,9 +60,9 @@ public class FtsScopeObject extends FtsVectorDisplayObject
   public final static float THRESHOLD_AUTO = (float)0.0; 
   public final static float THRESHOLD_OFF  = (float)1.0; 
 
-  public FtsScopeObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+  public FtsScopeObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
   {
-    super(fts, parent, variable, className, nArgs, args);
+    super(server, parent, className, nArgs, args, id);
     
     min = (float)-1.0;
     max = (float)1.0;
@@ -53,49 +70,76 @@ public class FtsScopeObject extends FtsVectorDisplayObject
 
   public void setOnset(int n)
   {
-    sendArgs[0].setInt(n); 
-    sendMessage(FtsObject.systemInlet, "onset", 1, sendArgs);
+      args.clear();
+      args.add(n);
+
+      try{
+	  send( FtsSymbol.get("onset"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsScopeObject: I/O Error sending onset Message!");
+	      e.printStackTrace(); 
+	  }
   }   
   
-  public void requestSetPeriod(float period)
+  public void setPeriod(float period)
   {
-    sendArgs[0].setFloat(period); 
-    sendMessage(FtsObject.systemInlet, "setPeriod", 1, sendArgs);
+      args.clear();
+      args.add(period);
+
+      try{
+	  send( FtsSymbol.get("setPeriod"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsScopeObject: I/O Error sending period Message!");
+	      e.printStackTrace(); 
+	  }
   }    
   
-  public void setPeriod(int nArgs , FtsAtom args[])
+  public void setCurrentPeriod(float period)
   {      
-    period = args[0].getFloat();    
+    this.period = period;    
   } 
   
   public float getPeriod()
   {
     return period;
   }  
-  public void requestSetThreshold(float th)
+  public void setThreshold(float th)
   {
+      args.clear();
+
       if(th==THRESHOLD_AUTO)
-	  sendArgs[0].setString("auto"); 
+	  args.add("auto");
       else if(th==THRESHOLD_OFF)
-	  sendArgs[0].setString("off"); 
+	  args.add("off");
       else
-	  sendArgs[0].setFloat(th);
+	  args.add(th);
       
-      sendMessage(FtsObject.systemInlet, "setThreshold", 1, sendArgs);  
+      try{
+	  send(FtsSymbol.get("setThreshold"), args);
+      }
+      catch(IOException e)
+	  {
+	      System.err.println("FtsScopeObject: I/O Error sending setThreshold Message!");
+	      e.printStackTrace(); 
+	  }
   } 
   
-  public void setThreshold(int nArgs , FtsAtom args[])
+  public void setCurrentThreshold(FtsAtom arg)
   {      
-      if(args[0].isString())
+      if(arg.isString())
 	  {
-	      String tType = args[0].getString();
+	      String tType = arg.stringValue;
 	      if(tType.equals("auto"))
 		  this.threshold = THRESHOLD_AUTO;
 	      else
 		  this.threshold = THRESHOLD_OFF;
 	  }
       else
-	  this.threshold = args[0].getFloat();    
+	  this.threshold = arg.floatValue;    
   } 
   
   public float getThreshold()

@@ -40,17 +40,14 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 public class Fork extends GraphicObject
 {
-  private static FtsAtom[] sendArgs = new FtsAtom[1];
-  static { sendArgs[0]= new FtsAtom(); }
-
   private static final int DEFAULT_DISTANCE = 25;
-  private static final int DEFAULT_WIDTH = DEFAULT_DISTANCE + 2 * ObjectGeometry.INOUTLET_PAD;
+  static final int DEFAULT_WIDTH = DEFAULT_DISTANCE + 2 * ObjectGeometry.INOUTLET_PAD;
   private static final int MINIMUM_WIDTH = DEFAULT_WIDTH;
-  private static final int CONST_HEIGHT = 12;
+  static final int CONST_HEIGHT = 12;
 
   private int nOutlets = 0; /* @@@@@*/
 
-  public Fork( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Fork( ErmesSketchPad theSketchPad, FtsGraphicObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
@@ -58,8 +55,7 @@ public class Fork extends GraphicObject
     if(nOutlets==0)
 	{
 	    nOutlets = 2;
-	    sendArgs[0].setInt(nOutlets); 
-	    ftsObject.sendMessage(FtsObject.systemInlet, "set_outlets", 1, sendArgs);
+	    ((FtsForkObject)ftsObject).requestSetOutlets(nOutlets);
 	}
 
     setInletDistance(DEFAULT_DISTANCE);
@@ -101,8 +97,7 @@ public class Fork extends GraphicObject
     else
       nOutlets = (theWidth - 2 * ObjectGeometry.INOUTLET_PAD) / getOutletDistance() + 1;
       
-    sendArgs[0].setInt(nOutlets); 
-    ftsObject.sendMessage(FtsObject.systemInlet, "set_outlets", 1, sendArgs);
+    ((FtsForkObject)ftsObject).requestSetOutlets(nOutlets);
 
     theWidth = (nOutlets - 1) * getOutletDistance() + 2 * ObjectGeometry.INOUTLET_PAD;
 

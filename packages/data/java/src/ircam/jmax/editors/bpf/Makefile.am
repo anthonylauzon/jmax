@@ -3,11 +3,11 @@ SUBDIRS=renderers tools
 noinst_PROGRAMS = package
 package_SOURCES = \
 Bpf.java \
+BpfWindow.java \
 BpfAdapter.java \
 BpfDataListener.java \
 BpfDataModel.java \
 BpfEditor.java \
-BpfExtension.java \
 BpfGraphicContext.java \
 BpfPanel.java \
 BpfPoint.java \
@@ -26,7 +26,7 @@ UtilBpfPoint.java
 JAVACX = @JAVACX@
 JAVACFLAGSX=@JAVACFLAGSX@
 JAVAROOTX=@top_srcdir@/packages/data/java/src
-CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/packages/data/java/src:@top_srcdir@/java/lib/jacl/jacl.jar:@top_srcdir@/java/lib/jacl/tcljava.jar
+CLASSPATH_ENVX=CLASSPATH=@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar:@top_srcdir@/packages/data/java/src
 
 SUFFIXES = .java .class
 
@@ -37,3 +37,5 @@ package: $(package_OBJECTS) $(package_DEPENDENCIES)
 
 clean-compile:
 	rm -f *.class
+
+

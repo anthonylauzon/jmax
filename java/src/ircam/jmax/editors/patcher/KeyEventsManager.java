@@ -24,22 +24,16 @@ package ircam.jmax.editors.patcher;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
 
 import ircam.jmax.*;
-import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 public class KeyEventsManager implements KeyListener
 {
   public static KeyEventsManager keyEventsManager = null;  
   private FtsObject ftsKeyServer;
-  private boolean noserver = false;
-
-  public static FtsAtom[] sendArgs = new FtsAtom[3];
-  static
-  {
-    for(int i=0; i<3; i++)
-      sendArgs[i]= new FtsAtom();
-  }
+  protected FtsArgs args = new FtsArgs();
 
   public static void createManager()
   {
@@ -49,16 +43,15 @@ public class KeyEventsManager implements KeyListener
 
   public KeyEventsManager()
   {
-    try 
-      {
-	Fts fts = MaxApplication.getFts();
-	ftsKeyServer = (FtsObject) fts.makeFtsObject( fts.getRootObject(), "_keyserver");
-      }
-    catch (FtsException e) 
-      {
-	System.err.println("Error in FtsKeyServer instantiation!");
-	noserver = true;
-      }
+      try
+	{
+	   ftsKeyServer = new FtsObject(MaxApplication.getServer(), MaxApplication.getServer().getRoot(), FtsSymbol.get("__keyserver"));
+	}
+    catch(IOException e)
+	{
+	    System.err.println("[KeyEventsManager]: Error in KeyServer creation!");
+	    e.printStackTrace();
+	}      
   }
     
   static public KeyEventsManager getManager()
@@ -146,31 +139,49 @@ public class KeyEventsManager implements KeyListener
    */
   public void keyPressed(KeyEvent e)
   {
-    if (noserver || e.isControlDown()) 
+    if (e.isControlDown()) 
       return;
  
     int code = getCode(e);
 
     if ( code != 0)
       {
-	sendArgs[0].setInt( code);
-	sendArgs[1].setInt(1);
-	ftsKeyServer.sendMessage(FtsObject.systemInlet, "key", 2, sendArgs);
+	  args.clear();
+	  args.add(code);
+	  args.add(1);
+	  
+	  try{
+	      ftsKeyServer.send( FtsSymbol.get("key"), args);
+	  }
+	  catch(IOException exc)
+	      {
+		  System.err.println("KeyEventManager: I/O Error sending key Message!");
+		  exc.printStackTrace(); 
+	      }
       }
   }   
  
   public void keyReleased(KeyEvent e)
   {
-    if (noserver || e.isControlDown()) 
+    if (e.isControlDown()) 
       return;
 
     int code = getCode(e);
 
     if ( code != 0)
       {
-	sendArgs[0].setInt(code);
-	sendArgs[1].setInt(0);
-	ftsKeyServer.sendMessage(FtsObject.systemInlet, "key", 2, sendArgs);
+	  args.clear();
+	  args.add(code);
+	  args.add(0);
+	  
+	  try{
+	      ftsKeyServer.send(  FtsSymbol.get("key"), args);
+	  }
+	  catch(IOException exc)
+	      {
+		  System.err.println("KeyEventManager: I/O Error sending key Message!");
+		  exc.printStackTrace(); 
+	      }
       }
   }
 

@@ -34,7 +34,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
+import ircam.ftsclient.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
@@ -42,7 +42,6 @@ import ircam.jmax.toolkit.actions.*;
 public class OpenAction extends EditorAction
 {
   Frame frame;
-    Fts fts;
   private File preset_file;
   
   public OpenAction()
@@ -57,57 +56,58 @@ public class OpenAction extends EditorAction
   
   public void doAction(EditorContainer container)
   {
-    File file;
+      File file;
 
-    if (preset_file == null)
-      file = MaxFileChooser.chooseFileToOpen(container.getFrame());
-    else
-      file = preset_file;
+      if (preset_file == null)
+	  file = MaxFileChooser.chooseFileToOpen(container.getFrame());
+      else
+	  file = preset_file;
+	
+      frame = container.getFrame();
+	
+      //fts = container.getEditor().getFts();
 
-    frame = container.getFrame();
-    fts = container.getEditor().getFts();
-
-    if (file != null)
-      {
-	try
+      if (file != null)
 	  {
-	    fts.fireAtomicAction(true);
-
-	    MaxDocument document = Mda.loadDocument(fts, file);
-	    
-	    RecentFileHistory recentFileHistory = MaxApplication.getRecentFileHistory();
-            recentFileHistory.addFile(file);
-
-	    try
-	      {		
-		  frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  
-
-		  if (document.getDocumentType().isEditable())
-		      document.edit();
-
-		  ((FtsPatcherObject)document.getRootData()).requestStopWaiting(new FtsActionListener(){
-			  public void ftsActionDone()
-			  {
-			      frame.setCursor(Cursor.getDefaultCursor());
-			      fts.fireAtomicAction(false);
-			  }
-		    });
-	      }
-	    catch (MaxDocumentException ex)
-	      {
-		  frame.setCursor(Cursor.getDefaultCursor());
-		  // Ignore MaxDocumentException exception in running the editor
-		  // May be an hack, may be is ok; move this stuff to an action
-		  // handler !!
-	      }
+	      /*try
+		{
+		FtsPatcherObject.fireAtomicAction(true);
+		
+		//MaxDocument document = Mda.loadDocument(fts, file);
+		
+		RecentFileHistory recentFileHistory = MaxApplication.getRecentFileHistory();
+		recentFileHistory.addFile(file);
+	
+		try
+		{		
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  
+		
+		if (document.getDocumentType().isEditable())
+		document.edit();
+	
+		((FtsPatcherObject)document.getRootData()).requestStopWaiting(new FtsActionListener(){
+		public void ftsActionDone()
+		{
+		frame.setCursor(Cursor.getDefaultCursor());
+		FtsPatcherObject.fireAtomicAction(false);
+		}
+		});
+		}
+		catch (MaxDocumentException ex)
+		{
+		frame.setCursor(Cursor.getDefaultCursor());
+		// Ignore MaxDocumentException exception in running the editor
+		// May be an hack, may be is ok; move this stuff to an action
+		// handler !!
+		}
+		}
+		catch (MaxDocumentException e)
+		{
+		frame.setCursor(Cursor.getDefaultCursor());
+		JOptionPane.showMessageDialog(container.getFrame(), e.toString(), 
+		"Error", JOptionPane.ERROR_MESSAGE);
+		}*/
 	  }
-	catch (MaxDocumentException e)
-	  {
-	    frame.setCursor(Cursor.getDefaultCursor());
-	    JOptionPane.showMessageDialog(container.getFrame(), e.toString(), 
-					  "Error", JOptionPane.ERROR_MESSAGE);
-	  }
-      }
   }
 }
 

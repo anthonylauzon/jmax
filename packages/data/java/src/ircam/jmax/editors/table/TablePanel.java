@@ -27,7 +27,6 @@ package ircam.jmax.editors.table;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
@@ -38,7 +37,6 @@ import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import java.io.*;
-import tcl.lang.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -436,7 +434,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   }
 
   public void Refresh(){
-      //getData().forceUpdate();
     repaint();
   }
 
@@ -444,7 +441,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   {
      try 
      {
-	 //getData().undo();
 	 ((UndoableData) gc.getFtsObject()).undo();
      } catch (CannotUndoException e1) {
        System.out.println("can't undo");	
@@ -455,7 +451,6 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   {
     try 
     {
-	//getData().redo();
       ((UndoableData) gc.getFtsObject()).redo();
     } catch (CannotRedoException e1) {
       System.out.println("can't redo");
@@ -548,23 +543,15 @@ public class TablePanel extends JPanel implements StatusBarClient, TableDataList
   }
 
   //------------------- Editor interface ---------------
-  final public Fts getFts()
-  {
-    return MaxApplication.getFts();
-  }
   EditorContainer itsEditorContainer;
 
   public EditorContainer getEditorContainer(){
     return itsEditorContainer;
   }
 
-  public MaxDocument getDocument(){
-    return getData().getDocument();
-  }
-  
   public void Close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
-    getData().closeEditor();
+    getData().requestDestroyEditor();
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
 }

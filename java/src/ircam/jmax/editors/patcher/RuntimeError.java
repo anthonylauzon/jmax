@@ -27,20 +27,21 @@ package ircam.jmax.editors.patcher;
 
 import java.lang.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
 public class RuntimeError 
 {
-    FtsObject object;
+    FtsGraphicObject object;
     String description;
     int counter;
     
-    public RuntimeError(FtsObject obj, String descr)
+    public RuntimeError(FtsGraphicObject obj, String descr)
     {
 	object = obj;
 	description = descr;
 	counter = 0;
     }	   
-    public FtsObject getObject()
+    public FtsGraphicObject getObject()
     {
 	return object;
     }

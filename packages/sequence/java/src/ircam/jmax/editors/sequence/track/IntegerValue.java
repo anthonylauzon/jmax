@@ -181,14 +181,17 @@ public class IntegerValue extends AbstractEventValue
 
     static 
     {
-	try
-	    {
-		path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	    }
-	catch(FileNotFoundException e){
-	    //System.err.println("Can't locate sequence images");
-	    path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	}
+	/*try
+	  {
+	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+	  }
+	  catch(FileNotFoundException e){
+	  //System.err.println("Can't locate sequence images");
+	  path = MaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+	  }*/
+	path = MaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+	/*************************************************************/
+	
 	INTEGER_ICON = new ImageIcon(path+"integer.gif");
     }
 }

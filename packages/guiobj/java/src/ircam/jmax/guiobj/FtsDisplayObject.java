@@ -31,23 +31,34 @@ import java.text.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 
-public class FtsDisplayObject extends FtsObject
+public class FtsDisplayObject extends FtsGraphicObject
 {
-  public FtsDisplayObject(Fts fts, FtsObject parent, String variable, String className, int nArgs, FtsAtom args[])
+  static
   {
-    super(fts, parent, null, "display", "");
+    ircam.ftsclient.FtsObject.registerMessageHandler( FtsDisplayObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+	public void invoke( ircam.ftsclient.FtsObject obj, int argc, ircam.ftsclient.FtsAtom[] argv)
+	{
+	  ((FtsDisplayObject)obj).display(argv[0].stringValue);
+	}
+      });
+  }
+
+  public FtsDisplayObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  {
+    super(server, parent, className, nArgs, args, id);
     
     ninlets = 1;
     noutlets = 0;
   }
 
-  public void handleMessage(String selector, int nArgs, FtsAtom args[])
+  public void display(String content)
   {
-    StringBuffer string = new StringBuffer();
+    //StringBuffer string = new StringBuffer();
     
     if (listener instanceof FtsMessageListener)
-      ((FtsMessageListener) listener).messageChanged(args[0].stringValue);
+      ((FtsMessageListener) listener).messageChanged(content);
   }
 }
 

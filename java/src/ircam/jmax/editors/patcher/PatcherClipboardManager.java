@@ -23,14 +23,16 @@ package ircam.jmax.editors.patcher;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
+import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 import ircam.jmax.editors.patcher.objects.*;
 
 import ircam.jmax.toolkit.*;
-import javax.swing.*;
 
 //
 // The window that contains the sketchpad. It knows the ftspatcher it is editing.
@@ -63,14 +65,15 @@ public class PatcherClipboardManager implements ClipboardOwner
 
   public PatcherClipboardManager() 
   {
-    try 
-      {
-	Fts fts = MaxApplication.getFts();
-	ftsClipboard = (FtsClipboard) fts.makeFtsObject( fts.getRootObject(), "__clipboard");
-      }
-    catch (FtsException e) 
-      {
-      }
+      try
+	  {
+	    ftsClipboard = new FtsClipboard();
+	  }
+      catch(IOException e)
+	  {
+	      System.err.println("[PatcherClipboardManager]: Error in FtsClipboard creation!");
+	      e.printStackTrace();
+	  }
   }
   
   public static void createManager() {
@@ -107,7 +110,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	  {
 	    MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
 
-	    ftsClipboard.copy(sketch.getFts().getSelection());
+	    ftsClipboard.copy(ErmesSelection.getFtsSelection());
 	    sketch.setLastCopyCount(ftsClipboard.getCopyCount());
 	    sketch.resetPaste(-1);
 	  }
@@ -132,7 +135,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	  container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
 	  MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
-	  ftsClipboard.copy( sketch.getFts().getSelection());
+	  ftsClipboard.copy( ErmesSelection.getFtsSelection());
 	  sketch.setLastCopyCount(ftsClipboard.getCopyCount());
 	  sketch.resetPaste(0);	  
 	  container.getFrame().setCursor( temp);
@@ -195,7 +198,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	    
 	    sketch.getFtsPatcher().update();
     
-	    sketch.getFts().sync();
+	    //sketch.getFts().sync();
 
 	    pasting = false;
 	    
@@ -216,7 +219,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 
   void PasteObjects(ErmesSketchPad sketch) 
   {
-    FtsObject	fo;
+    FtsGraphicObject	fo;
     FtsConnection fc;
     DisplayList displayList = sketch.getDisplayList();
     GraphicObject object;
@@ -238,7 +241,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	ErmesSelection.patcherSelection.deselectAll();
       }
 
-    fo = (FtsObject)ftsObjectsPasted.elementAt( 0);
+    fo = (FtsGraphicObject)ftsObjectsPasted.elementAt( 0);
 
     if (pasteNum == 0) 
 	sketch.setIncrementalPasteOffsets(0, 0);
@@ -253,7 +256,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 
     for ( Enumeration e = ftsObjectsPasted.elements(); e.hasMoreElements();) 
       {
-	fo = (FtsObject)e.nextElement();
+	fo = (FtsGraphicObject)e.nextElement();
 
 	float newPosX = fo.getX() + pasteNum*sketch.getPasteOffsetX();
 	float newPosY = fo.getY() + pasteNum*sketch.getPasteOffsetY();

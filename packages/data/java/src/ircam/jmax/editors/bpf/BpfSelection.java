@@ -328,7 +328,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 	    v.addElement(en.nextElement());
 	deselectAll();
 
-	((FtsBpfObject)itsModel).requestPointsRemove(v.elements());
+	((FtsBpfObject)itsModel).requestPointsRemove(v.elements(), v.size());
 
 	v = null;
     }

@@ -25,7 +25,7 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 
-import ircam.jmax.fts.*;
+import ircam.ftsclient.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.objects.*;
 

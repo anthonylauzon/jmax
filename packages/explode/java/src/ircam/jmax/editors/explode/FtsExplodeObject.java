@@ -25,6 +25,8 @@
 
 package ircam.jmax.editors.explode;
 
+import ircam.ftsclient.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -54,14 +56,53 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
   // and FTS that is not based on indexes. See also the implementation notes
   // in ExplodeSelection.java
   
+    static{
+	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadStart"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsExplodeObject)obj).loadStart();
+		}
+	    });
+	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadAppend"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsExplodeObject)obj).loadAppend(argv[0].intValue, argv[1].intValue, 
+						       argv[2].intValue, argv[3].intValue, argv[4].intValue);
+		}
+	    });
+	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("loadEnd"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsExplodeObject)obj).loadEnd();
+		}
+	    });
+	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("clean"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsExplodeObject)obj).clean();
+		}
+	    });
+	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("append"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsExplodeObject)obj).append(argv[0].intValue, argv[1].intValue, 
+						   argv[2].intValue, argv[3].intValue, argv[4].intValue);
+		}
+	    });
+	FtsObject.registerMessageHandler( FtsExplodeObject.class, FtsSymbol.get("setName"), new FtsMessageHandler(){
+		public void invoke( FtsObject obj, int argc, FtsAtom[] argv)
+		{
+		    ((FtsExplodeObject)obj).setName(argv[0].stringValue);
+		}
+	    });
+    }
 
   /**
    * constructor.
    */
-  public FtsExplodeObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  public FtsExplodeObject(FtsServer server, FtsObject parent, FtsSymbol classname, int nArgs, FtsAtom args[], int id)
   {
-      super(fts, parent, variableName, classname, 
-	    (nArgs > 0) ? classname + " " + FtsParse.unparseArguments(nArgs, args) : classname);
+      super(server, parent, classname, nArgs, args, id);
       
       listeners = new MaxVector();   
   }
@@ -347,14 +388,22 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     makeRoomAt(index);
     events[index] = event;
 
-    sendArgs[0].setInt(index); 
-    sendArgs[1].setInt(event.getTime());
-    sendArgs[2].setInt(event.getPitch());
-    sendArgs[3].setInt(event.getVelocity());
-    sendArgs[4].setInt(event.getDuration());
-    sendArgs[5].setInt(event.getChannel());
+    args.clear();
+    args.add(index);
+    args.add(event.getTime());
+    args.add(event.getPitch());
+    args.add(event.getVelocity());
+    args.add(event.getDuration());
+    args.add(event.getChannel());
 
-    sendMessage(FtsObject.systemInlet, "add_event", 6, sendArgs);
+    try{
+	send(FtsSymbol.get("add_event"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsObjectWithEditor: I/O Error sending add_event Message!");
+	    e.printStackTrace(); 
+	}
 
     notifyObjectAdded(event, index);
     
@@ -412,9 +461,17 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     deleteRoomAt(deleteIndex);
     
     // Send the remove command to fts
-    
-    sendArgs[0].setInt(deleteIndex);
-    sendMessage(FtsObject.systemInlet, "remove_event", 1, sendArgs);    
+    args.clear();
+    args.add(deleteIndex);
+
+    try{
+	send(FtsSymbol.get("remove_event"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsObjectWithEditor: I/O Error sending remove_event Message!");
+	    e.printStackTrace(); 
+	}
 	    
     notifyObjectDeleted(event, deleteIndex);
   }
@@ -446,16 +503,23 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
       return;
 
-    // Send the change command to fts
-    
-    sendArgs[0].setInt(index); 
-    sendArgs[1].setInt(event.getTime());
-    sendArgs[2].setInt(event.getPitch());
-    sendArgs[3].setInt(event.getVelocity());
-    sendArgs[4].setInt(event.getDuration());
-    sendArgs[5].setInt(event.getChannel());
+    // Send the change command to fts    
+    args.clear();
+    args.add(index);
+    args.add(event.getTime());
+    args.add(event.getPitch());
+    args.add(event.getVelocity());
+    args.add(event.getDuration());
+    args.add(event.getChannel());
 
-    sendMessage(FtsObject.systemInlet, "change_event", 6, sendArgs);
+    try{
+	send(FtsSymbol.get("change_event"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsObjectWithEditor: I/O Error sending change_event Message!");
+	    e.printStackTrace(); 
+	}
     
     notifyObjectChanged(event);
   }
@@ -490,11 +554,18 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     event.setTime(newTime);
     
     // inform FTS
+    args.clear();
+    args.add(index);
+    args.add(event.getTime());
 
-    sendArgs[0].setInt(index);
-    sendArgs[1].setInt(event.getTime());
-
-    sendMessage(FtsObject.systemInlet, "change_time", 2, sendArgs);    
+    try{
+	send(FtsSymbol.get("change_time"), args);
+    }
+    catch(IOException e)
+	{
+	    System.err.println("FtsObjectWithEditor: I/O Error sending change_time Message!");
+	    e.printStackTrace(); 
+	}
     
     // rearranges the events in the DB 
     if (index < newIndex) 
@@ -577,10 +648,10 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
      * Fts callback: open the editor associated with this FtsSequenceObject.
      * If not exist create them else show them.
      */
-    public void openEditor(int nArgs, FtsAtom args[])
+    public void openEditor(int argc, FtsAtom[] argv)
     {
 	if(getEditorFrame() == null)	    
-	    setEditorFrame( new Explode(this));
+	    setEditorFrame( new ExplodeWindow(this));
 	
 	showEditor();
     }
@@ -588,34 +659,33 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
     /**
      * Fts callback: destroy the editor associated with this FtsSequenceObject.
      */
-    public void destroyEditor(int nArgs, FtsAtom args[])
+    public void destroyEditor()
     {
 	disposeEditor();
     } 
     /**
      * Clean the explode before a new loading (Needed ?? )
      */
-    public void loadStart(int nArgs, FtsAtom args[])
+    public void loadStart()
     {	
 	for (int i = 0; i < events_fill_p; i++)
 	    events[i] = null;
 	
 	events_fill_p = 0;
     }
-    public void loadAppend(int nArgs, FtsAtom args[])
+    public void loadAppend(int time, int pitch, int velocity, int duration, int channel)
     {
 	// add events at the end; used during loading	
 	if (events_fill_p >= events_size)
 	    reallocateEvents();
 	
-	events[events_fill_p++] = new ScrEvent(this, args[0].getInt(), args[1].getInt(), args[2].getInt(),
-					       args[3].getInt(), args[4].getInt());
+	events[events_fill_p++] = new ScrEvent(this, time, pitch, channel, duration, channel);
     }
 
-    public void loadEnd(int nArgs, FtsAtom args[]){}
+    public void loadEnd(){}
 
     // Clean the explode, after a record message
-    public void clean(int nArgs, FtsAtom args[])
+    public void clean()
     {	
 	beginUpdate();
 	for(int i = 0; i < events_fill_p; i++)
@@ -629,7 +699,7 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
 	endUpdate();
     }
     // add a note, after an FTS computation.
-    public void append(int nArgs, FtsAtom args[])
+    public void append(int time, int pitch, int velocity, int duration, int channel)
     {	
 	int index;
 	
@@ -638,17 +708,16 @@ public class FtsExplodeObject extends FtsObjectWithEditor implements ExplodeData
 	    reallocateEvents();
 	
 	index = events_fill_p++;
-	events[index] = new ScrEvent(this, args[0].getInt(), args[1].getInt(), args[2].getInt(),
-				     args[3].getInt(), args[4].getInt());
+	events[index] = new ScrEvent(this, time, pitch, velocity, duration, channel);
 	
 	postEdit(new UndoableAdd(events[index]));
 	endUpdate();
 	notifyObjectAdded(events[index], index);
     }
 
-    public void setName(int nArgs, FtsAtom args[])
+    public void setName(String name)
     {
-	name = args[0].getString();
+	this.name = name;
     }
 
 
