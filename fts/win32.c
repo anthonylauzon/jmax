@@ -185,7 +185,7 @@ void fts_platform_init( void)
    we load audio packages */
   if (NULL == fts_cmd_args_get(fts_s_noaudio))
   { 
-    fts_package_load(fts_new_symbol("dsdev"));
+    //fts_package_load(fts_new_symbol("dsdev"));
   }
 
   /* boost the priority of the fts thread */
@@ -223,6 +223,7 @@ fts_get_root_from_registry(char *buf, int bufsize)
   HKEY key;
   HKEY version_key;
   char version[256];
+  const char* current_version;
 
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
     fts_post("Error opening registry key '%s'\n", JMAX_KEY);
@@ -232,6 +233,15 @@ fts_get_root_from_registry(char *buf, int bufsize)
   if (!fts_get_string_from_registry(key, "FtsVersion", version, 256)) {
     fts_post("Failed to read the value of registry key: '%s\\FtsVersion'\n", JMAX_KEY);
     RegCloseKey(key);
+    return 0;
+  }
+
+  /* Compare current version with the latest installed version */
+  current_version = fts_get_version();
+  if((version[0]!=current_version[0])||(version[2]!=current_version[2])
+     ||(version[4]!=current_version[4])||(version[5]!=current_version[5])) {
+    MessageBox(NULL,"Another version of jMax has been installed on top of this one.\nPlease use the newer one instead.\n","Version conflict error",MB_ICONSTOP | MB_OK);
+    fts_post("Another version of jMax has been installed on top of this one.\nPlease use the newer one instead.\n");
     return 0;
   }
 
