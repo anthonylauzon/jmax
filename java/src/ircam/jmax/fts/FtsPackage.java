@@ -27,7 +27,7 @@ import java.util.*;
 import ircam.fts.client.*;
 import ircam.jmax.*;
 
-public class FtsPackage extends FtsObject
+public class FtsPackage extends FtsObjectWithEditor
 {
   protected FtsArgs args = new FtsArgs();
 
@@ -112,11 +112,15 @@ public class FtsPackage extends FtsObject
 
   public void set(String message, Enumeration values)
   {
+    String value;
     args.clear();
 
     for(; values.hasMoreElements();)
-      args.addSymbol( FtsSymbol.get( (String)values.nextElement()));
-      
+      {
+	value =  (String)values.nextElement();
+	if( value != null)
+	  args.addSymbol( FtsSymbol.get( value));
+      }
     try
       {
 	send( FtsSymbol.get(message), args);
@@ -133,8 +137,10 @@ public class FtsPackage extends FtsObject
     args.clear();
 
     for(int i = 0; i< values.length; i++)
-      args.addSymbol( FtsSymbol.get(values[i]));
-     
+      {
+	if( values[i] != null)
+	  args.addSymbol( FtsSymbol.get(values[i]));
+      }
     try
       {
 	send( FtsSymbol.get(message), args);
@@ -146,10 +152,10 @@ public class FtsPackage extends FtsObject
       }
   }
 
-  public void save()
+  public void save( String name)
   {
     args.clear();
-    args.addSymbol( FtsSymbol.get( fileName));
+    args.addSymbol( FtsSymbol.get( (name != null) ? name : fileName));
 
     try
       {
@@ -268,6 +274,8 @@ public class FtsPackage extends FtsObject
       FtsHelpPatchTable.addSummary( name.toString()+" summary", dir+"/help/"+name+".summary.jmax");
   }
 
+  public void openEditor(int nArgs, FtsAtom[] args){}
+  public void destroyEditor(){}
   /*************************************/
 
   public Enumeration getRequires()

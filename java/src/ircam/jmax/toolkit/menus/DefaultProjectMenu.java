@@ -52,7 +52,11 @@ public class DefaultProjectMenu extends EditorMenu
 
     add(DefaultActions.newProjectAction, "New Project", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_N);
 
-    add(DefaultActions.editProjectAction, "Edit Project");
+    add(DefaultActions.openProjectAction, "Open Project ...", (Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), KeyEvent.VK_O);
+
+    addSeparator();
+
+    add(DefaultActions.editProjectAction, "Edit Current Project");
   }
 }
 

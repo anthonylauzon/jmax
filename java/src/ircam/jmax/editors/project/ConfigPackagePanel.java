@@ -166,12 +166,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
   void chooseAndAddPath( DefaultListModel model, String message, int index)
   {
-    if(fileChooser == null)
-      {
-	fileChooser = new JFileChooser();
-	fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      }
-
+    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser.setSelectedFile( null);
     
     int result = fileChooser.showDialog(null, "Select Path");
@@ -273,7 +268,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
     public void addRow(int index)
     {
       size++;    
-      if(size > rows)
+      if((size > rows) || (index != -1))
 	{
 	  Object[][] temp = new Object[size+5][2];
 	  if(index == -1)
@@ -290,12 +285,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
 		temp[i][1] = data[i][1];
 	      }
 
-	      /*temp[index+1][0] = null;
-		temp[index+1][1] = null;*/
-	      temp[index+1][0] = "%^$#&^$!@#&^$%@!*&!@$*&%*&%!@$*&%!@$";
-	      temp[index+1][1] = Boolean.FALSE;
-	      
-	      for(int j = index+2; j < size-1; j++)
+	      temp[index+1][0] = null;
+	      temp[index+1][1] = null;
+
+	      for(int j = index+2; j < size; j++)
 	      {
 		temp[j][0] = data[j-1][0];
 		temp[j][1] = data[j-1][1];
@@ -382,13 +375,24 @@ public class ConfigPackagePanel extends JPanel implements Editor
   {
     window.setVisible(false);
   }
+
   public void save()
   {
-    ftsPkg.save();
+    ftsPkg.save( null);
   }
+
   public void saveAs()
   {
-    ftsPkg.save();
+    fileChooser.setSelectedFile( null);
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    int result = fileChooser.showSaveDialog( window);
+
+    if ( result == JFileChooser.APPROVE_OPTION)
+      {
+	String fileName = fileChooser.getSelectedFile().getAbsolutePath();		  		
+	if( fileName != null)
+	  ftsPkg.save( fileName);
+      }
   }
   public void print()
   {
@@ -402,7 +406,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
   private DefaultListModel templPathModel, dataPathModel;
   private Window window;
   private FtsPackage ftsPkg;
-  private JFileChooser fileChooser; 
+  private JFileChooser fileChooser = new JFileChooser(); 
   private final int DEFAULT_WIDTH = 450;
   private final int DEFAULT_HEIGHT = 280;
 }

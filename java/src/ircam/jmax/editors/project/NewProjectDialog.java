@@ -1,0 +1,204 @@
+//
+// jMax
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+// 
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// See file LICENSE for further informations on licensing terms.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
+
+package ircam.jmax.editors.project;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+import ircam.jmax.*;
+import ircam.jmax.fts.*;
+
+/**
+ * The "system statistics" dialog.
+ */
+
+public class NewProjectDialog extends JDialog 
+{
+  public NewProjectDialog( Frame dw) 
+  {
+    super(dw, "New Project", true);
+
+    parent = (Frame)dw;
+  
+    JPanel titlePanel = new JPanel();    
+    titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
+    JLabel iconLabel = new JLabel( JMaxIcons.jmaxIcon);
+    JLabel titleLabel = new JLabel();
+    titleLabel.setFont( titleLabel.getFont().deriveFont( (float)36));
+    titleLabel.setText("New Project");
+    titlePanel.add( iconLabel);
+    titlePanel.add( Box.createRigidArea( new Dimension(20, 0)));
+    titlePanel.add( titleLabel);
+    titlePanel.add( Box.createHorizontalGlue());
+
+    //Create Project Name section.
+    JPanel namePanel = new JPanel();    
+    namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.X_AXIS));
+    namePanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEmptyBorder(), "Project Name"));
+    nameField = new JTextField();
+    nameField.addActionListener( new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  enableCreateButton();
+	}
+      });
+    nameField.setPreferredSize( new Dimension( 400, 25));
+    nameField.setMaximumSize( new Dimension( 2000, 25));
+    namePanel.add( nameField);
+    
+    //Create Project Location section
+    JPanel pathPanel = new JPanel();
+    pathPanel.setLayout(new BoxLayout(pathPanel, BoxLayout.X_AXIS));
+    pathPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEmptyBorder(), "Location"));
+    pathField = new JTextField()
+      {
+	public void setText(String text)
+	{
+	  super.setText( text);
+	  enableCreateButton();
+	}
+      };
+    
+    pathField.setPreferredSize( new Dimension( 400, 25));
+    pathField.setMaximumSize( new Dimension( 2000, 25));
+    JButton pathButton = new JButton("Choose...");
+    pathButton.addActionListener( new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  JFileChooser fileChooser = new JFileChooser();
+	  fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	  fileChooser.setSelectedFile( null);
+	  
+	  int result = fileChooser.showDialog(null, "Choose");
+	  if ( result == JFileChooser.APPROVE_OPTION)
+	    {
+	      String path = fileChooser.getSelectedFile().getAbsolutePath();		  		
+	      if(path!=null)
+		pathField.setText( path);
+	    }
+	}
+      });
+    pathPanel.add( pathField);
+    pathPanel.add( pathButton);
+
+    JPanel borderedPanel = new JPanel();
+    borderedPanel.setLayout(new BoxLayout(borderedPanel, BoxLayout.Y_AXIS));
+    borderedPanel.setBorder( BorderFactory.createEtchedBorder());
+    borderedPanel.add( namePanel);
+    borderedPanel.add( pathPanel);
+
+    JPanel buttonsPanel = new JPanel();
+    buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+    createButton = new JButton("Create");
+    createButton.addActionListener( new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
+	  //create the project
+	  returnValue = CREATE_OPTION;
+	  setVisible(false);
+	}
+      });
+    createButton.setEnabled( false);
+    JButton cancelButton = new JButton("Cancel");
+    cancelButton.addActionListener( new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{	  
+	  returnValue = CANCEL_OPTION;
+	  setVisible(false);
+	}
+      });
+    buttonsPanel.add(cancelButton);
+    buttonsPanel.add(Box.createHorizontalGlue());
+    buttonsPanel.add(createButton);
+
+    JPanel mainPanel = new JPanel();
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    mainPanel.add( titlePanel);
+    mainPanel.add( Box.createRigidArea( new Dimension(0, 20)));
+    mainPanel.add( borderedPanel);
+    mainPanel.add( Box.createVerticalGlue());
+    mainPanel.add( Box.createRigidArea( new Dimension(0, 10)));
+    mainPanel.add( buttonsPanel);
+
+    getContentPane().add( mainPanel);
+    getContentPane().validate();
+    pack();  
+
+    setResizable( false);
+    setLocationRelativeTo( parent);
+    setVisible( true);
+  }
+
+  void enableCreateButton()
+  {
+    String name = nameField.getText();
+    String path = pathField.getText();
+    createButton.setEnabled( (name!=null)&&(path!=null)&&(!name.equals("")&&(!path.equals(""))));
+  }
+
+  public static int showDialog(Frame frame)
+  {
+    instance = new NewProjectDialog( frame);
+    System.gc();
+    return instance.returnValue;
+  }
+  public static String getProjectName()
+  {
+    String name = instance.nameField.getText();
+    if( !name.endsWith(".jmax"))
+      name = name.concat(".jmax");
+    return name;
+  }
+  public static String getProjectLocation()
+  {
+    String location = instance.pathField.getText();
+     if( !location.endsWith("/"))
+      location = location.concat("/");
+     return location;
+  }
+
+  private static NewProjectDialog instance;
+
+  Frame parent;
+  JTextField nameField, pathField;
+  JButton createButton;
+
+  public static final int CANCEL_OPTION = 0;
+  public static final int CREATE_OPTION = 1;
+  int returnValue = CANCEL_OPTION; 
+}
+
+
+
+
+
+
+
+
+
+

@@ -26,6 +26,7 @@ import java.util.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
+import ircam.jmax.editors.project.*;
 
 public class FtsProject extends FtsPackage
 {
@@ -66,6 +67,24 @@ public class FtsProject extends FtsPackage
 	packages.put(pkgName, ftsPkg);
 	ftsPkg.upload();
       }
+  }
+
+  public void setAsCurrentProject()
+  {
+    try
+      {
+	send( FtsSymbol.get("set_as_current_project"));
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsProject: I/O Error sending setAsCurrentProject Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+  public void openEditor(int nArgs, FtsAtom[] args)
+  {
+    ProjectEditor.open();
   }
 
   Hashtable packages = new Hashtable();

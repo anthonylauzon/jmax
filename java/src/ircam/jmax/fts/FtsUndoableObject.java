@@ -50,6 +50,12 @@ public class FtsUndoableObject extends FtsGraphicObject implements UndoableData{
     init();
   }
 
+  public FtsUndoableObject(FtsServer server, FtsObject parent, int id)
+  {
+    super(server, parent, id);
+    init();
+  }
+
   public  FtsUndoableObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
     super(server, parent, className);

@@ -27,6 +27,7 @@ import javax.swing.*;
 public class JMaxIcons {
   public static final ImageIcon jmax_patcher_file_ = loadIcon( "mini_icon_jmax.gif");
   public static final ImageIcon jmax_tiny_logo_ = loadIcon( "jmax_logo_tiny.gif");
+  public static final ImageIcon jmaxIcon = loadIcon( "jmax_icon.gif");
   public static final ImageIcon lockMode = loadIcon( "tool_lock_mode.gif");
   public static final ImageIcon editMode = loadIcon( "tool_edit_mode.gif");
   public static final ImageIcon up = loadIcon( "tool_up.gif");

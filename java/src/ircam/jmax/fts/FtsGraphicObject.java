@@ -148,6 +148,11 @@ public class FtsGraphicObject extends FtsObject {
     this.className = className;
   }
 
+  public FtsGraphicObject(FtsServer server, FtsObject parent, int id)
+  {
+    super(server, parent, id);
+  }
+
   public FtsGraphicObject(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
     super(server, parent, className);

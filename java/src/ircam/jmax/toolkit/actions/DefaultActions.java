@@ -92,7 +92,13 @@ public class DefaultActions
   public static EditorAction newProjectAction     = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	ProjectEditor.newProject();
+	ProjectEditor.newProject( container.getFrame());
+      }
+    };
+  public static EditorAction openProjectAction     = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ProjectEditor.openProject( container.getFrame());
       }
     };
   public static EditorAction editProjectAction    = new EditorAction(){

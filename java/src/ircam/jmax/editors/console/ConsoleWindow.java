@@ -145,17 +145,17 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
   }
   public void print()
   {
-     PrinterJob printJob = PrinterJob.getPrinterJob();
-     PageFormat format = printJob.pageDialog(printJob.defaultPage());    
-     printJob.setPrintable( this, format);	    
-     
-     if (printJob.printDialog()) {
-       try {
-	 printJob.print();
-       } catch (Exception ex) {
+    PrinterJob printJob = PrinterJob.getPrinterJob();
+    PageFormat format = printJob.pageDialog(printJob.defaultPage());    
+    printJob.setPrintable( this, format);	    
+    
+    if (printJob.printDialog()) {
+      try {
+	printJob.print();
+      } catch (Exception ex) {
 	 ex.printStackTrace();
-       }
-     }
+      }
+    }
   }
 
   // Methods from interface EditorContainer

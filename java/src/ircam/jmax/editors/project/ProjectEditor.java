@@ -29,6 +29,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.awt.*;
+import java.io.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
@@ -96,13 +97,35 @@ public class ProjectEditor extends JFrame implements EditorContainer
     packagePanel.update();
   } 
 
-  public static void newProject()
+  public static void newProject( Frame frame)
   {
-    //apre un dialogo che mi chiede nome e path
-    //poi crea la directory e il file nome.jmax
-    //il progetto e' vuoto!!!
+    int result = NewProjectDialog.showDialog( frame);
+    if(result == NewProjectDialog.CREATE_OPTION)
+      {
+	FtsProject newProject = null;
+	String name = NewProjectDialog.getProjectName();
+	String location = NewProjectDialog.getProjectLocation();
+	
+	try{
+	  newProject = new FtsProject();
+	}
+	catch(IOException e)
+	  {
+	    System.err.println("Error in FtsProject creation!");
+	    e.printStackTrace();
+	  }
+	newProject.save( location+name);
+	newProject.setFileName( location+name);
+	newProject.setDir( location);
+	JMaxApplication.setCurrentProject( newProject);
+	newProject.setAsCurrentProject();
+      }
   }
 
+  public static void openProject( Frame frame)
+  {
+    
+  }
   /************* interface EditorContainer ************************/
   public Editor getEditor()
   {

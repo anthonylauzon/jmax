@@ -1220,6 +1220,20 @@ __fts_package_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_client_send_message( o, s_updateDone, 0, 0);  
 }
 
+static void
+__fts_package_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+}
+
+static void
+__fts_package_set_as_current_project(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t *this = (fts_package_t *)o;
+  fts_project_set( this);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+}
+
 static fts_status_t
 fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -1251,6 +1265,8 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, __fts_package_open_editor);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
 
   return fts_Success;
 }

@@ -63,6 +63,11 @@ public abstract class FtsObjectWithEditor extends FtsUndoableObject {
     super(server, parent, id, className, description);
   }
 
+  public FtsObjectWithEditor(FtsServer server, FtsObject parent, int id)
+  {
+    super(server, parent, id);
+  }
+
   public  FtsObjectWithEditor(FtsServer server, FtsObject parent, FtsSymbol className) throws IOException
   {
     super(server, parent, className);
