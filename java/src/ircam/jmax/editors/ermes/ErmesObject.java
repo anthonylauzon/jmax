@@ -100,6 +100,9 @@ public class ErmesObject implements FtsPropertyHandler {
     itsJustification = theJustification;
   }
 
+  public int GetJustification(){
+    return itsJustification;
+  }
 
   void ResizeToNewFont(Font itsFont) {}
   
@@ -323,6 +326,9 @@ public class ErmesObject implements FtsPropertyHandler {
     return itsFtsObject;
   }
 
+  public Font GetFont(){
+    return itsFont;
+  }
 
   public Vector GetOutletList(){
     return itsOutletList;

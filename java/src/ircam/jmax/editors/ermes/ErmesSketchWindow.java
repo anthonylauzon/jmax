@@ -56,9 +56,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   private Menu itsSubWindowsMenu;
   private Menu itsExecutionMenu;
   private Menu itsGraphicsMenu;
-  CheckboxMenuItem itsCurrentSizesMenu;
-  CheckboxMenuItem itsCurrentFontMenu;
-  CheckboxMenuItem itsCurrentJustificationMenu;
+  CheckboxMenuItem itsSelectedSizeMenu;//the Selected objects size MenuItem
+  CheckboxMenuItem itsSketchSizeMenu;//the SketchPad size MenuItem
+  CheckboxMenuItem itsSketchFontMenu;//the SketchPad font MenuItem
+  CheckboxMenuItem itsSelectedFontMenu;//the Selected objects font MenuItem
+  CheckboxMenuItem itsSelectedJustificationMenu;
+  CheckboxMenuItem itsSketchJustificationMenu;
   CheckboxMenuItem itsCurrentResizeMenu;
   CheckboxMenuItem itsAutoroutingCheckbox;
   MenuItem itsRunModeMenuItem;
@@ -486,7 +489,8 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     theJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Center"));
     aCheckItem.addItemListener(this);	
     aCheckItem.setState(true);
-    itsCurrentJustificationMenu = aCheckItem;
+    itsSelectedJustificationMenu = aCheckItem;
+    itsSketchJustificationMenu = itsSelectedJustificationMenu;
     theJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Right"));
     aCheckItem.addItemListener(this);	   
   }
@@ -503,9 +507,10 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     String aFontSize = String.valueOf(itsSketchPad.getSketchFontSize());
     for(int i=0; i<9;i++){
       aCheckboxMenuItem = (CheckboxMenuItem)itsSizesMenu.getItem(i);
-	if(aCheckboxMenuItem.getLabel().compareTo(aFontSize) == 0){
-	itsCurrentSizesMenu = aCheckboxMenuItem;
-	itsCurrentSizesMenu.setState(true);
+      if(aCheckboxMenuItem.getLabel().compareTo(aFontSize) == 0){
+	itsSketchSizeMenu = aCheckboxMenuItem;
+	itsSelectedSizeMenu = itsSketchSizeMenu;
+	itsSelectedSizeMenu.setState(true);
 	return;
       }
     }
@@ -517,8 +522,9 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     for(int i=0; i<itsFontList.length; i++){
       aCheckboxMenuItem = (CheckboxMenuItem)itsFontsMenu.getItem(i);
       if(aCheckboxMenuItem.getLabel().toLowerCase().compareTo(aFont.toLowerCase()) == 0){
-	itsCurrentFontMenu = aCheckboxMenuItem;
-	itsCurrentFontMenu.setState(true);
+	itsSketchFontMenu = aCheckboxMenuItem;
+	itsSelectedFontMenu = aCheckboxMenuItem;
+	itsSketchFontMenu.setState(true);
 	return;
       }
     }
@@ -875,11 +881,96 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
 
   private void FontsMenuAction(MenuItem theMenuItem, String theString) {
-    //if we are here, a font name have been choosen from the menu
-    itsCurrentFontMenu.setState(false);
-    itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
-    itsCurrentFontMenu = (CheckboxMenuItem) theMenuItem;
-    itsCurrentFontMenu.setState(true);
+    
+    if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
+    
+    if(itsSketchPad.GetSelectedList().size()==0) itsSketchFontMenu=(CheckboxMenuItem) theMenuItem;
+    
+    itsSelectedFontMenu = (CheckboxMenuItem) theMenuItem;
+    
+    if(itsSketchPad.GetSelectedList().size()==0)
+      itsSketchPad.ChangeFont(new Font(theString, Font.PLAIN, itsSketchPad.sketchFontSize));
+    else itsSketchPad.ChangeNameFont(theString);
+    
+    itsSelectedFontMenu.setState(true);
+  }
+
+  public void DeselectionUpdateMenu(){
+    if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
+    itsSelectedFontMenu = itsSketchFontMenu;
+    itsSelectedFontMenu.setState(true);
+    if(itsSelectedSizeMenu!=null) itsSelectedSizeMenu.setState(false);
+    itsSelectedSizeMenu = itsSketchSizeMenu;
+    itsSelectedSizeMenu.setState(true);
+    if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
+    itsSelectedJustificationMenu = itsSketchJustificationMenu;
+    itsSelectedJustificationMenu.setState(true);
+  }
+
+  public void SelectionUpdateMenu(String theFont, Integer theSize, Integer theJustification){
+    CheckboxMenuItem aCheckItem = null;
+    int i;
+    if(itsSelectedFontMenu!=null) itsSelectedFontMenu.setState(false);
+    if(theFont!=null){
+      for(i=0; i<itsFontsMenu.getItemCount(); i++){
+	aCheckItem = (CheckboxMenuItem)itsFontsMenu.getItem(i);
+	if(aCheckItem.getLabel().toLowerCase().equals(theFont)){
+	  itsSelectedFontMenu = aCheckItem;
+	  itsSelectedFontMenu.setState(true);
+	  break;
+	}
+      }
+    }
+    else itsSelectedFontMenu = null;
+    
+    if(itsSelectedSizeMenu!=null) itsSelectedSizeMenu.setState(false);
+    if(theSize!=null){
+      for(i=0; i<itsSizesMenu.getItemCount(); i++){
+	aCheckItem = (CheckboxMenuItem)itsSizesMenu.getItem(i);
+	if(aCheckItem.getLabel().equals(theSize.toString())){
+	  itsSelectedSizeMenu = aCheckItem;
+	  itsSelectedSizeMenu.setState(true);
+	  break;
+	}
+      }
+    }
+    else itsSelectedSizeMenu = null;
+
+    if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
+    if(theJustification!=null){
+      int aJust = theJustification.intValue();
+      if(aJust == ErmesSketchPad.CENTER_JUSTIFICATION){
+	for(i=0; i<itsJustificationMenu.getItemCount(); i++){
+	  aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem(i);
+	  if(aCheckItem.getLabel().equals("Center")){
+	    itsSelectedJustificationMenu = aCheckItem;
+	    itsSelectedJustificationMenu.setState(true);
+	    break;
+	  }
+	}
+      }
+      else if(aJust == ErmesSketchPad.LEFT_JUSTIFICATION){
+	for(i=0; i<itsJustificationMenu.getItemCount(); i++){
+	  aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem(i);
+	  if(aCheckItem.getLabel().equals("Left")){
+	    itsSelectedJustificationMenu = aCheckItem;
+	    itsSelectedJustificationMenu.setState(true);
+	    break;
+	  }
+	}
+      }
+      else if(aJust == ErmesSketchPad.RIGHT_JUSTIFICATION){
+	for(i=0; i<itsJustificationMenu.getItemCount(); i++){
+	  aCheckItem = (CheckboxMenuItem)itsJustificationMenu.getItem(i);
+	  if(aCheckItem.getLabel().equals("Right")){
+	    itsSelectedJustificationMenu = aCheckItem;
+	    itsSelectedJustificationMenu.setState(true);
+	    break;
+	  }
+	}
+      }
+    }
+    else itsSelectedJustificationMenu = null;
   }
 
   private void ExecutionMenuAction(MenuItem theMenuItem, String theString) {
@@ -894,26 +985,32 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
   
   private boolean SizesMenuAction(MenuItem theMenuItem, String theString) {
     //if we are here, a font size have been choosen from the FONT menu
-    itsCurrentSizesMenu.setState(false);
+    if(itsSelectedSizeMenu!=null) itsSelectedSizeMenu.setState(false);
 
     int fontSize = itsSketchPad.sketchFontSize;
     try {
       fontSize = Integer.parseInt(theString);
     } catch (NumberFormatException e) {}
     
-    itsCurrentSizesMenu = (CheckboxMenuItem)theMenuItem;
-    itsCurrentSizesMenu.setState(true);
+    if(itsSketchPad.GetSelectedList().size()==0) itsSketchSizeMenu = (CheckboxMenuItem)theMenuItem;
+    itsSelectedSizeMenu = (CheckboxMenuItem)theMenuItem;
     
-    itsSketchPad.sketchFontSize = fontSize;
-    itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), fontSize));
+    itsSelectedSizeMenu.setState(true);
+    
+    if(itsSketchPad.GetSelectedList().size()==0) {
+      itsSketchPad.sketchFontSize = fontSize;
+      itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), fontSize));
+    }
+    else itsSketchPad.ChangeSizeFont(fontSize);
     return true;
   }
 
   private boolean JustificationMenuAction(MenuItem theMenuItem, String theString) {
-    itsCurrentJustificationMenu.setState(false);
+    if(itsSelectedJustificationMenu!=null) itsSelectedJustificationMenu.setState(false);
     itsSketchPad.ChangeJustification(theString);
-    itsCurrentJustificationMenu = (CheckboxMenuItem)theMenuItem;
-    itsCurrentJustificationMenu.setState(true);
+    itsSelectedJustificationMenu = (CheckboxMenuItem)theMenuItem;
+    itsSelectedJustificationMenu.setState(true);
+    if(itsSketchPad.itsSelectedList.size()==0) itsSketchJustificationMenu = itsSelectedJustificationMenu;
     return true;
   }
 

@@ -337,6 +337,10 @@ class ErmesSketchHelper extends Object{
     DeselectInOutlet();
 
     if (itsSketchPad.itsSelectedList.size() == 0 && itsSketchPad.itsSelectedConnections.size() ==0 ) return;
+
+    if(itsSketchPad.itsSelectedList.size() != 0) 
+      ((ErmesSketchWindow)itsSketchPad.GetSketchWindow()).DeselectionUpdateMenu();
+
     for (Enumeration e = itsSketchPad.itsSelectedList.elements() ; e.hasMoreElements() ;) {
       aObject = (ErmesObject) e.nextElement();
       aObject.Deselect();
@@ -356,6 +360,7 @@ class ErmesSketchHelper extends Object{
     }
     itsSketchPad.itsSelectedConnections.removeAllElements();
     itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+
   }
   
   public void DeselectObjAndConn(){

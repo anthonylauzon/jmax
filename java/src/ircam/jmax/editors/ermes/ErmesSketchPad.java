@@ -258,7 +258,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     return sketchFontSize;
   }
 
-  void ChangeFont(Font theFont) {
+  public void ChangeFont(Font theFont){
     try {
       FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(theFont);
       setFont(theFont);   
@@ -269,29 +269,79 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       aErr.show();  
       return;
     }
-
     sketchFont = theFont;
+  }
+  
+
+  public void ChangeNameFont(String theFontName){
     ErmesObject aObject;
+    Font aFont;
     for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
-      RemoveElementRgn(aObject);
-      aObject.ChangeFont(theFont);
-      SaveOneElementRgn(aObject);
+      if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
+	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)){
+	aFont = new Font(theFontName, sketchFont.getStyle(), aObject.GetFont().getSize());
+	try {
+	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
+	  setFont(aFont);   
+	}
+	catch (Exception exc) {
+	  ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "This font/fontsize does not exist on this platform");
+	  aErr.setLocation(100, 100);
+	  aErr.show();  
+	  return;
+	}
+	
+	RemoveElementRgn(aObject);
+	aObject.ChangeFont(aFont);
+	SaveOneElementRgn(aObject);
+      }
+    }
+    ToSave();
+    repaint();
+  }
+
+  public void ChangeSizeFont(int fontSize){
+    ErmesObject aObject;
+    Font aFont;
+    for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject) e.nextElement();
+      if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
+	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)){
+	aFont = new Font(aObject.GetFont().getName(), sketchFont.getStyle(), fontSize);
+	try {
+	  FontMetrics aFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(aFont);
+	  setFont(aFont);   
+	}
+	catch (Exception exc) {
+	  ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "This font/fontsize does not exist on this platform");
+	  aErr.setLocation(100, 100);
+	  aErr.show();  
+	  return;
+	}
+	
+	RemoveElementRgn(aObject);
+	aObject.ChangeFont(aFont);
+	SaveOneElementRgn(aObject);
+      }
     }
     ToSave();
     repaint();
   }
 
   public void ChangeJustification(String theJustification){
-    if(theJustification.equals("Center")) itsJustificationMode = CENTER_JUSTIFICATION;
-    else if(theJustification.equals("Left")) itsJustificationMode = LEFT_JUSTIFICATION;
-    else if(theJustification.equals("Right")) itsJustificationMode = RIGHT_JUSTIFICATION;
+    int aJustificationMode = 0;
+    if(theJustification.equals("Center")) aJustificationMode = CENTER_JUSTIFICATION;
+    else if(theJustification.equals("Left")) aJustificationMode = LEFT_JUSTIFICATION;
+    else if(theJustification.equals("Right")) aJustificationMode = RIGHT_JUSTIFICATION;
+
+    if(itsSelectedList.size()==0) itsJustificationMode = aJustificationMode;
 
     ErmesObject aObject;
     for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject) e.nextElement();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment))
-	aObject.ChangeJustification(itsJustificationMode);
+	aObject.ChangeJustification(aJustificationMode);
     }
     ToSave();
     repaint();
@@ -402,6 +452,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	itsHelper.DeselectInOutlet();
 	itsSelectedList.addElement(theObject);
 	theObject.Select();
+	CheckCurrentFont();
 	if (offScreenPresent) {
 	  theObject.Paint(offGraphics);
 	  CopyTheOffScreen(getGraphics());   
@@ -415,7 +466,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	if (evt.isShiftDown()) {
 	  if(!itsSelectedList.contains(theObject)){
 	    itsSelectedList.addElement(theObject);
-	    theObject.Select();
+      	    theObject.Select();
+	    CheckCurrentFont();
 	    if (offScreenPresent) {
 	      theObject.Paint(offGraphics);
 	      CopyTheOffScreen(getGraphics());
@@ -445,6 +497,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	  // select the object involved
 	  itsSelectedList.addElement(theObject);
 	  theObject.Select();
+	  CheckCurrentFont();
 	  if (offScreenPresent) {
 	    theObject.Paint(offGraphics);
 	    CopyTheOffScreen(getGraphics());
@@ -869,6 +922,43 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     //no check for now: change the OffScreen property
   }
   
+  public void CheckCurrentFont(){
+    ErmesObject aObject;
+    String aFontName;
+    Integer aSize;
+    Integer aJustification;
+    Vector aUsedFontVector = new Vector();
+    Vector aUsedSizeVector = new Vector();
+    Vector aUsedJustificationVector = new Vector();
+    for (Enumeration en = itsSelectedList.elements(); en.hasMoreElements();) {
+      aObject = (ErmesObject)en.nextElement();
+      if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment)||
+	 (aObject instanceof ErmesObjInt)||(aObject instanceof ErmesObjFloat)){
+	aFontName = aObject.GetFont().getName().toLowerCase();
+	aSize = new Integer(aObject.GetFont().getSize());
+	aJustification = new Integer(aObject.GetJustification());
+	if(!aUsedFontVector.contains(aFontName)) aUsedFontVector.addElement(aFontName);
+	if(!aUsedSizeVector.contains(aSize)) aUsedSizeVector.addElement(aSize);
+	if(!aUsedJustificationVector.contains(aJustification)) 
+	  aUsedJustificationVector.addElement(aJustification);
+      }
+    }
+    if(aUsedFontVector.size()!=0){
+      if(aUsedFontVector.size()==1) aFontName = (String) aUsedFontVector.elementAt(0);
+      else aFontName = null;
+      
+      if(aUsedSizeVector.size()==1) aSize=(Integer)aUsedSizeVector.elementAt(0);
+      else aSize = null;
+      
+      if(aUsedJustificationVector.size()==1)
+	aJustification =(Integer)aUsedJustificationVector.elementAt(0);
+      else aJustification = null;
+      
+      ((ErmesSketchWindow)itsSketchWindow).SelectionUpdateMenu(aFontName, aSize, aJustification);
+    }
+  }
+
+
   //--------------------------------------------------------
   //	minimumSize
   //--------------------------------------------------------
@@ -1026,7 +1116,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 	    aObject.Paint(offGraphics);
 	    itsSelectedList.addElement(aObject);
 	  }
-	}			
+	}	
+	CheckCurrentFont();
 	if (offScreenPresent) {
 	  CopyTheOffScreen(getGraphics());
 	}
@@ -1275,6 +1366,7 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
       itsSelectedList.addElement(aObject);
       aObject.Select();
     }
+    CheckCurrentFont();
     repaint();
   }
 
