@@ -474,7 +474,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
     if (delegate != null)
       pushInteraction(delegate);
-
+    
     getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
   }
   

@@ -58,7 +58,8 @@ class EditCtrlInteraction extends Interaction
       //squeack &= (~ Squeack.CTRL);
     squeack &= (~ Squeack.SHORTCUT);
     squeack &= (~ Squeack.LOCATION_MASK);
-    
+    if( Squeack.isShift(squeack)) squeack &= (~ Squeack.SHIFT);
+
     switch (squeack)
       {
       case Squeack.DOWN:

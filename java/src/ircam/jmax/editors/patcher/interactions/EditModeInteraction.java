@@ -117,6 +117,7 @@ class EditModeInteraction extends Interaction
 	    // Drag connect
 	    return Interactions.dragReverseConnect;
 
+	  case (Squeack.SHORTCUT | Squeack.DOWN | Squeack.OBJECT | Squeack.SHIFT):
 	  case (Squeack.SHORTCUT | Squeack.DOWN | Squeack.OBJECT):
 	  case (Squeack.SHORTCUT | Squeack.DOWN | Squeack.TEXT):
               // Ctrl drag for controllers
