@@ -710,7 +710,6 @@ asio_audioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int a
 static int
 asio_audioport_open(asio_audioport_t* port, int input_or_output)
 {
-  int result = 0;
 
   if(nb_port_opened == 0)
   {
@@ -741,15 +740,18 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
         fts_dsp_set_sample_rate((double)current_port->sampleRate);
 
         current_port->driver->driver_interface->start();
-        
-        return 1; /* success */
     }
   }
-  else
+  else if(port!=current_port) /* user is trying to open a different port */
   {
-     fts_post("ASIO allows only to use one driver (%s)\n", current_port->driver->name);
-      // set port open
-     // fts_audioport_set_open((fts_audioport_t*)port, input_or_output);
+     fts_post("ASIO allows to use only one driver at a time\n");
+     fts_post("Current driver is : %s\n",current_port->driver->name);
+     return 0; /* error */
+  }
+  else /* user is trying to open another channel of the current port */
+  {
+     /* set port open */
+     fts_audioport_set_open((fts_audioport_t*)port, input_or_output);
      nb_port_opened++;
   }
 
@@ -757,7 +759,7 @@ asio_audioport_open(asio_audioport_t* port, int input_or_output)
   fts_post("[asio] open (%d)\n", nb_port_opened);
 #endif /* WANT_TO_DEBUG_ASIO_PACKAGES */
 
-  return 0; /* error */
+  return 1; /* success */
 }
 
 
