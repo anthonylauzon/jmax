@@ -84,11 +84,6 @@ integer_config(void)
 
   fts_class_alias(fts_new_symbol("integer"), fts_new_symbol("int"));
   fts_class_alias(fts_new_symbol("i"), fts_new_symbol("int"));
-
-  /* Support for the max only key and keyup objects */
-
-  fts_class_alias(fts_new_symbol("key"), fts_new_symbol("int"));
-  fts_class_alias(fts_new_symbol("keyup"), fts_new_symbol("int"));
 }
 
 /* ---------------- the metaclass instantiation function ------------------ */
