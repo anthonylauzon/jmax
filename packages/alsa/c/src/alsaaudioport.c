@@ -45,6 +45,8 @@
 #define DEFAULT_FORMAT s_s32_le
 #define DEFAULT_ACCESS s_mmap_noninterleaved
 
+#define PERIODS_PER_BUFFER 2
+
 /* Define WANT_XRUN_LOG to put xrun message in fts log file */
 #undef WANT_XRUN_LOG 
 /* #define WANT_XRUN_LOG 1 */
@@ -637,7 +639,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   /*
    * Set period size: the period size is the fifo size divided by the number of periods, here 2
    */
-  if ((err = snd_pcm_hw_params_set_period_size_near( stream->handle, hwparams, fifo_size / 2, 0)) < 0) 
+  if ((err = snd_pcm_hw_params_set_period_size_near( stream->handle, hwparams, fifo_size / PERIODS_PER_BUFFER, 0)) < 0) 
   {      
     fts_log("[alsaaudioport] period size not available (%s)\n", snd_strerror(err));
     return err;
