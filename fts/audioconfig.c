@@ -66,11 +66,6 @@ static fts_symbol_t audioconfig_s_outputs;
 
 
 
-static void 
-audioconfig_set_input_port(audioconfig_t* config, int index, fts_symbol_t name)
-{
-#warning NOT YET IMPLEMENTED (audioconfig_set_input_port)
-}
 
 
 static void
@@ -133,6 +128,20 @@ static void
 audiomanagers_get_input_device_names(fts_array_t* inputs_array)
 {
 #warning NOT YET IMPLEMENTED (audiomanagers_get_input_device_names), dummy implementation to test server<->client communication
+  /*
+    foreach registered audiomanagers
+       check which devices can be used for input
+         foreach devices check number of channel availables for input
+
+    skeleton implementation:
+  */
+/*   fts_atom_t args; */
+/*   fts_set_pointer(&args, &inputs_array); */
+/*   for (am = audiomanagers; am != NULL; am = am->next) */
+/*   { */
+/*     fts_send_message((fts_object_t*)am, fts_audiomanager_s_append_input_devices_names, 1, &args);     */
+/*   } */
+
   fts_array_append_symbol(inputs_array, fts_new_symbol("hw:1"));
   fts_array_append_int(inputs_array, 10);
   fts_array_append_symbol(inputs_array, fts_new_symbol("hw:2"));
@@ -145,6 +154,11 @@ static void
 audiomanagers_get_output_device_names(fts_array_t* outputs_array)
 {
 #warning NOT YET IMPLEMENTED (audiomanagers_get_output_device_names), dummy implementation to test server<->client communication
+  /*
+    foreach registered audiomanagers
+       check which devices can be used for output
+         foreach devices check number of channel availables for output
+  */
   fts_array_append_symbol(outputs_array, fts_new_symbol("hw:0"));
   fts_array_append_int(outputs_array, 5);
   fts_array_append_symbol(outputs_array, fts_new_symbol("hw:1"));
@@ -165,7 +179,12 @@ static void
 audiomanagers_get_sample_rates(fts_array_t* sample_rates_array)
 {
 #warning NOT YET IMPLEMENTED (audiomanagers_get_sample_rates), dummy implementation to test communication between fts server and client
-
+  /*
+    loop on registered audio managers:
+      foreach audiomanagers check which sample rate are available on audioport
+      check if sample rate already in samples_rates_array
+        if not add sample rate in array
+  */
   fts_array_append_int(sample_rates_array,22050);
   fts_array_append_int(sample_rates_array,44100);
   fts_array_append_int(sample_rates_array,48000);
@@ -176,6 +195,13 @@ static void
 audiomanagers_get_buffer_sizes(fts_array_t* buffer_sizes_array)
 {
 #warning NOT YET IMPLEMENTED (audiomanagers_get_buffer_sizes), dummy implementation to test communication between fts server and client
+  /*
+    loop on registered audio managers:
+      foreach audiomanagers check which buffer size are available on audioport
+      check if buffer size already in buffer_sizes_array
+        if not add buffer size in array
+  */
+
   fts_array_append_int(buffer_sizes_array, 128);
   fts_array_append_int(buffer_sizes_array, 256);
   fts_array_append_int(buffer_sizes_array, 512);
@@ -231,6 +257,7 @@ audioconfig_update_devices(audioconfig_t* config)
   fts_array_append_int(&audioconfig_inputs_array, -1);
   fts_array_append_symbol(&audioconfig_outputs_array, audioconfig_s_unconnected);
   fts_array_append_int(&audioconfig_outputs_array, -1);
+
   /* get devices names from all audiomanagers */
   audiomanagers_get_device_names(&audioconfig_inputs_array, &audioconfig_outputs_array);
   
@@ -250,6 +277,7 @@ audioconfig_update_sample_rates(audioconfig_t* config)
   int ac;
   fts_atom_t* at;
 
+  /* get available sample rates from audiomanagers */
   audiomanagers_get_sample_rates(&audioconfig_sample_rates_array);
 
   ac = fts_array_get_size(&audioconfig_sample_rates_array);
@@ -263,6 +291,7 @@ audioconfig_update_buffer_sizes(audioconfig_t* config)
   int ac;
   fts_atom_t* at;
 
+  /* get available buffer sizes from audiomanagers */
   audiomanagers_get_buffer_sizes(&audioconfig_buffer_sizes_array);
 
   ac = fts_array_get_size(&audioconfig_buffer_sizes_array);
@@ -462,9 +491,8 @@ fts_audioconfig_set_defaults(audioconfig_t* audioconfig)
 }
 
 static void 
-audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
+audioconfig_set_input_port(audioconfig_t* config, int index, fts_symbol_t name)
 {
-#warning NEED TO ADD A TEST HERE (audioconfig_set_output_port)
   audiolabel_t* label = audioconfig_label_get_by_index(config, index);
 
   /* reset output to none if it is set to internal */
@@ -479,6 +507,29 @@ audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
   {
     audioconfig_label_set_input_port(config, label, index, audiomanagers_get_input(name, label->name), name);
   }
+
+  post("[audioconfig] audioconfig_set_input_port, index: %d, name: %s\n", index, name);
+}
+
+static void 
+audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
+{
+  audiolabel_t* label = audioconfig_label_get_by_index(config, index);
+
+  /* reset output to none if it is set to internal */
+  if(label->output_audioport)
+    audioconfig_label_set_output_port(config, label, index, NULL, NULL);
+
+  if(name == audioconfig_s_unconnected)
+  {
+    audioconfig_label_set_output_port(config, label, index, NULL, NULL);
+  }
+  else
+  {
+    audioconfig_label_set_output_port(config, label, index, audiomanagers_get_input(name, label->name), name);
+  }
+
+  post("[audioconfig] audioconfig_set_output_port, index: %d, name: %s\n", index, name);
 }
 
 /****************************************************
@@ -489,9 +540,6 @@ audioconfig_set_output_port(audioconfig_t* config, int index, fts_symbol_t name)
 #define AUDIO_CONFIG_DEBUG
 
 fts_class_t* audioconfig_type = NULL;
-
-
-
 
 
 static void
@@ -859,13 +907,12 @@ audioconfig_instantiate(fts_class_t* cl)
   fts_class_message_varargs(cl, fts_s_default, audioconfig_set_to_defaults);
 
   fts_class_message_varargs(cl, fts_s_insert, audioconfig_insert_label);
+  fts_class_message_varargs(cl, fts_s_remove, audioconfig_remove_label);
+
   fts_class_message_varargs(cl, fts_s_upload, audioconfig_upload);
 
   fts_class_message_varargs(cl, audioconfig_s_buffer_size, audioconfig_buffer_size);
   fts_class_message_varargs(cl, audioconfig_s_sampling_rate, audioconfig_sample_rate);
-
-  fts_class_message_varargs(cl, fts_s_input, audioconfig_input);
-  fts_class_message_varargs(cl, fts_s_output, audioconfig_output);
 }
 
 
