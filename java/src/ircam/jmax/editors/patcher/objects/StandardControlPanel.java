@@ -67,6 +67,8 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
 
     add(namePanel);
 
+    add( new JSeparator());
+
     validate();
   }
 
@@ -90,11 +92,13 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
   public void setName()
   {
     String text = nameField.getText().trim();
-    if( (this.name == null) || (( text != null) && !text.equals( this.name)))
-      {
-	target.getFtsObject().requestSetName( text);
-	name = text;
-      }
+
+    if( text != null)
+      if( ((this.name == null) && !text.equals("")) || ((this.name != null) && !text.equals( this.name)))
+	{
+	  target.getFtsObject().requestSetName( text);
+	  name = text;
+	}
   }
 }
 
