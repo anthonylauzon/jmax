@@ -17,6 +17,8 @@
    All the post should generate an error.
 */
 
+#define OSSDEV_DEBUG
+
 /* Include files */
 
 #include <stdio.h>
@@ -64,7 +66,10 @@ static struct oss_audio_data_struct
 
   int fd;
 
-  int sampling_rate;	   
+  int sampling_rate;
+
+  int fragment_size;
+  int max_fragments;
 
   /* buffers  */
 
@@ -76,13 +81,20 @@ static struct oss_audio_data_struct
 
 static void oss_audio_set_parameters()
 {
-  int format, stereo, sr, fragsize;
+  int format, stereo, sr, fragparam, fragment_size, i;
 
   /* Set fragment size */
-  fragsize = 0x0008000a; /* 8 fragments of 1024 bytes, latency: 0.046s */
-  if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragsize))
-    post( "Error setting SNDCTL_DSP_SETFRAGMENT\n");
+  fragment_size = oss_audio_data.fragment_size;
+  for( i = 0; i < 16; i++)
+    if (fragment_size & (1<<i))
+      break;
 
+  fragparam = (oss_audio_data.max_fragments<<16) | (i);
+
+  if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragparam))
+    post( "Error in ioctl(SNDCTL_DSP_SETFRAGMENT)\n");
+
+#ifdef OSSDEV_DEBUG
   {
     audio_buf_info info;
 
@@ -93,12 +105,13 @@ static void oss_audio_set_parameters()
     post( "fragment size: %d bytes\n", info.fragsize);
     post( "bytes: %d\n", info.bytes);
   }
+#endif
 
   /* Set 16 bit format */
 
   format = AFMT_S16_LE;
   if (ioctl(oss_audio_data.fd, SNDCTL_DSP_SETFMT, &format) == -1)
-    post("Error setting SNDCTL_DSP_SETFMT\n");
+    post("Error in ioctl(SNDCTL_DSP_SETFMT)\n");
 
   if (format != AFMT_S16_LE)
     post("Audio device doesn't support 16 bit mode\n");
@@ -107,7 +120,7 @@ static void oss_audio_set_parameters()
 
   stereo = 1;
   if (ioctl(oss_audio_data.fd, SNDCTL_DSP_STEREO, &stereo) == -1)
-    post("SNDCTL_DSP_STEREO\n");
+    post("error in ioctl(SNDCTL_DSP_STEREO)\n");
 
   if (! stereo)
     post("Audio device doesn't support stereo mode\n");
@@ -116,7 +129,7 @@ static void oss_audio_set_parameters()
 
   sr = oss_audio_data.sampling_rate;
   if (ioctl(oss_audio_data.fd, SNDCTL_DSP_SPEED, &sr) == -1)
-    post("SNDCTL_DSP_SPEED\n");
+    post("error in ioctl(SNDCTL_DSP_SPEED)\n");
 
   if (sr != oss_audio_data.sampling_rate)
     post("Audio device doesn't support requested sampling rate\n");
@@ -241,6 +254,8 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Parameter parsing  */
   
   oss_audio_data.sampling_rate = fts_get_int_by_name(nargs, args, fts_new_symbol("sample_rate"), 44100);
+  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 1024);
+  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 8);
 
   /* open the device */
 
