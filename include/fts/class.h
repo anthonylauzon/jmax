@@ -40,7 +40,7 @@ struct fts_class {
   fts_symbol_t name; /* name of the class, i.e. the first name used to register it */
 
   /* A type id that separates primitive types from objects: lower values are primitive types */
-  int typeid;
+  int type_id;
 
   /* The hash function and equality function for this class */
   fts_hash_function_t hash_function;
@@ -83,7 +83,7 @@ struct fts_class {
 #define fts_class_set_hash_function( cl, fun) ((cl)->hash_function = fun)
 #define fts_class_set_equals_function( cl, fun) ((cl)->equals_function = fun)
 
-#define fts_class_is_primitive(CL) ((CL)->typeid < FTS_FIRST_OBJECT_TYPEID)
+#define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
 
 /**
  * Get a class by name.

@@ -98,22 +98,22 @@ int fts_atom_compare( const fts_atom_t *p1, const fts_atom_t *p2)
  *
  */
 
-static fts_class_t void_class = { typeid : FTS_TYPEID_VOID};
+static fts_class_t void_class = { type_id : FTS_TYPEID_VOID};
 fts_class_t *fts_void_class = &void_class;
 
-static fts_class_t int_class = { typeid : FTS_TYPEID_INT};
+static fts_class_t int_class = { type_id : FTS_TYPEID_INT};
 fts_class_t *fts_int_class = &int_class;
 
-static fts_class_t float_class = { typeid : FTS_TYPEID_FLOAT};
+static fts_class_t float_class = { type_id : FTS_TYPEID_FLOAT};
 fts_class_t *fts_float_class = &float_class;
 
-static fts_class_t symbol_class = { typeid : FTS_TYPEID_SYMBOL};
+static fts_class_t symbol_class = { type_id : FTS_TYPEID_SYMBOL};
 fts_class_t *fts_symbol_class = &symbol_class;
 
-static fts_class_t pointer_class = { typeid : FTS_TYPEID_POINTER};
+static fts_class_t pointer_class = { type_id : FTS_TYPEID_POINTER};
 fts_class_t *fts_pointer_class = &pointer_class;
 
-static fts_class_t string_class = { typeid : FTS_TYPEID_STRING};
+static fts_class_t string_class = { type_id : FTS_TYPEID_STRING};
 fts_class_t *fts_string_class = &string_class;
 
 void fts_kernel_atom_init( void)

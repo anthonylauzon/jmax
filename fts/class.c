@@ -33,7 +33,7 @@
 fts_class_t *fts_class_class;
 
 const int fts_system_inlet = -1;
-static int typeid = FTS_FIRST_OBJECT_TYPEID;
+static int type_id = FTS_FIRST_OBJECT_TYPEID;
 
 #define CLASS_INLET_MAX 255
 #define CLASS_TYPEID_MAX ((1 << 23) - 1)
@@ -65,7 +65,7 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 
   cl->name = name;
   cl->instantiate_fun = instantiate_fun;
-  cl->typeid = typeid++;
+  cl->type_id = type_id++;
 
   fts_class_set_hash_function( cl, default_hash_function);
   fts_class_set_equals_function( cl, default_equals_function);
@@ -642,7 +642,7 @@ void fts_kernel_class_init( void)
   fts_class_class->head.cl = fts_class_class;
   fts_class_class->name = NULL;
   fts_class_class->instantiate_fun = class_class_instantiate;
-  fts_class_class->typeid = typeid++;
+  fts_class_class->type_id = type_id++;
 
   fts_class_class->size = sizeof( fts_class_t);
   fts_class_class->heap = heap;

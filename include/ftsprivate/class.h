@@ -31,7 +31,7 @@
 #define FTS_TYPEID_POINTER  5
 #define FTS_TYPEID_STRING   6
 
-#define fts_class_get_typeid(CL) ((CL)->typeid)
+#define fts_class_get_typeid(CL) ((CL)->type_id)
 
 /* the class of 'class' objects */
 extern fts_class_t *fts_class_class;
