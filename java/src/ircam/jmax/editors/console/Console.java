@@ -40,7 +40,6 @@ public class Console extends Panel{
 
     itsKeyListener = new ConsoleKeyListener(this);
     itsTextArea.addKeyListener(itsKeyListener);
-    itsTextArea.addKeyListener(itsKeyListener);
     itsTextArea.addMouseListener(new ConsoleMouseListener(this));
     /*This was the first trial to see if we could insert swing objects... it worked
       Panel aPanel = new Panel();

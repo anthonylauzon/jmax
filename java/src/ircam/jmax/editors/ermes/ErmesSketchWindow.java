@@ -58,6 +58,18 @@ public class ErmesSketchWindow extends JFrame implements MaxWindow, KeyListener,
   public Vector itsSubWindowList;
   Vector itsWindowMenuList;
 
+  //********************************************************** //
+  //START of the transformation of SketchWindow in a MaxEditor //
+  //********************************************************** //
+
+  public abstract boolean CustomMenuActionPerformed(MenuItem theMenuItem, String theString);
+  public abstract boolean CustomMenuItemStateChanged(CheckboxMenuItem theMenuItem, String theString);
+  public abstract MaxDocument GetDocument();
+  public abstract void SetupMenu();
+  //**********************************************************//
+  // END of the transormation                                 //
+  //**********************************************************//
+
     //--------------------------------------------------------
     //	CONSTRUCTOR
     //
