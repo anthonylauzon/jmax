@@ -59,5 +59,10 @@ $(LIBDIR)/%.so : $(LIBDIR)/%.a
 endif
 endif
 
+ifeq ($(VENDOR),solaris2)
+$(LIBDIR)/%.so : $(OBJECTS)
+	ld $(FTS_SOFLAGS) -o $@ $(LD_ALL_FLAG) $+ $(LD_NONE_FLAG) $(MORESOLIBS) -lc -lm
+endif
+
 
 
