@@ -66,42 +66,25 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     class SequenceScrollDragAction implements ActionListener
     {
 	SequencePanel sequencePanel;
-	//Event event;
-	private int delta = 10;
+	private int delta = 2;
 	private int count = 0;
 	int x, y;
 	public void actionPerformed(ActionEvent ae)
 	{
-	    /*int time = (int)event.getTime();//verson 1
-	      if(sequencePanel.scrollBy(time))
-	      
-	      event.setTime(time+delta);
-	      else
-	      event.setTime(time-delta);*/
-	    
-	    /*int time = (int)event.getTime();//version 2
-	      if(sequencePanel.scrollBy(x, y))
-	      event.setTime(time+delta);
-	      else
-	      event.setTime(time-delta);*/
-
 	    if(sequencePanel.scrollBy(x, y))
-		count = count+delta;
+		delta = 2;
 	    else
-		count = count-delta;
+		delta = -2;
+
+	    count += delta;
+	    //getStartingPoint().x += delta;
+	    updateStart(-delta, 0);
+	    getListener().updateStartingPoint(-delta, 0);
 	}
 	void setEditor(SequencePanel editor)
 	{
 	    this.sequencePanel = editor;
 	}
-	/*Event getEvent()
-	  {
-	  return event;
-	  }
-	  void setEvent(Event evt)
-	  {
-	  event = evt;
-	  }*/
 	void setXY(int x, int y)
 	{
 	    this.x = x;
@@ -120,7 +103,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     void autoScrollIfNeeded(int x, int y)
     {
 	SequencePanel panel = (SequencePanel)((Sequence)gc.getFrame()).getEditor();
-	//if (! panel.eventIsVisible(tempEvent))
 	if (! panel.pointIsVisible(x , y))
 	{
 	    scroller.setXY(x, y);
@@ -128,7 +110,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 		{
 		    scroller.setEditor(panel);
 		    scroller.resetCount();
-		    //scroller.setEvent(tempEvent);
 		    scrollTimer.start();
 		}
 	}
@@ -138,7 +119,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 		    {
 			scrollTimer.stop();
 		    }
-		//moveTo(x, y);
 	    }
     }
 
@@ -213,13 +193,8 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     public void mouseReleased(MouseEvent e)
     {
 	if (scrollTimer.isRunning())
-	{
 	    scrollTimer.stop();
-	    scroller.resetCount();
-	    //PartitionAdapter a = (PartitionAdapter)(getGc().getAdapter());
-	    //Event evt = scroller.getEvent();
-	    //a.setX(/*evt*/tempEvent, a.getX(tempEvent)+scroller.getCount());
-	}
+	scroller.resetCount();
 	super.mouseReleased(e);
     }
 
@@ -242,8 +217,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
       if(!scrollTimer.isRunning())
 	  super.mouseDragged(e);
       
-      System.err.println("count "+scroller.getCount());
-
       autoScrollIfNeeded(e.getX(), e.getY());
   }
 
@@ -282,7 +255,7 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-		a.setX(tempEvent, a.getX(movTrackEvent)+dx);
+		a.setX(tempEvent, a.getX(movTrackEvent) + dx /*+ scroller.getCount()*/);
 	    
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 	      a.setY(tempEvent, a.getY(movTrackEvent)+dy);
@@ -304,6 +277,17 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     previousY = dy;
     g.dispose();
   }
+
+    void updateStart(int deltaX, int deltaY)
+    {
+	itsStartingPoint.x+=deltaX;
+	itsXORHandler.updateBegin(deltaX, deltaY);
+    }
+
+    DragListener getListener()
+    {
+	return itsListener;
+    }
 
     SequenceGraphicContext getGc()
     {

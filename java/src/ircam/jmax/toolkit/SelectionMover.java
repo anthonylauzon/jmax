@@ -71,6 +71,7 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
     itsXORHandler.beginAt(x, y);
     InteractionSemaphore.lock();
   }
+  
 
   /**
    * overrides InteractionModule.mouseDragged()
@@ -118,11 +119,9 @@ abstract public class SelectionMover extends InteractionModule implements XORPai
    */
   abstract public void XORDraw(int dx, int dy);
 
-    
-
   //---- Fields
-  DragListener itsListener;
-  XORHandler itsXORHandler;  
+  protected DragListener itsListener;
+  protected XORHandler itsXORHandler;  
   protected int previousX;
   protected int previousY;
 

@@ -115,6 +115,8 @@ public class PencilTool extends TableTool implements DynamicDragListener {
     getGc().getDataModel().endUpdate();
   }
 
+  public void updateStartingPoint(int deltaX, int deltaY){}
+
   /** set the value of a point in the model */
   private void setPoint(int x, int y)
   {

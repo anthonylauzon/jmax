@@ -39,6 +39,7 @@ public interface DragListener {
    * informs that the drag ended at the point x,y
    */
   public abstract void dragEnd(int x, int y);
+  public abstract void updateStartingPoint(int deltaX, int deltaY);
 }
 
 

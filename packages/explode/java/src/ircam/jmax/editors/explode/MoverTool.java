@@ -118,6 +118,12 @@ public class MoverTool extends Tool implements PositionListener, DragListener {
     gc.getGraphicDestination().repaint();    
   }
 
+  public void updateStartingPoint(int deltaX, int deltaY)
+  {
+    startingPoint.x+=deltaX;
+    startingPoint.y+=deltaY;
+  }
+
   //------------ Fields
   MouseTracker itsMouseTracker;
   SelectionMover itsSelectionMover;

@@ -108,6 +108,11 @@ public class VResizerTool extends SelecterTool implements DragListener {
 
   }
 
+  public void updateStartingPoint(int deltaX, int deltaY)
+  {
+    startingPoint.x+=deltaX;
+    startingPoint.y+=deltaY;
+  }
 
   //------------ Fields
   SelectionResizer itsSelectionResizer;

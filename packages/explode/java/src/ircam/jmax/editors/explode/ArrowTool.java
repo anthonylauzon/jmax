@@ -162,6 +162,11 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
     gc.getGraphicDestination().repaint();    
   }
 
+  public void updateStartingPoint(int deltaX, int deltaY)
+  {
+    startingPoint.x+=deltaX;
+    startingPoint.y+=deltaY;
+  }
 
   //---Fields
 

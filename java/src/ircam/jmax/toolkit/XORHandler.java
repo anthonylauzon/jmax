@@ -73,6 +73,13 @@ public class XORHandler {
     updated = true;
   }
 
+  public void updateBegin(int deltaX, int deltaY)
+    {
+	firstX+=deltaX;
+	firstY+=deltaY;
+	updated = true;
+    }
+
   /**
    * communicates that the point has moved
    */
