@@ -70,7 +70,9 @@ sync
 package require system
 package require guiobj
 
-#
+# load tutorials
+sourceFile $jmaxRootDir/tutorials/basics/project.env
+
 # load installation default packages
 # Use sourceFile as a protection against user errors
 #

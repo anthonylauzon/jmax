@@ -37,4 +37,6 @@ FTS_API void fts_do_recompute_errors(void);
 FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
 FTS_API void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
 
+extern fts_symbol_t fts_object_get_error(fts_object_t *obj);
+
 #endif

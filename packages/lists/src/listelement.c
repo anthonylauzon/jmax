@@ -37,51 +37,49 @@ listelement_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   listelement_t *this = (listelement_t *)o;
 
-  this->index = fts_get_long(at);
+  this->index = fts_get_number_int(at);
 }
 
 static void
 listelement_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listelement_t *this = (listelement_t *)o;
-  int i;
+  int i = this->index;
 
-  i = this->index;
-
-  if(ac > i)
-    {
-      if (!fts_is_void(at + i))
-	fts_outlet_send(o, 0, fts_type_get_selector(fts_get_type(at + i)), 1, at + i);
-    }
+  if(i < ac && !fts_is_void(at + i))
+    fts_outlet_send(o, 0, fts_get_selector(at + i), 1, at + i);
 }
 
 static void
 listelement_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  listelement_index(o, 0, 0, 1, at+1);
+  listelement_t *this = (listelement_t *)o;
+
+  ac--;
+  at++;
+
+  if(ac == 0)
+    this->index = 0;
+  else if(ac > 0 && fts_is_number(at))
+    this->index = fts_get_number_int(at);
+  else
+    fts_object_set_error(o, "First argument of number required");
 }
 
 static fts_status_t
 listelement_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(listelement_t), 2, 1, 0); 
 
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listelement_init);
 
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, listelement_init, 2, a);
-
-  /* define the methods */
-
+  fts_method_define_varargs(cl, 0, fts_s_int, listelement_list);
+  fts_method_define_varargs(cl, 0, fts_s_float, listelement_list);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, listelement_list);
   fts_method_define_varargs(cl, 0, fts_s_list, listelement_list);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, listelement_index, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, listelement_index);
+  fts_method_define_varargs(cl, 1, fts_s_float, listelement_index);
 
   return fts_Success;
 }
@@ -92,3 +90,8 @@ listelement_config(void)
   fts_class_install(fts_new_symbol("listelement"), listelement_instantiate);
   fts_class_alias(fts_new_symbol("lelem"), fts_new_symbol("listelement"));
 }
+
+
+
+
+

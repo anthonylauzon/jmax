@@ -293,16 +293,27 @@ static void
 display_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
-  int i;
-
-  this->string[0] = '{';
-  this->string[1] = '\0';
-  append_atom(this->string, at);
-
-  for(i=1; i<ac; i++)
-    append_blank_and_atom(this->string, at + i);
-
-  append_char(this->string, '}');
+  
+  if(ac == 0)
+    {
+      /* empty list */
+      this->string[0] = '{';
+      this->string[1] = '}';
+      this->string[2] = '\0';
+    }
+  else
+    {
+      int i;
+      
+      this->string[0] = '{';
+      this->string[1] = '\0';
+      append_atom(this->string, at);
+      
+      for(i=1; i<ac; i++)
+	append_blank_and_atom(this->string, at + i);
+      
+      append_char(this->string, '}');
+    }
 
   display_deliver(this);
 }

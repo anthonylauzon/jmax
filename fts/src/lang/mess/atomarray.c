@@ -27,112 +27,142 @@
 #include <fts/sys.h>
 #include <fts/lang/mess.h>
 
-/* local */
-static void list_realloc(fts_list_t *array, int size)
+/************************************************
+ *
+ *  list utils
+ *
+ */
+ 
+#define LIST_ALLOC_BLOCK 64
+
+void
+fts_list_set_size(fts_list_t *list, int size)
 {
-  int i;
+  int alloc = list->alloc;
 
-  if(size > array->alloc)
+  if(size > alloc)
     {
-      if(array->alloc)
-	array->atoms = (fts_atom_t *)fts_realloc((void *)array->atoms, sizeof(fts_atom_t) * size);
-      else
-	array->atoms = (fts_atom_t *)fts_malloc(sizeof(fts_atom_t) * size);
+      fts_atom_t *new_atoms;
+      int i;
 
-      array->alloc = size;
+      while(alloc < size)
+	alloc += LIST_ALLOC_BLOCK;
+
+      new_atoms = fts_block_alloc(alloc * sizeof(fts_atom_t));
+
+      if(alloc)
+	{
+	  /* copy old content */
+	  for(i=0; i<list->size; i++)
+	    new_atoms[i] = list->atoms[i];
+	
+	  fts_block_free(list->atoms, list->alloc * sizeof(fts_atom_t));
+	}
+
+      /* void newly allocated region */
+      for(i=list->size; i<alloc; i++)
+	fts_set_void(new_atoms + i);
+      
+      list->atoms = new_atoms;
+      list->size = size;
+      list->alloc = alloc;
     }
   else
     {
-      /* if shorter, void atoms at the end (release references) */
-      for(i=size; i<array->size; i++)
+      int i;
+
+      if(size < 0)
+	size = 0;
+
+      /* void region cut off at end */
+      for(i=size; i<list->size; i++)
 	{
-	  fts_atom_t *atom = array->atoms + i;
-	  
-	  fts_set_void(atom);
+	  fts_atom_t *ap = list->atoms + i;
+	  fts_atom_void(ap);
 	}
+
+      list->size = size;
     }
-  
-  array->size = size;
 }
 
-/* new/delete */
+void
+fts_list_init(fts_list_t *list, int ac, const fts_atom_t *at)
+{
+  int i;
+
+  list->atoms = 0;
+  list->size = 0;
+  list->alloc = 0;
+
+  fts_list_set_size(list, ac);
+
+  for(i=0; i<ac; i++)
+    fts_atom_assign(list->atoms + i, at + i);
+}
 
 fts_list_t *
 fts_list_new(int ac, const fts_atom_t *at)
 {
-  fts_list_t *array;
-  int i;
+  fts_list_t *list = (fts_list_t *)fts_malloc(sizeof(fts_list_t));
 
-  array = (fts_list_t *)fts_malloc(sizeof(fts_list_t));
+  fts_list_init(list, ac, at);
 
-  if(ac > 0)
-    {
-      int i;
-      array->atoms = (fts_atom_t *) fts_malloc(ac * sizeof(fts_atom_t));
-      array->size = ac;
-      
-      for(i=0; i<ac; i++)
-	fts_set_void(array->atoms + i);
-    }
-  else
-    {
-      array->atoms = 0;
-      array->size = 0;
-    }
+  return list;
+}
 
-  array->alloc = ac;
-
-  /* fill it */
-  for(i=0; i<ac; i++)
-    array->atoms[i] = at[i];
-
-  return array;
+void
+fts_list_reset(fts_list_t *list)
+{
+  fts_list_set_size(list, 0);
+  fts_block_free(list->atoms, list->alloc * sizeof(fts_atom_t));
 }
 
 void 
-fts_list_delete(fts_list_t *array)
+fts_list_delete(fts_list_t *list)
 {
-  fts_list_void(array);
-
-  if (array->atoms)
-    fts_free((void *)array->atoms);
-
-  fts_free((void *)array);
+  fts_list_reset(list);
+  fts_free((void *)list);
 }
 
-/* copy & void */
+void
+fts_list_set(fts_list_t *list, int ac, const fts_atom_t *at)
+{
+  int i;
+ 
+  fts_list_set_size(list, ac);
+
+  for(i=0; i<ac; i++)
+    {
+      fts_atom_t *ap = list->atoms + i;
+      
+      fts_atom_assign(ap, at + i);
+    }
+}
+
+void
+fts_list_append(fts_list_t *list, int ac, const fts_atom_t *at)
+{
+  int size = list->size;
+  int i;
+ 
+  fts_list_set_size(list, size + ac);
+
+  for(i=0; i<ac; i++)
+    {
+      fts_atom_t *ap = list->atoms + size + i;
+      
+      fts_atom_assign(ap, at + i);
+    }
+}
+
 void
 fts_list_copy(fts_list_t *in, fts_list_t *out)
 {
   int i;
-  list_realloc(out, in->size);
+
+  fts_list_set_size(out, in->size);
   
   for(i=0; i<in->size; i++)
-    out->atoms[i] = in->atoms[i];
-}
-
-void
-fts_list_void(fts_list_t *array)
-{
-  int i;
-  
-  for(i=0; i<array->size; i++)
-    {
-      fts_atom_t *atom = array->atoms + i;
-      fts_set_void(atom);
-    }
-}
-
-/* set the size of the array */
-void
-fts_list_set_size(fts_list_t *array, int size)
-{
-  int old_size = array->size;
-  int i;
-
-  list_realloc(array, size);
-
-  /* if longer, set new atoms at the end to void */
-  for(i=old_size; i<size; i++)
-    fts_set_void(array->atoms + i);
+    fts_atom_assign(out->atoms + i, in->atoms + i);
+    
 }

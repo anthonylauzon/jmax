@@ -157,30 +157,17 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
 	}
       else
 	{
-	  fts_atom_t error_prop;
+	  fts_symbol_t error = fts_object_get_error(obj);
 
-	  fts_object_get_prop(obj, fts_s_error, &error_prop);
-
-	  if(!fts_is_void(&error_prop))
+	  if(error)
 	    {
-	      fts_atom_t error_description_prop;
-
-	      fts_object_get_prop(obj, fts_s_error_description, &error_description_prop);
-	      
 	      /* free already allocated */
 	      fts_object_free(obj);
 	      
 	      /* return NULL */
 	      *ret = 0;
-	  
-	      if(fts_is_symbol(&error_description_prop))
-		{
-		  fts_symbol_t error_description = fts_get_symbol(&error_description_prop);
-	      
-		  return fts_new_status(fts_symbol_name(error_description));
-		}
-	      else
-		return &fts_CannotInstantiate;
+
+	      return fts_new_status(fts_symbol_name(error));
 	    }
 	}
     }

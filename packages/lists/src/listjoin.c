@@ -25,7 +25,6 @@
  */
 
 #include <fts/fts.h>
-#include "list.h"
 
 /*********************************************
  *
@@ -36,8 +35,8 @@
 typedef struct 
 {
   fts_object_t o;
-  list_t out;
-  list_t store;
+  fts_list_t out;
+  fts_list_t right;
 } listjoin_t;
 
 static void
@@ -45,11 +44,11 @@ listjoin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  list_init(&this->out);
-  list_init(&this->store);
+  ac--;
+  at++;
 
-  if(ac > 1)
-    list_set(&this->store, ac - 1, at + 1);
+  fts_list_init(&this->out, 0, 0);
+  fts_list_init(&this->right, ac, at);
 }
 
 static void
@@ -57,8 +56,8 @@ listjoin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  list_free(&this->out);
-  list_free(&this->store);
+  fts_list_reset(&this->out);
+  fts_list_reset(&this->right);
 }
 
 /*********************************************
@@ -68,40 +67,39 @@ listjoin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-listjoin_store_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+listjoin_set_right_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listjoin_t *this = (listjoin_t *)o;
 
-  list_set(&this->store, ac, at);
+  fts_list_set(&this->right, ac, at);
 }
 
 static void
 listjoin_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listjoin_t *this = (listjoin_t *)o;
-  int store_size = list_get_size(&this->store);
-  int total_size = store_size + ac;
+  int right_size = fts_list_get_size(&this->right);
+  int total_size = right_size + ac;
 
-  list_raw_resize(&this->out, total_size);
-  list_raw_set(&this->out, 0, ac, at);
-  list_raw_set(&this->out, ac, store_size, list_get_ptr(&this->store));
-
-  fts_outlet_send(o, 0, fts_s_list, total_size, list_get_ptr(&this->out));
+  fts_list_set_size(&this->out, total_size);
+  fts_list_set(&this->out, ac, at);
+  fts_list_append(&this->out, right_size, fts_list_get_ptr(&this->right));
+  
+  fts_outlet_send(o, 0, fts_s_list, total_size, fts_list_get_ptr(&this->out));
 }
-
 
 static void
 listjoin_prepend(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listjoin_t *this = (listjoin_t *)o;
-  int store_size = list_get_size(&this->store);
-  int total_size = store_size + ac;
+  int right_size = fts_list_get_size(&this->right);
+  int total_size = right_size + ac;
 
-  list_raw_resize(&this->out, total_size);
-  list_raw_set(&this->out, 0, store_size, list_get_ptr(&this->store));
-  list_raw_set(&this->out, store_size, ac, at);
+  fts_list_set_size(&this->out, total_size);
+  fts_list_set(&this->out, right_size, fts_list_get_ptr(&this->right));
+  fts_list_append(&this->out, ac, at);
 
-  fts_outlet_send(o, 0, fts_s_list, total_size, list_get_ptr(&this->out));
+  fts_outlet_send(o, 0, fts_s_list, total_size, fts_list_get_ptr(&this->out));
 }
 
 /*********************************************
@@ -113,22 +111,21 @@ listjoin_prepend(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 listjoin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  /* initialization */
   fts_class_init(cl, sizeof(listjoin_t), 2, 1, 0); 
 
-  /* system methods */
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listjoin_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, listjoin_delete);
-
-  /* user methods */
-  fts_method_define_varargs(cl, 1, fts_s_list, listjoin_store_list);
 
   if(fts_get_symbol(at) == fts_new_symbol("listappend"))
     fts_method_define_varargs(cl, 0, fts_s_list, listjoin_append);
   else
     fts_method_define_varargs(cl, 0, fts_s_list, listjoin_prepend);
 
-  /* outlet */
+  fts_method_define_varargs(cl, 1, fts_s_int, listjoin_set_right_list);
+  fts_method_define_varargs(cl, 1, fts_s_float, listjoin_set_right_list);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, listjoin_set_right_list);
+  fts_method_define_varargs(cl, 1, fts_s_list, listjoin_set_right_list);
+
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
 
   return fts_Success;

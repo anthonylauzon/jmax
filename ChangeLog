@@ -1,3 +1,12 @@
+2001-07-24  Norbert Schnell  <schnell@ligeti.ircam.fr>
+
+	* changed messtab to a double (int/symbol) hashtable and
+	added putmess and getmess classes
+
+	* changed messconst (package guiobj) to use the message class
+	
+	* added message class with list constructor (init)
+
 2001-07-24  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* fixed invalid license header in some Java files.

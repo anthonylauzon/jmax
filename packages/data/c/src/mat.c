@@ -71,10 +71,7 @@ set_size(mat_t *mat, int m, int n)
 	{
 	  fts_atom_t *ap = mat->data + i;
 
-	  if(fts_is_object(ap))
-	    fts_release(ap);
-
-	  fts_set_void(ap);
+	  fts_atom_void(ap);
 	}
       
       if(size > 0)
@@ -125,10 +122,7 @@ mat_set_size(mat_t *mat, int m, int n)
 	{
 	  fts_atom_t *ap = mat->data + i;
 
-	  if(fts_is_object(ap))
-	    fts_release(ap);
-
-	  fts_set_void(ap);
+	  fts_atom_void(ap);
 	}
       
       mat->m = m;
@@ -141,13 +135,7 @@ mat_set_element(mat_t *mat, int i, int j, fts_atom_t value)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
   
-  if(fts_is_object(ap))
-    fts_release(ap);
-
-  *ap = value;
-
-  if(fts_is_object(&value))
-    fts_refer(&value);
+  fts_atom_assign(ap, &value);
 }
 
 extern void
@@ -155,10 +143,7 @@ mat_void_element(mat_t *mat, int i, int j)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
   
-  if(fts_is_object(ap))
-    fts_release(ap);
-
-  fts_set_void(ap);
+  fts_atom_void(ap);
 }
 
 void
@@ -173,13 +158,7 @@ mat_set_const(mat_t *mat, fts_atom_t value)
     {
       fts_atom_t *ap = mat->data + i;
 
-      if(fts_is_object(ap))
-	fts_release(ap);
-
-      *ap = value;
-      
-      if(refer)
-	fts_refer(&value);
+      fts_atom_assign(ap, &value);
     }
 }
 
@@ -193,10 +172,7 @@ mat_void(mat_t *mat)
     {
       fts_atom_t *ap = mat->data + i;
 
-      if(fts_is_object(ap))
-	fts_release(ap);
-
-      fts_set_void(ap); /* void atom */
+      fts_atom_void(ap);
     }
 }
 
@@ -213,15 +189,7 @@ mat_set_from_atom_list(mat_t *mat, int onset, int ac, const fts_atom_t *at)
     ac = size - onset;
   
   for(i=0; i<ac; i++)
-    {
-      if(fts_is_object(ap))
-	fts_release(ap);
-      
-      *ap++ = at[i];
-      
-      if(fts_is_object(at + i))
-	fts_refer(at + i);	
-    }
+    fts_atom_assign(ap, at + i);
 }
 
 void
@@ -246,13 +214,7 @@ mat_set_from_lists(mat_t *mat, int ac, const fts_atom_t *at)
 	      fts_atom_t *matp = mat->data + i * n + j;
 	      fts_atom_t *aap = &fts_list_get_element(aa, j);
 	    
-	      if(fts_is_object(matp))
-		fts_release(matp);
-	      
-	      *matp = *aap;
-	      
-	      if(fts_is_object(aap))
-		fts_refer(aap);	
+	      fts_atom_assign(matp, aap);
 	    }
 	}
       else

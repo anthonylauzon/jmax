@@ -178,3 +178,24 @@ void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...)
   va_end(ap);
   post("error: %s\n", buf);
 }
+
+fts_symbol_t
+fts_object_get_error(fts_object_t *obj)
+{
+  fts_atom_t error_prop;
+  
+  fts_object_get_prop(obj, fts_s_error, &error_prop);
+  
+  if(fts_is_int(&error_prop) && fts_get_int(&error_prop) == 1)
+    {
+      fts_atom_t error_description_prop;
+      
+      fts_object_get_prop(obj, fts_s_error_description, &error_description_prop);
+      
+      if(fts_is_symbol(&error_description_prop))
+	return fts_get_symbol(&error_description_prop);
+    }
+
+  return 0;
+}
+	  

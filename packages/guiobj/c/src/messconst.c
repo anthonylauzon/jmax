@@ -20,26 +20,14 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Francois Dechelled, Norbert Schnell.
  *
  */
 
-
 #include <fts/fts.h>
+#include "message.h"
 
 #define MESSCONST_FLASH_TIME 125.0f
-
-static int 
-is_token(fts_symbol_t s)
-{
-  return ((s == fts_s_dot) ||
-	  (s == fts_s_comma) ||
-	  (s == fts_s_semi) ||
-	  (s == fts_s_column) ||
-	  (s == fts_s_double_colon) ||
-	  (s == fts_s_quote) ||
-	  (s == fts_s_comma));
-}
 
 /************************************************
  *
@@ -51,25 +39,12 @@ typedef struct
 {
   fts_object_t o;
 
-  fts_symbol_t s;
-  int ac;
-  fts_atom_t *at;
+  message_t *mess;
   
   /* blink when click */
   int value; 
   fts_alarm_t alarm;
 } messconst_t;
-
-/************************************************
- *
- *  single message
- *
- */
- 
-static void
-messconst_set(messconst_t *mess, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-}
 
 /************************************************
  *
@@ -87,7 +62,7 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   fts_alarm_set_delay(&this->alarm, MESSCONST_FLASH_TIME);
 
-  fts_outlet_send(o, 0, this->s, this->ac, this->at);
+  fts_outlet_send(o, 0, message_get_selector(this->mess), message_get_ac(this->mess), message_get_at(this->mess));
 }
 
 static void
@@ -95,7 +70,7 @@ messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   messconst_t *this = (messconst_t *)o;
 
-  fts_outlet_send(o, 0, this->s, this->ac, this->at);
+  fts_outlet_send(o, 0, message_get_selector(this->mess), message_get_ac(this->mess), message_get_at(this->mess));
 }
 
 /************************************************
@@ -157,116 +132,36 @@ messconst_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac
  *
  */
 
-static int
-messconst_check_message(int ac, const fts_atom_t *at, fts_symbol_t *mess_s, int *mess_ac, const fts_atom_t **mess_at)
-{
-  if(ac > 0)
-    {
-      int i;
-
-      for(i=0; i<ac; i++)
-	{
-	  fts_symbol_t s = fts_get_symbol(at + i);
-
-	  if(is_token(s))
-	    return 0;
-	}
-
-      if(ac == 1)
-	{
-	  if(fts_is_list(at))
-	    {
-	      /* list format: "{" [<value> ...] "}" (mandatory braces!) */
-	      fts_list_t *aa = fts_get_list(at);
-
-	      *mess_s = fts_s_list;
-	      *mess_ac = fts_list_get_size(aa);
-	      *mess_at = fts_list_get_ptr(aa);
-
-	      return 1;
-	    }
-	  else if(!fts_is_symbol(at))
-	    {
-	      /* value format: <value> (without type specifyer - selector is added from atom type) */
-	      
-	      *mess_s = fts_get_selector(at);
-	      *mess_ac = 1;
-	      *mess_at = at;
-	      
-	      return 1;
-	    }
-	}
-      else if(fts_is_int(at) || fts_is_float(at))
-	{
-	  *mess_s = fts_s_list;
-	  *mess_ac = ac;
-	  *mess_at = at;
-	    
-	  return 1;
-	}
-      else if(!fts_is_symbol(at))
-	return 0;
-
-      /* message format: <selector> [<value> ...] (any message - type specifyers are not allowed as selectors) */
-      {
-	fts_symbol_t s = fts_get_symbol(at);
-	fts_class_t *cl;
-	
-	if(fts_atom_type_lookup(s, &cl))
-	  return 0;
-	else
-	  {
-	    *mess_s = s;
-	    *mess_ac = ac - 1;
-	    *mess_at = at + 1;
-	    
-	    return 1;
-	  }
-      }
-    }
-  
-  return 0;
-}
-
 static void
 messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
-  fts_symbol_t mess_s;
-  int mess_ac;
-  const fts_atom_t *mess_at;
-
+  
   ac--;
   at++;
 
-  this->s = 0;
-  this->ac = 0;
-  this->at = 0;
-  this->value = 0;
-  fts_alarm_init(&(this->alarm), 0, messconst_tick, this);
-
-  if(messconst_check_message(ac, at, &mess_s, &mess_ac, &mess_at))
+  if(ac > 0)
     {
-      int i;
+      message_t *mess = (message_t *)fts_object_create(message_class, ac, at);
+      fts_symbol_t error = fts_object_get_error((fts_object_t *)mess);
       
-      this->s = mess_s;
-      
-      if(ac > 0)
+      if(!error)
 	{
-	  this->ac = mess_ac;
-	  this->at = fts_malloc(sizeof(fts_atom_t) * mess_ac);
+	  fts_object_refer((fts_object_t *)mess);
+
+	  this->mess = mess;
+	  
+	  this->value = 0;
+	  fts_alarm_init(&(this->alarm), 0, messconst_tick, this);
 	}
       else
 	{
-	  this->ac = 0;
-	  this->at = 0;
+	  fts_object_destroy((fts_object_t *)mess);
+	  fts_object_set_error(o, "%s", fts_symbol_name(error));
 	}
-      
-      for(i=0; i<mess_ac; i++)
-	this->at[i] = mess_at[i];
     }
   else
-    fts_object_set_error(o, "Syntax error in message or constant");
+    fts_object_set_error(o, "Empty message or constant");
 }
 
 static void
@@ -274,8 +169,7 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   messconst_t *this = (messconst_t *)o;
 
-  if(this->ac)
-    fts_free(this->at);
+  fts_object_release((fts_object_t *)this->mess);
 
   fts_alarm_reset(&(this->alarm));
 }

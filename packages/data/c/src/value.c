@@ -40,13 +40,7 @@ fts_class_t *value_class = 0;
 void
 value_set(value_t *this, fts_atom_t a)
 {
-  if(fts_is_object(&this->a))
-    fts_release(&this->a);
-  
-  this->a = a;
-  
-  if(fts_is_object(&a))
-    fts_refer(&a);
+  fts_atom_assign(&this->a, &a);
 }
 
 static void
@@ -57,9 +51,9 @@ value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(fts_is_object(&out))
     {
-      fts_refer(&out);
+      fts_atom_refer(&out);
       fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-      fts_release(&out);
+      fts_atom_release(&out);
     }
   else if(!fts_is_void(&this->a))
     fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
@@ -86,10 +80,7 @@ value_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   value_t *this = (value_t *)o;
 
-  if(fts_is_object(&this->a))
-    fts_release(&this->a);
-
-  fts_set_void(&this->a);
+  fts_atom_void(&this->a);
 }
 
 static void

@@ -26,6 +26,7 @@
 
 #include <fts/fts.h>
 
+#define MAXINT 2147483647
 
 typedef struct 
 {
@@ -34,16 +35,12 @@ typedef struct
   int length;
 } listsublist_t;
 
-
 static void
 listsublist_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   listsublist_t *this = (listsublist_t *)o;
-  int n;
-
-  if(!ac) return;
-
-  n = (this->index + this->length <= ac)? this->length: ac - this->index;
+  int n = (this->index + this->length <= ac)? this->length: ac - this->index;
+  int i = this->index;
 
   if(n > 0 && this->index < ac)
     fts_outlet_send(o, 0, fts_s_list, n, at + this->index);
@@ -54,7 +51,7 @@ listsublist_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   listsublist_t *this = (listsublist_t *)o;
 
-  this->index = fts_get_long(at);
+  this->index = fts_get_number_int(at);
 }
 
 static void
@@ -62,42 +59,45 @@ listsublist_length(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   listsublist_t *this = (listsublist_t *)o;
 
-  this->length = fts_get_long(at);
+  this->length = fts_get_number_int(at);
 }
 
 static void
 listsublist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  listsublist_index(o, 0, 0, 1, at + 1);
-  listsublist_length(o, 0, 0, 1, at + 2);  
+  listsublist_t *this = (listsublist_t *)o;
+
+  ac--;
+  at++;
+
+  this->index = 0;
+  this->length = MAXINT;
+
+  if(ac == 1 && fts_is_number(at))
+    this->length = fts_get_number_int(at);
+  else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+    {
+      this->index = fts_get_number_int(at);
+      this->length = fts_get_number_int(at + 1);
+    }
+  else
+    fts_object_set_error(o, "Two arguments of number required");
 }
 
 static fts_status_t
 listsublist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(listsublist_t), 3, 1, 0); 
 
-  /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_int;
-  a[2] = fts_s_int;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, listsublist_init, 3, a);
-
-  /* define the system methods */
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, listsublist_init);
 
   fts_method_define_varargs(cl, 0, fts_s_list, listsublist_list);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 1, fts_s_int, listsublist_index, 1, a);
-  a[0] = fts_s_int;
-  fts_method_define(cl, 2, fts_s_int, listsublist_length, 1, a);
+  fts_method_define_varargs(cl, 1, fts_s_int, listsublist_index);
+  fts_method_define_varargs(cl, 1, fts_s_float, listsublist_index);
 
-  /* Type the outlet */
+  fts_method_define_varargs(cl, 2, fts_s_int, listsublist_length);
+  fts_method_define_varargs(cl, 2, fts_s_float, listsublist_length);
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
 

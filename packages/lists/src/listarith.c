@@ -25,18 +25,15 @@
  */
 
 #include <fts/fts.h>
-#include "list.h"
 
 typedef struct 
 {
   fts_object_t o;
-  list_t list;
-  list_t right_list;
+  fts_list_t list;
+  fts_list_t right_list;
   fts_atom_t right_atom;
   fts_symbol_t right_type;
 } listarith_t;
-
-#define LIST_ALLOC_BLOCK 32
 
 /*********************************************
  *
@@ -375,7 +372,7 @@ listarith_set_right_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   listarith_t *this = (listarith_t *)o;
   int i;
 
-  list_set(&this->right_list, ac, at);
+  fts_list_set(&this->right_list, ac, at);
   this->right_type = fts_s_list;
 }
 
@@ -397,23 +394,26 @@ listarith_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, this->right_list.at + i, this->list.at + i);
+	atom_add(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_add(at + i, &this->right_atom, this->list.at + i);
+	atom_add(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
 
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -424,23 +424,26 @@ listarith_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_sub(at + i, this->right_list.at + i, this->list.at + i);
+	atom_sub(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_sub(at + i, &this->right_atom, this->list.at + i);
+	atom_sub(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -451,23 +454,26 @@ listarith_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_mul(at + i, this->right_list.at + i, this->list.at + i);
+	atom_mul(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_mul(at + i, &this->right_atom, this->list.at + i);
+	atom_mul(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
 
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -478,23 +484,26 @@ listarith_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_div(at + i, this->right_list.at + i, this->list.at + i);
+	atom_div(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_div(at + i, &this->right_atom, this->list.at + i);
+	atom_div(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -505,23 +514,26 @@ listarith_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_gt(at + i, this->right_list.at + i, this->list.at + i);
+	atom_gt(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_gt(at + i, &this->right_atom, this->list.at + i);
+	atom_gt(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -532,23 +544,26 @@ listarith_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ge(at + i, this->right_list.at + i, this->list.at + i);
+	atom_ge(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ge(at + i, &this->right_atom, this->list.at + i);
+	atom_ge(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -559,23 +574,26 @@ listarith_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_lt(at + i, this->right_list.at + i, this->list.at + i);
+	atom_lt(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_lt(at + i, &this->right_atom, this->list.at + i);
+	atom_lt(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -586,23 +604,26 @@ listarith_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_le(at + i, this->right_list.at + i, this->list.at + i);
+	atom_le(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_le(at + i, &this->right_atom, this->list.at + i);
+	atom_le(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -613,23 +634,26 @@ listarith_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ne(at + i, this->right_list.at + i, this->list.at + i);
+	atom_ne(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ne(at + i, &this->right_atom, this->list.at + i);
+	atom_ne(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 static void
@@ -640,28 +664,31 @@ listarith_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->right_type == fts_s_list)
     {
-      if(this->right_list.ac < ac)
-	ac = this->right_list.ac;
+      int size = fts_list_get_size(&this->right_list);
+      const fts_atom_t *ptr = fts_list_get_ptr(&this->right_list);
+
+      if(size < ac)
+	ac = size;
       
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ee(at + i, this->right_list.at + i, this->list.at + i);
+	atom_ee(at + i, ptr + i, fts_list_get_ptr(&this->list) + i);
     }
   else
     {
-      list_raw_resize(&this->list, ac);
+      fts_list_set_size(&this->list, ac);
       
       for(i=0; i<ac; i++)
-	atom_ee(at + i, &this->right_atom, this->list.at + i);
+	atom_ee(at + i, &this->right_atom, fts_list_get_ptr(&this->list) + i);
     }
   
-  fts_outlet_send(o, 0, fts_s_list, ac, this->list.at);
+  fts_outlet_send(o, 0, fts_s_list, ac, fts_list_get_ptr(&this->list));
 }
 
 /*********************************************
  *
- *  object
+ *  class
  *
  */
 
@@ -670,14 +697,21 @@ listarith_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   listarith_t *this = (listarith_t *)o;
 
-  list_init(&this->list);
-  list_init(&this->right_list);
+  ac--;
+  at++;
 
-  if(ac == 2)
-    listarith_set_right_atom(o, 0, 0, 1, at + 1);
+  fts_list_init(&this->list, 0, 0);
+  fts_set_void(&this->right_atom);
+
+  if(ac == 1)
+    {
+      if(!fts_is_object(at))
+	listarith_set_right_atom(o, 0, 0, 1, at);
+
+      fts_list_init(&this->right_list, 0, 0);
+    }
   else
-    listarith_set_right_list(o, 0, 0, ac - 1, at + 1);
-
+    fts_list_init(&this->right_list, ac, at);
 }
 
 static void
@@ -685,17 +719,9 @@ listarith_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   listarith_t *this = (listarith_t *)o;
 
-  if(this->list.at)
-    fts_block_free(this->list.at, this->list.alloc);
-  if(this->right_list.at)
-    fts_block_free(this->right_list.at, this->right_list.alloc);
+  fts_list_reset(&this->list);
+  fts_list_reset(&this->right_list);
 }
-
-/*********************************************
- *
- *  class
- *
- */
 
 static fts_status_t
 listarith_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

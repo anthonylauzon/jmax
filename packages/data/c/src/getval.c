@@ -194,9 +194,9 @@ getval_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   if(fts_is_object(&out))
     {
-      fts_refer(&out);
+      fts_atom_refer(&out);
       fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-      fts_release(&out);
+      fts_atom_release(&out);
     }
   else if(!fts_is_void(&out))
     fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
@@ -245,7 +245,7 @@ setval_value_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  */
 
 static void
-getval_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getelem_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
   int size = ivec_get_size((ivec_t *)this->obj);
@@ -256,16 +256,16 @@ getval_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-getval_ivec_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getelem_ivec_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
   this->i = fts_get_number_int(at);
-  getval_ivec(o, 0, 0, 0, 0);
+  getelem_ivec(o, 0, 0, 0, 0);
 }
 
 static void
-getval_ivec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getelem_ivec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
@@ -323,7 +323,7 @@ setval_ivec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-getval_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getelem_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
   int size = fvec_get_size((fvec_t *)this->obj);
@@ -334,16 +334,16 @@ getval_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-getval_fvec_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getelem_fvec_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
   this->i = fts_get_number_int(at);
-  getval_fvec(o, 0, 0, 0, 0);
+  getelem_fvec(o, 0, 0, 0, 0);
 }
 
 static void
-getval_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getelem_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   getelem_vec_t *this = (getelem_vec_t *)o;
 
@@ -357,7 +357,7 @@ getval_fvec_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       if(fts_is_number(at))
 	this->i = fts_get_number_int(at);
     case 0:
-      getval_fvec(o, 0, 0, 0, 0);
+      getelem_fvec(o, 0, 0, 0, 0);
       break;
     }
 }
@@ -414,9 +414,9 @@ getelem_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       
       if(fts_is_object(&out))
 	{
-	  fts_refer(&out);
+	  fts_atom_refer(&out);
 	  fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-	  fts_release(&out);
+	  fts_atom_release(&out);
 	}
       else if(!fts_is_void(&out))
 	fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
@@ -507,9 +507,9 @@ getelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       
       if(fts_is_object(&out))
 	{
-	  fts_refer(&out);
+	  fts_atom_refer(&out);
 	  fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
-	  fts_release(&out);
+	  fts_atom_release(&out);
 	}
       else if(!fts_is_void(&out))
 	fts_outlet_send(o, 0, fts_get_selector(&out), 1, &out);
@@ -636,6 +636,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_bang, getelem_vec);
       fts_method_define_varargs(cl, 0, fts_s_int, getelem_vec_index);
       fts_method_define_varargs(cl, 0, fts_s_float, getelem_vec_index);
+
       fts_method_define_varargs(cl, 1, vec_symbol, getval_set_reference);
     }
   else if(ac >= 2 && ivec_atom_is(at + ac - 1))
@@ -645,11 +646,12 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
       
-      fts_method_define_varargs(cl, 0, fts_s_list, getval_ivec_list);
+      fts_method_define_varargs(cl, 0, fts_s_list, getelem_ivec_list);
       
-      fts_method_define_varargs(cl, 0, fts_s_bang, getval_ivec);
-      fts_method_define_varargs(cl, 0, fts_s_int, getval_ivec_index);
-      fts_method_define_varargs(cl, 0, fts_s_float, getval_ivec_index);
+      fts_method_define_varargs(cl, 0, fts_s_bang, getelem_ivec);
+      fts_method_define_varargs(cl, 0, fts_s_int, getelem_ivec_index);
+      fts_method_define_varargs(cl, 0, fts_s_float, getelem_ivec_index);
+
       fts_method_define_varargs(cl, 1, ivec_symbol, getval_set_reference);
     }
   else if(ac >= 2 && fvec_atom_is(at + ac - 1))
@@ -659,11 +661,12 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, getelem_vec_init);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, getval_delete);
       
-      fts_method_define_varargs(cl, 0, fts_s_list, getval_fvec_list);
+      fts_method_define_varargs(cl, 0, fts_s_list, getelem_fvec_list);
       
-      fts_method_define_varargs(cl, 0, fts_s_bang, getval_fvec);
-      fts_method_define_varargs(cl, 0, fts_s_int, getval_fvec_index);
-      fts_method_define_varargs(cl, 0, fts_s_float, getval_fvec_index);
+      fts_method_define_varargs(cl, 0, fts_s_bang, getelem_fvec);
+      fts_method_define_varargs(cl, 0, fts_s_int, getelem_fvec_index);
+      fts_method_define_varargs(cl, 0, fts_s_float, getelem_fvec_index);
+
       fts_method_define_varargs(cl, 1, fvec_symbol, getval_set_reference);
     }
   else if(ac >= 2 && mat_atom_is(at + ac - 1))
@@ -679,8 +682,10 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_bang, getelem_mat);
       fts_method_define_varargs(cl, 0, fts_s_int, getelem_mat_row);
       fts_method_define_varargs(cl, 0, fts_s_float, getelem_mat_row);
+
       fts_method_define_varargs(cl, 1, fts_s_int, getelem_mat_col);
       fts_method_define_varargs(cl, 1, fts_s_float, getelem_mat_col);
+
       fts_method_define_varargs(cl, 2, mat_symbol, getval_set_reference);
     }
   else

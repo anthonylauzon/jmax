@@ -23,6 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 package require data
+package require mess
 
 ## package declaration
 package provide guiobj

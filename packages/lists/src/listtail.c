@@ -35,23 +35,15 @@ static void
 listtail_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(ac > 1)
-    fts_outlet_send(o, 0, fts_s_list, ac-1, at+1);
+    fts_outlet_send(o, 0, fts_s_list, ac - 1, at + 1);
 }
 
 static fts_status_t
 listtail_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(listtail_t), 1, 1, 0); 
 
-  /* define the methods */
-
   fts_method_define_varargs(cl, 0, fts_s_list, listtail_list);
-
-  /* Type the outlet */
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
 

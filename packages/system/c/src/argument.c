@@ -61,11 +61,9 @@ argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     this->arg = ptr + index;
   else if(ac > 1)
     {
-      this->def = at[1];
-      this->arg = &(this->def);
+      fts_atom_assign(&this->def, at + 1);
 
-      if(fts_is_object(&this->def))
-	fts_refer(&this->def);
+      this->arg = &this->def;
     }
   else
     {
@@ -81,8 +79,7 @@ argument_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   argument_t *this = (argument_t *)o;
 
-  if(fts_is_object(&this->def))
-    fts_release(&this->def);
+  fts_atom_void(&this->def);
 }
 
 static void

@@ -40,20 +40,11 @@ listsize_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 listsize_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  /* initialize the class */
-
   fts_class_init(cl, sizeof(listsize_t), 1, 1, 0); 
-
-  /* list args */
 
   fts_method_define_varargs(cl, 0, fts_s_list, listsize_list);
 
-  /* Type the outlet */
-
-  a[0] = fts_s_int;
-  fts_outlet_type_define(cl, 0,	fts_s_int, 1, a);
+  fts_outlet_type_define_varargs(cl, 0,	fts_s_int);
 
   return fts_Success;
 }

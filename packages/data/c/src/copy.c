@@ -42,8 +42,11 @@ copy_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   copy_t *this = (copy_t *)o;
 
-  this->a = at[1];    
-  fts_refer(at + 1);
+  ac--;
+  at++;
+
+  fts_set_void(&this->a);
+  fts_atom_assign(&this->a, at);
 }
 
 static void
@@ -51,7 +54,7 @@ copy_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   copy_t *this = (copy_t *)o;
 
-  fts_release(&this->a);
+  fts_atom_void(&this->a);
 }
 
 /******************************************************
@@ -65,9 +68,7 @@ copy_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   copy_t *this = (copy_t *)o;
 
-  fts_release(&this->a);
-  this->a = at[0];
-  fts_refer(at);
+  fts_atom_assign(&this->a, at);
 }
 
 /* int vector */

@@ -41,18 +41,21 @@ FTS_API fts_symbol_t fts_s_list;
 FTS_API fts_list_t *fts_list_new(int ac, const fts_atom_t *at);
 FTS_API void fts_list_delete(fts_list_t *this);
 
+FTS_API void fts_list_init(fts_list_t *list, int ac, const fts_atom_t *at);
+FTS_API void fts_list_set(fts_list_t *list, int ac, const fts_atom_t *at);
+FTS_API void fts_list_reset(fts_list_t *list);
+FTS_API void fts_list_set_size(fts_list_t *list, int size);
+
+FTS_API void fts_list_append(fts_list_t *list, int ac, const fts_atom_t *at);
 FTS_API void fts_list_copy(fts_list_t *in, fts_list_t *out);
-FTS_API void fts_list_void(fts_list_t *array);
 
-FTS_API void fts_list_set_size(fts_list_t *array, int size);
-#define fts_list_get_size(array) ((array)->size)
+#define fts_list_get_ptr(l) ((l)->atoms)
+#define fts_list_get_size(l) ((l)->size)
 
-#define fts_list_get_ptr(array) ((array)->atoms)
+#define fts_list_check_index(l, i)  ((i >= 0) && (i < (l)->size))
+#define fts_list_is_empty(l) ((l)->size == 0)
 
-#define fts_list_check_index(array, i)  ((i >= 0) && (i < (array)->size))
-#define fts_list_is_empty(array) ((array)->size == 0)
-
-#define fts_list_get_element(array, index) ((array)->atoms[index])
-#define fts_list_set_element(array, index, value) ((array)->atoms[(index)] = (value))
+#define fts_list_get_element(l, index) ((l)->atoms[index])
+#define fts_list_set_element(l, index, value) ((l)->atoms[(index)] = (value))
 
 #endif

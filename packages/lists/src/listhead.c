@@ -41,12 +41,11 @@ listhead_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 listhead_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
+  fts_class_init(cl, sizeof(listhead_t), 1, 1, 0);
 
-  /* initialize the class */
-  fts_class_init(cl, sizeof(listhead_t), 1, 1, 0); 
-
-  /* define the methods */
+  fts_method_define_varargs(cl, 0, fts_s_int, listhead_list);
+  fts_method_define_varargs(cl, 0, fts_s_float, listhead_list);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, listhead_list);
   fts_method_define_varargs(cl, 0, fts_s_list, listhead_list);
 
   return fts_Success;

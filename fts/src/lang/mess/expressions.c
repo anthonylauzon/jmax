@@ -1598,7 +1598,6 @@ fts_expressions_init(void)
 
   /* function installation */
   fts_expression_declare_fun(fts_new_symbol("unique"), unique);
-  fts_expression_declare_fun(fts_new_symbol("_getElement"), get_array_element);
 
   /* register pseudo constructors for primitive types */
   fts_atom_type_register(fts_s_int, 0);

@@ -149,8 +149,21 @@ FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 #define fts_is_list(ap) (fts_is_a(ap, fts_s_list))
 #define fts_is_object(ap) ((unsigned int)((ap)->type) & 1)
 
-#define fts_refer(ap) (fts_object_refer(fts_get_object(ap)))
-#define fts_release(ap) (fts_object_release(fts_get_object(ap)))
+/* atom that can be objects */
+#define fts_atom_refer(ap) do {if(fts_is_object(ap)) fts_object_refer(fts_get_object(ap));} while(0)
+#define fts_atom_release(ap) do {if(fts_is_object(ap)) fts_object_release(fts_get_object(ap));} while(0)
+
+#define fts_atom_assign_object(ap, o) \
+        do {if(fts_is_object(ap)) fts_atom_release(ap); \
+        fts_set_object((ap), o); fts_object_refer(o);} while(0)
+
+#define fts_atom_assign(a1p, a2p) \
+        do {if(fts_is_object(a1p)) fts_atom_release(a1p); \
+        *(a1p) = *(a2p); \
+        if(fts_is_object(a2p)) fts_atom_refer(a2p);} while(0)
+
+#define fts_atom_void(ap) \
+        do {if(fts_is_object(ap)) fts_atom_release(ap); fts_set_void(ap);} while(0)
 
 /* Convenience macros to deal with type and atom algebra */
 #define fts_same_types(ap1, ap2) (((ap1)->type) == (ap2)->type)

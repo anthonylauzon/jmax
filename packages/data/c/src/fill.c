@@ -43,10 +43,11 @@ fill_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 {
   fill_t *this = (fill_t *)o;
 
-  this->a = at[1];
+  ac--;
+  at++;
 
-  if(fts_is_object(&this->a))
-     fts_refer(&this->a);
+  fts_set_void(&this->a);
+  fts_atom_assign(&this->a, at);
 }
 
 static void
@@ -54,8 +55,7 @@ fill_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   fill_t *this = (fill_t *)o;
 
-  if(fts_is_object(&this->a))
-     fts_release(&this->a);
+  fts_atom_void(&this->a);
 }
 
 /******************************************************
@@ -77,9 +77,7 @@ fill_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   fill_t *this = (fill_t *)o;
 
-  fts_release(&this->a);
-  this->a = at[0];
-  fts_refer(at);
+  fts_atom_assign(&this->a, at);
 }
 
 /* number */

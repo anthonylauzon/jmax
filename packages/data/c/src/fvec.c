@@ -855,7 +855,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
 
       if(size == 0)
-	fts_object_set_error(o, "can't load from file \"%s\"", fts_symbol_name(file_name));
+	fts_object_set_error(o, "Cannot load fvec from file \"%s\"", fts_symbol_name(file_name));
 
       this->keep = fts_s_args;
     }
@@ -867,7 +867,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       this->keep = fts_s_args;
     }
   else
-    fts_object_set_error(o, "Wrong arguments");
+    fts_object_set_error(o, "Wrong arguments for fvec constructor");
 }
 
 static void

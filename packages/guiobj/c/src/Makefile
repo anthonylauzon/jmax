@@ -27,6 +27,6 @@ JMAXDISTDIR = ../../../..
 PACKAGEROOT = ..
 PACKAGELIB=$(LIBDIR)/libguiobj.so
 
-MODULE_CFLAGS=-I../../../data/c/src/
+MODULE_CFLAGS=-I../../../data/c/src/ -I../../../mess/c/src/
 
 include $(JMAXDISTDIR)/Makefiles/Makefile.package

@@ -147,7 +147,7 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  fts_class_t *cl;
 
 	  if(name == fts_s_list)
-	    message_set(this, name, 1, at);
+	    fts_object_set_error(o, "Use { } for lists");
 	  else if(fts_atom_type_lookup(name, &cl))
 	    {
 	      /* constructor format: <class name> [<value> ...] (construct object or primitive type) */
