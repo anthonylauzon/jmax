@@ -44,6 +44,7 @@ class ErmesToolButton extends JToggleButton
   String message;
   ErmesToolBar  toolBar;
   boolean state = false;
+  MediaTracker tracker;
 
   static MouseListener mListener = new MouseListener(){
     public void mouseClicked(MouseEvent e){
@@ -75,26 +76,28 @@ class ErmesToolButton extends JToggleButton
     this.message = message;
     this.toolBar = toolBar;
     
+    tracker = new MediaTracker(this); 
+
     if(Cursors.get(description) == null)
     {
-	ImageObserver observer =  new ImageObserver(){
-		public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
-		{
-		    return true;
-		}
-	    };	
 	Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
-	Toolkit.getDefaultToolkit().prepareImage(image, -1, -1, observer);
-	Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(observer), image.getHeight(observer));
+	tracker.addImage(image, 0);
+	Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
 	BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
-	Toolkit.getDefaultToolkit().prepareImage(bi, bestSize.width, bestSize.height, observer);
-	bi.createGraphics().drawImage(image, 0, 0, observer);
-
-	if((image.getWidth(observer)>0)&&(image.getHeight(observer)>0))
+	tracker.addImage(bi, 1);
+	
+	try
 	    {
+		tracker.waitForAll();
+		
+		bi.createGraphics().drawImage(image, 0, 0, this);
 		Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
 		Cursors.loadCursor(description, cursor);
 	    }
+	catch (InterruptedException e)
+	    {
+		System.err.println("Error loading "+description+" object cursor!");
+	    }	    
     }    
     addMouseListener(ErmesToolButton.mListener);
   }
