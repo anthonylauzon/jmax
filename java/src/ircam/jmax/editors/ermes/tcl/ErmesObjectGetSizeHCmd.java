@@ -28,7 +28,7 @@ class ErmesObjectGetSizeHCmd implements Command
 
 	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
 
-	interp.setResult(TclInteger.newInstance(aObject.currentRect.height));
+	interp.setResult(TclInteger.newInstance(aObject.getItsHeight()));
       }
     else
       {

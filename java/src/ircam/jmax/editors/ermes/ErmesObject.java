@@ -22,11 +22,11 @@ import ircam.jmax.utils.GlobalProbe;
  */
 public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable {
 
-  public int itsX, itsY;
+  private int itsX, itsY;
   int itsInitX, itsInitY;
   public boolean itsSelected = false;
   boolean laidOut;
-  public Rectangle currentRect;
+  private Rectangle currentRect;
   public ErmesSketchPad	itsSketchPad;
   FtsContainerObject 	itsFtsPatcher;
   public FtsObject	itsFtsObject = null;
@@ -37,7 +37,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   boolean	absolutePainting = false;
   boolean updated = false; ///////////////fast & furious synchronization
   boolean itsDragging = false;
-  public Font itsFont = null;
+  private Font itsFont = null;
   FontMetrics itsFontMetrics = null;
   int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
   //#@!boolean itsResized = false;
@@ -57,6 +57,55 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return itsArea;
   }
 
+  public int getItsX() {
+    return itsX;
+  }
+
+  public void setItsX(int theX) {
+    itsX = theX;
+    itsFtsObject.put("x", itsX);
+  }
+
+  public int getItsY() {
+    return itsY;
+  }
+
+  public void setItsY(int theY) {
+    itsY = theY;
+    itsFtsObject.put("y", itsY);
+  }
+
+  public int getItsWidth() {
+    if (currentRect == null) return 0;
+    else return currentRect.width;
+  }
+
+  public void setItsWidth(int theWidth) {
+    currentRect.width = theWidth;
+    itsFtsObject.put("w", theWidth);
+  }
+
+  public int getItsHeight() {
+    if (currentRect != null) 
+      return currentRect.height;
+    else return 0;
+  }
+
+  public void setItsHeight(int theHeight) {
+    currentRect.height = theHeight;
+    itsFtsObject.put("h", theHeight);
+  }
+
+  public Font getFont() {
+    return itsFont;
+  }
+
+  public void setFont(Font theFont) {
+    itsFont = theFont;
+    itsFtsObject.put("font", itsFont.getName());
+    itsFtsObject.put("fs", itsFont.getSize());
+  }
+  
   public void setDirty(boolean b) {
     itsDirtyFlag = b;
   }
@@ -317,20 +366,22 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
 
 // This init method is only called in "from skratch" initializations
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
+    itsFtsPatcher = theSketchPad.GetSketchWindow().itsPatcher;//added
+    makeFtsObject();//added
     itsSelected = false;
     itsSketchPad = theSketchPad;
     itsFont = itsSketchPad.sketchFont;
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
-    laidOut = false;
-    itsX = x;
-    itsY = y;
+    //laidOut = false;
+    setItsX(x);
+    setItsY(y);
 		
     if (currentRect == null) makeCurrentRect(x, y);
 
     Reshape(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
     
-    itsFtsPatcher = itsSketchPad.GetSketchWindow().itsPatcher;
-    makeFtsObject();
+    //here was itsFtsPatcher = itsSketchPad.GetSketchWindow().itsPatcher;
+    //here was makeFtsObject();
     if (itsFtsObject == null) return false;
     else update(itsFtsObject);
     itsSketchPad.addToDirtyObjects(this);
@@ -350,6 +401,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     Integer  aSize = (Integer)theFtsObject.get("fs");
     int aIntSize;
     
+    itsFtsObject = theFtsObject;
     if((aFont == null)&&(aSize == null)) itsFont = itsSketchPad.sketchFont;
     else{
       if(aFont == null) aFont = itsSketchPad.sketchFont.getName();
@@ -378,8 +430,8 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     int width=0;
     int  height=0;
 
-    itsX = ((Integer)theFtsObject.get("x")).intValue();
-    itsY = ((Integer)theFtsObject.get("y")).intValue();
+    setItsX(((Integer)theFtsObject.get("x")).intValue());
+    setItsY(((Integer)theFtsObject.get("y")).intValue());
     {
       Integer widthInt = (Integer) theFtsObject.get("w");
       if (widthInt != null)
@@ -443,14 +495,6 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     return itsSketchPad;
   }
 	
-  public int GetX(){
-    return itsX;
-  }
-
-  public int GetY(){
-    return itsY;
-  }
-
   public boolean ConnectionRequested(ErmesObjInOutlet theRequester)
   {
     // HERE the checking: is the type of connection requested allowed?
@@ -594,7 +638,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
     ErmesObjOutlet aOutlet;
     
     if (theDeltaH == 0 && theDeltaV == 0) return;
-    itsX+=theDeltaH; itsY+=theDeltaV;
+    setItsX(itsX+theDeltaH); setItsY(itsY+theDeltaV);
     currentRect.x = itsX;
     currentRect.y = itsY;	
     
@@ -612,8 +656,8 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   {
     if (theDeltaH ==0 && theDeltaV ==0) return;
     if (-theDeltaH > currentRect.width || -theDeltaV > currentRect.height) return;
-    currentRect.width += theDeltaH;
-    currentRect.height += theDeltaV;
+    setItsWidth(currentRect.width+theDeltaH);
+    setItsHeight(currentRect.height+theDeltaV);
     
 
     ErmesObjInlet aInlet;
@@ -639,28 +683,22 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   
   public void Resize1(int w, int h) {
     if (currentRect.width == w && currentRect.height == h) return;
-    currentRect.width = w;
-    currentRect.height = h;
+    setItsWidth(w);
+    setItsHeight(h);
   }
   
   public void Reshape(int x, int y, int width, int height) {
-    itsX = x;
-    itsY = y;
+    setItsX(x);
+    setItsY(y);
     currentRect.x = itsX;
     currentRect.y = itsY;
-    currentRect.width = width;
-    currentRect.height = height;
+    setItsWidth(width);
+    setItsHeight(height);
   }
   
   public Rectangle Bounds() {
     Rectangle aRect = new Rectangle (currentRect.x, currentRect.y, currentRect.width, currentRect.height);
     return aRect;
-  }
-	
-  public Rectangle GetDragBoxRect(){
-    return new Rectangle(currentRect.x+currentRect.width-DRAG_DIMENSION,
-			 currentRect.y+currentRect.height-DRAG_DIMENSION,
-			 DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
   public Dimension Size() {

@@ -58,13 +58,13 @@ class ErmesObjInt extends ErmesObject {
      itsInteger = ((Integer)theFtsObject.get("value")).intValue();
      DEFAULT_HEIGHT = itsFontMetrics.getHeight();
      DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
-     if(currentRect.height<DEFAULT_HEIGHT+4) {
+     if(getItsHeight()<DEFAULT_HEIGHT+4) {
        preferredSize.height = DEFAULT_HEIGHT+4;
-       Resize(0, getPreferredSize().height - currentRect.height);
+       Resize(0, getPreferredSize().height - getItsHeight());
      }
-     if(currentRect.width<DEFAULT_WIDTH+17){
+     if(getItsWidth()<DEFAULT_WIDTH+17){
        preferredSize.width = DEFAULT_WIDTH+17;
-       currentRect.width = preferredSize.width;
+       setItsWidth(preferredSize.width);
      }
      return true;
    }
@@ -129,14 +129,14 @@ class ErmesObjInt extends ErmesObject {
   
   void ResizeToNewFont(Font theFont){
     //#@!if(!itsResized){
-      Resize(17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..")-currentRect.width,itsFontMetrics.getHeight()+4-currentRect.height);
+      Resize(17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..")-getItsWidth(),itsFontMetrics.getHeight()+4-getItsHeight());
       //#@!}
       //#@!else ResizeToText(0,0);
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
+    int aWidth = getItsWidth()+theDeltaX;
+    int aHeight = getItsHeight()+theDeltaY;
     
     if((aWidth<aHeight/2+17+itsFontMetrics.stringWidth("0"))&&(aHeight<itsFontMetrics.getHeight()+4)) {
       aWidth = getMinimumSize().width;
@@ -147,11 +147,11 @@ class ErmesObjInt extends ErmesObject {
       
       if(aHeight<itsFontMetrics.getHeight()+4) aHeight = itsFontMetrics.getHeight()+4;
     }
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
 
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < currentRect.height/2 +17+itsFontMetrics.stringWidth("0"))||(currentRect.height+theDeltaY<itsFontMetrics.getHeight() + 4))
+    if((getItsWidth()+theDeltaX < getItsHeight()/2 +17+itsFontMetrics.stringWidth("0"))||(getItsHeight()+theDeltaY<itsFontMetrics.getHeight() + 4))
       return false;
     else return true;
   }
@@ -161,7 +161,7 @@ class ErmesObjInt extends ErmesObject {
     aHeight = itsFontMetrics.getHeight()+4;
     aWidth = 17+itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT+itsFontMetrics.stringWidth("..");
 
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
     itsSketchPad.repaint();
   }
 	
@@ -173,7 +173,7 @@ class ErmesObjInt extends ErmesObject {
     if(evt.getClickCount()>1) {
       Point aPoint = GetSketchWindow().getLocation();
     if (itsIntegerDialog == null) itsIntegerDialog = new ErmesObjIntegerDialog(MaxWindowManager.getTopFrame());
-      itsIntegerDialog.setLocation(aPoint.x + itsX,aPoint.y + itsY);
+      itsIntegerDialog.setLocation(aPoint.x + getItsX(),aPoint.y + getItsY());
       itsIntegerDialog.ReInit(String.valueOf(itsInteger), this, itsSketchPad.GetSketchWindow());
       itsIntegerDialog.setVisible(true);
       return true;
@@ -248,8 +248,8 @@ class ErmesObjInt extends ErmesObject {
 
     if (g == null) return;
     //draw the white area
-    int xWhitePoints[] = {itsX+3, itsX+currentRect.width-3, itsX+currentRect.width-3, itsX+3, itsX+currentRect.height/2+3};
-    int yWhitePoints[] = {itsY+1, itsY+1, itsY+currentRect.height-1,itsY+currentRect.height-1, itsY+currentRect.height/2};
+    int xWhitePoints[] = {getItsX()+3, getItsX()+getItsWidth()-3, getItsX()+getItsWidth()-3, getItsX()+3, getItsX()+getItsHeight()/2+3};
+    int yWhitePoints[] = {getItsY()+1, getItsY()+1, getItsY()+getItsHeight()-1,getItsY()+getItsHeight()-1, getItsY()+getItsHeight()/2};
     if(!itsSelected) g.setColor(Color.white);
     else g.setColor(itsUINormalColor);
     g.fillPolygon(xWhitePoints, yWhitePoints, 5);
@@ -258,38 +258,38 @@ class ErmesObjInt extends ErmesObject {
     if(!itsSelected) g.setColor(itsUINormalColor);
     else g.setColor(itsUISelectedColor);
     
-    g.fill3DRect(itsX+currentRect.width-4,itsY+1, 3, currentRect.height-2, true);
+    g.fill3DRect(getItsX()+getItsWidth()-4,getItsY()+1, 3, getItsHeight()-2, true);
     
-    int xPoints[]={itsX+1, itsX+currentRect.height/2+1, itsX+1};
-    int yPoints[]={itsY, itsY+currentRect.height/2, itsY+currentRect.height-1};
+    int xPoints[]={getItsX()+1, getItsX()+getItsHeight()/2+1, getItsX()+1};
+    int yPoints[]={getItsY(), getItsY()+getItsHeight()/2, getItsY()+getItsHeight()-1};
     g.fillPolygon(xPoints, yPoints, 3);
 
     //draw the outline
     g.setColor(Color.black);
-    g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
+    g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
     
     //draw the triangle
     if(!itsSelected) g.setColor(itsUISelectedColor);
     else g.setColor(Color.black);
-    g.drawLine(itsX+1,itsY,itsX+currentRect.height/2+1,itsY+currentRect.height/2);
-    g.drawLine(itsX+currentRect.height/2+1,itsY+currentRect.height/2,itsX+1, itsY+currentRect.height-1);
+    g.drawLine(getItsX()+1,getItsY(),getItsX()+getItsHeight()/2+1,getItsY()+getItsHeight()/2);
+    g.drawLine(getItsX()+getItsHeight()/2+1,getItsY()+getItsHeight()/2,getItsX()+1, getItsY()+getItsHeight()-1);
     
     //draw the value
     g.setColor(Color.black);
     String aString = GetVisibleString(String.valueOf(itsInteger));
-    g.setFont(itsFont);
-    g.drawString(aString, itsX+currentRect.height/2+5,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2 +1);
+    g.setFont(getFont());
+    g.drawString(aString, getItsX()+getItsHeight()/2+5,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2 +1);
     
     //draw the dragbox
     if(!itsSketchPad.itsRunMode)
-      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+      g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
   String GetVisibleString(String theString){
     String aString = theString;
     String aString2 = "..";
     int aStringLength = theString.length();
-    int aCurrentSpace = currentRect.width-(currentRect.height/2+5)-5;
+    int aCurrentSpace = getItsWidth()-(getItsHeight()/2+5)-5;
     int aStringWidth = itsFontMetrics.stringWidth(aString);
     if(aStringWidth<aCurrentSpace) return aString;
     while((aCurrentSpace<=aStringWidth)&&(aString.length()>0)){
@@ -306,8 +306,8 @@ class ErmesObjInt extends ErmesObject {
   // minimumSize
   //--------------------------------------------------------
   public Dimension getMinimumSize() {
-    if(currentRect==null) return minimumSize;
-    else return new Dimension(currentRect.height/2+13+itsFontMetrics.stringWidth("0"),itsFontMetrics.getHeight()+4); 
+    if(getItsHeight()==0 || getItsWidth() == 0) return minimumSize;
+    else return new Dimension(getItsHeight()/2+13+itsFontMetrics.stringWidth("0"),itsFontMetrics.getHeight()+4); 
   }
 
   //--------------------------------------------------------

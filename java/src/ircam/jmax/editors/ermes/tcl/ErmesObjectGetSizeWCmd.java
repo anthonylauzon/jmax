@@ -27,7 +27,7 @@ class ErmesObjectGetSizeWCmd implements Command
 
 	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
 
-	interp.setResult(TclInteger.newInstance(aObject.currentRect.width));
+	interp.setResult(TclInteger.newInstance(aObject.getItsWidth()));
       }
     else
       {

@@ -23,28 +23,27 @@ class ErmesObjComment extends ErmesObject {
 	
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     itsSketchPad = theSketchPad;
-    itsFont = theSketchPad.sketchFont;			
-    itsFontMetrics = theSketchPad.getFontMetrics(itsFont);
-    itsX = x; itsY = y;
+    setFont(theSketchPad.sketchFont);			
+    itsFontMetrics = theSketchPad.getFontMetrics(getFont());
+    setItsX(x); setItsY(y);
     if (!theString.equals("")) {//we have arguments (are you creating me from a script?)
       itsArgs = theString;
       preferredSize = new Dimension(70, itsFontMetrics.getHeight()*5);
       super.Init(theSketchPad, x, y, theString);
       return true;
     }
-    itsFontMetrics = itsSketchPad.GetTextArea().getFontMetrics(itsFont);
+    itsFontMetrics = itsSketchPad.GetTextArea().getFontMetrics(getFont());
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     preferredSize = new Dimension(70,FIELD_HEIGHT*5);
-    itsSketchPad.GetTextArea().setFont(itsFont);
+    itsSketchPad.GetTextArea().setFont(getFont());
     itsSketchPad.GetTextArea().setBackground(Color.white);
     itsSketchPad.GetTextArea().setText("");
     itsJustification = itsSketchPad.itsJustificationMode;
-    currentRect = new Rectangle();
-    itsSketchPad.GetTextArea().itsOwner = this; //redirect the only editable field to point here...
-    currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
-    Reshape(itsX, itsY, preferredSize.width, preferredSize.height);//?
     
-    itsSketchPad.GetTextArea().setBounds(itsX,itsY,currentRect.width,currentRect.height);
+    itsSketchPad.GetTextArea().itsOwner = this; //redirect the only editable field to point here...
+    makeCurrentRect(x, y);
+        
+    itsSketchPad.GetTextArea().setBounds(getItsX(),getItsY(),getItsWidth(),getItsHeight());
     itsSketchPad.validate();
     itsSketchPad.editStatus = itsSketchPad.EDITING_COMMENT;
     itsSketchPad.GetTextArea().setVisible(true);
@@ -96,7 +95,7 @@ class ErmesObjComment extends ErmesObject {
   //the 'ResizeToNewFont' method worked very well, so we're using it also in the shift-double_click  
   public void RestoreDimensions(){
 
-    Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-currentRect.width, itsFontMetrics.getHeight()*itsParsedTextVector.size()-currentRect.height);
+    Resize(itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET-getItsWidth(), itsFontMetrics.getHeight()*itsParsedTextVector.size()-getItsHeight());
     itsSketchPad.repaint();
   }
 
@@ -112,14 +111,14 @@ class ErmesObjComment extends ErmesObject {
   
   public void RestartEditing(){
     if (itsSketchPad.GetTextArea() != null) itsSketchPad.GetTextArea().setEditable(true);
-    itsSketchPad.GetTextArea().setFont(itsFont);
+    itsSketchPad.GetTextArea().setFont(getFont());
     itsSketchPad.GetTextArea().setText(itsArgs);
     itsSketchPad.GetTextArea().itsOwner = this;
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width+10, itsFontMetrics.getHeight()*5);
+      itsSketchPad.GetTextArea().setBounds(getItsX(), getItsY(), getItsWidth()+10, itsFontMetrics.getHeight()*5);
     else
-      itsSketchPad.GetTextArea().setBounds(itsX, itsY, currentRect.width+10,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetTextArea().setBounds(getItsX(), getItsY(), getItsWidth()+10,itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
 
     itsMaxString = "";
     itsParsedTextVector.removeAllElements();
@@ -130,9 +129,7 @@ class ErmesObjComment extends ErmesObject {
   }
 
   public void setSize(int theH, int theV) {
-    Dimension d = new Dimension(theH, theV);
-    super.Resize1(d.width, d.height);
-    currentRect.setSize(d.width, d.height);
+    Resize1(theH, theV);
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
   
@@ -151,17 +148,17 @@ class ErmesObjComment extends ErmesObject {
 
 
   public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
+    int aWidth = getItsWidth()+theDeltaX;
+    int aHeight = getItsHeight()+theDeltaY;
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET) aWidth = itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size()) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size();
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET)||
-       (currentRect.height+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size()))
+    if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString)+TEXT_INSET)||
+       (getItsHeight()+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size()))
       return false;
     else return true;
   }
@@ -194,18 +191,18 @@ class ErmesObjComment extends ErmesObject {
     if(!itsSketchPad.itsRunMode){ 
       if(itsSelected) g.setColor(Color.gray);
       else g.setColor(itsSketchPad.getBackground());
-      g.fill3DRect(itsX,itsY, currentRect.width, currentRect.height, true);
+      g.fill3DRect(getItsX(),getItsY(), getItsWidth(), getItsHeight(), true);
     
       //drag box
       if(itsSelected) {
 	g.setColor(Color.gray.darker());
-	g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+	g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
       }
     }
     //text
     if(!itsArgs.equals(" ")){
       g.setColor(Color.black);
-      g.setFont(itsFont);
+      g.setFont(getFont());
       DrawParsedString(g);
     }
   }
@@ -213,25 +210,25 @@ class ErmesObjComment extends ErmesObject {
   private void DrawParsedString(Graphics theGraphics){
     String aString;
     int i=0;
-    int insetY =(currentRect.height-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
+    int insetY =(getItsHeight()-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
     if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))/2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }    
     else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
     else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }

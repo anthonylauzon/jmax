@@ -40,7 +40,7 @@ abstract public class ErmesObjInOutlet implements ErmesDrawable{
     connected = false;
     if (preferredSize == null) preferredSize = new Dimension(7,9);
     if (IsInlet()) itsY-=9;
-    else itsY+= itsOwner.currentRect.height;
+    else itsY+= itsOwner.getItsHeight();
     updateAnchorPoint();
   }
 

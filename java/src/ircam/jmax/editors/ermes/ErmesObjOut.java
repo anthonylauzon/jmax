@@ -49,9 +49,7 @@ class ErmesObjOut extends ErmesObject {
   	
     itsSketchPad = theSketchPad;
 
-    Dimension d = getPreferredSize();
-
-    currentRect = new Rectangle(x, y, d.width, d.height);
+    makeCurrentRect(x, y);
     int temp = GetSketchWindow().itsPatcher.getNumberOfOutlets();
 
     if (theSketchPad.outCount < temp)
@@ -94,7 +92,7 @@ class ErmesObjOut extends ErmesObject {
     }
     else  {	//we want to choose among the different Outlet number
       itsSketchPad.itsOutPop.SetNewOwner(this); //make the Choice pointing to this
-      itsSketchPad.itsOutPop.show(itsSketchPad, itsX, itsY);
+      itsSketchPad.itsOutPop.show(itsSketchPad, getItsX(), getItsY());
     }
     return true;
   }
@@ -110,18 +108,18 @@ class ErmesObjOut extends ErmesObject {
   public void Paint_specific(Graphics g) {
     if(!itsSelected) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
-    g.fillRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2);
-    g.fill3DRect(itsX+2,itsY+2, currentRect.width-4,  currentRect.height-4, true);
+    g.fillRect(getItsX()+1,getItsY()+1, getItsWidth()-2,  getItsHeight()-2);
+    g.fill3DRect(getItsX()+2,getItsY()+2, getItsWidth()-4,  getItsHeight()-4, true);
     g.setColor(Color.black);
     //the box
-    g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
+    g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
     //the triangle
-    g.drawLine(itsX+1,itsY+ currentRect.height-1, itsX+currentRect.width/2, itsY+currentRect.height/2);
-    g.drawLine(itsX+currentRect.width/2,itsY+ currentRect.height/2  , itsX+currentRect.width-1,itsY+currentRect.height-1);	
+    g.drawLine(getItsX()+1,getItsY()+ getItsHeight()-1, getItsX()+getItsWidth()/2, getItsY()+getItsHeight()/2);
+    g.drawLine(getItsX()+getItsWidth()/2,getItsY()+ getItsHeight()/2  , getItsX()+getItsWidth()-1,getItsY()+getItsHeight()-1);	
     //the dragBox  
     //g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-    g.setFont(itsFont);
-    g.drawString(""+(itsId+1), itsX+2, itsY+currentRect.height +itsFontMetrics.getHeight()-1);
+    g.setFont(getFont());
+    g.drawString(""+(itsId+1), getItsX()+2, getItsY()+getItsHeight() +itsFontMetrics.getHeight()-1);
   }
 	
   void ResizeToNewFont(Font theFont) {
@@ -142,18 +140,18 @@ class ErmesObjOut extends ErmesObject {
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < getMinimumSize().width)||
-       (currentRect.height+theDeltaY < getMinimumSize().height))
+    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
+       (getItsHeight()+theDeltaY < getMinimumSize().height))
       return false;
     else return true;
   }
   
   public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
+    int aWidth = getItsWidth()+theDeltaX;
+    int aHeight = getItsHeight()+theDeltaY;
     if(aWidth<getMinimumSize().width) aWidth = getMinimumSize().width;
     if(aHeight<getMinimumSize().height) aHeight = getMinimumSize().height;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
 }
 

@@ -11,20 +11,29 @@ class ErmesObjThrottle{
   Dimension preferredSize = null;
   final int LATERAL_OFFSET = 2;
   final int THROTTLE_HEIGHT = /*6*/5;
+  Rectangle bounds = new Rectangle();
+  
+  int itsPreviousX;
+  int itsPreviousY;
+  static final int XOR_MODE = 0;
+  static final int PAINT_MODE = 1;
   
   public ErmesObjThrottle(ErmesObjSlider theSlider, int x, int y) {
     itsSlider = theSlider;
     itsX = x+LATERAL_OFFSET;
-    itsY = y+theSlider.currentRect.height-theSlider.BOTTOM_OFFSET-2;
-    preferredSize = new Dimension(theSlider.currentRect.width-2*LATERAL_OFFSET,THROTTLE_HEIGHT);
+    itsY = y+theSlider.getItsHeight()-theSlider.BOTTOM_OFFSET-2;
+    itsPreviousX = itsX;
+    itsPreviousY = itsY;
+    
+    preferredSize = new Dimension(theSlider.getItsWidth()-2*LATERAL_OFFSET,THROTTLE_HEIGHT);
   }
 
   
   int AbsoluteToSlider(int theAbsoluteY) { //coordinate conversion, not inverted and clipped
-    if (theAbsoluteY >= itsSlider.itsY)
-      if (theAbsoluteY <= itsSlider.itsY+itsSlider.currentRect.height) 
-	return (theAbsoluteY - itsSlider.itsY);
-      else return itsSlider.currentRect.height;
+    if (theAbsoluteY >= itsSlider.getItsY())
+      if (theAbsoluteY <= itsSlider.getItsY()+itsSlider.getItsHeight()) 
+	return (theAbsoluteY - itsSlider.getItsY());
+      else return itsSlider.getItsHeight();
     else return 0;
   }
 
@@ -36,7 +45,7 @@ class ErmesObjThrottle{
 	
   boolean IsInDragArea(int absoluteY) { //check if is in the "dragging" area
     return (AbsoluteToSlider(absoluteY) > itsSlider.UP_OFFSET &&
-	    AbsoluteToSlider(absoluteY) < itsSlider.currentRect.height- itsSlider.BOTTOM_OFFSET);
+	    AbsoluteToSlider(absoluteY) < itsSlider.getItsHeight()- itsSlider.BOTTOM_OFFSET);
   }
 	
   int AbsoluteToDrag(int theAbsoluteY) {	//coordinate conversion, inverted and clipped
@@ -48,51 +57,83 @@ class ErmesObjThrottle{
     int normalizedDrag = theDragCoord;
     if (theDragCoord <= 0) normalizedDrag = 0;
     else if (theDragCoord >= itsSlider.itsPixelRange) normalizedDrag = itsSlider.itsPixelRange;
-    return (itsSlider.itsY+itsSlider.UP_OFFSET+(itsSlider.itsPixelRange-normalizedDrag));
+    return (itsSlider.getItsY()+itsSlider.UP_OFFSET+(itsSlider.itsPixelRange-normalizedDrag));
   }
   
-  void Paint(Graphics g) {
-    int deltaX = itsSlider.itsX + LATERAL_OFFSET;
-    int deltaY = itsSlider.itsY + AbsoluteToSlider(itsY);
+  void eraseAndPaint(Graphics g) {
+    if (!erased) Paint_specific(g, XOR_MODE);      
+    Paint_specific(g, PAINT_MODE);
+  }
+
+  void paintNoErase(Graphics g) {
+    Paint_specific(g, PAINT_MODE);
+  }
+
+  boolean erased=true;
+  void Paint_specific(Graphics g, int mode) {
+    int deltaX = itsSlider.getItsX() + LATERAL_OFFSET;
+    int deltaY;
+    if (mode == PAINT_MODE) deltaY = itsSlider.getItsY() + AbsoluteToSlider(itsY);
+    else {
+      deltaY = itsPreviousY;
+    }
+
     g.setColor(itsSlider.itsUISelectedColor);
-    g.fillRect(deltaX+1, deltaY+1, getPreferredSize().width-2, getPreferredSize().height);
-    g.fill3DRect(deltaX+2, deltaY+2, getPreferredSize().width-4, getPreferredSize().height-2, true);
+
+    if (!itsSlider.itsSelected) {
+      if (mode == XOR_MODE) 
+	g.setXORMode(itsSlider.itsUINormalColor);
+
+      g.fillRect(deltaX+1, deltaY+1, getPreferredSize().width-2, getPreferredSize().height-2);
+    }
+
     g.setColor(Color.black);
+    if (mode == XOR_MODE) g.setXORMode(itsSlider.itsSelected?itsSlider.itsUISelectedColor:itsSlider.itsUINormalColor);
     g.drawRect(deltaX+0, deltaY+0, getPreferredSize().width-1, getPreferredSize().height-1);
+    if (mode == XOR_MODE) {
+      g.setPaintMode();//reset mode to normal
+      erased = true;
+    }
+    else erased = false;
   }
   
-	
-  public Rectangle Bounds(){
-    return new Rectangle(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
-    
-  }
-  
+  public Rectangle Bounds() {
+    bounds.setBounds(itsX, itsY, getPreferredSize().width, getPreferredSize().height);
+    return bounds;
+  }	
+
   public void Resize(int theWidth, int theHeight){
     preferredSize.width = theWidth;
     preferredSize.height = theHeight;
   }
-		
-  
-  public void Move(int theX, int theY){
+
+  void MoveAbsolute(int theX, int theY) {
     itsX = theX; itsY = theY; 
   }
+
+  void Move(int theX, int theY){
+    storeOld();
+    MoveAbsolute(theX, theY);
+  }
   
-  //no more used
-  //  public boolean MouseDrag(Event evt,int x, int y) {
-  //  if(itsSlider.GetSketchPad().itsRunMode){
-      //itsSlider.ThrottleMovedTo(itsY+y);
+  public void MoveByAbsolute(int theDeltaH, int theDeltaV) {
+      itsX += theDeltaH;
+      itsY+=theDeltaV;    
+  }
+  
+  void MoveBy(int theDeltaH, int theDeltaV) {
+    if (theDeltaH != 0 || theDeltaV != 0) {
+      storeOld();
+      MoveByAbsolute(theDeltaH, theDeltaV);
       
-      //itsSlider.ThrottleMovedTo(AbsoluteToDrag(y));
-  //    return true;
-  //  }
-  //  else return false;
-  //}
-  
-  public void MoveBy(int theDeltaH, int theDeltaV) {
-    itsX += theDeltaH;
-    itsY+=theDeltaV;
+    }
   }
 	
+  private void storeOld() {
+    itsPreviousX = itsX;
+    itsPreviousY = itsY;
+  }
+
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------

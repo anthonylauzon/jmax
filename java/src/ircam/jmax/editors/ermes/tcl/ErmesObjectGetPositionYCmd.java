@@ -30,7 +30,7 @@ class ErmesObjectGetPositionYCmd implements Command
 
 	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
 
-	interp.setResult(TclInteger.newInstance(aObject.itsY));
+	interp.setResult(TclInteger.newInstance(aObject.getItsY()));
       }
     else
       {

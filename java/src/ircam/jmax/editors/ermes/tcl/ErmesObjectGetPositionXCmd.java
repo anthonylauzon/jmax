@@ -31,7 +31,7 @@ class ErmesObjectGetPositionXCmd implements Command
 
 	aObject = (ErmesObject) ReflectObject.get(interp, argv[1]);
 
-	interp.setResult(TclInteger.newInstance(aObject.itsX));
+	interp.setResult(TclInteger.newInstance(aObject.getItsX()));
       }
     else
       {

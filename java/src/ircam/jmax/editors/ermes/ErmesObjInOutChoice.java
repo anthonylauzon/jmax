@@ -12,7 +12,7 @@ public class ErmesObjInOutChoice extends Choice implements ItemListener {
   
   void SetNewOwner(ErmesObject theObject) {
     itsOwner = theObject;
-    setSize(itsOwner.currentRect.width, itsOwner.currentRect.height * 2);
+    setSize(itsOwner.getItsWidth(), itsOwner.getItsHeight() * 2);
   }
 		
   public ErmesObjInOutChoice(ErmesObject theOwner) {

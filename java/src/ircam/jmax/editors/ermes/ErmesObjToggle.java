@@ -78,23 +78,23 @@ class ErmesObjToggle extends ErmesObject {
     if (g == null) return;
     if(!itsSelected) g.setColor(itsUINormalColor/*Color.lightGray*/);
     else g.setColor(itsUISelectedColor/*Color.gray*/);
-    g.fillRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2);
-    g.fill3DRect(itsX+2,itsY+2, currentRect.width-4,  currentRect.height-4, true);
+    g.fillRect(getItsX()+1,getItsY()+1, getItsWidth()-2,  getItsHeight()-2);
+    g.fill3DRect(getItsX()+2,getItsY()+2, getItsWidth()-4,  getItsHeight()-4, true);
     g.setColor(Color.black);
-    g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
+    g.drawRect(getItsX()+0,getItsY()+ 0, getItsWidth()-1, getItsHeight()-1);
     if (itsToggled) {
       g.setColor(itsCrossColor);
-      g.drawLine(itsX+4, itsY+4, itsX+currentRect.width-6, itsY+ currentRect.height-6);
-      g.drawLine(itsX+currentRect.width-6, itsY+4,itsX+ 4,itsY+ currentRect.height-6);
+      g.drawLine(getItsX()+4, getItsY()+4, getItsX()+getItsWidth()-6, getItsY()+ getItsHeight()-6);
+      g.drawLine(getItsX()+getItsWidth()-6, getItsY()+4,getItsX()+ 4,getItsY()+ getItsHeight()-6);
     }
     g.setColor(Color.black);
      if(!itsSketchPad.itsRunMode) 
-       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+       g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < getMinimumSize().width)||
-       (currentRect.height+theDeltaY < getMinimumSize().height))
+    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
+       (getItsHeight()+theDeltaY < getMinimumSize().height))
       return false;
     else return true;
   }

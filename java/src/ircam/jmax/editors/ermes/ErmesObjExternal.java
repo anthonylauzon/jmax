@@ -32,19 +32,22 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   // Init
   //--------------------------------------------------------
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
-    itsSelected = false;			//this was in ErmesObject
-    itsSketchPad = theSketchPad;	
-    laidOut = false;				
-    itsX = x;						
-    itsY = y;						
-    itsArgs = theString;			
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString); //OK, we have the args
-    itsFtsPatcher = GetSketchWindow().itsPatcher;
-    
-    //(new Throwable()).printStackTrace();
-    ParseText(itsArgs);
     return true;
+    /*old itsSelected = false;
+      itsSketchPad = theSketchPad;	
+      laidOut = false;				
+      setItsX(x);						
+      setItsY(y);						
+      itsArgs = theString;			
+      if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
+      else super.Init(theSketchPad, x, y, theString); //OK, we have the args
+      itsFtsPatcher = GetSketchWindow().itsPatcher;
+      
+      //(new Throwable()).printStackTrace();
+      ParseText(itsArgs);
+      return true;*/
   }
   
   public boolean Init(ErmesSketchPad theSketchPad, FtsObject theFtsObject) {
@@ -81,7 +84,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   public void makeFtsObject()
   {
     try{
-      itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);
+      if (itsArgs.equals("")) itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, "__void");
+      else itsFtsObject = Fts.makeFtsObject(itsFtsPatcher, itsArgs);
     }
     catch (FtsException e){
       Toolkit.getDefaultToolkit().beep();
@@ -169,47 +173,47 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     }
     else  g.setColor(Color.red);
 
-    g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
-    g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
+    g.fillRect(getItsX()+1,getItsY()+1,getItsWidth()-2, getItsHeight()-2);
+    g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
     
     if(!itsSelected) g.setColor(Color.white);
     else g.setColor(itsLangNormalColor);
-    g.fillRect(itsX+8, itsY+2, currentRect.width-(WIDTH_DIFF+4), currentRect.height-HEIGHT_DIFF-4);
+    g.fillRect(getItsX()+8, getItsY()+2, getItsWidth()-(WIDTH_DIFF+4), getItsHeight()-HEIGHT_DIFF-4);
     
     g.setColor(Color.black);
-    g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);
+    g.drawRect(getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
     
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
-      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+      g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
-    g.setFont(itsFont);
+    g.setFont(getFont());
     DrawParsedString(g);
   }
 	
   private void DrawParsedString(Graphics theGraphics){
     String aString;
     int i=0;
-    int insetY =(currentRect.height-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
+    int insetY =(getItsHeight()-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
 
     if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))/2, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }    
     else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+WIDTH_DIFF/*-4*/, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+WIDTH_DIFF/*-4*/, getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }
     else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
       for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
 	aString = (String)e.nextElement();
-	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-4*/), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	theGraphics.drawString(aString, getItsX()+(getItsWidth()-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF/*-4*/), getItsY()+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
 	i++;
       }
     }

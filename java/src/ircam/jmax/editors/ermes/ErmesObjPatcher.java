@@ -36,8 +36,8 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
     itsSelected = false;			//this was in ErmesObject
     itsSketchPad = theSketchPad;	
     laidOut = false;				
-    itsX = x;						
-    itsY = y;						
+    setItsX(x);						
+    setItsY(y);						
     itsArgs = theString;			
     if (theString.equals("")) super.Init(theSketchPad, x, y);	//we don't have arguments yet
     else super.Init(theSketchPad, x, y, theString); //OK, we have the args
@@ -54,7 +54,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
     super.Init(theSketchPad, theFtsObject);
 
-    Resize(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-currentRect.height);
+    Resize(0, itsFontMetrics.getHeight()+2*HEIGHT_DIFF-getItsHeight());
     ParseText(itsArgs);
     
     //#@!if(!itsResized){
@@ -65,7 +65,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 
   public boolean IsResizedObject(int theWidth){
-    return (theWidth>MaxWidth(itsFontMetrics.stringWidth(itsArgs)+currentRect.height/2+20,
+    return (theWidth>MaxWidth(itsFontMetrics.stringWidth(itsArgs)+getItsHeight()/2+20,
 			    (itsInletList.size())*12, (itsOutletList.size())*12));
   }
 
@@ -196,28 +196,28 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public void Paint_specific(Graphics g) {
     if(!itsSelected) g.setColor(itsLangNormalColor);
     else g.setColor(itsLangSelectedColor);
-    g.fill3DRect(itsX+1, itsY+1, currentRect.width-2, currentRect.height-2, true);
-    g.draw3DRect(itsX+3, itsY+3, currentRect.width-6, currentRect.height-6, false);
+    g.fill3DRect(getItsX()+1, getItsY()+1, getItsWidth()-2, getItsHeight()-2, true);
+    g.draw3DRect(getItsX()+3, getItsY()+3, getItsWidth()-6, getItsHeight()-6, false);
     
-    int xPoints[] = {itsX+7,itsX+7,itsX+13};
-    int yPoints[] = {itsY+6,itsY+18,itsY+12};
+    int xPoints[] = {getItsX()+7,getItsX()+7,getItsX()+13};
+    int yPoints[] = {getItsY()+6,getItsY()+18,getItsY()+12};
     g.fillPolygon(xPoints, yPoints, 3);
     g.setColor(Color.black);
-    g.drawRect(itsX+0,itsY+ 0, currentRect.width-1, currentRect.height-1);
-    g.drawRect(itsX+4, itsY+4, currentRect.width-8, currentRect.height-8);
+    g.drawRect(getItsX()+0,getItsY()+ 0, getItsWidth()-1, getItsHeight()-1);
+    g.drawRect(getItsX()+4, getItsY()+4, getItsWidth()-8, getItsHeight()-8);
     
     //the triangle
-    g.drawLine(itsX+7,itsY+6,itsX+7,itsY+currentRect.height-6);
-    g.drawLine(itsX+7, itsY+6, itsX+currentRect.height/2+2, itsY+currentRect.height/2);
-    g.drawLine(itsX+currentRect.height/2+2,itsY+currentRect.height/2, itsX+7, itsY+currentRect.height-6);
+    g.drawLine(getItsX()+7,getItsY()+6,getItsX()+7,getItsY()+getItsHeight()-6);
+    g.drawLine(getItsX()+7, getItsY()+6, getItsX()+getItsHeight()/2+2, getItsY()+getItsHeight()/2);
+    g.drawLine(getItsX()+getItsHeight()/2+2,getItsY()+getItsHeight()/2, getItsX()+7, getItsY()+getItsHeight()-6);
 
 
-    g.setFont(itsFont);
-    g.drawString(itsArgs, itsX+currentRect.height/2+5/*(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2*/,itsY+itsFontMetrics.getAscent()+(currentRect.height-itsFontMetrics.getHeight())/2);		
+    g.setFont(getFont());
+    g.drawString(itsArgs, getItsX()+getItsHeight()/2+5/*(currentRect.width-itsFontMetrics.stringWidth(itsArgs))/2*/,getItsY()+itsFontMetrics.getAscent()+(getItsHeight()-itsFontMetrics.getHeight())/2);		
     
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
-      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+      g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
   void ResizeToNewFont(Font theFont) {
@@ -229,17 +229,17 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 	
   public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
+    int aWidth = getItsWidth()+theDeltaX;
+    int aHeight = getItsHeight()+theDeltaY;
     if(aHeight<itsFontMetrics.getHeight() + 10) 
       aHeight = itsFontMetrics.getHeight() + 10;
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + /*32*/aHeight/2+5+5) 
       aWidth = itsFontMetrics.stringWidth(itsMaxString) + /*32*/aHeight/2+5+5;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < itsFontMetrics.stringWidth(itsMaxString)/*+32*/+currentRect.height/2+5+5)||(currentRect.height+theDeltaY<itsFontMetrics.getHeight() + 10))
+    if((getItsWidth()+theDeltaX < itsFontMetrics.stringWidth(itsMaxString)/*+32*/+getItsHeight()/2+5+5)||(getItsHeight()+theDeltaY<itsFontMetrics.getHeight() + 10))
       return false;
     else return true;
   }
@@ -247,7 +247,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   public void RestoreDimensions(){
 
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+/*2*WIDTH_DIFF+10*/(itsFontMetrics.getHeight()+10)/2+5+5,(itsInletList.size())*12, (itsOutletList.size())*12);
-    Resize(aMaxWidth-currentRect.width, itsFontMetrics.getHeight() + 10 - currentRect.height);
+    Resize(aMaxWidth-getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
     itsSketchPad.repaint();
   }
 
@@ -255,9 +255,8 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   // resize
   //--------------------------------------------------------
   public void setSize(int theH, int theV) {
-    Dimension d = new Dimension(theH, theV);
-    super.Resize1(d.width, d.height);
-    currentRect.setSize(d.width, d.height);
+    
+    Resize1(theH, theV);
     if (itsSketchPad != null) itsSketchPad.repaint();
   }
   

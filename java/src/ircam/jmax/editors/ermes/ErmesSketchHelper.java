@@ -496,9 +496,9 @@ class ErmesSketchHelper extends Object{
     if(itsSketchPad.doSnapToGrid){
       for(int i = 0; i<itsSketchPad.itsElements.size();i++){
 	aObject = (ErmesObject) itsSketchPad.itsElements.elementAt(i);
-	aPoint = SnapToGrid(aObject.itsX, aObject.itsY);
-	aDeltaH = aPoint.x - aObject.itsX;
-	aDeltaV = aPoint.y - aObject.itsY ;
+	aPoint = SnapToGrid(aObject.getItsX(), aObject.getItsY());
+	aDeltaH = aPoint.x - aObject.getItsX();
+	aDeltaV = aPoint.y - aObject.getItsY();
 	aObject.MoveBy(aDeltaH, aDeltaV);
       }
     }

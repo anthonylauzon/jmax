@@ -254,17 +254,18 @@ Rectangle previousResizeRect = new Rectangle();
       paintList(dirtyInOutlets, offGraphics);
       dirtyInOutlets.removeAllElements();
       //--
-      paintList(dirtyConnections, offGraphics);
-      dirtyConnections.removeAllElements();
-      
-      paintList(dirtyObjects, offGraphics);
-      dirtyObjects.removeAllElements();
-      //--
-      paintList(dirtyInOutlets, offGraphics);
-      dirtyInOutlets.removeAllElements();
-      //--
-      paintList(dirtyConnections, offGraphics);
-      dirtyConnections.removeAllElements();
+      if (!itsRunMode) { //objects UNDER connections 
+	paintList(dirtyObjects, offGraphics);
+	dirtyObjects.removeAllElements();
+	paintList(dirtyConnections, offGraphics);
+	dirtyConnections.removeAllElements();
+      }
+      else  { // connections UNDER objects
+	paintList(dirtyConnections, offGraphics);
+	dirtyConnections.removeAllElements();
+	paintList(dirtyObjects, offGraphics);
+	dirtyObjects.removeAllElements();
+      }
       //--
       CopyTheOffScreen(getGraphics());
       //emptyDirtyLists is done in CopyTheOffScreen()
@@ -609,13 +610,20 @@ Rectangle previousResizeRect = new Rectangle();
 	aOutlet = (ErmesObjOutlet) e1.nextElement();
 	aOutlet.Paint(offGraphics);
       }
-      aObject.Paint(offGraphics);
+      if (!itsRunMode) aObject.Paint(offGraphics);//edit mode=objects BEFORE connections
     }
+
     for (Enumeration e =itsConnections.elements(); e.hasMoreElements();) {
       aConnection = (ErmesConnection) e.nextElement();
       aConnection.Paint(offGraphics);
     }
     
+    if (itsRunMode) for (Enumeration e =itsElements.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject) e.nextElement();
+      aObject.Paint(offGraphics);
+    }
+
+
     CopyTheOffScreen(g);
   }
   
@@ -1241,36 +1249,36 @@ Rectangle previousResizeRect = new Rectangle();
     if (direction == Platform.LEFT_KEY) { //we're resetting the selection to the minimum (hor.) size
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(aObject.getMinimumSize().width-aObject.currentRect.width, 0);
+	aObject.Resize(aObject.getMinimumSize().width-aObject.getItsWidth(), 0);
       }
       repaint();
     }    
     else if (direction == Platform.RIGHT_KEY) { //we're setting all the object's widths to the max      
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	if (aObject.currentRect.width > max) max = aObject.currentRect.width;
+	if (aObject.getItsWidth() > max) max = aObject.getItsWidth();
       }
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(max-aObject.currentRect.width, 0);
+	aObject.Resize(max-aObject.getItsWidth(), 0);
       }
       repaint();
     }
     else if (direction == Platform.UP_KEY) {
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(0, aObject.getMinimumSize().height-aObject.currentRect.height);
+	aObject.Resize(0, aObject.getMinimumSize().height-aObject.getItsHeight());
       }
       repaint();
     }
     else if (direction == Platform.DOWN_KEY) {
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	if (aObject.currentRect.height > max) max = aObject.currentRect.height;
+	if (aObject.getItsHeight() > max) max = aObject.getItsHeight();
       }
       for (Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject) e.nextElement();
-	aObject.Resize(0, max-aObject.currentRect.height);
+	aObject.Resize(0, max-aObject.getItsHeight());
       }
       repaint();
     }
@@ -1686,10 +1694,10 @@ Rectangle previousResizeRect = new Rectangle();
     editStatus = RESIZING_OBJECT;
     itsResizingObject = theResizingObject;
     if (currentResizeRect == null) currentResizeRect = new Rectangle();
-    currentResizeRect.x = itsResizingObject.currentRect.x;
-    currentResizeRect.y = itsResizingObject.currentRect.y;
-    currentResizeRect.width = itsResizingObject.currentRect.width;
-    currentResizeRect.height = itsResizingObject.currentRect.height;
+    currentResizeRect.x = itsResizingObject.getItsX();
+    currentResizeRect.y = itsResizingObject.getItsY();
+    currentResizeRect.width = itsResizingObject.getItsWidth();
+    currentResizeRect.height = itsResizingObject.getItsHeight();
     previousResizeRect.setBounds(currentResizeRect.x, currentResizeRect.y, currentResizeRect.width, currentResizeRect.height);
   }
   
@@ -1717,9 +1725,9 @@ Rectangle previousResizeRect = new Rectangle();
     if(doSnapToGrid){
       for(int i = 0; i<currentSelection.itsObjects.size();i++){
 	aObject = (ErmesObject)currentSelection.itsObjects.elementAt(i);
-	aPoint = itsHelper.SnapToGrid(aObject.itsX, aObject.itsY);
-	aDeltaH = aPoint.x - aObject.itsX;
-	aDeltaV = aPoint.y - aObject.itsY ;
+	aPoint = itsHelper.SnapToGrid(aObject.getItsX(), aObject.getItsY());
+	aDeltaH = aPoint.x - aObject.getItsX();
+	aDeltaV = aPoint.y - aObject.getItsY() ;
 	aObject.MoveBy(aDeltaH, aDeltaV);
       }
     }
@@ -1788,6 +1796,7 @@ Rectangle previousResizeRect = new Rectangle();
   boolean erased1 = false;
 
   public void update(Graphics g) {
+    if (itsRunMode) return;
     if (editStatus == START_CONNECT) {
       if (!erased) {
 	g.setColor(Color.black);
@@ -1890,28 +1899,28 @@ Rectangle previousResizeRect = new Rectangle();
       aValue = MinYSelected();
       for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	aObject.MoveBy(0, aValue-aObject.GetY());
+	aObject.MoveBy(0, aValue-aObject.getItsY());
       }
     }
     else if(thePosition.equals("Left")){
       aValue = MinXSelected();
       for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	aObject.MoveBy(aValue-aObject.GetX(), 0);
+	aObject.MoveBy(aValue-aObject.getItsX(), 0);
       }
     }
     else if(thePosition.equals("Bottom")){
       aValue = MaxYSelected();
       for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	aObject.MoveBy(0, aValue-(aObject.GetY()+aObject.currentRect.height));
+	aObject.MoveBy(0, aValue-(aObject.getItsY()+aObject.getItsHeight()));
       }
     }
     else if(thePosition.equals("Right")){
       aValue = MaxXSelected();
       for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
 	aObject = (ErmesObject)e.nextElement();
-	aObject.MoveBy(aValue-(aObject.GetX()+aObject.currentRect.width), 0);
+	aObject.MoveBy(aValue-(aObject.getItsX()+aObject.getItsWidth()), 0);
       }
     }
     DrawOffScreen(getGraphics());//repaint();
@@ -1922,7 +1931,7 @@ Rectangle previousResizeRect = new Rectangle();
     int aMinY = 10000;
     for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      if(aMinY >= aObject.GetY()) aMinY = aObject.GetY();
+      if(aMinY >= aObject.getItsY()) aMinY = aObject.getItsY();
     }
     return aMinY;
   }
@@ -1932,7 +1941,7 @@ Rectangle previousResizeRect = new Rectangle();
     int aMinX = 10000;
     for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      if(aMinX >= aObject.GetX()) aMinX = aObject.GetX();
+      if(aMinX >= aObject.getItsX()) aMinX = aObject.getItsX();
     }
     return aMinX;
   }
@@ -1942,8 +1951,8 @@ Rectangle previousResizeRect = new Rectangle();
     int aMaxY = -10000;
     for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      if(aMaxY<aObject.GetY()+aObject.currentRect.height) 
-	aMaxY = aObject.GetY()+aObject.currentRect.height;
+      if(aMaxY<aObject.getItsY()+aObject.getItsHeight()) 
+	aMaxY = aObject.getItsY()+aObject.getItsHeight();
     }
     return aMaxY;
   }
@@ -1953,8 +1962,8 @@ Rectangle previousResizeRect = new Rectangle();
     int aMaxX = -10000;
     for(Enumeration e = currentSelection.itsObjects.elements(); e.hasMoreElements();) {
       aObject = (ErmesObject)e.nextElement();
-      if(aMaxX < aObject.GetX()+aObject.currentRect.width) 
-	aMaxX = aObject.GetX()+aObject.currentRect.width;
+      if(aMaxX < aObject.getItsX()+aObject.getItsWidth()) 
+	aMaxX = aObject.getItsX()+aObject.getItsWidth();
     }
     return aMaxX;
    }

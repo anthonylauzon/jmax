@@ -1113,17 +1113,17 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       if (aFObject == null) continue; //security check!           
       // Set geometrical properties
       
-      aFObject.put("x", aErmesObject.itsX);
-      aFObject.put("y", aErmesObject.itsY);
-      aFObject.put("w", aErmesObject.currentRect.width);
-      aFObject.put("h", aErmesObject.currentRect.height);
+      aFObject.put("x", aErmesObject.getItsX());
+      aFObject.put("y", aErmesObject.getItsY());
+      aFObject.put("w", aErmesObject.getItsWidth());
+      aFObject.put("h", aErmesObject.getItsHeight());
 
       // Set the font properties
-      if (!aErmesObject.itsFont.getName().equals(theSketchWindow.itsSketchPad.sketchFont.getName()))
-	aFObject.put("font", aErmesObject.itsFont.getName());
+      if (!aErmesObject.getFont().getName().equals(theSketchWindow.itsSketchPad.sketchFont.getName()))
+	aFObject.put("font", aErmesObject.getFont().getName());
 
-      if (aErmesObject.itsFont.getSize() != theSketchWindow.itsSketchPad.sketchFont.getSize())
-	aFObject.put("fs", aErmesObject.itsFont.getSize());
+      if (aErmesObject.getFont().getSize() != theSketchWindow.itsSketchPad.sketchFont.getSize())
+	aFObject.put("fs", aErmesObject.getFont().getSize());
 
       /*#@!if(aErmesObject.itsResized) aFObject.put("resized", "on");
       else aFObject.put("resized", "off");*/

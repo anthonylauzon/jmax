@@ -17,9 +17,9 @@ import ircam.jmax.fts.*;
 	
   protected int FIELD_HEIGHT;
   protected int FIELD_WIDTH;
-  Dimension preferredSize = null;
-  Dimension currentMinimumSize = new Dimension(); 
-  String 	  itsArgs;
+  Dimension preferredSize = new Dimension(100, 25);//hu-hu 
+  Dimension currentMinimumSize = null;
+  String 	  itsArgs = new String();
   public Vector itsParsedTextVector = new Vector();
   public String itsMaxString = "";
   //public void setSize(int theH, int theV) {}; 
@@ -40,22 +40,23 @@ import ircam.jmax.fts.*;
   //this 'glue' method is called when the external (or the message) have not their arguments yet
   //and we have to create also the (static) ErmesObjEditableField 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y) {
-    itsX = x; itsY = y;
-    itsSketchPad = theSketchPad;
-    itsFont = itsSketchPad.sketchFont;
 
-    itsFontMetrics = itsSketchPad.getFontMetrics(itsFont);
+    super.Init(theSketchPad, x, y, "");
+    //old setItsX(x); setItsY(y);
+    itsSketchPad = theSketchPad;
+    setFont(itsSketchPad.sketchFont);
+
+    itsFontMetrics = itsSketchPad.getFontMetrics(getFont());
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     FIELD_WIDTH = itsFontMetrics.stringWidth("0");
     preferredSize = new Dimension(70/*FIELD_WIDTH+2*WIDTH_DIFF*/,FIELD_HEIGHT+2*HEIGHT_DIFF);
-    itsSketchPad.GetEditField().setFont(itsFont);
+    itsSketchPad.GetEditField().setFont(getFont());
     itsSketchPad.GetEditField().setText("");
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
     itsJustification = itsSketchPad.itsJustificationMode;
-    currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
-    Reshape(itsX, itsY, preferredSize.width, preferredSize.height);
+    makeCurrentRect(x,y);
     
-    itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
+    itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight() + 20);
     DoublePaint();
     itsSketchPad.editStatus = itsSketchPad.EDITING_OBJECT;
     
@@ -71,15 +72,16 @@ import ircam.jmax.fts.*;
   //this method is called when the external (or the message) have their arguments
   //this happens (for now) just when we are instantiating from a script
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String args) {
-    itsFont = itsSketchPad.sketchFont;
-    itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); //bugsgi*/
-    itsJustification = itsSketchPad.itsJustificationMode;
-    FIELD_HEIGHT = itsFontMetrics.getHeight();
-    FIELD_WIDTH = itsFontMetrics.stringWidth("0");
-    preferredSize = new Dimension(70/*FIELD_WIDTH+2*WIDTH_DIFF*/, FIELD_HEIGHT+2*HEIGHT_DIFF);
-    super.Init(theSketchPad, x, y, args);
-    
-    ResizeToText(0, 0);	//will it work?
+    super.Init(theSketchPad, x, y, args);//new
+    /*old setFont(itsSketchPad.sketchFont);
+      itsFontMetrics = itsSketchPad.getFontMetrics(getFont()); 
+      itsJustification = itsSketchPad.itsJustificationMode;
+      FIELD_HEIGHT = itsFontMetrics.getHeight();
+      FIELD_WIDTH = itsFontMetrics.stringWidth("0");
+      preferredSize = new Dimension(70, FIELD_HEIGHT+2*HEIGHT_DIFF);
+      super.Init(theSketchPad, x, y, args);
+      
+      ResizeToText(0, 0);	//will it work?*/
     return true;
   }
 
@@ -95,6 +97,7 @@ import ircam.jmax.fts.*;
 
     FontMetrics temporaryFM = theSketchPad.getFontMetrics(theSketchPad.getFont());
     FIELD_HEIGHT = temporaryFM.getHeight();
+
     int lenght = temporaryFM.stringWidth(itsArgs);	//*
     preferredSize = new Dimension(lenght+2*WIDTH_DIFF, FIELD_HEIGHT+2*HEIGHT_DIFF);	//*
     super.Init(theSketchPad, theFtsObject);
@@ -127,15 +130,15 @@ import ircam.jmax.fts.*;
   public void RestartEditing(){
     if (itsSketchPad.GetEditField() != null) itsSketchPad.GetEditField().setEditable(true);
     
-    itsSketchPad.GetEditField().setFont(itsFont);
+    itsSketchPad.GetEditField().setFont(getFont());
     itsSketchPad.GetEditField().setText(itsArgs);
     itsSketchPad.GetEditField().itsOwner = this; 
 
 
     if(itsParsedTextVector.size()==0)
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*2);
     else
-      itsSketchPad.GetEditField().setBounds(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
+      itsSketchPad.GetEditField().setBounds(getItsX()+4, getItsY()+1, getItsWidth()-(WIDTH_DIFF/*-6*/-2), itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
     
 
     itsMaxString = "";
@@ -161,8 +164,8 @@ import ircam.jmax.fts.*;
     int aMaxWidth = MaxWidth(itsFontMetrics.stringWidth(itsMaxString)+2*WIDTH_DIFF,
 			    (itsInletList.size())*12, (itsOutletList.size())*12);
    
-    int aHeightDiff = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-currentRect.height;
-    int aWidthDiff = aMaxWidth-currentRect.width;
+    int aHeightDiff = itsFontMetrics.getHeight()*itsParsedTextVector.size()+2*HEIGHT_DIFF-getItsHeight();
+    int aWidthDiff = aMaxWidth-getItsWidth();
     if (aHeightDiff == 0 && aWidthDiff == 0) return;
     Resize(aWidthDiff, aHeightDiff);
     if (paintNow) {
@@ -209,17 +212,17 @@ import ircam.jmax.fts.*;
   }
 	
   public void ResizeToText(int theDeltaX, int theDeltaY){
-    int aWidth = currentRect.width+theDeltaX;
-    int aHeight = currentRect.height+theDeltaY;
+    int aWidth = getItsWidth()+theDeltaX;
+    int aHeight = getItsHeight()+theDeltaY;
     if(aWidth<itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF) aWidth = itsFontMetrics.stringWidth(itsMaxString) + 2*WIDTH_DIFF;
     if(aHeight<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF) aHeight = itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF;
-    Resize(aWidth-currentRect.width, aHeight-currentRect.height);
+    Resize(aWidth-getItsWidth(), aHeight-getItsHeight());
   }
   
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
     String temp = itsArgs;
-    if((currentRect.width+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +2*WIDTH_DIFF)||
-       (currentRect.height+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
+    if((getItsWidth()+theDeltaX <itsFontMetrics.stringWidth(itsMaxString) +2*WIDTH_DIFF)||
+       (getItsHeight()+theDeltaY<itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
       return false;
     else return true;
   }
@@ -269,7 +272,7 @@ import ircam.jmax.fts.*;
     ErmesObjOutlet aOutlet;
     for (Enumeration e=itsOutletList.elements(); e.hasMoreElements();) {
       aOutlet = (ErmesObjOutlet) e.nextElement();
-      aOutlet.MoveTo(aOutlet.itsX, itsY+currentRect.height);
+      aOutlet.MoveTo(aOutlet.itsX, getItsY()+getItsHeight());
       //ReroutingConnections(aOutlet);
     }
   }

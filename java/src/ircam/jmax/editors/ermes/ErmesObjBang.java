@@ -89,19 +89,19 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
       g.setColor(Color.yellow);
       itsFlashing = false;
     }
-    g.fillRect(itsX+1,itsY+1, currentRect.width-2,  currentRect.height-2);
-    g.fill3DRect(itsX+2,itsY+2, currentRect.width-4,  currentRect.height-4, true);
+    g.fillRect(getItsX()+1,getItsY()+1, getItsWidth()-2,  getItsHeight()-2);
+    g.fill3DRect(getItsX()+2,getItsY()+2, getItsWidth()-4,  getItsHeight()-4, true);
     g.setColor(Color.black);
-    g.drawRect(itsX, itsY, currentRect.width-1, currentRect.height-1);
-    g.drawOval(itsX+5, itsY+5, currentRect.width-10, currentRect.height-10);
+    g.drawRect(getItsX(), getItsY(), getItsWidth()-1, getItsHeight()-1);
+    g.drawOval(getItsX()+5, getItsY()+5, getItsWidth()-10, getItsHeight()-10);
  
     if(!itsSketchPad.itsRunMode) 
-      g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+      g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 	
   public boolean IsResizeTextCompat(int theDeltaX, int theDeltaY){
-    if((currentRect.width+theDeltaX < getMinimumSize().width)||
-       (currentRect.height+theDeltaY < getMinimumSize().height))
+    if((getItsWidth()+theDeltaX < getMinimumSize().width)||
+       (getItsHeight()+theDeltaY < getMinimumSize().height))
       return false;
     else return true;
   }
