@@ -173,14 +173,13 @@ SWING_DISTRIB_CLASSPATH=
 
 if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
 then
-    echo "Using Swing from environment's CLASSPATH ($CLASSPATH)."
+    echo > /dev/null
 else
     if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
     then
-	echo "Using Swing from ${ROOTDIR}/java/lib/swing/swingall.jar."
 	SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
     else
-	echo "Using Swing from JDK ($JDK_HOME)."
+	echo "Swing classes not found. Trying without..."
     fi
 fi
 
