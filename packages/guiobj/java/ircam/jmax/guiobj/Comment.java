@@ -125,30 +125,26 @@ public class Comment extends Editable
   // ----------------------------------------
   // Text area offset
   // ----------------------------------------
-  public static final int TEXT_X_OFFSET = 2;
-  public static final int TEXT_Y_OFFSET = 2;
+  public static final int TEXT_X_OFFSET = 1;
+  public static final int TEXT_Y_OFFSET = 1;
 
   public int getTextXOffset()
   {
-    //return TEXT_X_OFFSET;
-    return 1;
+    return TEXT_X_OFFSET;
   }
 
   public int getTextYOffset()
   {
-    //return TEXT_Y_OFFSET;
-    return 1;
+    return TEXT_Y_OFFSET;
   }
 
   public int getTextWidthOffset()
   {
-    //return 6;
     return 2;
   }
 
   public int getTextHeightOffset()
   {
-    //return 4;
     return 2;
   }
 
