@@ -1432,24 +1432,25 @@ static void
 _track_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
+  fts_symbol_t tr_type = fts_class_get_name( track_get_type(self));
   
-  if(ac > 0)
+  if(tr_type != seqsym_scomark)
   {
-    if(fts_get_symbol(at) && fts_get_symbol(at) == seqsym_markers)
-    {
-      if(self->markers)
-        track_clear(self->markers);
-    }  
+		if(ac > 0)
+		{
+			if(fts_get_symbol(at) && fts_get_symbol(at) == seqsym_markers)
+			{
+				if(self->markers)
+					marker_track_clear(self->markers);
+			}  
+		}
+		else
+			track_clear_and_upload(self);
   }
   else
-  {
-    track_clear_and_upload(self);
-
-    if(self->markers)
-      track_clear(self->markers);
-    
-    fts_object_set_state_dirty(o);
-  }
+		marker_track_clear(self);
+	
+	fts_object_set_state_dirty(o);
 }
 
 

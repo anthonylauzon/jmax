@@ -94,4 +94,5 @@ extern scomark_t *marker_track_insert_marker(track_t *marker_track, double time,
 extern void marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num, int upload);
 extern event_t *marker_track_append_bar(track_t *marker_track, event_t *start_evt);
 extern void marker_track_remove_events(track_t *marker_track, int ac, const fts_atom_t *at);
+extern void marker_track_clear(track_t *marker_track);
 #endif

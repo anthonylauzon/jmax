@@ -500,7 +500,12 @@ public void objectDeleted(Object whichObject, int oldIndex)
 	}
 	repaint();
 }
-public void trackCleared(){repaint();}
+public void trackCleared()
+{
+	lastBar = null;
+	lastBarTime = -1.0;
+	repaint();
+}
 public void startTrackUpload( TrackDataModel track, int size){}
 public void endTrackUpload( TrackDataModel track){ initPropertiesToDraw();}
 public void startPaste(){}

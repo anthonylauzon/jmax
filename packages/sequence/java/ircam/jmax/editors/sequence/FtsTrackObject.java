@@ -305,7 +305,7 @@ public void removeEvents(int nArgs , FtsAtom args[])
 }
 
 public void clear()
-{
+{	
   while(events_fill_p != 0)
   {
     if (isInGroup())
