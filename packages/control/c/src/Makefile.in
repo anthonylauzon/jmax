@@ -94,6 +94,7 @@ demux.c \
 dispatch.c \
 fit.c \
 for.c \
+invoke.c \
 make.c \
 mess.c \
 oneshot.c \
@@ -120,7 +121,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libcontrol_la_LIBADD = 
 libcontrol_la_OBJECTS =  control.lo count.lo demux.lo dispatch.lo fit.lo \
-for.lo make.lo mess.lo oneshot.lo range.lo switch.lo sync.lo tup.lo
+for.lo invoke.lo make.lo mess.lo oneshot.lo range.lo switch.lo sync.lo \
+tup.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -136,8 +138,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/control.P .deps/count.P .deps/demux.P \
-.deps/dispatch.P .deps/fit.P .deps/for.P .deps/make.P .deps/mess.P \
-.deps/oneshot.P .deps/range.P .deps/switch.P .deps/sync.P .deps/tup.P
+.deps/dispatch.P .deps/fit.P .deps/for.P .deps/invoke.P .deps/make.P \
+.deps/mess.P .deps/oneshot.P .deps/range.P .deps/switch.P .deps/sync.P \
+.deps/tup.P
 SOURCES = $(libcontrol_la_SOURCES)
 OBJECTS = $(libcontrol_la_OBJECTS)
 

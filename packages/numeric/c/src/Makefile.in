@@ -89,9 +89,12 @@ packagedir = $(pkgdatadir)/packages/numeric/c
 package_LTLIBRARIES = libnumeric.la
 libnumeric_la_SOURCES = \
 numeric.c \
+fft.c \
 rewrap.c \
 wrap.c 
 
+
+INCLUDES = -I@top_srcdir@/packages/data/c/src -I@top_srcdir@/packages/utils/c/src
 
 noinst_HEADERS = \
 numeric.h
@@ -109,7 +112,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libnumeric_la_LIBADD = 
-libnumeric_la_OBJECTS =  numeric.lo rewrap.lo wrap.lo
+libnumeric_la_OBJECTS =  numeric.lo fft.lo rewrap.lo wrap.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -124,7 +127,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/numeric.P .deps/rewrap.P .deps/wrap.P
+DEP_FILES =  .deps/fft.P .deps/numeric.P .deps/rewrap.P .deps/wrap.P
 SOURCES = $(libnumeric_la_SOURCES)
 OBJECTS = $(libnumeric_la_OBJECTS)
 

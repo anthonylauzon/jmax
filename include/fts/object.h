@@ -96,6 +96,7 @@ FTS_API fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet);
 #define fts_object_get_outlets_number(O) (((fts_object_t *)(O))->head.cl->noutlets)
 #define fts_object_get_inlets_number(O) (((fts_object_t *)(O))->head.cl->ninlets)
 #define fts_object_get_patcher(O) (((fts_object_t *)(O))->patcher)
+#define fts_object_set_patcher(O, patcher) (((fts_object_t *)(O))->patcher = (patcher))
 
 FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
