@@ -28,11 +28,15 @@ typedef struct _audiolabel
 {
     fts_symbol_t name;
     int stereo_flag; /* 0: mono; 1:stereo */
-    fts_audioport_t* input;
+    fts_symbol_t input_device;
+    fts_audioport_t* input_audioport;
     int input_channel;
     
-    fts_audioport_t* output;
+    fts_symbol_t output_device;
+    fts_audioport_t* output_audioport;
     int output_channel;
+
+    struct _audiolabel* next;
 } audiolabel_t;
 
 typedef struct _audioconfig
@@ -42,13 +46,15 @@ typedef struct _audioconfig
     int n_labels;    
 
     int buffer_size;
-    double sample_rate;
+    int sample_rate;
 
 } audioconfig_t;
 
 extern fts_class_t* audioconfig_type;
 
 extern void fts_audio_idle( void);
+
+void fts_audioconfig_set_defaults(audioconfig_t* config);
 extern void fts_audioconfig_dump( audioconfig_t *mc, fts_bmax_file_t *f);
 
 #endif
