@@ -132,6 +132,8 @@ public class ErmesToolBar extends JPanel  {
 
   void buttonSelected(ErmesToolButton button)
   {
+    if(selectedButton!=null)
+      selectedButton.reset();
     selectedButton = button;
     sketch.setAddModeInteraction(selectedButton.getDescription(), selectedButton.getMessage(), true);
   }
