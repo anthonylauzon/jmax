@@ -1,8 +1,12 @@
-# $Id: Makefile.am,v 1.18 2003/06/06 11:35:08 p_tisserand Exp $
+# $Id: Makefile.am,v 1.19 2003/07/23 12:16:13 p_tisserand Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.19  2003/07/23 12:16:13  p_tisserand
+# Changed installation directory of packages.
+# Now packages are installed in ${libdir}/jmax/packages.
+#
 # Revision 1.18  2003/06/06 11:35:08  p_tisserand
 # Fixed compilation on linux (not tested).
 # Added internal_sequence.h for Windows dll export.
@@ -118,4 +122,4 @@ internal_sequence.h \
 seqmess.h \
 seqmidi.h 
 
-libsequence_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
+libsequence_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module -release @JMAX_VERSION@
