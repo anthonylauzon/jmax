@@ -38,7 +38,9 @@ typedef struct _fts_fftab
   struct _fts_fftab *next_in_list; /* for list of tables for one float function */
 } fts_fftab_t;
 
-/***************************************************************************************
+
+
+/******************************************************************************
  *
  *  float functions
  *
@@ -185,6 +187,14 @@ static float cosf( float f)
 }
 #endif
 
+#ifndef HAVE_SQRTF
+static float sqrtf (float f)
+{
+  return (float) sqrtf(f);
+}
+#endif
+
+
 void
 fts_ffuns_init( void)
 {
@@ -192,6 +202,7 @@ fts_ffuns_init( void)
 
   fts_ffun_new( fts_new_symbol( "sin"), sinf);
   fts_ffun_new( fts_new_symbol( "cos"), cosf);
+  fts_ffun_new( fts_new_symbol( "sqrt"), sqrtf);  
 
 #if HAVE_TANF
   fts_ffun_new( fts_new_symbol( "tan"), tanf);

@@ -10,6 +10,7 @@ FUN(tanh)
 FUN(log)
 FUN(log10)
 FUN(exp)
+FUN(sqrt)
 #ifndef WIN32
 FUN(asinh)
 FUN(acosh)
