@@ -30,6 +30,20 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     addFocusListener(this);
   }
 
+  public void AbortEdit(){
+    setVisible(false);
+    setLocation(-200,-200);
+    focused = false;
+    
+    if(itsSketchPad.itsToolBar.locked) itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
+    else itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+    //itsOwner.itsInEdit = false;
+
+    if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());
+    itsOwner = null;  
+  }
+
   //--------------------------------------------------------
   // lostFocus
   //--------------------------------------------------------
@@ -45,14 +59,15 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
     // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
     String aTextString = getText();
     if (aTextString.compareTo("") == 0 || aTextString.compareTo(" ") == 0) {
-      setVisible(false);
-      setLocation(-200,-200);
-      
-      if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-      itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-      itsOwner = null;	//seems to be crazy but...
-      
-      return true; //(immediately)
+      /*setVisible(false);
+	setLocation(-200,-200);
+	
+	if (itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+	itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
+	itsOwner = null;	//seems to be crazy but...
+	*/
+      AbortEdit();
+      return true; 
     }
     //try to test if the object was already instantiated; in case, delete the object... (how?)
     
@@ -80,10 +95,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       itsOwner.ParseText(aTextString);
       itsOwner.makeFtsObject();
     }
-    ///qui accorcia se il testo e' piu' corto dell'oggetto
-    //dovrebbe farlo anche per l'altezza...
 
-    //int lenght = getFontMetrics(getFont()).stringWidth(aTextString);
     int lenght = getFontMetrics(getFont()).stringWidth(itsOwner.itsMaxString);
   
     if((lenght< getSize().width-20)&&(!itsOwner.itsResized)){
@@ -98,14 +110,17 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener{
       itsOwner.setSize(d1.width, d1.height);
     }
         
-    setVisible(false);
-    setLocation(-200,-200);
-    focused = false;
-    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+    /* setVisible(false);
+       setLocation(-200,-200);
+       focused = false;
+       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+       
+       if(itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
+       itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
+       itsOwner = null;*/
+    itsOwner.Repaint();
     
-    if(itsSketchPad != null) itsOwner.Paint(itsSketchPad.GetOffGraphics());
-    itsSketchPad.CopyTheOffScreen(itsSketchPad.getGraphics());//end bug 12
-    itsOwner = null;
+    AbortEdit();
 
     setRows(5);
     setColumns(20);

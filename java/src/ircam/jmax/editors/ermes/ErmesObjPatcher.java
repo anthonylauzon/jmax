@@ -168,7 +168,8 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
     if(evt.getClickCount()>1) {
-      if (itsSubWindow != null) {//show the subpatcher, it's there
+      if (itsSubWindow != null) {
+	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
 	itsSubWindow.setVisible(true);
 	itsSubWindow.itsPatcher.open();
 	ErmesSketchPad.RequestOffScreen(itsSketchPad);
@@ -177,6 +178,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
 	MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
 	GetSketchWindow().AddToSubWindowList(itsSubWindow);
+	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
       }
       return true;
     }

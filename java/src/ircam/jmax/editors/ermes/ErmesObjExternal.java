@@ -124,28 +124,26 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   //--------------------------------------------------------
   
    public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-     if (!itsSketchPad.itsRunMode) {
-       if(evt.getClickCount()>1) {
-	 if (iAmPatcher) {	
-	   if (itsSubWindow != null) {//show the subpatcher, it's there
-	     itsSubWindow.setVisible(true);
-	     ErmesSketchPad.RequestOffScreen(itsSketchPad);
-	   }
-	   else{	//this 'else' shouldn't be reached...
-	     itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
-	     MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
-	     GetSketchWindow().AddToSubWindowList(itsSubWindow);
-	   }
-	   return true;
+     if(evt.getClickCount()>1) {
+       if (iAmPatcher) {	
+	 if (itsSubWindow != null) {
+	   itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
+	   itsSubWindow.setVisible(true);
+	   ErmesSketchPad.RequestOffScreen(itsSketchPad);
+	 }
+	 else{	//this 'else' shouldn't be reached...
+	   itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	   MaxApplication.itsSketchWindowList.addElement(itsSubWindow);
+	   GetSketchWindow().AddToSubWindowList(itsSubWindow);
+	   itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
 	 }
        }
-       itsSketchPad.ClickOnObject(this, evt, x, y);
-       return true;
      }
-     else return true;	//run mode, no editing, no subpatcher opening (?)
+     else if (!itsSketchPad.itsRunMode) itsSketchPad.ClickOnObject(this, evt, x, y);
+     return true;
    }
 
-  public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()
+  public void RestartEditing() {
     if((iAmPatcher)&&(itsSubWindow != null)){
       GetSketchWindow().CreateFtsGraphics(itsSubWindow);
       itsSubWindow.dispose();
