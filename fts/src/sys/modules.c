@@ -180,7 +180,6 @@ fts_module_load(const char *name, const char *filename)
 	}
     }
 
-
   handle = dlopen(loadpath, RTLD_NOW);	
 
   if (! handle)
@@ -292,3 +291,5 @@ fts_load_boot_modules(void)
 }
 
 #endif
+
+

@@ -1,4 +1,6 @@
+#ifdef PTHREADS
 #include <pthread.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -59,7 +61,9 @@ struct _ftl_program_t {
   int pc;
 
   /* Profiling thread */
+#ifdef PTHREADS
   pthread_t profile_thread;
+#endif
 };
 
 static fts_hash_table_t *ftl_functions_table = 0;
@@ -831,9 +835,12 @@ void ftl_program_run( ftl_program_t *prog )
 #define DEFAULT_PROFILE_PERIOD_NS 23000000
 #endif
 
+#ifdef PTHREADS
 static struct timespec profile_period = { 0, DEFAULT_PROFILE_PERIOD_NS };
 
+
 static pthread_t profile_thread;
+#endif
 
 static void profile_thread_cleanup( void *arg)
 {
@@ -872,26 +879,33 @@ static void *profile_thread_fun( void *arg)
   fprintf( stderr, "Profile thread has started\n");
 #endif
 
+#ifdef PTHREADS
   pthread_cleanup_push( profile_thread_cleanup, 0);
+
 
   while (1)
     {
       ftl_program_pc_sample( prog);
-
       nanosleep( &profile_period, NULL);
     }
 
+
   pthread_cleanup_pop( 0);
+#endif
 }
 
 static void profile_thread_start( ftl_program_t *prog)
 {
+#ifdef PTHREADS
   pthread_create( &prog->profile_thread, 0, profile_thread_fun, prog);
+#endif
 }
 
 static void profile_thread_stop( ftl_program_t *prog)
 {
+#ifdef PTHREADS
   pthread_cancel( prog->profile_thread);
+#endif
 }
 
 /* --------------------------------------------------------------------------- */

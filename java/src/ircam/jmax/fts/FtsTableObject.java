@@ -54,7 +54,18 @@ public class FtsTableObject extends FtsObject implements FtsObjectWithData
 
     if (args.size() >= 3)
       vectorSize = Integer.parseInt(args.elementAt(2).toString());
-
+    else
+      {
+	try
+	  {
+	    if (args.size() >= 2) 
+	      vectorSize = Integer.parseInt(args.elementAt(1).toString());
+	  }
+	catch (NumberFormatException e)
+	  {
+	  }
+      }
+	
     vector = new FtsIntegerVector(this, vectorSize);
 
     installMessageHandler(new TableMessageHandler());

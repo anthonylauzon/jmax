@@ -223,8 +223,9 @@ abstract public class FtsObject implements MaxTclInterpreter
 
       void callHandler(String name, Object value, Object author)
       {
-	if (name.equals(this.name) && (handler != owner))
-	  handler.propertyChanged(FtsObject.this, name, value);
+	if (name.equals(this.name))
+	  if ((author == null) || (author != owner))
+	    handler.propertyChanged(FtsObject.this, name, value);
       }
     }
 
