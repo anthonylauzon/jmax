@@ -78,6 +78,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   int SKETCH_WIDTH = 1200/*800*/;
   int SKETCH_HEIGHT = 1200/*800*/;
 
+  int MAX_NUM_SELECTED = 10;
+
   int itsJustificationMode = LEFT_JUSTIFICATION;
   int itsResizeMode = BOTH_RESIZING;
 
@@ -99,6 +101,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   ErmesObject itsConnectingObj = null;  
   ErmesObjInOutlet itsConnectingLet = null;
   int currentMouseX, currentMouseY;	// used during the MOVING status
+  int itsPreviousMouseX, itsPreviousMouseY;// used during the MOVING status
+
   
   ErmesRegion itsElementRgn;
   ErmesRegion itsHSegmRgn;
@@ -121,8 +125,9 @@ Rectangle previousResizeRect = new Rectangle();
 
   Rectangle currentMovingBigRect = new Rectangle();
   Rectangle previousMovingBigRect = new Rectangle();
-  Rectangle currentMovingLittleRect = new Rectangle();
-  Rectangle previousMovingLittleRect = new Rectangle();
+  //Rectangle currentMovingLittleRect = new Rectangle();
+  //Rectangle previousMovingLittleRect = new Rectangle();
+  Vector itsMovingRectangles = new Vector();
 
   public boolean offScreenValid = true;
   
@@ -1183,9 +1188,10 @@ Rectangle previousResizeRect = new Rectangle();
     else if (editStatus == MOVING) {
       int aDeltaH, aDeltaV;
       currentMovingBigRect.setBounds(0,0,0,0);
-      currentMovingLittleRect.setBounds(0,0,0,0);
+      //currentMovingLittleRect.setBounds(0,0,0,0);
       previousMovingBigRect.setBounds(0,0,0,0);
-      previousMovingLittleRect.setBounds(0,0,0,0);
+      //previousMovingLittleRect.setBounds(0,0,0,0);
+      itsMovingRectangles.removeAllElements();
       editStatus = START_SELECT;
       if((currentMouseX-itsStartMovingPt.x!=0)||(currentMouseY-itsStartMovingPt.y!=0)){
 	aDeltaH = currentMouseX-itsStartMovingPt.x;
@@ -1444,7 +1450,20 @@ Rectangle previousResizeRect = new Rectangle();
     currentMouseY = theY;
     itsStartMovingPt.x = theX;
     itsStartMovingPt.y = theY;
+    itsPreviousMouseX = theX;
+    itsPreviousMouseY = theY;
     itsStartInclusionRect = itsHelper.StartMoveInclusionRect();
+    if(itsSelectedList.size()<MAX_NUM_SELECTED) FillVectorObjectRectangles();
+  }
+
+  void FillVectorObjectRectangles(){
+    ErmesObject aObject;
+    Rectangle aRect;
+    for (Enumeration e = itsSelectedList.elements() ; e.hasMoreElements() ;) {
+      aObject = (ErmesObject) e.nextElement();
+      aRect = aObject.Bounds();
+      itsMovingRectangles.addElement(aRect);
+    }
   }
 
   public void SelectAll(){
@@ -1619,6 +1638,7 @@ Rectangle previousResizeRect = new Rectangle();
 	}
 	else {
 	  erased = true;
+	  erased1 = true;
 	  CopyTheOffScreen(getGraphics());
 	}
       }
@@ -1905,6 +1925,7 @@ Rectangle previousResizeRect = new Rectangle();
 
 
   boolean erased = false;
+  boolean erased1 = false;
 
   public void update(Graphics g) {
     if (editStatus == AREA_SELECT) {
@@ -1945,59 +1966,49 @@ Rectangle previousResizeRect = new Rectangle();
     }
     else if (editStatus == MOVING){
       //faster version
-      previousMovingBigRect.setBounds(currentMovingBigRect.x,
-      				      currentMovingBigRect.y,
-				      currentMovingBigRect.width,
-				      currentMovingBigRect.height);
-      currentMovingBigRect = itsHelper.StartMoveInclusionRect();
       Rectangle aRect;
       g.setColor(Color.black);
-      previousMovingLittleRect.setBounds(currentMovingLittleRect.x,
-					 currentMovingLittleRect.y,
-					 currentMovingLittleRect.width,
-					 currentMovingLittleRect.height);   
-      currentMovingLittleRect.setBounds(itsCurrentObject.Bounds().x,
-					itsCurrentObject.Bounds().y,
-					itsCurrentObject.Bounds().width,
-					itsCurrentObject.Bounds().height);
-      currentMovingLittleRect.x+=(currentMouseX-itsStartMovingPt.x)+1;//2303
-      currentMovingLittleRect.y+=(currentMouseY-itsStartMovingPt.y)+1;//2303
-      currentMovingBigRect.x+=(currentMouseX-itsStartMovingPt.x);
-      currentMovingBigRect.y+=(currentMouseY-itsStartMovingPt.y);
-      
-      if (!erased) {
-	g.setXORMode(sketchColor);
-	g.drawRect(previousMovingLittleRect.x, 
-		   previousMovingLittleRect.y, 
-		   previousMovingLittleRect.width, 
-		   previousMovingLittleRect.height);
-	g.drawRect(previousMovingBigRect.x, 
-		   previousMovingBigRect.y, 
-		   previousMovingBigRect.width, 
-		   previousMovingBigRect.height);
-      erased = true;
+      g.setXORMode(sketchColor);
+      int aNumSelected = itsSelectedList.size();
+      if(aNumSelected<MAX_NUM_SELECTED){
+	if(!erased1){
+	  for(Enumeration e = itsMovingRectangles.elements(); e.hasMoreElements();) {
+	    aRect = (Rectangle)e.nextElement();
+	    g.drawRect(aRect.x,aRect.y, aRect.width, aRect.height);
+	  }
+	  erased1= true;
+	}
+	for(Enumeration e = itsMovingRectangles.elements(); e.hasMoreElements();) {
+	  aRect = (Rectangle)e.nextElement();
+	  aRect.x+=(currentMouseX-itsPreviousMouseX);
+	  aRect.y+=(currentMouseY-itsPreviousMouseY);
+	  g.drawRect(aRect.x,aRect.y, aRect.width, aRect.height);
+	}
+	itsPreviousMouseX = currentMouseX;
+	itsPreviousMouseY = currentMouseY;
+	erased1 = false;
       }
-      g.drawRect(currentMovingLittleRect.x, 
-      		 currentMovingLittleRect.y, 
-		 currentMovingLittleRect.width, 
-		 currentMovingLittleRect.height);
-      g.drawRect(currentMovingBigRect.x, 
-		 currentMovingBigRect.y, 
-		 currentMovingBigRect.width, 
-		 currentMovingBigRect.height);
-      erased = false;
-      /*//old code
-	g.drawImage(offImage,0,0, this);
-	Rectangle aInclusionRect = itsHelper.StartMoveInclusionRect();
-	Rectangle aRect;
-	g.setColor(Color.black);
-	aRect = itsCurrentObject.Bounds();
-	aRect.x+=(currentMouseX-itsStartMovingPt.x);
-	aRect.y+=(currentMouseY-itsStartMovingPt.y);
-	aInclusionRect.x+=(currentMouseX-itsStartMovingPt.x);
-	aInclusionRect.y+=(currentMouseY-itsStartMovingPt.y);
-	g.drawRect(aRect.x, aRect.y, aRect.width, aRect.height);
-	g.drawRect(aInclusionRect.x, aInclusionRect.y, aInclusionRect.width, aInclusionRect.height);*/
+      else{
+	previousMovingBigRect.setBounds(currentMovingBigRect.x,
+					currentMovingBigRect.y,
+					currentMovingBigRect.width,
+					currentMovingBigRect.height);
+	currentMovingBigRect = itsHelper.StartMoveInclusionRect();
+	currentMovingBigRect.x+=(currentMouseX-itsStartMovingPt.x);
+	currentMovingBigRect.y+=(currentMouseY-itsStartMovingPt.y);
+	if(!erased){
+	  g.drawRect(previousMovingBigRect.x, 
+		     previousMovingBigRect.y, 
+		     previousMovingBigRect.width, 
+		     previousMovingBigRect.height);
+	  erased = true;
+	}
+	g.drawRect(currentMovingBigRect.x, 
+		   currentMovingBigRect.y, 
+		   currentMovingBigRect.width, 
+		   currentMovingBigRect.height);
+	erased = false;
+      }
       return;
     }
     else if (editStatus == MOVINGSEGMENT){
