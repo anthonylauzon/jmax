@@ -718,8 +718,6 @@ ivec_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int a
 {
   ivec_t *this = (ivec_t *)o;
 
-  /*post("insert copy_size\n");*/
-
   if(this->copy)
     {
       int v_size = fts_get_int(at);
@@ -730,12 +728,8 @@ ivec_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int a
       int *src, *dst;
       int i;
 
-      /*post("v_size %d pix_size %d start %d copy_size %d \n", v_size, pix_size, start, copy_size);*/
-
       ivec_set_size(this, ivec_get_size(this) + copy_size);
       this_size = ivec_get_size(this);
-
-      /*post("this_size %d\n", this_size);*/
 
       src = ivec_get_ptr(this->copy);
       dst = ivec_get_ptr(this);
@@ -951,7 +945,7 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_list_t *aa = fts_get_list(at);
       int size = fts_list_get_size(aa);
-      
+
       ivec_alloc(this, size);
       ivec_set_from_atom_list(this, 0, size, fts_list_get_ptr(aa));
     }
@@ -960,7 +954,6 @@ ivec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       ivec_alloc(this, ac);
       ivec_set_from_atom_list(this, 0, ac, at);
     }
-
   this->file = 0;
   this->opened = 0; 
   this->vsize = 0; 

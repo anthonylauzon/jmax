@@ -42,69 +42,7 @@ typedef struct
 
 static fts_symbol_t sym_open_editor = 0;
 static fts_symbol_t sym_close_editor = 0;
-
-static void
-table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  table_t *this = (table_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 1, 0);
-  fts_atom_t a[1];
-  fts_object_t *obj;
-  int size;
-
-  if(name)
-    {
-      obj = ispw_get_object_by_name(name);
-      size = fts_get_int_arg(ac, at, 2, FTS_TABLE_DEFAULT_SIZE);
-
-      if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
-	{
-	  /* refer to existing vector */
-	  fts_object_refer(obj);
-	  
-	  if(size > ivec_get_size((ivec_t *)obj))
-	    ivec_set_size((ivec_t *)obj, size);
-
-	  this->vec = (ivec_t *)obj;
-	  this->name = name;
-  
-	  return;
-	}
-    }
-  else
-    size = fts_get_int_arg(ac, at, 1, FTS_TABLE_DEFAULT_SIZE);          
-  
-  /* new table */
-  fts_set_int(a, size);
-  obj = fts_object_create(ivec_class, 1, a);
-  
-  fts_object_refer(obj);
-
-  if(name)
-    ispw_register_named_object(obj, name);
-
-  this->vec = (ivec_t *)obj;
-  this->name = name;
-}
-
-static void
-table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  table_t *this = (table_t *)o;
-
-  if(this->name && fts_object_has_only_one_reference((fts_object_t *)this->vec))
-    ispw_unregister_named_object((fts_object_t *)this->vec, this->name);
-
-  fts_object_release((fts_object_t *)this->vec);
-}
-
-static void
-table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  table_t *this = (table_t *)o;
-
-  fts_message_send((fts_object_t *)this->vec, fts_SystemInlet, sym_open_editor, 0, 0);
-}
+static fts_symbol_t sym_size = 0;
 
 /********************************************************************
  *
@@ -233,12 +171,10 @@ table_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-table_resize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *vec = ((table_t *)o)->vec;
-  int size = fts_get_int(&at[0]);
-
-  ivec_set_size(vec, size);
+  fts_message_send((fts_object_t *)vec, 0, s, ac, at);
 }
 
 /*********************************************************************
@@ -350,6 +286,76 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
  *
  */
 
+static void
+table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+  fts_atom_t a[1];
+  fts_object_t *obj;
+  fts_symbol_t name = 0;
+  int size = FTS_TABLE_DEFAULT_SIZE;
+
+  ac--;
+  at++;
+
+  if(ac > 0 && fts_is_symbol(at))
+    {
+      name = fts_get_symbol(at);
+
+      obj = ispw_get_object_by_name(name);
+
+      if(ac > 1 && fts_is_number(at + 1)) 
+	size = fts_get_number_int(at + 1);
+
+      if(obj && (fts_object_get_class_name(obj) == ivec_symbol))
+	{
+	  /* refer to existing vector */
+	  fts_object_refer(obj);
+	  
+	  if(size > ivec_get_size((ivec_t *)obj))
+	    fts_message_send(obj, 0, sym_size, 1, at + 1);
+
+	  this->vec = (ivec_t *)obj;
+	  this->name = name;
+  
+	  return;
+	}
+    }
+  else if(ac > 0 && fts_is_number(at))
+    size = fts_get_number_int(at);
+  
+  /* new table */
+  fts_set_int(a, size);
+  obj = fts_object_create(ivec_class, 1, a);
+  
+  fts_object_refer(obj);
+
+  if(name)
+    ispw_register_named_object(obj, name);
+
+  this->vec = (ivec_t *)obj;
+  this->name = name;
+}
+
+static void
+table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+
+  if(this->name && fts_object_has_only_one_reference((fts_object_t *)this->vec))
+    ispw_unregister_named_object((fts_object_t *)this->vec, this->name);
+
+  fts_object_release((fts_object_t *)this->vec);
+}
+
+static void
+table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  table_t *this = (table_t *)o;
+
+  fts_message_send((fts_object_t *)this->vec, fts_SystemInlet, sym_open_editor, 0, 0);
+}
+
 static fts_status_t
 table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -389,7 +395,7 @@ table_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define(cl, 0, fts_new_symbol("sum"), table_sum, 0, 0);
       
       a[0] = fts_s_int;
-      fts_method_define(cl, 0, fts_new_symbol("size"), table_resize, 1, a);
+      fts_method_define(cl, 0, fts_new_symbol("size"), table_size, 1, a);
       
       fts_outlet_type_define(cl, 0, fts_s_int, 1, a);
       
@@ -404,6 +410,7 @@ table_config(void)
 {
   sym_open_editor = fts_new_symbol("open_editor");
   sym_close_editor = fts_new_symbol("close_editor");
+  sym_size = fts_new_symbol("size");
 
   fts_metaclass_install(fts_new_symbol("table"), table_instantiate, fts_arg_type_equiv);
 }
