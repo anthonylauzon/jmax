@@ -18,6 +18,6 @@ class MaxURLDataSource extends MaxDataSource
 
   public String toString()
   {
-    return "MaxURLDataSource(" + url.toString() + ")";
+    return url.toString();
   }
 }
