@@ -101,7 +101,7 @@ static void udp_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( udp_t), udp_init, udp_delete);
 
-  fts_class_method_varargs(cl, fts_s_sched_ready, udp_receive);
+  fts_class_message_varargs(cl, fts_s_sched_ready, udp_receive);
 
   fts_class_outlet( cl, 0, fts_s_int);
 }

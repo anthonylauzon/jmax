@@ -668,24 +668,24 @@ dict_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dict_t), dict_init, dict_delete);
   
-  fts_class_method_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
-  fts_class_method_varargs(cl, fts_s_get_array, dict_get_array);
-  fts_class_method_varargs(cl, fts_s_dump, dict_dump);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, dict_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_get_array, dict_get_array);
+  fts_class_message_varargs(cl, fts_s_dump, dict_dump);
 
-  fts_class_method_varargs(cl, fts_s_post, dict_post);
-  fts_class_method_varargs(cl, fts_s_print, dict_print);
+  fts_class_message_varargs(cl, fts_s_post, dict_post);
+  fts_class_message_varargs(cl, fts_s_print, dict_print);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dict_get_state);
   
-  fts_class_method_varargs(cl, fts_s_import, dict_import);
-  fts_class_method_varargs(cl, fts_s_export, dict_export);
+  fts_class_message_varargs(cl, fts_s_import, dict_import);
+  fts_class_message_varargs(cl, fts_s_export, dict_export);
   
-  fts_class_method_varargs(cl, fts_s_put, dict_set);
-  fts_class_method_varargs(cl, fts_s_set, dict_set);
-  fts_class_method_varargs(cl, fts_s_get, dict_get);
-  fts_class_method_varargs(cl, fts_s_clear, dict_clear);
+  fts_class_message_varargs(cl, fts_s_put, dict_set);
+  fts_class_message_varargs(cl, fts_s_set, dict_set);
+  fts_class_message_varargs(cl, fts_s_get, dict_get);
+  fts_class_message_varargs(cl, fts_s_clear, dict_clear);
   }
 
 void

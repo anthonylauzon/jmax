@@ -513,18 +513,18 @@ macosxmidi_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(macosxmidi_t), macosxmidi_init, macosxmidi_delete);
 
   /* FTS MIDI manager interface implementation */
-  fts_class_method_varargs(cl, fts_midimanager_s_get_default_input, macosxmidi_get_default_input);
-  fts_class_method_varargs(cl, fts_midimanager_s_get_default_output, macosxmidi_get_default_output);
-  fts_class_method_varargs(cl, fts_midimanager_s_append_input_names, macosxmidi_append_input_names);
-  fts_class_method_varargs(cl, fts_midimanager_s_append_output_names, macosxmidi_append_output_names);
-  fts_class_method_varargs(cl, fts_midimanager_s_get_input, macosxmidi_get_input);
-  fts_class_method_varargs(cl, fts_midimanager_s_get_output, macosxmidi_get_output);
+  fts_class_message_varargs(cl, fts_midimanager_s_get_default_input, macosxmidi_get_default_input);
+  fts_class_message_varargs(cl, fts_midimanager_s_get_default_output, macosxmidi_get_default_output);
+  fts_class_message_varargs(cl, fts_midimanager_s_append_input_names, macosxmidi_append_input_names);
+  fts_class_message_varargs(cl, fts_midimanager_s_append_output_names, macosxmidi_append_output_names);
+  fts_class_message_varargs(cl, fts_midimanager_s_get_input, macosxmidi_get_input);
+  fts_class_message_varargs(cl, fts_midimanager_s_get_output, macosxmidi_get_output);
 
   /* scheduler call back */
-  fts_class_method_varargs(cl, fts_s_sched_ready, macosxmidi_poll_fifo);
+  fts_class_message_varargs(cl, fts_s_sched_ready, macosxmidi_poll_fifo);
 
   /* debug print */
-  fts_class_method_varargs(cl, fts_s_print, macosxmidi_print);
+  fts_class_message_varargs(cl, fts_s_print, macosxmidi_print);
 }
 
 void 

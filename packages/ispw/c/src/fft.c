@@ -504,10 +504,10 @@ fft_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fft_t), fft_init, fft_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, fft_put);
+  fts_class_message_varargs(cl, fts_s_put, fft_put);
   
-  fts_class_method_varargs(cl, fts_s_bang, fft_bang);
-  fts_class_method_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
+  fts_class_message_varargs(cl, fts_s_bang, fft_bang);
+  fts_class_message_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -518,10 +518,10 @@ ifft_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fft_t), ifft_init, fft_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, ifft_put);
+  fts_class_message_varargs(cl, fts_s_put, ifft_put);
 
-  fts_class_method_varargs(cl, fts_s_bang, fft_bang);
-  fts_class_method_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
+  fts_class_message_varargs(cl, fts_s_bang, fft_bang);
+  fts_class_message_varargs(cl, fts_new_symbol("setphase"), fft_setphase);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

@@ -273,11 +273,11 @@ seqstep_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqstep_t), seqstep_init, seqstep_delete);
   
-  fts_class_method_varargs(cl, fts_new_symbol("goto"), seqstep_goto);
-  fts_class_method_varargs(cl, fts_new_symbol("reset"), seqstep_reset);
-  fts_class_method_varargs(cl, fts_new_symbol("prev"), seqstep_prev);
-  fts_class_method_varargs(cl, fts_s_next, seqstep_next);
-  fts_class_method_varargs(cl, fts_s_bang, seqstep_next);
+  fts_class_message_varargs(cl, fts_new_symbol("goto"), seqstep_goto);
+  fts_class_message_varargs(cl, fts_new_symbol("reset"), seqstep_reset);
+  fts_class_message_varargs(cl, fts_new_symbol("prev"), seqstep_prev);
+  fts_class_message_varargs(cl, fts_s_next, seqstep_next);
+  fts_class_message_varargs(cl, fts_s_bang, seqstep_next);
   
   fts_class_inlet_anything(cl, 0);
   fts_class_inlet(cl, 1, track_type, seqstep_set_reference);

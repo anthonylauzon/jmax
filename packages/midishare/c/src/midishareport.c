@@ -481,7 +481,7 @@ midishareport_instantiate(fts_class_t *cl)
   
   fts_midiport_class_init(cl);
   
-  fts_class_method_varargs(cl, fts_new_symbol("reset_unused"), midishareport_reset_unused);
+  fts_class_message_varargs(cl, fts_new_symbol("reset_unused"), midishareport_reset_unused);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
   }

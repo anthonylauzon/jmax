@@ -118,17 +118,17 @@ dsp_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dsp_t), dsp_init, dsp_delete);
 
-  fts_class_method_varargs(cl, fts_s_start, dsp_start);
-  fts_class_method_varargs(cl, fts_s_stop, dsp_stop);
+  fts_class_message_varargs(cl, fts_s_start, dsp_start);
+  fts_class_message_varargs(cl, fts_s_stop, dsp_stop);
 
   fts_class_inlet_int(cl, 0, dsp_on_off);
   fts_class_inlet_float(cl, 0, dsp_on_off);
   
-  fts_class_method_varargs(cl, fts_s_bang, dsp_print);
-  fts_class_method_varargs(cl, fts_s_print, dsp_print);
+  fts_class_message_varargs(cl, fts_s_bang, dsp_print);
+  fts_class_message_varargs(cl, fts_s_print, dsp_print);
 
-  fts_class_method_varargs(cl, fts_new_symbol("save"), dsp_save);
-  fts_class_method_varargs(cl, fts_new_symbol("print-signals"), dsp_print_signals);
+  fts_class_message_varargs(cl, fts_new_symbol("save"), dsp_save);
+  fts_class_message_varargs(cl, fts_new_symbol("print-signals"), dsp_print_signals);
 
   fts_class_outlet_int(cl, 0);
 }

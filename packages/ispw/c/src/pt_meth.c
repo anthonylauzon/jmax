@@ -269,21 +269,21 @@ void pt_common_delete(pt_common_obj_t *x)
 
 void pt_common_instantiate(fts_class_t *cl)
 {
-   fts_class_method_varargs(cl, fts_new_symbol("reference-pitch"), pt_common_meth_ref_pitch);
-   fts_class_method_varargs(cl, fts_new_symbol("reference-freq"), pt_common_meth_ref_freq);
-   fts_class_method_varargs(cl, fts_new_symbol("rough-pitch"), pt_common_meth_rough_pitch);
-   fts_class_method_varargs(cl, fts_new_symbol("pitch-range"), pt_common_meth_pitch_range);
-   fts_class_method_varargs(cl, fts_new_symbol("stick"), pt_common_meth_stick);
-   fts_class_method_varargs(cl, fts_new_symbol("stretch"), pt_common_meth_stretch);
-   fts_class_method_varargs(cl, fts_new_symbol("coefs"), pt_common_meth_coefs);
-   fts_class_method_varargs(cl, fts_new_symbol("amp-range"), pt_common_meth_amp_range);
-   fts_class_method_varargs(cl, fts_new_symbol("quality-range"), pt_common_meth_quality_range);
-   fts_class_method_varargs(cl, fts_new_symbol("debounce-time"), pt_common_meth_debouncetime);
-   fts_class_method_varargs(cl, fts_new_symbol("pt_common_tune"), pt_common_meth_obsolete);
-   fts_class_method_varargs(cl, fts_new_symbol("ampl_threshold"), pt_common_meth_obsolete);
-   fts_class_method_varargs(cl, fts_new_symbol("quality_threshold"), pt_common_meth_obsolete);
+   fts_class_message_varargs(cl, fts_new_symbol("reference-pitch"), pt_common_meth_ref_pitch);
+   fts_class_message_varargs(cl, fts_new_symbol("reference-freq"), pt_common_meth_ref_freq);
+   fts_class_message_varargs(cl, fts_new_symbol("rough-pitch"), pt_common_meth_rough_pitch);
+   fts_class_message_varargs(cl, fts_new_symbol("pitch-range"), pt_common_meth_pitch_range);
+   fts_class_message_varargs(cl, fts_new_symbol("stick"), pt_common_meth_stick);
+   fts_class_message_varargs(cl, fts_new_symbol("stretch"), pt_common_meth_stretch);
+   fts_class_message_varargs(cl, fts_new_symbol("coefs"), pt_common_meth_coefs);
+   fts_class_message_varargs(cl, fts_new_symbol("amp-range"), pt_common_meth_amp_range);
+   fts_class_message_varargs(cl, fts_new_symbol("quality-range"), pt_common_meth_quality_range);
+   fts_class_message_varargs(cl, fts_new_symbol("debounce-time"), pt_common_meth_debouncetime);
+   fts_class_message_varargs(cl, fts_new_symbol("pt_common_tune"), pt_common_meth_obsolete);
+   fts_class_message_varargs(cl, fts_new_symbol("ampl_threshold"), pt_common_meth_obsolete);
+   fts_class_message_varargs(cl, fts_new_symbol("quality_threshold"), pt_common_meth_obsolete);
 
-   fts_class_method_varargs(cl, fts_new_symbol("print-kernel"), pt_common_meth_print_kernel);
+   fts_class_message_varargs(cl, fts_new_symbol("print-kernel"), pt_common_meth_print_kernel);
 
    pt_common_init_millers_dumsqrt();
 }

@@ -352,12 +352,12 @@ matrix_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(matrix_t), matrix_init, matrix_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, matrix_put);
+  fts_class_message_varargs(cl, fts_s_put, matrix_put);
     
-  fts_class_method_varargs(cl, fts_s_set, matrix_node);
-  fts_class_method_varargs(cl, fts_new_symbol("in"), matrix_in);
-  fts_class_method_varargs(cl, fts_new_symbol("out"), matrix_out);
-  fts_class_method_varargs(cl, fts_new_symbol("all"), matrix_all);
+  fts_class_message_varargs(cl, fts_s_set, matrix_node);
+  fts_class_message_varargs(cl, fts_new_symbol("in"), matrix_in);
+  fts_class_message_varargs(cl, fts_new_symbol("out"), matrix_out);
+  fts_class_message_varargs(cl, fts_new_symbol("all"), matrix_all);
     
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

@@ -1055,7 +1055,7 @@ static void alsaaudioport_instantiate(fts_class_t *cl)
     fts_class_init( cl, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
 
     /* debug print */
-    fts_class_method_varargs(cl, fts_s_print, alsaaudioport_print);
+    fts_class_message_varargs(cl, fts_s_print, alsaaudioport_print);
 
     fts_class_add_daemon( cl, obj_property_get, fts_s_state, alsaaudioport_get_state);
 }

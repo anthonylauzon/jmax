@@ -722,7 +722,7 @@ binop_instantiate(fts_class_t *cl, binop_definition_t *definition)
 {
   fts_class_init(cl, sizeof(binop_t), binop_init, binop_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, definition->put);
+  fts_class_message_varargs(cl, fts_s_put, definition->put);
 
   fts_class_inlet_int(cl, 1, binop_set_scalar);
   fts_class_inlet_float(cl, 1, binop_set_scalar);

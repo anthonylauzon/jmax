@@ -501,22 +501,22 @@ seqplay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqplay_t), seqplay_init, seqplay_delete);
 
-  fts_class_method_varargs(cl, fts_new_symbol("locate"), seqplay_locate);
-  fts_class_method_varargs(cl, fts_s_start, seqplay_start);
-  fts_class_method_varargs(cl, fts_s_stop, seqplay_stop);
-  fts_class_method_varargs(cl, fts_new_symbol("pause"), seqplay_pause);
-  /* fts_class_method_varargs(cl, fts_new_symbol("loop"), seqplay_loop); */
+  fts_class_message_varargs(cl, fts_new_symbol("locate"), seqplay_locate);
+  fts_class_message_varargs(cl, fts_s_start, seqplay_start);
+  fts_class_message_varargs(cl, fts_s_stop, seqplay_stop);
+  fts_class_message_varargs(cl, fts_new_symbol("pause"), seqplay_pause);
+  /* fts_class_message_varargs(cl, fts_new_symbol("loop"), seqplay_loop); */
 
-  fts_class_method_varargs(cl, fts_new_symbol("begin"), seqplay_set_begin);
-  fts_class_method_varargs(cl, fts_new_symbol("end"), seqplay_set_end);
-  fts_class_method_varargs(cl, fts_new_symbol("speed"), seqplay_set_speed);
-  fts_class_method_varargs(cl, fts_new_symbol("duration"), seqplay_set_duration);
-  fts_class_method_varargs(cl, fts_s_set, seqplay_set);
+  fts_class_message_varargs(cl, fts_new_symbol("begin"), seqplay_set_begin);
+  fts_class_message_varargs(cl, fts_new_symbol("end"), seqplay_set_end);
+  fts_class_message_varargs(cl, fts_new_symbol("speed"), seqplay_set_speed);
+  fts_class_message_varargs(cl, fts_new_symbol("duration"), seqplay_set_duration);
+  fts_class_message_varargs(cl, fts_s_set, seqplay_set);
 
-  fts_class_method_varargs(cl, fts_new_symbol("sync"), seqplay_sync);
+  fts_class_message_varargs(cl, fts_new_symbol("sync"), seqplay_sync);
 
-  fts_class_method_varargs(cl, fts_s_bang, seqplay_play);
-  fts_class_method_varargs(cl, seqsym_track, seqplay_play);
+  fts_class_message_varargs(cl, fts_s_bang, seqplay_play);
+  fts_class_message_varargs(cl, seqsym_track, seqplay_play);
   
   fts_class_inlet_varargs(cl, 0, seqplay_play);
   fts_class_inlet_number(cl, 1, seqplay_set_begin);

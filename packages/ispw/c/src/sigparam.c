@@ -94,9 +94,9 @@ sigsamplerate_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigparam_t), sigsamplerate_init, sigparam_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigparam_put);
+  fts_class_message_varargs(cl, fts_s_put, sigparam_put);
   
-  fts_class_method_varargs(cl, fts_s_bang, sigparam_bang);
+  fts_class_message_varargs(cl, fts_s_bang, sigparam_bang);
 
   fts_dsp_declare_inlet(cl, 0);  
   fts_class_outlet_number(cl, 0);
@@ -107,9 +107,9 @@ sigvectorsize_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigparam_t), sigvectorsize_init, sigparam_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigparam_put);
+  fts_class_message_varargs(cl, fts_s_put, sigparam_put);
 
-  fts_class_method_varargs(cl, fts_s_bang, sigparam_bang);
+  fts_class_message_varargs(cl, fts_s_bang, sigparam_bang);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_class_outlet_number(cl, 0);

@@ -92,7 +92,7 @@ dsp_timebase_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_timebase_t), dsp_timebase_init, dsp_timebase_delete);
 
-  fts_class_method_varargs(cl, fts_s_sched_ready, dsp_timebase_advance);
+  fts_class_message_varargs(cl, fts_s_sched_ready, dsp_timebase_advance);
   }
 
 void
@@ -292,7 +292,7 @@ static void
 dsp_edge_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_dsp_edge_t), dsp_edge_init, dsp_edge_delete);
-  fts_class_method_varargs(cl, fts_s_put, dsp_edge_put);
+  fts_class_message_varargs(cl, fts_s_put, dsp_edge_put);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dsp_edge_get_state);  
 

@@ -26,6 +26,8 @@
 
 #include "control.h"
 
+extern void bus_config(void);
+
 extern void sync_config(void);
 extern void tup_config(void);
 
@@ -54,6 +56,8 @@ extern void speedlim_config(void);
 void
 control_config(void)
 {
+  bus_config();
+
   sync_config();
   tup_config();
 

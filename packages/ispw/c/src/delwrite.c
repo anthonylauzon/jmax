@@ -175,10 +175,10 @@ delwrite_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delwrite_t), delwrite_init, delwrite_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, delwrite_put);
+  fts_class_message_varargs(cl, fts_s_put, delwrite_put);
 
-  fts_class_method_varargs(cl, fts_s_clear, delwrite_clear);
-  fts_class_method_varargs(cl, fts_new_symbol("realloc"), delwrite_realloc);
+  fts_class_message_varargs(cl, fts_s_clear, delwrite_clear);
+  fts_class_message_varargs(cl, fts_new_symbol("realloc"), delwrite_realloc);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

@@ -135,7 +135,7 @@ value_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(value_t), value_init, value_delete);
 
-  fts_class_method_varargs(cl, fts_s_bang, value_bang);
+  fts_class_message_varargs(cl, fts_s_bang, value_bang);
 
   fts_class_inlet_int(cl, 0, value_scalar);
   fts_class_inlet_float(cl, 0, value_scalar);

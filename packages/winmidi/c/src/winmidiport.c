@@ -637,7 +637,7 @@ winmidiport_instantiate(fts_class_t *cl)
 
   fts_midiport_class_init(cl);
   
-  fts_class_method_varargs(cl, fts_s_sched_ready, winmidiport_dispatch);
+  fts_class_message_varargs(cl, fts_s_sched_ready, winmidiport_dispatch);
   
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, winmidiport_get_state);

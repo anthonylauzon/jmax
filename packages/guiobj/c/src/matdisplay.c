@@ -546,16 +546,16 @@ matdisplay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(matdisplay_t), matdisplay_init, matdisplay_delete);
 
-  fts_class_method_varargs(cl, fts_s_update_gui, matdisplay_update_gui); 
-  fts_class_method_varargs(cl, fts_s_update_real_time, matdisplay_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_dump, matdisplay_dump);
+  fts_class_message_varargs(cl, fts_s_update_gui, matdisplay_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, matdisplay_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_dump, matdisplay_dump);
 
-  fts_class_method_varargs(cl, sym_window, matdisplay_set_window_size_by_client);
-  fts_class_method_varargs(cl, sym_zoom, matdisplay_set_zoom_by_client);
+  fts_class_message_varargs(cl, sym_window, matdisplay_set_window_size_by_client);
+  fts_class_message_varargs(cl, sym_zoom, matdisplay_set_zoom_by_client);
 
-  fts_class_method_varargs(cl, sym_range, matdisplay_set_range);
-  fts_class_method_varargs(cl, sym_color, matdisplay_set_color);
-  fts_class_method_varargs(cl, fts_s_clear, matdisplay_clear);
+  fts_class_message_varargs(cl, sym_range, matdisplay_set_range);
+  fts_class_message_varargs(cl, sym_color, matdisplay_set_color);
+  fts_class_message_varargs(cl, fts_s_clear, matdisplay_clear);
  
   fts_class_inlet_number(cl, 0, matdisplay_number);
   fts_class_inlet_varargs(cl, 0, matdisplay_varargs);

@@ -74,8 +74,8 @@ finder_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_finder_t), 0, 0); 
 
-  fts_class_method_varargs(cl, fts_new_symbol("finder_find"), fts_finder_find);
-  fts_class_method_varargs(cl, fts_new_symbol("finder_find_friends"), fts_finder_find_friends);
+  fts_class_message_varargs(cl, fts_new_symbol("finder_find"), fts_finder_find);
+  fts_class_message_varargs(cl, fts_new_symbol("finder_find_friends"), fts_finder_find_friends);
 }
 
 /***********************************************************************

@@ -192,7 +192,7 @@ pink_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(pink_t), pink_init, pink_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, pink_put);
+  fts_class_message_varargs(cl, fts_s_put, pink_put);
 
   pink_ftl_sym = fts_new_symbol("pink");
   fts_dsp_declare_function(pink_ftl_sym, pink_ftl);

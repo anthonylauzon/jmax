@@ -115,8 +115,8 @@ clipboard_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_clipboard_t), clipboard_init, clipboard_delete);
 
-  fts_class_method_varargs(cl, fts_s_paste,  clipboard_paste_in);
-  fts_class_method_varargs(cl, fts_s_copy,   clipboard_copy_selection);
+  fts_class_message_varargs(cl, fts_s_paste,  clipboard_paste_in);
+  fts_class_message_varargs(cl, fts_s_copy,   clipboard_copy_selection);
 }
 
 

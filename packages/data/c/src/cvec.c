@@ -673,31 +673,31 @@ cvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(cvec_t), cvec_init, cvec_delete);
   
-  fts_class_method_varargs(cl, fts_s_post, cvec_post); 
-  fts_class_method_varargs(cl, fts_s_print, cvec_print); 
-  fts_class_method_varargs(cl, fts_s_set_from_instance, cvec_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_post, cvec_post); 
+  fts_class_message_varargs(cl, fts_s_print, cvec_print); 
+  fts_class_message_varargs(cl, fts_s_set_from_instance, cvec_set_from_instance);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, cvec_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, cvec_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, cvec_get_state);
   
-  fts_class_method_varargs(cl, fts_s_fill, cvec_fill); 
-  fts_class_method_varargs(cl, fts_s_set, cvec_set_elements);
+  fts_class_message_varargs(cl, fts_s_fill, cvec_fill); 
+  fts_class_message_varargs(cl, fts_s_set, cvec_set_elements);
 
-  fts_class_method_varargs(cl, fts_s_assign, cvec_assign);
+  fts_class_message_varargs(cl, fts_s_assign, cvec_assign);
  
-  fts_class_method_varargs(cl, fts_new_symbol("add"), cvec_add);
-  fts_class_method_varargs(cl, fts_new_symbol("sub"), cvec_sub);
-  fts_class_method_varargs(cl, fts_new_symbol("mul"), cvec_mul);
+  fts_class_message_varargs(cl, fts_new_symbol("add"), cvec_add);
+  fts_class_message_varargs(cl, fts_new_symbol("sub"), cvec_sub);
+  fts_class_message_varargs(cl, fts_new_symbol("mul"), cvec_mul);
 
-  fts_class_method_varargs(cl, fts_new_symbol("abs"), cvec_abs);
-  fts_class_method_varargs(cl, fts_new_symbol("log"), cvec_log);
-  fts_class_method_varargs(cl, fts_new_symbol("exp"), cvec_log);
+  fts_class_message_varargs(cl, fts_new_symbol("abs"), cvec_abs);
+  fts_class_message_varargs(cl, fts_new_symbol("log"), cvec_log);
+  fts_class_message_varargs(cl, fts_new_symbol("exp"), cvec_log);
 
-  fts_class_method_varargs(cl, fts_new_symbol("fft"), cvec_fft);
-  fts_class_method_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
+  fts_class_message_varargs(cl, fts_new_symbol("fft"), cvec_fft);
+  fts_class_message_varargs(cl, fts_new_symbol("ifft"), cvec_ifft);
 
-  fts_class_method_varargs(cl, fts_s_size, cvec_size);
+  fts_class_message_varargs(cl, fts_s_size, cvec_size);
   }
 
 /********************************************************************

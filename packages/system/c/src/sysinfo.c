@@ -22,20 +22,12 @@
 #include <fts/fts.h>
 #include <string.h>
 
-static fts_symbol_t sym_arch;
-
 extern fts_package_t* fts_get_system_package(void);
 
 typedef struct 
 {
   fts_object_t _o;
 } sysinfo_t;
-
-static void
-sysinfo_arch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_outlet_symbol(o, 0, sym_arch);
-}
 
 static void
 sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -150,18 +142,17 @@ sysinfo_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sysinfo_t), 0, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol("arch"), sysinfo_arch);
-  fts_class_method_varargs(cl, fts_new_symbol("classes"), sysinfo_classes);
-  fts_class_method_varargs(cl, fts_new_symbol("audio"), sysinfo_audio);
-  fts_class_method_varargs(cl, fts_new_symbol("midi"), sysinfo_midi);
+  fts_class_message_varargs(cl, fts_new_symbol("classes"), sysinfo_classes);
+  fts_class_message_varargs(cl, fts_new_symbol("audio"), sysinfo_audio);
+  fts_class_message_varargs(cl, fts_new_symbol("midi"), sysinfo_midi);
 
-  fts_class_method_varargs(cl, fts_new_symbol("noouts"), sysinfo_noouts);  
+  fts_class_message_varargs(cl, fts_new_symbol("noouts"), sysinfo_noouts);  
+
+  fts_class_inlet_anything(cl, 0);
 }
 
 void
 sysinfo_config(void)
 {
-  sym_arch = fts_new_symbol("FTS_ARCH_NAME");
-
   fts_class_install(fts_new_symbol("sysinfo"), sysinfo_instantiate);
 }

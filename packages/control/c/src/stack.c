@@ -153,10 +153,10 @@ stack_instantiate(fts_class_t *cl)
   fts_class_inlet_symbol(cl, 0, stack_input_atom);
   fts_class_inlet_varargs(cl, 0, stack_input_atoms);
 
-  fts_class_method_varargs(cl, fts_s_bang, stack_pop);
-  fts_class_method_varargs(cl, fts_new_symbol("pop"), stack_pop);
-  fts_class_method_varargs(cl, fts_s_flush, stack_flush);
-  fts_class_method_varargs(cl, fts_s_clear, stack_clear);
+  fts_class_message_varargs(cl, fts_s_bang, stack_pop);
+  fts_class_message_varargs(cl, fts_new_symbol("pop"), stack_pop);
+  fts_class_message_varargs(cl, fts_s_flush, stack_flush);
+  fts_class_message_varargs(cl, fts_s_clear, stack_clear);
 
   fts_class_outlet_varargs(cl, 0);
 }

@@ -160,16 +160,16 @@ value_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(value_t), value_init, value_delete);
 
-  fts_class_method_varargs(cl, fts_s_post, value_post);
+  fts_class_message_varargs(cl, fts_s_post, value_post);
 
-  fts_class_method_varargs(cl, fts_s_set_from_instance, value_set_from_instance);
-  fts_class_method_varargs(cl, fts_s_dump, value_dump);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, value_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_dump, value_dump);
 
-  fts_class_method_varargs(cl, fts_s_get_array, value_get_array);
-  fts_class_method_varargs(cl, fts_s_set_from_array, value_set_from_array);
+  fts_class_message_varargs(cl, fts_s_get_array, value_get_array);
+  fts_class_message_varargs(cl, fts_s_set_from_array, value_set_from_array);
   
-  fts_class_method_varargs(cl, fts_s_bang, value_output);
-  fts_class_method_varargs(cl, fts_s_set, value_set_atom);
+  fts_class_message_varargs(cl, fts_s_bang, value_output);
+  fts_class_message_varargs(cl, fts_s_set, value_set_atom);
 
   fts_class_inlet_varargs(cl, 0, value_set_and_output);
   fts_class_inlet_varargs(cl, 1, value_set_atoms);

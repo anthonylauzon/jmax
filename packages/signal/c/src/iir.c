@@ -383,9 +383,9 @@ iir_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(iir_t), iir_init, iir_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, iir_put);
+  fts_class_message_varargs(cl, fts_s_put, iir_put);
   
-  fts_class_method_varargs(cl, fts_s_clear, iir_clear);
+  fts_class_message_varargs(cl, fts_s_clear, iir_clear);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

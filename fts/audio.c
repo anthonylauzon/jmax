@@ -319,8 +319,8 @@ static void audioport_guard_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( audioport_guard_t), audioport_guard_init, audioport_guard_delete);
 
-  fts_class_method_varargs(cl, fts_s_put_prologue, audioport_guard_put_prologue);
-  fts_class_method_varargs(cl, fts_s_put_epilogue, audioport_guard_put_epilogue);
+  fts_class_message_varargs(cl, fts_s_put_prologue, audioport_guard_put_prologue);
+  fts_class_message_varargs(cl, fts_s_put_epilogue, audioport_guard_put_epilogue);
 
   fts_dsp_declare_function( s_audioport_guard, audio_guard_dsp_function);
 }
@@ -393,7 +393,7 @@ static void audioportin_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( fts_audioportin_t), audioportin_init, audioportin_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, audioportin_put);
+  fts_class_message_varargs(cl, fts_s_put, audioportin_put);
 
   fts_dsp_declare_outlet( cl, 0);
 }
@@ -435,7 +435,7 @@ static void indispatcher_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( indispatcher_t), indispatcher_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, indispatcher_propagate_input);
+  fts_class_message_varargs(cl, fts_s_propagate_input, indispatcher_propagate_input);
 
   fts_dsp_declare_inlet( cl, 0);
 }
@@ -542,7 +542,7 @@ static void audioportout_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( fts_audioportout_t), audioportout_init, audioportout_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, audioportout_put);
+  fts_class_message_varargs(cl, fts_s_put, audioportout_put);
 
   fts_dsp_declare_inlet(cl, 0);
 }

@@ -201,7 +201,7 @@ static void out_tilda_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( out_tilda_t), out_tilda_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, out_tilda_propagate_input);
+  fts_class_message_varargs(cl, fts_s_propagate_input, out_tilda_propagate_input);
 
   fts_dsp_declare_inlet( cl, 0);
 }

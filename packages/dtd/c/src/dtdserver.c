@@ -392,7 +392,7 @@ static void dtdserver_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof(dtdserver_t), dtdserver_init, dtdserver_delete);
 
-  fts_class_method_varargs(cl, fts_s_sched_ready, dtdserver_select);
+  fts_class_message_varargs(cl, fts_s_sched_ready, dtdserver_select);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, dtdserver_get_state);
 }

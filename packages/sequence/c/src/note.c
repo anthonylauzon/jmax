@@ -121,13 +121,13 @@ note_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(note_t), note_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_get_array, note_get_array);
-  fts_class_method_varargs(cl, fts_s_set_from_array, note_set_from_array);
+  fts_class_message_varargs(cl, fts_s_get_array, note_get_array);
+  fts_class_message_varargs(cl, fts_s_set_from_array, note_set_from_array);
 
-  fts_class_method_varargs(cl, fts_s_post, note_post);
+  fts_class_message_varargs(cl, fts_s_post, note_post);
 
-  fts_class_method_varargs(cl, fts_new_symbol("duration"), note_duration);
-  fts_class_method_varargs(cl, fts_new_symbol("pitch"), note_pitch);
+  fts_class_message_varargs(cl, fts_new_symbol("duration"), note_duration);
+  fts_class_message_varargs(cl, fts_new_symbol("pitch"), note_pitch);
 }
 
 void

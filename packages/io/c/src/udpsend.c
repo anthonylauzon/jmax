@@ -267,7 +267,7 @@ udpsend_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( udpsend_t), udpsend_init, udpsend_delete);
 
-  /*fts_class_method_varargs(cl, fts_s_anything, udpsend_anything);*/
+  /*fts_class_message_varargs(cl, fts_s_anything, udpsend_anything);*/
 }
 
 void udpsend_config( void)

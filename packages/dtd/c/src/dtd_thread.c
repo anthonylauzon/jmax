@@ -108,11 +108,11 @@ static void
 dtd_thread_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
 {
     fts_class_init(cl, sizeof(dtd_thread_t), dtd_thread_init, dtd_thread_delete);
-    fts_class_method_varargs(cl, fts_s_write, dtd_thread_write);
-    fts_class_method_varargs(cl, fts_s_read, dtd_thread_read);
+    fts_class_message_varargs(cl, fts_s_write, dtd_thread_write);
+    fts_class_message_varargs(cl, fts_s_read, dtd_thread_read);
 
-    fts_class_method_varargs(cl, fts_s_write, dtd_thread_write);
-    fts_class_method_varargs(cl, fts_s_read, dtd_thread_read);
+    fts_class_message_varargs(cl, fts_s_write, dtd_thread_write);
+    fts_class_message_varargs(cl, fts_s_read, dtd_thread_read);
     return fts_ok;
 }
 

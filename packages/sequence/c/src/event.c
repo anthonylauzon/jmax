@@ -162,7 +162,7 @@ event_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(event_t), event_init, event_delete);
 
-  fts_class_method_varargs(cl, fts_s_set, event_set);
+  fts_class_message_varargs(cl, fts_s_set, event_set);
 }
 
 /*****************************************************************

@@ -148,7 +148,7 @@ sustain_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sustain_t), sustain_init, sustain_clear);
 
-  fts_class_method_varargs(cl, fts_s_clear, sustain_clear);
+  fts_class_message_varargs(cl, fts_s_clear, sustain_clear);
 
   fts_class_inlet_number(cl, 0, sustain_number);
   fts_class_inlet_varargs(cl, 0, sustain_list);

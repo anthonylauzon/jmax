@@ -117,7 +117,7 @@ static void update_group_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( update_group_t), update_group_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_start, update_group_start);
+  fts_class_message_varargs(cl, fts_s_start, update_group_start);
 }
 
 

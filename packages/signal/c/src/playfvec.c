@@ -465,23 +465,23 @@ play_fvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(play_fvec_t), play_fvec_init, play_fvec_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, play_fvec_put);
+  fts_class_message_varargs(cl, fts_s_put, play_fvec_put);
 
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("period"), play_fvec_set_period_prop);
   
-  fts_class_method_varargs(cl, fts_s_bang, play_fvec_bang);
-  fts_class_method_varargs(cl, fts_s_start, play_fvec_start);
-  fts_class_method_varargs(cl, fts_s_stop, play_fvec_stop);
-  fts_class_method_varargs(cl, fts_new_symbol("loop"), play_fvec_loop);
-  fts_class_method_varargs(cl, fts_new_symbol("cycle"), play_fvec_cycle);
-  fts_class_method_varargs(cl, fts_new_symbol("pause"), play_fvec_pause);
-  fts_class_method_varargs(cl, fts_new_symbol("rewind"), play_fvec_rewind);
+  fts_class_message_varargs(cl, fts_s_bang, play_fvec_bang);
+  fts_class_message_varargs(cl, fts_s_start, play_fvec_start);
+  fts_class_message_varargs(cl, fts_s_stop, play_fvec_stop);
+  fts_class_message_varargs(cl, fts_new_symbol("loop"), play_fvec_loop);
+  fts_class_message_varargs(cl, fts_new_symbol("cycle"), play_fvec_cycle);
+  fts_class_message_varargs(cl, fts_new_symbol("pause"), play_fvec_pause);
+  fts_class_message_varargs(cl, fts_new_symbol("rewind"), play_fvec_rewind);
 
-  fts_class_method_varargs(cl, fts_new_symbol("begin"), play_fvec_set_begin);
-  fts_class_method_varargs(cl, fts_new_symbol("end"), play_fvec_set_end);
-  fts_class_method_varargs(cl, fts_new_symbol("speed"), play_fvec_set_speed);
+  fts_class_message_varargs(cl, fts_new_symbol("begin"), play_fvec_set_begin);
+  fts_class_message_varargs(cl, fts_new_symbol("end"), play_fvec_set_end);
+  fts_class_message_varargs(cl, fts_new_symbol("speed"), play_fvec_set_speed);
 
-  fts_class_method_varargs(cl, fts_s_set, play_fvec_set);
+  fts_class_message_varargs(cl, fts_s_set, play_fvec_set);
 
   fts_class_inlet(cl, 0, fvec_type, play_fvec_set_object);
   fts_class_inlet_varargs(cl, 0, play_fvec_list);

@@ -98,10 +98,10 @@ seqmess_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqmess_t), seqmess_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_post, seqmess_post);
+  fts_class_message_varargs(cl, fts_s_post, seqmess_post);
 
-  fts_class_method_varargs(cl, fts_s_get_array, seqmess_get_array);
-  fts_class_method_varargs(cl, fts_s_set_from_array, seqmess_set_from_array);
+  fts_class_message_varargs(cl, fts_s_get_array, seqmess_get_array);
+  fts_class_message_varargs(cl, fts_s_set_from_array, seqmess_set_from_array);
 }
 
 void

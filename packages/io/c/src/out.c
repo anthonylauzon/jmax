@@ -112,7 +112,7 @@ out_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(out_t), out_init, 0);
   
-  fts_class_method_varargs(cl, fts_s_bang, out_bang);
+  fts_class_message_varargs(cl, fts_s_bang, out_bang);
   fts_class_inlet_int(cl, 0, out_int_and_flush);
   fts_class_inlet_varargs(cl, 0, out_list_and_flush);
   fts_class_inlet_int(cl, 1, out_int);

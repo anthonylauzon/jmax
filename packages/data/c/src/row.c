@@ -178,8 +178,8 @@ row_instantiate(fts_class_t *cl)
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, row_getobj);
   
-  fts_class_method_varargs(cl, fts_s_fill, row_fill);      
-  fts_class_method_varargs(cl, fts_s_set, row_set);
+  fts_class_message_varargs(cl, fts_s_fill, row_fill);      
+  fts_class_message_varargs(cl, fts_s_set, row_set);
   }
 
 void

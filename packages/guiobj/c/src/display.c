@@ -254,8 +254,8 @@ display_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(display_t), display_init, display_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, display_put);
-  fts_class_method_varargs(cl, fts_s_update_real_time, display_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_put, display_put);
+  fts_class_message_varargs(cl, fts_s_update_real_time, display_update_real_time); 
 
   fts_dsp_declare_inlet(cl, 0);
   fts_class_inlet_varargs(cl, 0, display_varargs);

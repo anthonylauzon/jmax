@@ -1071,27 +1071,27 @@ funbuff_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(funbuff_t), funbuff_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_set, funbuff_set);
+  fts_class_message_varargs(cl, fts_s_set, funbuff_set);
 
-  fts_class_method_varargs(cl, fts_s_bang, funbuff_bang);
+  fts_class_message_varargs(cl, fts_s_bang, funbuff_bang);
   fts_class_inlet_int(cl, 0, funbuff_number);
   fts_class_inlet_float(cl, 0, funbuff_number);
 
-  fts_class_method_varargs(cl, fts_new_symbol("next"), funbuff_next);
-  fts_class_method_varargs(cl, fts_new_symbol("goto"), funbuff_goto);
-  fts_class_method_varargs(cl, fts_new_symbol("reduce"), funbuff_reduce);
-  fts_class_method_varargs(cl, fts_new_symbol("interp"), funbuff_interp);
+  fts_class_message_varargs(cl, fts_new_symbol("next"), funbuff_next);
+  fts_class_message_varargs(cl, fts_new_symbol("goto"), funbuff_goto);
+  fts_class_message_varargs(cl, fts_new_symbol("reduce"), funbuff_reduce);
+  fts_class_message_varargs(cl, fts_new_symbol("interp"), funbuff_interp);
 
-  fts_class_method_varargs(cl, fts_s_clear, funbuff_clear);
-  fts_class_method_varargs(cl, fts_new_symbol("interptab"), funbuff_interptab);
-  fts_class_method_varargs(cl, fts_new_symbol("cut"), funbuff_cut);
-  fts_class_method_varargs(cl, fts_new_symbol("copy"), funbuff_copy);
-  fts_class_method_varargs(cl, fts_new_symbol("paste"), funbuff_paste);
-  fts_class_method_varargs(cl, fts_new_symbol("dump"), funbuff_dump);
-  fts_class_method_varargs(cl, fts_new_symbol("find"), funbuff_find);
-  fts_class_method_varargs(cl, fts_new_symbol("undo"), funbuff_undo);
+  fts_class_message_varargs(cl, fts_s_clear, funbuff_clear);
+  fts_class_message_varargs(cl, fts_new_symbol("interptab"), funbuff_interptab);
+  fts_class_message_varargs(cl, fts_new_symbol("cut"), funbuff_cut);
+  fts_class_message_varargs(cl, fts_new_symbol("copy"), funbuff_copy);
+  fts_class_message_varargs(cl, fts_new_symbol("paste"), funbuff_paste);
+  fts_class_message_varargs(cl, fts_new_symbol("dump"), funbuff_dump);
+  fts_class_message_varargs(cl, fts_new_symbol("find"), funbuff_find);
+  fts_class_message_varargs(cl, fts_new_symbol("undo"), funbuff_undo);
 
-  fts_class_method_varargs(cl, fts_new_symbol("select"), funbuff_select);
+  fts_class_message_varargs(cl, fts_new_symbol("select"), funbuff_select);
 
   fts_class_inlet_int(cl, 1, funbuff_number_1);
   fts_class_inlet_float(cl, 1, funbuff_number_1);

@@ -107,7 +107,7 @@ mtof_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mtof_t), mtof_init, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol("tune"), mtof_tune);
+  fts_class_message_varargs(cl, fts_new_symbol("tune"), mtof_tune);
   fts_class_inlet_number(cl, 0, mtof_number);
 
   fts_class_outlet_float(cl, 0);
@@ -118,7 +118,7 @@ ftom_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mtof_t), mtof_init, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol("tune"), mtof_tune);
+  fts_class_message_varargs(cl, fts_new_symbol("tune"), mtof_tune);
   fts_class_inlet_number(cl, 0, ftom_number);
 
   fts_class_outlet_float(cl, 0);

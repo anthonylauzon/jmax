@@ -248,9 +248,9 @@ class_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(threshold_t), threshold_init, threshold_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, threshold_put);
+  fts_class_message_varargs(cl, fts_s_put, threshold_put);
   
-  fts_class_method_varargs(cl, fts_s_set, threshold_set);
+  fts_class_message_varargs(cl, fts_s_set, threshold_set);
   
   fts_dsp_declare_inlet(cl, 0);
 

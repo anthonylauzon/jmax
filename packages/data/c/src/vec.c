@@ -401,26 +401,26 @@ vec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vec_t), vec_init, vec_delete);
   
-  fts_class_method_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
-  fts_class_method_varargs(cl, fts_s_set_from_array, vec_set_from_array);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, vec_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_set_from_array, vec_set_from_array);
 
-  fts_class_method_varargs(cl, fts_s_get_array, vec_get_array);
-  fts_class_method_varargs(cl, fts_s_dump, vec_dump);
+  fts_class_message_varargs(cl, fts_s_get_array, vec_get_array);
+  fts_class_message_varargs(cl, fts_s_dump, vec_dump);
   
-  fts_class_method_varargs(cl, fts_s_post, vec_post); 
-  fts_class_method_varargs(cl, fts_s_print, vec_print); 
+  fts_class_message_varargs(cl, fts_s_post, vec_post); 
+  fts_class_message_varargs(cl, fts_s_print, vec_print); 
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, vec_get_vec);
   
-  fts_class_method_varargs(cl, fts_s_fill, vec_fill);      
-  fts_class_method_varargs(cl, fts_s_set, vec_set_elements);
+  fts_class_message_varargs(cl, fts_s_fill, vec_fill);      
+  fts_class_message_varargs(cl, fts_s_set, vec_set_elements);
   
-  fts_class_method_varargs(cl, fts_s_size, vec_size);
+  fts_class_message_varargs(cl, fts_s_size, vec_size);
   
-  fts_class_method_varargs(cl, fts_s_import, vec_import); 
-  fts_class_method_varargs(cl, fts_s_export, vec_export); 
+  fts_class_message_varargs(cl, fts_s_import, vec_import); 
+  fts_class_message_varargs(cl, fts_s_export, vec_export); 
   }
 
 void

@@ -178,8 +178,8 @@ tabpoke_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(tabpoke_t), tabpoke_init, 0);
   
-  fts_class_method_varargs(cl, fts_s_set, tabpoke_set);
-  fts_class_method_varargs(cl, fts_new_symbol("center"), tabpoke_center);
+  fts_class_message_varargs(cl, fts_s_set, tabpoke_set);
+  fts_class_message_varargs(cl, fts_new_symbol("center"), tabpoke_center);
 
   fts_class_inlet_varargs(cl, 0, tabpoke_list);
   fts_class_inlet_number(cl, 0, tabpoke_number);

@@ -270,7 +270,7 @@ static void client_manager_delete( fts_object_t *o, int winlet, fts_symbol_t s, 
 static void client_manager_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( client_manager_t), client_manager_init, client_manager_delete);
-  fts_class_method_varargs(cl, fts_s_sched_ready, client_manager_select);
+  fts_class_message_varargs(cl, fts_s_sched_ready, client_manager_select);
 }
 
 /***********************************************************************
@@ -1102,17 +1102,17 @@ static void client_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( client_t), client_init, client_delete);
 
-  fts_class_method_varargs(cl, fts_new_symbol( "get_project"), client_get_project);
-  fts_class_method_varargs(cl, fts_s_midi_config, client_get_midiconfig);
+  fts_class_message_varargs(cl, fts_new_symbol( "get_project"), client_get_project);
+  fts_class_message_varargs(cl, fts_s_midi_config, client_get_midiconfig);
 
-  fts_class_method_varargs(cl, fts_new_symbol( "new_object"), client_new_object);
-  fts_class_method_varargs(cl, fts_new_symbol( "set_object_property"), client_set_object_property);
-  fts_class_method_varargs(cl, fts_new_symbol( "connect_object"), client_connect_object);
-  fts_class_method_varargs(cl, fts_new_symbol( "load"), client_load_patcher_file);
-  fts_class_method_varargs(cl, fts_new_symbol( "load_project"), client_load_project);
-  fts_class_method_varargs(cl, fts_new_symbol( "load_package"), client_load_package);
+  fts_class_message_varargs(cl, fts_new_symbol( "new_object"), client_new_object);
+  fts_class_message_varargs(cl, fts_new_symbol( "set_object_property"), client_set_object_property);
+  fts_class_message_varargs(cl, fts_new_symbol( "connect_object"), client_connect_object);
+  fts_class_message_varargs(cl, fts_new_symbol( "load"), client_load_patcher_file);
+  fts_class_message_varargs(cl, fts_new_symbol( "load_project"), client_load_project);
+  fts_class_message_varargs(cl, fts_new_symbol( "load_package"), client_load_package);
 
-  fts_class_method_varargs(cl, fts_new_symbol( "shutdown"), client_shutdown);
+  fts_class_message_varargs(cl, fts_new_symbol( "shutdown"), client_shutdown);
 }
 
 /***********************************************************************
@@ -1270,7 +1270,7 @@ static void client_controller_instantiate(fts_class_t *cl)
 
   fts_class_add_daemon( cl, obj_property_put, fts_new_symbol("echo"), client_controller_set_echo);
 
-  /* fts_class_method_varargs(cl, NULL, client_controller_anything_client); */
+  /* fts_class_message_varargs(cl, NULL, client_controller_anything_client); */
   fts_class_set_default_handler(cl, client_controller_anything_fts);
   fts_class_outlet(cl, 0, fts_c_anything);
   }

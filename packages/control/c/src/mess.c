@@ -71,7 +71,7 @@ mess_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mess_t), mess_init, NULL);
   
-  fts_class_method_varargs(cl, fts_s_bang, mess_atoms);
+  fts_class_message_varargs(cl, fts_s_bang, mess_atoms);
 
   fts_class_inlet_varargs(cl, 0, mess_atoms);  
   fts_class_inlet_symbol(cl, 1, mess_set_selector);

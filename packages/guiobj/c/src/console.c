@@ -97,7 +97,7 @@ static void consolestream_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof(consolestream_t), consolestream_init, consolestream_delete);
 
-  fts_class_method_varargs(cl, fts_new_symbol("set_default"), consolestream_set_default);
+  fts_class_message_varargs(cl, fts_new_symbol("set_default"), consolestream_set_default);
 }
 
 void console_config( void)

@@ -333,7 +333,7 @@ static void jackaudioport_instantiate(fts_class_t *cl)
 {
     fts_class_init( cl, sizeof( jackaudioport_t), jackaudioport_init, jackaudioport_delete);
     
-    fts_class_method_varargs(cl, fts_s_sched_ready, jackaudioport_halt);
+    fts_class_message_varargs(cl, fts_s_sched_ready, jackaudioport_halt);
     
     fts_class_add_daemon( cl, obj_property_get, fts_s_state, jackaudioport_get_state);
     

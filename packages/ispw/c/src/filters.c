@@ -347,11 +347,11 @@ sig2p2z_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sig2p2z_t), sig2p2z_init, sig2p2z_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sig2p2z_put);
+  fts_class_message_varargs(cl, fts_s_put, sig2p2z_put);
   
-  fts_class_method_varargs(cl, fts_s_clear, sig2p2z_state_clear);
+  fts_class_message_varargs(cl, fts_s_clear, sig2p2z_state_clear);
 
-  fts_class_method_varargs(cl, fts_s_set, sig2p2z_set);
+  fts_class_message_varargs(cl, fts_s_set, sig2p2z_set);
   
   fts_class_inlet_float(cl, 1, sig2p2z_gain_c0);
   fts_class_inlet_float(cl, 2, sig2p2z_fbcoef1_c1);

@@ -443,16 +443,16 @@ vecdisplay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vecdisplay_t), vecdisplay_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_dump, vecdisplay_dump);
+  fts_class_message_varargs(cl, fts_s_dump, vecdisplay_dump);
 
-  fts_class_method_varargs(cl, fts_s_update_gui, vecdisplay_update_gui); 
-  fts_class_method_varargs(cl, fts_s_update_real_time, vecdisplay_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_update_gui, vecdisplay_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, vecdisplay_update_real_time); 
 
-  fts_class_method_varargs(cl, fts_s_size, vecdisplay_set_size_by_client);
-  fts_class_method_varargs(cl, fts_new_symbol("range"), vecdisplay_set_range_by_client);
+  fts_class_message_varargs(cl, fts_s_size, vecdisplay_set_size_by_client);
+  fts_class_message_varargs(cl, fts_new_symbol("range"), vecdisplay_set_range_by_client);
 
-  fts_class_method_varargs(cl, sym_bounds, vecdisplay_set_bounds);
-  fts_class_method_varargs(cl, fts_s_clear, vecdisplay_clear);
+  fts_class_message_varargs(cl, sym_bounds, vecdisplay_set_bounds);
+  fts_class_message_varargs(cl, fts_s_clear, vecdisplay_clear);
   
   fts_class_inlet_int(cl, 0, vecdisplay_number);
   fts_class_inlet_float(cl, 0, vecdisplay_number);

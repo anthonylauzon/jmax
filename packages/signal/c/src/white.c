@@ -80,7 +80,7 @@ white_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(white_t), white_init, white_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, white_put);
+  fts_class_message_varargs(cl, fts_s_put, white_put);
 
   white_ftl_sym = fts_new_symbol("white");
   fts_dsp_declare_function(white_ftl_sym, white_ftl);

@@ -283,7 +283,7 @@ static void udpreceive_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( udpreceive_t), udpreceive_init, udpreceive_delete);
 
-  fts_class_method_varargs(cl, fts_s_sched_ready, udpreceive_receive);
+  fts_class_message_varargs(cl, fts_s_sched_ready, udpreceive_receive);
 }
 
 void udpreceive_config( void)

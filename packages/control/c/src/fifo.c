@@ -191,10 +191,10 @@ fifo_instantiate(fts_class_t *cl)
 
   fts_class_inlet_varargs(cl, 0, fifo_input_atoms);
 
-  fts_class_method_varargs(cl, fts_s_bang, fifo_next);
-  fts_class_method_varargs(cl, fts_s_next, fifo_next);
-  fts_class_method_varargs(cl, fts_s_flush, fifo_flush);
-  fts_class_method_varargs(cl, fts_s_clear, fifo_clear);
+  fts_class_message_varargs(cl, fts_s_bang, fifo_next);
+  fts_class_message_varargs(cl, fts_s_next, fifo_next);
+  fts_class_message_varargs(cl, fts_s_flush, fifo_flush);
+  fts_class_message_varargs(cl, fts_s_clear, fifo_clear);
 
   fts_class_outlet_anything(cl, 0);
 }

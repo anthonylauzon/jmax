@@ -772,16 +772,16 @@ pbank_instantiate(fts_class_t *cl)
   fts_class_inlet_varargs(cl, 0, pbank_set_and_get);
   
   fts_class_inlet_int(cl, 0, pbank_get_row);
-  fts_class_method_varargs(cl, fts_new_symbol("recall"), pbank_recall);
+  fts_class_message_varargs(cl, fts_new_symbol("recall"), pbank_recall);
   
-  fts_class_method_varargs(cl, fts_s_set, pbank_set);
-  fts_class_method_varargs(cl, fts_new_symbol("put"), pbank_put);
+  fts_class_message_varargs(cl, fts_s_set, pbank_set);
+  fts_class_message_varargs(cl, fts_new_symbol("put"), pbank_put);
 
-  fts_class_method_varargs(cl, fts_new_symbol("store"), pbank_store);
+  fts_class_message_varargs(cl, fts_new_symbol("store"), pbank_store);
 
-  fts_class_method_varargs(cl, fts_new_symbol("write"), pbank_write);
-  fts_class_method_varargs(cl, fts_new_symbol("read"), pbank_read);
-  fts_class_method_varargs(cl, fts_s_export, pbank_export);
+  fts_class_message_varargs(cl, fts_new_symbol("write"), pbank_write);
+  fts_class_message_varargs(cl, fts_new_symbol("read"), pbank_read);
+  fts_class_message_varargs(cl, fts_s_export, pbank_export);
 
   fts_class_outlet_varargs(cl, 0);
 }

@@ -1056,36 +1056,36 @@ track_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(track_t), track_init, track_delete);
 
-  fts_class_method_varargs(cl, fts_s_dump, track_dump);
-  fts_class_method_varargs(cl, seqsym_add_event, track_add_event_from_array);
+  fts_class_message_varargs(cl, fts_s_dump, track_dump);
+  fts_class_message_varargs(cl, seqsym_add_event, track_add_event_from_array);
 
-  fts_class_method_varargs(cl, fts_s_upload, track_upload);
-  fts_class_method_varargs(cl, fts_s_post, track_post);
-  fts_class_method_varargs(cl, fts_s_print, track_print);
+  fts_class_message_varargs(cl, fts_s_upload, track_upload);
+  fts_class_message_varargs(cl, fts_s_post, track_post);
+  fts_class_message_varargs(cl, fts_s_print, track_print);
 
-  fts_class_method_varargs(cl, seqsym_import_midifile_dialog, track_import_midifile_dialog);
-  fts_class_method_varargs(cl, seqsym_import_midifile, track_import_midifile);
+  fts_class_message_varargs(cl, seqsym_import_midifile_dialog, track_import_midifile_dialog);
+  fts_class_message_varargs(cl, seqsym_import_midifile, track_import_midifile);
 
-  fts_class_method_varargs(cl, seqsym_export_midifile_dialog, track_export_midifile_dialog);
-  fts_class_method_varargs(cl, seqsym_export_midifile, track_export_midifile);
+  fts_class_message_varargs(cl, seqsym_export_midifile_dialog, track_export_midifile_dialog);
+  fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
 
-  fts_class_method_varargs(cl, seqsym_setName, track_set_name_by_client_request);
-  fts_class_method_varargs(cl, seqsym_addEvent, track_add_event_by_client_request);
-  fts_class_method_varargs(cl, seqsym_makeEvent, track_make_event_by_client_request);
-  fts_class_method_varargs(cl, seqsym_removeEvents, track_remove_events_by_client_request);
-  fts_class_method_varargs(cl, seqsym_moveEvents, track_move_events_by_client_request);
+  fts_class_message_varargs(cl, seqsym_setName, track_set_name_by_client_request);
+  fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_by_client_request);
+  fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_by_client_request);
+  fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_by_client_request);
+  fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_by_client_request);
 
-  fts_class_method_varargs(cl, seqsym_active, track_active);
+  fts_class_message_varargs(cl, seqsym_active, track_active);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, track_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, track_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, track_get_state);
 
-  fts_class_method_varargs(cl, fts_s_clear, track_clear_method);
-  fts_class_method_varargs(cl, seqsym_insert, track_insert);
-  fts_class_method_varargs(cl, seqsym_remove, track_remove);
-  fts_class_method_varargs(cl, fts_s_import, track_import);
-  fts_class_method_varargs(cl, fts_s_export, track_export);
+  fts_class_message_varargs(cl, fts_s_clear, track_clear_method);
+  fts_class_message_varargs(cl, seqsym_insert, track_insert);
+  fts_class_message_varargs(cl, seqsym_remove, track_remove);
+  fts_class_message_varargs(cl, fts_s_import, track_import);
+  fts_class_message_varargs(cl, fts_s_export, track_export);
 }
 
 void

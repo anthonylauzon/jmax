@@ -120,9 +120,9 @@ metro_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(metro_t), metro_init, metro_delete);
 
-  fts_class_method_varargs(cl, fts_s_bang, metro_start);
-  fts_class_method_varargs(cl, fts_s_start, metro_start);
-  fts_class_method_varargs(cl, fts_s_stop, metro_stop);
+  fts_class_message_varargs(cl, fts_s_bang, metro_start);
+  fts_class_message_varargs(cl, fts_s_start, metro_start);
+  fts_class_message_varargs(cl, fts_s_stop, metro_stop);
 
   fts_class_inlet_int(cl, 0, metro_number);
   fts_class_inlet_float(cl, 0, metro_number);

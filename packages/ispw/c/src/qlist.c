@@ -423,24 +423,24 @@ qlist_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(qlist_t), qlist_init, qlist_delete);
 
-  fts_class_method_varargs(cl, fts_s_upload, qlist_upload);
-  fts_class_method_varargs(cl, fts_s_dump, qlist_dump);
-  fts_class_method_varargs(cl, fts_s_save_dotpat, qlist_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_upload, qlist_upload);
+  fts_class_message_varargs(cl, fts_s_dump, qlist_dump);
+  fts_class_message_varargs(cl, fts_s_save_dotpat, qlist_save_dotpat); 
 
-  fts_class_method_varargs(cl, fts_s_openEditor, qlist_open_editor);
-  fts_class_method_varargs(cl, fts_s_destroyEditor, qlist_destroy_editor);
-  fts_class_method_varargs(cl, fts_s_closeEditor, qlist_close_editor); 
+  fts_class_message_varargs(cl, fts_s_openEditor, qlist_open_editor);
+  fts_class_message_varargs(cl, fts_s_destroyEditor, qlist_destroy_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, qlist_close_editor); 
 
-  fts_class_method_varargs(cl, fts_new_symbol("rewind"), qlist_rewind);
-  fts_class_method_varargs(cl, fts_new_symbol("flush"), qlist_flush);
-  fts_class_method_varargs(cl, fts_s_clear, qlist_clear);
+  fts_class_message_varargs(cl, fts_new_symbol("rewind"), qlist_rewind);
+  fts_class_message_varargs(cl, fts_new_symbol("flush"), qlist_flush);
+  fts_class_message_varargs(cl, fts_s_clear, qlist_clear);
 
-  fts_class_method_varargs(cl, fts_new_symbol("next"), qlist_next);
-  fts_class_method_varargs(cl, fts_new_symbol("read"), qlist_read);
+  fts_class_message_varargs(cl, fts_new_symbol("next"), qlist_next);
+  fts_class_message_varargs(cl, fts_new_symbol("read"), qlist_read);
 
-  fts_class_method_varargs(cl, fts_s_set, qlist_set);
+  fts_class_message_varargs(cl, fts_s_set, qlist_set);
 
-  fts_class_method_varargs(cl, fts_s_append, qlist_append);
+  fts_class_message_varargs(cl, fts_s_append, qlist_append);
 
   fts_class_outlet_anything(cl, 0);
 }

@@ -243,15 +243,15 @@ dsp_control_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dsp_control_t), dsp_control_init, NULL);
 
-  fts_class_method_varargs(cl, fts_s_upload, dsp_control_upload);
+  fts_class_message_varargs(cl, fts_s_upload, dsp_control_upload);
 
-  fts_class_method_varargs(cl, sym_dsp_on, dsp_control_remote_dsp_on);
-  fts_class_method_varargs(cl, sym_dsp_print, dsp_control_remote_dsp_print);
-  fts_class_method_varargs(cl, sym_start_collect, dsp_control_fpe_start_collect);
-  fts_class_method_varargs(cl, sym_stop_collect, dsp_control_fpe_stop_collect);
-  fts_class_method_varargs(cl, sym_clear_collect, dsp_control_fpe_clear_collect);
-  fts_class_method_varargs(cl, sym_check_nan, dsp_control_set_check_nan);
-  fts_class_method_varargs(cl, fts_new_symbol("dsp_restart"), dsp_control_restart);
+  fts_class_message_varargs(cl, sym_dsp_on, dsp_control_remote_dsp_on);
+  fts_class_message_varargs(cl, sym_dsp_print, dsp_control_remote_dsp_print);
+  fts_class_message_varargs(cl, sym_start_collect, dsp_control_fpe_start_collect);
+  fts_class_message_varargs(cl, sym_stop_collect, dsp_control_fpe_stop_collect);
+  fts_class_message_varargs(cl, sym_clear_collect, dsp_control_fpe_clear_collect);
+  fts_class_message_varargs(cl, sym_check_nan, dsp_control_set_check_nan);
+  fts_class_message_varargs(cl, fts_new_symbol("dsp_restart"), dsp_control_restart);
 }
 
 void dspcontrol_config( void)

@@ -99,7 +99,7 @@ sigtab1_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigtab1_t), sigtab1_init, sigtab1_delete);
 
-  fts_class_method_varargs(cl, fts_s_bang, sigtab1_reload);
+  fts_class_message_varargs(cl, fts_s_bang, sigtab1_reload);
   
   wavetable_init();
 }
@@ -215,9 +215,9 @@ osc_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(osc_t), osc_init, osc_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, osc_put);
+  fts_class_message_varargs(cl, fts_s_put, osc_put);
 
-  fts_class_method_varargs(cl, fts_s_set, osc_set);
+  fts_class_message_varargs(cl, fts_s_set, osc_set);
 
   fts_class_inlet_int(cl, 0, osc_number);
   fts_class_inlet_float(cl, 0, osc_number);
@@ -309,7 +309,7 @@ phasor_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(phasor_t), phasor_init, phasor_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, phasor_put);
+  fts_class_message_varargs(cl, fts_s_put, phasor_put);
 
   fts_class_inlet_int(cl, 0, phasor_set);
   fts_class_inlet_float(cl, 0, phasor_set);

@@ -446,15 +446,15 @@ alsaseqmidi_instantiate(fts_class_t* cl)
     fts_class_init(cl, sizeof(alsaseqmidi_t), alsaseqmidi_init, alsaseqmidi_delete);
 
     /* FTS MIDI manager interface implementation */
-    fts_class_method_varargs(cl, fts_midimanager_s_get_default_input, alsaseqmidi_get_default_input);
-    fts_class_method_varargs(cl, fts_midimanager_s_get_default_output, alsaseqmidi_get_default_output);
-    fts_class_method_varargs(cl, fts_midimanager_s_append_input_names, alsaseqmidi_append_inputs);
-    fts_class_method_varargs(cl, fts_midimanager_s_append_output_names, alsaseqmidi_append_outputs);
-    fts_class_method_varargs(cl, fts_midimanager_s_get_input, alsaseqmidi_get_input);
-    fts_class_method_varargs(cl, fts_midimanager_s_get_output, alsaseqmidi_get_output);
+    fts_class_message_varargs(cl, fts_midimanager_s_get_default_input, alsaseqmidi_get_default_input);
+    fts_class_message_varargs(cl, fts_midimanager_s_get_default_output, alsaseqmidi_get_default_output);
+    fts_class_message_varargs(cl, fts_midimanager_s_append_input_names, alsaseqmidi_append_inputs);
+    fts_class_message_varargs(cl, fts_midimanager_s_append_output_names, alsaseqmidi_append_outputs);
+    fts_class_message_varargs(cl, fts_midimanager_s_get_input, alsaseqmidi_get_input);
+    fts_class_message_varargs(cl, fts_midimanager_s_get_output, alsaseqmidi_get_output);
 
     /* debug print */
-    fts_class_method_varargs(cl, fts_s_print, alsaseqmidi_print);
+    fts_class_message_varargs(cl, fts_s_print, alsaseqmidi_print);
 }
 
 void

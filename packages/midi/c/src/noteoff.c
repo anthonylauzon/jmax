@@ -167,8 +167,8 @@ noteoff_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(noteoff_t), noteoff_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_clear, noteoff_clear);
-  fts_class_method_varargs(cl, fts_s_stop, noteoff_stop);
+  fts_class_message_varargs(cl, fts_s_clear, noteoff_clear);
+  fts_class_message_varargs(cl, fts_s_stop, noteoff_stop);
 
   fts_class_inlet_varargs(cl, 0, noteoff_varargs);
   fts_class_inlet_number(cl, 0, noteoff_pitch);

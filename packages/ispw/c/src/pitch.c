@@ -510,15 +510,15 @@ class_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(pitch_t), pitch_init, pitch_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, pitch_put);
+  fts_class_message_varargs(cl, fts_s_put, pitch_put);
   
   /* class' own methods */
-  fts_class_method_varargs(cl, fts_new_symbol("vibrato"), pitch_vibrato);
-  fts_class_method_varargs(cl, fts_new_symbol("max-error"), pitch_max_error);
-  fts_class_method_varargs(cl, fts_new_symbol("reattack"), pitch_reattack);
+  fts_class_message_varargs(cl, fts_new_symbol("vibrato"), pitch_vibrato);
+  fts_class_message_varargs(cl, fts_new_symbol("max-error"), pitch_max_error);
+  fts_class_message_varargs(cl, fts_new_symbol("reattack"), pitch_reattack);
   
-  fts_class_method_varargs(cl, fts_new_symbol("loud"), pitch_loud);
-  fts_class_method_varargs(cl, fts_s_print, pitch_print);
+  fts_class_message_varargs(cl, fts_new_symbol("loud"), pitch_loud);
+  fts_class_message_varargs(cl, fts_s_print, pitch_print);
 
   fts_dsp_declare_inlet(cl, 0);
 

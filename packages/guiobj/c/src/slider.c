@@ -283,20 +283,20 @@ slider_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(slider_t), slider_init, NULL); 
 
-  fts_class_method_varargs(cl, fts_s_dump, slider_dump); 
+  fts_class_message_varargs(cl, fts_s_dump, slider_dump); 
 
-  fts_class_method_varargs(cl, fts_s_update_gui, slider_update_gui); 
-  fts_class_method_varargs(cl, fts_s_update_real_time, slider_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, slider_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_update_gui, slider_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, slider_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, slider_save_dotpat); 
 
-  fts_class_method_varargs(cl, fts_s_value, slider_set_value); 
-  fts_class_method_varargs(cl, fts_s_min_value, slider_set_min); 
-  fts_class_method_varargs(cl, fts_s_max_value, slider_set_max); 
-  fts_class_method_varargs(cl, fts_s_orientation, slider_set_orientation); 
+  fts_class_message_varargs(cl, fts_s_value, slider_set_value); 
+  fts_class_message_varargs(cl, fts_s_min_value, slider_set_min); 
+  fts_class_message_varargs(cl, fts_s_max_value, slider_set_max); 
+  fts_class_message_varargs(cl, fts_s_orientation, slider_set_orientation); 
 
-  fts_class_method_varargs(cl, fts_s_bang, slider_bang);
-  fts_class_method_varargs(cl, fts_s_set, slider_set);
-  fts_class_method_varargs(cl, fts_s_range, slider_set_range);
+  fts_class_message_varargs(cl, fts_s_bang, slider_bang);
+  fts_class_message_varargs(cl, fts_s_set, slider_set);
+  fts_class_message_varargs(cl, fts_s_range, slider_set_range);
 
   fts_class_inlet_int(cl, 0, slider_int);
   fts_class_inlet_float(cl, 0, slider_float);

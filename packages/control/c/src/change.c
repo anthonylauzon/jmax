@@ -95,7 +95,7 @@ change_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(change_t), change_init, change_delete);
 
-  fts_class_method_varargs(cl, fts_s_set, change_set);
+  fts_class_message_varargs(cl, fts_s_set, change_set);
 
   fts_class_inlet_varargs(cl, 0, change_atoms);
   fts_class_outlet_varargs(cl, 0);

@@ -309,11 +309,11 @@ thread_manager_instantiate(fts_class_t* cl)
 {
     fts_class_init(cl, sizeof(thread_manager_t), thread_manager_init, thread_manager_delete);
 
-    fts_class_method_varargs(cl, fts_s_print, thread_manager_print);
+    fts_class_message_varargs(cl, fts_s_print, thread_manager_print);
 
-    fts_class_method_varargs(cl, thread_manager_s_create_thread, thread_manager_create_thread);
+    fts_class_message_varargs(cl, thread_manager_s_create_thread, thread_manager_create_thread);
 
-    fts_class_method_varargs(cl, fts_s_start, thread_manager_start);
+    fts_class_message_varargs(cl, fts_s_start, thread_manager_start);
 }
 
 

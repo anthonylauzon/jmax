@@ -154,13 +154,13 @@ comment_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( comment_t), comment_init, NULL);
 
-  fts_class_method_varargs(cl, fts_s_dump, comment_dump);
+  fts_class_message_varargs(cl, fts_s_dump, comment_dump);
 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, comment_save_dotpat); 
-  fts_class_method_varargs(cl, fts_s_update_gui, comment_update_gui); 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, comment_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_update_gui, comment_update_gui); 
 
-  fts_class_method_varargs(cl, fts_s_comment, comment_set_text);
-  fts_class_method_varargs(cl, fts_s_color, comment_set_color); 
+  fts_class_message_varargs(cl, fts_s_comment, comment_set_text);
+  fts_class_message_varargs(cl, fts_s_color, comment_set_color); 
 
   /* property daemon for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_comment, comment_put_text);

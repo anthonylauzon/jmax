@@ -333,8 +333,8 @@ line_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(line_t), line_init, NULL);
 
-  fts_class_method_varargs(cl, fts_s_stop, line_stop);
-  fts_class_method_varargs(cl, fts_s_set, line_set_value);
+  fts_class_message_varargs(cl, fts_s_stop, line_stop);
+  fts_class_message_varargs(cl, fts_s_set, line_set_value);
 
   fts_class_inlet_varargs(cl, 0, line_varargs);
   fts_class_inlet_number(cl, 0, line_number);

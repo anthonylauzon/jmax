@@ -160,7 +160,7 @@ class_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(clip_t), clip_init, clip_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, clip_put);
+  fts_class_message_varargs(cl, fts_s_put, clip_put);
   
   fts_class_inlet_int(cl, 1, clip_set_min);
   fts_class_inlet_float(cl, 1, clip_set_min);

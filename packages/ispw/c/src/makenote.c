@@ -137,8 +137,8 @@ makenote_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(makenote_t), makenote_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_clear, makenote_clear);
-  fts_class_method_varargs(cl, fts_s_stop, makenote_stop);
+  fts_class_message_varargs(cl, fts_s_clear, makenote_clear);
+  fts_class_message_varargs(cl, fts_s_stop, makenote_stop);
 
   fts_class_inlet_int(cl, 0, makenote_pitch);
   fts_class_inlet_float(cl, 0, makenote_pitch);

@@ -84,9 +84,9 @@ panel_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(panel_t), panel_init, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol("set_update_tag"), panel_connect); 
+  fts_class_message_varargs(cl, fts_new_symbol("set_update_tag"), panel_connect); 
 
-  fts_class_method_varargs(cl, fts_s_bang, panel_bang);
+  fts_class_message_varargs(cl, fts_s_bang, panel_bang);
   fts_class_inlet_symbol(cl, 0, panel_symbol);
 
   fts_class_outlet_symbol(cl, 0);

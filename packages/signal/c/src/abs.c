@@ -75,7 +75,7 @@ abs_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_t), abs_init, abs_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, abs_put);
+  fts_class_message_varargs(cl, fts_s_put, abs_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

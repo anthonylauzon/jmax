@@ -167,10 +167,10 @@ selection_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_selection_t), selection_init, selection_delete);
 
-  fts_class_method_varargs(cl, fts_new_symbol("add"),  selection_add);
-  fts_class_method_varargs(cl, fts_new_symbol("remove"), selection_remove);
+  fts_class_message_varargs(cl, fts_new_symbol("add"),  selection_add);
+  fts_class_message_varargs(cl, fts_new_symbol("remove"), selection_remove);
 
-  fts_class_method_varargs(cl, fts_s_clear, selection_clear);
+  fts_class_message_varargs(cl, fts_s_clear, selection_clear);
 }
 
 

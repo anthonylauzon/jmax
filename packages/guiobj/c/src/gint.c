@@ -129,14 +129,14 @@ static void gint_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(gint_t), 0, 0);
 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, gint_save_dotpat);
+  fts_class_message_varargs(cl, fts_s_save_dotpat, gint_save_dotpat);
 
-  fts_class_method_varargs(cl, fts_s_update_real_time, gint_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_value, gint_number); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, gint_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_value, gint_number); 
 
-  fts_class_method_varargs(cl, fts_s_bang, gint_bang);
-  fts_class_method_varargs(cl, fts_s_set, gint_set);
-  fts_class_method_varargs(cl, fts_new_symbol("incr"), gint_incr);
+  fts_class_message_varargs(cl, fts_s_bang, gint_bang);
+  fts_class_message_varargs(cl, fts_s_set, gint_set);
+  fts_class_message_varargs(cl, fts_new_symbol("incr"), gint_incr);
 
   fts_class_inlet_number(cl, 0, gint_number);
   fts_class_inlet_varargs(cl, 0, gint_varargs);

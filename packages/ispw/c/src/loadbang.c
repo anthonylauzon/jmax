@@ -42,7 +42,7 @@ loadbang_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(loadbang_t), 0, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol("load_init"), loadbang_load_init);
+  fts_class_message_varargs(cl, fts_new_symbol("load_init"), loadbang_load_init);
 
   fts_class_outlet_bang(cl, 0);
 }

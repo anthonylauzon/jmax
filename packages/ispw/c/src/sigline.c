@@ -241,7 +241,7 @@ sigline_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigline_t), sigline_init, sigline_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigline_put);
+  fts_class_message_varargs(cl, fts_s_put, sigline_put);
   
   fts_class_inlet_varargs(cl, 0, sigline_list);
 

@@ -250,12 +250,12 @@ label_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_label_t), label_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, label_propagate_input);
-  fts_class_method_varargs(cl, fts_s_find_friends, label_find_friends);
+  fts_class_message_varargs(cl, fts_s_propagate_input, label_propagate_input);
+  fts_class_message_varargs(cl, fts_s_find_friends, label_find_friends);
 
-  fts_class_method_varargs(cl, fts_s_input, label_send);
-  fts_class_method_varargs(cl, fts_s_add_listener, label_add_listener);
-  fts_class_method_varargs(cl, fts_s_remove_listener, label_remove_listener);
+  fts_class_message_varargs(cl, fts_s_input, label_send);
+  fts_class_message_varargs(cl, fts_s_add_listener, label_add_listener);
+  fts_class_message_varargs(cl, fts_s_remove_listener, label_remove_listener);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, label_get_state);
   }

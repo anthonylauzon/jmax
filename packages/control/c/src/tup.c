@@ -324,8 +324,8 @@ tup_instantiate(fts_class_t *cl)
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), tup_set_require_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), tup_set_mode_prop);
 
-  fts_class_method_varargs(cl, fts_s_bang, tup_output);
-  fts_class_method_varargs(cl, fts_s_set, tup_set);
+  fts_class_message_varargs(cl, fts_s_bang, tup_output);
+  fts_class_message_varargs(cl, fts_s_set, tup_set);
 
   fts_class_inlet_number(cl, 0, tup_input_single);
   fts_class_inlet_symbol(cl, 0, tup_input_single);
@@ -506,10 +506,10 @@ cotup_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(cotup_t), cotup_init, cotup_delete);
 
-  fts_class_method_varargs(cl, fts_s_set, cotup_set);
-  fts_class_method_varargs(cl, fts_s_bang, cotup_output);
-  fts_class_method_varargs(cl, fts_s_clear, cotup_clear);
-  fts_class_method_varargs(cl, fts_s_flush, cotup_flush);
+  fts_class_message_varargs(cl, fts_s_set, cotup_set);
+  fts_class_message_varargs(cl, fts_s_bang, cotup_output);
+  fts_class_message_varargs(cl, fts_s_clear, cotup_clear);
+  fts_class_message_varargs(cl, fts_s_flush, cotup_flush);
 
   fts_class_inlet_varargs(cl, 0, cotup_append_atoms);
 

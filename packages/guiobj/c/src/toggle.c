@@ -119,11 +119,11 @@ toggle_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(toggle_t), 0, 0);
 
-  fts_class_method_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, toggle_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, toggle_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, toggle_save_dotpat); 
 
-  fts_class_method_varargs(cl, fts_s_bang, toggle_toggle);
-  fts_class_method_varargs(cl, fts_s_set, toggle_set);
+  fts_class_message_varargs(cl, fts_s_bang, toggle_toggle);
+  fts_class_message_varargs(cl, fts_s_set, toggle_set);
 
   fts_class_inlet_int(cl, 0, toggle_number);
   fts_class_inlet_float(cl, 0, toggle_number);

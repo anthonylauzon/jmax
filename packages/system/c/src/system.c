@@ -21,8 +21,6 @@
 
 #include "system.h"
 
-extern void fts_signal_bus_config(void);
-
 extern void dsp_config(void);
 extern void sysinfo_config(void);
 
@@ -31,15 +29,9 @@ extern void argument_config(void);
 
 extern void print_config(void);
 
-extern void bus_config(void);
-extern void bus_tilda_config(void);
-
 void
 system_config(void)
 {
-
-  fts_signal_bus_config();
-
   dsp_config();
   sysinfo_config();
 
@@ -47,7 +39,4 @@ system_config(void)
   argument_config();
 
   print_config();
-
-  bus_config();
-  bus_tilda_config();
 }

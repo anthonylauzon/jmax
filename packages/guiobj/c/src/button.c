@@ -210,16 +210,16 @@ button_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(button_t), button_init, NULL);
 
-  fts_class_method_varargs(cl, fts_s_dump, button_dump);
+  fts_class_message_varargs(cl, fts_s_dump, button_dump);
 
-  fts_class_method_varargs(cl, fts_s_update_gui, button_update_gui); 
-  fts_class_method_varargs(cl, fts_s_update_real_time, button_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_update_gui, button_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, button_update_real_time); 
 
-  fts_class_method_varargs(cl, fts_s_color, button_set_color); 
-  fts_class_method_varargs(cl, fts_s_flash, button_set_flash); 
+  fts_class_message_varargs(cl, fts_s_color, button_set_color); 
+  fts_class_message_varargs(cl, fts_s_flash, button_set_flash); 
 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, button_save_dotpat); 
-  fts_class_method_varargs(cl, fts_s_bang, button_on);
+  fts_class_message_varargs(cl, fts_s_save_dotpat, button_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_bang, button_on);
 
   /* property daemons for compatibilty with older bmax files */
   fts_class_add_daemon(cl, obj_property_put, fts_s_color, button_put_color);

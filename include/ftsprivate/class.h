@@ -34,8 +34,6 @@ struct fts_class_outlet
 #define fts_metaclass_set_name(m, s) ((m)->name = (s))
 #define fts_metaclass_get_typeid(m) ((m)->typeid)
 
-extern void fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
 extern fts_method_t fts_class_inlet_get_method(fts_class_t *cl, int winlet, fts_metaclass_t *type);
 
 extern int fts_class_outlet_get_declarations(fts_class_t *cl, int woutlet, fts_iterator_t *iter);

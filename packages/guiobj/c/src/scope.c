@@ -552,18 +552,18 @@ scope_instantiate(fts_class_t *cl)
 {  
   fts_class_init(cl, sizeof(scope_t), scope_init, scope_delete);
 
-  fts_class_method_varargs(cl, fts_s_update_gui, scope_upload); 
-  fts_class_method_varargs(cl, fts_s_update_real_time, scope_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_update_gui, scope_upload); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, scope_update_real_time); 
 
-  fts_class_method_varargs(cl, fts_s_put, scope_put);
-  fts_class_method_varargs(cl, fts_s_dump, scope_dump); 
-  fts_class_method_varargs(cl, fts_s_upload, scope_upload);   
-  fts_class_method_varargs(cl, fts_s_size, scope_set_size_by_client);
-  fts_class_method_varargs(cl, fts_new_symbol("range"), scope_set_range_by_client);
+  fts_class_message_varargs(cl, fts_s_put, scope_put);
+  fts_class_message_varargs(cl, fts_s_dump, scope_dump); 
+  fts_class_message_varargs(cl, fts_s_upload, scope_upload);   
+  fts_class_message_varargs(cl, fts_s_size, scope_set_size_by_client);
+  fts_class_message_varargs(cl, fts_new_symbol("range"), scope_set_range_by_client);
 
-  fts_class_method_varargs(cl, sym_set_period, scope_set_period);
-  fts_class_method_varargs(cl, sym_set_threshold, scope_set_threshold);
-  fts_class_method_varargs(cl, fts_new_symbol("onset"), scope_set_pre_delay);
+  fts_class_message_varargs(cl, sym_set_period, scope_set_period);
+  fts_class_message_varargs(cl, sym_set_threshold, scope_set_threshold);
+  fts_class_message_varargs(cl, fts_new_symbol("onset"), scope_set_pre_delay);
 
   fts_dsp_declare_inlet(cl, 0);
 }

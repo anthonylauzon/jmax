@@ -241,7 +241,7 @@ vectrigon_instantiate(fts_class_t *cl, fts_method_t put_method)
 {
   fts_class_init(cl, sizeof(vectrigon_t), vectrigon_init, vectrigon_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, put_method);
+  fts_class_message_varargs(cl, fts_s_put, put_method);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

@@ -152,8 +152,8 @@ samppeek_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(samppeek_t), samppeek_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_init, samppeek_mess_init);
-  fts_class_method_varargs(cl, fts_s_set, samppeek_set);
+  fts_class_message_varargs(cl, fts_s_init, samppeek_mess_init);
+  fts_class_message_varargs(cl, fts_s_set, samppeek_set);
 
   fts_class_inlet_int(cl, 0, samppeek_int);
   fts_class_inlet_float(cl, 0, samppeek_float);

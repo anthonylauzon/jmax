@@ -1,6 +1,7 @@
 packagedir=$(pkgdatadir)/packages/control/c
 package_LTLIBRARIES=libcontrol.la
 libcontrol_la_SOURCES= \
+bus.c \
 change.c \
 control.c \
 count.c \

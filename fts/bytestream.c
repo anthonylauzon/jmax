@@ -312,7 +312,7 @@ static void fts_socketstream_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_socketstream_t), fts_socketstream_init, fts_socketstream_delete);
   fts_bytestream_class_init(cl);
 
-  fts_class_method_varargs(cl, fts_s_sched_ready, fts_socketstream_receive);
+  fts_class_message_varargs(cl, fts_s_sched_ready, fts_socketstream_receive);
 }
 
 /***********************************************************************
@@ -536,7 +536,7 @@ static void fts_pipestream_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_pipestream_t), fts_pipestream_init, fts_pipestream_delete);
   fts_bytestream_class_init(cl);
 
-  fts_class_method_varargs(cl, fts_s_sched_ready, fts_pipestream_receive);
+  fts_class_message_varargs(cl, fts_s_sched_ready, fts_pipestream_receive);
 }
 
 /***********************************************************************

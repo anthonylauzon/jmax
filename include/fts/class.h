@@ -115,8 +115,10 @@ FTS_API fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, fts_met
 #define fts_class_get_default_handler(c) ((c)->default_handler)
 #define fts_class_set_default_handler(c, m) ((c)->default_handler = (m))
 
+FTS_API void fts_class_default_error_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 /* method definition */
-FTS_API void fts_class_method_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
+FTS_API void fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth);
 FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_metaclass_t *type, fts_method_t mth);
 FTS_API void fts_class_inlet_anything(fts_class_t *cl, int woutlet);
 

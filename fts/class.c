@@ -354,7 +354,7 @@ fts_class_init( fts_class_t *cl, unsigned int size, fts_method_t constructor, ft
  *
  */
 void
-fts_class_method_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth)
+fts_class_message_varargs(fts_class_t *cl, fts_symbol_t s, fts_method_t mth)
 {
   if(s != NULL)
     {    

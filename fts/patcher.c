@@ -345,11 +345,11 @@ patcher_inout_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(patcher_inout_t), patcher_inout_init, patcher_inout_delete);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, patcher_inout_propagate_input);
+  fts_class_message_varargs(cl, fts_s_propagate_input, patcher_inout_propagate_input);
 
-  fts_class_method_varargs(cl, fts_s_input, patcher_inout_input);
-  fts_class_method_varargs(cl, fts_s_add_listener, patcher_inout_add_listener);
-  fts_class_method_varargs(cl, fts_s_remove_listener, patcher_inout_remove_listener);
+  fts_class_message_varargs(cl, fts_s_input, patcher_inout_input);
+  fts_class_message_varargs(cl, fts_s_add_listener, patcher_inout_add_listener);
+  fts_class_message_varargs(cl, fts_s_remove_listener, patcher_inout_remove_listener);
 }
 
 static void
@@ -563,8 +563,8 @@ receive_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_receive_t),  receive_init, receive_delete);
 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, receive_save_dotpat);
-  fts_class_method_varargs(cl, fts_s_spost_description, receive_spost_description); 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, receive_save_dotpat);
+  fts_class_message_varargs(cl, fts_s_spost_description, receive_spost_description); 
   
   fts_class_outlet_anything(cl, 0);
 }
@@ -700,10 +700,10 @@ send_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_send_t), send_init, send_delete);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, send_propagate_input); 
+  fts_class_message_varargs(cl, fts_s_propagate_input, send_propagate_input); 
 
-  fts_class_method_varargs(cl, fts_s_save_dotpat, send_save_dotpat); 
-  fts_class_method_varargs(cl, fts_s_spost_description, receive_spost_description); 
+  fts_class_message_varargs(cl, fts_s_save_dotpat, send_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_spost_description, receive_spost_description); 
 
   fts_class_set_default_handler(cl, send_input);
   fts_class_inlet_anything(cl, 0);
@@ -1864,42 +1864,42 @@ patcher_instantiate(fts_class_t *cl)
   /* initialize the class */
   fts_class_init(cl, sizeof(fts_patcher_t), patcher_init, patcher_delete);
 
-  fts_class_method_varargs(cl, fts_s_upload, fts_patcher_upload);
-  fts_class_method_varargs(cl, fts_s_upload_child, fts_patcher_upload_child);
+  fts_class_message_varargs(cl, fts_s_upload, fts_patcher_upload);
+  fts_class_message_varargs(cl, fts_s_upload_child, fts_patcher_upload_child);
 
-  fts_class_method_varargs(cl, fts_s_find, patcher_find);
-  fts_class_method_varargs(cl, fts_s_find_errors, patcher_find_errors);
+  fts_class_message_varargs(cl, fts_s_find, patcher_find);
+  fts_class_message_varargs(cl, fts_s_find_errors, patcher_find_errors);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
+  fts_class_message_varargs(cl, fts_s_propagate_input, patcher_propagate_input);
 
-  fts_class_method_varargs(cl, fts_new_symbol("load_init"), patcher_load_init); 
-  fts_class_method_varargs(cl, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
-  fts_class_method_varargs(cl, fts_s_save, fts_patcher_save_from_client); 
-  fts_class_method_varargs(cl, fts_s_paste, fts_patcher_paste); 
+  fts_class_message_varargs(cl, fts_new_symbol("load_init"), patcher_load_init); 
+  fts_class_message_varargs(cl, fts_new_symbol("open_help_patch"), fts_patcher_open_help_patch); 
+  fts_class_message_varargs(cl, fts_s_save, fts_patcher_save_from_client); 
+  fts_class_message_varargs(cl, fts_s_paste, fts_patcher_paste); 
 
-  fts_class_method_varargs(cl, fts_s_openEditor, patcher_open_editor);
-  fts_class_method_varargs(cl, fts_s_destroyEditor, patcher_destroy_editor);
-  fts_class_method_varargs(cl, fts_s_closeEditor, patcher_close_editor); 
-  fts_class_method_varargs(cl, fts_new_symbol("show_object"), show_object);
-  fts_class_method_varargs(cl, fts_new_symbol("stop_waiting"), stop_waiting);
+  fts_class_message_varargs(cl, fts_s_openEditor, patcher_open_editor);
+  fts_class_message_varargs(cl, fts_s_destroyEditor, patcher_destroy_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, patcher_close_editor); 
+  fts_class_message_varargs(cl, fts_new_symbol("show_object"), show_object);
+  fts_class_message_varargs(cl, fts_new_symbol("stop_waiting"), stop_waiting);
 
-  fts_class_method_varargs(cl, fts_new_symbol("start_updates"), fts_patcher_start_updates);
-  fts_class_method_varargs(cl, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
-  fts_class_method_varargs(cl, fts_new_symbol("patcher_update"), fts_patcher_update);
-  fts_class_method_varargs(cl, fts_new_symbol("set_wx"), fts_patcher_set_wx);
-  fts_class_method_varargs(cl, fts_new_symbol("set_wy"), fts_patcher_set_wy);
-  fts_class_method_varargs(cl, fts_new_symbol("set_ww"), fts_patcher_set_ww);
-  fts_class_method_varargs(cl, fts_new_symbol("set_wh"), fts_patcher_set_wh);
+  fts_class_message_varargs(cl, fts_new_symbol("start_updates"), fts_patcher_start_updates);
+  fts_class_message_varargs(cl, fts_new_symbol("stop_updates"), fts_patcher_stop_updates);
+  fts_class_message_varargs(cl, fts_new_symbol("patcher_update"), fts_patcher_update);
+  fts_class_message_varargs(cl, fts_new_symbol("set_wx"), fts_patcher_set_wx);
+  fts_class_message_varargs(cl, fts_new_symbol("set_wy"), fts_patcher_set_wy);
+  fts_class_message_varargs(cl, fts_new_symbol("set_ww"), fts_patcher_set_ww);
+  fts_class_message_varargs(cl, fts_new_symbol("set_wh"), fts_patcher_set_wh);
 
-  fts_class_method_varargs(cl, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
 
-  fts_class_method_varargs(cl, fts_new_symbol("delete_objects"), fts_patcher_delete_objects_from_client);
-  fts_class_method_varargs(cl, fts_new_symbol("add_connection"), fts_patcher_add_connection_from_client);
-  fts_class_method_varargs(cl, fts_new_symbol("delete_connection"), fts_patcher_delete_connection_from_client);
-  fts_class_method_varargs(cl, fts_new_symbol("redefine_object"), fts_patcher_redefine_object_from_client);
-  fts_class_method_varargs(cl, fts_new_symbol("redefine_patcher"), fts_patcher_redefine_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("delete_objects"), fts_patcher_delete_objects_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("add_connection"), fts_patcher_add_connection_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("delete_connection"), fts_patcher_delete_connection_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("redefine_object"), fts_patcher_redefine_object_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("redefine_patcher"), fts_patcher_redefine_from_client);
 
-  fts_class_method_varargs(cl, fts_s_spost_description, patcher_spost_description); 
+  fts_class_message_varargs(cl, fts_s_spost_description, patcher_spost_description); 
 
   fts_class_set_default_handler(cl, patcher_input);
   fts_class_outlet_anything(cl, 0);

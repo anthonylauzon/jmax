@@ -4,6 +4,7 @@ libsignal_la_SOURCES= \
 abs.c \
 binop.c \
 biquad.c \
+bus.c \
 clip.c \
 cut.c \
 delay.c \

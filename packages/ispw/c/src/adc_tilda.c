@@ -85,8 +85,8 @@ static void adc_tilda_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( adc_tilda_t), adc_tilda_init, adc_tilda_delete);
 
-  fts_class_method_varargs(cl, fts_s_start, adc_tilda_start);
-  fts_class_method_varargs(cl, fts_s_stop, adc_tilda_stop);
+  fts_class_message_varargs(cl, fts_s_start, adc_tilda_start);
+  fts_class_message_varargs(cl, fts_s_stop, adc_tilda_stop);
 
   fts_dsp_declare_outlet( cl, 0);
 }

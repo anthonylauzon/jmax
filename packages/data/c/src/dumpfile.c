@@ -342,11 +342,11 @@ dumpfile_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dumpfile_t), dumpfile_init, dumpfile_delete);
 
-  fts_class_method_varargs(cl, fts_s_open, dumpfile_open);
-  fts_class_method_varargs(cl, fts_s_close, dumpfile_close);
+  fts_class_message_varargs(cl, fts_s_open, dumpfile_open);
+  fts_class_message_varargs(cl, fts_s_close, dumpfile_close);
 
-  fts_class_method_varargs(cl, fts_s_dump, dumpfile_dump_object); 
-  fts_class_method_varargs(cl, fts_new_symbol("restore"), dumpfile_restore_object);
+  fts_class_message_varargs(cl, fts_s_dump, dumpfile_dump_object); 
+  fts_class_message_varargs(cl, fts_new_symbol("restore"), dumpfile_restore_object);
 }
 
 void

@@ -805,24 +805,24 @@ static void messbox_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(messbox_t), messbox_init, messbox_delete);
 
-  fts_class_method_varargs(cl, fts_s_find, messbox_find);
+  fts_class_message_varargs(cl, fts_s_find, messbox_find);
 
   /* atom list saving/loading/update support */
-  fts_class_method_varargs(cl, fts_s_upload, messbox_upload);
+  fts_class_message_varargs(cl, fts_s_upload, messbox_upload);
 
-  fts_class_method_varargs(cl, fts_s_dump, messbox_dump);
-  fts_class_method_varargs(cl, fts_s_save_dotpat, messbox_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_dump, messbox_dump);
+  fts_class_message_varargs(cl, fts_s_save_dotpat, messbox_save_dotpat); 
 
-  fts_class_method_varargs(cl, fts_s_update_gui, messbox_update_gui); 
-  fts_class_method_varargs(cl, fts_s_update_real_time, messbox_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_spost_description, messbox_spost_description); 
+  fts_class_message_varargs(cl, fts_s_update_gui, messbox_update_gui); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, messbox_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_spost_description, messbox_spost_description); 
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_value, messbox_get_value);
 
-  fts_class_method_varargs(cl, fts_s_bang, messbox_eval);
-  fts_class_method_varargs(cl, fts_s_set, messbox_set);
-  fts_class_method_varargs(cl, fts_s_append, messbox_append);
-  fts_class_method_varargs(cl, fts_s_clear, messbox_clear);
+  fts_class_message_varargs(cl, fts_s_bang, messbox_eval);
+  fts_class_message_varargs(cl, fts_s_set, messbox_set);
+  fts_class_message_varargs(cl, fts_s_append, messbox_append);
+  fts_class_message_varargs(cl, fts_s_clear, messbox_clear);
 
   fts_class_inlet_int(cl, 0, messbox_eval);
   fts_class_inlet_float(cl, 0, messbox_eval);

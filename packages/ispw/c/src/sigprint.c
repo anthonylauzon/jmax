@@ -156,9 +156,9 @@ sigprint_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigprint_t), sigprint_init, sigprint_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigprint_put);
+  fts_class_message_varargs(cl, fts_s_put, sigprint_put);
 
-  fts_class_method_varargs(cl, fts_s_bang, sigprint_bang);
+  fts_class_message_varargs(cl, fts_s_bang, sigprint_bang);
   fts_class_inlet_int(cl, 0, sigprint_int);
 
   fts_dsp_declare_function(fts_s_print, ftl_sigprint);

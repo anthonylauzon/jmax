@@ -142,7 +142,7 @@ sig_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigobj_t), sig_init, sig_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sig_put_dsp_function);
+  fts_class_message_varargs(cl, fts_s_put, sig_put_dsp_function);
 
   fts_class_inlet_number(cl, 0, sig_number);
 

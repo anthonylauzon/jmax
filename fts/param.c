@@ -300,23 +300,23 @@ param_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_param_t), param_init, param_delete);
 
-  fts_class_method_varargs(cl, fts_s_post, param_post);
+  fts_class_message_varargs(cl, fts_s_post, param_post);
 
-  fts_class_method_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
-  fts_class_method_varargs(cl, fts_s_set, param_set_atoms);
-  fts_class_method_varargs(cl, fts_s_dump, param_dump);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, param_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_set, param_set_atoms);
+  fts_class_message_varargs(cl, fts_s_dump, param_dump);
 
-  fts_class_method_varargs(cl, fts_s_get_array, param_get_array);
-  fts_class_method_varargs(cl, fts_s_set_from_array, param_set_atoms);
+  fts_class_message_varargs(cl, fts_s_get_array, param_get_array);
+  fts_class_message_varargs(cl, fts_s_set_from_array, param_set_atoms);
 
-  fts_class_method_varargs(cl, fts_new_symbol("load_init"), param_update);
+  fts_class_message_varargs(cl, fts_new_symbol("load_init"), param_update);
 
-  fts_class_method_varargs(cl, fts_s_input, param_input_atoms);
-  fts_class_method_varargs(cl, fts_s_add_listener, param_add_listener);
-  fts_class_method_varargs(cl, fts_s_remove_listener, param_remove_listener);
+  fts_class_message_varargs(cl, fts_s_input, param_input_atoms);
+  fts_class_message_varargs(cl, fts_s_add_listener, param_add_listener);
+  fts_class_message_varargs(cl, fts_s_remove_listener, param_remove_listener);
 
-  fts_class_method_varargs(cl, fts_s_bang, param_update);
-  fts_class_method_varargs(cl, fts_s_clear, param_clear);
+  fts_class_message_varargs(cl, fts_s_bang, param_update);
+  fts_class_message_varargs(cl, fts_s_clear, param_clear);
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, param_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, param_get_keep);

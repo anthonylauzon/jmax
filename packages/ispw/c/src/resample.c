@@ -119,7 +119,7 @@ sigup_instantiate(fts_class_t *cl)
 
   fts_class_init(cl, sizeof(sigup_t), sigup_init, sigup_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigup_put);
+  fts_class_message_varargs(cl, fts_s_put, sigup_put);
 
   fts_set_int(&a, 1);
   fts_class_put_prop(cl, fts_s_dsp_upsampling, &a);
@@ -191,7 +191,7 @@ sigdown_instantiate(fts_class_t *cl)
 
   fts_class_init(cl, sizeof(sigdown_t), sigdown_init, sigdown_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigdown_put);
+  fts_class_message_varargs(cl, fts_s_put, sigdown_put);
 
   fts_set_int(&a, 1);
   fts_class_put_prop(cl, fts_s_dsp_downsampling, &a);

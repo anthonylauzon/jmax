@@ -1451,22 +1451,22 @@ fts_package_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_package_t), __fts_package_init, __fts_package_delete);
 
-  fts_class_method_varargs(cl, fts_s_upload, __fts_package_upload);
-  fts_class_method_varargs(cl, fts_s_update, __fts_package_update);
-  fts_class_method_varargs(cl, fts_s_print, __fts_package_print);
+  fts_class_message_varargs(cl, fts_s_upload, __fts_package_upload);
+  fts_class_message_varargs(cl, fts_s_update, __fts_package_update);
+  fts_class_message_varargs(cl, fts_s_print, __fts_package_print);
 
-  fts_class_method_varargs(cl, fts_s_require, __fts_package_require);
-  fts_class_method_varargs(cl, fts_s_template, __fts_package_template);
-  fts_class_method_varargs(cl, fts_s_template_path, __fts_package_template_path);
-  fts_class_method_varargs(cl, fts_s_abstraction, __fts_package_abstraction);
-  fts_class_method_varargs(cl, fts_s_abstraction_path, __fts_package_abstraction_path);
-  fts_class_method_varargs(cl, fts_s_data_path, __fts_package_data_path);
-  fts_class_method_varargs(cl, fts_s_help, __fts_package_help);
-  fts_class_method_varargs(cl, fts_s_save, __fts_package_save);
-  fts_class_method_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
-  fts_class_method_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
-  fts_class_method_varargs(cl, fts_s_midi_config, __fts_package_midi_config);
-  fts_class_method_varargs(cl, fts_s_audio_config, __fts_package_audio_config);
+  fts_class_message_varargs(cl, fts_s_require, __fts_package_require);
+  fts_class_message_varargs(cl, fts_s_template, __fts_package_template);
+  fts_class_message_varargs(cl, fts_s_template_path, __fts_package_template_path);
+  fts_class_message_varargs(cl, fts_s_abstraction, __fts_package_abstraction);
+  fts_class_message_varargs(cl, fts_s_abstraction_path, __fts_package_abstraction_path);
+  fts_class_message_varargs(cl, fts_s_data_path, __fts_package_data_path);
+  fts_class_message_varargs(cl, fts_s_help, __fts_package_help);
+  fts_class_message_varargs(cl, fts_s_save, __fts_package_save);
+  fts_class_message_varargs(cl, fts_s_openEditor, __fts_package_open_editor);
+  fts_class_message_varargs(cl, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);
+  fts_class_message_varargs(cl, fts_s_midi_config, __fts_package_midi_config);
+  fts_class_message_varargs(cl, fts_s_audio_config, __fts_package_audio_config);
 }
 
 /***********************************************
@@ -1553,7 +1553,7 @@ static void loader_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof(fts_object_t), 0, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol( "load"), loader_load);
+  fts_class_message_varargs(cl, fts_new_symbol( "load"), loader_load);
 }
 
 /***********************************************************************

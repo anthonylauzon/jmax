@@ -357,24 +357,24 @@ table_instantiate(fts_class_t *cl)
   /* table [int] */
   fts_class_init(cl, sizeof(table_t), table_init, table_delete);
   
-  fts_class_method_varargs(cl, fts_s_openEditor, table_open_editor);
+  fts_class_message_varargs(cl, fts_s_openEditor, table_open_editor);
   
   /* save/load bmax file if not instantiated with reference */
-  fts_class_method_varargs(cl, fts_s_save, table_save);  
-  fts_class_method_varargs(cl, fts_s_save_dotpat, table_save_dotpat); 
+  fts_class_message_varargs(cl, fts_s_save, table_save);  
+  fts_class_message_varargs(cl, fts_s_save_dotpat, table_save_dotpat); 
   
   /* user methods */
-  fts_class_method_varargs(cl, fts_s_set, table_set_with_onset_from_atoms);
+  fts_class_message_varargs(cl, fts_s_set, table_set_with_onset_from_atoms);
   
-  fts_class_method_varargs(cl, fts_new_symbol("const"), table_const);
-  fts_class_method_varargs(cl, fts_s_clear, table_clear);
+  fts_class_message_varargs(cl, fts_new_symbol("const"), table_const);
+  fts_class_message_varargs(cl, fts_s_clear, table_clear);
   
-  fts_class_method_varargs(cl, fts_new_symbol("inv"), table_inv);
-  fts_class_method_varargs(cl, fts_new_symbol("quantile"), table_quantile);
-  fts_class_method_varargs(cl, fts_s_bang, table_get_random);
+  fts_class_message_varargs(cl, fts_new_symbol("inv"), table_inv);
+  fts_class_message_varargs(cl, fts_new_symbol("quantile"), table_quantile);
+  fts_class_message_varargs(cl, fts_s_bang, table_get_random);
   
-  fts_class_method_varargs(cl, fts_new_symbol("sum"), table_sum);  
-  fts_class_method_varargs(cl, fts_s_size, table_size);
+  fts_class_message_varargs(cl, fts_new_symbol("sum"), table_sum);  
+  fts_class_message_varargs(cl, fts_s_size, table_size);
   
   fts_class_inlet_number(cl, 0, table_index);
   fts_class_inlet_varargs(cl, 0, table_varargs);

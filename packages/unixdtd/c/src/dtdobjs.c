@@ -430,20 +430,20 @@ static void readsf_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(readsf_t), readsf_init, readsf_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, readsf_put);
+  fts_class_message_varargs(cl, fts_s_put, readsf_put);
 
-  fts_class_method_varargs(cl, s_open,  readsf_open);
+  fts_class_message_varargs(cl, s_open,  readsf_open);
 
-  fts_class_method_varargs(cl, fts_s_bang, readsf_start);
+  fts_class_message_varargs(cl, fts_s_bang, readsf_start);
   fts_class_inlet_int(cl, 0, readsf_number);
 
-  fts_class_method_varargs(cl, s_play, readsf_start);
-  fts_class_method_varargs(cl, fts_s_start, readsf_start);
+  fts_class_message_varargs(cl, s_play, readsf_start);
+  fts_class_message_varargs(cl, fts_s_start, readsf_start);
 
-  fts_class_method_varargs(cl, s_pause, readsf_pause);
+  fts_class_message_varargs(cl, s_pause, readsf_pause);
 
-  fts_class_method_varargs(cl, fts_s_stop, readsf_stop);
-  fts_class_method_varargs(cl, s_close, readsf_stop);
+  fts_class_message_varargs(cl, fts_s_stop, readsf_stop);
+  fts_class_message_varargs(cl, s_close, readsf_stop);
 
   fts_dsp_declare_outlet(cl, 0);
 
@@ -746,20 +746,20 @@ writesf_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(writesf_t), writesf_init, writesf_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, writesf_put);
+  fts_class_message_varargs(cl, fts_s_put, writesf_put);
 
-  fts_class_method_varargs(cl, s_open, writesf_open);
+  fts_class_message_varargs(cl, s_open, writesf_open);
 
-  fts_class_method_varargs(cl, fts_s_bang, writesf_record);
+  fts_class_message_varargs(cl, fts_s_bang, writesf_record);
   fts_class_inlet_int(cl, 0, writesf_number);
 
-  fts_class_method_varargs(cl, s_record, writesf_record);
-  fts_class_method_varargs(cl, fts_s_start, writesf_record);
+  fts_class_message_varargs(cl, s_record, writesf_record);
+  fts_class_message_varargs(cl, fts_s_start, writesf_record);
 
-  fts_class_method_varargs(cl, s_pause, writesf_pause);
+  fts_class_message_varargs(cl, s_pause, writesf_pause);
 
-  fts_class_method_varargs(cl, fts_s_stop, writesf_close);
-  fts_class_method_varargs(cl, s_close, writesf_close);
+  fts_class_message_varargs(cl, fts_s_stop, writesf_close);
+  fts_class_message_varargs(cl, s_close, writesf_close);
 
   fts_dsp_declare_inlet(cl, 0);
 

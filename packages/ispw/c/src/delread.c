@@ -194,7 +194,7 @@ delread_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delread_t), delread_init, delread_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, delread_put);
+  fts_class_message_varargs(cl, fts_s_put, delread_put);
 
   fts_class_inlet_int(cl, 0, delread_number);
   fts_class_inlet_float(cl, 0, delread_number);

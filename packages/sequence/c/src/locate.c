@@ -203,10 +203,10 @@ locate_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(locate_t), locate_init, locate_delete);
 
-  fts_class_method_varargs(cl, fts_new_symbol("mode"), locate_set_mode);
+  fts_class_message_varargs(cl, fts_new_symbol("mode"), locate_set_mode);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), locate_set_mode_prop);
 
-  fts_class_method_varargs(cl, fts_new_symbol("epsilon"), locate_set_epsilon);
+  fts_class_message_varargs(cl, fts_new_symbol("epsilon"), locate_set_epsilon);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("epsilon"), locate_set_epsilon_prop);
 
   fts_class_inlet_number(cl, 0, locate_locate);

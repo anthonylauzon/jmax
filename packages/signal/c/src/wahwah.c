@@ -167,7 +167,7 @@ wahwah_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(wahwah_t), wahwah_init, wahwah_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, wahwah_put);
+  fts_class_message_varargs(cl, fts_s_put, wahwah_put);
   
   /* signal inlets and outlets */
   fts_dsp_declare_inlet(cl, 0);

@@ -26,13 +26,13 @@
 
 #include <fts/fts.h>
 
-static fts_class_t *bus_tilda_class = 0;
+static fts_class_t *bus_class = 0;
 
 static fts_symbol_t bus_tilda_symbol = 0;
 static fts_symbol_t throw_tilda_symbol = 0;
 static fts_symbol_t catch_tilda_symbol = 0;
 
-fts_metaclass_t *bus_tilda_type = 0;
+static fts_metaclass_t *bus_type = 0;
 
 typedef struct
 {
@@ -41,9 +41,8 @@ typedef struct
   int n_channels;
   float *buf[2]; /* two buffers */
   int toggle; /* toggle (0/1) indicating current write buffer (swapping buffers each tick) */
-  int n_tick;
-  
-} bus_tilda_t;
+  int n_tick;  
+} bus_t;
 
 /*****************************************************************************
  *
@@ -52,7 +51,7 @@ typedef struct
  */
 
 static void
-bus_tilda_reset(bus_tilda_t *this, int n_tick, double sr)
+bus_reset(bus_t *this, int n_tick, double sr)
 {
   int n = n_tick * this->n_channels;
   int i;
@@ -71,23 +70,23 @@ bus_tilda_reset(bus_tilda_t *this, int n_tick, double sr)
 }
 
 static void
-bus_tilda_put_epilogue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bus_put_epilogue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  bus_tilda_t *this = (bus_tilda_t *)o;
+  bus_t *this = (bus_t *)o;
   int n_tick = fts_dsp_get_tick_size();
   double sr = fts_dsp_get_sample_rate();
   fts_atom_t a;
 
-  bus_tilda_reset(this, n_tick, sr);
+  bus_reset(this, n_tick, sr);
 
   fts_set_object(&a, this);
   fts_dsp_add_function(bus_tilda_symbol, 1, &a);
 }
 
 static void
-bus_tilda_ftl(fts_word_t *a)
+bus_ftl(fts_word_t *a)
 {
-  bus_tilda_t *this = (bus_tilda_t *)fts_word_get_pointer(a);
+  bus_t *this = (bus_t *)fts_word_get_pointer(a);
   int toggle = this->toggle;
   float *buf = this->buf[toggle];
   int n = this->n_channels * this->n_tick;
@@ -102,9 +101,9 @@ bus_tilda_ftl(fts_word_t *a)
 }
 
 static void
-bus_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  bus_tilda_t *this = (bus_tilda_t *)o;
+  bus_t *this = (bus_t *)o;
   int n_channels = 0;
   int n;
 
@@ -136,9 +135,9 @@ bus_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 }
 
 static void
-bus_tilda_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  bus_tilda_t *this = (bus_tilda_t *)o;
+  bus_t *this = (bus_t *)o;
 
   fts_free(this->buf[0]);
   fts_free(this->buf[1]);
@@ -147,11 +146,11 @@ bus_tilda_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts
 }
 
 static void
-bus_tilda_instantiate(fts_class_t *cl)
+bus_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(bus_tilda_t), bus_tilda_init, bus_tilda_delete);
+  fts_class_init(cl, sizeof(bus_t), bus_init, bus_delete);
 
-  fts_class_message_varargs(cl, fts_s_put_epilogue, bus_tilda_put_epilogue);
+  fts_class_message_varargs(cl, fts_s_put_epilogue, bus_put_epilogue);
 }
 
 /*****************************************************************************
@@ -161,11 +160,11 @@ bus_tilda_instantiate(fts_class_t *cl)
  */
 static fts_hashtable_t *default_busses = 0;
 
-static bus_tilda_t *
+static bus_t *
 bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 {
   fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
-  bus_tilda_t *bus = 0;
+  bus_t *bus = 0;
   fts_atom_t key, a;
   
   fts_set_symbol(&key, name);
@@ -174,8 +173,8 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
     {
       fts_object_t *obj = fts_get_object(value);
       
-      if(fts_object_get_metaclass(obj) == bus_tilda_type)
-	return bus = (bus_tilda_t *)obj;
+      if(fts_object_get_metaclass(obj) == bus_type)
+	return bus = (bus_t *)obj;
     }
   
   if(default_busses == 0)
@@ -185,10 +184,10 @@ bus_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
       fts_hashtable_init( default_busses, 0, FTS_HASHTABLE_MEDIUM);
     }
   else if(fts_hashtable_get(default_busses, &key, &a))
-    return (bus_tilda_t *)fts_get_object(&a);
+    return (bus_t *)fts_get_object(&a);
 
   /* if there wasn't a variable nor a default, make a default */
-  bus = (bus_tilda_t *)fts_object_create(bus_tilda_type, 0, 0);
+  bus = (bus_t *)fts_object_create(bus_type, 0, 0);
   
   fts_set_object(&a, (fts_object_t *)bus);
   fts_hashtable_put(default_busses, &key, &a);
@@ -210,14 +209,14 @@ typedef struct access_tilda
   fts_object_t o;
   ftl_data_t bus;
   ftl_data_t index;
-} access_tilda_t;
+} access_t;
 
 static fts_dsp_edge_t *
-access_tilda_get_edge(access_tilda_t *this)
+access_get_edge(access_t *this)
 {
   if(this->bus)
     {
-      bus_tilda_t *bus = *((bus_tilda_t **)ftl_data_get_ptr(this->bus));
+      bus_t *bus = *((bus_t **)ftl_data_get_ptr(this->bus));
 
       if(bus != NULL)
 	return bus->edge;
@@ -227,15 +226,15 @@ access_tilda_get_edge(access_tilda_t *this)
 }
 
 static void
-access_tilda_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
-  fts_dsp_edge_t *edge = access_tilda_get_edge(this);
-  bus_tilda_t *bus = (bus_tilda_t *)fts_get_object(at);
+  access_t *this = (access_t *)o;
+  fts_dsp_edge_t *edge = access_get_edge(this);
+  bus_t *bus = (bus_t *)fts_get_object(at);
 
   if(edge == bus->edge)
     {
-      bus_tilda_t **ptr = ftl_data_get_ptr(this->bus);
+      bus_t **ptr = ftl_data_get_ptr(this->bus);
 
       fts_object_release((fts_object_t *)*ptr);
       
@@ -247,11 +246,11 @@ access_tilda_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-access_tilda_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
   int *ptr = ftl_data_get_ptr(this->index);
-  bus_tilda_t *bus = *((bus_tilda_t **)ftl_data_get_ptr(this->bus));
+  bus_t *bus = *((bus_t **)ftl_data_get_ptr(this->bus));
   int index = fts_get_number_int(at);
 
   if(index < 0)
@@ -263,31 +262,31 @@ access_tilda_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-access_tilda_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
 
   if(ac > 1 && fts_is_number(at + 1))
-    access_tilda_set_index(o, 0, 0, 1, at + 1);
+    access_set_index(o, 0, 0, 1, at + 1);
 
-  if(ac > 0 && fts_is_a(at, bus_tilda_type))
-    access_tilda_set_bus(o, 0, 0, 1, at);	
+  if(ac > 0 && fts_is_a(at, bus_type))
+    access_set_bus(o, 0, 0, 1, at);	
 }
 
 static void
-access_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
 
-  this->bus = ftl_data_alloc(sizeof(bus_tilda_t *));
+  this->bus = ftl_data_alloc(sizeof(bus_t *));
   this->index = ftl_data_alloc(sizeof(int));
 
   if(ac > 1 && fts_is_number(at + 1))
-    access_tilda_set_index(o, 0, 0, 1, at + 1);
+    access_set_index(o, 0, 0, 1, at + 1);
 
   if(ac > 0)
     {
-      bus_tilda_t **ptr = ftl_data_get_ptr(this->bus);
+      bus_t **ptr = ftl_data_get_ptr(this->bus);
 
       if(fts_is_symbol(at))
 	{
@@ -302,8 +301,8 @@ access_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
 	      return;
 	    }
 	}
-      else if(fts_is_a(at, bus_tilda_type))
-	*ptr = (bus_tilda_t *)fts_get_object(at);
+      else if(fts_is_a(at, bus_type))
+	*ptr = (bus_t *)fts_get_object(at);
       else
 	{
 	  fts_object_set_error(o, "bad argument");
@@ -319,15 +318,15 @@ access_tilda_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const ft
 }	
 
 static void
-access_tilda_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
 
   fts_dsp_remove_object(o);
 
   if(this->bus)
     {
-      bus_tilda_t **bus = ftl_data_get_ptr(this->bus);
+      bus_t **bus = ftl_data_get_ptr(this->bus);
 
       fts_object_release((fts_object_t *)*bus);
       ftl_data_free(this->bus);
@@ -344,9 +343,9 @@ access_tilda_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
  */
 
 static void
-throw_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+throw_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
   fts_atom_t a[4];
@@ -362,9 +361,9 @@ throw_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-throw_tilda_ftl(fts_word_t *a)
+throw_ftl(fts_word_t *a)
 {
-  bus_tilda_t *bus = *((bus_tilda_t **)fts_word_get_pointer(a + 0));
+  bus_t *bus = *((bus_t **)fts_word_get_pointer(a + 0));
   int index = fts_word_get_int(a + 2);
   float *input = (float *)fts_word_get_pointer(a + 3);
   int n_tick = fts_word_get_int(a + 4);
@@ -377,29 +376,29 @@ throw_tilda_ftl(fts_word_t *a)
 }
 
 static void
-throw_tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+throw_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
   fts_dsp_edge_t *edge;
 
-  access_tilda_init(o, 0, 0, ac, at);
+  access_init(o, 0, 0, ac, at);
 
-  edge = access_tilda_get_edge(this);
+  edge = access_get_edge(this);
 
   if(edge)
     fts_dsp_before_edge(o, edge);
 }
 
 static void
-throw_tilda_instantiate(fts_class_t *cl)
+throw_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(access_tilda_t), throw_tilda_init, access_tilda_delete);
+  fts_class_init(cl, sizeof(access_t), throw_init, access_delete);
 
-  fts_class_message_varargs(cl, fts_s_put, throw_tilda_put);
+  fts_class_message_varargs(cl, fts_s_put, throw_put);
 
-  fts_class_inlet_varargs(cl, 1, access_tilda_varargs);
-  fts_class_inlet(cl, 1, bus_tilda_type, access_tilda_set_bus);
-  fts_class_inlet_int(cl, 1, access_tilda_set_index);
+  fts_class_inlet_varargs(cl, 1, access_varargs);
+  fts_class_inlet(cl, 1, bus_type, access_set_bus);
+  fts_class_inlet_int(cl, 1, access_set_index);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -412,9 +411,9 @@ throw_tilda_instantiate(fts_class_t *cl)
  */
 
 static void
-catch_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+catch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_output_size(dsp, 0);
   fts_atom_t a[4];
@@ -427,9 +426,9 @@ catch_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-catch_tilda_ftl(fts_word_t *a)
+catch_ftl(fts_word_t *a)
 {
-  bus_tilda_t *bus = *((bus_tilda_t **)fts_word_get_pointer(a + 0));
+  bus_t *bus = *((bus_t **)fts_word_get_pointer(a + 0));
   int index = fts_word_get_int(a + 1);
   float *output = (float *)fts_word_get_pointer(a + 2);
   int n_tick = fts_word_get_int(a + 3);
@@ -442,46 +441,46 @@ catch_tilda_ftl(fts_word_t *a)
 }
 
 static void
-catch_tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+catch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  access_tilda_t *this = (access_tilda_t *)o;
+  access_t *this = (access_t *)o;
   fts_dsp_edge_t *edge;
 
-  access_tilda_init(o, 0, 0, ac, at);
+  access_init(o, 0, 0, ac, at);
 
-  edge = access_tilda_get_edge(this);
+  edge = access_get_edge(this);
 
   if(edge)
     fts_dsp_after_edge(o, edge);
 }
 
 static void
-catch_tilda_instantiate(fts_class_t *cl)
+catch_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(access_tilda_t), catch_tilda_init, access_tilda_delete);
+  fts_class_init(cl, sizeof(access_t), catch_init, access_delete);
 
-  fts_class_message_varargs(cl, fts_s_put, catch_tilda_put);
+  fts_class_message_varargs(cl, fts_s_put, catch_put);
 
-  fts_class_inlet_varargs(cl, 0, access_tilda_varargs);
-  fts_class_inlet(cl, 0, bus_tilda_type, access_tilda_set_bus);
-  fts_class_inlet_int(cl, 0, access_tilda_set_index);
+  fts_class_inlet_varargs(cl, 0, access_varargs);
+  fts_class_inlet(cl, 0, bus_type, access_set_bus);
+  fts_class_inlet_int(cl, 0, access_set_index);
       
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
 }
 
 void
-bus_tilda_config(void)
+signal_bus_config(void)
 {
   bus_tilda_symbol = fts_new_symbol("bus~");
   throw_tilda_symbol = fts_new_symbol("throw~");
   catch_tilda_symbol = fts_new_symbol("catch~");
 
-  fts_dsp_declare_function(bus_tilda_symbol, bus_tilda_ftl);
-  fts_dsp_declare_function(throw_tilda_symbol, throw_tilda_ftl);
-  fts_dsp_declare_function(catch_tilda_symbol, catch_tilda_ftl);
+  fts_dsp_declare_function(bus_tilda_symbol, bus_ftl);
+  fts_dsp_declare_function(throw_tilda_symbol, throw_ftl);
+  fts_dsp_declare_function(catch_tilda_symbol, catch_ftl);
 
-  bus_tilda_type = fts_class_install(bus_tilda_symbol, bus_tilda_instantiate);
-  fts_class_install(throw_tilda_symbol, throw_tilda_instantiate);
-  fts_class_install(catch_tilda_symbol, catch_tilda_instantiate);
+  bus_type = fts_class_install(bus_tilda_symbol, bus_instantiate);
+  fts_class_install(throw_tilda_symbol, throw_instantiate);
+  fts_class_install(catch_tilda_symbol, catch_instantiate);
 }

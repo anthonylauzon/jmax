@@ -257,18 +257,18 @@ xypad_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(xypad_t), xypad_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_update_real_time, xypad_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_dump, xypad_dump);  
+  fts_class_message_varargs(cl, fts_s_update_real_time, xypad_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_dump, xypad_dump);  
 
-  fts_class_method_varargs(cl, fts_s_update_gui, xypad_update_gui); 
-  fts_class_method_varargs(cl, sym_setXMinValue, xypad_set_xminvalue); 
-  fts_class_method_varargs(cl, sym_setXMaxValue, xypad_set_xmaxvalue); 
-  fts_class_method_varargs(cl, sym_setYMinValue, xypad_set_yminvalue); 
-  fts_class_method_varargs(cl, sym_setYMaxValue, xypad_set_ymaxvalue); 
-  fts_class_method_varargs(cl, sym_position, xypad_set_couple); 
+  fts_class_message_varargs(cl, fts_s_update_gui, xypad_update_gui); 
+  fts_class_message_varargs(cl, sym_setXMinValue, xypad_set_xminvalue); 
+  fts_class_message_varargs(cl, sym_setXMaxValue, xypad_set_xmaxvalue); 
+  fts_class_message_varargs(cl, sym_setYMinValue, xypad_set_yminvalue); 
+  fts_class_message_varargs(cl, sym_setYMaxValue, xypad_set_ymaxvalue); 
+  fts_class_message_varargs(cl, sym_position, xypad_set_couple); 
 
-  fts_class_method_varargs(cl, fts_s_set, xypad_set);
-  fts_class_method_varargs(cl, fts_s_bang, xypad_bang);
+  fts_class_message_varargs(cl, fts_s_set, xypad_set);
+  fts_class_message_varargs(cl, fts_s_bang, xypad_bang);
 
   fts_class_inlet_varargs(cl, 0, xypad_set_couple);
 

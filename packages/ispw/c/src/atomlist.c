@@ -444,11 +444,11 @@ atom_list_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_atom_list_t), fts_atom_list_init, fts_atom_list_delete);
 
-  fts_class_method_varargs(cl, fts_s_upload, fts_atom_list_upload);
+  fts_class_message_varargs(cl, fts_s_upload, fts_atom_list_upload);
 
-  fts_class_method_varargs(cl, sym_atomlist_set, fts_atom_list_client_set);
-  fts_class_method_varargs(cl, sym_atomlist_set_name, fts_atom_list_set_name);
-  fts_class_method_varargs(cl, sym_atomlist_update, fts_atom_list_update);
+  fts_class_message_varargs(cl, sym_atomlist_set, fts_atom_list_client_set);
+  fts_class_message_varargs(cl, sym_atomlist_set_name, fts_atom_list_set_name);
+  fts_class_message_varargs(cl, sym_atomlist_update, fts_atom_list_update);
 }
 
 /********************************************************************/

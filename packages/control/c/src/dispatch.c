@@ -74,7 +74,7 @@ dispatch_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(dispatch_t), NULL, NULL);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, dispatch_propagate_input);
+  fts_class_message_varargs(cl, fts_s_propagate_input, dispatch_propagate_input);
 
   fts_class_inlet_int(cl, 0, dispatch_values);
   fts_class_inlet_float(cl, 0, dispatch_values);

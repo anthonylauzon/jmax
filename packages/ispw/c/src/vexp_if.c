@@ -182,7 +182,7 @@ expr_instantiate(fts_class_t *cl)
   /* declaring the class */
   fts_class_init(cl, sizeof(t_expr), expr_init, expr_delete);
 
-  fts_class_method_varargs(cl, fts_s_bang, expr_bang);
+  fts_class_message_varargs(cl, fts_s_bang, expr_bang);
 
   fts_class_inlet_int(cl, 0, expr_atom);
   fts_class_inlet_float(cl, 0, expr_atom);

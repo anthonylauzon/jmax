@@ -126,8 +126,8 @@ sigswitch_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigswitch_t), sigswitch_init, sigswitch_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigswitch_put);
-  fts_class_method_varargs(cl, fts_new_symbol("put_after_successors"), sigswitch_put_after);
+  fts_class_message_varargs(cl, fts_s_put, sigswitch_put);
+  fts_class_message_varargs(cl, fts_new_symbol("put_after_successors"), sigswitch_put_after);
   
   fts_class_inlet_int(cl, 0, sigswitch_switch);
   fts_class_inlet_int(cl, 1, sigswitch_switch);

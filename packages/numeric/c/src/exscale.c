@@ -212,7 +212,7 @@ exscale_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(exscale_t), exscale_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_set, exscale_set);
+  fts_class_message_varargs(cl, fts_s_set, exscale_set);
 
   fts_class_inlet_number(cl, 0, exscale_number);
   fts_class_inlet_number(cl, 1, exscale_set_inlow);

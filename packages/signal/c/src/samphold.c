@@ -138,11 +138,11 @@ samphold_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(samphold_t), samphold_init, samphold_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, samphold_put);
+  fts_class_message_varargs(cl, fts_s_put, samphold_put);
   
   fts_class_inlet_float(cl, 0, samphold_number);
   fts_class_inlet_int(cl, 0, samphold_number);
-  fts_class_method_varargs(cl, fts_new_symbol("reset"), samphold_reset);
+  fts_class_message_varargs(cl, fts_new_symbol("reset"), samphold_reset);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_inlet(cl, 1);

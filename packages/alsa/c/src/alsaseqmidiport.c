@@ -474,7 +474,7 @@ alsaseqmidiport_input_instantiate(fts_class_t* cl)
 {
     fts_class_init(cl, sizeof(alsaseqmidiport_t), alsaseqmidiport_input_init, alsaseqmidiport_input_delete);
 
-    fts_class_method_varargs(cl, fts_s_sched_ready, alsaseqmidiport_select);
+    fts_class_message_varargs(cl, fts_s_sched_ready, alsaseqmidiport_select);
 }
 
 

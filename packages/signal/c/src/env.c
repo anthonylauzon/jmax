@@ -617,24 +617,24 @@ env_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(env_t), env_init, env_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, env_put);
+  fts_class_message_varargs(cl, fts_s_put, env_put);
 
-  fts_class_method_varargs(cl, fts_new_symbol("mode"), env_set_mode);
+  fts_class_message_varargs(cl, fts_new_symbol("mode"), env_set_mode);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), env_set_mode_prop);
 
-  fts_class_method_varargs(cl, fts_s_bang, env_go);
-  fts_class_method_varargs(cl, fts_new_symbol("release"), env_release);
+  fts_class_message_varargs(cl, fts_s_bang, env_go);
+  fts_class_message_varargs(cl, fts_new_symbol("release"), env_release);
 
-  fts_class_method_varargs(cl, fts_s_stop, env_stop);
+  fts_class_message_varargs(cl, fts_s_stop, env_stop);
 
-  fts_class_method_varargs(cl, bpf_symbol, env_bpf);
+  fts_class_message_varargs(cl, bpf_symbol, env_bpf);
   fts_class_inlet_int(cl, 0, env_number);
   fts_class_inlet_float(cl, 0, env_number);
   fts_class_inlet_varargs(cl, 0, env_array);
 
-  fts_class_method_varargs(cl, fts_new_symbol("adsr"), env_adsr);
-  fts_class_method_varargs(cl, fts_new_symbol("speed"), env_set_speed);
-  fts_class_method_varargs(cl, fts_new_symbol("duration"), env_set_duration);
+  fts_class_message_varargs(cl, fts_new_symbol("adsr"), env_adsr);
+  fts_class_message_varargs(cl, fts_new_symbol("speed"), env_set_speed);
+  fts_class_message_varargs(cl, fts_new_symbol("duration"), env_set_duration);
 
   fts_dsp_declare_outlet(cl, 0);
 }

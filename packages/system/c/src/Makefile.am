@@ -3,8 +3,6 @@ package_LTLIBRARIES=libsystem.la
 libsystem_la_SOURCES= \
 sysinfo.c \
 argument.c \
-bus.c \
-bus_tilda.c \
 const.c \
 dsp1.c \
 print.c \

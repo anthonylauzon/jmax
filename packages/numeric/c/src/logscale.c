@@ -212,7 +212,7 @@ logscale_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(logscale_t), logscale_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_set, logscale_set);
+  fts_class_message_varargs(cl, fts_s_set, logscale_set);
 
   fts_class_inlet_number(cl, 0, logscale_number);
   fts_class_inlet_number(cl, 1, logscale_set_inlow);

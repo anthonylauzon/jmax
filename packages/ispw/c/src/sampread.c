@@ -196,11 +196,11 @@ class_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sampread_t), sampread_init, sampread_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sampread_put);
+  fts_class_message_varargs(cl, fts_s_put, sampread_put);
   
   fts_class_inlet_int(cl, 0, sampread_set_by_int);
-  fts_class_method_varargs(cl, fts_s_set, sampread_set);
-  fts_class_method_varargs(cl, fts_s_jump, sampread_jump);
+  fts_class_message_varargs(cl, fts_s_set, sampread_set);
+  fts_class_message_varargs(cl, fts_s_jump, sampread_jump);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

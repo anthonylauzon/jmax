@@ -213,9 +213,9 @@ pipe_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(pipe_t), pipe_init, pipe_delete);
 
-  fts_class_method_varargs(cl, fts_s_bang,  pipe_bang);
-  fts_class_method_varargs(cl, fts_s_clear, pipe_clear);
-  fts_class_method_varargs(cl, fts_s_flush, pipe_flush);
+  fts_class_message_varargs(cl, fts_s_bang,  pipe_bang);
+  fts_class_message_varargs(cl, fts_s_clear, pipe_clear);
+  fts_class_message_varargs(cl, fts_s_flush, pipe_flush);
 
   fts_class_inlet_varargs(cl, 0, pipe_list);
   fts_class_inlet_int(cl, 0, pipe_atom_trigger);

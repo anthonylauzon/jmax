@@ -282,7 +282,7 @@ biquad_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(biquad_t), biquad_init, biquad_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, biquad_put);
+  fts_class_message_varargs(cl, fts_s_put, biquad_put);
   
   fts_class_inlet_float(cl, 1, biquad_set_coef_a0);
   fts_class_inlet_float(cl, 2, biquad_set_coef_a1);
@@ -296,8 +296,8 @@ biquad_instantiate(fts_class_t *cl)
   fts_class_inlet_int(cl, 4, biquad_set_coef_b1);
   fts_class_inlet_int(cl, 5, biquad_set_coef_b2);
   
-  fts_class_method_varargs(cl, fts_s_set, biquad_set_coefs);
-  fts_class_method_varargs(cl, fts_s_clear, biquad_state_clear);
+  fts_class_message_varargs(cl, fts_s_set, biquad_set_coefs);
+  fts_class_message_varargs(cl, fts_s_clear, biquad_state_clear);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

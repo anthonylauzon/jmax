@@ -150,7 +150,7 @@ prepend_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(prepend_t), prepend_init, prepend_delete);
 
-  fts_class_method_varargs(cl, fts_s_set, prepend_set);
+  fts_class_message_varargs(cl, fts_s_set, prepend_set);
 
   fts_class_set_default_handler(cl, prepend_message);
   fts_class_inlet_varargs(cl, 0, prepend_varargs);

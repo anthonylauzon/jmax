@@ -79,7 +79,7 @@ const_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(const_t), const_init, const_delete);
   
-  fts_class_method_varargs(cl, fts_s_bang, const_bang);
+  fts_class_message_varargs(cl, fts_s_bang, const_bang);
   
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
   

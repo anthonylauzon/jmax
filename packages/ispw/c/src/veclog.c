@@ -194,7 +194,7 @@ sigexp_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(veclog_t), veclog_init, veclog_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, exp_put);
+  fts_class_message_varargs(cl, fts_s_put, exp_put);
   
   fts_class_inlet_int(cl, 1, veclog_set_base);
   fts_class_inlet_float(cl, 1, veclog_set_base);
@@ -209,7 +209,7 @@ siglog_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(veclog_t), siglog_init, veclog_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, log_put);
+  fts_class_message_varargs(cl, fts_s_put, log_put);
   
   fts_class_inlet_int(cl, 1, siglog_set_base);
   fts_class_inlet_float(cl, 1, siglog_set_base);
@@ -223,7 +223,7 @@ siglog10_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(veclog_t), veclog_init, veclog_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, log10_put);
+  fts_class_message_varargs(cl, fts_s_put, log10_put);
   
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

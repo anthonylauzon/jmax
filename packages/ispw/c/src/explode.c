@@ -1389,38 +1389,38 @@ explode_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(explode_t), explode_init_mth, explode_delete_mth);
   
-  /*fts_class_method_varargs(cl, fts_s_upload, explode_upload);*/
-  /*fts_class_method_varargs(cl, fts_s_append, explode_append_event);*/
-  fts_class_method_varargs(cl, fts_s_dump, explode_dump);
-  fts_class_method_varargs(cl, fts_s_save_dotpat, explode_save_dotpat); 
+  /*fts_class_message_varargs(cl, fts_s_upload, explode_upload);*/
+  /*fts_class_message_varargs(cl, fts_s_append, explode_append_event);*/
+  fts_class_message_varargs(cl, fts_s_dump, explode_dump);
+  fts_class_message_varargs(cl, fts_s_save_dotpat, explode_save_dotpat); 
 
   /* graphical editor */
-  fts_class_method_varargs(cl, fts_s_openEditor, explode_open_editor);
-  fts_class_method_varargs(cl, fts_s_destroyEditor, explode_destroy_editor);
-  fts_class_method_varargs(cl, fts_s_closeEditor, explode_close_editor);
+  fts_class_message_varargs(cl, fts_s_openEditor, explode_open_editor);
+  fts_class_message_varargs(cl, fts_s_destroyEditor, explode_destroy_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, explode_close_editor);
   
-  fts_class_method_varargs(cl, sym_add_event, explode_add);
-  fts_class_method_varargs(cl, sym_remove_event, explode_remove);
-  fts_class_method_varargs(cl, sym_change_event, explode_change);
-  fts_class_method_varargs(cl, sym_change_time, explode_change_time);
+  fts_class_message_varargs(cl, sym_add_event, explode_add);
+  fts_class_message_varargs(cl, sym_remove_event, explode_remove);
+  fts_class_message_varargs(cl, sym_change_event, explode_change);
+  fts_class_message_varargs(cl, sym_change_time, explode_change_time);
 
-  fts_class_method_varargs(cl, fts_s_clear, explode_clear_mth);
-  fts_class_method_varargs(cl, fts_s_start, explode_start_mth);
-  fts_class_method_varargs(cl, fts_s_stop, explode_stop_mth);
-  fts_class_method_varargs(cl, fts_new_symbol("record"), explode_record_mth); 
-  fts_class_method_varargs(cl, fts_s_restore, explode_record_mth);
+  fts_class_message_varargs(cl, fts_s_clear, explode_clear_mth);
+  fts_class_message_varargs(cl, fts_s_start, explode_start_mth);
+  fts_class_message_varargs(cl, fts_s_stop, explode_stop_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("record"), explode_record_mth); 
+  fts_class_message_varargs(cl, fts_s_restore, explode_record_mth);
 
-  fts_class_method_varargs(cl, fts_s_next, explode_next_mth);
-  fts_class_method_varargs(cl, fts_new_symbol("nth"), explode_nth_mth);
-  fts_class_method_varargs(cl, fts_s_append, explode_append_mth);
+  fts_class_message_varargs(cl, fts_s_next, explode_next_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("nth"), explode_nth_mth);
+  fts_class_message_varargs(cl, fts_s_append, explode_append_mth);
 
-  fts_class_method_varargs(cl, fts_new_symbol("follow"), explode_follow_mth);
-  fts_class_method_varargs(cl, fts_new_symbol("startat"), explode_startat_mth);
-  fts_class_method_varargs(cl, fts_new_symbol("followat"), explode_followat_mth);
-  fts_class_method_varargs(cl, fts_new_symbol("params"), explode_params_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("follow"), explode_follow_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("startat"), explode_startat_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("followat"), explode_followat_mth);
+  fts_class_message_varargs(cl, fts_new_symbol("params"), explode_params_mth);
 
   /* export standard MIDI file */
-  fts_class_method_varargs(cl, fts_s_export, explode_export);
+  fts_class_message_varargs(cl, fts_s_export, explode_export);
 
   fts_class_inlet_number(cl, 0, explode_number_mth);
   fts_class_inlet_number(cl, 1, explode_number_1_mth);

@@ -208,7 +208,7 @@ delayline_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delayline_t), delayline_init, delayline_delete);
 
-  fts_class_method_varargs(cl, fts_s_put_epilogue, delayline_put);
+  fts_class_message_varargs(cl, fts_s_put_epilogue, delayline_put);
 
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, delayline_get_state);
 }
@@ -340,7 +340,7 @@ delay_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	  fts_object_refer((fts_object_t *)line);
 	}
       else
-	fts_object_signal_runtime_error(o, "delay line must have same edge");
+	fts_object_signal_runtime_error(o, "delay line doesn't belong to the same DSP edge");
     }
 }
 
@@ -384,7 +384,7 @@ delay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), delay_init, delay_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, delay_put);
+  fts_class_message_varargs(cl, fts_s_put, delay_put);
 
   fts_class_inlet_int(cl, 1, delay_set_time);
   fts_class_inlet_float(cl, 1, delay_set_time);
@@ -571,7 +571,7 @@ tapin_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), tapin_init, tap_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, tapin_put);
+  fts_class_message_varargs(cl, fts_s_put, tapin_put);
 
   fts_class_inlet_int(cl, 1, delay_set_time);
   fts_class_inlet_float(cl, 1, delay_set_time);
@@ -586,7 +586,7 @@ tapout_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), tapout_init, tap_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, tapout_put);
+  fts_class_message_varargs(cl, fts_s_put, tapout_put);
 
   fts_class_inlet_int(cl, 0, delay_set_time);
   fts_class_inlet_float(cl, 0, delay_set_time);
@@ -711,7 +711,7 @@ retap_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), retap_init, tap_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, retap_put);
+  fts_class_message_varargs(cl, fts_s_put, retap_put);
 
   fts_class_inlet_int(cl, 1, retap_set_time);
   fts_class_inlet_float(cl, 1, retap_set_time);
@@ -838,7 +838,7 @@ vtap_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(delay_t), vtap_init, tap_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, vtap_put);
+  fts_class_message_varargs(cl, fts_s_put, vtap_put);
 
   fts_class_inlet(cl, 1, delayline_metaclass, delay_set_line);
 

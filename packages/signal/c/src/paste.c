@@ -201,7 +201,7 @@ paste_instantiate(fts_class_t *cl)
 {  
   fts_class_init(cl, sizeof(paste_t), paste_init, paste_delete);      
   
-  fts_class_method_varargs(cl, fts_s_put, paste_put);
+  fts_class_message_varargs(cl, fts_s_put, paste_put);
   
   fts_class_inlet(cl, 0, fvec_type, paste_fvec);
 

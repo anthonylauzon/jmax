@@ -138,9 +138,9 @@ retard_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(retard_t), retard_init, retard_delete);
 
-  fts_class_method_varargs(cl, fts_s_flush, retard_flush);
-  fts_class_method_varargs(cl, fts_s_clear, retard_clear);
-  fts_class_method_varargs(cl, fts_s_stop, retard_clear);
+  fts_class_message_varargs(cl, fts_s_flush, retard_flush);
+  fts_class_message_varargs(cl, fts_s_clear, retard_clear);
+  fts_class_message_varargs(cl, fts_s_stop, retard_clear);
 
   fts_class_inlet_int(cl, 0, retard_input_atom);
   fts_class_inlet_float(cl, 0, retard_input_atom);

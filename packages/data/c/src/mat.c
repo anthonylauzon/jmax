@@ -700,24 +700,24 @@ mat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mat_t), mat_init, mat_delete);
 
-  fts_class_method_varargs(cl, fts_s_post, mat_post); 
-  fts_class_method_varargs(cl, fts_s_print, mat_print); 
+  fts_class_message_varargs(cl, fts_s_post, mat_post); 
+  fts_class_message_varargs(cl, fts_s_print, mat_print); 
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_keep, data_object_daemon_get_keep);
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, mat_get_mat);
 
-  fts_class_method_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
-  fts_class_method_varargs(cl, fts_s_dump, mat_dump);
+  fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
+  fts_class_message_varargs(cl, fts_s_dump, mat_dump);
   
-  fts_class_method_varargs(cl, fts_s_fill, mat_fill);      
-  fts_class_method_varargs(cl, fts_s_set, mat_set_elements);
-  fts_class_method_varargs(cl, fts_s_row, mat_set_row_elements);
+  fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
+  fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
+  fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
 
-  fts_class_method_varargs(cl, fts_s_size, mat_size);
+  fts_class_message_varargs(cl, fts_s_size, mat_size);
             
-  fts_class_method_varargs(cl, fts_s_import, mat_import); 
-  fts_class_method_varargs(cl, fts_s_export, mat_export); 
+  fts_class_message_varargs(cl, fts_s_import, mat_import); 
+  fts_class_message_varargs(cl, fts_s_export, mat_export); 
 }
 
 void

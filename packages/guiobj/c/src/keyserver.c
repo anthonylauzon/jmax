@@ -97,7 +97,7 @@ keyserver_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_t), 0, 0);
 
-  fts_class_method_varargs(cl, fts_new_symbol("key"), keyserver_key);
+  fts_class_message_varargs(cl, fts_new_symbol("key"), keyserver_key);
 }
 
 void 

@@ -371,11 +371,11 @@ filestream_instantiate(fts_class_t *cl)
 
   /* define variable */
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, filestream_get_state);
-  fts_class_method_varargs(cl, fts_s_sched_ready, filestream_read);
+  fts_class_message_varargs(cl, fts_s_sched_ready, filestream_read);
   
-  fts_class_method_varargs(cl, fts_s_open, filestream_open);
-  fts_class_method_varargs(cl, fts_s_close, filestream_close);
-  fts_class_method_varargs(cl, fts_s_bang, filestream_bang);
+  fts_class_message_varargs(cl, fts_s_open, filestream_open);
+  fts_class_message_varargs(cl, fts_s_close, filestream_close);
+  fts_class_message_varargs(cl, fts_s_bang, filestream_bang);
   fts_class_inlet_int(cl, 0, filestream_int);
   fts_class_inlet_varargs(cl, 0, filestream_list);
 

@@ -155,7 +155,7 @@ clip_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(clip_t), clip_init, 0);
 
-  fts_class_method_varargs(cl, fts_s_set, clip_set);
+  fts_class_message_varargs(cl, fts_s_set, clip_set);
 
   fts_class_inlet_varargs(cl, 0, clip_varargs);
   fts_class_inlet_int(cl, 0, clip_int);

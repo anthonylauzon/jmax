@@ -66,7 +66,7 @@ sigthru_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigthru_t), sigthru_init, sigthru_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sigthru_put);
+  fts_class_message_varargs(cl, fts_s_put, sigthru_put);
 
   fts_class_inlet_varargs(cl, 0, sigthru_input);
   fts_class_set_default_handler(cl, sigthru_input);

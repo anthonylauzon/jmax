@@ -243,13 +243,13 @@ messconst_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(messconst_t), messconst_init, messconst_delete);
 
-  fts_class_method_varargs(cl, fts_s_set, messconst_set);
-  fts_class_method_varargs(cl, fts_s_dump, messconst_dump);
+  fts_class_message_varargs(cl, fts_s_set, messconst_set);
+  fts_class_message_varargs(cl, fts_s_dump, messconst_dump);
 
-  fts_class_method_varargs(cl, fts_s_update_real_time, messconst_update_real_time); 
-  fts_class_method_varargs(cl, fts_s_spost_description, messconst_spost_description); 
+  fts_class_message_varargs(cl, fts_s_update_real_time, messconst_update_real_time); 
+  fts_class_message_varargs(cl, fts_s_spost_description, messconst_spost_description); 
   
-  fts_class_method_varargs(cl, fts_s_bang, messconst_send);
+  fts_class_message_varargs(cl, fts_s_bang, messconst_send);
   
   fts_class_inlet_varargs(cl, 0, messconst_varargs);
   fts_class_outlet_anything(cl, 0);

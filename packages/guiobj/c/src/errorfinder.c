@@ -48,7 +48,7 @@ error_finder_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_error_finder_t), NULL, NULL); 
 
-  fts_class_method_varargs(cl, fts_new_symbol("error_finder_find"), fts_error_finder_find);
+  fts_class_message_varargs(cl, fts_new_symbol("error_finder_find"), fts_error_finder_find);
 }
 
 /***********************************************************************

@@ -97,10 +97,10 @@ static void dac_tilda_instantiate(fts_class_t *cl)
 {
   fts_class_init( cl, sizeof( dac_tilda_t), dac_tilda_init, dac_tilda_delete);
 
-  fts_class_method_varargs(cl, fts_s_propagate_input, dac_tilda_propagate_input);
+  fts_class_message_varargs(cl, fts_s_propagate_input, dac_tilda_propagate_input);
 
-  fts_class_method_varargs(cl, fts_s_start, dac_tilda_start);
-  fts_class_method_varargs(cl, fts_s_stop, dac_tilda_stop);
+  fts_class_message_varargs(cl, fts_s_start, dac_tilda_start);
+  fts_class_message_varargs(cl, fts_s_stop, dac_tilda_stop);
 
   fts_dsp_declare_inlet( cl, 0);
 }

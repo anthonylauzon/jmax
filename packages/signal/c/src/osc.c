@@ -211,10 +211,10 @@ osc_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(osc_t), osc_init, osc_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, osc_put);
+  fts_class_message_varargs(cl, fts_s_put, osc_put);
   
-  fts_class_method_varargs(cl, fts_new_symbol("phase"), osc_set_phase);
-  fts_class_method_varargs(cl, fts_new_symbol("freq"), osc_set_freq);
+  fts_class_message_varargs(cl, fts_new_symbol("phase"), osc_set_phase);
+  fts_class_message_varargs(cl, fts_new_symbol("freq"), osc_set_freq);
 
   fts_class_inlet_int(cl, 0, osc_set_freq);
   fts_class_inlet_float(cl, 0, osc_set_freq);
@@ -361,10 +361,10 @@ phi_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(osc_t), phi_init, phi_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, phi_put);
+  fts_class_message_varargs(cl, fts_s_put, phi_put);
   
-  fts_class_method_varargs(cl, fts_new_symbol("phase"), phi_set_phase);
-  fts_class_method_varargs(cl, fts_new_symbol("freq"), phi_set_freq);
+  fts_class_message_varargs(cl, fts_new_symbol("phase"), phi_set_phase);
+  fts_class_message_varargs(cl, fts_new_symbol("freq"), phi_set_freq);
   
   fts_class_inlet_int(cl, 0, phi_set_freq);
   fts_class_inlet_float(cl, 0, phi_set_freq);

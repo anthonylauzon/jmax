@@ -109,7 +109,7 @@ sqrt_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vecsqrt_t), vecsqrt_init, vecsqrt_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, sqrt_put);
+  fts_class_message_varargs(cl, fts_s_put, sqrt_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
@@ -120,7 +120,7 @@ rsqrt_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(vecsqrt_t), vecsqrt_init, vecsqrt_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, rsqrt_put);
+  fts_class_message_varargs(cl, fts_s_put, rsqrt_put);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);

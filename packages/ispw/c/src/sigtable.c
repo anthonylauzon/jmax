@@ -402,15 +402,15 @@ sigtable_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(sigtable_t), sigtable_init, sigtable_delete);
 
-  fts_class_method_varargs(cl, fts_s_put, put_dsp_check_size);
+  fts_class_message_varargs(cl, fts_s_put, put_dsp_check_size);
   
-  fts_class_method_varargs(cl, fts_new_symbol("read"), sigtable_read);
-  fts_class_method_varargs(cl, fts_new_symbol("write"), sigtable_write);
+  fts_class_message_varargs(cl, fts_new_symbol("read"), sigtable_read);
+  fts_class_message_varargs(cl, fts_new_symbol("write"), sigtable_write);
   
-  fts_class_method_varargs(cl, fts_new_symbol("load"), sigtable_load);
-  fts_class_method_varargs(cl, fts_new_symbol("save"), sigtable_save);
+  fts_class_message_varargs(cl, fts_new_symbol("load"), sigtable_load);
+  fts_class_message_varargs(cl, fts_new_symbol("save"), sigtable_save);
 
-  fts_class_method_varargs(cl, fts_new_symbol("realloc"), sigtable_realloc);
+  fts_class_message_varargs(cl, fts_new_symbol("realloc"), sigtable_realloc);
 
   fts_class_outlet_int(cl, 0);
 }

@@ -213,9 +213,9 @@ seqrec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqrec_t), seqrec_init, seqrec_delete);
   
-  fts_class_method_varargs(cl, fts_s_start, seqrec_start);
-  fts_class_method_varargs(cl, fts_new_symbol("pause"), seqrec_pause);
-  fts_class_method_varargs(cl, fts_s_stop, seqrec_stop);
+  fts_class_message_varargs(cl, fts_s_start, seqrec_start);
+  fts_class_message_varargs(cl, fts_new_symbol("pause"), seqrec_pause);
+  fts_class_message_varargs(cl, fts_s_stop, seqrec_stop);
   
   fts_class_inlet_int(cl, 0, seqrec_record_atom);
   fts_class_inlet_float(cl, 0, seqrec_record_atom);
