@@ -371,9 +371,9 @@ void fts_hashtable_fprintf( fts_hashtable_t *h, FILE *f)
  * Iterator
  */
 
-static int hashtable_iterator_has_more( void *data)
+static int hashtable_iterator_has_more( fts_iterator_t *iter)
 {
-  fts_hashtable_iterator_t *i = (fts_hashtable_iterator_t *)data;
+  fts_hashtable_iterator_t *i = (fts_hashtable_iterator_t *) iter->data;
 
   if (i->cell)
     return 1;
@@ -387,14 +387,14 @@ static int hashtable_iterator_has_more( void *data)
 	}
     }
 
-  fts_heap_free( data, iterator_heap);
+  fts_heap_free( iter->data, iterator_heap);
   
   return 0;
 }
 
-static void hashtable_iterator_next( void *data, fts_atom_t *a)
+static void hashtable_iterator_next( fts_iterator_t *iter, fts_atom_t *a)
 {
-  fts_hashtable_iterator_t *i = (fts_hashtable_iterator_t *)data;
+  fts_hashtable_iterator_t *i = (fts_hashtable_iterator_t *) iter->data;
 
   if ( !i->cell)
     {
