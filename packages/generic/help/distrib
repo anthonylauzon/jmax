@@ -2,4 +2,3 @@ all	all	generic.help.index.tcl
 all	all	generic.summary.jmax
 all	all	getlist.help.jmax
 all	all	mat.help.jmax
-all	all	project.env

@@ -3,6 +3,5 @@ all 	all	itab.help.jmax
 all 	all	nsplit.help.jmax
 all 	all	numeric.help.index.tcl
 all 	all	numeric.summary.jmax
-all 	all	project.env
 all 	all	rewrap.help.jmax
 all 	all	wrap.help.jmax

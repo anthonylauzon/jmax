@@ -19,7 +19,6 @@ all	all	osc1~.help.jmax
 all	all	phasor~.help.jmax
 all	all	pitch~.help.jmax
 all	all	print~.help.jmax
-all	all	project.env
 all	all	pt~.help.jmax
 all	all	samphold~.help.jmax
 all	all	samplerate~.help.jmax
