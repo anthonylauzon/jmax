@@ -9,8 +9,6 @@ SSOURCES = \
           ErmesSketchHelper.java \
           ErmesSketchPad.java \
           ErmesSketchWindow.java \
-          ErmesToggleButton.java \
-          ErmesToolBar.java \
 	  ErmesSwToolbar.java \
 	  ErmesSwVarEdit.java \
 	  ErmesToolBarLayout.java \
