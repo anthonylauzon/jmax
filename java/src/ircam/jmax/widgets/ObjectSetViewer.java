@@ -89,12 +89,7 @@ public class ObjectSetViewer extends JPanel {
 
   public ObjectSetViewer()
     {
-      jList = new JList() {
-	public Dimension getMaximumSize() 
-	  {
-	    return new Dimension(400, super.getMaximumSize().height);
-	  }
-      };
+      jList = new JList();
 
       jList.setBackground( Color.white);
 

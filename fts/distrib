@@ -1,4 +1,5 @@
 all	all	Makefiles
-all	all	bin
 all	all     src
 all	all	scripts
+all	all	bin/ARCH/opt/fts
+
