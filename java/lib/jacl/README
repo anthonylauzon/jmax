@@ -1,0 +1,124 @@
+Jacl
+
+SCCS: @(#) README.jacl 1.10 97/12/19 12:02:31
+ 
+1. Introduction
+---------------
+
+Jacl (which stands for JAva Command Language) is a platform
+independent scripting language for Java.  The feature set and
+functionality of Jacl are structured to mirror the scripting language
+Tcl/Tk version 8.0.  In addition to the write-once-run-anywhere
+philosophy, Jacl provides it's user with two other key concepts.
+First, Jacl enables users to write Tcl extensions entirely in Java.
+Extension writers can use the classes supplied in tcl.lang.*, as well
+as any other classes, to write portable extensions.  Second, Jacl
+includes the Java Package, which provides a direct Tcl interface to
+Java Objects.  For example, the Java Package contains a Tcl command,
+java::info, that provides a Jacl user with information about the
+public methods, fields, etc. of a given Java class or object.  The
+Java Package the user to script Java.
+
+2. Documentation
+----------------
+
+The best way to get started with Jacl is to look at the demos provided
+in this release.  The "docs" directory contains additional
+information.  See the "diffs.txt" file in this directory for a list of
+Tcl features and the extent to which they are implemented in Jacl.
+Also, look at the SunScript homepage for other useful information
+about our project.
+
+3. Requirements
+---------------
+
+The Jacl distribution requires the Java Development Kit 1.1 or
+greater.  Please not that we have only tested Jacl on Solaris and
+Windows NT.  In the future, we plan to support Jacl on all platforms
+where JDK 1.1 is supported.
+
+4. Installation
+---------------
+
+If you have a binary release of Jacl, follow the instructions in the
+INSTALL.txt file, located in this directory.
+
+If you have a source release of Jacl, and you are compiling under
+UNIX, change to the "unix" subdirectory.  If you are compiling under
+Windows, then change to the "win" directory.  Then, for installation
+instructions, see the README file in that directory.
+
+5. License Agreement
+---------------------
+
+See the file "license.terms" for information on usage and 
+redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+
+6. Contact Information
+----------------------
+
+SunScript home page:  http://sunscript.sun.com
+Email: Ray.Johnson@eng.sun.com
+
+7. Tcl newsgroup
+----------------
+
+There is a network news group "comp.lang.tcl" intended for the exchange
+of information about Tcl, Tk, and related applications.  Feel free to use
+the newsgroup both for general information questions and for bug reports.
+We read the newsgroup and will attempt to fix bugs and problems reported
+to it.
+
+8. Support and bug fixes
+------------------------
+
+We're very interested in receiving bug reports and suggestions for
+improvements.  We prefer that you send this information to the
+comp.lang.tcl newsgroup rather than to any of us at Sun.  We'll see
+anything on comp.lang.tcl, and in addition, someone else who reads
+comp.lang.tcl may be able to offer a solution.  The normal turn-around
+time for bugs is 3-6 weeks.
+
+When reporting bugs, please provide a short Tcl script that we can use
+to reproduce the bug.  Make sure that the script runs with bare-bones
+Tcl and doesn't depend on any extensions or other programs,
+particularly those that exist only at your site.  Also, please include
+three additional pieces of information with the script:
+    (a) How do we use the script to make the problem happen (e.g.
+	what things do we click on, in what order)?
+    (b) What happens when you do these things (presumably this is
+        undesirable)?
+    (c) What did you expect to happen instead?
+
+9. Regular expressions
+----------------------
+
+The regular expression features of Tcl are now available in the
+binary version of Jacl.  We actually used a commercial regular
+expression package from ORO, Inc.  While this resulted in our ability
+to give you regular expression features months ahead of schedule, it
+unfortunantly means we can't offer the same features in the source
+release of Jacl.  If you would like to use the ORO regular expression
+package with Jacl but you must have a modifiable source base you will
+need to work out a deal with Sun and ORO.
+
+Please note that there are certain differences between how Tcl regular
+expressions are supposed to work and how the ORO package works.  As a
+result some scripts that rely on certain regular expression
+constructs will not be portable between Jacl and the C version of
+Tcl.  It is our plan to eventually do a full port of the Tcl regular
+expression package for complete compatibility.
+
+For more information about ORO, Inc. and the regular expression
+package they produce please check out their home page:
+
+	http://www.oroinc.com/
+
+The Jacl & Tcl Blend team
+-------------------------
+
+Ray Johnson - Project Manager
+Melissa Hirschl
+Ioi Lam
+Bryan Surles
+Special thanks to Scott Stanton who implemented Tcl Blend.
