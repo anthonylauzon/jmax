@@ -27,7 +27,9 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/package.h>
+#include <ftsprivate/patcher.h>
 
 const int fts_system_inlet = -1;
 static int typeid = FTS_FIRST_OBJECT_TYPEID;
@@ -88,47 +90,104 @@ fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias)
   fts_package_add_metaclass(fts_get_current_package(), mcl, alias);
 }
 
-/* iterate through packages in the order of system, current, list of required */
-static fts_package_t *
-get_next_package(fts_package_t *current, fts_iterator_t *iter)
+static fts_metaclass_t *get_metaclass( fts_symbol_t package_name, fts_symbol_t class_name)
 {
-  fts_package_t *next = NULL;
+  fts_package_t *pkg;
+  fts_metaclass_t *mcl;
 
-  if(current == NULL)
-    return fts_get_system_package();
-  else if(current == fts_get_system_package())
-    return fts_get_current_package();
+  pkg = fts_package_get( package_name);
+  if (pkg == NULL)
+    return NULL;
 
-  /* ask the required packages of the current package */
-  if(current == fts_get_current_package())
-    fts_package_get_required_packages(fts_get_current_package(), iter);
-      
-  /* iterate through list of required packages */
-  while(next == NULL && fts_iterator_has_more(iter)) 
-    {
-      fts_atom_t pkg_name;
-
-      fts_iterator_next(iter, &pkg_name);
-      next = fts_package_get(fts_get_symbol(&pkg_name)); /* package can be NULL !? */
-    }
-
-  return next;
+  return fts_package_get_metaclass( pkg, class_name);
 }
 
-fts_metaclass_t*
-fts_metaclass_get_by_name(fts_symbol_t name)
+fts_metaclass_t *
+fts_metaclass_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name)
 {
-  fts_package_t *pkg = fts_get_system_package();
-  fts_metaclass_t *mcl = NULL;
+  fts_package_t *pkg;
+  fts_metaclass_t *mcl;
   fts_iterator_t iter;
 
-  while(mcl == NULL && pkg != NULL)
+  if (package_name != NULL)
+    return get_metaclass( package_name, class_name);
+
+  /* ask the kernel package before any other package. The kernel
+     classes should not be redefined anyway. If we search the kernel
+     package before the required packages, we avoid the loading of all
+     (required) packages to find the patcher class.  */
+  pkg = fts_get_system_package();
+
+  mcl = fts_package_get_metaclass(pkg, class_name);
+  if (mcl != NULL)
+    return mcl;
+
+  /* ask the current package */
+  pkg = fts_get_current_package();
+  mcl = fts_package_get_metaclass(pkg, class_name);
+  if (mcl != NULL)
+    return mcl;
+
+  /* ask the required packages of the current package */
+  fts_package_get_required_packages(pkg, &iter);
+
+  while ( fts_iterator_has_more( &iter)) 
     {
-      mcl = fts_package_get_metaclass(pkg, name);
-      pkg = get_next_package(pkg, &iter);
+      fts_atom_t a;
+
+      fts_iterator_next( &iter, &a);
+
+      mcl = get_metaclass( fts_get_symbol( &a), class_name);
+      if (mcl != NULL)
+	return mcl;
+  }
+
+  return NULL;
+}
+
+fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *mcl, fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_symbol_t error;
+  fts_class_t *cl = 0;
+  fts_object_t *obj;
+
+  if ( mcl->name == fts_s_patcher)
+    {
+      /* Patcher behave differently w.r.t. than other objects;
+	 the metaclass do not depend on the arguments, but on the inlets/outlets.
+	 New patchers are created with zero in zero outs, and changed later 
+      */
+      fts_atom_t a[2];
+
+      fts_set_int(a, 0);
+      fts_set_int(a + 1, 0);
+      cl = fts_class_instantiate( patcher_metaclass, 2, a);
+    }
+  else
+    cl = fts_class_instantiate( mcl, ac, at);
+
+  if (!cl)
+    return NULL;
+
+  obj = fts_object_new( cl);
+  obj->patcher = patcher;
+
+  if ( fts_class_get_constructor(cl))
+    fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at);
+
+  error = fts_object_get_error(obj);
+  
+  if (error)
+    {
+      fts_object_free(obj);
+      
+      return NULL;
     }
 
-  return mcl;
+  if ( patcher != NULL)
+    fts_patcher_add_object( patcher, obj);
+
+  return obj;
 }
 
 /******************************************************************************/

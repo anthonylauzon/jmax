@@ -261,7 +261,7 @@ explay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   char buf[30];
 
   gen_explode_name(buf, "explode", fts_get_number_int(at));
-  this->explode_name = fts_new_symbol_copy(buf);
+  this->explode_name = fts_new_symbol(buf);
   this->current = 0;
 }
 

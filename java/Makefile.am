@@ -28,6 +28,7 @@ $(JARFILE): $(JAR_DEP)
 	else \
 		cd src ; jar -cvf ../$(JARFILE) jmax.jar.root `find . -name "*.class"`; \
 	fi
+#	jar -i $(JARFILE)
 
 
 install-data-hook:

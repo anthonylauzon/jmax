@@ -31,44 +31,18 @@
 
 
 /**
- * Lookup a symbol and create a new definition if symbol
- * was not found.
- * 
- * NOTE: this function must be used ONLY for constant strings
- * because it stores the string that is passed and does not 
- * copy it !
+ * Lookup a string and insert it in the symbol table if the symbol table
+ * does not already contain a string that is equals (using strcmp()) to the
+ * passed string.
  * 
  * @fn fts_symbol_t fts_new_symbol( const char *name)
- * @param name a string that will be stored in the symbol definition.
- * This string must be a constant, as in fts_new_symbol( "foo")
- * @return the fts_symbol_t that was retrieved or created. This is
- * a pointer to an opaque structure
+ * @param name the string to lookup
+ * @return the string that was retrieved or created. Its content will be
+ * the same as the passed argument, but the pointer value is guaranteed
+ * to be unique
  * @ingroup symbols
 */
 FTS_API fts_symbol_t fts_new_symbol( const char *name);
-
-/**
- * Lookup a symbol and create a new definition if symbol
- * was not found.
- * 
- * NOTE: this function is the same as <TT>fts_new_symbol</TT>, except
- * that it copies the string that is passed to a memory area
- * allocated using fts_malloc. It can be safely used with non-constant 
- * strings.
- * 
- * @param name     a string that will be stored in the symbol definition
- * @return the fts_symbol_t that was retrieved or created. This is
- * a pointer to an opaque structure
- * @ingroup symbols
- */
-FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
-
-
-/*
- * Compatibility
- */
-FTS_API const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbol_t symbol);
-#define fts_symbol_name(symbol) __OLD_fts_symbol_name(__FILE__, __LINE__, (symbol))
 
 /*
   Predefined symbols. See predefsymbols.h
@@ -76,8 +50,6 @@ FTS_API const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbo
 #undef PREDEF_SYMBOL
 #define PREDEF_SYMBOL(V,S) FTS_API fts_symbol_t V;
 #include <fts/predefsymbols.h>
-
-
 
 
 

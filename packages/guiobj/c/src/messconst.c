@@ -24,13 +24,6 @@
 
 #define MESSCONST_FLASH_TIME 125.0f
 
-/************************************************
- *
- *  messconst
- *
- */
-fts_symbol_t s_messconst = 0;
- 
 typedef struct {
   fts_object_t o;
   int value; /* for blinking */
@@ -40,8 +33,6 @@ typedef struct {
   int ac;
   fts_atom_t *at;
 } messconst_t;
-
-static fts_metaclass_t *messconst_metaclass;
 
 /************************************************
  *
@@ -68,7 +59,19 @@ messconst_expression_callback( int ac, const fts_atom_t *at, void *data)
     fts_outlet_atoms( (fts_object_t *)data, 0, ac, at);
 }
 
-void
+static void
+messconst_eval( messconst_t *this)
+{
+  fts_status_t status;
+
+  status = fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+
+  if (status != fts_ok)
+    fts_object_signal_runtime_error( (fts_object_t *)this, "%s", fts_status_get_description( status));
+}
+
+
+static void
 messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
@@ -82,15 +85,13 @@ messconst_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fts_timebase_add_call(fts_get_timebase(), o, messconst_off, 0, MESSCONST_FLASH_TIME);
     }
 
-  fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+  messconst_eval( this);
 }
 
 static void
 messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  messconst_t *this = (messconst_t *)o;
-
-  fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+  messconst_eval( (messconst_t *)o);
 }
  
 static void
@@ -116,8 +117,15 @@ messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   messconst_t *this = (messconst_t *) o;
   int ninlets;
+  fts_status_t status;
 
-  fts_expression_set( this->expression, ac, at, fts_object_get_patcher( (fts_object_t *)this));
+  status = fts_expression_set( this->expression, ac, at, fts_object_get_patcher( (fts_object_t *)this));
+  if (status != fts_ok)
+    {
+      fts_object_signal_runtime_error( o, "%s", fts_status_get_description( status));
+      return;
+    }
+
   fts_array_init( &this->tmp, ac, at);
 
   ninlets = fts_expression_get_env_count( this->expression);
@@ -163,48 +171,25 @@ messconst_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_assign(this->at + winlet, at);
 
   if (winlet == 0)
-    fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+    messconst_eval( this);
 }
 
 static void
 messconst_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
+  fts_status_t status;
 
   if (ac == 1 && s == fts_get_selector( at))
     {
       fts_atom_assign(this->at + winlet, at);
 
       if (winlet == 0)
-	fts_expression_reduce( this->expression, this->ac, this->at, messconst_expression_callback, this);
+	messconst_eval( this);
     }
   else
     fts_object_signal_runtime_error(o, "Don't understand message %s", s);
 
-}
-
-/************************************************
- *
- *  daemons 
- *
- */
- 
-static void
-messconst_get_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  messconst_t *this = (messconst_t *)obj;
-
-  fts_set_int(value, this->value);
-}
-
-static void
-messconst_put_value(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  messconst_t *this = (messconst_t *)obj;
-
-  fts_outlet_bang(obj, 0);
-
-  fts_update_request(obj);
 }
 
 /************************************************
@@ -221,6 +206,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   int noutlets = 1;
   int new = 0;
   int i;
+  fts_status_t status;
   
   /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
   if (ac == 4 
@@ -239,7 +225,13 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       new = 1;
     }
 
-  this->expression = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this));
+  status = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this), &this->expression);
+  if (status != fts_ok)
+    {
+      fts_object_set_error( o, "%s", fts_status_get_description( status));
+      return;
+    }
+
   fts_array_init( &this->tmp, 0, 0);
 
   this->ac = ninlets;
@@ -291,6 +283,5 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 messconst_config(void)
 {
-  s_messconst = fts_new_symbol("messconst");
-  messconst_metaclass = fts_class_install(s_messconst, messconst_instantiate);
+  fts_class_install( fts_new_symbol("messconst"), messconst_instantiate);
 }

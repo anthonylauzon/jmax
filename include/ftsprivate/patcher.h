@@ -63,11 +63,11 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
 extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
+#ifndef REIMPLEMENTING_VARIABLES
 extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data);
+#endif
 
 extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
-
-extern void fts_patcher_blip(fts_patcher_t *this, const char *msg);
 
 extern void fts_patcher_upload_object(fts_object_t *this, fts_object_t *obj);
 

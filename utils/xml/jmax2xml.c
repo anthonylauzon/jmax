@@ -989,7 +989,7 @@ static int process_file( FILE *in, FILE *out)
 
 	  if (buf[i] == 0)
 	    {
-	      symbols[symbolIndex]= fts_new_symbol_copy(buf);
+	      symbols[symbolIndex]= fts_new_symbol(buf);
 	      symbolIndex++;
 	      i = 0;
 	    }

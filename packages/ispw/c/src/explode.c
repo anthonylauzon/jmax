@@ -968,7 +968,7 @@ explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 	{
 	  char s[1024];
 	  snprintf(s, 1024, "%s.mid", this->data.name);
-	  file_name = fts_new_symbol_copy(s);
+	  file_name = fts_new_symbol(s);
 	}
       else
 	file_name = fts_new_symbol("explode.mid");

@@ -23,7 +23,6 @@
 #include <ftsconfig.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/client.h>
-#include <ftsprivate/variable.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -1703,7 +1702,7 @@ midiconfig_get_fresh_label_name(midiconfig_t *config, fts_symbol_t name)
   while(midiconfig_label_get_by_name(config, name) != NULL) 
     {
       sprintf(new_str + len, "%d", ++num);
-      name = fts_new_symbol_copy(new_str);
+      name = fts_new_symbol(new_str);
     }
 
   return name;
@@ -1712,11 +1711,13 @@ midiconfig_get_fresh_label_name(midiconfig_t *config, fts_symbol_t name)
 static void
 midiconfig_restore(midiconfig_t *config)
 {
+#ifndef REIMPLEMENTING_VARIABLES
   fts_atom_t a;
 
   fts_set_object(&a, midiconfig);
   fts_variable_suspend(fts_get_root_patcher(), midiconfig_s_name);
   fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)config);
+#endif
 }
 
 static void
@@ -1884,7 +1885,9 @@ fts_midiconfig_get_output(fts_symbol_t name)
 void
 fts_midiconfig_add_listener(fts_object_t *obj)
 {
+#ifndef REIMPLEMENTING_VARIABLES
   fts_variable_add_user(fts_get_root_patcher(), midiconfig_s_name, obj);
+#endif
 }
 
 fts_object_t *
@@ -2066,7 +2069,7 @@ midiconfig_load( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       /* replace current config by loaded config */
       midiconfig_set((midiconfig_t *)obj);
 
-      ((midiconfig_t *)obj)->file_name = fts_new_symbol_copy( path);
+      ((midiconfig_t *)obj)->file_name = fts_new_symbol( path);
       
       midiconfig_set_dirty( (midiconfig_t *)obj, 0);
     }
@@ -2278,6 +2281,13 @@ fts_midi_config(void)
 
   /* define global midiconfig variable */
   fts_set_object(&a, midiconfig);
+
+#ifndef REIMPLEMENTING_VARIABLES
   fts_variable_define(fts_get_root_patcher(), midiconfig_s_name);
   fts_variable_restore(fts_get_root_patcher(), midiconfig_s_name, &a, (fts_object_t *)midiconfig);
+#endif
+
+#if 0
+  fts_class_install(fts_new_symbol("mm"), mm_instantiate);
+#endif
 }

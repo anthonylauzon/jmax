@@ -310,7 +310,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 	      if (feof(this->fd))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
@@ -323,7 +323,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 		    {
 		      this->buf[this->buf_fill++] = c;
 		      this->buf[this->buf_fill++] = '\0';
-		      fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		      fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		      this->ttype = FTS_LEX_SYMBOL;
 		      return;
 		    }
@@ -336,7 +336,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 	      else if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  this->lookahead = c;
 		  this->lookahead_valid = 1;
@@ -345,7 +345,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 	      else if (fts_patlex_is_blank(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
@@ -364,7 +364,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 	      if (feof(this->fd))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
@@ -374,14 +374,14 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 		     a single $ symbol */
 		  this->buf[this->buf_fill++] = c;
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
 	      else if (fts_patlex_is_blank(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
@@ -395,7 +395,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 
 		      this->buf[this->buf_fill++] = '\'';
 		      this->buf[this->buf_fill++] = '\0';
-		      fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		      fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		      this->ttype = FTS_LEX_SYMBOL;
 		      return;
 		    }
@@ -460,14 +460,14 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 	      if (feof(this->fd))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}
 	      else if (fts_patlex_is_semi(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  this->lookahead = c;
 		  this->lookahead_valid = 1;
@@ -476,7 +476,7 @@ static void fts_patlex_next_token(fts_patlex_t *this)
 	      else if (fts_patlex_is_blank(c))
 		{
 		  this->buf[this->buf_fill++] = '\0';
-		  fts_set_symbol(&(this->val), fts_new_symbol_copy(this->buf));
+		  fts_set_symbol(&(this->val), fts_new_symbol(this->buf));
 		  this->ttype = FTS_LEX_SYMBOL;
 		  return;
 		}

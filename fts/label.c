@@ -21,7 +21,6 @@
  */
 
 #include <fts/fts.h>
-#include <ftsprivate/variable.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/label.h>
 
@@ -112,7 +111,11 @@ fts_metaclass_t *fts_label_metaclass = 0;
 fts_label_t *
 fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 {
+#ifdef REIMPLEMENTING_VARIABLES
+  fts_atom_t *value = NULL;
+#else
   fts_atom_t *value = fts_variable_get_value_or_void(scope, name);
+#endif
   fts_label_t *label = NULL;
   fts_atom_t key, a;
   
@@ -150,7 +153,11 @@ fts_label_get_or_create(fts_patcher_t *scope, fts_symbol_t name)
 fts_label_t *
 fts_label_get(fts_patcher_t *scope, fts_symbol_t name)
 {
+#ifdef REIMPLEMENTING_VARIABLES
+  fts_atom_t *value = NULL;
+#else
   fts_atom_t *value = fts_variable_get_value(scope, name);
+#endif
   fts_label_t *label = 0;
   
   if(value)

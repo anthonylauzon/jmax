@@ -59,7 +59,7 @@ scan_atom(fts_atom_t *atom, int type, char *string)
 
     case RSEND_SYM:
 
-      fts_set_symbol(atom, fts_new_symbol_copy(string)); 
+      fts_set_symbol(atom, fts_new_symbol(string)); 
       break;
 
     default:
@@ -92,7 +92,7 @@ Rreceive_input(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 	  string[j] = '\0';
 	  
 	  if(type == 0)
-	    target = fts_new_symbol_copy(string);
+	    target = fts_new_symbol(string);
 	  else
 	    {
 	      scan_atom(&a, type, string);

@@ -222,12 +222,12 @@ static void udpreceive_receive( fts_object_t *o, int winlet, fts_symbol_t s, int
 	{
 	  if (first_token == 0)
 	    {
-	      selector = fts_new_symbol_copy( protodecode_get_string( &pr));
+	      selector = fts_new_symbol( protodecode_get_string( &pr));
 	      first_token = 1;
 	    }
 	  else
 	    {
-	      fts_set_symbol( &(argv[argc]), fts_new_symbol_copy( protodecode_get_string( &pr)));
+	      fts_set_symbol( &(argv[argc]), fts_new_symbol( protodecode_get_string( &pr)));
 	      argc++;
 	    }
 	}

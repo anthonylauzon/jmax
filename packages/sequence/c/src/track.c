@@ -54,7 +54,7 @@ create_event(int ac, const fts_atom_t *at)
     event = (event_t *)fts_object_create(event_type, 1, at + 1);
   else
     {
-      fts_metaclass_t *type = fts_metaclass_get_by_name(type_name);
+      fts_metaclass_t *type = fts_metaclass_get_by_name( NULL, type_name);
 
       if(type)
 	{
@@ -853,7 +853,7 @@ track_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_atom_t a[4];
 
   snprintf(str, 1024, "%s.mid", track_name? track_name: "untitled");
-  default_name = fts_new_symbol_copy(str);
+  default_name = fts_new_symbol(str);
 
   fts_set_symbol(a, seqsym_import_midifile);
   fts_set_symbol(a + 1, fts_new_symbol("Open standard MIDI file"));
@@ -915,7 +915,7 @@ track_export_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_atom_t a[4];
 
   snprintf(str, 1024, "%s.mid", track_name? track_name: "untitled");
-  default_name = fts_new_symbol_copy(str);
+  default_name = fts_new_symbol(str);
 
   fts_set_symbol(a, seqsym_export_midifile);
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));

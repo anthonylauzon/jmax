@@ -278,7 +278,7 @@ fts_get_default_root_directory( void)
 
   fts_log("[win32]: Using '%s' as document root\n", root);
 
-  return fts_new_symbol_copy( root);
+  return fts_new_symbol( root);
 }
 
 fts_symbol_t 
@@ -294,7 +294,7 @@ fts_get_user_config( void)
 
   fts_make_absolute_path(cwd, "config.jmax", path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol_copy(path);
+    return fts_new_symbol(path);
   }
 
   return NULL;
@@ -312,7 +312,7 @@ fts_get_system_config( void)
 
   fts_make_absolute_path(root, "config.jprj", path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol_copy(path);
+    return fts_new_symbol(path);
   }
 
   /* check the config file in the windows directory */
@@ -322,7 +322,7 @@ fts_get_system_config( void)
 
   fts_make_absolute_path(win, "config.jprj", path, _MAX_PATH);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol_copy(path);
+    return fts_new_symbol(path);
   }
 
   return NULL;

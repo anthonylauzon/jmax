@@ -38,7 +38,7 @@ struct fts_metaclass {
   */
   fts_symbol_t selector; 
   
-  /* An integer id: lower values are primitive types */
+  /* A type id that separates primitive types from objects: lower values are primitive types */
   int typeid;
 
   fts_instantiate_fun_t instantiate_fun;
@@ -87,6 +87,22 @@ FTS_API fts_status_description_t fts_InletOutOfRange;
 FTS_API fts_status_description_t fts_OutletOutOfRange;
 FTS_API fts_status_description_t fts_CannotInstantiate;
 
+/**
+ * Create an instance of a class.
+ *
+ * A new instance of the class is created and initialized.
+ * If parent patcher is not NULL, the created instance will be added as child to the parent patcher.
+ *
+ * @fn fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *cl, fts_patcher_t *parent, int ac, const fts_atom_t *at)
+ * @param cl the class to instantiate
+ * @param parent the parent of the created object
+ * @param ac argument count
+ * @param at the arguments
+ * @return the created object, NULL if instantiation failed
+ */
+FTS_API fts_object_t *fts_metaclass_new_instance( fts_metaclass_t *cl, fts_patcher_t *parent, int ac, const fts_atom_t *at);
+
+
 /* Meta classes functions */
 FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 FTS_API void fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
@@ -100,7 +116,7 @@ FTS_API void fts_class_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
 FTS_API fts_status_t fts_class_init( fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
 FTS_API fts_class_t *fts_class_instantiate(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
 
-FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t name);
+FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t package_name, fts_symbol_t class_name);
 
 /* method definition */
 FTS_API void fts_method_define(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t fun);

@@ -48,7 +48,7 @@ macosxmidi_reference_get_name(MIDIEndpointRef ref)
 {
   CFStringRef cfsr;
   MIDIObjectGetStringProperty((MIDIObjectRef)ref, kMIDIPropertyName, &cfsr);  
-  return fts_new_symbol_copy(CFStringGetCStringPtr(cfsr, CFStringGetSystemEncoding()));
+  return fts_new_symbol(CFStringGetCStringPtr(cfsr, CFStringGetSystemEncoding()));
 }
 
 /*
@@ -176,7 +176,7 @@ macosxmidi_hash_insert_id(fts_hashtable_t *ht, fts_symbol_t name, int id)
     /* generate new key */
     while(fts_hashtable_get(ht, &k, &a) && macosxmidi_hash_get_id(ht, &k) != id) {
       sprintf(new_str + len, "%d", ++num);
-      fts_set_symbol(&k, fts_new_symbol_copy(new_str));
+      fts_set_symbol(&k, fts_new_symbol(new_str));
     }
 
     /* put with new key */

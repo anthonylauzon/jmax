@@ -68,7 +68,7 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sprintf( tmp, "switch_%d", switch_count);
   switch_count++;
 
-  this->current = ftl_program_add_subroutine( dsp_get_current_dsp_chain(), fts_new_symbol_copy(tmp));
+  this->current = ftl_program_add_subroutine( dsp_get_current_dsp_chain(), fts_new_symbol(tmp));
 
   /* Add the call FTL subroutine conditionnally function */
   fts_set_ftl_data( argv, this->switch_ftl_data);

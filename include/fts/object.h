@@ -46,9 +46,6 @@ struct fts_object
   /* Variable: If this object is bound to a variable, this is the variable name */
   fts_symbol_t varname;
 
-  /* Variables referred by the object */
-  fts_binding_list_t *var_refs; /* handled completely in the variable.c file */
-
   /* connections */
   int n_inlets;
   int n_outlets;
@@ -65,7 +62,7 @@ struct fts_object
 
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
 
-/* create/destroy object without patcher (attention: hack in fts_object_create()!) */
+/* create/destroy object without patcher */
 FTS_API fts_object_t *fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
 FTS_API void fts_object_destroy(fts_object_t *obj);
 
@@ -80,16 +77,9 @@ FTS_API void fts_object_delete_from_patcher(fts_object_t *obj);
 
 /* object description (system functions) */
 FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
-FTS_API void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name, int argc, const fts_atom_t *argv);
 
 #define fts_object_get_description_size(o) ((o)->argc)
 #define fts_object_get_description_atoms(o) ((o)->argv)
-
-FTS_API void fts_object_reset_description(fts_object_t *obj);
-FTS_API int fts_object_description_defines_variable(int ac, const fts_atom_t *at);
-
-/* object access */
-FTS_API fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet);
 
 #define fts_object_get_outlets_number(o) (((fts_object_t *)(o))->n_outlets)
 #define fts_object_get_inlets_number(o) (((fts_object_t *)(o))->n_inlets)
@@ -105,8 +95,6 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_variable(o) ((o)->varname)
 #define fts_object_set_variable(o, name) ((o)->varname = (name))
 
-FTS_API void fts_object_redefine_variable(fts_object_t *o);
-
 #define fts_object_has_id(o) ((o)->head.id > FTS_NO_ID)
 #define fts_object_get_id(o) ((o)->head.id)
 #define fts_object_get_class(o) ((o)->head.cl)
@@ -115,9 +103,6 @@ FTS_API void fts_object_redefine_variable(fts_object_t *o);
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
-
-/* messages for the status line */
-FTS_API void fts_object_blip(fts_object_t *obj, const char *format , ...);
 
 #define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)

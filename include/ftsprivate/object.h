@@ -29,4 +29,10 @@
 extern fts_object_t *fts_object_recompute(fts_object_t *old);
 extern fts_object_t *fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at);
 
+/* Allocate an object from the class allocator */
+extern fts_object_t *fts_object_new( fts_class_t *cl);
+
+/* Frees an object using the class allocator */
+extern void fts_object_free( fts_object_t *obj);
+
 #endif

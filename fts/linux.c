@@ -67,7 +67,7 @@ fts_get_user_config( void)
   home = getenv("HOME");
   fts_make_absolute_path(home, ".jmaxcf", path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol_copy(path);
+    return fts_new_symbol(path);
   }
 
   return NULL;
@@ -80,7 +80,7 @@ fts_get_system_config( void)
 
   fts_make_absolute_path(DEFAULT_ROOT, "config.jprj", path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol_copy(path);
+    return fts_new_symbol(path);
   }
 
   return NULL;  

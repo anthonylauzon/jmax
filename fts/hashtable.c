@@ -337,7 +337,6 @@ void fts_hashtable_stats( fts_hashtable_t *h)
   printf( "minimum %d maximum %d\n", min_keys, max_keys);
 }
 
-#ifdef DEBUG
 void fts_hashtable_log( fts_hashtable_t *h)
 {
   int i;
@@ -365,7 +364,6 @@ void fts_hashtable_log( fts_hashtable_t *h)
       fts_log( "\n");
     }
 }
-#endif
 
 /* **********************************************************************
  * Iterator

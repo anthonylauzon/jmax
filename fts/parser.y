@@ -24,21 +24,34 @@
 #include <fts/fts.h>
 #include <ftsprivate/parser.h>
 
+#define YYDEBUG 1
+
+#ifndef STANDALONE
 #define free fts_free
 #define malloc fts_malloc
+static int yylex();
+#else
+extern int yylex();
+extern void tokenizer_init( const char *s);
+#endif
+
 #define YYPARSE_PARAM data
 #define YYLEX_PARAM data
 
-static int yylex();
 static int yyerror( const char *msg);
 
-static fts_parsetree_t *fts_parsetree_new_node( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right);
+static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right);
 
 struct _parser_data {
   int ac;
   const fts_atom_t *at;
   fts_parsetree_t *tree;
 };
+
+static fts_status_description_t syntax_error_status_description = {
+  "Syntax error"
+};
+fts_status_t syntax_error_status = &syntax_error_status_description;
 
 %}
 
@@ -49,64 +62,65 @@ struct _parser_data {
   fts_parsetree_t *n;
 }
 
+
 /*
  * Tokens
  */
 
-%token <a> FTS_TOKEN_INT
-%token <a> FTS_TOKEN_FLOAT
-%token <a> FTS_TOKEN_SYMBOL
+%token <a> TK_INT
+%token <a> TK_FLOAT
+%token <a> TK_SYMBOL
+%token TK_SEMI
+%token TK_COLON
+%token TK_PAR
+%token TK_OPEN_PAR
+%token TK_CLOSED_PAR
+%token TK_CPAR
+%token TK_OPEN_CPAR
+%token TK_CLOSED_CPAR
+%token TK_SQPAR
+%token TK_OPEN_SQPAR
+%token TK_CLOSED_SQPAR
 
-%token FTS_TOKEN_SEMI
-%token FTS_TOKEN_COLON
-%token FTS_TOKEN_PAR
-%token FTS_TOKEN_TOPLEVEL_PAR
-%token FTS_TOKEN_OPEN_PAR
-%token FTS_TOKEN_CLOSED_PAR
-%token FTS_TOKEN_CPAR
-%token FTS_TOKEN_OPEN_CPAR
-%token FTS_TOKEN_CLOSED_CPAR
-%token FTS_TOKEN_SQPAR
-%token FTS_TOKEN_OPEN_SQPAR
-%token FTS_TOKEN_CLOSED_SQPAR
 
 /*
  * Operators
  */
 
-
-%left FTS_TOKEN_COMMA
-%left FTS_TOKEN_TUPLE
-%right FTS_TOKEN_EQUAL
-%left FTS_TOKEN_LOGICAL_OR
-%left FTS_TOKEN_LOGICAL_AND
-%left FTS_TOKEN_EQUAL_EQUAL FTS_TOKEN_NOT_EQUAL
-%left FTS_TOKEN_GREATER	FTS_TOKEN_GREATER_EQUAL FTS_TOKEN_SMALLER FTS_TOKEN_SMALLER_EQUAL
-%right FTS_TOKEN_UMINUS, FTS_TOKEN_UPLUS
-%left FTS_TOKEN_SHIFT_LEFT FTS_TOKEN_SHIFT_RIGHT
-%left FTS_TOKEN_PLUS FTS_TOKEN_MINUS
-%left FTS_TOKEN_TIMES FTS_TOKEN_DIV FTS_TOKEN_PERCENT
-%right FTS_TOKEN_LOGICAL_NOT
-%left FTS_TOKEN_POWER
-/* %left FTS_TOKEN_FUNCALL */
-%left FTS_TOKEN_ARRAY_INDEX
-%left FTS_TOKEN_DOT
-%right FTS_TOKEN_DOLLAR
+%left TK_COMMA
+%left TK_TUPLE
+%left TK_LOGICAL_OR
+%left TK_LOGICAL_AND
+%left TK_EQUAL_EQUAL TK_NOT_EQUAL
+%left TK_GREATER TK_GREATER_EQUAL TK_SMALLER TK_SMALLER_EQUAL
+%left TK_SHIFT_LEFT TK_SHIFT_RIGHT
+%left TK_PLUS TK_MINUS
+%left TK_TIMES TK_DIV TK_PERCENT
+%right TK_UMINUS, TK_UPLUS
+%right TK_LOGICAL_NOT
+%left TK_POWER
+%left TK_ARRAY_INDEX
+%left TK_DOT
+%right TK_DOLLAR
+%nonassoc TK_COLON
 
 
-%type <n> jmax_expression
-%type <n> comma_expression_list
+/*
+ * Non-terminal types
+ */
+
 %type <n> expression
-%type <n> term_list
-/* %type <n> opt_term_list */
+%type <n> comma_tuple_list
+%type <n> tuple
 %type <n> term
 %type <n> primitive
-%type <n> par_op
-%type <n> unary_op
-%type <n> binary_op
+%type <n> par
+%type <n> unary
+%type <n> binary
 %type <n> ref
-/* %type <n> funcall */
 %type <n> variable
+%type <n> class
+%type <n> class_name
 
 %%
 /* **********************************************************************
@@ -115,119 +129,219 @@ struct _parser_data {
  *
  */
 
-jmax_expression: comma_expression_list
+expression: comma_tuple_list
 		{ ((struct _parser_data *)data)->tree = $1; }
 ;
 
-comma_expression_list: comma_expression_list FTS_TOKEN_COMMA expression
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_COMMA, 0, $1, $3); }
-	| expression
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_COMMA, 0, 0, $1); }
+comma_tuple_list: comma_tuple_list TK_COMMA tuple
+		{ $$ = fts_parsetree_new( TK_COMMA, 0, $1, $3); }
+	| tuple
+		{ $$ = fts_parsetree_new( TK_COMMA, 0, 0, $1); }
 	| 
 		{ $$ = 0; }
 ;
 
-expression: FTS_TOKEN_OPEN_PAR term_list FTS_TOKEN_CLOSED_PAR
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TOPLEVEL_PAR, 0, 0, $2); }
-	| term_list
-;
-
-
-term_list: term_list term   %prec FTS_TOKEN_TUPLE   
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TUPLE, 0, $1, $2); }
+tuple: tuple term /*---*/ %prec TK_TUPLE
+		{ $$ = fts_parsetree_new( TK_TUPLE, 0, $1, $2); }
 	| term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TUPLE, 0, 0, $1); }
 ;
 
 term: primitive
-	| par_op
-	| unary_op
-	| binary_op
-/* 	| funcall */
+	| par
+	| unary
+	| binary
 	| ref
+	| class
 ;
 
-primitive: FTS_TOKEN_INT
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_INT, &($1), 0, 0); }
-	| FTS_TOKEN_FLOAT
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_FLOAT, &($1), 0, 0); }
-	| FTS_TOKEN_SYMBOL
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SYMBOL, &($1), 0, 0); }
+primitive: TK_INT
+		{ $$ = fts_parsetree_new( TK_INT, &($1), 0, 0); }
+	| TK_FLOAT
+		{ $$ = fts_parsetree_new( TK_FLOAT, &($1), 0, 0); }
+	| TK_SYMBOL
+		{ $$ = fts_parsetree_new( TK_SYMBOL, &($1), 0, 0); }
 ;
 
-par_op: FTS_TOKEN_OPEN_PAR term_list FTS_TOKEN_CLOSED_PAR
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_PAR, 0, 0, $2); }
+par: TK_OPEN_PAR tuple TK_CLOSED_PAR
+		{ $$ = fts_parsetree_new( TK_PAR, 0, 0, $2); }
 ;
 
-unary_op: FTS_TOKEN_PLUS term %prec FTS_TOKEN_UPLUS
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_UPLUS, 0, $2, 0); }
-	| FTS_TOKEN_MINUS term %prec FTS_TOKEN_UMINUS
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_UMINUS, 0, $2, 0); }
-	| FTS_TOKEN_LOGICAL_NOT term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_LOGICAL_NOT, 0, $2, 0); }
+unary: TK_PLUS term %prec TK_UPLUS
+		{ $$ = fts_parsetree_new( TK_UPLUS, 0, $2, 0); }
+	| TK_MINUS term %prec TK_UMINUS
+		{ $$ = fts_parsetree_new( TK_UMINUS, 0, $2, 0); }
+	| TK_LOGICAL_NOT term
+		{ $$ = fts_parsetree_new( TK_LOGICAL_NOT, 0, $2, 0); }
 ;
 
-binary_op: term FTS_TOKEN_PLUS term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_PLUS, 0, $1, $3); }
-	| term FTS_TOKEN_MINUS term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_MINUS, 0, $1, $3); }
-	| term FTS_TOKEN_TIMES term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_TIMES, 0, $1, $3); }
-	| term FTS_TOKEN_DIV term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_DIV, 0, $1, $3); }
-	| term FTS_TOKEN_POWER term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_POWER, 0, $1, $3); }
-	| term FTS_TOKEN_PERCENT term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_PERCENT, 0, $1, $3); }
-	| term FTS_TOKEN_SHIFT_LEFT term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SHIFT_LEFT, 0, $1, $3); }
-	| term FTS_TOKEN_SHIFT_RIGHT term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SHIFT_RIGHT, 0, $1, $3); }
-	| term FTS_TOKEN_LOGICAL_AND term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_LOGICAL_AND, 0, $1, $3); }
-	| term FTS_TOKEN_LOGICAL_OR term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_LOGICAL_OR, 0, $1, $3); }
-	| term FTS_TOKEN_EQUAL_EQUAL term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_EQUAL_EQUAL, 0, $1, $3); }
-	| term FTS_TOKEN_NOT_EQUAL term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_NOT_EQUAL, 0, $1, $3); }
-	| term FTS_TOKEN_GREATER term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_GREATER, 0, $1, $3); }
-	| term FTS_TOKEN_GREATER_EQUAL term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_GREATER_EQUAL, 0, $1, $3); }
-	| term FTS_TOKEN_SMALLER term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SMALLER, 0, $1, $3); }
-	| term FTS_TOKEN_SMALLER_EQUAL term
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_SMALLER_EQUAL, 0, $1, $3); }
+binary: term TK_PLUS term
+		{ $$ = fts_parsetree_new( TK_PLUS, 0, $1, $3); }
+	| term TK_MINUS term
+		{ $$ = fts_parsetree_new( TK_MINUS, 0, $1, $3); }
+	| term TK_TIMES term
+		{ $$ = fts_parsetree_new( TK_TIMES, 0, $1, $3); }
+	| term TK_DIV term
+		{ $$ = fts_parsetree_new( TK_DIV, 0, $1, $3); }
+	| term TK_POWER term
+		{ $$ = fts_parsetree_new( TK_POWER, 0, $1, $3); }
+	| term TK_PERCENT term
+		{ $$ = fts_parsetree_new( TK_PERCENT, 0, $1, $3); }
+	| term TK_SHIFT_LEFT term
+		{ $$ = fts_parsetree_new( TK_SHIFT_LEFT, 0, $1, $3); }
+	| term TK_SHIFT_RIGHT term
+		{ $$ = fts_parsetree_new( TK_SHIFT_RIGHT, 0, $1, $3); }
+	| term TK_LOGICAL_AND term
+		{ $$ = fts_parsetree_new( TK_LOGICAL_AND, 0, $1, $3); }
+	| term TK_LOGICAL_OR term
+		{ $$ = fts_parsetree_new( TK_LOGICAL_OR, 0, $1, $3); }
+	| term TK_EQUAL_EQUAL term
+		{ $$ = fts_parsetree_new( TK_EQUAL_EQUAL, 0, $1, $3); }
+	| term TK_NOT_EQUAL term
+		{ $$ = fts_parsetree_new( TK_NOT_EQUAL, 0, $1, $3); }
+	| term TK_GREATER term
+		{ $$ = fts_parsetree_new( TK_GREATER, 0, $1, $3); }
+	| term TK_GREATER_EQUAL term
+		{ $$ = fts_parsetree_new( TK_GREATER_EQUAL, 0, $1, $3); }
+	| term TK_SMALLER term
+		{ $$ = fts_parsetree_new( TK_SMALLER, 0, $1, $3); }
+	| term TK_SMALLER_EQUAL term
+		{ $$ = fts_parsetree_new( TK_SMALLER_EQUAL, 0, $1, $3); }
 ;
-
-/* opt_term_list: term_list */
-/* 	| /\* empty *\/ */
-/* 		{ $$ = 0; } */
-/* ; */
-
-/* funcall: FTS_TOKEN_FUNCTION FTS_TOKEN_OPEN_PAR opt_term_list FTS_TOKEN_CLOSED_PAR /\* %prec FTS_TOKEN_FUNCALL *\/ */
-/* 		{ $$ = fts_parsetree_new_node(FTS_TOKEN_FUNCALL, &($1), 0, $3) ; } */
-/* ; */
 
 ref: variable
-	| variable FTS_TOKEN_OPEN_SQPAR term_list FTS_TOKEN_CLOSED_SQPAR %prec FTS_TOKEN_ARRAY_INDEX
+	| variable TK_OPEN_SQPAR tuple TK_CLOSED_SQPAR /*---*/ %prec TK_ARRAY_INDEX
 ;
 
-variable: FTS_TOKEN_DOLLAR FTS_TOKEN_SYMBOL
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_DOLLAR, &($2), 0, 0); }
-	| FTS_TOKEN_DOLLAR FTS_TOKEN_INT
-		{ $$ = fts_parsetree_new_node( FTS_TOKEN_DOLLAR, &($2), 0, 0); }
+variable: TK_DOLLAR TK_SYMBOL
+		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
+	| TK_DOLLAR TK_INT
+		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
+;
+
+class: TK_SYMBOL TK_COLON class_name /*---*/ %prec TK_COLON
+		{ $$ = fts_parsetree_new( TK_COLON, 0, $3, fts_parsetree_new( TK_SYMBOL, &($1), 0, 0)); }
+	| TK_COLON class_name /*---*/ %prec TK_COLON
+		{
+		  fts_atom_t a;
+		  fts_set_symbol( &a, NULL);
+		  $$ = fts_parsetree_new( TK_COLON, 0, $2, fts_parsetree_new( TK_SYMBOL, &a, 0, 0));
+		}
+;
+
+class_name: TK_SYMBOL
+		{ $$ = fts_parsetree_new( TK_SYMBOL, &($1), 0, 0); }
+	| TK_PLUS
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_plus);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_MINUS
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_minus);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_TIMES
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_times);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_DIV
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_div);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_PERCENT
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_percent);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_SHIFT_LEFT
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_shift_left);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_SHIFT_RIGHT
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_shift_right);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_GREATER
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_greater);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_GREATER_EQUAL
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_greater_equal);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_SMALLER
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_smaller);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_SMALLER_EQUAL
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_smaller_equal);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_EQUAL_EQUAL
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_equal_equal);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_NOT_EQUAL
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_not_equal);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_LOGICAL_NOT
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_logical_not);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_LOGICAL_OR
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_logical_or);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
+	| TK_LOGICAL_AND
+		{ 
+		  fts_atom_t a;
+		  fts_set_symbol( &a, fts_s_logical_and);
+		  $$ = fts_parsetree_new( TK_SYMBOL, &a, 0, 0); 
+		}
 ;
 
 %%
+
+#ifndef STANDALONE
+
+/* **********************************************************************
+ *
+ * FTS code
+ *
+ */
 
 static fts_hashtable_t fts_token_table;
 
 static int yyerror( const char *msg)
 {
-  fprintf( stderr, "%s\n", msg);
-
   return 0;
 }
 
@@ -248,18 +362,18 @@ static int yylex( YYSTYPE *lvalp, void *data)
 	token = fts_get_int( &v);
       else
 	{
-	  token = FTS_TOKEN_SYMBOL;
+	  token = TK_SYMBOL;
 	  lvalp->a = *parser_data->at;
 	}
     }
   else if (fts_is_int( parser_data->at))
     {
-      token = FTS_TOKEN_INT;
+      token = TK_INT;
       lvalp->a = *parser_data->at;
     }
   else if (fts_is_float( parser_data->at))
     {
-      token = FTS_TOKEN_FLOAT;
+      token = TK_FLOAT;
       lvalp->a = *parser_data->at;
     }
 
@@ -277,7 +391,7 @@ static int yylex( YYSTYPE *lvalp, void *data)
 
 static fts_heap_t *parsetree_heap;
 
-static fts_parsetree_t *fts_parsetree_new_node( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right)
+static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right)
 {
   fts_parsetree_t *tree;
 
@@ -296,16 +410,21 @@ static fts_parsetree_t *fts_parsetree_new_node( int token, fts_atom_t *value, ft
   return tree;
 }
 
-fts_parsetree_t *fts_parsetree_new( int ac, const fts_atom_t *at)
+fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
 {
   struct _parser_data parser_data;
 
   parser_data.ac = ac;
   parser_data.at = at;
 
-  yyparse( &parser_data);
+  if (yyparse( &parser_data))
+    {
+      *ptree = NULL;
+      return syntax_error_status;
+    }
 
-  return parser_data.tree;
+  *ptree = parser_data.tree;
+  return fts_ok;
 }
 
 void fts_parsetree_delete( fts_parsetree_t *tree)
@@ -339,33 +458,178 @@ void fts_kernel_parser_init( void)
    fts_hashtable_put( &fts_token_table, &k, &v);	\
  }
 
-  PUT_TOKEN( fts_s_dollar, FTS_TOKEN_DOLLAR);
-  PUT_TOKEN( fts_s_semi, FTS_TOKEN_SEMI);
-  PUT_TOKEN( fts_s_comma, FTS_TOKEN_COMMA);
-  PUT_TOKEN( fts_s_plus, FTS_TOKEN_PLUS);
-  PUT_TOKEN( fts_s_minus, FTS_TOKEN_MINUS);
-  PUT_TOKEN( fts_s_times, FTS_TOKEN_TIMES);
-  PUT_TOKEN( fts_s_div, FTS_TOKEN_DIV);
-  PUT_TOKEN( fts_s_power, FTS_TOKEN_POWER);
-  PUT_TOKEN( fts_s_open_par, FTS_TOKEN_OPEN_PAR);
-  PUT_TOKEN( fts_s_closed_par, FTS_TOKEN_CLOSED_PAR);
-  PUT_TOKEN( fts_s_open_sqpar, FTS_TOKEN_OPEN_SQPAR);
-  PUT_TOKEN( fts_s_closed_sqpar, FTS_TOKEN_CLOSED_SQPAR);
-  PUT_TOKEN( fts_s_open_cpar, FTS_TOKEN_OPEN_CPAR);
-  PUT_TOKEN( fts_s_closed_cpar, FTS_TOKEN_CLOSED_CPAR);
-  PUT_TOKEN( fts_s_dot, FTS_TOKEN_DOT);
-  PUT_TOKEN( fts_s_percent, FTS_TOKEN_PERCENT);
-  PUT_TOKEN( fts_s_shift_left, FTS_TOKEN_SHIFT_LEFT);
-  PUT_TOKEN( fts_s_shift_right, FTS_TOKEN_SHIFT_RIGHT);
-  PUT_TOKEN( fts_s_logical_and, FTS_TOKEN_LOGICAL_AND);
-  PUT_TOKEN( fts_s_logical_or, FTS_TOKEN_LOGICAL_OR);
-  PUT_TOKEN( fts_s_logical_not, FTS_TOKEN_LOGICAL_NOT);
-  PUT_TOKEN( fts_s_equal_equal, FTS_TOKEN_EQUAL_EQUAL);
-  PUT_TOKEN( fts_s_not_equal, FTS_TOKEN_NOT_EQUAL);
-  PUT_TOKEN( fts_s_greater, FTS_TOKEN_GREATER);
-  PUT_TOKEN( fts_s_greater_equal, FTS_TOKEN_GREATER_EQUAL);
-  PUT_TOKEN( fts_s_smaller, FTS_TOKEN_SMALLER);
-  PUT_TOKEN( fts_s_smaller_equal, FTS_TOKEN_SMALLER_EQUAL);
-  PUT_TOKEN( fts_s_colon, FTS_TOKEN_COLON);
-  PUT_TOKEN( fts_s_equal, FTS_TOKEN_EQUAL);
+  PUT_TOKEN( fts_s_dollar, TK_DOLLAR);
+  PUT_TOKEN( fts_s_semi, TK_SEMI);
+  PUT_TOKEN( fts_s_comma, TK_COMMA);
+  PUT_TOKEN( fts_s_plus, TK_PLUS);
+  PUT_TOKEN( fts_s_minus, TK_MINUS);
+  PUT_TOKEN( fts_s_times, TK_TIMES);
+  PUT_TOKEN( fts_s_div, TK_DIV);
+  PUT_TOKEN( fts_s_power, TK_POWER);
+  PUT_TOKEN( fts_s_open_par, TK_OPEN_PAR);
+  PUT_TOKEN( fts_s_closed_par, TK_CLOSED_PAR);
+  PUT_TOKEN( fts_s_open_sqpar, TK_OPEN_SQPAR);
+  PUT_TOKEN( fts_s_closed_sqpar, TK_CLOSED_SQPAR);
+  PUT_TOKEN( fts_s_open_cpar, TK_OPEN_CPAR);
+  PUT_TOKEN( fts_s_closed_cpar, TK_CLOSED_CPAR);
+  PUT_TOKEN( fts_s_dot, TK_DOT);
+  PUT_TOKEN( fts_s_percent, TK_PERCENT);
+  PUT_TOKEN( fts_s_shift_left, TK_SHIFT_LEFT);
+  PUT_TOKEN( fts_s_shift_right, TK_SHIFT_RIGHT);
+  PUT_TOKEN( fts_s_logical_and, TK_LOGICAL_AND);
+  PUT_TOKEN( fts_s_logical_or, TK_LOGICAL_OR);
+  PUT_TOKEN( fts_s_logical_not, TK_LOGICAL_NOT);
+  PUT_TOKEN( fts_s_equal_equal, TK_EQUAL_EQUAL);
+  PUT_TOKEN( fts_s_not_equal, TK_NOT_EQUAL);
+  PUT_TOKEN( fts_s_greater, TK_GREATER);
+  PUT_TOKEN( fts_s_greater_equal, TK_GREATER_EQUAL);
+  PUT_TOKEN( fts_s_smaller, TK_SMALLER);
+  PUT_TOKEN( fts_s_smaller_equal, TK_SMALLER_EQUAL);
+  PUT_TOKEN( fts_s_colon, TK_COLON);
+
+#if YYDEBUG
+  yydebug = 1;
+#endif
 }
+
+#else
+
+/* **********************************************************************
+ *
+ * Standalone code
+ *
+ */
+
+#define PREDEF_SYMBOL(V,S) fts_symbol_t V = S;
+#include <fts/predefsymbols.h>
+
+static int yyerror( const char *msg)
+{
+  fprintf( stderr, "***** %s\n", msg);
+  return 0;
+}
+
+static fts_parsetree_t *fts_parsetree_new( int token, fts_atom_t *value, fts_parsetree_t *left, fts_parsetree_t *right)
+{
+  fts_parsetree_t *tree;
+
+  tree = (fts_parsetree_t *)malloc( sizeof( fts_parsetree_t));
+
+  tree->token = token;
+
+  if (value)
+    tree->value = *value;
+  else
+    fts_set_void( &tree->value);
+
+  tree->left = left;
+  tree->right = right;
+
+  return tree;
+}
+
+fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
+{
+  struct _parser_data parser_data;
+
+  parser_data.ac = ac;
+  parser_data.at = at;
+
+  if (yyparse( &parser_data))
+    {
+      *ptree = NULL;
+      return syntax_error_status;
+    }
+
+  *ptree = parser_data.tree;
+  return fts_ok;
+}
+
+void fts_parsetree_delete( fts_parsetree_t *tree)
+{
+  if (!tree)
+    return;
+
+  fts_parsetree_delete( tree->left);
+  fts_parsetree_delete( tree->right);
+  free( tree);
+}
+
+static void parsetree_print_aux( fts_parsetree_t *tree, int indent)
+{
+  int i;
+
+  if (!tree)
+    return;
+
+  fprintf( stderr, "%d:", indent);
+
+  for ( i = 0; i < indent; i++)
+    fprintf( stderr, "   ");
+
+  switch( tree->token) {
+  case TK_COLON: fprintf( stderr, ": %s\n", fts_get_symbol( &tree->value)); break;
+  case TK_COMMA: fprintf( stderr, ",\n"); break;
+  case TK_TUPLE: fprintf( stderr, "TUPLE\n"); break;
+  case TK_INT: fprintf( stderr, "INT %d\n", fts_get_int( &tree->value)); break;
+  case TK_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
+  case TK_SYMBOL: 
+    {
+      fts_symbol_t s = fts_get_symbol( &tree->value);
+      fprintf( stderr, "SYMBOL %s\n", (s != NULL) ? s : "null");
+    }
+    break;
+  case TK_PAR: fprintf( stderr, "()\n"); break;
+  case TK_CPAR: fprintf( stderr, "{}\n"); break;
+  case TK_SQPAR: fprintf( stderr, "[]\n"); break;
+  case TK_DOLLAR: 
+    if (fts_is_int( &tree->value))
+      fprintf( stderr, "$%d\n", fts_get_int( &tree->value)); 
+    else if (fts_is_symbol( &tree->value))
+      fprintf( stderr, "$%s\n", fts_get_symbol( &tree->value)); 
+    break;
+  case TK_UPLUS: fprintf( stderr, "+u\n"); break;
+  case TK_UMINUS: fprintf( stderr, "-u\n"); break;
+  case TK_LOGICAL_NOT: fprintf( stderr, "!\n"); break;
+  case TK_PLUS: fprintf( stderr, "+\n"); break;
+  case TK_MINUS: fprintf( stderr, "-\n"); break;
+  case TK_TIMES: fprintf( stderr, "*\n"); break;
+  case TK_DIV: fprintf( stderr, "/\n"); break;
+  case TK_POWER: fprintf( stderr, "**\n"); break;
+  case TK_PERCENT: fprintf( stderr, "%%\n"); break;
+  case TK_SHIFT_LEFT: fprintf( stderr, "<<\n"); break;
+  case TK_SHIFT_RIGHT: fprintf( stderr, ">>\n"); break;
+  case TK_LOGICAL_AND: fprintf( stderr, "&&\n"); break;
+  case TK_LOGICAL_OR: fprintf( stderr, "||\n"); break;
+  case TK_EQUAL_EQUAL: fprintf( stderr, "==\n"); break;
+  case TK_NOT_EQUAL: fprintf( stderr, "!=\n"); break;
+  case TK_GREATER: fprintf( stderr, ">\n"); break;
+  case TK_GREATER_EQUAL: fprintf( stderr, ">=\n"); break;
+  case TK_SMALLER: fprintf( stderr, "<\n"); break;
+  case TK_SMALLER_EQUAL: fprintf( stderr, "<=\n"); break;
+  }
+
+  parsetree_print_aux( tree->left, indent+1);
+  parsetree_print_aux( tree->right, indent+1);
+}
+
+void fts_parsetree_print( fts_parsetree_t *tree)
+{
+  parsetree_print_aux( tree, 0);
+}
+
+main( int argc, char **argv)
+{
+  fts_parsetree_t *tree;
+
+#ifdef YYDEBUG
+  yydebug = 1;
+#endif
+
+  tokenizer_init( argv[1]);
+
+  if (fts_parsetree_parse( 0, 0, &tree) == fts_ok)
+    fts_parsetree_print( tree);
+}
+
+#endif

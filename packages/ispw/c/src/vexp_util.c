@@ -114,7 +114,7 @@ ex_get_ivec_by_name(fts_symbol_t name)
 
 int ex_getsym(char *p, fts_symbol_t *s)
 {
-  *s = fts_new_symbol_copy(p);
+  *s = fts_new_symbol(p);
   return(*s ? 0 : 1);
 }
 

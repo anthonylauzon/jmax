@@ -67,7 +67,7 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom
   vsprintf(buf, format, ap);
   va_end(ap);
 
-  fts_set_symbol(&a, fts_new_symbol_copy(buf));
+  fts_set_symbol(&a, fts_new_symbol(buf));
   fts_object_put_prop(obj, fts_s_error_description, &a);
 
   /* Return the object  */
@@ -85,59 +85,6 @@ void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet)
 {
   if (fts_object_get_outlets_number(obj) <= noutlet)
     fts_object_set_outlets_number(obj, noutlet + 1);
-}
-
-
-/* Just locally mark that recomputing errors is needed */
-
-static int need_recompute_errors = 0;
-
-void fts_recompute_errors()
-{
-  need_recompute_errors = 1;
-}
-
-/*
-  Try to recompute all the error objects; to be called after
-  an "env" change; do something only if we know (with fts_recompute_errors)
-  that some change happened in the environment; called directly from
-  the client; this double mechanism is needed to avoid trying to recompute
-  all errors at every small declaration, that can be catastrophic for example
-  if a library declare its templates with explicit declarations.
-  */
-
-void fts_do_recompute_errors(void)
-{
-  fts_objectset_t *errors;
-  fts_object_t *root;
-  fts_atom_t a[1];
-  fts_iterator_t iterator;
-
-  if (need_recompute_errors)
-    {
-      errors = fts_objectset_create();
-      root = (fts_object_t *) fts_get_root_patcher();
-      fts_set_object(&a[0], (fts_object_t *) errors);
-      
-      /* Find all the errors */
-      fts_send_message(root, fts_s_find_errors, 1, a);
-  
-      /* Recompute them all */
-      fts_objectset_get_objects( errors, &iterator );
-
-      while (fts_iterator_has_more( &iterator))
-	{
-	  fts_object_t *object;
-	  fts_atom_t a;
-
-	  fts_iterator_next( &iterator, &a);
-	  object = fts_get_object( &a);
-
-	  fts_object_recompute(object);
-	}
-
-      fts_objectset_destroy( errors);
-    }
 }
 
 
@@ -160,7 +107,7 @@ void fts_object_set_error(fts_object_t *obj, const char *format, ...)
   vsprintf(buf, format, ap);
   va_end(ap);
 
-  fts_set_symbol(&a, fts_new_symbol_copy(buf));
+  fts_set_symbol(&a, fts_new_symbol(buf));
   fts_object_put_prop(obj, fts_s_error_description, &a);
 }
 
@@ -193,7 +140,7 @@ fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
   if(runtime_error_handler)
     {
       fts_set_object(a + 0, obj);
-      fts_set_symbol(a + 1, fts_new_symbol_copy(buf));
+      fts_set_symbol(a + 1, fts_new_symbol(buf));
       /* fts_set_string(a + 1, buf); ??? */
       
       fts_client_send_message(runtime_error_handler, sym_runtime_error_post, 2, a);
@@ -208,18 +155,6 @@ fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...)
       else
 	post("error in %s: %s\n", class, buf);	
     }
-}
-
-/* ERASE ME!!! */
-void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...)
-{
-  va_list ap;
-  char buf[1024];
-
-  va_start(ap, format);
-  vsprintf(buf, format, ap);
-  va_end(ap);
-  post("error: %s\n", buf);
 }
 
 fts_symbol_t

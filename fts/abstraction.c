@@ -203,7 +203,7 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 	{
 	  /* found, declare it and return */
 
-	  fts_abstraction_add_declaration(name, fts_new_symbol_copy(buf));
+	  fts_abstraction_add_declaration(name, fts_new_symbol(buf));
 
 	  return file;
 	}
@@ -262,7 +262,7 @@ static fts_symbol_t get_name_without_extension( fts_symbol_t name)
 
       buff[ pdot - pname]  = '\0';
 
-      return fts_new_symbol_copy( buff);
+      return fts_new_symbol( buff);
     }
 
   return name;

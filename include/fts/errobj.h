@@ -25,9 +25,6 @@ FTS_API fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const 
 
 FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
 
-/* ERASE ME!!! */
-FTS_API void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
-
 FTS_API void fts_object_signal_runtime_error(fts_object_t *obj, const char *format, ...);
 
 FTS_API fts_symbol_t fts_object_get_error(fts_object_t *obj);

@@ -29,7 +29,7 @@ typedef struct _fts_parsetree_t {
   struct _fts_parsetree_t *left, *right;
 } fts_parsetree_t;
 
-extern fts_parsetree_t *fts_parsetree_new( int ac, const fts_atom_t *at);
+extern fts_status_t fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree);
 
 extern void fts_parsetree_delete( fts_parsetree_t *tree);
 

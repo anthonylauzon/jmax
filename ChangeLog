@@ -1,3 +1,10 @@
+2002-09-25  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* added parsing of object expressions to the expression parser/evaluator.
+	Reimplemented fts_eval_object_description using this parser.
+	* remove fts_object_blip
+	* templates are not supported yet, but will be back soon
+
 2002-09-21  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* introduced variable number of in/outlets for objects

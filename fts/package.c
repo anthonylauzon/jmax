@@ -88,7 +88,7 @@ static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symb
   if ( strstr( file, pkg->dir) != NULL)
     {
       dirlen = strlen( pkg->dir) + 1;
-      rel_file = fts_new_symbol_copy( file + dirlen);
+      rel_file = fts_new_symbol( file + dirlen);
       return rel_file;
     }  
   else
@@ -124,10 +124,10 @@ fts_init_package_paths(void)
   if (s) 
     {
       /* init system_package dir */
-      fts_system_package->dir = fts_new_symbol_copy(s);
+      fts_system_package->dir = fts_new_symbol(s);
       
       snprintf(path, MAXPATHLEN, "%s%c%s", s, fts_file_separator, "packages");
-      fts_set_symbol(&a, fts_new_symbol_copy(path));
+      fts_set_symbol(&a, fts_new_symbol(path));
       fts_package_paths = fts_list_append(fts_package_paths, &a);
     }
 }
@@ -225,7 +225,7 @@ fts_package_load(fts_symbol_t name)
     pkg->state = fts_package_defined;
     pkg->name = name;
     pkg->filename = filename;
-    pkg->dir = fts_new_symbol_copy(path);
+    pkg->dir = fts_new_symbol(path);
   }
   
   /* load the default files */
@@ -451,7 +451,7 @@ fts_package_get_declared_template(fts_package_t* pkg, fts_symbol_t name)
       if (fts_template_get_filename(template) == NULL) 
 	{
 	  fts_make_absolute_path(pkg->dir, fts_template_get_original_filename(template), buf, MAXPATHLEN);
-	  fts_template_set_filename(template, fts_new_symbol_copy(buf));
+	  fts_template_set_filename(template, fts_new_symbol(buf));
 	}
       
       return template;
@@ -485,7 +485,7 @@ fts_package_get_template_in_path(fts_package_t* pkg, fts_symbol_t name)
 	return NULL;
       
       /* Register the template */
-      template = fts_template_new(name, fts_new_symbol_copy(path), NULL);
+      template = fts_template_new(name, fts_new_symbol(path), NULL);
       
       /* Create the database if necessary */
       if (pkg->templates_in_path == NULL) 
@@ -605,7 +605,7 @@ fts_package_get_declared_abstraction(fts_package_t* pkg, fts_symbol_t name)
       fts_make_absolute_path(pkg->dir, 
 			     fts_abstraction_get_original_filename(abstraction), 
 			     buf, MAXPATHLEN);
-      fts_abstraction_set_filename(abstraction, fts_new_symbol_copy(buf));
+      fts_abstraction_set_filename(abstraction, fts_new_symbol(buf));
     }
 
     return abstraction;
@@ -643,7 +643,7 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
 	}
 
       /* Register the abstraction */
-      t = fts_abstraction_new(name, fts_new_symbol_copy(path), fts_new_symbol_copy(filename));
+      t = fts_abstraction_new(name, fts_new_symbol(path), fts_new_symbol(filename));
 
       /* Create the database if necessary */
       if (pkg->abstractions_in_path == NULL) {

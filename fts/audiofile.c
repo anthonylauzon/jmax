@@ -198,7 +198,7 @@ fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, f
       fts_audiofile_set_sample_format_by_name(aufile, sample_format);
 
       if(suffix != NULL)
-	fts_audiofile_set_file_format_by_suffix(aufile, fts_new_symbol_copy(suffix + 1));
+	fts_audiofile_set_file_format_by_suffix(aufile, fts_new_symbol(suffix + 1));
       else
 	fts_audiofile_set_file_format_by_suffix(aufile, 0);
 

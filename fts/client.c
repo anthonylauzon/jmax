@@ -284,7 +284,7 @@ static fts_status_t client_manager_instantiate(fts_class_t *cl, int ac, const ft
  *
  */
 
-#define SYMBOL_CACHE_SIZE 512
+#define SYMBOL_CACHE_SIZE 1031
 
 typedef struct {
   int length;
@@ -388,7 +388,15 @@ static void symbol_cache_destroy( symbol_cache_t *cache)
 static void symbol_cache_put( symbol_cache_t *cache, fts_symbol_t s, int index)
 {
   if (index >= cache->length)
-    cache->symbols = fts_realloc( cache->symbols, index+1);
+    {
+      int i, old_length = cache->length;
+
+      cache->length = index+1;
+      cache->symbols = fts_realloc( cache->symbols, cache->length * sizeof( fts_symbol_t));
+
+      for ( i = old_length; i < cache->length; i++)
+	cache->symbols[i] = 0;
+    }
 
   cache->symbols[index] = s;
 }
@@ -478,7 +486,7 @@ static void end_symbol_cache_action( unsigned char input, client_t *client)
   index = get_int_from_bytes( fts_stack_base( &client->input_buffer));
 
   fts_stack_push( &client->input_buffer, unsigned char, '\0');
-  s = fts_new_symbol_copy( fts_stack_base( &client->input_buffer) + sizeof( int));
+  s = fts_new_symbol( fts_stack_base( &client->input_buffer) + sizeof( int));
 
   symbol_cache_put( &client->input_cache, s, index);
 
@@ -862,9 +870,9 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   dir_name = (char *)alloca( strlen( file_name) + 1);
   strcpy( dir_name, file_name);
   fts_dirname( dir_name);
-  fts_package_add_template_path( fts_project_get(), fts_new_symbol_copy( dir_name));
-  fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol_copy( dir_name));
-  fts_package_add_data_path( fts_project_get(), fts_new_symbol_copy( dir_name));
+  fts_package_add_template_path( fts_project_get(), fts_new_symbol( dir_name));
+  fts_package_add_abstraction_path( fts_project_get(), fts_new_symbol( dir_name));
+  fts_package_add_data_path( fts_project_get(), fts_new_symbol( dir_name));
 
   /*
     We change the working directory so that it is the directory of the
@@ -1142,6 +1150,9 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_symbol_t s_bus = fts_new_symbol( "bus");
   fts_symbol_t s_label = fts_new_symbol( "label");
 
+#ifdef REIMPLEMENTING_VARIABLES
+  fts_object_set_error( (fts_object_t *)this, "First argument does not refer to an object");
+#else
   this->gate = 0;
 
   /* By default, we don't echo the message coming from the client to the client */
@@ -1213,6 +1224,7 @@ static void client_controller_init(fts_object_t *o, int winlet, fts_symbol_t s, 
 
   fts_connection_new(from, 0, (fts_object_t *)this, 0, fts_c_anything);
   fts_connection_new((fts_object_t *)this, 0, to, 0, fts_c_anything);
+#endif
 }
 
 static void client_controller_delete_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

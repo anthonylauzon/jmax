@@ -388,7 +388,7 @@ fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator)
       if(strcmp("()", buf) == 0)
 	fts_set_void(at);
       else
-	fts_set_symbol(at, fts_new_symbol_copy(buf));
+	fts_set_symbol(at, fts_new_symbol(buf));
       break;
     default:
       break;

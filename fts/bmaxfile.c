@@ -1099,7 +1099,7 @@ static int fts_binary_file_map( FILE *f, fts_binary_file_desc_t *desc)
 
 	  if (buf[i] == 0)
 	    {
-	      desc->symbols[symbolIndex]= fts_new_symbol_copy(buf);
+	      desc->symbols[symbolIndex]= fts_new_symbol(buf);
 	      symbolIndex++;
 	      i = 0;
 	    }

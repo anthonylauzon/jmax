@@ -80,8 +80,8 @@ alsamidi_scan_devices(alsamidi_t *this, int stream, fts_array_t *array)
 	  snprintf(device_name, NAME_SIZE, "%s %s", snd_ctl_card_info_get_name(cardinfo), snd_rawmidi_info_get_name(midiinfo));
 	  snprintf(hw_name, NAME_SIZE, "hw:%d,%d", card, device);
 
-	  device_symbol = fts_new_symbol_copy(device_name);
-	  hw_symbol = fts_new_symbol_copy(hw_name);
+	  device_symbol = fts_new_symbol(device_name);
+	  hw_symbol = fts_new_symbol(hw_name);
 
 	  /* enter device to hashtable id not already done */
 	  fts_set_symbol(&k, device_symbol);

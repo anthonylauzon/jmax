@@ -36,6 +36,36 @@
 
 
 #include <fts/fts.h>
+
+#ifdef REIMPLEMENTING_VARIABLES
+fts_atom_t *
+fts_variable_get_value( fts_patcher_t *scope, fts_symbol_t name)
+{
+  static fts_atom_t a;
+
+  fts_set_void( &a);
+
+  return &a;
+}
+
+fts_atom_t *
+fts_variable_get_value_or_void(fts_patcher_t *scope, fts_symbol_t name)
+{
+  return fts_variable_get_value( scope, name);
+}
+
+void 
+fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
+{
+}
+
+void
+fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user)
+{
+}
+
+#else
+
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/variable.h>
@@ -770,3 +800,4 @@ void fts_kernel_variable_init(void)
   objlist_heap  = fts_heap_new(sizeof(fts_mess_obj_list_t));
   var_refs_heap = fts_heap_new(sizeof(fts_binding_list_t));
 }
+#endif

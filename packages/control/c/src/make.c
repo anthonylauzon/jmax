@@ -84,7 +84,7 @@ make_set_classname(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   make_t *this = (make_t *)o;
   fts_symbol_t classname = fts_get_symbol(at);
-  fts_metaclass_t *class = fts_metaclass_get_by_name(classname);
+  fts_metaclass_t *class = fts_metaclass_get_by_name(NULL, classname);
 
   if(class)
     {

@@ -264,7 +264,7 @@ alsaseqmidiport_io_init(alsaseqmidiport_t* this,
 		 NAME_SIZE - strlen(label_name_str) - 1, 
 		 ":%s", port_name);
 	label_name_str[NAME_SIZE - 1] = '\0';
-	this->name = fts_new_symbol_copy(label_name_str);
+	this->name = fts_new_symbol(label_name_str);
 
     }
     else
@@ -279,7 +279,7 @@ alsaseqmidiport_io_init(alsaseqmidiport_t* this,
 		 NAME_SIZE - 1 - strlen(label_name_str) - 1, 
 		 ":%s", port_name);
 	label_name_str[NAME_SIZE - 1] = '\0';
-	this->name = fts_new_symbol_copy(label_name_str);
+	this->name = fts_new_symbol(label_name_str);
 
     }
     if (err < 0)

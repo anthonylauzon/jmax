@@ -28,12 +28,6 @@
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>
 
-/* Note that in this code there are error messages sent as blip;
-   this is ok during editing, but the same error may occour while
-   loading a patch in an environment where some object changed
-   without keeping compatibility; we should send the messages to the 
-   console in this case ?*/
-
 /* #define TRACE_DEBUG */
 
 /******************************************************************************/
@@ -80,7 +74,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
   /* check the outlet range (should never happen, a part from loading) */
   if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
     {
-      fts_object_blip(src, "Outlet out of range");
+      fts_object_signal_runtime_error(src, "Outlet out of range");
       return NULL;
     }
 
@@ -94,7 +88,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
 	  {
 	    /* Found, return error message */
 	    
-	    fts_object_blip(src, "Double connection, cannot connect.");
+	    fts_object_signal_runtime_error(src, "Double connection, cannot connect.");
 	    return NULL;
 	  }
       }
@@ -112,9 +106,8 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
       if((meth == NULL) || 
 	 (selector == fts_s_sig && meth == fts_class_inlet_get_anything(dst->head.cl, winlet) && propagate == 0))
 	{
-	  /* mismatch if no method for typed outlet or anything method of object which is no propagating through it */
+	  fts_object_signal_runtime_error(src, "Type mismatch, cannot connect");
 
-	  fts_object_blip(src, "Connection type mismatch");
 	  return NULL;
 	}
     }

@@ -22,6 +22,8 @@
 package ircam.fts.client;
 
 class SymbolCache {
+  private static final int DEFAULT_INITIAL_CAPACITY = 1031;
+
   SymbolCache( int initialCapacity)
   {
     cache = new FtsSymbol[initialCapacity];
@@ -29,7 +31,7 @@ class SymbolCache {
 
   SymbolCache()
   {
-    this( 512);
+    this( DEFAULT_INITIAL_CAPACITY);
   }
 
   final int index( FtsSymbol v)

@@ -212,7 +212,10 @@ Clean property handling: keep property list (replace by a hashtable ?),
 replace daemon by methods using fts_return
 
 <p>
-Remove meta-classes ???
+Remove meta-classes:
+ - in fts_metaclass_new_instance, remove patcher stuff
+ - check fts_metaclass_new_instance return value (fts_status_t or fts_object_t * ?)
+
 
 <p>
 Replace FTS_HASHTABLE_INT and co by fts_t_int
@@ -230,8 +233,10 @@ Remove soundfile
 Remove fts_new_symbol_copy (symbols are always copied into a contiguous area)
 
 <p>
-Remove updates with properties
+Updates:
+ - move the update_group_table to the client (to avoid maintaining 2 client tables)
 
+ 
 <p>
 Unify file loading/saving w.r.t. .pat/.jmax/.etc
 

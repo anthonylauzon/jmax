@@ -2,7 +2,6 @@ lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
 @PLATFORM@.c \
-OLDexpression.c \
 abstraction.c \
 array.c \
 atom.c \
@@ -49,7 +48,6 @@ sigconn.c \
 stack.c \
 symbol.c \
 template.c \
-thread.c \
 time.c \
 tuple.c \
 update.c \
@@ -62,9 +60,9 @@ bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD= @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
 libfts_la_LDFLAGS = -no-undefined
-AM_YFLAGS=-d -v
+AM_YFLAGS=-d --verbose
 AM_LFLAGS=-olex.yy.c
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 
 INCLUDES=-I$(top_srcdir)/include
-
+AM_CFLAGS=-DREIMPLEMENTING_VARIABLES

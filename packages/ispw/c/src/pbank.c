@@ -370,7 +370,7 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  char buf[256];
 
 	  sprintf(buf, "%d-%s", j, receive);
-	  this->receives[j] = fts_new_symbol_copy(buf);
+	  this->receives[j] = fts_new_symbol(buf);
 	}
     }
   else

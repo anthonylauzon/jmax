@@ -48,9 +48,6 @@ struct fts_patcher
   fts_template_t *template;
 
   fts_symbol_t file_name;
-
-  /* Variables */
-  fts_env_t env;
   
   int save_id;
 };    

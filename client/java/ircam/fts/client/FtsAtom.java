@@ -218,5 +218,23 @@ public class FtsAtom {
       setObject( (FtsObject)value);
   }
 
+  public String toString()
+  {
+    if ( isVoid())
+      return "void";
+    else if ( isInt())
+      return Integer.toString( intValue);
+    else if ( isDouble())
+      return Double.toString( doubleValue);
+    else if ( isSymbol())
+      return symbolValue.toString();
+    else if ( isString() || isRawString())
+      return stringValue;
+    else if ( isObject())
+      return objectValue.toString();
+
+    return "unknown";
+  }
+
   private Class type;
 }

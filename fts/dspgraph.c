@@ -290,7 +290,7 @@ fts_dsp_signal_t *fts_dsp_signal_new( int vector_size, float sample_rate)
   sig = (fts_dsp_signal_t *)fts_zalloc( sizeof(fts_dsp_signal_t));
 
   sprintf( buffer, "_sig_%d", signal_count++);
-  sig->name = fts_new_symbol_copy( buffer);
+  sig->name = fts_new_symbol( buffer);
   sig->refcnt = SIGNAL_PENDING;
   sig->length = vector_size;
   sig->srate = sample_rate;

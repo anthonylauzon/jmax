@@ -21,9 +21,8 @@
 
 #ifdef WIN32
 #include <ftsconfig-win32.h>
-#elif defined(__APPLE__) && defined(__MACH__) 
+#elif defined(__APPLE__) && defined(__MACH__)
 #include <ftsconfig-macosx.h>
 #else
 #include <ftsconfig-ac.h>
 #endif
-

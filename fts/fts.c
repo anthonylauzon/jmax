@@ -78,21 +78,21 @@ static void fts_cmd_args_parse( int argc, char **argv)
 	  if (p != NULL)
 	    *p = '\0';
 
-	  name = fts_new_symbol_copy( *argv + 2);
+	  name = fts_new_symbol( *argv + 2);
 
 	  if (p == NULL || p[1] == '\0')
 	    value = s_yes;
 	  else
 	    {
 	      p++;
-	      value = fts_new_symbol_copy( p);
+	      value = fts_new_symbol( p);
 	    }
 	}
       else
 	{
 	  sprintf( filevar, "file%d", filecount++);
-	  name = fts_new_symbol_copy( filevar);
-	  value = fts_new_symbol_copy( *argv);
+	  name = fts_new_symbol( filevar);
+	  value = fts_new_symbol( *argv);
 	}
 
       fts_cmd_args_put( name, value);
@@ -175,11 +175,12 @@ static void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_package_init);
   _K_DECNCALL( fts_kernel_tuple_init);
   _K_DECNCALL( fts_kernel_connection_init);
+#if 0
   _K_DECNCALL( fts_kernel_variable_init);
+#endif
   _K_DECNCALL( fts_kernel_patcher_init);
   _K_DECNCALL( fts_kernel_parser_init);
   _K_DECNCALL( fts_kernel_expression_init); /* Must be after parser_init */
-  _K_DECNCALL( fts_kernel_oldexpression_init);
   _K_DECNCALL( fts_kernel_ftl_init);
   _K_DECNCALL( fts_kernel_param_init);
   _K_DECNCALL( fts_kernel_dsp_graph_init);
@@ -209,7 +210,6 @@ static void fts_kernel_classes_config( void)
   _K_DECNCALL( fts_objectset_config);
   _K_DECNCALL( fts_selection_config);
   _K_DECNCALL( fts_saver_config);
-  _K_DECNCALL( fts_thread_manager_config);
 }
 
 void fts_init( int argc, char **argv)

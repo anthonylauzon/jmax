@@ -76,7 +76,7 @@ tabpoke_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   if (fts_is_int(at))
     {
       gensampname(name_str, "sample", fts_get_int_arg(ac, at, 0, 0));
-      tab_name = fts_new_symbol_copy(name_str);
+      tab_name = fts_new_symbol(name_str);
     }
   else
     tab_name = fts_get_symbol_arg(ac, at, 0, 0);

@@ -1,16 +1,19 @@
 SUBDIRS= ircam
 
 jardir=$(datadir)/jmax/client/java
-JAR=ftsclient.jar
-jar_DATA = $(JAR)
+JARFILE=ftsclient.jar
+jar_DATA = $(JARFILE)
 
 JAR_DEP=ircam/fts/client/classpackage.stamp
 
-CLEANFILES=${JAR}
+CLEANFILES=${JARFILE}
 
-$(JAR): $(JAR_DEP)
-	-test -f $(JAR) || rm -f $(JAR)
-	jar -cvf $(JAR) `find ircam/fts/client -name '*.class'`
+$(JARFILE): $(JAR_DEP)
+	if test -f $(JARFILE); then \
+		jar -uvf $(JARFILE) `find . -name "*.class" -newer $(JARFILE)` ; \
+	else \
+		jar -cvf $(JARFILE) `find . -name "*.class"`; \
+	fi
 
 install-data-hook:
 	cd $(DESTDIR)$(jardir); find . -name "*.class" -exec rm {} \;

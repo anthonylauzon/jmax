@@ -176,7 +176,9 @@ sequence_tuple_update(sequence_t *this)
       track = track_get_next(track);
     }
 
+#if 0
   fts_object_redefine_variable((fts_object_t *)this);
+#endif
 }
 
 static void
@@ -187,7 +189,9 @@ sequence_tuple_append(sequence_t *this, track_t *track)
   fts_set_object(&a, (fts_object_t *)track);
   fts_tuple_append(this->tuple, 1, &a);
 
+#if 0
   fts_object_redefine_variable((fts_object_t *)this);
+#endif
 }
 
 /******************************************************
@@ -330,7 +334,7 @@ sequence_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_atom_t a[4];
   
   snprintf(str, 1024, " ");
-  default_name = fts_new_symbol_copy(str);
+  default_name = fts_new_symbol(str);
   
   fts_set_symbol(a, seqsym_import_midifile);
   fts_set_symbol(a + 1, fts_new_symbol("Import standard MIDI file"));

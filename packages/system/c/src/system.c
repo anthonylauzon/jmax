@@ -30,7 +30,6 @@ extern void const_config(void);
 extern void argument_config(void);
 
 extern void print_config(void);
-extern void blip_config(void);
 
 extern void bus_config(void);
 extern void bus_tilda_config(void);

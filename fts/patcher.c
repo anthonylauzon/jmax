@@ -56,13 +56,11 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/errobj.h>
-#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/package.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/template.h>
-#include <ftsprivate/variable.h>
 #include <ftsprivate/label.h>
 
 fts_metaclass_t *patcher_metaclass = 0;
@@ -86,7 +84,6 @@ fts_symbol_t sym_releaseConnection = 0;
 fts_symbol_t sym_redefineObject = 0;
 fts_symbol_t sym_objectRedefined = 0;
 fts_symbol_t sym_setRedefined = 0;
-fts_symbol_t sym_blip = 0;
 fts_symbol_t sym_setDescription;
 fts_symbol_t sym_setSaved;
 fts_symbol_t sym_endUpload;
@@ -986,16 +983,21 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->n_inlets = 0;
   this->n_outlets = 0;
 
+#ifndef REIMPLEMENTING_VARIABLES
   fts_env_init(&this->env, (fts_object_t *) this);
+#endif
+
   fts_patcher_set_standard(this);
 
   /* Define the "args" variable */
   this->args = (fts_tuple_t *)fts_object_create(fts_tuple_metaclass, ac, at);
   fts_object_refer(this->args);
 
-  fts_variable_define(this, fts_s_args);
-  fts_set_object(&va, (fts_object_t *)this->args);
+#ifndef REIMPLEMENTING_VARIABLES
+  fts_variable_define( this, fts_s_args);
+  fts_set_object( &va, (fts_object_t *)this->args);
   fts_variable_restore(this, fts_s_args, &va, o);
+#endif
 
   patcher_redefine_number_of_inlets(this, n_inlets);
   patcher_redefine_number_of_outlets(this, n_outlets);
@@ -1056,7 +1058,9 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   /* delete all the variables */
   fts_object_release( this->args);
 
+#ifndef REIMPLEMENTING_VARIABLES
   fts_variables_undefine(this, (fts_object_t *)this);
+#endif
 
   /* delete the inlets and inlets tables */
   if (this->inlets)
@@ -1464,7 +1468,7 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   else
     snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
   
-  file_name = fts_new_symbol_copy(path);
+  file_name = fts_new_symbol(path);
 
   fts_log("[patcher] help %s\n", file_name);
 
@@ -1482,13 +1486,13 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 static void 
 fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)this, ac - 2, at + 2);
+  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)o, ac - 2, at + 2);
   fts_atom_t a[1];
-  fts_set_int(a, -1);
 
   fts_object_put_prop(obj, fts_s_x, at);
   fts_object_put_prop(obj, fts_s_y, at+1);
+
+  fts_set_int(a, -1);
   fts_object_put_prop(obj, fts_s_layer, a);
 
   fts_client_upload_object(obj, -1);
@@ -1655,6 +1659,7 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
       fts_atom_t argv[512];
       int argc;
 
+#ifndef REIMPLEMENTING_VARIABLES
       if (fts_object_description_defines_variable(ac, at))
 	{
 	  fts_set_symbol(&argv[0], fts_s_patcher); 
@@ -1664,6 +1669,7 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
 	    argv[argc] = at[argc+1];
 	}
       else
+#endif
 	{
 	  /* Plain syntax */
 	  fts_set_symbol(&argv[0], fts_s_patcher);
@@ -1681,9 +1687,7 @@ fts_patcher_redefine_from_client( fts_object_t *o, int winlet, fts_symbol_t s, i
       fts_set_string( a,  fts_memorystream_get_bytes( stream));
       fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, a);
 
-      /*fts_client_send_message((fts_object_t *)this, sym_setDescription, argc - 1, argv + 1);*/
-    
-      fts_patcher_set_dirty((fts_patcher_t *)o, 1);
+      fts_patcher_set_dirty( this, 1);
     }
   else
     printf_mess("System Error in FOS message REDEFINE PATCHER: bad args", ac, at);
@@ -1844,20 +1848,6 @@ static void fts_patcher_paste( fts_object_t *o, int winlet, fts_symbol_t s, int 
 /****************************************************************/
 /****************************************************************/
 
-/* daemon for getting the property "state". */
-static void
-patcher_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
-{
-  fts_atom_t *v;
-
-  v = fts_variable_get_value( (fts_patcher_t *)obj, fts_s_export);
-
-  if(v)
-    *value = *v;
-  else
-    fts_set_object(value, obj);
-}
-
 /* daemon for setting the number of inlets */
 static void
 patcher_set_ninlets(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
@@ -1951,24 +1941,27 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void 
 fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data)
 {
+#ifndef REIMPLEMENTING_VARIABLES
   fts_patcher_t *this = (fts_patcher_t *)data;
 
   if(! fts_variable_is_suspended(this, name))
     fts_variable_define(this, name);
 
   fts_variable_restore(this, name, value, (fts_object_t *)this);
+#endif
 }
 
 fts_patcher_t *
 fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 {
   fts_object_t *obj;
-  fts_oldexpression_state_t *e;
   int ac;
   fts_atom_t at[1024];
   int rac;
   const fts_atom_t *rat;
   fts_atom_t a;
+#ifndef REIMPLEMENTING_VARIABLES
+  fts_oldexpression_state_t *e;
 
   obj = (fts_object_t *) this; 
 
@@ -2030,6 +2023,8 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
   /* free the expression state structure */
   fts_oldexpression_state_free(e);
 
+#endif
+
   return this;
 }
 
@@ -2054,6 +2049,7 @@ fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj)
     }
 
   *p = obj;
+  fts_object_refer(obj);
 }
 
 void 
@@ -2087,21 +2083,6 @@ fts_patcher_get_objects_count(fts_patcher_t *this)
  *
  */
 
-void 
-fts_patcher_blip(fts_patcher_t *this, const char *msg)
-{
-  if (fts_patcher_is_open(this))
-    {
-      fts_atom_t a[1];
-  
-      fts_set_string(&a[0], (char *)msg);
-      fts_client_send_message((fts_object_t *)this, sym_blip, 1, a);
-    }
-  else if (fts_object_get_patcher((fts_object_t *)this))
-    {
-      fts_patcher_blip(fts_object_get_patcher((fts_object_t *)this), msg);
-    }
-}
 
 /* set a patch as dirty or as saved: if this patcher is a sub-patcher propagate the set_dirty to his father
  * until a firts level patche is reached.
@@ -2188,7 +2169,6 @@ void fts_kernel_patcher_init(void)
   sym_objectRedefined = fts_new_symbol("objectRedefined");
   sym_setRedefined = fts_new_symbol("setRedefined");
   sym_endUpload = fts_new_symbol("endUpload");
-  sym_blip = fts_new_symbol("setMessage");
   sym_setDescription = fts_new_symbol("setDescription");
   sym_setSaved = fts_new_symbol("setSaved");
   sym_startPaste = fts_new_symbol("startPaste");

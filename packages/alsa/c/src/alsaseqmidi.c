@@ -101,13 +101,13 @@ alsaseqmidi_scan_clients(alsaseqmidi_t* this, int perm, fts_hashtable_t* ht)
 		snprintf(port_name, NAME_SIZE, "%s", snd_seq_client_info_get_name(cinfo));
 		/* Get client port name */
 		snprintf(port_name + strlen(port_name), NAME_SIZE - strlen(port_name) - 1, "::%s", snd_seq_port_info_get_name(pinfo));
-		port_name_symbol = fts_new_symbol_copy(port_name);
+		port_name_symbol = fts_new_symbol(port_name);
 
 		/* Get client ID */
 		snprintf(address, ADDRESS_SIZE, "%d", snd_seq_client_info_get_client(cinfo));
 		/* Get port ID */
 		snprintf(address + strlen(address), ADDRESS_SIZE - strlen(address) - 1, ":%d", snd_seq_port_info_get_port(pinfo));
-		address_symbol = fts_new_symbol_copy(address);
+		address_symbol = fts_new_symbol(address);
 
 		fts_set_symbol(&k, port_name_symbol);
 		/* Insert in hashtable if not already done */
@@ -349,7 +349,7 @@ alsaseqmidi_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
     
     snprintf(client_name, NAME_SIZE, "jMax_alsa::");
     snd_seq_set_client_name(this->seq, client_name);
-    this->client_name = fts_new_symbol_copy(client_name);    
+    this->client_name = fts_new_symbol(client_name);    
     fts_log("[alsaseqmidi] ALSA sequencer client name set (%s)\n", client_name);
     
 }

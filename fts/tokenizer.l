@@ -33,7 +33,7 @@
 #define SET_HEXINT(T) fts_set_int( (lvalp), strtol( T, (char **)NULL, 16))
 #define SET_FLOAT(T) fts_set_float( (lvalp), strtod( T, (char **)NULL))
 #define SET_SYMBOL(S) fts_set_symbol( (lvalp), (S)) 
-#define SET_SYMBOL_COPY(T) fts_set_symbol( (lvalp), fts_new_symbol_copy( T)) 
+#define SET_SYMBOL_NEW(S) fts_set_symbol( (lvalp), fts_new_symbol(S)) 
 
 %}
 
@@ -113,8 +113,8 @@ quoted_symbol	\"[^\"]+\"
 {smaller_equal}	{ SET_SYMBOL( fts_s_smaller_equal); return 1; }
 {colon}		{ SET_SYMBOL( fts_s_colon); return 1; }
 {equal}		{ SET_SYMBOL( fts_s_equal); return 1; }
-{quoted_symbol}	{ yytext[yyleng-1] = '\0'; SET_SYMBOL_COPY( yytext+1); return 1; }
-{symbol}	{ SET_SYMBOL_COPY( yytext); return 1; }
+{quoted_symbol}	{ yytext[yyleng-1] = '\0'; SET_SYMBOL_NEW( yytext+1); return 1; }
+{symbol}	{ SET_SYMBOL_NEW( yytext); return 1; }
 
 %%
 

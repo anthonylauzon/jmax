@@ -215,7 +215,7 @@ char *fts_file_find( const char *filename, char *buf, int len)
   if (fts_package_get_data_file( pkg, filename, buf, len))
     return buf;
   
-      /* ask the required packages of the current package */
+  /* ask the required packages of the current package */
   fts_package_get_required_packages( pkg, &pkg_iter);
 
   while ( fts_iterator_has_more( &pkg_iter)) 

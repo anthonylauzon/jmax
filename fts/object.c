@@ -23,7 +23,6 @@
 #include <stdarg.h>
 
 #include <fts/fts.h>
-#include <ftsprivate/OLDexpression.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/class.h>
@@ -33,23 +32,51 @@
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/property.h>
 #include <ftsprivate/template.h>
-#include <ftsprivate/variable.h>
 #include <ftsprivate/bmaxfile.h>
 
 /* forward declarations  */
-static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data);
 static void fts_object_move_properties(fts_object_t *old, fts_object_t *new);
-static void fts_object_send_kernel_properties(fts_object_t *obj);
-static fts_symbol_t fts_object_description_get_variable_name(int ac, const fts_atom_t *at);
-
 static void fts_object_unbind(fts_object_t *obj);
-static void fts_object_free(fts_object_t *obj);
 
 /******************************************************************************
  *
  *  create object
  *
  */
+
+fts_object_t *fts_object_new( fts_class_t *cl)
+{
+  fts_object_t *obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
+
+  obj->head.cl = cl;
+  obj->head.id = FTS_NO_ID;
+
+  obj->n_inlets = cl->ninlets;
+  if (cl->ninlets)
+    obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+    
+  obj->n_outlets = cl->noutlets;
+  if (cl->noutlets)
+    obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+
+  return obj;
+}
+
+void 
+fts_object_free(fts_object_t *obj)
+{
+  fts_properties_free(obj);
+
+  if (obj->argv)
+    fts_free( obj->argv);
+
+  if (obj->out_conn)
+    fts_free( obj->out_conn);
+  if (obj->in_conn)
+    fts_free( obj->in_conn);
+
+  fts_heap_free(obj, obj->head.cl->heap);
+}
 
 void
 fts_object_set_inlets_number(fts_object_t *o, int n)
@@ -93,20 +120,9 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
   fts_class_t *cl = mcl->inst_list;
   fts_object_t *obj = 0;
 
-  if(cl)
+  if (cl)
     {
-      obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
-      
-      obj->head.cl = cl;
-      obj->head.id = FTS_NO_ID;
-      obj->n_inlets = cl->ninlets;
-      obj->n_outlets = cl->noutlets;
-      
-      if (cl->ninlets)
-	obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
-      
-      if (cl->noutlets)
-	obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+      obj = fts_object_new( cl);
       
       if(fts_class_get_constructor(cl))
 	fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
@@ -146,7 +162,7 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
     }
   else
     {
-      fts_metaclass_t *mcl = fts_metaclass_get_by_name(fts_get_symbol(at));
+      fts_metaclass_t *mcl = fts_metaclass_get_by_name(NULL, fts_get_symbol(at));
       
       if (mcl)
 	cl = fts_class_instantiate(mcl, ac - 1, at + 1);
@@ -158,19 +174,9 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
       return &fts_CannotInstantiate;
     }
 
-  obj = (fts_object_t *)fts_heap_zalloc(cl->heap);
+  obj = fts_object_new( cl);
 
   obj->patcher = patcher;
-  obj->head.cl = cl;
-  obj->head.id = FTS_NO_ID;
-  obj->n_inlets = cl->ninlets;
-  obj->n_outlets = cl->noutlets;
-
-  if (cl->ninlets)
-    obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
-    
-  if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
 
   if(fts_class_get_constructor(cl))
     fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac - 1, at + 1);
@@ -195,285 +201,93 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   return fts_ok;
 }
 
-/* create an object in a patcher, appling all the expression/object semantic */
-fts_object_t *
-fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
+struct eval_data {
+  fts_object_t *obj;
+  fts_patcher_t *patcher;
+};
+
+static void
+eval_object_description_expression_callback( int ac, const fts_atom_t *at, void *data)
 {
-  fts_object_t  *obj = 0;
-  fts_symbol_t  var;
-  fts_oldexpression_state_t *e = 0;
-  fts_atom_t state;
-  int ac = 0;
-  const fts_atom_t *at = 0;
-  fts_atom_t new_args[1024];
+  struct eval_data *eval_data = (struct eval_data *)data;
 
-#ifdef TRACE_DEBUG
-  fts_log( "Object new ");
-  fts_log_atoms( aoc, aot);
-  fts_log( "\n");
-#endif
-
-  /* first of all, we check if we are in the case of a object variable definition syntax */
-  if (fts_object_description_defines_variable(aoc, aot))
+  if (ac == 1 && fts_is_object( at))
     {
-      /* extract the variable name */
-      var = fts_object_description_get_variable_name(aoc, aot);
+      eval_data->obj = fts_get_object( at);
+      return;
+    }
 
-      /* skip the variable for the evaluation */
-      ac = aoc - 2;
-      at = aot + 2;
+  if (ac >= 1 && fts_is_symbol( at))
+    {
+      fts_metaclass_t *mcl;
 
-      /* check if the variable already exists */
-      if(!fts_variable_can_define(patcher, var))
+      mcl = fts_metaclass_get_by_name( NULL, fts_get_symbol( at));
+      if (mcl == NULL)
 	{
-	  /* don't use definition of doubly defined variable */
-	  var = 0;
-
-	  /* remove variable definition from object description */
-	  aoc -= 2;
-	  aot += 2;
+	  eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Object or template %s not found", fts_get_symbol(at));
+	  return;
 	}
+
+      eval_data->obj = fts_metaclass_new_instance( mcl, eval_data->patcher, ac-1, at+1);
+      if (eval_data->obj == NULL)
+	eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "Error in class instantiation");
+
+      return;
     }
-  else
+
+  eval_data->obj = fts_error_object_new( eval_data->patcher, ac, at, "No valid class name");
+}
+
+#define CHECK_ERROR_PROPERTY(OBJ)		\
+{						\
+  fts_atom_t a;					\
+  						\
+  if (fts_object_is_error(OBJ))			\
+    fts_set_int(&a, 1);				\
+  else						\
+    fts_set_int(&a, 0);				\
+						\
+  fts_object_put_prop( OBJ, fts_s_error, &a);	\
+}
+
+fts_object_t *
+fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  fts_expression_t *expression;
+  struct eval_data data;
+  fts_status_t status;
+
+  if (ac == 0)
     {
-      var = 0;
-      ac = aoc;
-      at = aot;
+      obj = fts_error_object_new( patcher, 0, 0, "Empty object");
+      fts_object_set_description(obj, ac, at);
+      CHECK_ERROR_PROPERTY(obj);
+      return obj;
     }
 
-  /* prepare the variable, if defined */
-  if ((var != 0) && (!fts_variable_is_suspended(patcher, var)))
+  data.obj = NULL;
+  data.patcher = patcher;
+
+  if ((status = fts_expression_new( ac, at, patcher, &expression)) != fts_ok)
     {
-      /* Define the variable, suspended;
-	 this will also steal all the objects referring to the same variable name
-	 in the local scope from any variable defined outside the scope */
-
-      fts_variable_define(patcher, var);
+      obj = fts_error_object_new( patcher, ac, at, fts_status_get_description( status));
+      fts_object_set_description(obj, ac, at);
+      CHECK_ERROR_PROPERTY(obj);
+      return obj;
     }
 
-  /* Then, check for zero arguments, and produce an error object in this case */
-  if ((! obj) && (aoc == 0))
+  if ((status = fts_expression_reduce( expression, 0, 0, eval_object_description_expression_callback, &data)) == fts_ok)
     {
-      /* error: zero arguments */
-      obj = fts_error_object_new(patcher, aoc, aot, "Zero arguments in object");
-    }
+      obj = data.obj;
+      fts_object_set_description(obj, ac, at);
+      CHECK_ERROR_PROPERTY(obj);
+      return obj;
+    }      
 
-  /* 
-   * The creation algorithm will try all the following techniques in
-   * the given order until an object is created:
-   *
-   * 1 - Get the first argument; if it is a symbol, and there is an
-   *     object doctor for this name, delegate the object creation to
-   *     the doctor, without further evaluation; if the doctor return
-   *     null, return an error object.
-   *
-   * 2 - Expression-evaluate the whole description; if the evaluation
-   *     give an error, return an error object.
-   *     If the first value is not a symbol, return an error object.
-   *     Otherwise consider the result of the evaluation as the description
-   *     of the object for the following.
-   *
-   * 3 - if an object doctor exists for the object name, delegate to it the 
-   *     object creation without further evaluation; if the doctor
-   *     return null, return an error object.
-   * 
-   * 4 - if an explicitly declared template exists, instantiate
-   *     that template.
-   *
-   * 5 - if an explicitly declared abstraction exists, instantiate
-   *     that abstraction.
-   * 
-   * 6 - if an FTS class exists, instantiate that class.
-   * 
-   * 7 - if an template exists in the template path, instantiate
-   *     that template.
-   *
-   * 8 - if an abstraction exists in the abstraction path, instantiate
-   *     that abstraction.
-   *
-   *   
-   * 9 - Make an error object
-   *
-   */
-
-#if 0
-  /* 1-  try the doctor */
-  if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
-    {
-      /* If the doctor return null, it means the doctor don't want
-	 to do this particular object, so we just continue */
-      obj = fts_call_object_doctor(patcher, ac, at);
-    }
-#endif
-
-  /* 2- Expression evaluate */
-  if (!obj)
-    {
-      /* Compute the expressions with the correct offset */
-      e = fts_oldexpression_eval(patcher, ac, at,  1024, new_args);
-	  
-      if (fts_oldexpression_get_status(e) != FTS_OLDEXPRESSION_OK)
-	{
-	  /* Error in expression */
-	  obj = fts_error_object_new(patcher, aoc, aot, fts_oldexpression_get_msg(e), fts_oldexpression_get_err_arg(e));
-	}
-      else if (! fts_is_symbol(&new_args[0]))
-	{
-	  /* Missing class name, or class name is not a symbol */
-	  obj = fts_error_object_new(patcher, aoc, aot, "The first argument should be a class name, but is not a symbol");
-	}
-      else
-	{
-	  at = new_args;
-	  ac = fts_oldexpression_get_result_count(e);
-	}
-    }
-
-#ifdef TRACE_DEBUG
-  fts_log( "After expression eval ");
-  fts_log_atoms( ac, at);
-  fts_log( "\n");
-#endif
-
-#if 0
-  /* 3- Retry the object doctor */
-  if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
-    {
-      /* If the doctor return null, it means the doctor don't want
-	 to do this particular object, so we just continue */
-      obj = fts_call_object_doctor(patcher, ac, at);
-    }
-#endif
-
-  /* 4- explicitly declared template  */
-  if (! obj)
-    {
-      /* First of all, try an explicitly declared abstraction */
-      obj =  fts_template_new_declared(patcher, ac, at);
-    }
-
-
-  /* 5- explicitly declared abstraction  */
-  if (! obj)
-    {
-      /* First of all, try an explicitly declared abstraction */
-      obj =  fts_abstraction_new_declared(patcher, ac, at);
-    }
-
-
-  /* 6- Make the object if the FTS class exists */
-  if ((! obj) && fts_metaclass_get_by_name(fts_get_symbol(&at[0])))
-    {
-      /* We have a metaclass: this prevent looking for 
-	 further abstractions */
-      fts_status_t ret;
-
-      ret = fts_object_new_to_patcher(patcher, ac, at, &obj);
-
-      if (ret != fts_ok)
-	{
-	  /* Standard FTS instantiation error  */
-	  if (ret == &fts_CannotInstantiate)
-	    obj = fts_error_object_new(patcher, aoc, aot, "Error in class instantiation");
-	  else if (ret == &fts_ArgumentMissing)
-	    obj = fts_error_object_new(patcher, aoc, aot, "Missing argument in object");
-	  else if (ret == &fts_ArgumentTypeMismatch)
-	    obj = fts_error_object_new(patcher, aoc, aot, "Argument types mismatch");
-	  else
-	    obj = fts_error_object_new(patcher, aoc, aot, fts_status_get_description(ret));
-	}
-    }
-
-  /* 7- Try a path template  */
-  if (! obj)
-    obj = fts_template_new_search(patcher, ac, at);
-
-  /* 8 - Try a path abstraction */
-  if (! obj)
-    obj = fts_abstraction_new_search(patcher, ac, at);
-
-
-  /* 9- Make an error object */
-  if (!obj)
-    {
-      /* Object not found */
-      obj = fts_error_object_new(patcher, aoc, aot, "Object or template %s not found", fts_get_symbol(at));
-    }
-
-  /* Check if we are defining a variable *and* we have a state;
-   * If yes, just store the state in the variable state for later use.
-   * if not, destroy the current object, and substitute it with an error object
-   * and store an error value in the variable state.
-   */
-
-  if ((! fts_object_is_error(obj)) && (var != 0))
-    {
-      fts_object_get_prop(obj, fts_s_state, &state);
-      
-      if (fts_is_void(&state))
-	{
-	  /* ERROR: the object cannot define a variable, it does not have a "state" property */
-	  fts_object_delete_from_patcher(obj);
-	  obj = fts_error_object_new(patcher, aoc, aot, "Object can't define a variable");
-	}
-    }
-
-  if (fts_object_is_error(obj))
-    fts_set_void(&state);
-
-  /* Object created (at worst, a error object) do the last operations, like setting 
-     the object description, variables and properties;
-     We check if the argv exists already; a doctor may have
-     changed the object definition, for persistent fixes !!
-  */
-  if ((fts_object_is_patcher(obj) && (! fts_patcher_is_standard((fts_patcher_t *)obj))) || (! obj->argv))
-    fts_object_set_description(obj, aoc, aot);
-
-  /* Assign the variable references to the object; do it also if
-     it is an error object, because we may try to recompute, and recover,
-     the object, if one of this variables have been redefined. */
-  if (e)
-    fts_oldexpression_add_variables_user(e, obj);
-
-  /* 
-     If it is not an error, and not a template, assign the local variables/properties.
-     Note that in case of the template, this operation has been done during the load vm code
-     execution; little weird, but needed to avoid object recomputing during loading.
-  */
-  if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
-    {
-      if (fts_object_is_patcher(obj))
-	fts_oldexpression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
-      else
-	fts_oldexpression_map_to_assignements(e, fts_object_assign, (void *) obj);
-    }
-
-  /* Free the expression state structure if any */
-  if (e)
-    fts_oldexpression_state_free(e);
-
-  /* then, assign it to the variable if any */
-  if (var != 0)
-    {
-      fts_variable_restore(patcher, var, &state, obj);
-      obj->varname = var;
-    }
-
-  /* Finally, assign the error property;
-     Always present, and always explicit for the moment,
-     until we don't have global daemons again.
-  */
-  {
-    fts_atom_t a;
-
-    if (fts_object_is_error(obj))
-      fts_set_int(&a, 1);
-    else
-      fts_set_int(&a, 0);
-
-    fts_object_put_prop(obj, fts_s_error, &a);
-  }
-
+  obj = fts_error_object_new( patcher, ac, at, fts_status_get_description( status));
+  fts_object_set_description(obj, ac, at);
+  CHECK_ERROR_PROPERTY(obj);
   return obj;
 }
 
@@ -496,6 +310,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 static void 
 fts_object_unbind(fts_object_t *obj)
 {
+#if 0
   /* Unbind it from its variable if any */
   if (fts_object_get_variable(obj))
     fts_variable_undefine(obj->patcher, fts_object_get_variable(obj), obj);
@@ -503,6 +318,7 @@ fts_object_unbind(fts_object_t *obj)
   /* Remove it as user of its var refs */
   while (obj->var_refs)
     fts_binding_remove_user(obj->var_refs->var, obj);
+#endif
 }
 
 /* remove all connections from the object (done when unplugged from the patcher) */
@@ -537,27 +353,6 @@ fts_object_unclient(fts_object_t *obj)
 {
   if (obj->head.id > FTS_NO_ID)
     fts_client_release_object(obj);
-}
-
-/* delete the unbound, unconnected object already removed from the patcher */
-static void 
-fts_object_free(fts_object_t *obj)
-{
-  /* free the object properties */
-  fts_properties_free(obj);
-
-  /* free the object description */
-  if (obj->argv)
-    fts_free( obj->argv);
-
-  /* free the inlets and outlets */
-  if (obj->out_conn)
-    fts_free( obj->out_conn);
-  if (obj->in_conn)
-    fts_free( obj->in_conn);
-
-  /* free the object */
-  fts_heap_free(obj, obj->head.cl->heap);
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
@@ -735,39 +530,11 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
   return NULL;
 }
 
-void
-fts_object_redefine_variable(fts_object_t *o)
-{
-  fts_symbol_t name = fts_object_get_variable(o);
-
-  if(name)
-    {
-      fts_atom_t state;
-      
-      fts_variable_suspend(fts_object_get_patcher(o), name);
-      fts_object_get_prop(o, fts_s_state, &state);
-      fts_variable_restore(fts_object_get_patcher(o), name, &state, o);
-    }
-}
-
 /*********************************************************************************
  * 
  * object description
  *
  */
-
-/* variable as part of object description */
-int
-fts_object_description_defines_variable(int ac, const fts_atom_t *at)
-{
-  return (ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_colon);
-}
-
-static fts_symbol_t
-fts_object_description_get_variable_name(int ac, const fts_atom_t *at)
-{
-  return fts_get_symbol(&at[0]);
-}
 
 /* This is to support "changing" objects; usefull during 
  * .pat loading, where not all the information is available 
@@ -809,73 +576,11 @@ fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
 }
 
 
-/* This is to support "changing" objects; usefull during 
- * .pat loading, where not all the information is available 
- * at the right place; used currently for explode in the fts1.5 package,
- * and for patcher redefinition.
- * 
- */
-
-void 
-fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name, int argc, const fts_atom_t *argv)
-{
-  int i;
-
-  if (obj->argc == argc + 1)
-    {
-      /* Just copy the values, the size is correct */
-      fts_set_symbol(&(obj->argv[0]), class_name);
-
-      for (i = 0; i < argc; i++)
-	obj->argv[i + 1] = argv[i];
-    }
-  else
-    {
-      /* Free the old object description, if any */
-
-      if (obj->argv)
-	fts_free( obj->argv);
-
-      /* reallocate the description if argc > -0 and copy the arguments */
-      obj->argc = argc + 1;
-      obj->argv = (fts_atom_t *) fts_zalloc((argc + 1) * sizeof(fts_atom_t));
-
-      fts_set_symbol(&(obj->argv[0]), class_name);
-
-      for (i = 0; i < argc; i++)
-	obj->argv[i + 1] = argv[i];
-    }
-}
-
-
-/* This function delete the object description; it is intended to be used
-   in object doctor that convert the object to something else *including*
-   expressions, so must use fts_eval_object_description for the whole thing,
-   but want to keep the original description, so after creating the object,
-   they reset the description, so that the original one is used.
-   */
-void 
-fts_object_reset_description(fts_object_t *obj)
-{
-  if (obj->argv)
-    {
-      fts_free( obj->argv);
-      
-      obj->argv = 0;
-      obj->argc = 0;
-    }
-}
-
 /*****************************************************************************
  *
  *  object access
  *
  */
-
-fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet)
-{
-  return o->head.cl->outlets[woutlet].selector;
-}
 
 fts_symbol_t 
 fts_object_get_class_name(fts_object_t *obj)
@@ -900,16 +605,6 @@ fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
  *  basic property handling
  *
  */
-
-/* utility functions to assign a property as found by the expression parser */
-static void 
-fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
-{
-  fts_object_t *obj = (fts_object_t *)data;
-  
-  fts_object_put_prop(obj, name, value); 
-}
-
 
 static void 
 fts_move_property(fts_object_t *old, fts_object_t *new, fts_symbol_t name)
@@ -941,27 +636,6 @@ fts_object_move_properties(fts_object_t *old, fts_object_t *new)
   fts_move_property(old, new, fts_s_font);
   fts_move_property(old, new, fts_s_fontSize);
   fts_move_property(old, new, fts_s_fontStyle);
-}
-
-/*************************************************************************************
- *
- *  blip
- *
- *  send a blip for an object (i.e. a message that will be shown in the status line)
- *
- */
-/* to be removed */
-void 
-fts_object_blip(fts_object_t *obj, const char *format , ...)
-{
-  va_list ap;
-  char buf[512];
-
-  va_start( ap, format);
-  vsprintf(buf, format, ap);
-  va_end(ap);
-
-  fts_patcher_blip(fts_object_get_patcher(obj), buf);
 }
 
 /*************************************************************************************

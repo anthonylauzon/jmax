@@ -270,7 +270,7 @@ fts_template_file_modified(fts_symbol_t filename)
   /* resolve the links in the path, so that we have a unique name 
      for the file */
   realpath( filename, buf);
-  filename = fts_new_symbol_copy(buf);
+  filename = fts_new_symbol(buf);
 
 #ifdef TEMPLATE_DEBUG 
   fts_log("File %s modified.\n", filename);

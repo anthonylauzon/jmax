@@ -137,7 +137,7 @@ samppeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_atom_t a;
 
   gensampname(buf, "sample", fts_get_int_arg(ac, at, 0, 0));
-  fts_set_symbol(&a, fts_new_symbol_copy(buf));
+  fts_set_symbol(&a, fts_new_symbol(buf));
   samppeek_set(o, winlet, s, 1, &a);
 }
 

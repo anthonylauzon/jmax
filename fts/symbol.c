@@ -27,16 +27,13 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 
 #include <fts/fts.h>
 
-/***********************************************************************
- * Symbol table
- */
-
 static fts_hashtable_t symbol_table;
 
-static fts_symbol_t symbol_new_aux( const char *s, int copy)
+fts_symbol_t fts_new_symbol( const char *s)
 {
   fts_atom_t k, v;
   const char *p;
@@ -44,46 +41,28 @@ static fts_symbol_t symbol_new_aux( const char *s, int copy)
   /* Lookup symbol in the hash table */
   fts_set_string( &k, (char *)s);
   if ( fts_hashtable_get( &symbol_table, &k, &v))
-    return (fts_symbol_t)fts_get_pointer( &v);
+    {
+/*       fprintf( stderr, "[symbol] searching \"%s\", found, returning %p \"%s\"\n", s, fts_get_pointer( &v), (char *)fts_get_pointer( &v)); */
+      return (fts_symbol_t)fts_get_pointer( &v);
+    }
 
-  /* Symbol do not exist: copy the string if needed */
-  if (copy)
-    p = strcpy( fts_malloc( strlen(s)+1 ), s);
-  else
-    p = s;
+  /* Symbol do not exist: copy the string */
+  p = strcpy( fts_malloc( strlen(s)+1 ), s);
 
   /* Add the new symbol in the hash table */
-  fts_set_pointer( &k, (char *)p);
+  fts_set_string( &k, (char *)p);
   fts_set_pointer( &v, (char *)p);
   fts_hashtable_put( &symbol_table, &k, &v);
+
+/*   fprintf( stderr, "[symbol] searching \"%s\", not found, returning %p \"%s\"\n", s, p, p); */
 
   return (fts_symbol_t)p;
 }
 
-fts_symbol_t fts_new_symbol(const char *s)
-{
-  return symbol_new_aux( s, 0);
-}
-
-fts_symbol_t fts_new_symbol_copy(const char *s)
-{
-  return symbol_new_aux( s, 1);
-}
-
-
 /***********************************************************************
- * Compatibility
- */
-
-const char *__OLD_fts_symbol_name( const char *file, int line, fts_symbol_t symbol)
-{
-  fprintf( stderr, "[symbol] fts_symbol_name is deprecated (file %s line %d)\n", file, line);
-
-  return symbol;
-}
-
-/***********************************************************************
+ *
  * Predefined symbols
+ *
  */
 
 #undef PREDEF_SYMBOL

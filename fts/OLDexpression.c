@@ -1062,7 +1062,7 @@ static int fts_op_eval(fts_oldexpression_state_t *e)
 			fts_get_symbol(ptos),
 			fts_get_float(tos));
 
-	      fts_set_symbol(ptos, fts_new_symbol_copy(buf));
+	      fts_set_symbol(ptos, fts_new_symbol(buf));
 	    }
 	  else
 	    {

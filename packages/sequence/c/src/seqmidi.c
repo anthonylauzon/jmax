@@ -233,7 +233,7 @@ sequence_read_track_start(fts_midifile_t *file)
   fts_object_refer(data->track);
 
   get_stripped_file_name_with_index(str, name, data->track_index);
-  track_set_name(data->track, fts_new_symbol_copy(str));
+  track_set_name(data->track, fts_new_symbol(str));
 
   data->track_index++;
 }

@@ -242,6 +242,16 @@ public class FtsArgs {
     return current;
   }
 
+  public String toString()
+  {
+    StringBuffer b = new StringBuffer();
+
+    for ( int i = 0; i < current; i++)
+      b.append( " [" + i + "] " + array[i] + "\n");
+
+    return b.toString();
+  }
+
   private FtsAtom[] array;
   private int size;
   private int current;

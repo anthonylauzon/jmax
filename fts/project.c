@@ -122,6 +122,6 @@ fts_project_get_dir(void)
       {
 	char buf[1024];
 	
-	return fts_new_symbol_copy(getcwd(buf, 1024));
+	return fts_new_symbol(getcwd(buf, 1024));
       }
 }
