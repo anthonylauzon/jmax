@@ -53,8 +53,6 @@ extern void int_vector_copy(int_vector_t *in, int_vector_t *out);
 extern void int_vector_zero(int_vector_t *vector);
 
 #define int_vector_get_size(vector) ((vector)->size)
-#define int_vector_get_name(vector) ((vector)->name)
-
 extern void int_vector_set_size(int_vector_t *vector, int size);
 
 #define int_vector_is_empty(vector) ((vector)->size == 0)
@@ -62,7 +60,8 @@ extern void int_vector_set_size(int_vector_t *vector, int size);
 #define int_vector_get_element(vector, index) ((vector)->values[index])
 #define int_vector_set_element(vector, index, value) ((vector)->values[index] = (value))
 
-#define int_vector_set_const(vector, constant) fts_vec_ifill((constant), (int *)((vector)->values), (vector)->size)
+void int_vector_set_const(int_vector_t *vector, int c);
+void int_vector_zero(int_vector_t *vector);
 
 #define int_vector_get_ptr(vector) ((vector)->values)
 extern void int_vector_set_from_ptr(int_vector_t *vector, int *ptr, int size);
@@ -73,7 +72,8 @@ extern int int_vector_get_min_value(int_vector_t *vector);
 extern int int_vector_get_max_value(int_vector_t *vector);
 
 /* files */
-extern int int_vector_import_ascii(int_vector_t *vec, fts_symbol_t file_name);
+extern int int_vector_read_atom_file(int_vector_t *vec, fts_symbol_t file_name);
+extern int int_vector_write_atom_file(int_vector_t *vec, fts_symbol_t file_name);
 
 /* save in bmax format */
 extern void int_vector_save_bmax(int_vector_t *this, fts_bmax_file_t *f);

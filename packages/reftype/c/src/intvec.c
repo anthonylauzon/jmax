@@ -154,6 +154,16 @@ int_vector_set_from_atom_list(int_vector_t *vector, int offset, int ac, const ft
     }
 }
 
+void
+int_vector_set_const(int_vector_t *vector, int c)
+{
+  int *values = vector->values;
+  int i;
+  
+  for(i=0; i<vector->size; i++)
+    values[i] = c;
+}
+
 /* sum, min, max */
 int
 int_vector_get_sum(int_vector_t *vector)
@@ -312,7 +322,7 @@ int_vector_grow(int_vector_t *vec, int size)
 }
 
 int 
-int_vector_import_ascii(int_vector_t *vec, fts_symbol_t file_name)
+int_vector_read_atom_file(int_vector_t *vec, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
   int n = 0;
@@ -320,10 +330,7 @@ int_vector_import_ascii(int_vector_t *vec, fts_symbol_t file_name)
   char c;
 
   if(!file)
-    {
-      post("can't open file to read: %s\n", fts_symbol_name(file_name));
-      return (0);
-    }
+    return -1;
 
   while(fts_atom_file_read(file, &a, &c))
     {
@@ -343,6 +350,32 @@ int_vector_import_ascii(int_vector_t *vec, fts_symbol_t file_name)
   fts_atom_file_close(file);
 
   return (n);
+}
+
+int
+int_vector_write_atom_file(int_vector_t *vec, fts_symbol_t file_name)
+{
+  fts_atom_file_t *file;
+  int size = int_vector_get_size(vec);
+  int i;
+
+  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+
+  if(!file)
+    return -1;
+
+  /* write the content of the vector */
+  for(i=0; i<size; i++)     
+    {
+      fts_atom_t a;
+      
+      fts_set_int(&a, int_vector_get_element(vec, i));
+      fts_atom_file_write(file, &a, '\n');
+    }
+
+  fts_atom_file_close(file);
+
+  return (i);
 }
 
 /********************************************************************

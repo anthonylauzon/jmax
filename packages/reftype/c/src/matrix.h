@@ -63,12 +63,12 @@ extern void matrix_fill(matrix_t *mx, fts_atom_t atom);
 
 void matrix_set_from_atom_list(matrix_t *mx, int offset, int ac, const fts_atom_t *at);
 
-extern int matrix_import_ascii_newline(matrix_t *mx, fts_symbol_t file_name);
-extern int matrix_export_ascii_newline(matrix_t *mx, fts_symbol_t file_name);
+extern int matrix_read_atom_file_newline(matrix_t *mx, fts_symbol_t file_name);
+extern int matrix_write_atom_file_newline(matrix_t *mx, fts_symbol_t file_name);
 
-extern int matrix_import_ascii_separator(matrix_t *mx, fts_symbol_t file_name, 
+extern int matrix_read_atom_file_separator(matrix_t *mx, fts_symbol_t file_name, 
 					      fts_symbol_t separator, int ac, const fts_atom_t *at);
-extern int matrix_export_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator);
+extern int matrix_write_atom_file_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator);
 
 /* refdata */
 #define matrix_get_constructor(ac, at) (reftype_get_constructor(matrix_reftype, (ac), (at)))

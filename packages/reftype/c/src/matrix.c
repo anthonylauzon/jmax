@@ -177,24 +177,23 @@ matrix_fill(matrix_t *mx, fts_atom_t value)
 }
 
 void
-matrix_set_from_atom_list(matrix_t *mx, int offset, int ac, const fts_atom_t *at)
+matrix_set_from_atom_list(matrix_t *mx, int onset, int ac, const fts_atom_t *at)
 {
+  fts_atom_t *ap = mx->data + onset;
   int m = matrix_get_m(mx);
   int n = matrix_get_n(mx);
   int size = m * n;
   int i;
   
-  if(offset + ac > size)
-    ac = size - offset;
+  if(onset + ac > size)
+    ac = size - onset;
   
   for(i=0; i<ac; i++)
     {
-      fts_atom_t *ap = mx->data + i;
-      
       if(refdata_atom_is(ap))
 	refdata_atom_release(ap);
       
-      *ap = at[i];
+      *ap++ = at[i];
       
       if(refdata_atom_is(at + i))
 	refdata_atom_refer(at + i);	
@@ -257,7 +256,7 @@ matrix_grow(matrix_t *mx, int size)
 }
 
 int 
-matrix_import_ascii_newline(matrix_t *mx, fts_symbol_t file_name)
+matrix_read_atom_file_newline(matrix_t *mx, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
   int m = 0;
@@ -268,10 +267,7 @@ matrix_import_ascii_newline(matrix_t *mx, fts_symbol_t file_name)
   char c;
 
   if(!file)
-    {
-      post("can't open file to read: %s\n", fts_symbol_name(file_name));
-      return(-1);
-    }
+    return -1;
 
   matrix_void(mx);
 
@@ -322,7 +318,7 @@ matrix_import_ascii_newline(matrix_t *mx, fts_symbol_t file_name)
 }
 
 int
-matrix_export_ascii_newline(matrix_t *mx, fts_symbol_t file_name)
+matrix_write_atom_file_newline(matrix_t *mx, fts_symbol_t file_name)
 {
   fts_atom_file_t *file;
   int m = mx->m;
@@ -332,10 +328,7 @@ matrix_export_ascii_newline(matrix_t *mx, fts_symbol_t file_name)
   file = fts_atom_file_open(fts_symbol_name(file_name), "w");
 
   if(!file)
-    {
-      post("mat: can't open file to write: %s\n", fts_symbol_name(file_name));
-      return(-1);
-    }
+    return -1;
 
   /* write the content of the matrix */
   for(i=0; i<m; i++)     
@@ -353,7 +346,7 @@ matrix_export_ascii_newline(matrix_t *mx, fts_symbol_t file_name)
 }
 
 int 
-matrix_import_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator, int ac, const fts_atom_t *at)
+matrix_read_atom_file_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator, int ac, const fts_atom_t *at)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
   int m = 0;
@@ -364,10 +357,7 @@ matrix_import_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t
   char c;
 
   if(!file)
-    {
-      post("mat: can't open file to read: %s\n", fts_symbol_name(file_name));
-      return(-1);
-    }
+    return -1;
 
   if(!separator)
     separator = sym_comma;
@@ -429,8 +419,16 @@ matrix_import_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t
       j = 0;
     }
 
-  mx->m = m;
-  mx->n = n;
+  if(n > 0)
+    {
+      mx->m = m;
+      mx->n = n;
+    }
+  else
+    {
+      mx->m = 0;
+      mx->n = 0;      
+    }
   
   fts_atom_file_close(file);
 
@@ -438,7 +436,7 @@ matrix_import_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t
 }
 
 int
-matrix_export_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator)
+matrix_write_atom_file_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t separator)
 {
   fts_atom_file_t *file;
   int m = mx->m;
@@ -449,10 +447,7 @@ matrix_export_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t
   file = fts_atom_file_open(fts_symbol_name(file_name), "w");
 
   if(!file)
-    {
-      post("can't open file to write: %s\n", fts_symbol_name(file_name));
-      return(-1);
-    }
+    return -1;
 
   fts_set_symbol(&sep, separator);
 
@@ -468,6 +463,7 @@ matrix_export_ascii_separator(matrix_t *mx, fts_symbol_t file_name, fts_symbol_t
     }
 
   fts_atom_file_close(file);
+
   return(m * n);
 }
 

@@ -60,7 +60,8 @@ extern void float_vector_set_size(float_vector_t *vector, int size);
 #define float_vector_get_element(vector, index) ((vector)->values[index])
 #define float_vector_set_element(vector, index, value) ((vector)->values[index] = (value))
 
-#define float_vector_set_const(vector, constant) fts_vec_ffill((constant), (vector)->values, (vector)->size)
+void float_vector_set_const(float_vector_t *vector, float c);
+void float_vector_zero(float_vector_t *vector);
 
 #define float_vector_get_ptr(vector) ((vector)->values)
 extern void float_vector_set_from_ptr(float_vector_t *vector, float *ptr, int size);
@@ -71,7 +72,8 @@ extern float float_vector_get_min_value(float_vector_t *vector);
 extern float float_vector_get_max_value(float_vector_t *vector);
 
 /* files */
-extern int float_vector_import_ascii(float_vector_t *vec, fts_symbol_t file_name);
+extern int float_vector_read_atom_file(float_vector_t *vec, fts_symbol_t file_name);
+extern int float_vector_write_atom_file(float_vector_t *vec, fts_symbol_t file_name);
 
 /* save in bmax format */
 extern void float_vector_save_bmax(float_vector_t *vector, fts_bmax_file_t *f);

@@ -117,6 +117,16 @@ float_vector_zero(float_vector_t *vector)
 }
 
 void
+float_vector_set_const(float_vector_t *vector, float c)
+{
+  float *values = vector->values;
+  int i;
+  
+  for(i=0; i<vector->size; i++)
+    values[i] = c;
+}
+
+void
 float_vector_set_size(float_vector_t *vector, int size)
 {
   int old_size = vector->size;
@@ -253,7 +263,7 @@ static void float_vector_export_fun(fts_data_t *data)
   fts_client_mess_add_int(vector->size);
 
   for (i=0; i<vector->size; i++)
-    fts_client_mess_add_int((int)(vector->values[i] * 1000.0f));
+    fts_client_mess_add_int((int)(vector->values[i] * 32768.0f));
 
   fts_data_end_remote_call();
 }
@@ -272,7 +282,7 @@ float_vector_remote_set( fts_data_t *data, int ac, const fts_atom_t *at)
   nvalues = fts_get_int(&at[1]);
 
   for (i=0; i<nvalues; i++)
-    vector->values[i + offset] = (float)fts_get_int(&at[i + 2]) * 0.001f;
+    vector->values[i + offset] = (float)fts_get_int(&at[i + 2]) / 32768.0f;
 }
 
 
@@ -311,7 +321,7 @@ float_vector_grow(float_vector_t *vec, int size)
 }
 
 int 
-float_vector_import_ascii(float_vector_t *vec, fts_symbol_t file_name)
+float_vector_read_atom_file(float_vector_t *vec, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
   int n = 0;
@@ -319,11 +329,8 @@ float_vector_import_ascii(float_vector_t *vec, fts_symbol_t file_name)
   char c;
 
   if(!file)
-    {
-      post("can't open file to read: %s\n", fts_symbol_name(file_name));
-      return (0);
-    }
-
+    return -1;
+  
   while(fts_atom_file_read(file, &a, &c))
     {
       if(n >= vec->alloc)
@@ -344,13 +351,39 @@ float_vector_import_ascii(float_vector_t *vec, fts_symbol_t file_name)
   return (n);
 }
 
+int
+float_vector_write_atom_file(float_vector_t *vec, fts_symbol_t file_name)
+{
+  fts_atom_file_t *file;
+  int size = float_vector_get_size(vec);
+  int i;
+
+  file = fts_atom_file_open(fts_symbol_name(file_name), "w");
+
+  if(!file)
+    return -1;
+
+  /* write the content of the vector */
+  for(i=0; i<size; i++)     
+    {
+      fts_atom_t a;
+      
+      fts_set_float(&a, float_vector_get_element(vec, i));
+      fts_atom_file_write(file, &a, '\n');
+    }
+
+  fts_atom_file_close(file);
+
+  return (i);
+}
+
 /********************************************************************
  *
  *  bmax format
  *
  */
 
-/* vector is actually quite a temporary hack; there should be a real
+/* this is actually quite a temporary hack; there should be a real
    save standard technique for fts_data_t; it assume that is reloaded
    for a vector !!*/
 
@@ -491,7 +524,7 @@ void float_vector_config(void)
   float_vector_reftype = reftype_declare(float_vector_symbol, float_vector_dispatcher, float_vector_destructor);
 
   /* float_vector_data_class = fts_data_class_new(float_vector_symbol); */
-  float_vector_data_class = fts_data_class_new(fts_new_symbol("ivec"));
+  float_vector_data_class = fts_data_class_new(fts_new_symbol("fvec"));
   fts_data_class_define_export_function(float_vector_data_class, float_vector_export_fun);
   fts_data_class_define_function(float_vector_data_class, FLOAT_VECTOR_SET, float_vector_remote_set);
   fts_data_class_define_function(float_vector_data_class, FLOAT_VECTOR_UPDATE, float_vector_remote_update);

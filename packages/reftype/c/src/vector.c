@@ -63,7 +63,7 @@ vector_grow(vector_t *vec, int size)
 }
 
 int 
-vector_import_ascii(vector_t *vec, fts_symbol_t file_name)
+vector_read_atom_file(vector_t *vec, fts_symbol_t file_name)
 {
   fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
   int n = 0;
@@ -71,10 +71,7 @@ vector_import_ascii(vector_t *vec, fts_symbol_t file_name)
   char c;
 
   if(!file)
-    {
-      post("can't open file to read: %s\n", fts_symbol_name(file_name));
-      return(-1);
-    }
+    return -1;
 
   vector_void(vec);
 
@@ -95,7 +92,7 @@ vector_import_ascii(vector_t *vec, fts_symbol_t file_name)
 }
 
 int
-vector_export_ascii(vector_t *vec, fts_symbol_t file_name)
+vector_write_atom_file(vector_t *vec, fts_symbol_t file_name)
 {
   fts_atom_file_t *file;
   int size = vector_get_size(vec);
@@ -104,10 +101,7 @@ vector_export_ascii(vector_t *vec, fts_symbol_t file_name)
   file = fts_atom_file_open(fts_symbol_name(file_name), "w");
 
   if(!file)
-    {
-      post("can't open file to write: %s\n", fts_symbol_name(file_name));
-      return(-1);
-    }
+    return -1;
 
   /* write the content of the vector */
   for(i=0; i<size; i++)     
