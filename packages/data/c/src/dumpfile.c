@@ -168,7 +168,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	  fts_object_t *object = fts_get_object(at);
 	  fts_class_t *class = fts_object_get_class(object);
 	  fts_symbol_t class_name = fts_class_get_name(class);
-	  fts_method_t meth_dump = fts_class_get_method(class, fts_system_inlet, fts_s_dump);
+	  fts_method_t meth_dump = fts_class_get_method(class, fts_s_dump);
 
 	  if(meth_dump)
 	    {
@@ -224,7 +224,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	    }
 
 	  /* clear object */
-	  fts_send_message(object, fts_system_inlet, fts_s_clear, 0, 0);
+	  fts_send_message(object, fts_s_clear, 0, 0);
 	  
 	  /* reset message */
 	  fts_message_set(mess, 0, 0, 0);
@@ -254,7 +254,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 			  mess_ac = fts_message_get_ac(mess);
 			  mess_at = fts_message_get_at(mess);
 			  
-			  fts_send_message(object, fts_system_inlet, fts_message_get_selector(mess), mess_ac, mess_at);
+			  fts_send_message(object, fts_message_get_selector(mess), mess_ac, mess_at);
 			  
 			  /* reset message */
 			  fts_message_set(mess, 0, 0, 0);
@@ -294,7 +294,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	      mess_ac = fts_message_get_ac(mess);
 	      mess_at = fts_message_get_at(mess);
 	      
-	      fts_send_message(object, fts_system_inlet, fts_message_get_selector(mess), mess_ac, mess_at);
+	      fts_send_message(object, fts_message_get_selector(mess), mess_ac, mess_at);
 	    }
 
 	  /* read next class name */

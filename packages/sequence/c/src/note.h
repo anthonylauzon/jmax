@@ -47,8 +47,4 @@ typedef struct _note_
 #define note_set_duration(n, x) ((n)->duration = (x))
 #define note_get_duration(n) ((n)->duration)
 
-/* note atoms */
-#define note_atom_get(ap) ((note_t *)fts_get_object(ap))
-#define note_atom_is(ap) (fts_is_a((ap), note_type))
-
 #endif

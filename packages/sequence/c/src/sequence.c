@@ -252,7 +252,7 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     {
       /* add track at client and upload events */
       sequence_add_track_at_client(this, track);
-      fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_upload, 0, 0);
+      fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
 
       /* next track */
       track = track_get_next(track);
@@ -356,7 +356,7 @@ sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(track)
 	{
 	  if(ac > 1)
-	    fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_import, ac - 1, at + 1);
+	    fts_send_message((fts_object_t *)track, fts_s_import, ac - 1, at + 1);
 	  else
 	    /* for now this is not allowed */
 	    fts_object_signal_runtime_error(o, "import: file name required");
@@ -381,7 +381,7 @@ sequence_export_track_by_index(fts_object_t *o, int winlet, fts_symbol_t s, int 
       if(track)
 	{
 	  if(ac > 1)
-	    fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_export, ac - 1, at + 1);
+	    fts_send_message((fts_object_t *)track, fts_s_export, ac - 1, at + 1);
 	  else
 	    /* for now this is not allowed */
 	    fts_object_signal_runtime_error(o, "export: file name required");
@@ -404,7 +404,7 @@ sequence_insert_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       track_t *track = sequence_get_track_by_index(this, index);
       
       if(track)
-	fts_send_message((fts_object_t *)track, fts_system_inlet, seqsym_insert, ac - 1, at + 1);
+	fts_send_message((fts_object_t *)track, seqsym_insert, ac - 1, at + 1);
       else	
 	fts_object_signal_runtime_error(o, "insert: no track #%d", index);
     }
@@ -423,7 +423,7 @@ sequence_remove_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       track_t *track = sequence_get_track_by_index(this, index);
       
       if(track)
-	fts_send_message((fts_object_t *)track, fts_system_inlet, seqsym_remove, ac - 1, at + 1);
+	fts_send_message((fts_object_t *)track, seqsym_remove, ac - 1, at + 1);
       else	
 	fts_object_signal_runtime_error(o, "remove: no track #%d", index);
     }
@@ -458,7 +458,38 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       track_t *track = sequence_get_track_by_index(this, index);
       
       if(track)
-	fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_clear, 0, 0);
+	fts_send_message((fts_object_t *)track, fts_s_clear, 0, 0);
+    }
+}
+
+static void
+sequence_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int size = sequence_get_size(this);
+
+  if(size == 0)
+    fts_spost(stream, "(:sequence)");
+  else
+    {
+      track_t *track = sequence_get_first_track(this);
+
+      fts_spost(stream, "(:sequence");
+
+      while(track != NULL)
+	{
+	  track_t *next = track_get_next(track);
+
+	  fts_spost_symbol(stream, track_get_type(track));
+
+	  if(next != NULL)
+	    fts_spost(stream, " ");
+	  
+	  track = next;
+	}
+
+      fts_spost(stream, ")");      
     }
 }
 
@@ -467,44 +498,40 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   sequence_t *this = (sequence_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
-  if(ac == 0)
+  track_t *track = sequence_get_first_track(this);
+  int size = sequence_get_size(this);
+  int i;
+  
+  if(size == 0)
+    fts_spost(stream, "<empty sequence>\n");
+  else 
     {
-      track_t *track = sequence_get_first_track(this);
-      int size = sequence_get_size(this);
-      int i;
-
-      if(size == 0)
-	fts_spost(stream, "(empty sequence)\n");
+      fts_symbol_t track_name = track_get_name(track);
+      fts_symbol_t track_type = track_get_type(track);
+      int track_size = track_get_size(track);
+      const char *name_str = track_name? track_name: "untitled";
+      
+      if(size == 1)
+	fts_spost(stream, "<sequence of 1 track>\n");
       else
+	fts_spost(stream, "<sequence of %d track%s>\n", size);
+      
+      fts_spost(stream, "{\n", size);
+      
+      for(i=0; i<size; i++)
 	{
-	  fts_spost(stream, "(%d track%s) {\n", size, (size > 1)? "s": "");
-
-	  for(i=0; i<size; i++)
-	    {
-	      fts_symbol_t track_name = track_get_name(track);
-	      fts_symbol_t track_type = track_get_type(track);
-	      int track_size = track_get_size(track);
-	      const char *name_str = track_name? track_name: "untitled";
-
-	      fts_spost(stream, "  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
-		   track_type, (track_size == 1)? "": "s");
-
-	      track = track_get_next(track);
-  	    }
-
-	  fts_spost(stream, "}\n");      
-  	}
-    }
-  else if(ac && fts_is_number(at))
-    {
-      int index = fts_get_number_int(at);
-      track_t *track = sequence_get_track_by_index(this, index);
-
-      if(track)
-	fts_send_message((fts_object_t *)track, fts_system_inlet, fts_s_print, 1, at);
-      else
-	fts_object_signal_runtime_error(o, "print: no track %d", index);
+	  fts_symbol_t track_name = track_get_name(track);
+	  fts_symbol_t track_type = track_get_type(track);
+	  int track_size = track_get_size(track);
+	  const char *name_str = track_name? track_name: "untitled";
+	  
+	  fts_spost(stream, "  track %d: \"%s\" %d %s event%s\n", i, name_str, track_size, 
+		    track_type, (track_size == 1)? "": "s");
+	  
+	  track = track_get_next(track);
+	}
+      
+      fts_spost(stream, "}\n");      
     }
 }
 
@@ -759,6 +786,7 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, seqsym_add_event, sequence_add_event_to_last_track);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, sequence_dump);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, sequence_post);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, sequence_print);
   
   /* graphical editor */

@@ -87,7 +87,7 @@ static void update_group_timebase( fts_object_t *o, int winlet, fts_symbol_t s, 
 	  update_entry_t *p = this->update_fifo;
 
 	  this->update_fifo = p->next;
-	  fts_send_message(p->obj, fts_system_inlet, fts_s_update_real_time, 0, 0);
+	  fts_send_message(p->obj, fts_s_update_real_time, 0, 0);
 	  fts_object_release( p->obj);
 	  fts_heap_free( p, update_heap);
 	}

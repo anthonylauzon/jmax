@@ -34,7 +34,7 @@
 static void
 getsize_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vec_t *vec = vec_atom_get(at);
+  vec_t *vec = (vec_t *)fts_get_object(at);
 
   fts_outlet_int(o, 0, vec_get_size(vec));
 }
@@ -42,7 +42,7 @@ getsize_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static void
 getsize_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *vec = ivec_atom_get(at);
+  ivec_t *vec = (ivec_t *)fts_get_object(at);
 
   fts_outlet_int(o, 0, ivec_get_size(vec));
 }
@@ -50,7 +50,7 @@ getsize_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 getsize_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *vec = fvec_atom_get(at);
+  fvec_t *vec = (fvec_t *)fts_get_object(at);
 
   fts_outlet_int(o, 0, fvec_get_size(vec));
 }
@@ -58,7 +58,7 @@ getsize_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 getsize_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_t *mat = mat_atom_get(at);
+  mat_t *mat = (mat_t *)fts_get_object(at);
   fts_atom_t list[2];
 
   fts_set_int(list, mat_get_m(mat));

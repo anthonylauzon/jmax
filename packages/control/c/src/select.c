@@ -102,6 +102,10 @@ static void
 select_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   select_t *this = (select_t *)o;
+  int n = ac + 1;
+
+  if(n < 2)
+    n = 2;
 
   if(ac > 0)
     fts_array_init(&this->compare, ac , at);
@@ -110,6 +114,9 @@ select_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       fts_array_init(&this->compare, 0 , 0);
       fts_array_append_int(&this->compare, 0);
     }
+
+  fts_object_set_inlets_number(o, n);
+  fts_object_set_outlets_number(o, n);
 }
 
 static void
@@ -123,13 +130,7 @@ select_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t 
 select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n = ac + 1;
-  int i;
-
-  if(n < 2)
-    n = 2;
-
-  fts_class_init(cl, sizeof(select_t), n, n, 0);
+  fts_class_init(cl, sizeof(select_t), 2, 2, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, select_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, select_delete);
@@ -137,8 +138,7 @@ select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_anything, select_anything);
   fts_method_define_varargs(cl, 0, fts_s_list, select_tuple);
 
-  for(i=1; i<n; i++)
-    fts_method_define_varargs(cl, i, fts_s_anything, select_set_anything);
+  fts_method_define_varargs(cl, 1, fts_s_anything, select_set_anything);
 
   return fts_ok;
 }
@@ -146,6 +146,6 @@ select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 select_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("select"), select_instantiate, fts_narg_equiv);
-  fts_alias_install(fts_new_symbol("sel"), fts_new_symbol("select"));
+  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("select"), select_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("sel"));
 }

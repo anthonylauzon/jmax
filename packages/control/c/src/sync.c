@@ -241,33 +241,23 @@ sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   this->n = n;
   this->trigger = this->require = this->reset = this->wait = (1 << n) - 1;
+
+  fts_object_set_inlets_number(o, n);
+  fts_object_set_outlets_number(o, n);
 }
 
 static fts_status_t
 sync_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n = 0;
-  int i;
-
-  if(ac == 1 && fts_is_number(at))
-    n = fts_get_number_int(at);
-  else if(ac > 1)
-    n = ac;
-
-  if(n < 2) 
-    n = 2;
-  else if(n > SYNC_MAX_SIZE)
-    n = SYNC_MAX_SIZE;
-
-  fts_class_init(cl, sizeof(sync_t), n, n, 0);
+  fts_class_init(cl, sizeof(sync_t), 1, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, sync_init);
+
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("trigger"), sync_set_trigger_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("require"), sync_set_require_prop);
   fts_class_add_daemon(cl, obj_property_put, fts_new_symbol("mode"), sync_set_mode_prop);
       
-  for(i=0; i<n; i++)
-    fts_method_define_varargs(cl, i, fts_s_anything, sync_input);
+  fts_method_define_varargs(cl, 0, fts_s_anything, sync_input);
   
   return fts_ok;
 }
@@ -281,5 +271,5 @@ sync_config(void)
   sym_left = fts_new_symbol("left");
   sym_right = fts_new_symbol("right");
 
-  fts_metaclass_install(fts_new_symbol("sync"), sync_instantiate, fts_narg_equiv);
+  fts_class_install(fts_new_symbol("sync"), sync_instantiate);
 }

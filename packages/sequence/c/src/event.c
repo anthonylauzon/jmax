@@ -43,9 +43,9 @@ event_get_duration(event_t *event)
   fts_atom_t *value = &event->value;
   double duration = 0.0;
 
-  if(note_atom_is(value))
+  if(fts_is_a(value, note_type))
     {
-      note_t *note = note_atom_get(value);
+      note_t *note = (note_t *)fts_get_object(value);
 
       duration = note_get_duration(note);
     }
@@ -66,7 +66,7 @@ event_get_array(event_t *event, fts_array_t *array)
       fts_atom_t a;
       
       fts_set_pointer(&a, array);
-      fts_send_message(obj, fts_system_inlet, fts_s_get_array, 1, &a);
+      fts_send_message(obj, fts_s_get_array, 1, &a);
     }
   else if(!fts_is_void(&event->value))
     fts_array_append(array, 1, &event->value);
@@ -82,7 +82,7 @@ event_get_description(event_t *event, fts_array_t *array)
       fts_atom_t a[2];
       
       fts_set_pointer(a, array);
-      fts_send_message(obj, fts_system_inlet, fts_s_get_array, 1, a);
+      fts_send_message(obj, fts_s_get_array, 1, a);
       
       fts_set_float(a + 0, (float) event->time);
       fts_set_symbol(a + 1, type);
@@ -122,7 +122,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     {
       fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
 
-      fts_send_message(obj, fts_system_inlet, fts_s_set_from_array, ac, at);
+      fts_send_message(obj, fts_s_set_from_array, ac, at);
     }
   else if(!fts_is_void(&this->value))
     this->value = at[0];

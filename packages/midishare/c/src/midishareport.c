@@ -449,15 +449,21 @@ midishareport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   midishare_reference_t *ref;
   int port = 0;
   
-  midishareport_check(ac, at, &name, &port);
+  fts_symbol_t name;
+  int port;
 
-  fts_midiport_init(&this->head);
-  fts_midiport_set_input(&this->head);
-  fts_midiport_set_output(&this->head, &midishareport_output_functions);
-  
-  this->ref = midishare_register(name, port, &this->head);
-  this->port = port;
-  this->sysex = 0;
+  if(midishareport_check(ac, at, &name, &port))
+    {
+      fts_midiport_init(&this->head);
+      fts_midiport_set_input(&this->head);
+      fts_midiport_set_output(&this->head, &midishareport_output_functions);
+      
+      this->ref = midishare_register(name, port, &this->head);
+      this->port = port;
+      this->sysex = 0;
+    }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void 
@@ -468,38 +474,21 @@ midishareport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   midishare_unregister(this->ref, this->port);
 }
 
-static int 
-midishareport_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{ 
-  fts_symbol_t name;
-  int port;
-
-  return midishareport_check(ac1, at1, &name, &port);
-}
-
 static fts_status_t
 midishareport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t name;
-  int port;
-
-  if(midishareport_check(ac, at, &name, &port))
-    {
-      fts_class_init(cl, sizeof(midishareport_t), 1, 0, 0);
-      
-      fts_midiport_class_init(cl);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midishareport_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midishareport_delete);
-
-      fts_method_define_varargs(cl, 0, fts_new_symbol("reset_unused"), midishareport_reset_unused);
-    
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
-      
-      return fts_ok;
-    }
-     
-  return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(midishareport_t), 1, 0, 0);
+  
+  fts_midiport_class_init(cl);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, midishareport_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, midishareport_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reset_unused"), midishareport_reset_unused);
+  
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, midishareport_get_state);
+  
+  return fts_ok;
 }
 
 void
@@ -507,7 +496,7 @@ midishareport_config(void)
 {
   fts_hashtable_init(&midishare_reference_table, 0, FTS_HASHTABLE_MEDIUM);
 
-  fts_metaclass_install( fts_new_symbol("midishareport"), midishareport_instantiate, midishareport_equiv);
+  fts_class_install( fts_new_symbol("midishareport"), midishareport_instantiate);
 }
 
 void

@@ -50,12 +50,7 @@ DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
 
 DATA_API void fmat_set_const(fmat_t *mat, float c);
-#define fmat_zero(m) fmat_set_const((m), 0.0)
 
 DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
-
-/* fmat atoms */
-#define fmat_atom_get(ap) ((fmat_t *)fts_get_object(ap))
-#define fmat_atom_is(ap) (fts_is_a((ap), fmat_type))
 
 #endif

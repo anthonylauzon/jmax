@@ -45,7 +45,7 @@ static void fts_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   for (i = 2; (i < ac) && (i < 256); i++)
     a[i-1] = at[i];
 
-  fts_send_message(scope, fts_system_inlet, fts_s_find, ac-1, a);
+  fts_send_message(scope, fts_s_find, ac-1, a);
 }
 
 static void fts_finder_find_friends( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -60,12 +60,12 @@ static void fts_finder_find_friends( fts_object_t *o, int winlet, fts_symbol_t s
 
   fts_set_object(&a[0], (fts_object_t *) set);
   
-  if(fts_class_get_method( fts_object_get_class(target), fts_system_inlet, fts_s_find_friends))
-    fts_send_message(target, fts_system_inlet, fts_s_find_friends, 1, a);
+  if(fts_class_get_method( fts_object_get_class(target), fts_s_find_friends))
+    fts_send_message(target, fts_s_find_friends, 1, a);
   else
     {
 	fts_set_symbol(&a[1], fts_object_get_class_name(target));
-	fts_send_message((fts_object_t *)fts_get_root_patcher(), fts_system_inlet, fts_s_find, 2, a);
+	fts_send_message((fts_object_t *)fts_get_root_patcher(), fts_s_find, 2, a);
     }
 }
 

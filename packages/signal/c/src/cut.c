@@ -89,7 +89,7 @@ static void
 cut_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cut_t *this = (cut_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   if(this->fvec != fvec)
     {
@@ -182,7 +182,7 @@ cut_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	}
       else if(fts_is_a(at, fvec_type))
 	{
-	  fvec = fvec_atom_get(at);
+	  fvec = (fvec_t *)fts_get_object(at);
 	  size = fvec_get_size(fvec);
 	}
       else

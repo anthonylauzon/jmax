@@ -80,7 +80,7 @@ static void
 wave_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   wave_t *this = (wave_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   /* check float vector size */
   if(fvec_get_size(fvec) < WAVE_TABLE_SIZE + 1)
@@ -246,7 +246,7 @@ wave_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 0)
     return wave_instantiate_cosine(cl, ac, at);
-  else if (ac == 1 && fvec_atom_is(at))
+  else if (ac == 1 && fts_is_a(at, fvec_type))
     return wave_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

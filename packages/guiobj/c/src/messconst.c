@@ -45,57 +45,6 @@ static fts_metaclass_t *messconst_metaclass;
 
 /************************************************
  *
- * Utilities
- *
- */
- 
-/*
- * Copied from fts/patcher.c.
- * Really ugly code.
- */
-static void messconst_redefine_number_of_inlets( fts_object_t *this, int new_ninlets)
-{
-  int old_ninlets, i;
-  fts_atom_t a[4];
-  fts_connection_t **new_in_conn;
-
-  old_ninlets = fts_object_get_inlets_number( this);
-
-  if (old_ninlets == new_ninlets)
-    return;
-
-  /* delete all the connections that will not be pertinent any more */
-  fts_object_trim_inlets_connections(this, new_ninlets);
-
-  /* reallocate and copy the incoming connections and inlets properties if needed */
-  new_in_conn = (fts_connection_t **) fts_zalloc(new_ninlets * sizeof(fts_connection_t *));
-
-  for (i = 0; i < new_ninlets; i++)
-    {
-      if (i < old_ninlets)
-	new_in_conn[i] = this->in_conn[i];
-    }
-
-  fts_free( this->in_conn);
-  this->in_conn = new_in_conn;
-
-  /* change the object class */
-  fts_set_symbol( a, fts_s_ninlets);
-  fts_set_int(a+1, new_ninlets);
-  fts_set_symbol( a+2, fts_s_noutlets);
-  fts_set_int(a+3, 1); /* outlets */
-  this->head.cl = fts_class_instantiate( messconst_metaclass, 4, a);
-
-  if (fts_object_has_id( this))
-    {
-      fts_set_int( a, new_ninlets);
-      fts_client_send_message( this, fts_s_ninlets, 1, a);
-    }
-}
-
-
-/************************************************
- *
  *  user methods
  *
  */
@@ -162,7 +111,8 @@ messconst_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_client_send_message_real_time(o, fts_s_value, 1, &a);
 }
  
-static void messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void 
+messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *) o;
   int ninlets;
@@ -174,7 +124,7 @@ static void messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   if (ninlets == 0)
     ninlets = 1;
 
-  messconst_redefine_number_of_inlets( (fts_object_t *)this, ninlets);
+  fts_object_set_inlets_number(o, ninlets);
 
   if (ninlets != this->ac)
     {
@@ -267,27 +217,38 @@ static void
 messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messconst_t *this = (messconst_t *)o;
+  int ninlets = 1;
+  int noutlets = 1;
   int i;
   
-  this->expression = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this));
-  fts_array_init( &this->tmp, 0, 0);
-
-  this->ac = fts_object_get_inlets_number( (fts_object_t *)this);
-  this->at = (fts_atom_t *)fts_malloc( sizeof( fts_atom_t) * this->ac);
-
-  for ( i = 0; i < this->ac; i++)
-    fts_set_int( this->at + i, 0);
-
   /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
-  if ( ! (ac == 4 
-	  && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_ninlets
-	  && fts_is_int( at+1)
-	  && fts_is_symbol( at+2) && fts_get_symbol( at+2) == fts_s_noutlets
-	  && fts_is_int( at+3)) )
+  if (ac == 4 
+      && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_ninlets
+      && fts_is_int( at+1)
+      && fts_is_symbol( at+2) && fts_get_symbol( at+2) == fts_s_noutlets
+      && fts_is_int( at+3))
+    {
+      /* If new one, then it gives the number of inlets and outlets */
+      ninlets = fts_get_int( at+1);
+      noutlets = fts_get_int( at+3);
+
+      fts_object_set_inlets_number(o, ninlets);
+      fts_object_set_outlets_number(o, noutlets);
+    }
+  else
     {
       /* if old one, then we must call the set method by hand, giving as argument the description */
       messconst_set( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
     }
+
+  this->expression = fts_expression_new( 0, 0, fts_object_get_patcher( (fts_object_t *)this));
+  fts_array_init( &this->tmp, 0, 0);
+
+  this->ac = ninlets;
+  this->at = (fts_atom_t *)fts_malloc( sizeof( fts_atom_t) * this->ac);
+
+  for ( i = 0; i < this->ac; i++)
+    fts_set_int( this->at + i, 0);
 }
 
 static void
@@ -303,21 +264,7 @@ messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_status_t
 messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int ninlets = 1, noutlets = 1, i;
-
-  /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
-  if (ac == 4 
-      && fts_is_symbol( at) && fts_get_symbol( at) == fts_s_ninlets
-      && fts_is_int( at+1)
-      && fts_is_symbol( at+2) && fts_get_symbol( at+2) == fts_s_noutlets
-      && fts_is_int( at+3))
-    {
-      /* If new one, then it gives the number of inlets and outlets */
-      ninlets = fts_get_int( at+1);
-      noutlets = fts_get_int( at+3);
-    }
-
-  fts_class_init(cl, sizeof(messconst_t), ninlets, noutlets, 0);
+  fts_class_init(cl, sizeof(messconst_t), 1, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, messconst_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, messconst_delete);
@@ -333,11 +280,8 @@ messconst_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, messconst_bang);
   
-  for (i = 0; i < ninlets; i ++)
-    {
-      fts_method_define_varargs(cl, i, fts_s_list, messconst_tuple);
-      fts_method_define_varargs(cl, i, fts_s_anything, messconst_anything);
-    }
+  fts_method_define_varargs(cl, 0, fts_s_list, messconst_tuple);
+  fts_method_define_varargs(cl, 0, fts_s_anything, messconst_anything);
 
   return fts_ok;
 }
@@ -346,5 +290,5 @@ void
 messconst_config(void)
 {
   s_messconst = fts_new_symbol("messconst");
-  messconst_metaclass = fts_metaclass_install( s_messconst, messconst_instantiate, fts_arg_equiv);
+  messconst_metaclass = fts_class_install(s_messconst, messconst_instantiate);
 }

@@ -170,7 +170,8 @@ static void
 table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *vec = ((table_t *)o)->vec;
-  fts_send_message((fts_object_t *)vec, 0, s, ac, at);
+
+  fts_send_message((fts_object_t *)vec, fts_s_size, ac, at);
 }
 
 /*********************************************************************
@@ -184,7 +185,7 @@ table_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   table_t *this = (table_t *)o;
   
-  fts_send_message((fts_object_t *)this->vec, fts_system_inlet, fts_s_save, ac, at);
+  fts_send_message((fts_object_t *)this->vec, fts_s_save, ac, at);
 }
 
 static int 
@@ -345,7 +346,7 @@ table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   table_t *this = (table_t *)o;
 
   fts_patcher_upload_object(fts_get_root_patcher(), (fts_object_t *)this->vec);
-  fts_send_message((fts_object_t *)this->vec, fts_system_inlet, fts_s_openEditor, 0, 0);
+  fts_send_message((fts_object_t *)this->vec, fts_s_openEditor, 0, 0);
 }
 
 static fts_status_t

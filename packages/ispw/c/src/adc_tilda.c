@@ -34,7 +34,12 @@ typedef struct {
 static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   adc_tilda_t *this = (adc_tilda_t *)o;
-  int i, outlets;
+  int outlets, i;
+
+  if (ac == 0)
+    outlets = 2;
+  else
+    outlets = ac;
 
   this->port = fts_audioport_get_default(o);
   if ( !this->port)
@@ -43,7 +48,7 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       return;    
     }
 
-  outlets = fts_object_get_outlets_number( o);
+  fts_object_set_outlets_number( o, outlets);
 
   if ( ac != 0)
     {
@@ -78,14 +83,7 @@ static void adc_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int outlets, i;
-
-  if (ac == 0)
-    outlets = 2;
-  else
-    outlets = ac;
-
-  fts_class_init( cl, sizeof( adc_tilda_t), 1, outlets, 0);
+  fts_class_init( cl, sizeof( adc_tilda_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, adc_tilda_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, adc_tilda_delete);
@@ -93,13 +91,12 @@ static fts_status_t adc_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
   fts_method_define_varargs( cl, 0, fts_s_start, adc_tilda_start);
   fts_method_define_varargs( cl, 0, fts_s_stop, adc_tilda_stop);
 
-  for ( i = 0; i < outlets; i++)
-    fts_dsp_declare_outlet( cl, i);
+  fts_dsp_declare_outlet( cl, 0);
 
   return fts_ok;
 }
 
 void adc_tilda_config( void)
 {
-  fts_metaclass_install( fts_new_symbol( "adc~"), adc_tilda_instantiate, fts_narg_equiv);
+  fts_class_install( fts_new_symbol( "adc~"), adc_tilda_instantiate);
 }

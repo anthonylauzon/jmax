@@ -49,10 +49,10 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   matrix_t *this = (matrix_t *)o;
   
-  if(ac > 1 && fts_is_int(at) && fts_is_int(at + 1))
+  if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
     {
-      int n_ins = fts_get_int(at); /* # of ins */
-      int n_outs = fts_get_int(at + 1); /* # of outs */
+      int n_ins = fts_get_number_int(at); /* # of ins */
+      int n_outs = fts_get_number_int(at + 1); /* # of outs */
       float def_time = 0.0;
       fts_ramp_t *ramps;
       int n, in, out, i;
@@ -98,6 +98,8 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->n_tick = 0;
       
       fts_dsp_add_object(o);
+      fts_object_set_inlets_number(o, n_ins);
+      fts_object_set_outlets_number(o, n_outs);      
     }
   else
     fts_object_set_error(o, "Matrix dimension arguments required");
@@ -348,45 +350,31 @@ matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 static fts_status_t 
 matrix_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_ins = fts_get_int_arg(ac, at, 0, 0);
-  int n_outs = fts_get_int_arg(ac, at, 1, 0);
-  int i, j;
-
-  if(n_ins < 1)
-    n_ins = 1;
-
-  if(n_outs < 1)
-    n_outs = 1;
-  
-  fts_class_init(cl, sizeof(matrix_t), n_ins + 1, n_outs, 0);
+  fts_class_init(cl, sizeof(matrix_t), 1, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, matrix_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, matrix_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, matrix_put);
     
-  fts_method_define_varargs(cl, n_ins, fts_s_list, matrix_node);
+  fts_method_define_varargs(cl, 0, fts_s_set, matrix_node);
   fts_method_define_varargs(cl, 0, fts_new_symbol("in"), matrix_in);
   fts_method_define_varargs(cl, 0, fts_new_symbol("out"), matrix_out);
   fts_method_define_varargs(cl, 0, fts_new_symbol("all"), matrix_all);
     
-  /* dsp in/outlets */
-  for(i=0; i<n_ins; i++)
-    fts_dsp_declare_inlet(cl, i);
-
-  for(j=0; j<n_outs; j++)
-    fts_dsp_declare_outlet(cl, j);
+  fts_dsp_declare_inlet(cl, 0);
+  fts_dsp_declare_outlet(cl, 0);
   
-  matrix_copy_in_ftl_symbol = fts_new_symbol("matrix_in_copy");
-  matrix_copy_out_ftl_symbol = fts_new_symbol("matrix_out_copy");
-
-  fts_dsp_declare_function(matrix_copy_in_ftl_symbol, ftl_matrix_copy_in);
-  fts_dsp_declare_function(matrix_copy_out_ftl_symbol, ftl_matrix_copy_out);
-
   return fts_ok;
 }
 
 void 
 signal_matrix_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("matrix~"), matrix_instantiate, fts_never_equiv);
+  matrix_copy_in_ftl_symbol = fts_new_symbol("matrix_in_copy");
+  matrix_copy_out_ftl_symbol = fts_new_symbol("matrix_out_copy");
+
+  fts_dsp_declare_function(matrix_copy_in_ftl_symbol, ftl_matrix_copy_in);
+  fts_dsp_declare_function(matrix_copy_out_ftl_symbol, ftl_matrix_copy_out);
+
+  fts_class_install(fts_new_symbol("matrix~"), matrix_instantiate);
 }

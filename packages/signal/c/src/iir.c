@@ -357,6 +357,7 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	}
   
       fts_dsp_add_object(o);
+      fts_object_set_inlets_number(o, n_order + 1);
     }
   else
     fts_object_set_error(o, "Wrong arguments");
@@ -380,25 +381,20 @@ iir_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 iir_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int i;
- 
-  fts_class_init(cl, sizeof(iir_t), ac + 1, 1, 0);
+  fts_class_init(cl, sizeof(iir_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, iir_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, iir_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_put, iir_put);
   
-  for(i=1; i<ac+1; i++)
-    {
-      fts_method_define_varargs(cl, i, fts_s_int, iir_set_coef);
-      fts_method_define_varargs(cl, i, fts_s_float, iir_set_coef);
-    }
-
   fts_method_define_varargs(cl, 0, fts_s_clear, iir_clear);
 
   fts_dsp_declare_inlet(cl, 0);
   fts_dsp_declare_outlet(cl, 0);
   
+  fts_method_define_varargs(cl, 1, fts_s_int, iir_set_coef);
+  fts_method_define_varargs(cl, 1, fts_s_float, iir_set_coef);
+
   return fts_ok;
 }
 
@@ -416,5 +412,5 @@ signal_iir_config(void)
   fts_dsp_declare_function(sym_iir[3], ftl_iir_3);
   fts_dsp_declare_function(sym_iir[4], ftl_iir_4);
 
-  fts_metaclass_install(sym_iir[0], iir_instantiate, fts_narg_equiv);
+  fts_class_install(sym_iir[0], iir_instantiate);
 }

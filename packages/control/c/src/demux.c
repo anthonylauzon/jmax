@@ -47,10 +47,11 @@ demux_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   int i = fts_get_int_arg(ac, at, 1, 0);
   
   if(n < 2)
-    this->n = 2;
-  else
-    this->n = n;
-  
+    n = 2;
+
+  this->n = n;
+  fts_object_set_outlets_number(o, n);
+
   if(i >= 0 && i < n)
     this->out = i;
   else
@@ -96,12 +97,7 @@ demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 demux_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n = fts_get_int_arg(ac, at, 0, 0);
-
-  if(n < 2)
-    n = 2;
-
-  fts_class_init(cl, sizeof(demux_t), 2, n, 0);
+  fts_class_init(cl, sizeof(demux_t), 2, 1, 0);
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, demux_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, demux_delete);
@@ -117,5 +113,5 @@ demux_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 demux_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("demux"), demux_instantiate, fts_first_arg_equiv);
+  fts_class_install(fts_new_symbol("demux"), demux_instantiate);
 }

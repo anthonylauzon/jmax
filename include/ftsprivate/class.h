@@ -23,45 +23,29 @@
 #ifndef _FTS_PRIVATE_CLASS_H_
 #define _FTS_PRIVATE_CLASS_H_
 
-typedef struct fts_mess_type fts_mess_type_t;
-typedef struct fts_class_mess fts_class_mess_t;
-
-struct fts_mess_type
-{
-  fts_symbol_t symb;
-
-  int mandatory_args;
-  int nargs;
-  fts_symbol_t *arg_types;
-};
-
-
-struct fts_class_mess
-{
-  fts_mess_type_t tmess;
-  fts_method_t mth;
-};
-
 struct fts_inlet_decl
 {
-  int nmess;
-  int nalloc;
-  fts_class_mess_t **messlist;
+  fts_hashtable_t messhash;
+  fts_method_t anything;
 };
 
 struct fts_outlet_decl
 {
-  fts_mess_type_t tmess;	
+  fts_symbol_t selector;	
 };
 
 #define fts_metaclass_get_package(m) ((m)->package)
 #define fts_metaclass_set_package(m, p) ((m)->package = (p))
 
 #define fts_metaclass_set_selector(m, s) ((m)->selector = (s))
-
 #define fts_metaclass_get_typeid(m) ((m)->typeid)
 
-extern fts_class_mess_t *fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything);
-extern fts_class_mess_t *fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s);
+extern fts_method_t fts_class_inlet_get_method(fts_class_t *cl, int inlet, fts_symbol_t s);
+extern fts_method_t fts_class_inlet_get_anything(fts_class_t *cl, int inlet);
+extern int fts_class_inlet_has_anything_only(fts_class_t *cl, int inlet);
+
+extern fts_symbol_t fts_class_outlet_get_selector(fts_class_t *cl, int outlet);
+
 
 #endif
+

@@ -108,8 +108,9 @@ public class Fork extends GraphicObject
       }
     else
       nOutlets = (theWidth - 2 * ObjectGeometry.INOUTLET_PAD) / getOutletDistance() + 1;
-      
-    ((FtsForkObject)ftsObject).requestSetOutlets(nOutlets);
+
+    if(nOutlets != ftsObject.getNumberOfOutlets())
+      ((FtsForkObject)ftsObject).requestSetOutlets(nOutlets);
 
     theWidth = (nOutlets - 1) * getOutletDistance() + 2 * ObjectGeometry.INOUTLET_PAD;
 

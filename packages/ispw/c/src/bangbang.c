@@ -21,13 +21,6 @@
 
 #include <fts/fts.h>
 
-/*------------------------- bangbang class -------------------------------------*/
-
-typedef struct
-{
-  fts_object_t o;
-} bangbang_t;
-
 static void
 bangbang_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -37,11 +30,9 @@ bangbang_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_outlet_bang(o, i);
 }
 
-
-static fts_status_t
-bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+static void
+bangbang_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int i;
   int noutlets;
 
   if (ac >= 1  && fts_is_int(at))
@@ -49,12 +40,16 @@ bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   else
     noutlets = 2;
 
-  fts_class_init(cl, sizeof(bangbang_t), 1, noutlets, 0);
+  fts_object_set_outlets_number(o, noutlets);
+}
+
+static fts_status_t
+bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, bangbang_bang);
-
-  for (i = 0; i < noutlets; i++)
-    fts_outlet_type_define(cl, i, fts_s_bang, 0, 0);
+  fts_outlet_type_define(cl, 0, fts_s_bang);
 
   return fts_ok;
 }
@@ -62,5 +57,5 @@ bangbang_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 bangbang_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("bangbang"),bangbang_instantiate, fts_arg_equiv);
+  fts_class_install(fts_new_symbol("bangbang"), bangbang_instantiate);
 }

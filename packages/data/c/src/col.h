@@ -42,7 +42,6 @@ typedef struct
 
 #define col_set_element(x, i, v) (mat_set_element((x)->mat, (i), (x)->j, (v)))
 #define col_get_element(x, i) (mat_get_element((x)->mat, (i), (x)->j))
-#define col_void_element(x, i) (mat_void_element((x)->mat, (i), (x)->j))
 
 #define col_get_onset(x) ((x)->j)
 #define col_get_step(x) ((x)->mat->m)
@@ -50,10 +49,6 @@ typedef struct
 DATA_API void col_void(col_t *col);
 DATA_API void col_set_const(col_t *col, fts_atom_t atom);
 DATA_API void col_set_from_atoms(col_t *col, int onset, int ac, const fts_atom_t *at);
-
-/* col atoms */
-#define col_atom_get(ap) ((col_t *)fts_get_object(ap))
-#define col_atom_is(ap) (fts_is_a((ap), col_type))
 
 #endif
 

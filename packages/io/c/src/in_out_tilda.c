@@ -108,21 +108,29 @@ typedef struct {
 static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   in_tilda_t *this = (in_tilda_t *)o;
+  int inlets;
 
-  if ( !in_out_check( o, ac, at, &this->port, &this->channel))
-    return;
-
-  if (this->channel >= 0)
+  if (in_out_class_check( ac, at, &inlets))
     {
-      int i;
+      fts_object_set_inlets_number(o, inlets);
 
-      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
-	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this);
+      if (in_out_check( o, ac, at, &this->port, &this->channel))
+	{
+	  if (this->channel >= 0)
+	    {
+	      int i;
+	      
+	      for ( i = 0; i < fts_object_get_outlets_number( o); i++)
+		fts_audioport_add_input_object( this->port, i, (fts_object_t *)this);
+	    }
+	  else
+	    fts_audioport_add_input_object( this->port, this->channel, (fts_object_t *)this);
+
+	  return;
+	}
     }
-  else
-    {
-      fts_audioport_add_input_object( this->port, this->channel, (fts_object_t *)this);
-    }
+
+  fts_object_set_error(o, "Wrong arguments");
 }
 
 static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -144,18 +152,12 @@ static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac
 
 static fts_status_t in_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int outlets = 0, i;
-
-  if ( !in_out_class_check( ac, at, &outlets))
-    return &fts_CannotInstantiate;
-
-  fts_class_init( cl, sizeof( fts_object_t), 0, outlets, 0);
+  fts_class_init( cl, sizeof( fts_object_t), 0, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, in_tilda_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, in_tilda_delete);
 
-  for ( i = 0; i < outlets; i++)
-    fts_dsp_declare_outlet( cl, i);
+  fts_dsp_declare_outlet( cl, 0);
 
   return fts_ok;
 }
@@ -174,8 +176,16 @@ typedef struct {
 static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   out_tilda_t *this = (out_tilda_t *)o;
+  int outlets;
 
-  in_out_check( o, ac, at, &this->port, &this->channel);
+  if (in_out_class_check( ac, at, &outlets))
+    {
+      fts_object_set_outlets_number(o, outlets);
+
+      in_out_check( o, ac, at, &this->port, &this->channel);
+    }
+  else
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -194,17 +204,11 @@ static void out_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
 
 static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int inlets = 0, i;
-
-  if ( !in_out_class_check( ac, at, &inlets))
-    return &fts_CannotInstantiate;
-
-  fts_class_init( cl, sizeof( out_tilda_t), inlets, 0, 0);
+  fts_class_init( cl, sizeof( out_tilda_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, out_tilda_init);
 
-  for ( i = 0; i < inlets; i++)
-    fts_dsp_declare_inlet( cl, i);
+  fts_dsp_declare_inlet( cl, 0);
 
   fts_class_define_thru( cl, out_tilda_propagate_input);
 
@@ -213,6 +217,6 @@ static fts_status_t out_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
 
 void in_out_tilda_config( void)
 {
-  fts_metaclass_install( fts_new_symbol( "in~"), in_tilda_instantiate, fts_never_equiv);
-  fts_metaclass_install( fts_new_symbol( "out~"), out_tilda_instantiate, fts_never_equiv);
+  fts_class_install( fts_new_symbol( "in~"), in_tilda_instantiate);
+  fts_class_install( fts_new_symbol( "out~"), out_tilda_instantiate);
 }

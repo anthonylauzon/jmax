@@ -99,11 +99,9 @@ FTS_API void fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const
 FTS_API fts_status_description_t fts_MethodNotFound;
 FTS_API fts_status_description_t fts_ArgumentMissing;
 FTS_API fts_status_description_t fts_ArgumentTypeMismatch;
-FTS_API fts_status_description_t fts_ExtraArguments;
 FTS_API fts_status_description_t fts_InvalidMessage;
 
 /* The object stack; used for fpe handling, debug and who know what else in the future */
-
 #define DO_OBJECT_STACK
 
 #ifdef DO_OBJECT_STACK
@@ -135,17 +133,6 @@ FTS_API fts_object_t *fts_objstack[];
 
 #endif
 
-/* Messaging */
-FTS_API fts_status_t fts_send_message(fts_object_t *, int winlet, fts_symbol_t , int,  const fts_atom_t *);
-
-/* NOt to be used by users, but called by the optimized macros ... */
-FTS_API fts_status_t fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
-					   int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache);
-
-
-FTS_API fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t , int, const fts_atom_t *);
-
-
 /* argument macros and functions */
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))
@@ -160,6 +147,12 @@ FTS_API fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t ,
 ((N) < (AC) ? (fts_is_int(&(AT)[N]) ? (float) fts_get_int(&(AT)[N]) : \
 	      (fts_is_float(&(AT)[N]) ?  fts_get_float(&(AT)[N]) : (DEF))) : (DEF))
 
+
+/* messages */
+FTS_API fts_status_t fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+/* outlets */
+FTS_API fts_status_t fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
 FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);

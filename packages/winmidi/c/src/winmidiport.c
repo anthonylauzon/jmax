@@ -654,6 +654,7 @@ winmidiport_config(void)
 {
   fts_symbol_t winmidiport_symbol;
   winmidiport_symbol = fts_new_symbol("winmidiport");
-  fts_metaclass_install( winmidiport_symbol, winmidiport_instantiate, winmidiport_equiv);
+
+  fts_class_install( winmidiport_symbol, winmidiport_instantiate);
   fts_midiport_set_default_class(winmidiport_symbol);
 }

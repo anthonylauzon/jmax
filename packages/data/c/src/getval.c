@@ -321,7 +321,7 @@ setelem_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int i = this->i;
   
   if(ac > 0 && s == fts_get_selector(at) && i >= 0 && i < size)
-    vec_set_element((vec_t *)this->obj, i, at[0]);
+    vec_set_element((vec_t *)this->obj, i, at);
 }
 
 /******************************************************
@@ -372,7 +372,7 @@ setelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   int j = this->j;
   
   if(ac > 0 && s == fts_get_selector(at) && i >= 0 && i < m && j >= 0 && j < n)
-    mat_set_element((mat_t *)this->obj, i, j, at[0]);
+    mat_set_element((mat_t *)this->obj, i, j, at);
 }
 
 /******************************************************
@@ -384,7 +384,7 @@ setelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 && value_atom_is(at))
+  if(ac == 1 && fts_is_a(at, value_type))
     {
       fts_class_init(cl, sizeof(getval_t), 2, 1, 0); 
       
@@ -405,7 +405,7 @@ getval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac >= 1 && vec_atom_is(at + ac - 1))
+  if(ac >= 1 && fts_is_a(at + ac - 1, vec_type))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
@@ -418,7 +418,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, vec_symbol, getval_set_reference);
     }
-  else if(ac >= 1 && ivec_atom_is(at + ac - 1))
+  else if(ac >= 1 && fts_is_a(at + ac - 1, ivec_type))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
@@ -431,7 +431,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, ivec_symbol, getval_set_reference);
     }
-  else if(ac >= 2 && fvec_atom_is(at + ac - 1))
+  else if(ac >= 2 && fts_is_a(at + ac - 1, fvec_type))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 2, 1, 0); 
       
@@ -444,7 +444,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, fvec_symbol, getval_set_reference);
     }
-  else if(ac >= 1 && mat_atom_is(at + ac - 1))
+  else if(ac >= 1 && fts_is_a(at + ac - 1, mat_type))
     {
       fts_class_init(cl, sizeof(getelem_mat_t), 3, 1, 0);
       
@@ -470,7 +470,7 @@ getelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 && value_atom_is(at))
+  if(ac == 1 && fts_is_a(at, value_type))
     {
       fts_class_init(cl, sizeof(getval_t), 2, 0, 0);
   
@@ -490,7 +490,7 @@ setval_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac >= 1 && vec_atom_is(at + ac - 1))
+  if(ac >= 1 && fts_is_a(at + ac - 1, vec_type))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
@@ -504,7 +504,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 2, vec_symbol, getval_set_reference);
     }
-  else if(ac >= 1 && ivec_atom_is(at + ac - 1))
+  else if(ac >= 1 && fts_is_a(at + ac - 1, ivec_type))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
@@ -519,7 +519,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 2, ivec_symbol, getval_set_reference);
     }
-  else if(ac >= 1 && fvec_atom_is(at + ac - 1))
+  else if(ac >= 1 && fts_is_a(at + ac - 1, fvec_type))
     {
       fts_class_init(cl, sizeof(getelem_vec_t), 3, 0, 0); 
       
@@ -534,7 +534,7 @@ setelem_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 2, fvec_symbol, getval_set_reference);
     }
-  else if(ac >= 1 && mat_atom_is(at + ac - 1))
+  else if(ac >= 1 && fts_is_a(at + ac - 1, mat_type))
     {
       fts_class_init(cl, sizeof(getelem_mat_t), 4, 0, 0); 
       

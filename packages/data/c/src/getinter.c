@@ -220,7 +220,7 @@ getinter_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 && ivec_atom_is(at))
+  if(ac == 1 && fts_is_a(at, ivec_type))
     {
       fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
       
@@ -232,7 +232,7 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, ivec_symbol, getinter_set_reference);
     }
-  else if(ac == 1 && fvec_atom_is(at))
+  else if(ac == 1 && fts_is_a(at, fvec_type))
     {
       fts_class_init(cl, sizeof(getinter_t), 2, 1, 0); 
       
@@ -244,7 +244,7 @@ getinter_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, 1, fvec_symbol, getinter_set_reference);
     }
-  else if(ac == 1 && bpf_atom_is(at))
+  else if(ac == 1 && fts_is_a(at, bpf_type))
     {
       fts_class_init(cl, sizeof(getinter_bpf_t), 2, 1, 0); 
       

@@ -49,16 +49,11 @@ mat_set_size(mat_t *mat, int m, int n)
   
   if(size > alloc)
     {
-      while(size > alloc)
-	alloc += MAT_BLOCK_SIZE;
+      mat->data = fts_realloc(mat->data, size * sizeof(fts_atom_t));
+      mat->alloc = size;
 
-      mat->data = fts_realloc(mat->data, alloc * sizeof(fts_atom_t));
-
-      /* init new region to void */
-      for(i=mat->alloc; i<alloc; i++)
-	fts_set_void(mat->data + i);
-
-      mat->alloc = alloc;
+      for(i=0; i<size; i++)
+	fts_set_int(mat->data + i, 0);
     }
   else
     {
@@ -67,7 +62,10 @@ mat_set_size(mat_t *mat, int m, int n)
 
       /* void region cut off */
       for(i=size; i<old_size; i++)
-	fts_atom_void(mat->data + i);
+	{
+	  fts_atom_release(mat->data + i);
+	  fts_set_int(mat->data + i, 0);
+	}
     }
 
   mat->m = m;
@@ -75,23 +73,15 @@ mat_set_size(mat_t *mat, int m, int n)
 }
 
 void
-mat_set_element(mat_t *mat, int i, int j, fts_atom_t value)
+mat_set_element(mat_t *mat, int i, int j, const fts_atom_t *value)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
   
-  fts_atom_assign(ap, &value);
+  fts_atom_assign(ap, value);
 }
 
 void
-mat_void_element(mat_t *mat, int i, int j)
-{
-  fts_atom_t *ap = mat->data + i * mat->n + j;
-  
-  fts_atom_void(ap);
-}
-
-void
-mat_set_const(mat_t *mat, fts_atom_t value)
+mat_set_const(mat_t *mat, const fts_atom_t *value)
 {
   int size = mat->m * mat->n;
 
@@ -101,21 +91,7 @@ mat_set_const(mat_t *mat, fts_atom_t value)
     {
       fts_atom_t *ap = mat->data + i;
 
-      fts_atom_assign(ap, &value);
-    }
-}
-
-void
-mat_void(mat_t *mat)
-{
-  int i;
-  int size = mat->m * mat->n;
-
-  for(i=0; i<size; i++)
-    {
-      fts_atom_t *ap = mat->data + i;
-
-      fts_atom_void(ap);
+      fts_atom_assign(ap, value);
     }
 }
 
@@ -190,11 +166,16 @@ static void
 mat_grow(mat_t *mat, int size)
 {
   int alloc = mat->alloc;
+  fts_atom_t *p = mat->data;
+  int i;
 
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
 
   mat_set_size(mat, alloc, 1);
+
+  for(i=alloc; i<mat->alloc; i++)
+    fts_set_int(p + i, 0);
 }
 
 int 
@@ -211,7 +192,7 @@ mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
   if(!file)
     return -1;
 
-  mat_void(mat);
+  mat_set_size(mat, 0, 0);
 
   while(fts_atom_file_read(file, &a, &c))
     {
@@ -304,7 +285,7 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
   if(!separator)
     separator = sym_comma;
 
-  mat_void(mat);
+  mat_set_size(mat, 0, 0);
 
   while(fts_atom_file_read(file, &a, &c))
     {
@@ -423,44 +404,12 @@ mat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-mat_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  mat_t *this = (mat_t *)o;
-  int m = mat_get_m(this);
-  int n = mat_get_n(this);
-  
-  if(ac > 1 && fts_is_number(at) && fts_is_number(at + 1))
-    {
-      int i = fts_get_number_int(at);
-      int j = fts_get_number_int(at + 1);
-
-      if(i >= 0 && i < m && j >= 0 && j < n)
-	mat_void_element(this, i, j);
-    }
-  else if(ac == 1)
-    {
-      int i = fts_get_number_int(at);
-
-      if(i >= 0 && i < m)
-	{
-	  int j;
-
-	  /* void row */
-	  for(j=0; j<n; j++)
-	    mat_void_element(this, i, j);
-	}
-    }
-  else
-    mat_void(this);
-}
-
-static void
 mat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
 
   if(ac > 0)
-    mat_set_const(this, at[0]);
+    mat_set_const(this, at);
 }
 
 static void
@@ -531,7 +480,7 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   /* set newly allocated region to void */
   for(i=old_size; i<m*n; i++)
-    fts_set_void(this->data + i);
+    fts_set_int(this->data + i, 0);
 }
 
 static void
@@ -592,7 +541,7 @@ static void
 mat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
-  mat_t *set = mat_atom_get(at);
+  mat_t *set = (mat_t *)fts_get_object(at);
 
   mat_copy(set, this);
 }
@@ -638,24 +587,47 @@ mat_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
+mat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  mat_t *this = (mat_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int m = mat_get_m(this);
+  int n = mat_get_n(this);
+  int size = m * n;
+  
+  if(size == 0)
+    fts_spost(stream, "(:mat)");
+  else
+    fts_spost(stream, "(:mat %d %d)", m, n);
+}
+
+static void
 mat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = mat_get_m(this);
   int n = mat_get_n(this);
-  int i;
+  int size = m * n;
   
-  fts_spost(stream, "{\n");
-
-  for(i=0; i<m; i++)
+  if(size == 0)
+    fts_spost(stream, "<empty mat>\n");
+  else
     {
-      fts_spost(stream, "  ");
-      fts_spost_atoms(stream, n, mat_get_row(this, i));
-      fts_spost(stream, "\n");
-    }
+      int i;
 
-  fts_spost(stream, "}\n");
+      fts_spost(stream, "<mat %dx%d>\n", m, n);
+      fts_spost(stream, "{\n");
+
+      for(i=0; i<m; i++)
+	{
+	  fts_spost(stream, "  ");
+	  fts_spost_atoms(stream, n, mat_get_row(this, i));
+	  fts_spost(stream, ",\n");
+	}
+
+      fts_spost(stream, "}\n");
+    }
 }
 
 static void
@@ -674,6 +646,11 @@ static void
 mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *this = (mat_t *)o;
+
+  this->data = NULL;
+  this->m = 0;
+  this->n = 0;
+  this->alloc = 0;
 
   data_object_set_keep((data_object_t *)o, fts_s_no);
 
@@ -732,6 +709,7 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mat_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, mat_delete);
 
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, mat_post); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, mat_print); 
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -748,7 +726,6 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, mat_output);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, mat_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, mat_fill);      
   fts_method_define_varargs(cl, 0, fts_s_set, mat_set_elements);
   fts_method_define_varargs(cl, 0, fts_s_row, mat_set_row_elements);

@@ -45,7 +45,7 @@ invoke_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
       if(class != this->class)
 	{
-	  fts_method_t method = fts_class_get_method(class, 0, this->selector);
+	  fts_method_t method = fts_class_get_method(class, this->selector);
 
 	  if(method)
 	    {

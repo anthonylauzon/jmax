@@ -47,20 +47,21 @@ fork_set_outlets(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_set_int(a + 1, n);      
   fts_object_set_description(o, 2, a);
 
-  fts_object_change_number_of_outlets(o, n);
+  fts_object_set_outlets_number(o, n);
+}
+
+static void
+fork_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_object_set_outlets_number(o, 2);
 }
 
 static fts_status_t 
 fork_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_outs;
-  
-  if(ac > 0)
-    n_outs = fts_get_int(at);
-  else
-    n_outs = 2;
+  fts_class_init(cl, sizeof(fts_object_t), 1, 1, 0);
 
-  fts_class_init(cl, sizeof(fts_object_t), 1, n_outs, 0);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fork_init);
   fts_method_define_varargs(cl, 0, fts_s_anything, fork_input);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_outlets"), fork_set_outlets);
@@ -72,5 +73,5 @@ void fork_config(void)
 {
   sym_fork = fts_new_symbol("fork");
 
-  fts_metaclass_install(sym_fork, fork_instantiate, fts_first_arg_equiv);
+  fts_class_install(sym_fork, fork_instantiate);
 }

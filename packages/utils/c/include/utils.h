@@ -119,6 +119,9 @@ UTILS_API float *fts_fftab_get_hanning(int size); /* hanning (offset cosine) win
  *
  */
 
+#define FTS_CUBIC_HEAD 1
+#define FTS_CUBIC_TAIL 2
+
 #define FTS_CUBIC_TABLE_BITS 8
 #define FTS_CUBIC_TABLE_SIZE 256
 

@@ -46,6 +46,7 @@ struct fts_metaclass {
   fts_class_t *inst_list; /* instance data base */
   
   fts_package_t *package; /* home package of the metaclass */
+  struct fts_metaclass *next; /* next metaclass with the same name in the same package */
 };
 
 struct fts_class {
@@ -85,7 +86,6 @@ struct fts_class {
 FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
 FTS_API fts_status_description_t fts_InletOutOfRange;
 FTS_API fts_status_description_t fts_OutletOutOfRange;
-FTS_API fts_status_description_t fts_OutletAlreadyDefined;
 FTS_API fts_status_description_t fts_CannotInstantiate;
 
 /* Meta classes functions */
@@ -93,7 +93,7 @@ FTS_API fts_status_description_t fts_CannotInstantiate;
 FTS_API fts_metaclass_t *fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_equiv_fun_t equiv_fun);
 FTS_API fts_metaclass_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 
-FTS_API void fts_alias_install(fts_symbol_t alias_name, fts_symbol_t class_name);
+FTS_API void fts_metaclass_alias(fts_metaclass_t *mcl, fts_symbol_t alias);
 
 #define fts_metaclass_get_selector(MCL) ((MCL)->selector ? (MCL)->selector : (MCL)->name)
 #define fts_metaclass_is_primitive(MCL) ((MCL)->typeid < FTS_FIRST_OBJECT_TYPEID)
@@ -108,54 +108,37 @@ FTS_API fts_metaclass_t *fts_metaclass_get_by_name( fts_symbol_t name);
 
 /* method definition */
 
-#define fts_method_define(class, winlet, s, fun, argc, at)  \
-  fts_method_define_optargs(class, winlet, s, fun, argc, at, argc) 
-
+FTS_API void fts_method_define(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t fun);
 #define fts_method_define_varargs(class, winlet, s, fun)  \
-  fts_method_define_optargs(class, winlet, s, fun, 0, 0, FTS_VAR_ARGS) 
-
-
-FTS_API fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
-					      fts_method_t fun, int, fts_symbol_t *at, int mandatory_args);
+  fts_method_define(class, winlet, s, fun)
 
 #define fts_method_define_int(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_int, fun, 1, &fts_s_int, 1);
+  fts_method_define(class, winlet, fts_s_int, fun);
 
 #define fts_method_define_float(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_float, fun, 1, &fts_s_float, 1);
+  fts_method_define(class, winlet, fts_s_float, fun);
 
 #define fts_method_define_number(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_int, fun, 1, &fts_s_int, 1); \
-  fts_method_define_optargs(class, winlet, fts_s_float, fun, 1, &fts_s_float, 1);
+  fts_method_define(class, winlet, fts_s_int, fun); \
+  fts_method_define(class, winlet, fts_s_float, fun);
 
 #define fts_method_define_symbol(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_symbol, fun, 1, &fts_s_symbol, 1);
+  fts_method_define(class, winlet, fts_s_symbol, fun);
 
 #define fts_method_define_bang(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_bang, fun, 0, 0, 0);
-
-#define fts_method_define_list(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_list, fun, 0, 0, FTS_VAR_ARGS);
+  fts_method_define(class, winlet, fts_s_bang, fun);
 
 #define fts_method_define_anything(class, winlet, fun) \
-  fts_method_define_optargs(class, winlet, fts_s_anything, fun, 0, 0, FTS_VAR_ARGS);
+  fts_method_define(class, winlet, fts_s_anything, fun);
 
 /* outlet type definition */
-#define fts_outlet_type_define(class, woutlet, s, ac, at)  \
-          fts_outlet_type_define_optargs(class, woutlet, s, ac, at, ac) 
-
+FTS_API void fts_outlet_type_define(fts_class_t *cl, int woutlet, fts_symbol_t s);
 #define fts_outlet_type_define_varargs(class, woutlet, s)  \
-          fts_outlet_type_define_optargs(class, woutlet, s, 0, 0, FTS_VAR_ARGS) 
-
-FTS_API fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
-						   int ac, fts_symbol_t *at,  int mandatory_args);
+          fts_outlet_type_define(class, woutlet, s) 
 
 #define fts_class_get_name(C) ((C)->mcl->name)
 
-FTS_API fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s);
-
-#define fts_class_has_method(C,I,S) (fts_class_get_method((C),(I),(S))!=0)
-
+FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s);
 #define fts_class_get_constructor(c) ((c)->constructor)
 #define fts_class_get_deconstructor(c) ((c)->deconstructor)
 

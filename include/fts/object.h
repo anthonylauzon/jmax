@@ -50,6 +50,8 @@ struct fts_object
   fts_binding_list_t *var_refs; /* handled completely in the variable.c file */
 
   /* connections */
+  int n_inlets;
+  int n_outlets;
   fts_connection_t **in_conn;
   fts_connection_t **out_conn;
 
@@ -89,10 +91,13 @@ FTS_API int fts_object_description_defines_variable(int ac, const fts_atom_t *at
 /* object access */
 FTS_API fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet);
 
-#define fts_object_get_outlets_number(O) (((fts_object_t *)(O))->head.cl->noutlets)
-#define fts_object_get_inlets_number(O) (((fts_object_t *)(O))->head.cl->ninlets)
-#define fts_object_get_patcher(O) (((fts_object_t *)(O))->patcher)
-#define fts_object_set_patcher(O, patcher) (((fts_object_t *)(O))->patcher = (patcher))
+#define fts_object_get_outlets_number(o) (((fts_object_t *)(o))->n_outlets)
+#define fts_object_get_inlets_number(o) (((fts_object_t *)(o))->n_inlets)
+FTS_API void fts_object_set_outlets_number(fts_object_t *o, int n);
+FTS_API void fts_object_set_inlets_number(fts_object_t *o, int n);
+
+#define fts_object_get_patcher(o) (((fts_object_t *)(o))->patcher)
+#define fts_object_set_patcher(o, patcher) (((fts_object_t *)(o))->patcher = (patcher))
 
 FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
@@ -113,9 +118,6 @@ FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
 /* messages for the status line */
 FTS_API void fts_object_blip(fts_object_t *obj, const char *format , ...);
-
-/* change number of outlets */
-FTS_API void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets);
 
 #define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)

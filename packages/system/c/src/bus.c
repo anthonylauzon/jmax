@@ -397,7 +397,7 @@ bus_config(void)
   catch_symbol = fts_new_symbol("catch");
   bus_symbol = fts_new_symbol("bus");
 
-  bus_type = fts_metaclass_install(bus_symbol, bus_instantiate, fts_first_arg_equiv);
-  fts_metaclass_install(throw_symbol, throw_instantiate, fts_never_equiv);
-  fts_metaclass_install(catch_symbol, catch_instantiate, fts_never_equiv);
+  bus_type = fts_class_install(bus_symbol, bus_instantiate);
+  fts_class_install(throw_symbol, throw_instantiate);
+  fts_class_install(catch_symbol, catch_instantiate);
 }

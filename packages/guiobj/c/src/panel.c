@@ -100,6 +100,6 @@ panel_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 panel_config(void)
 {
-  fts_class_install( fts_new_symbol("openpanel"), panel_instantiate);
-  fts_alias_install( fts_new_symbol("savepanel"), fts_new_symbol("openpanel"));
+  fts_metaclass_t *mcl = fts_class_install( fts_new_symbol("openpanel"), panel_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("savepanel"));
 }

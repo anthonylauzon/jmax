@@ -80,37 +80,24 @@ mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 mess_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0)
-    {
-      fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
+  fts_class_init(cl, sizeof(mess_t), 2, 1, 0);
   
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mess_init);
-      
-      fts_method_define_varargs(cl, 0, fts_s_bang, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_float, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_symbol, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_list, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);
-      
-      fts_method_define_varargs(cl, 1, fts_s_symbol, mess_set_selector);
-    }
-  else
-    {
-      fts_class_init(cl, sizeof(mess_t), 1, 1, 0);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mess_init);
   
-      fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_float, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_symbol, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_list, mess_atoms);
-      fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);      
-    }
-      
+  fts_method_define_varargs(cl, 0, fts_s_bang, mess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_int, mess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_float, mess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, mess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_list, mess_atoms);
+  fts_method_define_varargs(cl, 0, fts_s_anything, mess_anything);
+  
+  fts_method_define_varargs(cl, 1, fts_s_symbol, mess_set_selector);
+
   return fts_ok;
 }
 
 void
 mess_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("mess"), mess_instantiate, fts_arg_equiv);
+  fts_class_install(fts_new_symbol("mess"), mess_instantiate);
 }

@@ -42,8 +42,4 @@ DATA_API void dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, cons
 DATA_API void dict_recall(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom);
 DATA_API void dict_get_keys(dict_t *dict, fts_array_t *array);
 
-/* dict atoms */
-#define dict_atom_get(ap) ((dict_t *)fts_get_object(ap))
-#define dict_atom_is(ap) (fts_is_a((ap), dict_type))
-
 #endif

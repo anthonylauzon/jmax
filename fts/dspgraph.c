@@ -161,7 +161,7 @@ graph_iterator_step( graph_iterator_t *iter)
       fts_set_pointer(a + 0, graph_iterator_push);
       fts_set_pointer(a + 1, iter);
       fts_set_int(a + 2, iter->top->connection->winlet);
-      stat = fts_send_message(dest, fts_system_inlet, fts_s_propagate_input, 3, a);
+      stat = fts_send_message(dest, fts_s_propagate_input, 3, a);
 
       if(stat == fts_ok)
 	{
@@ -419,13 +419,21 @@ post_object( fts_object_t *obj)
  *
  */
 
+static int
+dsp_class_is_outlet(fts_class_t *cl, int out)
+{
+  fts_symbol_t selector = fts_class_outlet_get_selector(cl, out);
+  
+  return (selector == fts_s_sig || selector == NULL);
+}
+
 static int 
 dsp_input_get(fts_object_t *obj, int winlet)
 {
   int i, n;
 
   for (i = 0, n = 0; i < winlet; i++)
-    if (fts_class_has_method( fts_object_get_class( obj), i, fts_s_sig))
+    if (fts_class_inlet_get_method( fts_object_get_class( obj), i, fts_s_sig) != NULL)
       n++;
 
   return n;
@@ -434,11 +442,12 @@ dsp_input_get(fts_object_t *obj, int winlet)
 static int 
 dsp_output_get(fts_object_t *obj, int woutlet)
 {
-  int i, n;
-  fts_outlet_decl_t *out;
+  fts_class_t *cl = fts_object_get_class(obj);
+  int n = 0;
+  int i;
 
-  for (i = 0, n = 0, out = fts_object_get_class( obj)->outlets; i < woutlet; i++, out++)
-    if (out->tmess.symb == fts_s_sig || !out->tmess.symb)
+  for (i=0; i<woutlet; i++)
+    if (dsp_class_is_outlet(cl, i))
       n++;
 
   return n;
@@ -566,7 +575,7 @@ dsp_graph_schedule_node(fts_dsp_graph_t *graph, fts_dsp_node_t *node)
       */
 
       fts_set_pointer(&a, &node->descr);
-      fts_send_message(node->o, fts_system_inlet, fts_s_put, 1, &a);
+      fts_send_message(node->o, fts_s_put, 1, &a);
 
       /*{
 	ftl_instruction_info_t *info;
@@ -623,19 +632,21 @@ mark_signal_connection(fts_connection_t* connection, void *arg)
 static void 
 dsp_graph_succ_realize(fts_dsp_graph_t *graph, fts_dsp_node_t *node, edge_fun_t fun, int mark_connections)
 {
-  fts_outlet_decl_t *outlets = fts_object_get_class(node->o)->outlets;
-  int out;
+  fts_object_t *obj = node->o;
+  fts_class_t *cl = fts_object_get_class(obj);
+  fts_outlet_decl_t *outlets = fts_object_get_class(obj)->outlets;
+  int i;
 
-  for(out=0; out<fts_object_get_outlets_number(node->o); out++)
+  for(i=0; i<fts_object_get_outlets_number(obj); i++)
     {
       int sig_out = 0;
 
       /* for each signal outlet */
-      if(outlets[out].tmess.symb == fts_s_sig || !outlets[out].tmess.symb)
+      if(dsp_class_is_outlet(cl, i))
 	{
 	  graph_iterator_t iter;
 
-	  graph_iterator_init( &iter, node->o, out);
+	  graph_iterator_init( &iter, obj, i);
 
 	  while(!graph_iterator_end( &iter))
 	    {
@@ -657,7 +668,7 @@ dsp_graph_succ_realize(fts_dsp_graph_t *graph, fts_dsp_node_t *node, edge_fun_t 
 		      graph_iterator_apply_to_connection_stack(&iter, mark_signal_connection, (void *)&(graph->signal_connection_table));
 		    }
 
-		  (*fun)( graph, node, out, succ_node, in, node->descr.out[sig_out]);
+		  (*fun)( graph, node, i, succ_node, in, node->descr.out[sig_out]);
 		}
 
 	      graph_iterator_next( &iter);
@@ -757,7 +768,7 @@ dsp_graph_schedule_depth(fts_dsp_graph_t *graph, fts_dsp_node_t *src, int woutle
       dsp_graph_schedule_node(graph, dest);
       dsp_graph_succ_realize(graph, dest, dsp_graph_schedule_depth, fts_c_signal);
 
-      fts_send_message( dest->o, fts_system_inlet, fts_new_symbol("put_after_successors"), 0, 0);
+      fts_send_message( dest->o, fts_new_symbol("put_after_successors"), 0, 0);
     }
 }
 
@@ -792,7 +803,7 @@ dsp_graph_send_message( fts_dsp_graph_t *graph, fts_symbol_t message)
   fts_dsp_node_t *node;
 
   for( node = graph->nodes; node; node = node->next)
-    fts_send_message( node->o, fts_system_inlet, message, 0, 0);
+    fts_send_message( node->o, message, 0, 0);
 }
 
 static void 

@@ -173,7 +173,7 @@ static void fts_eval_atom_list(messbox_t *this, fts_atom_list_t *list, int env_a
 
 #define SEND_MESSAGE \
   if (ev_dest_is_object) \
-    { if(target) fts_send_message((fts_object_t *)target, 0, ev_sym, ev_argc, ev_fp); } \
+    { if(target) fts_send_message((fts_object_t *)target, ev_sym, ev_argc, ev_fp); } \
   else \
     fts_outlet_send(default_dst, outlet, ev_sym, ev_argc, ev_fp);
 
@@ -583,7 +583,7 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 {
   messbox_t *this = (messbox_t *) o;
 
-  fts_send_message((fts_object_t *)this->atom_list, fts_system_inlet, fts_s_delete, 0, 0);
+  fts_send_message((fts_object_t *)this->atom_list, fts_s_delete, 0, 0);
 }
 
 

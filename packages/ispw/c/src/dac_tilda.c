@@ -31,7 +31,12 @@ typedef struct {
 static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dac_tilda_t *this = (dac_tilda_t *)o;
-  int i, inlets;
+  int inlets, i;
+
+  if (ac == 0)
+    inlets = 2;
+  else
+    inlets = ac;
 
   this->port = fts_audioport_get_default( o);
   if ( !this->port)
@@ -40,10 +45,9 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       return;    
     }
 
-  inlets = fts_object_get_inlets_number( o);
+  fts_object_set_inlets_number( o, inlets);
 
   this->indexes = (int *)fts_malloc( inlets * sizeof( int));
-
   if ( ac != 0)
     {
       for ( i = 0; i < inlets; i++)
@@ -91,15 +95,7 @@ static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t 
 
 static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int inlets, i;
-  fts_audioport_t *port;
-
-  if (ac == 0)
-    inlets = 2;
-  else
-    inlets = ac;
-
-  fts_class_init( cl, sizeof( dac_tilda_t), inlets, 0, 0);
+  fts_class_init( cl, sizeof( dac_tilda_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, dac_tilda_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, dac_tilda_delete);
@@ -107,9 +103,7 @@ static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
   fts_method_define_varargs( cl, 0, fts_s_start, dac_tilda_start);
   fts_method_define_varargs( cl, 0, fts_s_stop, dac_tilda_stop);
 
-  for ( i = 0; i < inlets; i++)
-    fts_dsp_declare_inlet( cl, i);
-
+  fts_dsp_declare_inlet( cl, 0);
   fts_class_define_thru( cl, dac_tilda_propagate_input);
 
   return fts_ok;
@@ -117,5 +111,5 @@ static fts_status_t dac_tilda_instantiate(fts_class_t *cl, int ac, const fts_ato
 
 void dac_tilda_config( void)
 {
-  fts_metaclass_install( fts_new_symbol( "dac~"), dac_tilda_instantiate, fts_narg_equiv);
+  fts_class_install( fts_new_symbol( "dac~"), dac_tilda_instantiate);
 }

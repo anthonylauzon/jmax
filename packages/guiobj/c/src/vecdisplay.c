@@ -192,7 +192,7 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   int size = this->size;
-  ivec_t * vec = ivec_atom_get(at);
+  ivec_t * vec = (ivec_t *)fts_get_object(at);
   int *ptr = ivec_get_ptr(vec);
   int n = ivec_get_size(vec);
   
@@ -233,9 +233,9 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 vecdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vecdisplay_t * this = (vecdisplay_t *)o;
+  vecdisplay_t *this = (vecdisplay_t *)o;
   int size = this->size;
-  fvec_t * vec = fvec_atom_get(at);
+  fvec_t *vec = (fvec_t *)fts_get_object(at);
   float *ptr = fvec_get_ptr(vec);
   int n = fvec_get_size(vec);
 
@@ -278,7 +278,7 @@ vecdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   int size = this->size;
-  cvec_t * vec = cvec_atom_get(at);
+  cvec_t *vec = (cvec_t *)fts_get_object(at);
   complex *ptr = cvec_get_ptr(vec);
   int n = cvec_get_size(vec);
 

@@ -55,7 +55,6 @@ DATA_API void ivec_set_size(ivec_t *vector, int size);
 #define ivec_set_element(v, i, x) ((v)->values[i] = (x))
 
 DATA_API void ivec_set_const(ivec_t *vector, int c);
-#define ivec_zero(v) ivec_set_const((v), 0)
 DATA_API void ivec_copy(ivec_t *org, ivec_t *copy);
 
 DATA_API void ivec_set_with_onset_from_atoms(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
@@ -64,9 +63,5 @@ DATA_API int ivec_get_sum(ivec_t *vector);
 DATA_API int ivec_get_sub_sum(ivec_t *vector, int from, int to);
 DATA_API int ivec_get_min_value(ivec_t *vector);
 DATA_API int ivec_get_max_value(ivec_t *vector);
-
-/* ivec atoms */
-#define ivec_atom_get(ap) ((ivec_t *)fts_get_object(ap))
-#define ivec_atom_is(ap) (fts_is_a((ap), ivec_type))
 
 #endif

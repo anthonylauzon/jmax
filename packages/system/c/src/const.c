@@ -28,12 +28,6 @@
 
 static fts_symbol_t sym_const = 0;
 
-/********************************************************************
- *
- *   object
- *
- */
-
 typedef struct
 {
   fts_object_t o;
@@ -45,8 +39,15 @@ const_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   const_t *this = (const_t *)o;
 
+  if(ac > 1)
+    {
+      fts_object_t *tuple = fts_object_create(fts_tuple_metaclass, ac, at);
+      
+      fts_object_refer(tuple);
+      fts_set_object(&this->a, tuple);
+    }
   if(ac > 0)
-    this->a = at[0];
+    fts_atom_assign(&this->a, at);
   else
     fts_object_set_error(o, "No value given");
 }
@@ -65,13 +66,6 @@ const_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_outlet_atom(o, 0, &this->a);
 }
 
-/********************************************************************
- *
- *   class
- *
- */
-
-/* when defining a variable: daemon for getting the property "state". */
 static void
 const_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
@@ -83,36 +77,16 @@ const_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 static fts_status_t
 const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 1)
-    {
-      if(fts_is_tuple(at))
-	{
-	  fts_class_init(cl, sizeof(const_t), 0, 0, 0);
-	  
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, const_init);
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, const_delete);
-	  
-	  fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
-      
-	  return fts_ok;
-	}
-      else
-	{
-	  fts_class_init(cl, sizeof(const_t), 1, 1, 0);
-	  
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, const_init);
-	  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, const_delete);
-	  
-	  fts_method_define_varargs(cl, 0, fts_s_bang, const_bang);
-	  fts_outlet_type_define_varargs(cl, 0, fts_get_selector(at));
-	  
-	  fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
-      
-	  return fts_ok;
-	}
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(const_t), 1, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, const_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, const_delete);
+  
+  fts_method_define_varargs(cl, 0, fts_s_bang, const_bang);
+  
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, const_get_state);
+  
+  return fts_ok;
 }
 
 void
@@ -120,5 +94,5 @@ const_config(void)
 {
   sym_const = fts_new_symbol("const");
 
-  fts_metaclass_install(sym_const, const_instantiate, fts_arg_type_equiv);
+  fts_class_install(sym_const, const_instantiate);
 }

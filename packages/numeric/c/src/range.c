@@ -72,17 +72,25 @@ range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	      this->i_points[i] = v;
 	      this->f_points[i] = (float)v;
 	    }
-	  else /* if(fts_is_float(ap)) */
+	  else if(fts_is_float(ap))
 	    {
 	      float v = fts_get_float(ap);
 
 	      this->i_points[i] = (int)ceil(v);
 	      this->f_points[i] = v;
 	    }
+	  else
+	    {
+	      this->i_points[i] = 0;
+	      this->f_points[i] = 0.0;
+	    }
 	}
     }
 
   this->n = n;
+
+  fts_object_set_inlets_number(o, n + 1);
+  fts_object_set_outlets_number(o, n + 1);
 }
 
 static void
@@ -186,21 +194,7 @@ range_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int i, n;
-
-  if(ac == 0)
-    n = 1;
-  else 
-    n = ac;
-
-  /* test whether args are numbers */
-  for(i=0; i<ac; i++)
-    {
-      if(!fts_is_number(at + i))
-	return &fts_CannotInstantiate;
-    }
-
-  fts_class_init(cl, sizeof(range_t), n + 1, n + 1, 0);
+  fts_class_init(cl, sizeof(range_t), 2, 2, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, range_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, range_delete);
@@ -208,11 +202,8 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, range_int);
   fts_method_define_varargs(cl, 0, fts_s_float, range_float);
 
-  for(i=0; i<n; i++)
-    {
-      fts_method_define_varargs(cl, i + 1, fts_s_int, range_point);
-      fts_method_define_varargs(cl, i + 1, fts_s_float, range_point);
-    }
+  fts_method_define_varargs(cl, 1, fts_s_int, range_point);
+  fts_method_define_varargs(cl, 1, fts_s_float, range_point);
 
   return fts_ok;
 }
@@ -220,5 +211,5 @@ range_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 range_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("range"), range_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("range"), range_instantiate);
 }

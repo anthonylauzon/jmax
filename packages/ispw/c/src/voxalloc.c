@@ -246,12 +246,8 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, voxalloc_int);
   fts_method_define_varargs(cl, 0, fts_s_float, voxalloc_float);
 
-  if(fts_get_int_arg(ac, at, 3, 0) == 0)
-    { 
-      /* dur inlet */
-      fts_method_define_varargs(cl, 1, fts_s_int, voxalloc_number_1);
-      fts_method_define_varargs(cl, 1, fts_s_float, voxalloc_number_1);
-    }
+  fts_method_define_varargs(cl, 1, fts_s_int, voxalloc_number_1);
+  fts_method_define_varargs(cl, 1, fts_s_float, voxalloc_number_1);
   
   fts_outlet_type_define_varargs(cl, 0,	fts_s_bang);
   fts_outlet_type_define_varargs(cl, 1,	fts_s_int);
@@ -260,16 +256,10 @@ voxalloc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 	
-static int
-voxalloc_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
-{
-  return(fts_get_int_arg(ac0, at0, 3, 0) == fts_get_int_arg(ac1, at1, 3, 0));
-}
-
 void
 voxalloc_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("voxalloc"), voxalloc_instantiate, voxalloc_equiv);
+  fts_class_install(fts_new_symbol("voxalloc"), voxalloc_instantiate);
 }
 
 

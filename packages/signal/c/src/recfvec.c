@@ -70,7 +70,7 @@ static void
 rec_fvec_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   rec_fvec_t *this = (rec_fvec_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   if(this->fvec)
     fts_object_release((fts_object_t *)this->fvec);
@@ -297,7 +297,7 @@ rec_fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->sr = 0.001 * fts_dsp_get_sample_rate();
   this->sp = 1000. / fts_dsp_get_sample_rate();
 
-  if(ac > 0 && fvec_atom_is(at))
+  if(ac > 0 && fts_is_a(at, fvec_type))
     rec_fvec_set(o, 0, 0, ac, at);
   else
     fts_object_set_error(o, "First argument of fvec required");

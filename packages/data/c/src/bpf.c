@@ -180,7 +180,7 @@ bpf_remove_points(bpf_t *bpf, int index, int n)
 	n = size - index;
       
       if(size <= n)
-	set_size(bpf, 0);
+	bpf->size = 0;
       else
 	{
 	  int i;
@@ -330,7 +330,7 @@ bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 {
   bpf_t *this = (bpf_t *)o;
 
-  bpf_clear(this);
+  this->size = 0;
 
   if(ac > 0)
     {
@@ -379,24 +379,65 @@ bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
+bpf_set_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+
+  this->size = 1;
+  
+  this->points[0].time = 0.0;
+  this->points[0].value = 0.0;
+
+  if(bpf_editor_is_open(this))
+    bpf_set_client(this);
+
+  data_object_set_dirty(o);
+}
+
+static void
+bpf_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  bpf_t *this = (bpf_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+
+  if(this->size <= FTS_POST_MAX_ELEMENTS/2)
+    {
+      int i;
+
+      fts_spost(stream, "(:bpf");
+      
+      for(i=0; i<this->size; i++)
+	fts_spost(stream, " %.7g %.7g", this->points[i].time, this->points[i].value);
+      
+      fts_spost(stream, ")");
+    }
+  else
+    fts_spost(stream, "(:bpf)");
+}
+
+static void
 bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  int i;
+  int size = this->size;
 
-  fts_spost(stream, "{\n");
-
-  for(i=0; i<this->size; i++)
+  if(size == 0)
+    fts_spost(stream, "<empty bpf>\n", size);
+  else if (size == 1)
+    fts_spost(stream, "<bpf of 1 point: @%.7g, %.7g>\n", this->points[0].time, this->points[0].value);
+  else
     {
-      fts_spost(stream, "  (");
-      fts_spost_float(stream, this->points[i].time);
-      fts_spost(stream, ", ");      
-      fts_spost_float(stream, this->points[i].value);
-      fts_spost(stream, ")");
+      int i;
+
+      fts_spost(stream, "<bpf of %d points, %.7g msec>\n", size, this->points[size - 1].time);
+      fts_spost(stream, "{\n");
+      
+      for(i=0; i<this->size; i++)
+	fts_spost(stream, "  @%.7g, %.7g\n", this->points[i].time, this->points[i].value);
+      
+      fts_spost(stream, "}\n");
     }
-  
-  fts_spost(stream, "}\n");
 }
 
 static void
@@ -513,7 +554,7 @@ static void
 bpf_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   bpf_t *this = (bpf_t *)o;
-  bpf_t *in = bpf_atom_get(at);
+  bpf_t *in = (bpf_t *)fts_get_object(at);
   
   bpf_copy(in, this);
 
@@ -567,7 +608,7 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->size = 0;
   this->opened = 0;
 
-  if(ac)
+  if(ac > 0)
     {
       bpf_set(o, 0, 0, ac, at);
       data_object_set_keep((data_object_t *)o, fts_s_args);
@@ -609,6 +650,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, bpf_get_array);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, bpf_set);
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, bpf_post);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, bpf_print);
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -617,6 +659,7 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, bpf_set);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_append, bpf_append);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, bpf_set_clear);
   
   /* graphical editor */
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_openEditor, bpf_open_editor);
@@ -627,9 +670,9 @@ bpf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("remove_points"), bpf_remove_points_by_client_request);
   fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("set_points"), bpf_set_points_by_client_request);
   
-  fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);
-  
+  fts_method_define_varargs(cl, 0, fts_s_bang, bpf_output);  
   fts_method_define_varargs(cl, 0, fts_s_set, bpf_set);
+  fts_method_define_varargs(cl, 0, fts_s_clear, bpf_set_clear);
   
   return fts_ok;
 }

@@ -210,9 +210,9 @@ array_iterator_has_more(fts_iterator_t *iter)
 
   if(aiter->index >= aiter->array->size)
     {
-    fts_heap_free(iter->data, iterator_heap);
-    iter->data = NULL;
-    return 0;
+      fts_heap_free(iter->data, iterator_heap);
+      iter->data = NULL;
+      return 0;
     }
   else
     return 1;

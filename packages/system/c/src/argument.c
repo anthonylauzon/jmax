@@ -45,30 +45,36 @@ static void
 argument_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   argument_t *this = (argument_t *)o;
-  fts_tuple_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
-  fts_atom_t *ptr = fts_tuple_get_atoms(args);
-  int size = fts_tuple_get_size(args);
-  int index;
 
-  fts_set_void(&this->def);
-
-  index = fts_get_int(at);
-  
-  if(args && index < size)
-    this->arg = ptr + index;
-  else if(ac > 1)
+  if((ac == 1 || ac == 2) && fts_is_int(at))
     {
-      fts_atom_assign(&this->def, at + 1);
+      fts_tuple_t *args = fts_patcher_get_args(fts_object_get_patcher(o));
+      fts_atom_t *ptr = fts_tuple_get_atoms(args);
+      int size = fts_tuple_get_size(args);
+      int index;
+      
+      fts_set_void(&this->def);
+      
+      index = fts_get_int(at);
+      
+      if(args && index < size)
+	this->arg = ptr + index;
+      else if(ac > 1)
+	{
+	  fts_atom_assign(&this->def, at + 1);
+	  
+	  this->arg = &this->def;
+	}
+      else
+	{
+	  fts_object_set_error(o, "Argument %d is not defined for this patcher", index);
+	  return;
+	}
 
-      this->arg = &this->def;
+      fts_variable_add_user(fts_object_get_patcher(o), fts_s_args, o);
     }
   else
-    {
-      fts_object_set_error(o, "Argument %d is not defined for this patcher", index);
-      return;
-    }
-
-  fts_variable_add_user(fts_object_get_patcher(o), fts_s_args, o);
+    fts_object_set_error(o, "Wrong arguments");
 }
 
 static void
@@ -105,26 +111,23 @@ argument_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t p
 static fts_status_t
 argument_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if((ac == 1 || ac == 2) && fts_is_int(at))
-    {
-      fts_class_init(cl, sizeof(argument_t), 1, 1, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, argument_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, argument_delete);
-      
-      fts_class_add_daemon(cl, obj_property_get, fts_s_state, argument_get_state);
-      
-      return fts_ok;
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(argument_t), 1, 1, 0);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, argument_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, argument_delete);
+  
+  fts_class_add_daemon(cl, obj_property_get, fts_s_state, argument_get_state);
+  
+  return fts_ok;
 }
 
 void
 argument_config(void)
 {
+  fts_metaclass_t *mcl;
+
   sym_argument = fts_new_symbol("argument");
 
-  fts_metaclass_install(sym_argument, argument_instantiate, fts_arg_type_equiv);
-  fts_alias_install(fts_new_symbol("arg"), sym_argument);
+  mcl = fts_class_install(sym_argument, argument_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("arg"));
 }

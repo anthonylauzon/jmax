@@ -89,7 +89,7 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
   if (flags == FTS_SCHED_READ || flags == FTS_SCHED_WRITE)
     fd = va_arg( ap, int);
 
-  mth = fts_class_get_method( fts_object_get_class(obj), fts_system_inlet, fts_s_sched_ready);
+  mth = fts_class_get_method( fts_object_get_class(obj), fts_s_sched_ready);
   if ( !mth)
     {
       fprintf( stderr, "[sched] object %s does not define a method for \"sched_ready\"\n", fts_class_get_name( fts_object_get_class(obj)));
@@ -101,7 +101,7 @@ int fts_sched_add( fts_object_t *obj, int flags, ...)
   callback->flags = flags;
   callback->fd = fd;
   callback->ready_mth = mth;
-  callback->error_mth = fts_class_get_method( fts_object_get_class(obj), fts_system_inlet, fts_s_sched_error);
+  callback->error_mth = fts_class_get_method( fts_object_get_class(obj), fts_s_sched_error);
 
   callback->next = sched->callback_head;
   sched->callback_head = callback;

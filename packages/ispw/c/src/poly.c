@@ -278,7 +278,7 @@ poly_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 poly_config(void)
 {
-  fts_class_install(fts_new_symbol("poly"), poly_instantiate);
-  fts_alias_install(fts_new_symbol("loco"), fts_new_symbol("poly"));
+  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("poly"), poly_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("loco"));
 }
 

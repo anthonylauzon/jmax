@@ -760,7 +760,7 @@ bus_tilda_config(void)
   fts_dsp_declare_function(bus_tilda_read_symbol, bus_tilda_read);
   fts_dsp_declare_function(bus_tilda_write_read_symbol, bus_tilda_write_and_read);
 
-  fts_metaclass_install(bus_tilda_symbol, bus_tilda_instantiate, fts_first_arg_equiv);
-  fts_metaclass_install(throw_tilda_symbol, throw_tilda_instantiate, fts_never_equiv);
-  fts_metaclass_install(catch_tilda_symbol, catch_tilda_instantiate, fts_never_equiv);
+  fts_class_install(bus_tilda_symbol, bus_tilda_instantiate);
+  fts_class_install(throw_tilda_symbol, throw_tilda_instantiate);
+  fts_class_install(catch_tilda_symbol, catch_tilda_instantiate);
 }

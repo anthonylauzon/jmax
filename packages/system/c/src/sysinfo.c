@@ -46,28 +46,45 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_atom_t pkg_name;
   fts_atom_t mcl_name;
 
-  fts_get_package_names(&pkg_iter);
+  /* post html header */
+  post("<html>\n");
+  post("<head>\n");
+  post("  <title>jMax classes</title\n");
+  post("</head>\n");
+  post("<body>\n");
+  
+  /* head line */
+  post("<h1>jMax classes</h1>\n", fts_get_symbol(&pkg_name));
 
+  /* table header */
+  post("<table width=100% border=1 cellpadding=3 cellspacing=0>\n");
+
+  fts_get_package_names(&pkg_iter);
   while (fts_iterator_has_more(&pkg_iter))
     {
       fts_iterator_next(&pkg_iter, &pkg_name);
-
       pkg = fts_package_get(fts_get_symbol(&pkg_name));
 
       if(pkg != NULL && fts_package_get_state(pkg) != fts_package_corrupt)
 	{
-	  post("%s\n", fts_get_symbol(&pkg_name));
+	  post("  <tr><td colspan=2><h2>%s</h2></td></tr>\n", fts_get_symbol(&pkg_name));
 	  
 	  fts_package_get_metaclass_names(pkg, &mcl_iter);
-	  
 	  while(fts_iterator_has_more(&mcl_iter)) 
 	    {
-	      fts_iterator_next(&mcl_iter, &mcl_name);
-	      
-	      post("  %s\n", fts_get_symbol(&mcl_name));
-	    } 
+	      fts_iterator_next(&mcl_iter, &mcl_name);	      
+	      post("    <tr><td width=10%>%s</td><td>&nbsp;</td></tr>\n", fts_get_symbol(&mcl_name));
+	    }
+
 	}
     }
+
+  /* table footer */
+  post("</table>\n");
+
+  /* post html footer */
+  post("</body>\n");
+  post("</html>\n");
 }
 
 static void
@@ -75,7 +92,7 @@ sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   fts_audioport_t *port = fts_audioport_get_default(o);
 
-  fts_send_message((fts_object_t *)port, fts_system_inlet, fts_s_print, 1, at);
+  fts_send_message((fts_object_t *)port, fts_s_print, ac, at);
 }
 
 static void
@@ -83,7 +100,7 @@ sysinfo_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   fts_object_t *config = fts_midiconfig_get();
 
-  fts_send_message(config, fts_system_inlet, fts_s_print, 1, at);
+  fts_send_message(config, fts_s_print, ac, at);
 }
 
 static fts_status_t

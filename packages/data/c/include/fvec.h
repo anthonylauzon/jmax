@@ -26,19 +26,14 @@
 #define _DATA_FVEC_H_
 
 #include "data.h"
-
-typedef struct _fvec_
-{
-  data_object_t o;
-  float *values;
-  int size;
-  int alloc;
-} fvec_t;
+#include "fmat.h"
 
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_metaclass_t *fvec_type;
 
-#define fvec_get_size(v) ((v)->size)
+typedef fmat_t fvec_t;
+
+#define fvec_get_size(v) ((v)->m)
 DATA_API void fvec_set_size(fvec_t *vector, int size);
 
 #define fvec_get_ptr(v) ((v)->values)
@@ -49,12 +44,7 @@ DATA_API void fvec_set_size(fvec_t *vector, int size);
 DATA_API void fvec_copy(fvec_t *org, fvec_t *copy);
 
 DATA_API void fvec_set_const(fvec_t *vector, float c);
-#define fvec_zero(v) fvec_set_const((v), 0.0)
 
 DATA_API void fvec_set_with_onset_from_atoms(fvec_t *vector, int offset, int ac, const fts_atom_t *at);
-
-/* fvec atoms */
-#define fvec_atom_get(ap) ((fvec_t *)fts_get_object(ap))
-#define fvec_atom_is(ap) (fts_is_a((ap), fvec_type))
 
 #endif

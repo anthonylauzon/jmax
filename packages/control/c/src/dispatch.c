@@ -50,7 +50,7 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       fts_object_t *obj = fts_get_object(a);
       fts_class_t *class = fts_object_get_class(obj);
-      fts_method_t method = fts_class_get_method(class, fts_system_inlet, sym__remote_value);
+      fts_method_t method = fts_class_get_method(class, sym__remote_value);
 
       if(method)
 	method(obj, fts_system_inlet, sym__remote_value, ac, at);

@@ -164,15 +164,19 @@ key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       int code = get_code(at);
 
       if(code > 0)
-	keyserver_add_listener(code, o, key_action);
+	{
+	  keyserver_add_listener(code, o, key_action);
+	  this->code = code;
+	}
       else
 	{
-	  post("key: unknown key specifier: ");
-	  post_atoms(1, at);
-	  post("\n");
+	  if(fts_is_int(at))
+	    fts_object_set_error(o, "unknown key specifier: %d", fts_get_int(at));
+	  else if(fts_is_symbol(at))
+	    fts_object_set_error(o, "unknown key specifier: %s", fts_get_symbol(at));
+	  else
+	    fts_object_set_error(o, "unknown key specifier");
 	}
-
-      this->code = code;
     }
 }
 
@@ -187,23 +191,10 @@ key_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 key_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac == 0)
-    {
-      fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, key_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, key_delete);
-    }
-
-  else if(ac == 1)
-    {
-      fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
-      
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, key_init);
-      fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, key_delete);
-    }
-  else
-    return &fts_CannotInstantiate;
+  fts_class_init(cl, sizeof(fts_key_t), 0, 2, 0);
+  
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, key_init);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, key_delete);
 
   return fts_ok;
 }
@@ -248,15 +239,19 @@ keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       int code = get_code(at);
 
       if(code > 0)
-	keyserver_add_listener(code, o, keystat_action);
+	{
+	  keyserver_add_listener(code, o, keystat_action);
+	  this->code = code;
+	}
       else
 	{
-	  post("keystat: unknown key specifier: ");
-	  post_atoms(1, at);
-	  post("\n");
+	  if(fts_is_int(at))
+	    fts_object_set_error(o, "unknown key specifier: %d", fts_get_int(at));
+	  else if(fts_is_symbol(at))
+	    fts_object_set_error(o, "unknown key specifier: %s", fts_get_symbol(at));
+	  else
+	    fts_object_set_error(o, "unknown key specifier");
 	}
-
-      this->code = code;
     }
 }
 
@@ -316,6 +311,6 @@ key_config(void)
 
   sym_space = fts_new_symbol("space");
 
-  fts_metaclass_install(fts_new_symbol("key"), key_instantiate, fts_narg_equiv);
+  fts_class_install(fts_new_symbol("key"), key_instantiate);
   fts_metaclass_install(fts_new_symbol("keystat"), keystat_instantiate, fts_narg_equiv);
 }

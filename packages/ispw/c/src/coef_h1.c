@@ -303,6 +303,6 @@ sigcoef_hlshelf1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 sigcoef_hlshelf1_config(void)
 {
-  fts_class_install(fts_new_symbol("coef_hlshelf1~"),sigcoef_hlshelf1_instantiate);
-  fts_alias_install(fts_new_symbol("coef_h~"), fts_new_symbol("coef_hlshelf1~"));
+  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("coef_hlshelf1~"),sigcoef_hlshelf1_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("coef_h~"));
 }

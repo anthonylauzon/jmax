@@ -88,7 +88,7 @@ static void
 play_fvec_set_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   play_fvec_t *this = (play_fvec_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   if(this->fvec)
     fts_object_release(this->fvec);

@@ -109,6 +109,8 @@ unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->types[0] = type_int;
       this->types[1] = type_int;
     }
+
+  fts_object_set_outlets_number(o, this->n);
 }
 
 static void
@@ -122,18 +124,7 @@ unpack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a;
-  int i;
-
-  if (!ac)
-    {
-      fts_class_init(cl, sizeof(unpack_t), 1, 2, 0);
-
-      fts_outlet_type_define_varargs(cl, 0, fts_s_int);
-      fts_outlet_type_define_varargs(cl, 1, fts_s_int);
-    }
-  else
-    fts_class_init(cl, sizeof(unpack_t), 1, ac, 0);
+  fts_class_init(cl, sizeof(unpack_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, unpack_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, unpack_delete);
@@ -142,23 +133,6 @@ unpack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, unpack_send);
   fts_method_define_varargs(cl, 0, fts_s_float, unpack_send);
 
-  for(i=0; i<ac; i++)
-    {
-      if (fts_is_number(at + i))
-	fts_outlet_type_define_varargs(cl, i, fts_get_selector(at + i));
-      else if (fts_is_symbol(at + i))
-	{
-	  fts_symbol_t sym = fts_get_symbol(at + i);
-
-	  if(sym == sym_i)
-	    fts_outlet_type_define_varargs(cl, i, fts_s_int);
-	  else if(sym == sym_f)
-	    fts_outlet_type_define_varargs(cl, i, fts_s_float);
-	  else
-	    fts_outlet_type_define_varargs(cl, i, fts_s_symbol);
-	}
-    }
-  
   return fts_ok;
 }
 
@@ -168,5 +142,5 @@ unpack_config(void)
   sym_f = fts_new_symbol("f");
   sym_i = fts_new_symbol("i");
 
-  fts_metaclass_install(fts_new_symbol("unpack"), unpack_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("unpack"), unpack_instantiate);
 }

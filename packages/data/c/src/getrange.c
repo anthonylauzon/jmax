@@ -38,7 +38,7 @@
 static void
 getrange_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *vec = ivec_atom_get(at);
+  ivec_t *vec = (ivec_t *)fts_get_object(at);
   int min = INT_MAX;
   int max = INT_MIN;
   int size = ivec_get_size(vec);
@@ -63,7 +63,7 @@ getrange_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static void
 getrange_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *vec = fvec_atom_get(at);
+  fvec_t *vec = (fvec_t *)fts_get_object(at);
   float min = FLT_MAX;
   float max = FLT_MIN;
   int size = fvec_get_size(vec);

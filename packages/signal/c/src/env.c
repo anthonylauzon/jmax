@@ -139,7 +139,7 @@ static void
 env_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   env_t *this = (env_t *)o;
-  bpf_t *bpf = bpf_atom_get(at);
+  bpf_t *bpf = (bpf_t *)fts_get_object(at);
 
   env_set_current(this, bpf);
 }
@@ -227,7 +227,7 @@ env_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void 
 env_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  if(ac == 1 && bpf_atom_is(at))
+  if(ac == 1 && fts_is_a(at, bpf_type))
     env_set_bpf(o, 0, 0, 1, at);
   else
     env_set_array(o, 0, 0, ac, at);
@@ -592,7 +592,7 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   this->editid = 0;
 
-  if(bpf_atom_is(at))
+  if(fts_is_a(at, bpf_type))
     env_set_bpf(o, 0, 0, 1, at);
   else
     env_set_current(this, this->local);

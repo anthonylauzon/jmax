@@ -316,6 +316,8 @@ tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
     }
 
+  fts_object_set_inlets_number(o, n);
+
   this->n = n;
   this->trigger = 1;
   this->reset = 0;
@@ -336,20 +338,7 @@ tup_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 static fts_status_t
 tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n = 0;
-  int i;
-
-  if(ac == 1 && fts_is_number(at))
-    n = fts_get_number_int(at);
-  else
-    n = ac;
-
-  if(n < 2)
-    n = 2;
-  else if(n > TUP_MAX_SIZE)
-    n = TUP_MAX_SIZE;
-
-  fts_class_init(cl, sizeof(tup_t), n, 1, 0); 
+  fts_class_init(cl, sizeof(tup_t), 2, 1, 0); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tup_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tup_delete);
@@ -361,14 +350,11 @@ tup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, tup_output);
   fts_method_define_varargs(cl, 0, fts_s_set, tup_set);
 
-  for(i=0; i<n; i++)
-    {
-      fts_method_define_varargs(cl, i, fts_s_int, tup_input_primitive);
-      fts_method_define_varargs(cl, i, fts_s_float, tup_input_primitive);
-      fts_method_define_varargs(cl, i, fts_s_symbol, tup_input_primitive);
-      fts_method_define_varargs(cl, i, fts_s_list, tup_input_atoms);
-      fts_method_define_varargs(cl, i, fts_s_anything, tup_input_anything);
-    }
+  fts_method_define_varargs(cl, 1, fts_s_int, tup_input_primitive);
+  fts_method_define_varargs(cl, 1, fts_s_float, tup_input_primitive);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, tup_input_primitive);
+  fts_method_define_varargs(cl, 1, fts_s_list, tup_input_atoms);
+  fts_method_define_varargs(cl, 1, fts_s_anything, tup_input_anything);
 
   return fts_ok;
 }
@@ -443,22 +429,13 @@ untup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     n = 2;
 
   this->n = n;
+  fts_object_set_outlets_number(o, n);
 }
 
 static fts_status_t
 untup_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n = 0;
-
-  if(ac == 1 && fts_is_number(at))
-    n = fts_get_number_int(at);
-
-  if(n < 2) 
-    n = 2;
-  else if(n > TUP_MAX_SIZE)
-    n = TUP_MAX_SIZE;
-
-  fts_class_init(cl, sizeof(untup_t), 1, n, 0); 
+  fts_class_init(cl, sizeof(untup_t), 1, 1, 0); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, untup_init);
 
@@ -677,7 +654,7 @@ getup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  getup_t *this = (getup_t *)o;
 	  fts_object_t *input = fts_get_object(at);
 	  fts_class_t *class = fts_object_get_class(input);
-	  fts_method_t method = fts_class_get_method(class, fts_system_inlet, fts_s_get_array);
+	  fts_method_t method = fts_class_get_method(class, fts_s_get_array);
 	  
 	  if(method)
 	    {
@@ -733,8 +710,8 @@ tup_config(void)
   sym_left = fts_new_symbol("left");
   sym_right = fts_new_symbol("right");
 
-  fts_metaclass_install(fts_new_symbol("tup"), tup_instantiate, tup_equiv);
-  fts_metaclass_install(fts_new_symbol("untup"), untup_instantiate, fts_first_arg_equiv);
+  fts_class_install(fts_new_symbol("tup"), tup_instantiate);
+  fts_class_install(fts_new_symbol("untup"), untup_instantiate);
   fts_class_install(fts_new_symbol("cotup"), cotup_instantiate);
   fts_class_install(fts_new_symbol("detup"), detup_instantiate);
   fts_class_install(fts_new_symbol("getup"), getup_instantiate);

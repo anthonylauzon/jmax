@@ -37,11 +37,6 @@ static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_open_file = 0;
 static fts_symbol_t sym_local = 0;
 
-/* add something to beginning and and of float vector */
-/* for four-point interpolation */
-#define FVEC_MONSET 1
-#define FVEC_MOVERHEAD 4
-
 /********************************************************
  *
  *  utility functions
@@ -60,25 +55,26 @@ fvec_set_size(fvec_t *vec, int size)
 
   if(size > alloc)
     {
-      if(vec->values != NULL)
-	values = (float *)fts_realloc((vec->values - FVEC_MONSET), sizeof(float) * (size + FVEC_MOVERHEAD)) + FVEC_MONSET;
+      if(values == NULL)
+	values = (float *)fts_malloc((size + FTS_CUBIC_HEAD + FTS_CUBIC_TAIL) * sizeof(float));
       else
-	values = (float *)fts_malloc(sizeof(float) * (size + FVEC_MOVERHEAD)) + FVEC_MONSET;	
+	values = (float *)fts_realloc((vec->values - FTS_CUBIC_HEAD), (size + FTS_CUBIC_HEAD + FTS_CUBIC_TAIL) * sizeof(float));
+
+      values += FTS_CUBIC_HEAD;
 
       values[-1] = 0.0;
       values[size] = 0.0;
       values[size + 1] = 0.0;
-      values[size + 2] = 0.0;
 
       vec->values = values;
       vec->alloc = size;
     }
 
   /* when shortening: zero old values */
-  for(i=size; i<vec->size; i++)
+  for(i=size; i<vec->m; i++)
     vec->values[i] = 0.0;
 
-  vec->size = size;
+  vec->m = size;
 }
 
 void
@@ -87,7 +83,7 @@ fvec_set_const(fvec_t *vec, float c)
   float *values = vec->values;
   int i;
   
-  for(i=0; i<vec->size; i++)
+  for(i=0; i<vec->m; i++)
     values[i] = c;
 }
 
@@ -116,7 +112,7 @@ fvec_get_sum(fvec_t *vec)
   float sum = 0;
   int i;
 
-  for(i=0; i<vec->size; i++)
+  for(i=0; i<vec->m; i++)
     sum += vec->values[i];
 
   return sum;
@@ -130,7 +126,7 @@ fvec_get_min_value(fvec_t *vec)
 
   min = vec->values[0];
 
-  for (i=1; i<vec->size; i++)
+  for (i=1; i<vec->m; i++)
     if (vec->values[i] < min)
       min = vec->values[i];
 
@@ -146,7 +142,7 @@ fvec_get_max_value(fvec_t *vec)
 
   max = vec->values[0];
 
-  for (i=1; i<vec->size; i++)
+  for (i=1; i<vec->m; i++)
     if (vec->values[i] > max)
       max = vec->values[i];
 
@@ -329,14 +325,6 @@ static void
 fvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_object(o, 0, o);
-}
-
-static void
-fvec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fvec_t *this = (fvec_t *)o;
-
-  fvec_set_const(this, 0.0f);
 }
 
 static void
@@ -547,7 +535,7 @@ fvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       if(size >= 0)
 	{
-	  int old_size = this->size;
+	  int old_size = this->m;
 	  int i;
 
 	  fvec_set_size(this, size);
@@ -574,7 +562,7 @@ fvec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -609,7 +597,7 @@ fvec_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -644,7 +632,7 @@ fvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -679,7 +667,7 @@ fvec_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -717,7 +705,7 @@ fvec_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -752,7 +740,7 @@ fvec_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -809,7 +797,7 @@ fvec_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -844,7 +832,7 @@ fvec_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -877,7 +865,7 @@ fvec_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -912,7 +900,7 @@ fvec_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -947,7 +935,7 @@ fvec_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -982,7 +970,7 @@ fvec_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -1017,7 +1005,7 @@ fvec_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -1050,7 +1038,7 @@ fvec_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int this_size = fvec_get_size(this);
 	  int right_size = fvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -1132,7 +1120,7 @@ fvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 0 && fts_is_a(at, cvec_type))
     {
       /* complex FFT */
-      cvec_t *in = cvec_atom_get(at);
+      cvec_t *in = (cvec_t *)fts_get_object(at);
       int in_size = cvec_get_size(in);
       unsigned int fft_size = fts_get_fft_size(2 * in_size);
       float *fft_ptr;
@@ -1283,56 +1271,75 @@ fvec_save_soundfile(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
  */
 
 static void
+fvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int size = fvec_get_size(this);
+
+  if(size == 0)
+    fts_spost(stream, "(:fvec)");
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+    {
+      int i;
+      
+      fts_spost(stream, "(:fvec", size);
+      
+      for(i=0; i<size-1; i++)
+	fts_spost(stream, "%.7g ", fvec_get_element(this, i));
+      
+      fts_spost(stream, "%.7g)", fvec_get_element(this, i));
+    }
+  else
+    fts_spost(stream, "(:fvec %d)", size);
+}
+
+static void
 fvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = fvec_get_size(this);
-  int i;
 
-  fts_spost(stream, "{");
-
-  if(size > 8)
+  if(size == 0)
+    fts_spost(stream, "<empty fvec>\n");
+  else if(size == 1)
+    fts_spost(stream, "<fvec of 1 element: %.7g>\n", fvec_get_element(this, 0));
+  else if(size <= FTS_POST_MAX_ELEMENTS)
     {
-      int size8 = (size / 8) * 8;
-      int i, j;
-
-      for(i=0; i<size8; i+=8)
-	{
-	  /* print one line of 8 with indent */
-	  fts_spost(stream, "\n  ");
-	  for(j=0; j<8; j++)
-	    {
-	      fts_spost_float(stream, fvec_get_element(this, i + j));
-	      fts_spost(stream, " ");
-	    }
-	}
-	  
-      /* print last line with indent */
-      if(i < size)
-	{
-	  fts_spost(stream, "\n  ");
-	  for(; i<size; i++)
-	    {
-	      fts_spost_float(stream, fvec_get_element(this, i));
-	      fts_spost(stream, " ");
-	    }
-	}
-
-      fts_spost(stream, "\n");
-    }
-  else if(size)
-    {
+      int i;
+      
+      fts_spost(stream, "<fvec of %d elements: ", size);
+      
       for(i=0; i<size-1; i++)
+	fts_spost(stream, "%.7g ", fvec_get_element(this, i));
+      
+      fts_spost(stream, "%.7g>\n", fvec_get_element(this, i));
+    }
+  else
+    {
+      int i, j;
+      
+      fts_spost(stream, "<fvec of %d elements>\n", size);
+      fts_spost(stream, "{\n");
+      
+      for(i=0; i<size; i+=FTS_POST_MAX_ELEMENTS)
 	{
-	  fts_spost_float(stream, fvec_get_element(this, i));
-	  fts_spost(stream, " ");
+	  int n = size - i;
+
+	  if(n > FTS_POST_MAX_ELEMENTS)
+	    n = FTS_POST_MAX_ELEMENTS;
+	  
+	  fts_spost(stream, "  ");
+	  
+	  for(j=0; j<n; j++)
+	    fts_spost(stream, "%.7g ", fvec_get_element(this, i + j));
+	  
+	  fts_spost(stream, "\n");
 	}
       
-      fts_spost_float(stream, fvec_get_element(this, i));
+      fts_spost(stream, "}\n");
     }
-
-  fts_spost(stream, "}\n");
 }
 
 static void
@@ -1365,7 +1372,7 @@ static void
 fvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
-  fvec_t *in = fvec_atom_get(at);
+  fvec_t *in = (fvec_t *)fts_get_object(at);
   
   fvec_copy(in, this);
 }
@@ -1414,10 +1421,10 @@ fvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(ac > 0)
     {
       if(fts_is_a(at, fvec_type))
-	fvec_copy(fvec_atom_get(at), this);
+	fvec_copy((fvec_t *)fts_get_object(at), this);
       else if(fts_is_a(at, cvec_type))
 	{
-	  cvec_t *cvec = cvec_atom_get(at);
+	  cvec_t *cvec = (cvec_t *)fts_get_object(at);
 	  complex *c = cvec_get_ptr(cvec);
 	  int size = cvec_get_size(cvec);
 	  int i;
@@ -1447,7 +1454,8 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   fvec_t *this = (fvec_t *)o;
   
   this->values = NULL;
-  this->size = 0;
+  this->m = 0;
+  this->n = 1;
   this->alloc = FVEC_NO_ALLOC;
   data_object_set_keep((data_object_t *)o, fts_s_no);
 
@@ -1456,7 +1464,7 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else if(ac == 1 && fts_is_int(at))
     {
       fvec_set_size(this, fts_get_int(at));
-      fvec_zero(this);
+      fvec_set_const(this, 0.0);
     }
   else if(ac == 1 && fts_is_tuple(at))
     {
@@ -1499,7 +1507,7 @@ fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fvec_t *this = (fvec_t *)o;
 
   if(this->values != NULL)
-    fts_free(this->values - FVEC_MONSET);
+    fts_free(this->values - FTS_CUBIC_HEAD);
 }
 
 static fts_status_t
@@ -1511,6 +1519,7 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fvec_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fvec_delete);
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, fvec_post); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, fvec_print); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, fvec_set_elements);
@@ -1531,7 +1540,6 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fvec_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, fvec_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, fvec_fill);
   fts_method_define_varargs(cl, 0, fts_s_set, fvec_set_elements);
 

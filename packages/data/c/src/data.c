@@ -32,7 +32,6 @@ extern void col_config(void);
 extern void row_config(void);
 extern void bpf_config(void);
 extern void dict_config(void);
-extern void preset_config(void);
 
 extern void getval_config(void);
 extern void getinter_config(void);
@@ -81,7 +80,6 @@ data_config(void)
   row_config();
   bpf_config();
   dict_config();
-  preset_config();
 
   getval_config();  
   getinter_config();

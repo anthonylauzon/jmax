@@ -567,7 +567,7 @@ static void end_message_action( unsigned char input, client_t *client)
 
   /* Client messages are sent to the system inlet */
   if (target)
-    fts_send_message( target, fts_system_inlet, selector, argc, argv);
+    fts_send_message( target, selector, argc, argv);
 
  skipped:
   fts_stack_clear( &client->input_args);
@@ -892,7 +892,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_patcher_set_file_name(patcher, file_name);
 
   /* activate the post-load init, like loadbangs */   
-  fts_send_message( (fts_object_t *)patcher, fts_system_inlet, fts_new_symbol("load_init"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_new_symbol("load_init"), 0, 0);
 
   fts_set_int(a, fts_get_object_id((fts_object_t *)patcher));
   fts_set_symbol(a+1, file_name);
@@ -900,8 +900,8 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_client_send_message( (fts_object_t *)client, fts_new_symbol( "patcher_loaded"), 3, a);
 
   /* upload the patcher to the client */
-  fts_send_message( (fts_object_t *)patcher, fts_system_inlet, fts_s_upload, 0, 0);
-  fts_send_message( (fts_object_t *)patcher, fts_system_inlet, fts_new_symbol("openEditor"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_s_upload, 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_new_symbol("openEditor"), 0, 0);
 
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
@@ -932,8 +932,8 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
       fts_set_int(a, fts_get_object_id( (fts_object_t *)project));
       fts_client_send_message(o, fts_s_project, 1, a);
       
-      fts_send_message( (fts_object_t *)project, fts_system_inlet, fts_s_upload, 0, 0);
-      fts_send_message( (fts_object_t *)project, fts_system_inlet, fts_s_openEditor, 0, 0);
+      fts_send_message( (fts_object_t *)project, fts_s_upload, 0, 0);
+      fts_send_message( (fts_object_t *)project, fts_s_openEditor, 0, 0);
     }
 }
 
@@ -963,9 +963,9 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
 
 	  fts_set_int(a, fts_get_object_id( (fts_object_t *)package));
 	  fts_client_send_message(o, fts_s_package, 1, a);    
-	  fts_send_message( (fts_object_t *)package, fts_system_inlet, fts_s_upload, 0, 0);
+	  fts_send_message( (fts_object_t *)package, fts_s_upload, 0, 0);
 	}
-      fts_send_message( (fts_object_t *)package, fts_system_inlet, fts_s_openEditor, 0, 0);
+      fts_send_message( (fts_object_t *)package, fts_s_openEditor, 0, 0);
     }
 }
 
@@ -1050,7 +1050,7 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_set_int(a, fts_get_object_id( project));
   fts_client_send_message(o, fts_s_project, 1, a);
   
-  fts_send_message( project, fts_system_inlet, fts_s_upload, 0, 0);
+  fts_send_message( project, fts_s_upload, 0, 0);
 }
 
 static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1067,7 +1067,7 @@ static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, 
       fts_set_int(&a, fts_get_object_id(config));
       fts_client_send_message(o, fts_s_midi_config, 1, &a);
       
-      fts_send_message(config, fts_system_inlet, fts_s_upload, 0, 0);
+      fts_send_message(config, fts_s_upload, 0, 0);
     }
 }
 
@@ -1493,7 +1493,7 @@ void fts_client_upload_object(fts_object_t *obj, int client_id)
   fts_client_register_object(obj, client_id);
 
   fts_set_object( a, obj);
-  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_system_inlet, fts_s_upload_child, 1, a);  
+  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_s_upload_child, 1, a);  
 }
 
 void fts_client_register_object(fts_object_t *obj, int client_id)

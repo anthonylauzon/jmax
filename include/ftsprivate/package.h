@@ -246,23 +246,13 @@ fts_abstraction_t *fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_s
 /**
  * Add a new meta class to this package.
  *
- * @fn fts_status_t fts_package_add_metaclass(fts_package_t* pkg, fts_metaclass_t *mcl)
+ * @fn fts_status_t fts_package_add_metaclass(fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_t name)
  * @param pkg the package
  * @param mcl the meta class
+ * @param name the registery name
  * @return a status object 
  * @ingroup package */
-fts_status_t fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl);
-
-/**
- * Add a new alias for an existing class name to this package.
- *
- * @fn fts_status_t fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
- * @param pkg the package
- * @param alias alias name
- * @param name name of the class to be aliased
- * @return a status object 
- * @ingroup package */
-fts_status_t fts_package_add_alias( fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name);
+fts_status_t fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_t name);
 
 /**
  * Returns the meta class with the specified name. 

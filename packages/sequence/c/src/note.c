@@ -97,12 +97,12 @@ note_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 void 
-note_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+note_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   note_t *this = (note_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
 
-  fts_spost(stream, "{%d %f}\n", this->pitch, (float)this->duration);
+  fts_spost(stream, "(:note %d %d)", this->pitch, (float)this->duration);
 }
 
 static void
@@ -126,7 +126,7 @@ note_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, note_get_array);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_array, note_set_from_array);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, note_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, note_post);
 
   fts_method_define_varargs(cl, 0, fts_new_symbol("duration"), note_duration);
   fts_method_define_varargs(cl, 0, fts_new_symbol("pitch"), note_pitch);

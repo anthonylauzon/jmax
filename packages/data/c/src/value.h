@@ -39,8 +39,4 @@ DATA_API fts_metaclass_t *value_type;
 #define value_set(v, x) fts_atom_assign(&(v)->a, (x))
 #define value_get(v) (&(v)->a)
 
-/* value atoms */
-#define value_atom_get(ap) ((value_t *)fts_get_object(ap))
-#define value_atom_is(ap) (fts_is_a((ap), value_type))
-
 #endif

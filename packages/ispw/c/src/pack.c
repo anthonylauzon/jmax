@@ -149,6 +149,8 @@ pack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    x->argv[i] = at[i];
 	}
     }
+
+  fts_object_set_inlets_number(o, x->argc);  
 }
 
 static void
@@ -162,19 +164,7 @@ pack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 static fts_status_t
 pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_atom_t sat[2];
-  int n;
-
-  /* then provide default arguments */
-  if (!ac)
-    {
-      ac = 2;
-      fts_set_int(sat, 0);
-      fts_set_int(sat + 1, 0);
-      at = sat;
-    }
-
-  fts_class_init(cl, sizeof(pack_t), ac, 1, 0);
+  fts_class_init(cl, sizeof(pack_t), 2, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, pack_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, pack_delete);
@@ -187,12 +177,9 @@ pack_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_float, pack_send);
   fts_method_define_varargs(cl, 0, fts_s_symbol, pack_send);
 
-  for (n = 1; n < ac; at++, n++)
-    {
-      fts_method_define_varargs(cl, n, fts_s_int, pack_inlet);
-      fts_method_define_varargs(cl, n, fts_s_float, pack_inlet);
-      fts_method_define_varargs(cl, n, fts_s_symbol, pack_inlet);
-    }
+  fts_method_define_varargs(cl, 1, fts_s_int, pack_inlet);
+  fts_method_define_varargs(cl, 1, fts_s_float, pack_inlet);
+  fts_method_define_varargs(cl, 1, fts_s_symbol, pack_inlet);
 
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
 
@@ -205,6 +192,6 @@ pack_config(void)
   pack_s_f = fts_new_symbol("f");
   pack_s_i = fts_new_symbol("i");
 
-  fts_metaclass_install(fts_new_symbol("pack"),pack_instantiate, fts_narg_equiv);
+  fts_class_install(fts_new_symbol("pack"), pack_instantiate);
 }
 

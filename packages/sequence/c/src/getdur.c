@@ -32,7 +32,7 @@
 static void
 getdur_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  track_t *track = track_atom_get(at);
+  track_t *track = (track_t *)fts_get_object(at);
 
   fts_outlet_float(o, 0, track_get_duration(track));
 }

@@ -666,9 +666,8 @@ fts_package_get_abstraction_in_path(fts_package_t* pkg, fts_symbol_t name)
  */
 
 fts_status_t 
-fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl)
+fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl, fts_symbol_t name)
 {
-  fts_symbol_t name = mcl->name;
   fts_atom_t data, k;
 
   /* Create the database if necessary */
@@ -687,7 +686,8 @@ fts_package_add_metaclass( fts_package_t* pkg, fts_metaclass_t *mcl)
       fts_hashtable_put(pkg->classes, &k, &data);
     }
 
-  fts_metaclass_set_package(mcl, pkg);
+  if(fts_metaclass_get_package(mcl) == NULL)
+    fts_metaclass_set_package(mcl, pkg);
 
   return fts_ok;
 }
@@ -699,31 +699,10 @@ fts_package_get_metaclass(fts_package_t* pkg, fts_symbol_t name)
   
   fts_set_symbol( &k, name);
   
-  if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data)) {
+  if ((pkg->classes != NULL) && fts_hashtable_get(pkg->classes, &k, &data))
     return fts_get_pointer(&data);
-  } else {
-    return NULL;
-  }
-}
-
-fts_status_t 
-fts_package_add_alias(fts_package_t* pkg, fts_symbol_t alias, fts_symbol_t name)
-{
-  fts_metaclass_t *mcl;
-  fts_atom_t data, k;
-
-  mcl = fts_package_get_metaclass(pkg, name);
-  
-  fts_set_symbol( &k, alias);
-  if (fts_hashtable_get(pkg->classes, &k, &data))
-    return &fts_DuplicatedMetaclass;
   else
-    {
-      fts_set_pointer(&data, mcl);
-      fts_hashtable_put(pkg->classes, &k, &data);
-    }
-  
-  return fts_ok;
+    return NULL;
 }
 
 void 
@@ -1053,10 +1032,10 @@ __fts_package_midi_config(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     {
       fts_atom_t a[1];
       fts_set_symbol( a, pkg->midi_config);
-      fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_system_inlet, fts_s_load, 1, a);
+      fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_s_load, 1, a);
     }
   else
-    fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_system_inlet, fts_s_default, 0, 0);
+    fts_send_message((fts_object_t *)fts_midiconfig_get(), fts_s_default, 0, 0);
 }
 
 static void 
@@ -1476,8 +1455,7 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, __fts_package_delete);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, __fts_package_upload);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_update, __fts_package_update);
-
-  fts_method_define_varargs(cl, 0, fts_s_print, __fts_package_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, __fts_package_print);
 
   fts_method_define_varargs(cl, 0, fts_s_require, __fts_package_require);
   fts_method_define_varargs(cl, 0, fts_s_template, __fts_package_template);
@@ -1580,7 +1558,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 
   /* Send a "print" message to the result */
-  if ( (status = fts_send_message( obj, 0, fts_s_print, 0, 0)) != fts_ok)
+  if ( (status = fts_send_message( obj, fts_s_print, 0, 0)) != fts_ok)
     post( "Message send failed (%s)\n", fts_status_get_description(status));
 
   if (fts_object_get_metaclass(obj) == fts_package_type) {

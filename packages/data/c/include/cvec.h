@@ -26,23 +26,18 @@
 #define _DATA_CVEC_H_
 
 #include "data.h"
+#include "fmat.h"
 #include <utils/c/include/utils.h>
 
-typedef struct _cvec_
-{
-  data_object_t o;
-  complex *values;
-  int size;
-  int alloc;
-} cvec_t;
+typedef fmat_t cvec_t;
 
 DATA_API fts_symbol_t cvec_symbol;
 DATA_API fts_metaclass_t *cvec_type;
 
-#define cvec_get_size(v) ((v)->size)
+#define cvec_get_size(v) ((v)->m)
 DATA_API void cvec_set_size(cvec_t *vector, int size);
 
-#define cvec_get_ptr(v) ((v)->values)
+#define cvec_get_ptr(v) ((complex *)(v)->values)
 
 #define cvec_get_element(v, i) ((v)->values[i])
 #define cvec_set_element(v, i, x) ((v)->values[i] = (x))
@@ -50,12 +45,7 @@ DATA_API void cvec_set_size(cvec_t *vector, int size);
 DATA_API void cvec_copy(cvec_t *org, cvec_t *copy);
 
 DATA_API void cvec_set_const(cvec_t *vector, complex c);
-#define cvec_zero(v) cvec_set_const((v), CZERO)
 
 DATA_API void cvec_set_with_onset_from_atoms(cvec_t *vector, int offset, int ac, const fts_atom_t *at);
-
-/* cvec atoms */
-#define cvec_atom_get(ap) ((cvec_t *)fts_get_object(ap))
-#define cvec_atom_is(ap) (fts_is_a((ap), cvec_type))
 
 #endif

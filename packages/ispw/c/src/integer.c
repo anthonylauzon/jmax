@@ -102,6 +102,6 @@ int_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 int_config(void)
 {
-  fts_class_install(fts_s_int, int_instantiate);
-  fts_alias_install(fts_new_symbol("i"), fts_s_int);
+  fts_metaclass_t *mcl = fts_class_install(fts_s_int, int_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("i"));
 }

@@ -47,7 +47,7 @@ paste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   paste_t *this = (paste_t *)o;
   float *buf = this->buf;
   int buf_size = this->size;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
   int size = fvec_get_size(fvec);
   float *ptr = fvec_get_ptr(fvec);
   int onset = (int)((fts_get_time() - fts_dsp_get_time()) * this->conv);

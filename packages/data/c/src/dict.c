@@ -44,6 +44,8 @@ dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom)
   /* remove old entry for same key */
   if(fts_hashtable_get(hash, key, &a))
     fts_atom_void(&a);  
+  else
+    fts_set_void(&a);
 
   fts_atom_assign(&a, atom);
 
@@ -64,15 +66,6 @@ dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *
       fts_set_object(&a, (fts_object_t *)tuple);
       dict_store(dict, key, &a);
     }
-}
-
-void
-dict_recall(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom)
-{
-  fts_hashtable_t *hash = dict_get_hash(dict, key);
-  
-  fts_set_void(atom);
-  fts_hashtable_get(hash, key, atom);
 }
 
 static void
@@ -120,23 +113,26 @@ dict_remove_all(dict_t *dict)
 void
 dict_get_keys(dict_t *dict, fts_array_t *array)
 {
-  fts_iterator_t iterators[2];
-  int tab;
+  fts_iterator_t iterator;
 
-  fts_hashtable_get_keys(&dict->table_int, iterators + 0);
-  fts_hashtable_get_keys(&dict->table_symbol, iterators + 1);
+  fts_hashtable_get_keys(&dict->table_int, &iterator);
 
-  for(tab=0; tab<2; tab++)
+  while(fts_iterator_has_more(&iterator))
     {
-      fts_iterator_t *iterator = iterators + tab;
+      fts_atom_t key;
+      
+      fts_iterator_next(&iterator, &key);
+      fts_array_append(array, 1, &key);
+    }
 
-      while(fts_iterator_has_more(iterator))
-	{
-	  fts_atom_t key;
+  fts_hashtable_get_keys(&dict->table_symbol, &iterator);
 
-	  fts_iterator_next(iterator, &key);
-	  fts_array_append(array, 1, &key);
-	}
+  while(fts_iterator_has_more(&iterator))
+    {
+      fts_atom_t key;
+      
+      fts_iterator_next(&iterator, &key);
+      fts_array_append(array, 1, &key);
     }
 }
 
@@ -212,9 +208,10 @@ dict_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   
   if(ac > 0 && (fts_is_symbol(at) || fts_is_int(at)))
     {
+      fts_hashtable_t *hash = dict_get_hash(this, at);
       fts_atom_t a;
-
-      dict_recall(this, at, &a);
+      
+      fts_hashtable_get(hash, at, &a);
       fts_outlet_atom(o, 0, &a);
     }
 }
@@ -224,20 +221,14 @@ dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   dict_t *this = (dict_t *)o;
 
-  if(ac > 0)
-    { 
-      if(fts_is_int(at) || fts_is_symbol(at))
-	dict_remove(this, at);
-    }
-  else
-    dict_remove_all(this);
+  dict_remove_all(this);
 }
 
 static void
 dict_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
-  dict_t *in = dict_atom_get(at);
+  dict_t *in = (dict_t *)fts_get_object(at);
   
   dict_copy(in, this);
 }
@@ -252,17 +243,17 @@ dict_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   for(tab=0; tab<2; tab++)
     {
-      fts_iterator_t *key_iterator, *value_iterator;
+      fts_iterator_t key_iterator, value_iterator;
 
-      fts_hashtable_get_keys(hash[tab], key_iterator);
-      fts_hashtable_get_values(hash[tab], value_iterator);
+      fts_hashtable_get_keys(hash[tab], &key_iterator);
+      fts_hashtable_get_values(hash[tab], &value_iterator);
 
-      while(fts_iterator_has_more(key_iterator))
+      while(fts_iterator_has_more(&key_iterator))
 	{
 	  fts_atom_t key, value;
 	  
-	  fts_iterator_next(key_iterator, &key);
-	  fts_iterator_next(value_iterator, &value);
+	  fts_iterator_next(&key_iterator, &key);
+	  fts_iterator_next(&value_iterator, &value);
 
 	  if(fts_is_tuple(&value))
 	    {
@@ -575,6 +566,15 @@ dict_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prope
 }
 
 static void
+dict_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  dict_t *this = (dict_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+
+  fts_spost(stream, "(:dict)");
+}
+
+static void
 dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   dict_t *this = (dict_t *)o;
@@ -583,54 +583,43 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   int size = fts_hashtable_get_size(&this->table_int) + fts_hashtable_get_size(&this->table_symbol);
   int tab;
 
-  if(size > 0)
+  if(size == 0)
+    fts_spost(stream, "<empty dictionary>\n");
+  else
     {
+      if(size == 1)
+	fts_spost(stream, "<dictionary of 1 entry>\n");
+      else
+	fts_spost(stream, "<dictionary of %d entries>\n", size);
+
+      fts_spost(stream, "{\n");
+
       for(tab=0; tab<2; tab++)
 	{
-	  fts_iterator_t *key_iterator, *value_iterator;
+	  fts_iterator_t key_iterator, value_iterator;
 	  
-	  fts_hashtable_get_keys(hash[tab], key_iterator);
-	  fts_hashtable_get_values(hash[tab], value_iterator);
+	  fts_hashtable_get_keys(hash[tab], &key_iterator);
+	  fts_hashtable_get_values(hash[tab], &value_iterator);
 	  
-	  while(fts_iterator_has_more(key_iterator))
+	  while(fts_iterator_has_more(&key_iterator))
 	    {
 	      fts_atom_t key, value;
 	      
-	      fts_iterator_next(key_iterator, &key);
-	      fts_iterator_next(value_iterator, &value);
+	      fts_iterator_next(&key_iterator, &key);
+	      fts_iterator_next(&value_iterator, &value);
 	      
 	      if(fts_is_int(&key))
 		fts_spost(stream, "  %d: ", fts_get_int(&key));
 	      else
 		fts_spost(stream, "  %s: ", fts_get_symbol(&key));
 	      
-	      if(fts_is_tuple(&value))
-		{
-		  fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
-		  int size = fts_tuple_get_size(tuple);
-		  const fts_atom_t *atoms = fts_tuple_get_atoms(tuple);
-		  
-		  fts_spost(stream, "(");
-		  
-		  if(size)
-		    fts_spost_atoms(stream, size, atoms);
-		  
-		  fts_spost(stream, ")\n");
-		}
-	      else if(fts_is_object(&value))
-		fts_spost(stream, "<%s>\n", fts_object_get_class_name(fts_get_object(&value)));
-	      else
-		{
-		  fts_spost_atoms(stream, 1, &value);
-		  fts_spost(stream, "\n");
-		}
+	      fts_spost_atoms(stream, 1, &value);
+	      fts_spost(stream, "\n");
 	    }
-	  
-	  fts_spost(stream, "}\n");
 	}
+	  
+      fts_spost(stream, "}\n");
     }
-  else
-    fts_spost(stream, "(empty dict)\n");
 }
 
 /**********************************************************
@@ -645,31 +634,21 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   dict_t *this = (dict_t *)o;
   int i;
 
+  ac &= -2;
+
   fts_hashtable_init(&this->table_int, FTS_HASHTABLE_INT, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
 
   data_object_set_keep((data_object_t *)o, fts_s_no);
 
-  for(i=0; i<ac; i++)
+  for(i=0; i<ac; i+=2)
     {
-      if(fts_is_tuple(at + i))
-	{
-	  fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
-	  int tac = fts_tuple_get_size(tup);
-	  fts_atom_t *tat = fts_tuple_get_atoms(tup);
-	  
-	  if(tac > 1 && (fts_is_int(tat) || fts_is_symbol(tat)))
-	    dict_store_atoms(this, tat, tac - 1, tat + 1);
-	  else
-	    {
-	      dict_clear(o, 0, 0, 0, 0);
-	      fts_object_set_error(o, "Wrong key type in initialization");
-	    }
-	}
+      if(fts_is_int(at + i) || fts_is_symbol(at + i))
+	dict_store(this, at + i, at + i + 1);
       else
 	{
 	  dict_clear(o, 0, 0, 0, 0);
-	  fts_object_set_error(o, "Wrong arguments");
+	  fts_object_set_error(o, "Wrong key type in initialization");
 	}
 
       data_object_set_keep((data_object_t *)o, fts_s_args);
@@ -700,6 +679,8 @@ dict_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, dict_clear);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, dict_dump);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, dict_post);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, dict_print);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);

@@ -61,7 +61,7 @@ static void
 pick_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   pick_t *this = (pick_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   if(this->fvec != fvec)
     {

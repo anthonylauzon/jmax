@@ -427,20 +427,6 @@ ivec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-ivec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  ivec_t *this = (ivec_t *)o;
-
-  ivec_set_const(this, 0);
-
-  if(ivec_editor_is_open(this))
-    {
-      if(this->zoom<0.5) ivec_send_pixels(this);
-      ivec_send_visibles(this);
-    }
-}
-
-static void
 ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
@@ -902,55 +888,82 @@ ivec_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int a
  */
 
 static void
+ivec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int size = ivec_get_size(this);
+
+  if(size == 0)
+    fts_spost(stream, "(:ivec)");
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+    {
+      int i;
+      
+      fts_spost(stream, "(:ivec", size);
+      
+      for(i=0; i<size-1; i++)
+	fts_spost(stream, "%d ", ivec_get_element(this, i));
+      
+      fts_spost(stream, "%d)", ivec_get_element(this, i));
+    }
+  else
+    fts_spost(stream, "(:ivec %d)", size);
+}
+
+static void
 ivec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = ivec_get_size(this);
-  int i;
 
-  fts_spost(stream, "{");
-
-  if(size > 8)
+  if(size == 0)
+    fts_spost(stream, "<empty ivec>\n");
+  else if(size == 1)
+    fts_spost(stream, "<ivec of 1 element: %d>\n", ivec_get_element(this, 0));
+  else if(size <= FTS_POST_MAX_ELEMENTS)
     {
-      int size8 = (size / 8) * 8;
-      int i, j;
-
-      for(i=0; i<size8; i+=8)
-	{
-	  /* print one line of 8 with indent */
-	  fts_spost(stream, "\n  ");
-	  for(j=0; j<8; j++)
-	    fts_spost(stream, "%d ", ivec_get_element(this, i + j));
-	}
-	  
-      /* print last line with indent */
-      if(i < size)
-	{
-	  fts_spost(stream, "\n  ");
-
-	  for(; i<size; i++)
-	    fts_spost(stream, "%d ", ivec_get_element(this, i));
-	}
-
-      fts_spost(stream, "\n");
-    }
-  else if(size)
-    {
+      int i;
+      
+      fts_spost(stream, "<ivec of %d elements: ", size);
+      
       for(i=0; i<size-1; i++)
 	fts_spost(stream, "%d ", ivec_get_element(this, i));
       
-      fts_spost(stream, "%d", ivec_get_element(this, i));
+      fts_spost(stream, "%d>\n", ivec_get_element(this, i));
     }
+  else
+    {
+      int i, j;
+      
+      fts_spost(stream, "<ivec of %d elements>\n", size);
+      fts_spost(stream, "{\n");
+      
+      for(i=0; i<size; i+=FTS_POST_MAX_ELEMENTS)
+	{
+	  int n = size - i;
 
-  fts_spost(stream, "}\n");
+	  if(n > FTS_POST_MAX_ELEMENTS)
+	    n = FTS_POST_MAX_ELEMENTS;
+	  
+	  fts_spost(stream, "  ");
+	  
+	  for(j=0; j<n; j++)
+	    fts_spost(stream, "%d ", ivec_get_element(this, i + j));
+	  
+	  fts_spost(stream, "\n");
+	}
+      
+      fts_spost(stream, "}\n");
+    }
 }
 
 static void
 ivec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
-  ivec_t *set = ivec_atom_get(at);
+  ivec_t *set = (ivec_t *)fts_get_object(at);
 
   ivec_copy(set, this);
 }
@@ -1097,6 +1110,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, ivec_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, ivec_delete);
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, ivec_post); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, ivec_print); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, ivec_set_elements);
@@ -1119,7 +1133,6 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_bang, ivec_output);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, ivec_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, ivec_fill);
   fts_method_define_varargs(cl, 0, fts_s_set, ivec_set_elements);
       
@@ -1145,7 +1158,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
 
   /* type outlet */
-  fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_symbol);      
+  fts_outlet_type_define(cl, 0, ivec_symbol);
 
   return fts_ok;
 }

@@ -14,7 +14,6 @@ getval.c \
 ivec.c \
 mat.c \
 dict.c \
-preset.c \
 row.c \
 value.c \
 vec.c \
@@ -26,7 +25,6 @@ noinst_HEADERS= \
 col.h \
 mat.h \
 dict.h \
-preset.h \
 row.h \
 value.h \
 vec.h

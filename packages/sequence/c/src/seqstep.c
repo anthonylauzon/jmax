@@ -238,7 +238,7 @@ seqstep_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   seqstep_reset(o, 0, 0, 0, 0);
 
   fts_object_release(this->track);
-  this->track = track_atom_get(at);
+  this->track = (track_t *)fts_get_object(at);
   fts_object_refer(this->track);
 }
 
@@ -258,7 +258,7 @@ seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->prev = 0;
   this->next = 0;
 
-  if(track_atom_is(at))
+  if(fts_is_a(at, track_type))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);
@@ -302,5 +302,5 @@ seqstep_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 seqstep_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("seqstep"), seqstep_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("seqstep"), seqstep_instantiate);
 }

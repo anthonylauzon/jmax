@@ -115,7 +115,7 @@ osc_ctl_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   osc_ctl_t *this = (osc_ctl_t *)o;
   osc_ctl_data_t *data = (osc_ctl_data_t *)ftl_data_get_ptr(this->data);
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   if(fvec_get_size(fvec) >= OSC_TABLE_SIZE + 1)
     {
@@ -129,7 +129,7 @@ static void
 osc_ctl_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   osc_ctl_t *this = (osc_ctl_t *)o;
-  fvec_t *fvec = fvec_atom_get(at + 1);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
   osc_ctl_data_t *data;
 
   fts_dsp_add_object(o);
@@ -279,7 +279,7 @@ static void
 osc_sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   osc_sig_t *this = (osc_sig_t *)o;
-  fvec_t *fvec = fvec_atom_get(at + 1);  
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
   osc_sig_data_t *data;
 
   fts_dsp_add_object(o);
@@ -337,12 +337,12 @@ osc_sig_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static fts_status_t
 osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  if(ac > 0 && !fvec_atom_is(at))
+  if(ac > 0 && !fts_is_a(at, fvec_type))
     return &fts_CannotInstantiate;
 
-  if(ac == 0 || (ac == 1 && fvec_atom_is(at)))
+  if(ac == 0 || (ac == 1 && fts_is_a(at, fvec_type)))
     return osc_sig_instantiate(cl, ac, at);
-  else if ((ac == 1 && fts_is_number(at)) || (ac == 2 && fts_is_number(at) && fvec_atom_is(at + 1)))
+  else if ((ac == 1 && fts_is_number(at)) || (ac == 2 && fts_is_number(at) && fts_is_a(at + 1, fvec_type)))
     return osc_ctl_instantiate(cl, ac, at);
   else
     return &fts_CannotInstantiate;

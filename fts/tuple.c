@@ -52,14 +52,14 @@ tuple_compare(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-tuple_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tuple_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   
   fts_spost(stream, "(");
   fts_spost_atoms(stream, fts_tuple_get_size(this), fts_tuple_get_atoms(this));
-  fts_spost(stream, ")\n");
+  fts_spost(stream, ")");
 }
 
 static void
@@ -85,7 +85,8 @@ tuple_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, tuple_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, tuple_delete);
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, tuple_print);
+
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, tuple_post);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_compare, tuple_compare);
   

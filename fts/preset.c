@@ -102,8 +102,8 @@ static int
 preset_check_object(preset_t *this, fts_object_t *obj)
 {
   fts_class_t *class = fts_object_get_class(obj);
-  fts_method_t meth_set = fts_class_get_method(class, fts_SystemInlet, fts_s_set_from_instance);
-  fts_method_t meth_dump = fts_class_get_method(class, fts_SystemInlet, fts_s_dump);
+  fts_method_t meth_set = fts_class_get_method(class, fts_s_set_from_instance);
+  fts_method_t meth_dump = fts_class_get_method(class, fts_s_dump);
 
   return (meth_set != 0) && (meth_dump != 0);
 }
@@ -240,7 +240,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      clones[i] = fts_object_create(type, 0, 0);
 
 	      fts_set_object(&a, objects[i]);
-	      fts_send_message(clones[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+	      fts_send_message(clones[i], fts_s_set_from_instance, 1, &a);
 
 	      fts_object_refer(clones[i]);
 	    }
@@ -258,7 +258,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	      clones[i] = fts_object_create(type, 0, 0);
 
 	      fts_set_object(&a, objects[i]);
-	      fts_send_message(clones[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+	      fts_send_message(clones[i], fts_s_set_from_instance, 1, &a);
 
 	      fts_object_refer(clones[i]);
 	    }
@@ -290,7 +290,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	      fts_atom_t a;
 
 	      fts_set_object(&a, clones[i]);
-	      fts_send_message(this->objects[i], fts_SystemInlet, fts_s_set_from_instance, 1, &a);
+	      fts_send_message(this->objects[i], fts_s_set_from_instance, 1, &a);
 	    }
 
 	  fts_outlet_int(o, 0, n);
@@ -322,7 +322,7 @@ preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->current[index] = fts_object_create(type, 0, 0);
     }
 
-  fts_send_message(this->current[index], fts_SystemInlet, selector, ac - 2, at + 2);
+  fts_send_message(this->current[index], selector, ac - 2, at + 2);
 }
 
 static void
@@ -362,7 +362,7 @@ preset_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 	  
 	  /* dump clone messages */
 	  fts_set_object(&a, (fts_object_t *)preset_dumper);
-	  fts_send_message(clones[i], fts_SystemInlet, fts_s_dump, 1, &a);
+	  fts_send_message(clones[i], fts_s_dump, 1, &a);
 	}
     }
   

@@ -86,7 +86,7 @@ seqfind_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   seqfind_t *this = (seqfind_t *)o;
 
   fts_object_release(this->track);
-  this->track = track_atom_get(at);
+  this->track = (track_t *)fts_get_object(at);
   fts_object_refer(this->track);
 }
 
@@ -130,7 +130,7 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->track = 0;
   this->mode = sym_first;
 
-  if(track_atom_is(at))
+  if(fts_is_a(at, track_type))
     {
       this->track = (track_t *)fts_get_object(at);
       fts_object_refer(this->track);

@@ -29,11 +29,12 @@
 void
 ispwcomp_config(void)
 {
-  fts_package_add_alias(fts_get_system_package(), fts_new_symbol("receive"), fts_s_inlet);
-  fts_package_add_alias(fts_get_system_package(), fts_new_symbol("send"), fts_s_outlet);
-  fts_package_add_alias(fts_get_system_package(), fts_new_symbol("r"), fts_s_inlet);
-  fts_package_add_alias(fts_get_system_package(), fts_new_symbol("s"), fts_s_outlet);
-  fts_package_add_alias(fts_get_system_package(), fts_new_symbol("r~"), fts_s_inlet);
-  fts_package_add_alias(fts_get_system_package(), fts_new_symbol("s~"), fts_s_outlet);
+  fts_metaclass_alias(fts_inlet_metaclass, fts_new_symbol("receive"));
+  fts_metaclass_alias(fts_inlet_metaclass, fts_new_symbol("r"));
+  fts_metaclass_alias(fts_inlet_metaclass, fts_new_symbol("r~"));
+
+  fts_metaclass_alias(fts_outlet_metaclass, fts_new_symbol("send"));
+  fts_metaclass_alias(fts_outlet_metaclass, fts_new_symbol("s"));
+  fts_metaclass_alias(fts_outlet_metaclass, fts_new_symbol("s~"));
 }
 

@@ -60,7 +60,7 @@ create_event(int ac, const fts_atom_t *at)
 	{
 	  fts_object_t *obj = fts_object_create(type, 0, 0);	
 	  fts_class_t *class = fts_object_get_class(obj);
-	  fts_method_t meth_set = fts_class_get_method(class, fts_system_inlet, fts_s_set_from_array);
+	  fts_method_t meth_set = fts_class_get_method(class, fts_s_set_from_array);
 
 	  if(obj && meth_set)
 	    {
@@ -715,38 +715,68 @@ track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
   
 static void 
+track_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  fts_symbol_t track_type = track_get_type(this);
+  
+  if(track_type == fts_s_void)
+    fts_spost(stream, "(:track)");
+  else
+    {
+      fts_spost(stream, "(:track ");
+      fts_spost_symbol(stream, track_type);
+      fts_spost(stream, ")");
+    }
+}
+
+static void 
 track_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *this = (track_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  fts_symbol_t track_name = track_get_name(this);
   fts_symbol_t track_type = track_get_type(this);
   int track_size = track_get_size(this);
   event_t *event = track_get_first(this);  
-  const char *name_str = track_name? track_name: "untitled";
 
   if(track_size == 0)
     {
-      fts_spost(stream, "(\"%s\" empty %s track)\n", name_str, track_type);
-      return;
+      if(track_type == fts_s_void)
+	fts_spost(stream, "<empty track>\n");
+      else
+	fts_spost(stream, "<empty %s track>\n", track_type);
     }
-  else if(track_size == 1)
-    fts_spost(stream, "(\"%s\" 1 %s event) {\n", name_str, track_type);
-  else
-    fts_spost(stream, "(\"%s\" %d %s events) {\n", name_str, track_size, track_type);
-      
-  while(event)
+  else 
     {
-      fts_spost(stream, "  @");
-      fts_spost_float(stream, event_get_time(event));
-      fts_spost(stream, ": ");
-      fts_spost_atoms(stream, 1, event_get_value(event));
-      fts_spost(stream, "\n", event_get_time(event));
+      if(track_type == fts_s_void)
+	fts_spost(stream, "<%s ", track_type);
+      else
+	fts_spost(stream, "<");
 
-      event = event_get_next(event);
-    }  
-  
-  fts_spost(stream, "}\n");      
+      if(track_size == 1)
+	{
+	  fts_spost(stream, "track of 1 event: @%.7g, ", event_get_time(event));
+	  fts_spost_atoms(stream, 1, event_get_value(event));
+	  fts_spost(stream, ">\n", event_get_time(event));
+	}
+      else
+	{
+	  fts_spost(stream, "track of %d events>\n", track_size);
+	  fts_spost(stream, "{\n");
+      
+	  while(event)
+	    {
+	      fts_spost(stream, "@%.7g, ", event_get_time(event));
+	      fts_spost_atoms(stream, 1, event_get_value(event));
+	      fts_spost(stream, "\n");
+	      
+	      event = event_get_next(event);
+	    }  
+	  
+	  fts_spost(stream, "}\n");      
+	}
+    }
 }
 
 static void
@@ -1037,6 +1067,7 @@ track_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, seqsym_add_event, track_add_event_from_array);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_upload, track_upload);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, track_post);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, track_print);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_clear, track_clear_method);
 

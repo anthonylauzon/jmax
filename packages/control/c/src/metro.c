@@ -134,6 +134,5 @@ metro_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 metro_config(void)
 {
-  fts_class_install(fts_new_symbol("metronome"), metro_instantiate);
-  fts_alias_install(fts_new_symbol("metro"), fts_new_symbol("metronome"));
+  fts_class_install(fts_new_symbol("metro"), metro_instantiate);
 }

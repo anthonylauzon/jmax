@@ -30,73 +30,20 @@
 #include <ftsprivate/package.h>
 
 const int fts_system_inlet = -1;
-
 static int typeid = FTS_FIRST_OBJECT_TYPEID;
 
 /* Return Status declarations */
-
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};
 fts_status_description_t fts_ClassAlreadyInitialized = {"class already initialized"};
 fts_status_description_t fts_InletOutOfRange = {"inlet out of range"};
 fts_status_description_t fts_OutletOutOfRange = {"outlet out of range"};
-fts_status_description_t fts_OutletAlreadyDefined = {"outlet already defined"};
 fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
-
-/* Static  declarations  */
-static fts_heap_t *class_mess_heap;
-
-/* Forward declarations */
-
-static fts_class_mess_t *fts_class_mess_create(fts_symbol_t s, fts_method_t mth,
-					       int mandatory_args, int nargs, fts_symbol_t *arg_types);
-
-static int fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg);
-
-
-/******************************************************************************/
-/*                                                                            */
-/*                Utilities                                                   */
-/*                                                                            */
-/******************************************************************************/
-
-static void fts_array_alloc( void **array, unsigned int size, unsigned int *nalloc, unsigned int wanted)
-{
-#define ALLOC_INC 8
-  if (*nalloc < wanted)
-    {
-      unsigned int newalloc = wanted + ALLOC_INC;
-
-      *array = fts_realloc(*array, newalloc*size);
-
-      memset((char *)(*array)+(*nalloc)*size, 0, (newalloc-*nalloc)*size);
-      *nalloc = newalloc;
-    }
-}
-
-
-static void fts_atom_type_copy( int ac, fts_symbol_t *at, fts_symbol_t **sat)
-{
-  if (ac > 0)
-    {
-      int i;
-
-      *sat = (fts_symbol_t *) fts_malloc( ac*sizeof(fts_symbol_t ) );
-
-      for (i = 0; i < ac; i++)
-	(*sat)[i]=at[i];
-    }
-  else
-    *sat = 0;
-}
-
-
 
 /******************************************************************************/
 /*                                                                            */
 /*                MetaClass  Handling                                         */
 /*                                                                            */
 /******************************************************************************/
-
 
 static fts_class_t *fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at);
 
@@ -109,11 +56,11 @@ fts_metaclass_new(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun, fts_
   mcl->instantiate_fun = instantiate_fun;
   mcl->equiv_fun = equiv_fun;
   mcl->selector = name;
-  mcl->package = 0;
+  mcl->package = NULL;
 
   mcl->typeid = typeid++;
 
-  /* for simple classes create first class instance without arguments */
+  /* for simple classes create class instance without arguments */
   if(equiv_fun == 0)
     fts_class_new(mcl, 0, 0);
 
@@ -127,7 +74,7 @@ fts_metaclass_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun,
 
   if(name != NULL)
     {
-      if(fts_package_add_metaclass(fts_get_current_package(), mcl) != fts_ok)
+      if(fts_package_add_metaclass(fts_get_current_package(), mcl, name) != fts_ok)
 	return 0;
     }
 
@@ -140,59 +87,55 @@ fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
   return fts_metaclass_install( name, instantiate_fun, 0);
 }
 
-void 
-fts_alias_install( fts_symbol_t alias_name, fts_symbol_t class_name)
+/* for now just recreate the same metaclass and add it to the current package */
+void
+fts_metaclass_alias(fts_metaclass_t *mcl, fts_symbol_t alias)
 {
-  fts_package_add_alias(fts_get_current_package(), alias_name, class_name);
+  fts_package_add_metaclass(fts_get_current_package(), mcl, alias);
+}
+
+/* iterate through packages in the order of system, current, list of required */
+static fts_package_t *
+get_next_package(fts_package_t *current, fts_iterator_t *iter)
+{
+  fts_package_t *next = NULL;
+
+  if(current == NULL)
+    return fts_get_system_package();
+  else if(current == fts_get_system_package())
+    return fts_get_current_package();
+
+  /* ask the required packages of the current package */
+  if(current == fts_get_current_package())
+    fts_package_get_required_packages(fts_get_current_package(), iter);
+      
+  /* iterate through list of required packages */
+  while(next == NULL && fts_iterator_has_more(iter)) 
+    {
+      fts_atom_t pkg_name;
+
+      fts_iterator_next(iter, &pkg_name);
+      next = fts_package_get(fts_get_symbol(&pkg_name)); /* package can be NULL !? */
+    }
+
+  return next;
 }
 
 fts_metaclass_t*
 fts_metaclass_get_by_name(fts_symbol_t name)
 {
-  fts_package_t *pkg;
-  fts_metaclass_t *mcl;
-  fts_iterator_t pkg_iter;
-  fts_atom_t pkg_name;
+  fts_package_t *pkg = fts_get_system_package();
+  fts_metaclass_t *mcl = NULL;
+  fts_iterator_t iter;
 
-  /* ask the kernel package before any other package. The kernel
-     classes should not be redefined anyway. If we search the kernel
-     package before the required packages, we avoid the loading of all
-     (required) packages to find the patcher class.  */
-  pkg = fts_get_system_package();
-
-  mcl = fts_package_get_metaclass(pkg, name);
-  if (mcl != NULL) {
-    return mcl;
-  }
-
-  /* ask the current package */
-  pkg = fts_get_current_package();
-  mcl = fts_package_get_metaclass(pkg, name);
-  if (mcl != NULL) {
-    return mcl;
-  }
-
-  /* ask the required packages of the current package */
-  fts_package_get_required_packages(pkg, &pkg_iter);
-
-  while ( fts_iterator_has_more( &pkg_iter)) {
-    fts_iterator_next( &pkg_iter, &pkg_name);
-    pkg = fts_package_get(fts_get_symbol(&pkg_name));
-    
-    if (pkg == NULL) {
-      continue;
+  while(mcl == NULL && pkg != NULL)
+    {
+      mcl = fts_package_get_metaclass(pkg, name);
+      pkg = get_next_package(pkg, &iter);
     }
 
-    mcl = fts_package_get_metaclass(pkg, name);
-    if (mcl != NULL) {
-      return mcl;
-    }
-  }
-
-  return NULL;
+  return mcl;
 }
-
-
 
 /******************************************************************************/
 /*                                                                            */
@@ -282,11 +225,11 @@ fts_class_new(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       fts_class_register(mcl, ac, at, cl);
       
       /* put the ninlets and noutlets in the class */
-      fts_set_int(&a, cl->ninlets);
-      fts_class_put_prop(cl, fts_s_ninlets, &a);
+      /*fts_set_int(&a, cl->ninlets);*/
+      /*fts_class_put_prop(cl, fts_s_ninlets, &a);*/
       
-      fts_set_int(&a, cl->noutlets);
-      fts_class_put_prop(cl, fts_s_noutlets, &a);
+      /*fts_set_int(&a, cl->noutlets);*/
+      /*fts_class_put_prop(cl, fts_s_noutlets, &a);*/
 
       return cl;
     }
@@ -308,22 +251,36 @@ fts_class_instantiate(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
   return cl;
 }
 
-
 fts_status_t 
 fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
 {
+  int i;
+
   if (cl->size)
     return &fts_ClassAlreadyInitialized;
 
   cl->size = size;
   cl->heap = fts_heap_new(size);
 
+  /* allocate system inlet declaration */
   cl->sysinlet = fts_zalloc(sizeof(fts_inlet_decl_t));
 
+  fts_hashtable_init(&(cl->sysinlet->messhash), FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+  cl->sysinlet->anything = NULL;
+
+  /* allocate inlet declarations */
   cl->ninlets = ninlets;
   if (ninlets)
     cl->inlets = fts_zalloc(ninlets * sizeof(fts_inlet_decl_t));
 
+  /* init message hashtable and anything method for all inlets */
+  for(i=0; i<ninlets; i++)
+    {
+      fts_hashtable_init(&(cl->inlets[i].messhash), FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
+      cl->inlets[i].anything = NULL;
+    }
+
+  /* allocate outlet declarations */
   cl->noutlets = noutlets;
   if (noutlets)
     cl->outlets = fts_zalloc(noutlets * sizeof(fts_outlet_decl_t));
@@ -333,197 +290,160 @@ fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, v
   return fts_ok;
 }
 
-fts_status_t
-fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t mth, int nargs, fts_symbol_t *arg_types, int mandatory_args)
+void
+fts_method_define(fts_class_t *cl, int winlet, fts_symbol_t s, fts_method_t mth)
 {
-  fts_inlet_decl_t *in;
-  fts_class_mess_t *msg;
-
-  if (winlet == fts_system_inlet)
-    {
-      if(s == fts_s_init)
+  if(s != NULL)
+    {    
+      fts_inlet_decl_t *in;
+      
+      if (winlet == fts_system_inlet)
 	{
-	  cl->constructor = mth;
-	  return fts_ok;
+	  if(s == fts_s_init)
+	    {
+	      cl->constructor = mth;
+	      return;
+	    }
+	  else if(s == fts_s_delete)
+	    {
+	      cl->deconstructor = mth;
+	      return;
+	    }
+	  
+	  in = cl->sysinlet;
 	}
-      else if(s == fts_s_delete)
+      else if (winlet < cl->ninlets && winlet >= 0)
+	in = cl->inlets + winlet;
+      else
 	{
-	  cl->deconstructor = mth;
-	  return fts_ok;
+	  post("inlet number %d out of range [0..%d] for class `%s', method `%s'\n", winlet, cl->ninlets, fts_class_get_name(cl), s); 
+	  return;
 	}
-	
-      in = cl->sysinlet;
+      
+      if(s == fts_s_anything)
+	{
+	  if(in->anything != NULL)
+	    post("message \"%s\" doubly defined for class %s %d\n", s, fts_class_get_name(cl), winlet);
+	  else
+	    in->anything = mth;
+	}
+      else
+	{
+	  fts_atom_t k, a;
+
+	  fts_set_symbol(&k, s);
+	  if(fts_hashtable_get(&in->messhash, &k, &a))
+	    post("message \"%s\" doubly defined for class %s %d\n", s, fts_class_get_name(cl), winlet);
+	  else
+	    {
+	      fts_set_pointer(&a, mth);
+	      fts_hashtable_put(&in->messhash, &k, &a);
+	    }
+	}
     }
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
   else
-    {
-      post("fts_method_define: inlet number %d out of range [0..%d] for class `%s', method `%s'\n", 
-	   winlet, cl->ninlets, fts_class_get_name(cl),
-	   (s ? s : "")); 
-
-      return &fts_InletOutOfRange;
-    }
-
-  msg = fts_class_mess_create(s, mth, mandatory_args, nargs, arg_types);
-
-  if (fts_class_mess_exists(in, msg))
-    {
-      post("fts_method_define: doubly defined method, class %s, inlet number %d message '%s'\n", 
-	   fts_class_get_name(cl), winlet, (s? s: ""));
-    }
-  else
-    {
-      fts_array_alloc((void **)&in->messlist, sizeof(fts_class_mess_t *), &in->nalloc, in->nmess+1);
-      in->messlist[in->nmess++] = msg;
-    }
-
-  return fts_ok;
+    post("method definition with NULL selector for class %s\n", winlet, fts_class_get_name(cl)); 
 }
 
-fts_status_t 
-fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s, int ac, fts_symbol_t *at, int mandatory_args)
+void
+fts_outlet_type_define( fts_class_t *cl, int woutlet, fts_symbol_t s)
 {
   fts_outlet_decl_t *out;
 
   if (woutlet >= cl->noutlets || woutlet < 0)
     {
-      post("fts_outlet_type_define: outlet out of range #%d for class `%s'\n", woutlet,
-	   fts_class_get_name(cl));
-      return &fts_OutletOutOfRange;
+      post("fts_outlet_type_define: outlet out of range #%d for class `%s'\n", woutlet, fts_class_get_name(cl));
+      return;
     }
   out = &cl->outlets[woutlet];
 
-  if (out->tmess.symb)
+  if (out->selector)
     {
-      post("fts_outlet_type_define: outlet #%d already defined for class `%s'\n", woutlet,
-	   fts_class_get_name(cl));
-      return &fts_OutletAlreadyDefined;
+      post("outlet %d doubly defined for class `%s'\n", woutlet, fts_class_get_name(cl));
+      return;
     }
 
-  out->tmess.symb = s;
-  out->tmess.mandatory_args = mandatory_args;
-  out->tmess.nargs = ac;
-  fts_atom_type_copy(ac, at, &(out->tmess.arg_types));
-
-  return fts_ok;
+  out->selector = s;
 }
 
-/******************************************************************************/
-/*                                                                            */
-/*                    Class_mess (Method) handling                            */
-/*                                                                            */
-/******************************************************************************/
-
-
-
-static fts_class_mess_t *
-fts_class_mess_create(fts_symbol_t s, fts_method_t mth, int mandatory_args, int nargs, fts_symbol_t *arg_types)
-{
-  fts_class_mess_t *cm = (fts_class_mess_t *) fts_heap_alloc(class_mess_heap);
-
-  fts_atom_type_copy(nargs, arg_types, &(cm->tmess.arg_types));
-  cm->tmess.mandatory_args = mandatory_args;
-  cm->tmess.nargs = nargs;
-  cm->tmess.symb = s;
-  cm->mth = mth;
-
-  return cm;
-}
-
-fts_class_mess_t *
-fts_class_mess_inlet_get(fts_inlet_decl_t *in, fts_symbol_t s,  int *panything)
-{
-  fts_class_mess_t **messtable, *mess_anything = 0;
-  int i;
-
-  messtable = in->messlist;
-
-  for (i = 0; i < (int)in->nmess; i++)
-    {
-      if (messtable[i]->tmess.symb == s)
-	{
-	  *panything = 0;
-	  return messtable[i];
-	}
-      else if (messtable[i]->tmess.symb == fts_s_anything)
-	mess_anything = messtable[i];
-    }
-  
-  *panything = 1;
-  return mess_anything;
-}
-
-/* first try of something new 22.3.2000
-fts_class_mess_t *
-fts_simple_class_mess_get(fts_inlet_decl_t *in, fts_symbol_t s)
-{
-  fts_class_mess_t **messtable = in->messlist;
-  int i;
-
-  for (i=0; i<in->nmess; i++)
-    if (messtable[i]->tmess.symb == s)
-      return messtable[i];
-  
-  return 0;
-}
-*/
-
-fts_class_mess_t *
-fts_class_mess_get(fts_class_t *cl, int winlet, fts_symbol_t s)
+static fts_inlet_decl_t *
+class_get_inlet_decl(fts_class_t *cl, int inlet)
 {
   fts_inlet_decl_t *in;
-  int panything;
 
-  if (winlet == fts_system_inlet)
-    in = cl->sysinlet;
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
-  else
-    return 0;
+  if(inlet >= cl->ninlets)
+    inlet = cl->ninlets - 1;
+  
+  if(inlet >= 0)
+    return cl->inlets + inlet;
 
-  return fts_class_mess_inlet_get(in, s, &panything);
+  return NULL;
 }
 
-
-static int
-fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg)
+static fts_outlet_decl_t *
+class_get_outlet_decl(fts_class_t *cl, int outlet)
 {
-  fts_class_mess_t **mess;
-  fts_symbol_t s = msg->tmess.symb;
-  int n, nmess = in->nmess;
-
-  for (mess = in->messlist, n = 0; n < nmess; mess++, n++)
-    if ((*mess)->tmess.symb == s)
-      return 1;
+  if(outlet < 0)
+    outlet = 0;
+  else if(outlet >= cl->noutlets)
+    outlet = cl->noutlets - 1;
   
-  return 0;
+  return cl->outlets + outlet;
 }
 
-fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s)
+static fts_method_t
+inlet_get_method(fts_inlet_decl_t *in, fts_symbol_t s)
 {
-  fts_inlet_decl_t *in;
-  fts_class_mess_t **mess;
-  int i; 
+  fts_atom_t k, a;
 
-  if (inlet == fts_system_inlet)
-    in = cl->sysinlet;
-  else if (inlet < cl->ninlets && inlet >= 0)
-    in = &cl->inlets[inlet];
+  fts_set_symbol(&k, s);
+  if(fts_hashtable_get(&in->messhash, &k, &a))
+    return fts_get_pointer(&a);
   else
-    return 0;
+    return in->anything;
+}
 
-  mess = in->messlist;
+fts_method_t 
+fts_class_get_method(fts_class_t *cl, fts_symbol_t s)
+{
+  fts_inlet_decl_t *in = cl->sysinlet;
 
-  for( i = 0; i < in->nmess; i++)
-    {
-      if ((*mess)->tmess.symb == s)
-	return (*mess)->mth;
+  return inlet_get_method(in, s);
+}
 
-      mess++; 
-    }
-  
-  return 0;
+fts_method_t 
+fts_class_inlet_get_method(fts_class_t *cl, int inlet, fts_symbol_t s)
+{
+  fts_inlet_decl_t *in = class_get_inlet_decl(cl, inlet);
+
+  if(in != NULL)
+    return inlet_get_method(in, s);
+
+  return NULL;
+}
+
+fts_method_t 
+fts_class_inlet_get_anything(fts_class_t *cl, int inlet)
+{
+  fts_inlet_decl_t *in = class_get_inlet_decl(cl, inlet);
+
+  return in->anything;
+}
+
+int
+fts_class_inlet_has_anything_only(fts_class_t *cl, int inlet)
+{
+  fts_inlet_decl_t *in = class_get_inlet_decl(cl, inlet);
+
+  return (fts_hashtable_get_size(&in->messhash) == 0) && (in->anything != NULL);
+}
+
+fts_symbol_t 
+fts_class_outlet_get_selector(fts_class_t *cl, int outlet)
+{
+  fts_outlet_decl_t *out = class_get_outlet_decl(cl, outlet);
+
+  return out->selector;
 }
 
 /*****************************************************************************
@@ -739,5 +659,4 @@ fts_never_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 
 void fts_kernel_class_init( void)
 {
-  class_mess_heap = fts_heap_new(sizeof(fts_class_mess_t));
 }

@@ -132,7 +132,7 @@ static void
 matdisplay_cvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t * this = (matdisplay_t *)o;
-  cvec_t * vec = cvec_atom_get(at);
+  cvec_t * vec = (cvec_t *)fts_get_object(at);
   float min = this->min;
   float max = this->max;
   float range = max - min; 
@@ -179,7 +179,7 @@ static void
 matdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t * this = (matdisplay_t *)o;
-  ivec_t * vec = ivec_atom_get(at);
+  ivec_t * vec = (ivec_t *)fts_get_object(at);
   int min = (int)this->min;
   int max = (int)this->max;
   int range = max - min; 
@@ -226,7 +226,7 @@ static void
 matdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   matdisplay_t * this = (matdisplay_t *)o;
-  fvec_t * vec = fvec_atom_get(at);
+  fvec_t *vec = (fmat_t *)fts_get_object(at);
   float min = this->min;
   float max = this->max;
   float range = max - min; 
@@ -272,8 +272,8 @@ matdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void 
 matdisplay_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  matdisplay_t * this = (matdisplay_t *)o;
-  fmat_t * mat = fmat_atom_get(at);
+  matdisplay_t *this = (matdisplay_t *)o;
+  fmat_t *mat = (fmat_t *)fts_get_object(at);
   float min = this->min;
   float max = this->max;
   float range = max - min; 

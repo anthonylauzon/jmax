@@ -87,7 +87,7 @@ mess_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if(object != this->object || selector != this->selector)
 	{
 	  fts_class_t *class = fts_object_get_class(object);
-	  fts_method_t method = fts_class_get_method(class, 0, selector);
+	  fts_method_t method = fts_class_get_method(class, selector);
 	  
 	  if(method)
 	    {

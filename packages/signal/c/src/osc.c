@@ -86,7 +86,7 @@ static void
 osc_set_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   osc_t *this = (osc_t *)o;
-  fvec_t *fvec = fvec_atom_get(at);
+  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 
   /* check float vector size */
   if(fvec_get_size(fvec) < OSC_TABLE_SIZE + 1)
@@ -286,7 +286,7 @@ osc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac == 0 || (ac == 1 && fts_is_number(at)))
     return osc_instantiate_cosine(cl, ac, at);
-  else if ((ac == 1 && fvec_atom_is(at)) || (ac == 2 && fts_is_number(at) && fvec_atom_is(at + 1)))
+  else if ((ac == 1 && fts_is_a(at, fvec_type)) || (ac == 2 && fts_is_number(at) && fts_is_a(at + 1, fvec_type)))
     return osc_instantiate_fvec(cl, ac, at);
   else
     return &fts_CannotInstantiate;

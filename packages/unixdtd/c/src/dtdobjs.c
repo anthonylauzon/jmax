@@ -260,6 +260,7 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_dsp_add_object(o);
 
   this->timebase = fts_get_timebase();
+  fts_object_set_outlets_number(o, n_channels + 1);  
 }
 
 static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -427,14 +428,7 @@ static void readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 
 static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_channels, i;
-
-  n_channels = fts_get_int_arg(ac, at, 0, 1);
-
-  if (n_channels < 1)
-    n_channels = 1;
-
-  fts_class_init(cl, sizeof(readsf_t), 1, n_channels + 1, 0);
+  fts_class_init(cl, sizeof(readsf_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, readsf_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, readsf_delete);
@@ -454,8 +448,7 @@ static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs( cl, 0, fts_s_stop, readsf_stop);
   fts_method_define_varargs( cl, 0, s_close, readsf_stop);
 
-  for (i = 0; i < n_channels; i++)
-    fts_dsp_declare_outlet(cl, i);
+  fts_dsp_declare_outlet(cl, 0);
 
   fts_dsp_declare_function( readsf_symbol, readsf_dsp);
 
@@ -627,6 +620,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_add_object(o);
 
   this->timebase = fts_get_timebase();
+  fts_object_set_outlets_number(o, n_channels);
 }
 
 static void writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -755,13 +749,7 @@ static void writesf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 static fts_status_t 
 writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  int n_channels = fts_get_int_arg(ac, at, 0, 1);
-  int i;
-
-  if (n_channels < 1)
-    n_channels = 1;
-
-  fts_class_init(cl, sizeof(writesf_t), n_channels, 0, 0);
+  fts_class_init(cl, sizeof(writesf_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, writesf_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, writesf_delete);
@@ -781,8 +769,7 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs( cl, 0, fts_s_stop, writesf_close);
   fts_method_define_varargs( cl, 0, s_close, writesf_close);
 
-  for (i = 0; i < n_channels; i++)
-    fts_dsp_declare_inlet(cl, i);
+  fts_dsp_declare_inlet(cl, 0);
 
   fts_dsp_declare_function( writesf_symbol, writesf_dsp);
 
@@ -802,8 +789,8 @@ void dtdobjs_config( void)
   readsf_symbol = fts_new_symbol( "readsf~");
   writesf_symbol = fts_new_symbol( "writesf~");
 
-  fts_metaclass_install(readsf_symbol, readsf_instantiate, fts_first_arg_equiv);
-  fts_metaclass_install(writesf_symbol, writesf_instantiate, fts_first_arg_equiv);
+  fts_class_install(readsf_symbol, readsf_instantiate);
+  fts_class_install(writesf_symbol, writesf_instantiate);
 
   s_open = fts_new_symbol( "open");
   s_close = fts_new_symbol( "close");

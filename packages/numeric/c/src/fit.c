@@ -68,6 +68,8 @@ fit_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     }
 
   this->n = n;
+
+  fts_object_set_inlets_number(o, n + 1);
 }
 
 static void
@@ -134,15 +136,7 @@ fit_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static fts_status_t
 fit_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-  int i, n;
-
-  if(ac > 0)
-    n = ac;
-  else 
-    n = 1;
-
-  fts_class_init(cl, sizeof(fit_t), n + 1, 1, 0);
+  fts_class_init(cl, sizeof(fit_t), 2, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fit_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fit_delete);
@@ -150,11 +144,8 @@ fit_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_int, fit_input);
   fts_method_define_varargs(cl, 0, fts_s_float, fit_input);
 
-  for(i=0; i<n; i++)
-    {
-      fts_method_define_varargs(cl, i + 1, fts_s_int, fit_point);
-      fts_method_define_varargs(cl, i + 1, fts_s_float, fit_point);
-    }
+  fts_method_define_varargs(cl, 1, fts_s_int, fit_point);
+  fts_method_define_varargs(cl, 1, fts_s_float, fit_point);
 
   return fts_ok;
 }
@@ -162,5 +153,5 @@ fit_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fit_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("fit"), fit_instantiate, fts_narg_equiv);
+  fts_class_install(fts_new_symbol("fit"), fit_instantiate);
 }

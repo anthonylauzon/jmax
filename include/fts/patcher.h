@@ -50,6 +50,9 @@ struct fts_patcher
   int save_id;
 };    
 
+FTS_API fts_metaclass_t *fts_inlet_metaclass;
+FTS_API fts_metaclass_t *fts_outlet_metaclass;
+
 #define fts_patcher_get_args(p)    ((p)->args)
 #define fts_patcher_is_open(p)     ((p)->open)
 

@@ -167,7 +167,7 @@ fts_dsp_declare_inlet(fts_class_t *cl, int num)
 void 
 fts_dsp_declare_outlet(fts_class_t *cl, int num)
 {
-  fts_outlet_type_define(cl, num, fts_s_sig, 0, 0);
+  fts_outlet_type_define(cl, num, fts_s_sig);
 }
 
 void 
@@ -191,7 +191,7 @@ fts_dsp_add_function(fts_symbol_t symb, int ac, fts_atom_t *av)
 int 
 fts_dsp_is_sig_inlet(fts_object_t *o, int num)
 {
-  return fts_class_has_method( fts_object_get_class(o), num, fts_s_sig);
+  return fts_class_inlet_get_method( fts_object_get_class(o), num, fts_s_sig) != NULL;
 }
 
 int 

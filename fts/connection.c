@@ -47,12 +47,10 @@ fts_metaclass_t *fts_connection_type = 0;
 fts_connection_t *
 fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet, fts_connection_type_t type)
 {
-  fts_outlet_decl_t *outlet;
-  fts_inlet_decl_t *inlet;
-  fts_class_mess_t *mess = 0;
+  fts_method_t meth = NULL;
+  fts_symbol_t selector = NULL;
   fts_connection_t *conn;
   int valid = 1;
-  int anything;
 
   /* first of all, if one of the two object is an error object, add the required inlets/outlets to it */
   if (fts_object_is_error(src))
@@ -80,7 +78,7 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
     type = fts_c_anything;
 
   /* check the outlet range (should never happen, a part from loading) */
-  if (woutlet >= src->head.cl->noutlets || woutlet < 0)
+  if (woutlet >= fts_object_get_outlets_number(src) || woutlet < 0)
     {
       fts_object_blip(src, "Outlet out of range");
       return NULL;
@@ -103,23 +101,14 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
   }
   
   /* find the outlet and the inlet in the class structure */
-  outlet = &src->head.cl->outlets[woutlet];
+  selector = fts_class_outlet_get_selector(src->head.cl, woutlet);
 
-  if (winlet == fts_system_inlet)
-    inlet = dst->head.cl->sysinlet;
-  else if (winlet < dst->head.cl->ninlets && winlet >= 0)
-    inlet = &dst->head.cl->inlets[winlet];
-  else
+  if(selector != NULL)
     {
-      fts_object_blip(src, "Inlet out of range, cannot connect.");
-      return NULL;
-    }
+      meth = fts_class_inlet_get_method(dst->head.cl, winlet, selector);
 
-  if(outlet->tmess.symb)
-    {
-      mess = fts_class_mess_inlet_get(inlet, outlet->tmess.symb, &anything);
-
-      if(!mess || (anything && outlet->tmess.symb == fts_s_sig && !fts_object_is_thru(dst)))
+      if((meth == NULL) || 
+	 (selector == fts_s_sig && meth == fts_class_inlet_get_anything(dst->head.cl, winlet) && !fts_object_is_thru(dst)))
 	{
 	  fts_object_blip(src, "Type mismatch, cannot connect");
 	  return NULL;
@@ -127,7 +116,6 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
     }
 
   conn = (fts_connection_t *) fts_object_create(fts_connection_type, 0, 0);
-
   conn->src = src;
   conn->woutlet = woutlet;
   conn->dst = dst;
@@ -136,23 +124,20 @@ fts_connection_new(fts_object_t *src, int woutlet, fts_object_t *dst, int winlet
 
   ((fts_object_t *)conn)->patcher = conn->src->patcher;
 
-  /* pre-initialize the cache, if possible */
-  if(mess)
+  /* initialize the cache */
+  if(meth)
     {
-      if (anything)
+      if(selector != NULL || fts_class_inlet_has_anything_only(dst->head.cl, winlet))
 	{
-	  /* we found an anything method at the inlet:
-	     we cache the method for anything here because, since the
-	     outlet is typed, we are sure we will always call the anything method
-	     for this type */
-
+	  /* lock cache to anything method because outlet is typed or its anyway the only method */
 	  conn->symb = 0;
-	  conn->mth  = mess->mth;
+	  conn->mth  = meth;
 	}
       else
 	{
-	  conn->symb = mess->tmess.symb;
-	  conn->mth  = mess->mth;
+	  /* init cache to */
+	  conn->symb = selector;
+	  conn->mth  = meth;
 	}
     }
   else
@@ -192,7 +177,7 @@ fts_connection_delete(fts_connection_t *conn)
 {
   fts_object_t *src;
   fts_object_t *dst;
-  fts_connection_t **p;		/* indirect precursor */
+  fts_connection_t **p; /* indirect precursor */
 
   /* First, release the client representation of the connection, if any */
   if ( fts_object_has_id( (fts_object_t *)conn) && conn->type > fts_c_hidden)
@@ -304,7 +289,7 @@ fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
   int inlet;
 
 
-  for (inlet = inlets; inlet < obj->head.cl->ninlets; inlet++)
+  for (inlet = inlets; inlet < fts_object_get_inlets_number(obj); inlet++)
     {
       fts_connection_t *p;
 
@@ -313,6 +298,8 @@ fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
 
       for (p = obj->in_conn[inlet]; p; p = obj->in_conn[inlet])
 	fts_connection_delete(p);
+
+      obj->in_conn[inlet] = NULL; 
     }
 }
 
@@ -322,7 +309,7 @@ fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
 {
   int outlet;
 
-  for (outlet = outlets; outlet < obj->head.cl->noutlets; outlet++)
+  for (outlet = outlets; outlet < fts_object_get_outlets_number(obj); outlet++)
     {
       fts_connection_t *p;
 
@@ -332,6 +319,9 @@ fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
 
       for (p = obj->out_conn[outlet]; p ;  p = obj->out_conn[outlet])
 	fts_connection_delete(p);
+
+
+      obj->out_conn[outlet] = NULL; 
     }
 }
 

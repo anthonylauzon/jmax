@@ -44,29 +44,12 @@ vec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-vec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  vec_t *this = (vec_t *)o;
-  int size = vec_get_size(this);
-  
-  if(ac > 0 && fts_is_number(at))
-    {
-      int i = fts_get_number_int(at);
-
-      if(i >= 0 && i < size)
-	vec_void_element(this, i);
-    }
-  else
-    vec_void(this);
-}
-
-static void
 vec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
 
   if(ac > 0)
-    vec_set_const(this, at[0]);
+    vec_set_const(this, at);
 }
 
 static void
@@ -178,7 +161,7 @@ vec_set_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 vec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_copy(mat_atom_get(at), (mat_t *)o);
+  mat_copy((mat_t *)fts_get_object(at), (mat_t *)o);
 }
 
 static void
@@ -251,7 +234,7 @@ vec_read_atom_file(vec_t *vec, fts_symbol_t file_name)
   if(!file)
     return -1;
 
-  vec_void(vec);
+  vec_set_size(vec, 0);
 
   while(fts_atom_file_read(file, &a, &c))
     {
@@ -301,14 +284,69 @@ vec_write_atom_file(vec_t *vec, fts_symbol_t file_name)
  */
 
 static void
+vec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  vec_t *this = (vec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int size = vec_get_size(this);
+
+  if(size == 0)
+    fts_spost(stream, "(:vec)");
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+    {
+      fts_atom_t *p = vec_get_ptr(this);
+      
+      fts_spost(stream, "(:vec ", size);
+      fts_spost_atoms(stream, size, p);
+      fts_spost(stream, ")");
+    }
+  else
+    fts_spost(stream, "(:vec %d)", size);
+}
+
+static void
 vec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   vec_t *this = (vec_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int size = vec_get_size(this);
+  fts_atom_t *p = vec_get_ptr(this);
 
-  fts_spost(stream, "{");
-  fts_spost_atoms(stream, vec_get_size(this), vec_get_ptr(this));
-  fts_spost(stream, "}\n");
+  if(size == 0)
+    fts_spost(stream, "<empty vec>\n");
+  else if(size == 1)
+    {
+      fts_spost(stream, "<vec of 1 element: ");
+      fts_spost_atoms(stream, 1, p);
+      fts_spost(stream, ">\n");
+    }
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+    {
+      fts_spost(stream, "<vec of %d elements: ", size);
+      fts_spost_atoms(stream, size, p);
+      fts_spost(stream, ">\n");
+    }
+  else
+    {
+      int i;
+
+      fts_spost(stream, "<vec of %d elements>\n", size);
+      fts_spost(stream, "{\n");
+      
+      for(i=0; i<size; i+=FTS_POST_MAX_ELEMENTS)
+	{
+	  int n = size - i;
+
+	  if(n > FTS_POST_MAX_ELEMENTS)
+	    n = FTS_POST_MAX_ELEMENTS;
+	  
+	  fts_spost(stream, "  ");
+	  fts_spost_atoms(stream, n, p + i);
+	  fts_spost(stream, "\n");
+	}
+
+      fts_spost(stream, "}\n");
+    }
 }
 
 static void
@@ -381,6 +419,7 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_get_array, vec_get_array);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, vec_dump);
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, vec_post); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, vec_print); 
   
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -390,7 +429,6 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, vec_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, vec_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, vec_fill);      
   fts_method_define_varargs(cl, 0, fts_s_set, vec_set_elements);
   
@@ -400,7 +438,7 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_export, vec_export); 
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, vec_symbol, 1, &vec_symbol);
+  fts_outlet_type_define(cl, 0, vec_symbol);
   
   return fts_ok;
 }

@@ -43,30 +43,31 @@ cvec_set_size(cvec_t *vec, int size)
 
   if(size > vec->alloc)
     {
-      vec->values = (complex *)fts_realloc(vec->values, sizeof(complex) * size);
+      vec->values = (float *)fts_realloc(vec->values, sizeof(complex) * size);
       vec->alloc = size;
     }
 
   /* when shortening: zero old values */
-  for(i=size; i<vec->size; i++)
-    vec->values[i] = CZERO;
+  for(i=size; i<vec->m; i++)
+    ((complex *)vec->values)[i] = CZERO;
 
-  vec->size = size;
+  vec->m = size;
 }
 
 void
 cvec_set_const(cvec_t *vec, complex c)
 {
-  complex *values = vec->values;
+  complex *values = (complex *)vec->values;
   int i;
   
-  for(i=0; i<vec->size; i++)
+  for(i=0; i<vec->m; i++)
     values[i] = c;
 }
 
 void
 cvec_set_with_onset_from_atoms(cvec_t *vec, int offset, int ac, const fts_atom_t *at)
 {
+  complex *values = (complex *)vec->values;
   int size = cvec_get_size(vec);
   int i;
   
@@ -77,12 +78,12 @@ cvec_set_with_onset_from_atoms(cvec_t *vec, int offset, int ac, const fts_atom_t
     {
       if(fts_is_number(at + i))
 	{
-	  vec->values[i + offset].re = fts_get_number_float(at + i);
-	  vec->values[i + offset].im = 0.0;
+	  values[i + offset].re = fts_get_number_float(at + i);
+	  values[i + offset].im = 0.0;
 	  
 	}
       else
-	vec->values[i + offset] = CZERO;
+	values[i + offset] = CZERO;
     }
 }
 
@@ -108,14 +109,6 @@ static void
 cvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_outlet_object(o, 0, o);
-}
-
-static void
-cvec_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  cvec_t *this = (cvec_t *)o;
-
-  cvec_set_const(this, CZERO);
 }
 
 static void
@@ -160,14 +153,15 @@ cvec_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
       if(size >= 0)
 	{
-	  int old_size = this->size;
+	  complex *values = (complex *)this->values;
+	  int old_size = this->m;
 	  int i;
 
 	  cvec_set_size(this, size);
 
 	  /* when extending: zero new values */
 	  for(i=old_size; i<size; i++)
-	    this->values[i] = CZERO;
+	    values[i] = CZERO;
 	}
     }
 }
@@ -187,7 +181,7 @@ cvec_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, cvec_type))
 	{
-	  cvec_t *right = cvec_atom_get(at);
+	  cvec_t *right = (cvec_t *)fts_get_object(at);
 	  int this_size = cvec_get_size(this);
 	  int right_size = cvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -215,7 +209,7 @@ cvec_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, cvec_type))
 	{
-	  cvec_t *right = cvec_atom_get(at);
+	  cvec_t *right = (cvec_t *)fts_get_object(at);
 	  int this_size = cvec_get_size(this);
 	  int right_size = cvec_get_size(right);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -243,7 +237,7 @@ cvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *right = fvec_atom_get(at);
+	  fvec_t *right = (fvec_t *)fts_get_object(at);
 	  int right_size = fvec_get_size(right);
 	  int this_size = cvec_get_size(this);
 	  int size = (this_size <= right_size)? this_size: right_size;
@@ -259,8 +253,8 @@ cvec_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	}
       else if(fts_is_a(at, cvec_type))
 	{
-	  cvec_t *right = cvec_atom_get(at);
-	  int right_size = fvec_get_size(right);
+	  cvec_t *right = (cvec_t *)fts_get_object(at);
+	  int right_size = cvec_get_size(right);
 	  int this_size = cvec_get_size(this);
 	  int size = (this_size <= right_size)? this_size: right_size;
 	  complex *l = cvec_get_ptr(this);
@@ -369,7 +363,7 @@ cvec_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   else if(fts_is_a(at, fvec_type))
     {
       /* real FFT */
-      fvec_t *in = fvec_atom_get(at); 
+      fvec_t *in = (fvec_t *)fts_get_object(at); 
       float *in_ptr = fvec_get_ptr(in);
       int in_size = fvec_get_size(in);
       unsigned int fft_size = fts_get_fft_size(in_size);
@@ -393,7 +387,7 @@ cvec_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   else if(fts_is_a(at, cvec_type))
     {
       /* complex FFT */
-      cvec_t *in = cvec_atom_get(at);
+      cvec_t *in = (cvec_t *)fts_get_object(at);
       int in_size = cvec_get_size(in);
       unsigned int fft_size = fts_get_fft_size(in_size);
       complex *fft_ptr;
@@ -439,7 +433,7 @@ cvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else if(fts_is_a(at, cvec_type))
     {
       /* complex IFFT */
-      cvec_t *in = cvec_atom_get(at);
+      cvec_t *in = (cvec_t *)fts_get_object(at);
       int in_size = cvec_get_size(in);
       unsigned int fft_size = fts_get_fft_size(in_size);
       complex *fft_ptr;
@@ -473,60 +467,99 @@ cvec_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  */
 
 static void
+cvec_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  cvec_t *this = (cvec_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int size = cvec_get_size(this);
+  complex *p = cvec_get_ptr(this);
+
+  if(size == 0)
+    fts_spost(stream, "(:cvec)");
+  else if(size <= FTS_POST_MAX_ELEMENTS)
+    {
+      int i;
+      
+      fts_spost(stream, "(:cvec", size);
+      
+      for(i=0; i<size-1; i++)
+	{
+	  fts_spost_complex(stream, p[i].re, p[i].im);
+	  fts_spost(stream, " ");
+	}
+      
+      fts_spost_complex(stream, p[i].re, p[i].im);
+      fts_spost(stream, ")");
+    }
+  else
+    fts_spost(stream, "(:cvec %d)", size);
+}
+
+static void
 cvec_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int size = cvec_get_size(this);
   complex *p = cvec_get_ptr(this);
-  int i;
 
-  fts_spost(stream, "{");
-
-  if(size > 8)
+  if(size == 0)
+    fts_spost(stream, "<empty cvec>\n");
+  else if(size == 1)
     {
-      int size8 = (size / 8) * 8;
-      int i, j;
-
-      for(i=0; i<size8; i+=8)
-	{
-	  fts_spost(stream, "\n  ");
-	  for(j=0; j<8; j++)
-	    {
-	      fts_spost_complex(stream, p[i + j].re, p[i + j].im);
-	      fts_spost(stream, " ");
-	    }
-	}
-	  
-      if(i < size)
-	{
-	  fts_spost(stream, "\n  ");
-	  for(; i<size; i++)
-	    {
-	      fts_spost_complex(stream, p[i].re, p[i].im);
-	      fts_spost(stream, " ");
-	    }
-	}
+      fts_spost(stream, "<cvec of 1 element: ");
+      fts_spost_complex(stream, p[0].re, p[0].im);
+      fts_spost(stream, ">\n");
     }
-  else if(size)
+  else if(size <= FTS_POST_MAX_ELEMENTS)
     {
+      int i;
+      
+      fts_spost(stream, "<cvec of %d elements: ", size);
+      
       for(i=0; i<size-1; i++)
 	{
 	  fts_spost_complex(stream, p[i].re, p[i].im);
 	  fts_spost(stream, " ");
 	}
-
+	        
       fts_spost_complex(stream, p[i].re, p[i].im);
+      fts_spost(stream, ">\n");
     }
-  
-  fts_spost(stream, "}\n");
+  else
+    {
+      int i, j;
+      
+      fts_spost(stream, "<cvec of %d elements>\n", size);
+      fts_spost(stream, "{\n");
+      
+      for(i=0; i<size; i+=FTS_POST_MAX_ELEMENTS)
+	{
+	  int n = size - i;
+
+	  if(n > FTS_POST_MAX_ELEMENTS)
+	    n = FTS_POST_MAX_ELEMENTS;
+	  
+	  fts_spost(stream, "  ");
+	  
+	  for(j=0; j<n; j++)
+	    {
+	      fts_spost_complex(stream, p[i + j].re, p[i + j].im);
+	      fts_spost(stream, " ");
+	    }
+
+	  fts_spost(stream, "\n");
+	}
+	  
+      fts_spost(stream, "}\n");
+    }
 }
 
 static void
 cvec_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   cvec_t *this = (cvec_t *)o;
-  cvec_t *in = cvec_atom_get(at);
+  cvec_t *in = (cvec_t *)fts_get_object(at);
   
   cvec_copy(in, this);
 }
@@ -539,10 +572,10 @@ cvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   if(ac > 0)
     {
       if(fts_is_a(at, cvec_type))
-	cvec_copy(cvec_atom_get(at), this);
+	cvec_copy((cvec_t *)fts_get_object(at), this);
       else if(fts_is_a(at, fvec_type))
 	{
-	  fvec_t *fvec = fvec_atom_get(at);
+	  fvec_t *fvec = (fvec_t *)fts_get_object(at);
 	  float *f = fvec_get_ptr(fvec);
 	  int size = fvec_get_size(fvec);
 	  complex *c;
@@ -599,7 +632,8 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   cvec_t *this = (cvec_t *)o;
   
   this->values = 0;
-  this->size = 0;
+  this->m = 0;
+  this->n = 2;
   this->alloc = 0;
   data_object_set_keep((data_object_t *)o, fts_s_no);
 
@@ -609,7 +643,7 @@ cvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else if(ac == 1 && fts_is_int(at))
     {
       cvec_set_size(this, fts_get_int(at));
-      cvec_zero(this);
+      cvec_set_const(this, CZERO);
     }
   else if(ac == 1 && fts_is_tuple(at))
     {
@@ -649,6 +683,7 @@ cvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, cvec_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, cvec_delete);
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, cvec_post); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, cvec_print); 
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set, cvec_set_elements);
@@ -662,7 +697,6 @@ cvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, cvec_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, cvec_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, cvec_fill); 
   fts_method_define_varargs(cl, 0, fts_s_set, cvec_set_elements);
 

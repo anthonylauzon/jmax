@@ -51,6 +51,42 @@ static void fts_object_free(fts_object_t *obj);
  *
  */
 
+void
+fts_object_set_inlets_number(fts_object_t *o, int n)
+{
+  if(o->n_inlets != n)
+    {
+      int i;
+
+      fts_object_trim_inlets_connections(o, n);
+
+      o->in_conn = fts_realloc(o->in_conn, n * sizeof(fts_connection_t *));
+      
+      for(i=o->n_inlets; i<n; i++)
+	o->in_conn[i] = NULL;
+
+      o->n_inlets = n;
+    }
+}
+
+void
+fts_object_set_outlets_number(fts_object_t *o, int n)
+{
+  if(o->n_outlets != n)
+    {
+      int i;
+
+      fts_object_trim_outlets_connections(o, n);
+
+      o->out_conn = fts_realloc(o->out_conn, n * sizeof(fts_connection_t *));
+
+      for(i=o->n_outlets; i<n; i++)
+	o->out_conn[i] = NULL;
+
+      o->n_outlets = n;
+    }
+}
+
 fts_object_t *
 fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 {
@@ -63,12 +99,14 @@ fts_object_create(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
       
       obj->head.cl = cl;
       obj->head.id = FTS_NO_ID;
-      
-      if (cl->noutlets)
-	obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+      obj->n_inlets = cl->ninlets;
+      obj->n_outlets = cl->noutlets;
       
       if (cl->ninlets)
 	obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
+      
+      if (cl->noutlets)
+	obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
       
       if(fts_class_get_constructor(cl))
 	fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac, at); 
@@ -125,13 +163,15 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   obj->patcher = patcher;
   obj->head.cl = cl;
   obj->head.id = FTS_NO_ID;
-
-  if (cl->noutlets)
-    obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+  obj->n_inlets = cl->ninlets;
+  obj->n_outlets = cl->noutlets;
 
   if (cl->ninlets)
     obj->in_conn = (fts_connection_t **) fts_zalloc(cl->ninlets * sizeof(fts_connection_t *));
     
+  if (cl->noutlets)
+    obj->out_conn = (fts_connection_t **) fts_zalloc(cl->noutlets * sizeof(fts_connection_t *));
+
   if(fts_class_get_constructor(cl))
     fts_class_get_constructor(cl)(obj, fts_system_inlet, fts_s_init, ac - 1, at + 1);
 
@@ -337,8 +377,6 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
 	    obj = fts_error_object_new(patcher, aoc, aot, "Error in class instantiation");
 	  else if (ret == &fts_ArgumentMissing)
 	    obj = fts_error_object_new(patcher, aoc, aot, "Missing argument in object");
-	  else if (ret == &fts_ExtraArguments)
-	    obj = fts_error_object_new(patcher, aoc, aot, "Extra argument in object");
 	  else if (ret == &fts_ArgumentTypeMismatch)
 	    obj = fts_error_object_new(patcher, aoc, aot, "Argument types mismatch");
 	  else
@@ -474,7 +512,7 @@ fts_object_unconnect(fts_object_t *obj)
   int outlet, inlet;
 
   /* delete all the survived connections starting in the object */
-  for (outlet=0; outlet<obj->head.cl->noutlets; outlet++)
+  for (outlet=0; outlet<obj->n_outlets; outlet++)
     {
       fts_connection_t *p;
 
@@ -484,7 +522,7 @@ fts_object_unconnect(fts_object_t *obj)
     }
 
   /* Delete all the survived connections ending in the object */
-  for (inlet=0; inlet<obj->head.cl->ninlets; inlet++)
+  for (inlet=0; inlet<obj->n_inlets; inlet++)
     {
       fts_connection_t *p;
 
@@ -619,10 +657,10 @@ fts_object_recompute(fts_object_t *old)
 	  fts_object_upload_connections(obj);
 
 	  /* ask the object to send to the client object specific gui properties */
-	  fts_send_message(obj, fts_system_inlet, fts_s_update_gui, 0, 0);
+	  fts_send_message(obj, fts_s_update_gui, 0, 0);
 
 	  /* add to real time update list */
-	  if(fts_class_has_method( fts_object_get_class(obj), fts_system_inlet, fts_s_update_real_time))
+	  if(fts_class_get_method( fts_object_get_class(obj), fts_s_update_real_time) != NULL)
 	    fts_update_request(obj);
 	}
     }
@@ -659,8 +697,8 @@ fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 	 and outlets for the connections */
       if (fts_object_is_error(new))
 	{
-	  fts_error_object_fit_inlet(new, old->head.cl->ninlets - 1);
-	  fts_error_object_fit_outlet(new, old->head.cl->noutlets - 1);
+	  fts_error_object_fit_inlet(new, old->n_inlets - 1);
+	  fts_error_object_fit_outlet(new, old->n_outlets - 1);
 	}
       
       /* 1. move the properties
@@ -828,71 +866,6 @@ fts_object_reset_description(fts_object_t *obj)
     }
 }
 
-/* change number of outlets */
-void
-fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
-{
-  int old_noutlets = fts_object_get_outlets_number(o);
-
-  if (old_noutlets == new_noutlets)
-    return;
-
-  /* delete all the connections that will not be pertinent any more */
-  fts_object_trim_outlets_connections(o, new_noutlets);
-
-  /* reallocate and copy the outlets, incoming connections and outlets properties if needed */
-  if (new_noutlets == 0)
-    {
-      /* no new outlets, but there are old outlets to delete */
-      fts_free( o->out_conn);
-
-      o->out_conn = 0;
-    }
-  else if (old_noutlets > 0)
-    {
-      /* there are new outlets and old outlets (reallocate and move) */
-      int i;
-      fts_outlet_t  **new_outlets;
-      fts_connection_t **new_out_conn;
-
-      new_outlets  = (fts_outlet_t **)  fts_malloc(new_noutlets * sizeof(fts_outlet_t *));
-      new_out_conn = (fts_connection_t **) fts_zalloc(new_noutlets * sizeof(fts_connection_t *));
-
-      for (i = 0; i < new_noutlets; i++)
-	{
-	  new_outlets[i] = 0;
-
-	  if (i < old_noutlets)
-	    new_out_conn[i] = o->out_conn[i];
-	  else
-	    new_out_conn[i] = 0;
-	}
-
-      fts_free( o->out_conn);
-	      
-      o->out_conn = new_out_conn;
-    }
-  else 
-    {
-      /* there are new outlets, but there were no outlets before (allocate without copying old stuff) */
-      int i;
-
-      o->out_conn = (fts_connection_t **) fts_zalloc(new_noutlets * sizeof(fts_connection_t *));
-
-      for (i = 0; i < new_noutlets; i++)
-	o->out_conn[i] = 0;
-    }
-
-  /* change the class (of course, not the metaclass). */
-  {
-    fts_metaclass_t *mcl = fts_object_get_metaclass(o);
-    fts_atom_t a;
-    
-    fts_set_int(&a, new_noutlets);
-    o->head.cl = fts_class_instantiate(mcl, 1, &a);
-  }
-}
-
 /*****************************************************************************
  *
  *  object access
@@ -901,7 +874,7 @@ fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets)
 
 fts_symbol_t fts_object_get_outlet_type( fts_object_t *o, int woutlet)
 {
-  return o->head.cl->outlets[woutlet].tmess.symb;
+  return o->head.cl->outlets[woutlet].selector;
 }
 
 fts_symbol_t 

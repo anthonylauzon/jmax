@@ -848,7 +848,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, unsigned char *progr
 	    fts_log( "OBJ_MESS %d %s %d\n", inlet, sel, nargs);
 #endif
 
-	    fts_send_message(object_stack[object_tos], inlet, sel, nargs, &eval_stack[eval_tos]);
+	    fts_send_message(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
 	  }
 	break;
 
@@ -1185,7 +1185,6 @@ fts_object_t *fts_binary_filedesc_load( FILE *f, fts_object_t *parent, int ac, c
 
 /* saver dumper utility */
 static fts_metaclass_t *saver_dumper_type = 0;
-static fts_symbol_t s_saver_dumper = 0;
 
 typedef struct _saver_dumper
 {
@@ -1809,7 +1808,7 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   if(fts_is_void(&a) || (fts_is_symbol(&a) && fts_get_symbol(&a) == fts_s_yes))
     {
       fts_set_object(&a, (fts_object_t *)saver_dumper);
-      fts_send_message(obj, fts_system_inlet, fts_s_dump, 1, &a);
+      fts_send_message(obj, fts_s_dump, 1, &a);
     }
 }
 
@@ -2133,7 +2132,5 @@ saver_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 fts_saver_config(void)
 {
-  s_saver_dumper = fts_new_symbol("saver_dumper");
-
-  saver_dumper_type = fts_class_install(s_saver_dumper, saver_dumper_instantiate);
+  saver_dumper_type = fts_class_install(NULL, saver_dumper_instantiate);
 }

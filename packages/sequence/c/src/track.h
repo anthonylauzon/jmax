@@ -91,8 +91,4 @@ extern event_t *track_highlight_and_next(track_t *track, event_t *event);
 extern void track_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void track_add_event_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-/* track atoms */
-#define track_atom_get(ap) ((track_t *)fts_get_object(ap))
-#define track_atom_is(ap) (fts_is_a((ap), track_type))
-
 #endif

@@ -98,25 +98,6 @@ col_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-col_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  col_t *this = (col_t *)o;
-  
-  if(ac > 1 && fts_is_number(at))
-    {
-      int m = mat_get_m(this->mat);
-      int n = mat_get_n(this->mat);
-      int i = fts_get_number_int(at);
-      int j = this->j;
-
-      if(i >= 0 && i < m && j >= 0 && j < n)
-	mat_void_element(this->mat, i, j);
-    }
-  else
-    col_void(this);
-}
-
-static void
 col_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   col_t *this = (col_t *)o;
@@ -149,23 +130,6 @@ col_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
  */
 
 static void
-col_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  col_t *this = (col_t *)o;
-  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-  mat_t *mat = this->mat;
-  int size = col_get_size(this);
-  int i;
-  
-  fts_spost(stream, "{");
-
-  for(i=0; i<size; i++)
-    fts_spost_atoms(stream, 1, col_get_element(this, i));
-
-  fts_spost(stream, "}\n");
-}
-
-static void
 col_getobj(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
   fts_set_object(value, obj);
@@ -182,9 +146,9 @@ col_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 {
   col_t *this = (col_t *)o;
 
-  if(mat_atom_is(at + 0))
+  if(fts_is_a(at, mat_type))
     {
-      mat_t *mat = mat_atom_get(at + 0);
+      mat_t *mat = (mat_t *)fts_get_object(at + 0);
 
       this->mat = mat;
       fts_object_refer((fts_object_t *)mat);
@@ -221,19 +185,16 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, col_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, col_delete);
   
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, col_print); 
-  
   fts_class_add_daemon(cl, obj_property_get, fts_s_state, col_getobj);
   
   /* user methods */
   fts_method_define_varargs(cl, 0, fts_s_bang, col_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, col_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, col_fill);      
   fts_method_define_varargs(cl, 0, fts_s_set, col_set);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, col_symbol, 1, &col_symbol);
+  fts_outlet_type_define(cl, 0, col_symbol);
   
   return fts_ok;
 }

@@ -168,9 +168,9 @@ fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *
 
 /* Return Status */
 fts_status_description_t fts_MethodNotFound = {"method not found"};
+fts_status_description_t fts_StackOverflow = {"method stack overflow"};
 fts_status_description_t fts_ArgumentMissing = {"argument missing"};
 fts_status_description_t fts_ArgumentTypeMismatch = {"argument type mismatch"};
-fts_status_description_t fts_ExtraArguments = {"extra arguments"};
 fts_status_description_t fts_InvalidMessage = {"invalid symbol message"};
 
 /* The object stack */
@@ -179,26 +179,15 @@ int fts_objstack_top = 0; /* Next free slot; can overflow, must be checked */
 fts_object_t *fts_objstack[FTS_OBJSTACK_SIZE];
 
 fts_status_t 
-fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_inlet_decl_t *in;
-  fts_class_mess_t *mess;
   fts_class_t *cl = o->head.cl;
-  int anything;
+  fts_method_t meth = fts_class_get_method(cl, s);
 
-  if (winlet == fts_system_inlet)
-    in = cl->sysinlet;
-  else if (winlet < cl->ninlets && winlet >= 0)
-    in = &cl->inlets[winlet];
-  else
-    return &fts_InletOutOfRange;
-
-  mess = fts_class_mess_inlet_get(in, s, &anything);  /* @@@anything */
-
-  if (mess && !FTS_REACHED_MAX_CALL_DEPTH())
+  if (meth && !FTS_REACHED_MAX_CALL_DEPTH())
     {
       FTS_OBJSTACK_PUSH(o);
-      (*mess->mth)(o, winlet, s, ac, at);
+      meth(o, 0, s, ac, at);
       FTS_OBJSTACK_POP(o);
 
       return fts_ok;
@@ -207,94 +196,69 @@ fts_send_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   return &fts_MethodNotFound;
 }
 
-
-fts_status_t
-fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache)
+static fts_status_t
+message_outlet(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_inlet_decl_t *in;
-  fts_class_mess_t *mess;
   fts_class_t *cl = o->head.cl;
-  fts_class_mess_t **messtable;
-  int i;
+  fts_symbol_t selector = fts_class_outlet_get_selector(cl, woutlet);
+  fts_connection_t *conn = o->out_conn[woutlet];
 
-  if (winlet == fts_system_inlet)
-    in = cl->sysinlet;
-  else
+  if (selector != NULL && selector != s)
+    return &fts_InvalidMessage;
+
+  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
     {
-      if (winlet >= cl->ninlets)
-	winlet = cl->ninlets-1;
-
-      if (winlet >= 0)
-	in = &cl->inlets[winlet];
-      else
-	return &fts_InletOutOfRange;
-    }
-      
-
-  messtable = in->messlist;
-
-  if ((in->nmess == 1) && (messtable[0]->tmess.symb == fts_s_anything))
-    {
-      /* special case for the anything as unique method */
-      
-      mess = messtable[0];
-      *symb_cache = 0;
-      *mth_cache  = mess->mth;
-    }
-  else
-    {
-      mess = 0;
-      for (i = 0; i < in->nmess; i++)
+      while(conn)
 	{
-	  if (messtable[i]->tmess.symb == s)
+	  if ((conn->symb == s) || (conn->symb == NULL && conn->mth != NULL))
 	    {
-	      mess = messtable[i];
-
-	      *symb_cache = mess->tmess.symb;
-	      *mth_cache = mess->mth;
-
-	      break;
+	      /* call cashed method */
+	      FTS_OBJSTACK_PUSH(conn->dst);
+	      (*conn->mth)(conn->dst, conn->winlet, s, ac, at);
+	      FTS_OBJSTACK_POP(conn->dst);
 	    }
-	  else if (messtable[i]->tmess.symb == fts_s_anything)
+	  else
 	    {
-	      /* found and temporary stored a method for anything;
-		 since it is not unique, we do not cache it */
-
-	      mess = messtable[i];
+	      /* search method and cache if found */
+	      fts_method_t meth = fts_class_inlet_get_method(fts_object_get_class(conn->dst), conn->winlet, s);
+	      
+	      if(meth)
+		{
+		  conn->symb = s;
+		  conn->mth = meth;
+		  
+		  FTS_OBJSTACK_PUSH(o);
+		  (*meth)(conn->dst, conn->winlet, s, ac, at);
+		  FTS_OBJSTACK_POP(o);
+		  
+		  return fts_ok;
+		}
+	      else
+		{
+		  fts_object_signal_runtime_error(o, "Received unknown message %s at inlet %d", s, conn->winlet);
+		  return &fts_MethodNotFound;
+		}
 	    }
+	  
+	  conn = conn->next_same_src;
 	}
     }
-
-  if (mess && !FTS_REACHED_MAX_CALL_DEPTH())
-    {
-      FTS_OBJSTACK_PUSH(o);
-      (*mess->mth)(o, winlet, s, ac, at);
-      FTS_OBJSTACK_POP(o);
-
-      return fts_ok;
-    }
   else
     {
-      fts_object_signal_runtime_error(o, "Unknown message %s for object of class %s, inlet %d", 
-				      s, fts_object_get_class_name(o), winlet);
-
-      return &fts_MethodNotFound;
+      fts_object_signal_runtime_error(o, "Message stack overflow at inlet %d", conn->winlet);
+      return &fts_StackOverflow;
     }
+
+  return fts_ok;
 }
 
-
-/* All the call to this  Function are overwritten to macro in case of optimization.
-   The function is left here so that a user can compile an object with -g to test it
-*/
 
 fts_status_t
 fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_connection_t *conn;
   fts_class_t *cl = o->head.cl;
-  fts_outlet_decl_t *out;
-  int n;
   const fts_atom_t *a;
+  int n;
 
   if(ac == 1 && fts_is_tuple(at))
     {
@@ -309,111 +273,43 @@ fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_
       a = at;
     }
 
-  if (woutlet >= cl->noutlets || woutlet < 0)
+  if (woutlet >= fts_object_get_outlets_number(o) || woutlet < 0)
     return &fts_OutletOutOfRange;
 
-  out = &cl->outlets[woutlet];
-
-  if (!s)
-    return &fts_InvalidMessage;
-
-  if (out->tmess.symb && out->tmess.symb != s)
-    return &fts_InvalidMessage;
-
-  conn = o->out_conn[woutlet];
-
-  if (!FTS_REACHED_MAX_CALL_DEPTH()) 
-    {
-      while(conn)
-	{
-	  if ((conn->symb == s) || (!conn->symb && conn->mth))
-	    {
-	      /* call cashed method */
-	      FTS_OBJSTACK_PUSH(conn->dst);
-	      (*conn->mth)(conn->dst, conn->winlet, s, n, a);
-	      FTS_OBJSTACK_POP(conn->dst);
-	    }
-	  else
-	    fts_send_message_cache(conn->dst, conn->winlet, s, n, a, &conn->symb, &conn->mth);
-	  
-	  conn = conn->next_same_src;
-	}
-    }
-
-  return fts_ok;
+  return message_outlet(o, woutlet, s, n, a);
 }
 
-
-/* Utility functions */
-
-/*
-   The fts_outlet_* functions call will be overwritten by macro
-   expansion in case of -O optimization; the functions are 
-   always compiled, also to allow user object to be compiled with
-   -g also with -O compiled libraries.
-*/
-
-void fts_outlet_int(fts_object_t *o, int woutlet, int n)
+void 
+fts_outlet_int(fts_object_t *o, int woutlet, int n)
 {
-  fts_connection_t *conn;
-  fts_atom_t atom;
+  fts_atom_t a;
 
-  fts_set_int(&atom, n);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_int, 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
+  fts_set_int(&a, n);
+  message_outlet(o, woutlet, fts_s_int, 1, &a);
 }
 
-void fts_outlet_float(fts_object_t *o, int woutlet, float f)
+void 
+fts_outlet_float(fts_object_t *o, int woutlet, float f)
 {
-  fts_connection_t *conn;
-  fts_atom_t atom;
+  fts_atom_t a;
 
-  fts_set_float(&atom, f);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_float, 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
+  fts_set_float(&a, f);
+  message_outlet(o, woutlet, fts_s_float, 1, &a);
 }
 
-void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
+void 
+fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
 {
-  fts_connection_t *conn;
-  fts_atom_t atom;
+  fts_atom_t a;
 
-  fts_set_symbol(&atom, s);
-
-  conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_symbol, 1, &atom); 
-
-      conn = conn->next_same_src;
-    }
+  fts_set_symbol(&a, s);
+  message_outlet(o, woutlet, fts_s_symbol, 1, &a);
 }
 
-void fts_outlet_bang(fts_object_t *o, int woutlet)
+void 
+fts_outlet_bang(fts_object_t *o, int woutlet)
 {
-  fts_connection_t *conn = o->out_conn[woutlet];
-
-  while(conn)
-    {
-      fts_send_message(conn->dst, conn->winlet, fts_s_bang, 0, 0); 
-
-      conn = conn->next_same_src;
-    }
+  message_outlet(o, woutlet, fts_s_bang, 0, 0);
 }
 
 void
@@ -424,14 +320,14 @@ fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj)
   fts_set_object(&a, obj);
 
   fts_object_refer(obj);
-  fts_outlet_send(o, woutlet, fts_metaclass_get_selector(fts_object_get_metaclass(obj)), 1, &a);
+  message_outlet(o, woutlet, fts_metaclass_get_selector(fts_object_get_metaclass(obj)), 1, &a);
   fts_object_release(obj);
 }
 
 void
 fts_outlet_primitive(fts_object_t *o, int woutlet, const fts_atom_t *a)
 {
-  fts_outlet_send(o, woutlet, fts_get_selector(a), 1, a);
+  message_outlet(o, woutlet, fts_get_selector(a), 1, a);
 }
 
 void
@@ -439,10 +335,8 @@ fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* a)
 {
   if(fts_is_tuple(a))
     fts_tuple_output(o, woutlet, (fts_tuple_t *)fts_get_object(a));
-  else if(fts_is_message(a))
-    fts_message_output(o, woutlet, (fts_message_t *)fts_get_object(a));
   else if(!fts_is_void(a))
-    fts_outlet_send(o, woutlet, fts_get_selector(a), 1, a);
+    message_outlet(o, woutlet, fts_get_selector(a), 1, a);
 }
 
 void
@@ -451,7 +345,7 @@ fts_outlet_atoms(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
   if(ac == 1)
     fts_outlet_atom(o, woutlet, at);
   else if(ac > 1)
-    fts_outlet_send(o, woutlet, fts_s_list, ac, at);
+   message_outlet(o, woutlet, fts_s_list, ac, at);
 }
 
 void
@@ -479,7 +373,7 @@ fts_outlet_atoms_copy(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at
 	  fts_atom_refer(output + i);
 	}
       
-      fts_outlet_send(o, woutlet, fts_s_list, ac, at);
+      message_outlet(o, woutlet, fts_s_list, ac, at);
       
       for(i=0; i<ac; i++)
 	fts_atom_release(output + i);

@@ -24,8 +24,6 @@
  *
  */
 
-
-
 /*
  * Extended with the keyword "t", that means thru; a t outlet
  * always reproduce exactly what sent in the input, including
@@ -33,6 +31,29 @@
  * The forced conversion behaviour is not natural, but is kept
  * for backward compatibility.
  * Now there are no limit in the number of arguments.
+ *
+ *   ARGUMENT   TYPE OF OUTPUT
+ *   'i'        int outlet
+ *   'f'        float outlet
+ *   'b'        bang outlet
+ *   's'        symbol outlet
+ *   'l'        list outlet
+ *   't'        thru outlet
+ *   int        int outlet
+ *   float      float outlet
+ *   other-symbol bang.
+ *
+ *   Actually, in this table the symbol 'i' stay for any symbol
+ *   starting with 'i'; this is awfull, but kept for backward 
+ *   compatibility.
+ *
+ *   Actually, the 't' introduce a rare incompatibility; in the
+ *   old version, a trigger with a t outlet would creare a bang
+ *   outlet, beacuse no error control was done.
+ *
+ *   If there are no arguments, the trigger default to two int
+ *   outlets (backward compatibility, it would make more sense 
+ *   having two thru as default).
  *
  */
 
@@ -54,7 +75,6 @@ typedef struct
   int noutlets;
   trigger_outlet_t *trigger_outlet_table;
 } trigger_t;
-
 
 static void
 trigger_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -270,77 +290,13 @@ trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     }
 }
 
-/* Special method that is the only installed for trigger with only "b" arguments */
-
-static void
-trigger_all_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  trigger_t *x = (trigger_t *)o;
-  int outlet = x->noutlets;
-
-  while (outlet--)
-    fts_outlet_bang(o, outlet);
-}
-
-
-/* Special method that is the only installed for trigger with only "t" arguments */
-
-static void
-trigger_all_thru(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  trigger_t *x = (trigger_t *)o;
-  int outlet = x->noutlets;
-
-  while (outlet--)
-    fts_outlet_send(o, outlet, s, ac, at);
-}
-
-
-/* The init method get the user data from the class and put
-   a pointer to it in the object itself */
-
 static void
 trigger_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   trigger_t *x = (trigger_t *)o;
-
-  x->trigger_outlet_table = (trigger_outlet_t *)fts_object_get_user_data(o);
-  x->noutlets = ac;
-}
-
-static fts_status_t
-trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
-{
   trigger_outlet_t *trigger_outlet_table;
   int noutlets;
-  int all_bang, all_thru;
   int n;
-
-  /* Create the trigger_outlet_table structure, to be put in the user data of the class 
-     Looks for each argument; arguments can be:
-
-     ARGUMENT   TYPE OF OUTLET
-     'i'        int outlet
-     'f'        float outlet
-     'b'        bang outlet
-     's'        symbol outlet
-     'l'        list outlet
-     't'        thru outlet
-     int        int outlet
-     float      float outlet
-     other-symbol bang.
-     Actually, in this table the symbol 'i' stay for any symbol
-     starting with 'i'; this is awfull, but kept for backward 
-     compatibility.
-
-     Actually, the 't' introduce a rare incompatibility; in the
-     old version, a trigger with a t outlet would creare a bang
-     outlet, beacuse no error control was done.
-
-     If there are no arguments, the trigger default to two int
-     outlets (backward compatibility, it would make more sense having two 
-     thru as default).
-     */
 
   if (ac > 0)
     noutlets = ac;
@@ -349,24 +305,13 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   trigger_outlet_table = fts_malloc(noutlets * sizeof(trigger_outlet_t));
 
-  all_bang = 1;
-  all_thru  = 1;
-
   if (ac > 0)
     for (n = 0; n < ac; at++, n++)
       {
 	if (fts_is_float(at))
-	  {
-	    trigger_outlet_table[n] = trigger_outlet_float;
-	    all_bang = 0;
-	    all_thru = 0;
-	  }
+	  trigger_outlet_table[n] = trigger_outlet_float;
 	else if (fts_is_int(at))
-	  {
-	    trigger_outlet_table[n] = trigger_outlet_int;
-	    all_bang = 0;
-	    all_thru = 0;
-	  }
+	  trigger_outlet_table[n] = trigger_outlet_int;
 	else if (fts_is_symbol(at))
 	  {
 	    const char *s = fts_get_symbol(at);
@@ -375,41 +320,30 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	      {
 	      case 'i':
 		trigger_outlet_table[n] = trigger_outlet_int;
-		all_bang = 0;
-		all_thru = 0;
 		break;
 
 	      case 'f':
 		trigger_outlet_table[n] = trigger_outlet_float;
-		all_bang = 0;
-		all_thru = 0;
 		break;
 
 	      case 's':
 		trigger_outlet_table[n] = trigger_outlet_symbol;
-		all_bang = 0;
-		all_thru = 0;
 		break;
 
 	      case 'b':
 		trigger_outlet_table[n] = trigger_outlet_bang;
-		all_thru = 0;
 		break;
 
 	      case 'l':
 		trigger_outlet_table[n] = trigger_outlet_list;
-		all_bang = 0;
-		all_thru = 0;
 		break;
 
 	      case 't':
 		trigger_outlet_table[n] = trigger_outlet_thru;
-		all_bang = 0;
 		break;
 
 	      default:
 		trigger_outlet_table[n] = trigger_outlet_bang;
-		all_thru = 0;
 		break;
 	      }
 	  }
@@ -418,57 +352,29 @@ trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     {
       trigger_outlet_table[0] = trigger_outlet_int;
       trigger_outlet_table[1] = trigger_outlet_int;
-      all_bang = 0;
-      all_thru = 0;
     }
 
-  fts_class_init(cl, sizeof(trigger_t), 1, noutlets, (void *)trigger_outlet_table);
+  x->trigger_outlet_table = trigger_outlet_table;
+  x->noutlets = ac;
+
+  fts_object_set_outlets_number(o, noutlets);
+}
+
+static fts_status_t
+trigger_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(trigger_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, trigger_init);
 
-  if (all_bang)
-    fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_bang);
-  else if (all_thru)
-    fts_method_define_varargs(cl, 0, fts_s_anything, trigger_all_thru);
-  else
-    {
-      fts_method_define_varargs(cl, 0, fts_s_bang, trigger_bang);
-      fts_method_define_varargs(cl, 0, fts_s_int, trigger_int);
-      fts_method_define_varargs(cl, 0, fts_s_float, trigger_float);
-      fts_method_define_varargs(cl, 0, fts_s_symbol, trigger_symbol);
-      fts_method_define_varargs(cl, 0, fts_s_list, trigger_list);
-      fts_method_define_varargs(cl, 0, fts_s_anything, trigger_anything);
-    }
+  fts_method_define_varargs(cl, 0, fts_s_bang, trigger_bang);
+  fts_method_define_varargs(cl, 0, fts_s_int, trigger_int);
+  fts_method_define_varargs(cl, 0, fts_s_float, trigger_float);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, trigger_symbol);
+  fts_method_define_varargs(cl, 0, fts_s_list, trigger_list);
+  fts_method_define_varargs(cl, 0, fts_s_anything, trigger_anything);
 
-  /* Type the outlet using the trigger_outlet_table */
-  for (n = 0; n < noutlets;  n++)
-    {
-      switch (trigger_outlet_table[n])
-	{
-	case trigger_outlet_int:
-	  fts_outlet_type_define_varargs(cl,  n,  fts_s_int);
-	  break;
-	case trigger_outlet_float:
-	  fts_outlet_type_define_varargs(cl,  n,  fts_s_float);
-	  break;
-	case trigger_outlet_symbol:
-	  fts_outlet_type_define_varargs(cl,  n,  fts_s_symbol);
-	  break;
-	case trigger_outlet_list:
-	  fts_outlet_type_define_varargs(cl,  n,  fts_s_list);
-	  break;
-	  
-	case trigger_outlet_bang:
-	  fts_outlet_type_define_varargs(cl,  n,  fts_s_bang);
-	  break;
-	  
-	case trigger_outlet_thru:
-	  /* no type in this case */
-	  break;
-	}
-    }
-
-    return fts_ok;
+  return fts_ok;
 }
 
 
@@ -553,7 +459,7 @@ trigger_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 void
 trigger_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("trigger"), trigger_instantiate, trigger_equiv);
-  fts_alias_install(fts_new_symbol("t"), fts_new_symbol("trigger"));
+  fts_metaclass_t *mcl = fts_class_install(fts_new_symbol("trigger"), trigger_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("t"));
 }
 

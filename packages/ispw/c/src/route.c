@@ -99,6 +99,8 @@ iroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   iroute_t *this = (iroute_t *)o;
   int i;
 
+  fts_object_set_outlets_number(o, ac + 1);
+
   this->ns = ac;
   this->ints = (int *)fts_malloc(sizeof(int) * ac);
 
@@ -122,7 +124,7 @@ iroute_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 iroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(iroute_t), 1, ac + 1, 0);
+  fts_class_init(cl, sizeof(iroute_t), 1, 1, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, iroute_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, iroute_delete);
@@ -249,6 +251,8 @@ mroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   mroute_t *this = (mroute_t *)o;
   int i;
 
+  fts_object_set_outlets_number(o, ac + 1);
+
   this->ns = ac;
   this->symbols = (fts_symbol_t *)fts_malloc(sizeof(fts_symbol_t) * ac);
 
@@ -272,7 +276,7 @@ mroute_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 static fts_status_t
 mroute_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(mroute_t), 1, ac + 1, 0);
+  fts_class_init(cl, sizeof(mroute_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, mroute_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, mroute_delete);
@@ -304,5 +308,5 @@ route_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 route_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("route"), route_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("route"), route_instantiate);
 }

@@ -97,17 +97,23 @@ print_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       if(fts_is_object(at))
 	{
 	  fts_object_t *obj = fts_get_object(at);	  
-	  fts_method_t meth_print = fts_class_get_method(fts_object_get_class(obj), fts_system_inlet, fts_s_print);
+	  fts_method_t meth = fts_class_get_method(fts_object_get_class(obj), fts_s_print);
 	  fts_atom_t a;
 	  
-	  if(meth_print)
+	  if(meth)
 	    {
-	      /* print class name and let the object print its content */
-	      fts_spost(this->stream, ":%s", s);
-	      
 	      fts_set_object(&a, this->stream);
-	      meth_print(obj, fts_system_inlet, fts_s_print, 1, &a);
-	      
+	      meth(obj, 0, 0, 1, &a);
+	      return;
+	    }
+	  
+	  meth = fts_class_get_method(fts_object_get_class(obj), fts_s_post);
+	  
+	  if(meth)
+	    {
+	      fts_set_object(&a, this->stream);
+	      meth(obj, 0, 0, 1, &a);
+	      fts_spost(this->stream, "\n");
 	      return;
 	    }
 	}

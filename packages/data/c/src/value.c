@@ -59,20 +59,14 @@ value_set_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-value_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  value_t *this = (value_t *)o;
-
-  fts_set_void(&this->a);
-}
-
-static void
-value_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
-
+   
+  fts_spost(stream, "(:val ");
   fts_spost_atoms(stream, 1, &this->a);
+  fts_spost(stream, ")");
 }
 
 static void
@@ -96,7 +90,7 @@ static void
 value_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   value_t *this = (value_t *)o;
-  value_t *in = value_atom_get(at);
+  value_t *in = (value_t *)fts_get_object(at);
   
   fts_atom_assign(&this->a, &in->a);
 }
@@ -136,7 +130,7 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 {
   value_t *this = (value_t *) o;
 
-  value_clear(o, 0, 0, 0, 0);
+  fts_set_void(&this->a);
 }
 
 static void
@@ -153,7 +147,7 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, value_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, value_delete);
 
-  fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, value_print);
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, value_post);
 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_set_from_instance, value_set_from_instance);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_dump, value_dump);
@@ -166,8 +160,6 @@ value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_bang, value_output);
   fts_method_define_varargs(cl, 0, fts_s_anything, value_set_and_output);
 
-  fts_method_define_varargs(cl, 0, fts_s_clear, value_clear);
-  
   fts_method_define_varargs(cl, 1, fts_s_anything, value_set_value);
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -183,6 +175,5 @@ value_config(void)
   value_symbol = fts_new_symbol("value");
 
   value_type = fts_class_install(value_symbol, value_instantiate);
-
-  fts_alias_install(fts_new_symbol("val"), value_symbol);
+  fts_metaclass_alias(value_type, fts_new_symbol("val"));
 }

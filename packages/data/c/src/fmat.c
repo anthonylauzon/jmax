@@ -173,7 +173,7 @@ fmat_read_atom_file_newline(fmat_t *fmat, fts_symbol_t file_name)
   if(!file)
     return -1;
 
-  fmat_zero(fmat);
+  fmat_set_const(fmat, 0.0);
 
   while(fts_atom_file_read(file, &a, &c))
     {
@@ -276,7 +276,7 @@ fmat_read_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_t
   if(!separator)
     separator = fts_s_comma;
 
-  fmat_zero(fmat);
+  fmat_set_const(fmat, 0.0);
 
   while(fts_atom_file_read(file, &a, &c))
     {
@@ -406,14 +406,6 @@ fmat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-fmat_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fmat_t *this = (fmat_t *)o;
-
-  fmat_set_const(this, 0.0f);
-}
-
-static void
 fmat_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
@@ -470,7 +462,7 @@ static void
 fmat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
-  int old_size = fmat_get_m(this)* fmat_get_n(this);
+  int old_size = fmat_get_m(this) * fmat_get_n(this);
   int m = 0;
   int n = 0;
   int i;
@@ -512,7 +504,7 @@ fmat_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -551,7 +543,7 @@ fmat_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -590,7 +582,7 @@ fmat_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -629,7 +621,7 @@ fmat_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -673,7 +665,7 @@ fmat_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -712,7 +704,7 @@ fmat_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -773,7 +765,7 @@ fmat_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -812,7 +804,7 @@ fmat_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -851,7 +843,7 @@ fmat_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -890,7 +882,7 @@ fmat_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -929,7 +921,7 @@ fmat_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -968,7 +960,7 @@ fmat_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -1007,7 +999,7 @@ fmat_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -1046,7 +1038,7 @@ fmat_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if(fts_is_a(at, fmat_type))
 	{
-	  fmat_t *right = fmat_atom_get(at);
+	  fmat_t *right = (fmat_t *)fts_get_object(at);
 	  int this_m = fmat_get_m(this);
 	  int this_n = fmat_get_n(this);
 	  int right_m = fmat_get_m(right);
@@ -1143,38 +1135,56 @@ fmat_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
  */
 
 static void
+fmat_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *this = (fmat_t *)o;
+  fts_bytestream_t *stream = fts_post_get_stream(ac, at);
+  int m = fmat_get_m(this);
+  int n = fmat_get_n(this);
+  int size = n * m;
+  
+  if(size == 0)
+    fts_spost(stream, "(:fmat)");
+  else
+    fts_spost(stream, "(:fmat %d %d)", m, n);
+}
+
+static void
 fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
   fts_bytestream_t *stream = fts_post_get_stream(ac, at);
   int m = fmat_get_m(this);
   int n = fmat_get_n(this);
+  int size = m * n;
   int i, j;
   
-  fts_spost(stream, "{\n");
-
-  for(i=0; i<m; i++)
+  if(size == 0)
+    fts_spost(stream, "<empty fmat>\n");
+  else
     {
-      fts_spost(stream, "  ");
+      fts_spost(stream, "<fmat %dx%d>\n", m, n);
+      fts_spost(stream, "{\n");
 
-      for(j=0; j<n-1; j++)
+      for(i=0; i<m; i++)
 	{
-	  fts_spost_float(stream, fmat_get_element(this, i, j));
-	  fts_spost(stream, " ");
+	  fts_spost(stream, "  ");
+	  
+	  for(j=0; j<n-1; j++)
+	    fts_spost(stream, "%.7g ", fmat_get_element(this, i, j));
+	  
+	  fts_spost(stream, "%.7g,\n");
 	}
-
-      fts_spost_float(stream, fmat_get_element(this, i, j));
-      fts_spost(stream, "\n");
+      
+      fts_spost(stream, "}\n");
     }
-
-  fts_spost(stream, "}\n");
 }
 
 static void
 fmat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *this = (fmat_t *)o;
-  fmat_t *set = fmat_atom_get(at);
+  fmat_t *set = (fmat_t *)fts_get_object(at);
 
   fmat_copy(set, this);
 }
@@ -1227,9 +1237,15 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac == 0)
     fmat_set_size(this, 0, 0);
   else if(ac == 1 && fts_is_int(at))
-    fmat_set_size(this, fts_get_int(at), 1);
+    {
+      fmat_set_size(this, fts_get_int(at), 1);
+      fmat_set_const(this, 0.0);
+    }
   else if(ac == 2 && fts_is_int(at) && fts_is_int(at + 1))
-    fmat_set_size(this, fts_get_int(at), fts_get_int(at + 1));
+    {
+      fmat_set_size(this, fts_get_int(at), fts_get_int(at + 1));
+      fmat_set_const(this, 0.0);      
+    }
   else if(fts_is_tuple(at))
     {
       int m = 0;
@@ -1254,6 +1270,7 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	}
       
       fmat_set_size(this, m, n);
+      fmat_set_const(this, 0.0);
       fmat_set_from_tuples(this, ac, at);
 
       data_object_set_keep((data_object_t *)o, fts_s_args);
@@ -1285,6 +1302,7 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_init, fmat_init);
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_delete, fmat_delete);
   
+  fts_method_define_varargs(cl, fts_system_inlet, fts_s_post, fmat_post); 
   fts_method_define_varargs(cl, fts_system_inlet, fts_s_print, fmat_print); 
 
   fts_class_add_daemon(cl, obj_property_put, fts_s_keep, data_object_daemon_set_keep);
@@ -1301,7 +1319,6 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   
   fts_method_define_varargs(cl, 0, fts_s_bang, fmat_output);
   
-  fts_method_define_varargs(cl, 0, fts_s_clear, fmat_clear);
   fts_method_define_varargs(cl, 0, fts_s_fill, fmat_fill);
   fts_method_define_varargs(cl, 0, fts_s_set, fmat_set_elements);
   fts_method_define_varargs(cl, 0, fts_s_row, fmat_set_row_elements);

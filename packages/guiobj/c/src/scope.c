@@ -560,6 +560,8 @@ scope_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 scope_config(void)
 {
+  fts_metaclass_t *mcl;
+
   scope_symbol = fts_new_symbol("scope~");
   sym_display = fts_new_symbol("display");
   sym_auto = fts_new_symbol("auto");
@@ -568,6 +570,7 @@ scope_config(void)
   sym_set_threshold = fts_new_symbol("setThreshold");
 
   fts_dsp_declare_function(scope_symbol, scope_ftl);  
-  fts_class_install(scope_symbol, scope_instantiate);
-  fts_alias_install(fts_new_symbol("scope"), scope_symbol);
+
+  mcl = fts_class_install(scope_symbol, scope_instantiate);
+  fts_metaclass_alias(mcl, fts_new_symbol("scope"));
 }

@@ -50,7 +50,7 @@ static void
 locate_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   locate_t *this = (locate_t *)o;
-  track_t *track = track_atom_get(at);
+  track_t *track = (track_t *)fts_get_object(at);
 
   if(this->track)
     fts_object_release(this->track);
@@ -183,7 +183,7 @@ locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->epsilon = 0.0;
   this->mode = seqsym_event;
 
-  if(ac > 0 && track_atom_is(at))
+  if(ac > 0 && fts_is_a(at, track_type))
     locate_set_track(o, 0, 0, ac, at);
   else
     fts_object_set_error(o, "Argument of track required");
@@ -223,5 +223,5 @@ locate_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 locate_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("locate"), locate_instantiate, fts_arg_type_equiv);
+  fts_class_install(fts_new_symbol("locate"), locate_instantiate);
 }
