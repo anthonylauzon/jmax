@@ -106,11 +106,9 @@ public class ExplodePanel extends JPanel implements Editor{
     add(itsView);
     currentView = view;
 
-    if (view == PIANOROLL_VIEW && itsScrPanel.tb == null)
+    if (view == PIANOROLL_VIEW)
       {
-	itsScrPanel.prepareToolbar();
-	// See also the documentation
-	// in ScrPanel.prepareToolbar() for details.
+	itsScrPanel.frameAvailable();
       }
     
     itsContainer.getFrame().validate();

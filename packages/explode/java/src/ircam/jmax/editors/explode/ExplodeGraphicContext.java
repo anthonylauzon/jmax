@@ -108,14 +108,14 @@ public class ExplodeGraphicContext extends GraphicContext {
     return itsLogicalTime;
   }
 
-  public void setToolbar(EditorToolbar t)
+  public void setToolManager(ToolManager t)
   {
-    toolbar = t;
+    toolManager = t;
   }
 
-  public EditorToolbar getToolbar()
+  public ToolManager getToolManager()
   {
-    return toolbar;
+    return toolManager;
   }
 
   public void setSelection(ExplodeSelection s)
@@ -138,7 +138,7 @@ public class ExplodeGraphicContext extends GraphicContext {
 
   int itsLogicalTime;
 
-  EditorToolbar toolbar;
+  ToolManager toolManager;
 }
 
 

@@ -111,6 +111,13 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     multipleObjectSelected();
   }
 
+  /** 
+   * GraphicSelectionListener implementation. Selection via doubleClick.  */
+  public void selectionPointDoubleClicked(int x, int y, int modifiers)
+  {
+  }
+
+
   /**
    * Selects all the objects in a given rectangle
    */

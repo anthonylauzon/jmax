@@ -44,13 +44,19 @@ public class PartitionEventRenderer implements ObjectRenderer {
   }
 
 
+  public void render(Object obj, Graphics g, boolean selected)
+    {
+	render(obj, g, selected, gc);
+    } 
+
   /**
    * draw the given event in the given graphic context.
    * It takes into account the selection state.
    */
-  public void render(Object obj, Graphics g, boolean selected) 
+  public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
     ScrEvent e = (ScrEvent) obj;
+    ExplodeGraphicContext gc = (ExplodeGraphicContext) theGc;
 
     int x = gc.getAdapter().getX(e);
     int y = gc.getAdapter().getY(e);
@@ -73,12 +79,18 @@ public class PartitionEventRenderer implements ObjectRenderer {
   
   }
   
+    public boolean contains(Object obj, int x, int y)
+    {
+	return contains(obj, x, y, gc);
+    } 
+
   /**
    * returns true if the given event contains the given (graphic) point
    */
-  public boolean contains(Object obj, int x, int y) 
+  public boolean contains(Object obj, int x, int y, GraphicContext theGc) 
   {
     ScrEvent e = (ScrEvent) obj;
+    ExplodeGraphicContext gc = (ExplodeGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);
@@ -88,14 +100,22 @@ public class PartitionEventRenderer implements ObjectRenderer {
   }
 
 
-  Rectangle eventRect = new Rectangle();
-  Rectangle tempRect = new Rectangle();
+    Rectangle eventRect = new Rectangle();
+    Rectangle tempRect = new Rectangle();
+    
+    
+    public boolean touches(Object obj, int x, int y, int w, int h) 
+    {
+	return touches(obj, x, y, w, h, gc);
+    }
+
   /**
    * returns true if the representation of the given event "touches" the given rectangle
    */
-  public boolean touches(Object obj, int x, int y, int w, int h) 
+  public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext theGc) 
   {
     ScrEvent e = (ScrEvent) obj;
+    ExplodeGraphicContext gc = (ExplodeGraphicContext) theGc;
 
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);

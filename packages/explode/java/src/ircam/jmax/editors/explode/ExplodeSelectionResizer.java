@@ -56,7 +56,7 @@ public class ExplodeSelectionResizer extends SelectionResizer {
     int deltaX = egc.getAdapter().getInvX(e.getX()) - egc.getAdapter().getInvX(itsStartingPoint.x);
     int deltaY = egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y);
     
-    egc.getStatusBar().post(egc.toolbar.getTool(), " dx "+deltaX);
+    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+deltaX);
 
     super.mouseDragged(e);
   }

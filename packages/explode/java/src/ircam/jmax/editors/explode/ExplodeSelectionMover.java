@@ -121,10 +121,10 @@ public class ExplodeSelectionMover extends SelectionMover  implements XORPainter
     int deltaY = egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y);
     
     if ((itsMovements & MoverTool.HORIZONTAL_MOVEMENT) != 0)
-      egc.getStatusBar().post(egc.toolbar.getTool(), " dx "+(deltaX));
+      egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX));
     else if ((itsMovements & MoverTool.VERTICAL_MOVEMENT) != 0)
-      egc.getStatusBar().post(egc.toolbar.getTool(), " dy "+deltaY);
-    else egc.getStatusBar().post(egc.toolbar.getTool(), " dx "+(deltaX)+", dy "+(deltaY));
+      egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
+    else egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX)+", dy "+(deltaY));
 
     super.mouseDragged(e);
   }

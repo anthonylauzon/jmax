@@ -32,6 +32,7 @@ import java.awt.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.dialogs.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
@@ -49,6 +50,7 @@ import ircam.jmax.editors.explode.menus.*;
 public class Explode extends JFrame implements EditorContainer, AAAReadme {
 
   //------------------- fields
+    ExplodeRemoteData explodeData;
   ExplodePanel itsExplodePanel;
   JMenu itsFileMenu;
   EditMenu itsEditMenu;
@@ -61,12 +63,14 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
    * It creates the panels that will display the datas in maxData
    */
   public Explode(ExplodeRemoteData maxData)
-  {
+  { 
     super();
 
+    explodeData = (ExplodeRemoteData) maxData;
     MaxWindowManager.getWindowManager().addWindow(this);
 
     makeTitle(maxData);
+
 
     // Build The Menus and Menu Bar
     makeMenuBar();
@@ -77,6 +81,24 @@ public class Explode extends JFrame implements EditorContainer, AAAReadme {
     validate();
     setVisible(true);
   }
+
+    /** This function is an example on how to translate an explode DB into an agrep form.*/
+    void translateToAgrep(Writer w)
+    {
+	PrintWriter pw = new PrintWriter(w);
+	
+	try {
+	    for (int i = 0; i<explodeData.length(); i++)
+		{
+		    pw.print((char) (128+explodeData.getEventAt(i).getPitch()));
+		}
+	}
+	catch(Exception e){}
+	pw.println();
+    }
+    
+    
+    // Build The Menus and Menu Bar
 
   private final void makeTitle(ExplodeRemoteData maxData){
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Explode " + maxData.getName()));
