@@ -37,56 +37,56 @@ public class ScrEvent {
   /**
    * the starting time of this event
    */
-  public int getTime() {
+  public final int getTime() {
     return itsTime;
   }
 
   /**
    * the pitch of this event
    */
-  public int getPitch() {
+  public final int getPitch() {
     return itsPitch;
   }
 
   /**
    * the MIDI velocity associated to this event
    */
-  public int getVelocity() {
+  public final int getVelocity() {
     return itsVelocity;
   }
 
   /**
    * the MIDI channel associated to this event
    */
-  public int getChannel() {
+  public final int getChannel() {
     return itsChannel;
   }
 
   /**
    * the duration of this event
    */
-  public int getDuration() {
+  public final int getDuration() {
     return itsDuration;
   }
 
   /* the corresponding set functions.. */
-  public void setTime(int time) {
+  public final void setTime(int time) {
     itsTime = time;
   }
 
-  public void setPitch(int pitch) {
+  public final void setPitch(int pitch) {
     itsPitch = pitch;
   }
 
-  public void setDuration(int duration) {
+  public final void setDuration(int duration) {
     itsDuration = duration;
   }
 
-  public void setVelocity(int theVelocity) {
+  public final void setVelocity(int theVelocity) {
     itsVelocity = theVelocity;
   }
 
-  public void setChannel(int theChannel) {
+  public final void setChannel(int theChannel) {
     itsChannel = theChannel;
   }
 
