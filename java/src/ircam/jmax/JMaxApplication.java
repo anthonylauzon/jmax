@@ -375,18 +375,8 @@ public class JMaxApplication {
 
   public static FtsMidiManager getMidiManager()
   {
-    if(singleInstance.midiManager == null)
-      {
-	try{
-	  singleInstance.midiManager = new FtsBidonMidiManager();
-	}
-	catch(IOException e)
-	  {
-	    System.err.println("midimanagerrrrrrrrrrrrrrrrrrrr!!!!!!!!!!!!!!!!!!!!!!!");
-	  }
-      }
     return singleInstance.midiManager; 
- }
+  }
 
   public static void setMidiManager( FtsMidiManager midim)
   {

@@ -111,6 +111,7 @@ static fts_symbol_t s_client_manager;
 static fts_symbol_t s_package_loaded;
 static fts_symbol_t s_remove_object;
 static fts_symbol_t s_show_message;
+static fts_symbol_t s_midi_manager;
 
 
 /* Predefined ids */
@@ -1022,6 +1023,22 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_send_message( project, fts_SystemInlet, fts_s_upload, 0, 0);
 }
 
+static void client_get_midi_manager( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_atom_t a[1];
+  fts_object_t *midimanager = (fts_object_t *)fts_midimanager_get();
+
+  if( !midimanager) return;
+
+  if (!fts_object_has_id( midimanager))
+    client_register_object( (client_t *)o, midimanager, FTS_NO_ID);
+
+  fts_set_int(a, fts_get_object_id( midimanager));
+  fts_client_send_message(o, s_midi_manager, 1, a);
+  
+  fts_send_message( midimanager, fts_SystemInlet, fts_s_upload, 0, 0);
+}
+
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -1054,6 +1071,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_project"), client_get_project);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_midi_manager"), client_get_midi_manager);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
@@ -1548,6 +1566,7 @@ void fts_client_config( void)
   s_package_loaded = fts_new_symbol( "package_loaded");
   s_remove_object = fts_new_symbol( "removeObject");
   s_show_message = fts_new_symbol( "showMessage");
+  s_midi_manager = fts_new_symbol( "midi_manager");
 
   client_table_init();
 

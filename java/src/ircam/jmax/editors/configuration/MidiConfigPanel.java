@@ -47,13 +47,14 @@ public class MidiConfigPanel extends JPanel implements Editor
     window = win;
     midiMan = mm;
 
-    midiMan.setFtsActionListener( new FtsActionListener(){
-	public void ftsActionDone()
-	{
-	  update();
-	  window.setVisible( true);
-	}
-      });
+    if( midiMan != null)
+      midiMan.setFtsActionListener( new FtsActionListener(){
+	  public void ftsActionDone()
+	  {
+	    update();
+	    window.setVisible( true);
+	  }
+	});
 
     initDataModel();
 
@@ -88,12 +89,17 @@ public class MidiConfigPanel extends JPanel implements Editor
     scrollPane.setPreferredSize( new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
     add( scrollPane);
+
+    if( midiMan == null)
+      midiTable.setEnabled( false);
   }
 
   void initDataModel()
   {
     midiModel = new MidiTableModel( midiMan);
     
+    if( midiMan == null) return;
+
     FtsMidiManager.MidiLabel label;
     for( Enumeration e = midiMan.getLabels(); e.hasMoreElements();)
       {
@@ -104,6 +110,8 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   void initCellEditors()
   {
+    if( midiMan == null) return;
+
     JComboBox sourceCombo = new JComboBox( midiMan.getSources());
     sourceCombo.setBackground( Color.white);
     sourceCombo.setFont( (Font)UIManager.get("Table.font"));

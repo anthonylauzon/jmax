@@ -83,7 +83,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     tabbedPane.addTab("Audio", audioPanel);
     tabbedPane.setSelectedIndex(0);
     tabbedPane.setEnabledAt( 1, false);
-
+    
     /************ Buttons **********************************/
     JButton addButton = new JButton("Add");
     addButton.addActionListener(new ActionListener(){
@@ -111,6 +111,13 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
     validate();
     pack();
+
+    if( JMaxApplication.getMidiManager() == null)
+      {
+	tabbedPane.setEnabledAt( 0, false);
+	addButton.setEnabled( false);
+	deleteButton.setEnabled( false);
+      }
   }
 
   private void makeMenuBar()
