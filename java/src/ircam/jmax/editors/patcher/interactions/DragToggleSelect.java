@@ -77,6 +77,7 @@ class DragToggleSelect extends Interaction
 	//to made faster the shift+click objects selection we loose "to back" feature 
 	//bringToBack = true;
 	bringToBack = false;
+	editor.endInteraction();
       }
     else if (Squeack.isDown(squeack) && Squeack.isShift(squeack) && Squeack.onBackground(squeack))
       {
