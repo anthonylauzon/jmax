@@ -34,7 +34,7 @@ public class PasteAction extends EditorAction
 {
   public PasteAction()
   {
-    super("paste");
+    super("Paste", "paste", KeyEvent.VK_P, KeyEvent.VK_V, false);
   }
 
   public void doAction(EditorContainer container)

@@ -390,6 +390,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     requestFocusInWindow();
     itsSketchPad.requestFocus();
+	getEditMenu().pasteAction.setEnabled(!PatcherClipboardManager.getManager().isEmpty());
   }
 
   public void windowDeactivated(WindowEvent e){}
@@ -412,6 +413,12 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   public void componentShown( ComponentEvent e){}
 
   public void componentHidden( ComponentEvent e){}
+
+
+   public EditMenu getEditMenu()
+	  {
+		 return itsEditMenu;
+	  }
 }
 
 

@@ -46,72 +46,60 @@ public class EditMenu extends EditorMenu
 {
   ErmesSketchPad sketch;
 
-  JMenuItem cutItem;
-  JMenuItem copyItem;
-  JMenuItem pasteItem;
-  JMenuItem duplicateItem;
-  JMenuItem inspectItem;
-  JMenuItem selectAllItem;
-  JMenuItem lockItem;
-  AlignMenu alignMenu;
-  JMenuItem toFrontMenuItem;
-  JMenuItem toBackMenuItem;
-  JMenuItem undoItem;
-  JMenuItem redoItem;
+  public EditorAction cutAction       			= new CutAction();
+  public EditorAction copyAction      			= new CopyAction();
+  public EditorAction pasteAction     			= new PasteAction();
+  public EditorAction duplicateAction 			= new DuplicateAction();
+  public EditorAction selectAllAction 			= new SelectAllAction();
+  public EditorAction findAction      			= new FindAction();
+  public EditorAction inspectAction   			= new InspectAction();
+  public EditorAction lockAction      			= new LockAction();
+  public EditorAction alignTopAction    		= new AlignTopAction();
+  public EditorAction alignLeftAction   		= new AlignLeftAction();
+  public EditorAction alignBottomAction 		= new AlignBottomAction();
+  public EditorAction alignRightAction  		= new AlignRightAction();
+  public EditorAction undoAction				= new UndoAction();
+  public EditorAction redoAction				= new RedoAction(); 
+  public EditorAction bringToFrontAction 		= new BringToFrontAction();
+  public EditorAction sendToBackAction  		= new SendToBackAction();
 
   public EditMenu(ErmesSketchPad sketch)
   {
     super("Edit");
+	setMnemonic(KeyEvent.VK_E);
 
     this.sketch = sketch;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    cutItem       = add(Actions.cutAction, "Cut", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_X);
-    copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
-    pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
-    pasteItem.setEnabled( false);
-    duplicateItem = add(Actions.duplicateAction, "Duplicate", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_D);
-
+    add(cutAction);
+    add(copyAction);
+    add(pasteAction);
+    add(duplicateAction);
     addSeparator();
-
-    undoItem = add( Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Z);
-    redoItem = add( Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Y);
-
+    add(undoAction);
+    add(redoAction);
     addSeparator();
-
-    inspectItem = add(Actions.inspectAction, "Inspect", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_I);
-
+    add(inspectAction);
     addSeparator();
-
-    JMenuItem scaleItem = add(Actions.scalePatcherAction, "Rescale Window");
-
+    add(Actions.scalePatcherAction);
     addSeparator();
-
-    selectAllItem = add(Actions.selectAllAction, "SelectAll", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_A);
-
+    add(selectAllAction);
     addSeparator();
-
-    add(Actions.findAction, "Find", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_F);
-
+    add(findAction);
     addSeparator();
-
-
-    alignMenu = new AlignMenu();
+    AlignMenu alignMenu = new AlignMenu(this);
     add(alignMenu);
-
     addSeparator();
-
-    toFrontMenuItem = add(Actions.bringToFrontAction, "Bring To Front", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_U);
-    toBackMenuItem  = add(Actions.sendToBackAction, "Send To Back", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_B);
-
+    add(bringToFrontAction);
+    add(sendToBackAction);
     addSeparator();
-
-    lockItem = add(Actions.lockAction, "Lock", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_E);
+    add(lockAction);
   }
 
   public void updateMenu()
   {
+/*
     DataFlavor[] flavors = null;
     Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
     if( clipboardContent != null)
@@ -143,8 +131,8 @@ public class EditMenu extends EditorMenu
 
 	    if (sketch.getSelectedText() != null)
 	      {
-		cutItem.setEnabled(true);
-		copyItem.setEnabled(true);
+			 cutItem.setEnabled(true);
+			 copyItem.setEnabled(true);
 	      }
 	    else
 	      {
@@ -196,11 +184,10 @@ public class EditMenu extends EditorMenu
 
 	selectAllItem.setEnabled(true);	
       }
-    
-    undoItem.setText("Undo "+sketch.getUndoType());
-    undoItem.setEnabled(  sketch.canUndo());	
-    redoItem.setText("Redo "+sketch.getUndoType());
-    redoItem.setEnabled( sketch.canRedo());
+
+	 undoAction.putValue(undoAction.NAME, "Undo " + sketch.getUndoType());
+	 redoAction.putValue(redoAction.NAME, "Redo " + sketch.getUndoType());
+*/
   }
 }
 

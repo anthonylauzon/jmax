@@ -30,6 +30,8 @@ import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.actions.*;
+import ircam.jmax.editors.patcher.menus.*;
 
 //
 // A class representing a selection in Ermes, with its associated FtsSelection
@@ -90,8 +92,10 @@ public class ErmesSelection implements Transferable
 
   public void select( DisplayObject object)
   {
-    if( object instanceof GraphicConnection) select( (GraphicConnection)object);
-    else select( (GraphicObject)object);
+    if( object instanceof GraphicConnection)
+	   select( (GraphicConnection)object);
+    else
+	   select( (GraphicObject)object);
   }
 
   public void select( GraphicObject object) 
@@ -104,6 +108,7 @@ public class ErmesSelection implements Transferable
 	objects.addElement( object);
 	ftsSelection.add( object.getFtsObject());
 	object.setSelected(true);
+	selectionChanged();
       }
   }
 
@@ -153,6 +158,7 @@ public class ErmesSelection implements Transferable
 	object.setSelected(false);
 	objects.removeElement( object);
 	ftsSelection.remove( object.getFtsObject());
+	selectionChanged();
       }
   }
 
@@ -212,6 +218,7 @@ public class ErmesSelection implements Transferable
     objects.removeAllElements();
     connections.removeAllElements();
     ftsSelection.clean();
+	selectionChanged();
   }
 
   public void redraw() 
@@ -322,6 +329,40 @@ public class ErmesSelection implements Transferable
 	action.processObject(object);
       }
   }
+
+   private void selectionChanged()
+	  {
+		 if(getOwner() == null) return;
+		 ErmesSketchWindow window;
+		 if(getOwner().getEditorContainer() instanceof ErmesSketchWindow)
+			window = (ErmesSketchWindow)getOwner().getEditorContainer();
+		 else
+			return;
+
+		 EditMenu m = window.getEditMenu();
+
+		 int numSelected = objects.size();
+
+		 m.copyAction.setEnabled(numSelected > 0);
+		 m.cutAction.setEnabled(numSelected > 0);
+		 m.duplicateAction.setEnabled(numSelected > 0);
+		 m.bringToFrontAction.setEnabled(numSelected > 0);
+		 m.sendToBackAction.setEnabled(numSelected > 0);
+
+		 boolean inspectable = false;
+		 Enumeration enum = objects.elements();
+		 while(enum.hasMoreElements())
+		 {
+			GraphicObject o = (GraphicObject)enum.nextElement();
+			inspectable = inspectable || o.isInspectable();
+		 }
+		 m.inspectAction.setEnabled(inspectable);
+
+		 m.alignTopAction.setEnabled(numSelected > 1);
+		 m.alignLeftAction.setEnabled(numSelected > 1);
+		 m.alignBottomAction.setEnabled(numSelected > 1);
+		 m.alignRightAction.setEnabled(numSelected > 1);
+	  }
 
 
   //--------------------------------------------------------

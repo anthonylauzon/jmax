@@ -35,7 +35,7 @@ public class BringToFrontAction extends EditorAction
 {
   public BringToFrontAction()
   {
-    super("bring to front");
+    super("Bring to front", "bring to front", KeyEvent.VK_UNDEFINED, KeyEvent.VK_U, false);
   }
 
   public  void doAction(EditorContainer container)

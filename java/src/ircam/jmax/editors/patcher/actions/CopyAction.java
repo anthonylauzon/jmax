@@ -34,12 +34,13 @@ public class CopyAction extends EditorAction
 {
   public CopyAction()
   {
-    super("copy");
+    super("Copy", "copy", KeyEvent.VK_C, KeyEvent.VK_C, false);
   }
 
   public  void doAction(EditorContainer container)
   {
     PatcherClipboardManager.getManager().Copy(container);
+	((ErmesSketchWindow)container).getEditMenu().pasteAction.setEnabled(!PatcherClipboardManager.getManager().isEmpty());
   }
 }
 

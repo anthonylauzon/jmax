@@ -25,19 +25,37 @@ import java.util.*;
 
 // import javax.swing.*;
 import javax.swing.AbstractButton;
+import javax.swing.JMenuItem;
+import java.awt.event.KeyEvent;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.actions.*;
 
-public class DefaultHelpMenu extends EditorMenu {
+public class DefaultHelpMenu extends EditorMenu
+{
+   private JMenuItem aboutItem = null;
+   protected int objectSummariesOffset = 0;
 
   public DefaultHelpMenu()
   {
     super("Help");
     setHorizontalTextPosition( AbstractButton.LEFT);
+	setMnemonic(KeyEvent.VK_H);
 
-    add( DefaultActions.statisticsAction, "System Info");
+    add(DefaultActions.statisticsAction); //, "System Info");
+
+	/*
     addSeparator();
+	aboutItem = new JMenuItem("About...");
+	aboutItem.setMnemonic(KeyEvent.VK_A);
+	aboutItem.addActionListener(
+	   new ActionListener()
+	   {
+		  // Popup about box here
+	   }
+	);
+	*/
+	
   }
 
   public void updateMenu()
@@ -51,11 +69,12 @@ public class DefaultHelpMenu extends EditorMenu {
 	    final String str = (String) en.nextElement();
 	    if(count > numEntries)
 	      {			      
-		add( new OpenHelpSummaryAction( FtsHelpPatchTable.getHelpSummaryPatch(str)), str);
-		numEntries++;
+			 insert( new OpenHelpSummaryAction( FtsHelpPatchTable.getHelpSummaryPatch(str), str), count - 1 + objectSummariesOffset);
+			 numEntries++;
 	      }
 	    count++;
 	  }
+	insertSeparator(count - 1 + objectSummariesOffset);
       }
   }
 

@@ -34,7 +34,7 @@ public class SelectAllAction extends EditorAction
 {
   public SelectAllAction()
   {
-    super("select all");
+    super("Select All", "select all", KeyEvent.VK_L, KeyEvent.VK_A, true);
   }
 
   public void doAction(EditorContainer container)

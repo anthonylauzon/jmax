@@ -48,24 +48,25 @@ public class DefaultProjectMenu extends EditorMenu
   public DefaultProjectMenu( EditorContainer editor)
   {
     super("Project");
+	setMnemonic(KeyEvent.VK_P);
 
-    setHorizontalTextPosition( AbstractButton.LEFT);
-    setDefaultNumEntries( 8);
+    setHorizontalTextPosition(AbstractButton.LEFT);
+    setDefaultNumEntries(8);
 
-    add(DefaultActions.newProjectAction, "New Project");
-    add(DefaultActions.openProjectAction, "Open Project ...");
-    add(DefaultActions.editCurrentProjectAction, "Edit Current Project");
+    add(DefaultActions.newProjectAction); // , "New Project");
+    add(DefaultActions.openProjectAction); // , "Open Project ...");
+    add(DefaultActions.editCurrentProjectAction); //, "Edit Current Project");
     if (editor instanceof ProjectEditor)
-      add(DefaultActions.saveAsDefaultProjectAction, "Save As Default Project");
+	   add(DefaultActions.saveAsDefaultProjectAction); //, "Save As Default Project");
     addSeparator();
-    add(DefaultActions.newPackageAction, "New Package");
-    add(DefaultActions.openPackageAction, "Open Package ...");
+    add(DefaultActions.newPackageAction); // , "New Package");
+    add(DefaultActions.openPackageAction); //, "Open Package ...");
     addSeparator();
-    add(DefaultActions.newConfigurationAction, "New Configuration");
-    add(DefaultActions.openConfigurationAction, "Open Configuration ...");
-    add(DefaultActions.editCurrentConfigurationAction, "Edit Current Configuration");
+    add(DefaultActions.newConfigurationAction); //, "New Configuration");
+    add(DefaultActions.openConfigurationAction); //, "Open Configuration ...");
+    add(DefaultActions.editCurrentConfigurationAction); //, "Edit Current Configuration");
     if (editor instanceof ConfigurationEditor)
-      add(DefaultActions.saveAsDefaultConfigurationAction, "Save As Default Configuration");
+	   add(DefaultActions.saveAsDefaultConfigurationAction); //, "Save As Default Configuration");
   }
 }
 

@@ -38,6 +38,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
+import javax.swing.Action;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
@@ -1359,41 +1360,43 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	System.err.println("[ErmesSketchPad]: Error in FtsClipboard creation!");
 	e.printStackTrace();
       }
+	updateUndoRedoActions();
   }
 
-  public void setUndo( String type, boolean remove, boolean update)
-  {
-    isUpdateUndo = (undoType.equals( type) && update && !undoed);
-    isRemoveUndo = remove;
-    undoType = type;
-
-    if( !isRemoveUndo)
-      {
-	if( !isUpdateUndo)
+   public void setUndo( String type, boolean remove, boolean update)
 	  {
-	    undoObjects.removeAllElements();
-	    for( Enumeration e = ErmesSelection.patcherSelection.getSelectedObjects(); e.hasMoreElements(); )
-	      addUndoRedoObject( (GraphicObject)e.nextElement());
+		 isUpdateUndo = (undoType.equals(type) && update && !undoed);
+		 isRemoveUndo = remove;
+		 undoType = type;
+
+		 if(!isRemoveUndo)
+		 {
+			if( !isUpdateUndo)
+			{
+			   undoObjects.removeAllElements();
+			   for( Enumeration e = ErmesSelection.patcherSelection.getSelectedObjects(); e.hasMoreElements(); )
+				  addUndoRedoObject( (GraphicObject)e.nextElement());
 	    
-	    canUndo = (undoObjects.size() > 0);
-	    undoed = false;
-	  }	
-      }
-    else
-      {
-	removeSelection.deselectAll();
-	for( Enumeration e = ErmesSelection.patcherSelection.getSelectedObjects(); e.hasMoreElements(); )
-	  addUndoRedoObject( (GraphicObject)e.nextElement());
+			   canUndo = (undoObjects.size() > 0);
+			   undoed = false;
+			}	
+		 }
+		 else
+		 {
+			removeSelection.deselectAll();
+			for( Enumeration e = ErmesSelection.patcherSelection.getSelectedObjects(); e.hasMoreElements(); )
+			   addUndoRedoObject( (GraphicObject)e.nextElement());
 	
-	if( removeSelection.getSelectedObjectsSize() > 0)
-	  {
-	    ftsUndoClipboard.copy( removeSelection.getFtsSelection());
-	    canUndo = true;
+			if( removeSelection.getSelectedObjectsSize() > 0)
+			{
+			   ftsUndoClipboard.copy( removeSelection.getFtsSelection());
+			   canUndo = true;
+			}
+			else canUndo = false;  
+		 }
+		 canRedo = false;
+		 updateUndoRedoActions();
 	  }
-	else canUndo = false;  
-      }
-    canRedo = false;
-  }
 
   public void setUndo( String type, GraphicObject obj, boolean remove, boolean update)
   {
@@ -1419,6 +1422,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	canUndo = true;
       }
     canRedo = false;
+	updateUndoRedoActions();
   }
 
   public void setRedo()
@@ -1426,27 +1430,53 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     canRedo = true;
     canUndo = false;
 
-    if( !isRemoveUndo)
-      for( Enumeration e = undoObjects.elements(); e.hasMoreElements();)
-	((GraphicObject)e.nextElement()).setRedo();
+    if(!isRemoveUndo)
+      for(Enumeration e = undoObjects.elements(); e.hasMoreElements();)
+		 ((GraphicObject)e.nextElement()).setRedo();
+
+	updateUndoRedoActions();
   }
 
-  void addUndoRedoObject( GraphicObject obj)
-  {
-    if( isRemoveUndo)
-      {
-	removeSelection.add( obj);
-	// select all connections for this obj
-	for( Enumeration e = displayList.getConnectionsFor( obj); e.hasMoreElements();)
-	  removeSelection.add( (GraphicConnection)e.nextElement());
-      }
-    else
-      if( !undoObjects.contains( obj))
-	{
-	  obj.setUndo();
-	  undoObjects.addElement( obj);
-	}
-   }
+   void addUndoRedoObject( GraphicObject obj)
+	  {
+		 if(isRemoveUndo)
+		 {
+			removeSelection.add( obj);
+			// select all connections for this obj
+			for( Enumeration e = displayList.getConnectionsFor( obj); e.hasMoreElements();)
+			   removeSelection.add( (GraphicConnection)e.nextElement());
+		 }
+		 else
+			if(!undoObjects.contains(obj))
+			{
+			   obj.setUndo();
+			   undoObjects.addElement( obj);
+			}
+	  }
+
+   private void updateUndoRedoActions()
+	  {
+		 ErmesSketchWindow container;
+		 if(getEditorContainer() == null || !(getEditorContainer() instanceof ErmesSketchWindow)) return;
+		 container = (ErmesSketchWindow)getEditorContainer();
+
+		 if(container.getEditMenu() == null
+			|| container.getEditMenu().undoAction == null
+			|| container.getEditMenu().redoAction == null) return;
+
+		 if(canUndo)
+			container.getEditMenu().undoAction.putValue(Action.NAME, "Undo " + undoType);
+		 else
+			container.getEditMenu().undoAction.putValue(Action.NAME, "Can't undo");
+		
+		 if(canRedo)
+			container.getEditMenu().redoAction.putValue(Action.NAME, "Redo " + undoType);
+		 else
+			container.getEditMenu().redoAction.putValue(Action.NAME, "Can't redo");
+
+		 container.getEditMenu().undoAction.setEnabled(canUndo);
+		 container.getEditMenu().redoAction.setEnabled(canRedo);
+	  }
 
   public void undo()
   {
@@ -1464,6 +1494,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	redraw();
       }
     undoed = true;
+	updateUndoRedoActions();
   }
 
   public void redo()
@@ -1487,6 +1518,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 
     canRedo = false;
     canUndo = true;
+	updateUndoRedoActions();
   }
 
   public void resetUndoRedo()
@@ -1497,6 +1529,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     canUndo = false;
     undoing = false;
     undoType = "";
+	updateUndoRedoActions();
   }
 
   public boolean canUndo()

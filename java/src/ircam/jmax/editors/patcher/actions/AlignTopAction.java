@@ -35,7 +35,7 @@ public class AlignTopAction extends EditorAction
 {
   public AlignTopAction()
   {
-    super("align top");
+    super("Align top", "align top", KeyEvent.VK_T, KeyEvent.VK_UP, false);
   }
 
   public void doAction(EditorContainer container)

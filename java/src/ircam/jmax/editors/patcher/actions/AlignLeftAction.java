@@ -35,7 +35,7 @@ public class AlignLeftAction extends EditorAction
 {
   public AlignLeftAction()
   {
-    super("align left");
+    super("Align left", "align left", KeyEvent.VK_L, KeyEvent.VK_LEFT, false);
   }
 
   public  void doAction(EditorContainer container)

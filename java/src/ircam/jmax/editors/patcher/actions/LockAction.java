@@ -34,12 +34,16 @@ public class LockAction extends EditorAction
 {
   public LockAction()
   {
-    super("lock");
+    super("Lock", "lock", KeyEvent.VK_K, KeyEvent.VK_E, true);
   }
 
   public void doAction(EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
     sketch.setLocked(!sketch.isLocked());
+	if(sketch.isLocked())
+	   putValue(NAME, "Unlock");
+	else
+	   putValue(NAME, "Lock");
   }
 }

@@ -33,6 +33,7 @@ LockAction.java\
 MoveAction.java\
 OpenHelpPatchAction.java\
 PasteAction.java\
+RedoAction.java\
 RemoveInOutletConnection.java\
 ResizeAction.java\
 ResizeToMaxHeightAction.java\
@@ -46,7 +47,8 @@ SendToBackAction.java\
 SendToBackObjectAction.java\
 SetAutomaticFitAction.java\
 ShowErrorAction.java\
-ShowHTMLAction.java
+ShowHTMLAction.java\
+UndoAction.java
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@

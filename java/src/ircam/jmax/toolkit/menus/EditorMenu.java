@@ -54,7 +54,7 @@ public abstract class EditorMenu extends JMenu
     addMenuListener(new MenuListener(){
 	public void menuSelected(MenuEvent e)
 	{
-	  updateMenu();
+	   updateMenu();
 	}
 	
 	public void menuDeselected(MenuEvent e)
@@ -81,10 +81,11 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    item = new JMenuItem(name, mnemonic);
+    item = new JMenuItem(action);
 
-    item.addActionListener(action);
-    item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
+    // item.addActionListener(action);
+	// item.setAction(action);
+    // item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
 
     add(item);
 
@@ -95,9 +96,10 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    item = new JMenuItem(name, mnemonic); 
-    item.addActionListener(action);
-    item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
+    item = new JMenuItem(action); 
+	// item.addActionListener(action);
+	// item.setAction(action);
+    // item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
 
     insert(item, position);
 
@@ -108,9 +110,10 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    item = new JMenuItem(name); 
-    item.addActionListener(action);
-    add(item);
+    item = new JMenuItem(action); 
+	// item.addActionListener(action);
+	// item.setAction(action);
+    add(action);
 
     return item;
   }
@@ -120,7 +123,8 @@ public abstract class EditorMenu extends JMenu
     JMenuItem item;
     
     item = new JMenuItem(name); 
-    item.addActionListener(action);
+	// item.addActionListener(action);
+	item.setAction(action);
     remove( position);
     insert( item, position); 
     
@@ -132,7 +136,8 @@ public abstract class EditorMenu extends JMenu
     JCheckBoxMenuItem item;
 
     item = new JCheckBoxMenuItem(name);
-    item.addActionListener(action);
+	// item.addActionListener(action);
+	item.setAction(action);
     add(item);
 
     return item;
@@ -143,7 +148,8 @@ public abstract class EditorMenu extends JMenu
     JMenuItem item;
 
     item = new JMenuItem(name);
-    item.addActionListener(action);
+	// item.addActionListener(action);
+	item.setAction(action);
     insert(item, position);
 
     return item;

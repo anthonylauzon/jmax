@@ -41,14 +41,16 @@ import ircam.jmax.toolkit.menus.*;
 
 public class AlignMenu extends EditorMenu
 {
-  public AlignMenu()
+  public AlignMenu(EditMenu parent)
   {
-    super("Align");
+    super("Align objects");
+
+	setMnemonic(KeyEvent.VK_A);
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    add(Actions.alignTopAction,    "Top",    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_UP);
-    add(Actions.alignLeftAction,   "Left",   Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_LEFT);
-    add(Actions.alignBottomAction, "Bottom", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_DOWN);
-    add(Actions.alignRightAction,  "Right",  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_RIGHT);
+    add(parent.alignTopAction);
+    add(parent.alignLeftAction);
+    add(parent.alignBottomAction);
+    add(parent.alignRightAction);
   }
 }

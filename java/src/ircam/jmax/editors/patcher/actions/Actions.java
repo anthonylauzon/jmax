@@ -66,14 +66,6 @@ public class Actions
   public static EditorAction deleteSelectionAction = new DeleteSelectionAction();
   public static EditorAction showErrorAction       = new ShowErrorAction();
 
-  public static EditorAction alignTopAction    = new AlignTopAction();
-  public static EditorAction alignLeftAction   = new AlignLeftAction();
-  public static EditorAction alignBottomAction = new AlignBottomAction();
-  public static EditorAction alignRightAction  = new AlignRightAction();
-
-  public static EditorAction bringToFrontAction = new BringToFrontAction();
-  public static EditorAction sendToBackAction  = new SendToBackAction();
-
   public static EditorAction fontSmallerAction     = new FontSmallerAction();
   public static EditorAction fontBiggerAction      = new FontBiggerAction();
   public static EditorAction fontSizesAction       = new FontSizesAction();
@@ -85,15 +77,6 @@ public class Actions
   public static EditorAction fitToTextAction       = new FitToTextAction();
   //public static EditorAction fontBaseSizesAction   = new FontBaseSizesAction();
 
-  public static EditorAction cutAction       = new CutAction();
-  public static EditorAction copyAction      = new CopyAction();
-  public static EditorAction pasteAction     = new PasteAction();
-  public static EditorAction duplicateAction = new DuplicateAction();
-  public static EditorAction selectAllAction = new SelectAllAction();
-  public static EditorAction findAction      = new FindAction();
-  public static EditorAction inspectAction   = new InspectAction();
-  public static EditorAction lockAction      = new LockAction();
-
   public static EditorAction saveToAction   = new SaveToAction();
   public static EditorAction saveTemplateAction = new SaveToAction();
 
@@ -103,8 +86,8 @@ public class Actions
   public static EditorAction showHtmlAction = new ShowHTMLAction();
 
   //Object popup actions
-  public static EditorAction bringToFrontObjectAction = new BringToFrontObjectAction();
-  public static EditorAction sendToBackObjectAction = new SendToBackObjectAction();
+  public static EditorAction bringToFrontObjectAction 	= new BringToFrontObjectAction();
+  public static EditorAction sendToBackObjectAction 	= new SendToBackObjectAction();
   public static EditorAction removeConnectionsAction = new RemoveInOutletConnection();
   public static EditorAction fitToTextPopUpAction = new FitToTextPopUpAction();
   public static EditorAction fontBiggerPopUpAction = new FontBiggerPopUpAction();
@@ -115,23 +98,11 @@ public class Actions
   public static EditorAction fontPopUpAction = new FontPopUpAction();
   public static EditorAction jmaxFontPopUpAction = new JMaxFontPopUpAction();
   public static EditorAction inspectObjectAction = new EditorAction(){
-      public void doAction(EditorContainer container)
-      {
-	ObjectPopUp.getPopUpTarget().inspect();
-      }
-    };
-  public static EditorAction undoAction = new EditorAction(){
-      public void doAction(EditorContainer container)
-      {
-	((ErmesSketchPad)container.getEditor()).undo();
-      }
-    };
-  public static EditorAction redoAction = new EditorAction(){
-      public void doAction(EditorContainer container)
-      {
-	((ErmesSketchPad)container.getEditor()).redo();
-      }
-    };
+		public void doAction(EditorContainer container)
+		   {
+			  ObjectPopUp.getPopUpTarget().inspect();
+		   }
+	 };
 }
 
 

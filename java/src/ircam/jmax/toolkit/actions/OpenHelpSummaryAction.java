@@ -35,10 +35,10 @@ public class OpenHelpSummaryAction extends EditorAction
 {
   String argument;
 
-  public OpenHelpSummaryAction(String arg)
+  public OpenHelpSummaryAction(String summary, String shortName)
   {
-    super("Open Help Summary");
-    argument = arg;
+    super(shortName);
+    argument = summary;
   }
 
   public void doAction(EditorContainer container)

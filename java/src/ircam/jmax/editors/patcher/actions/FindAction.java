@@ -37,7 +37,7 @@ public class FindAction extends EditorAction
 
   public FindAction()
   {
-    super("find");
+    super("Find", "find", KeyEvent.VK_F, KeyEvent.VK_F, true);
   }
 
   public void doAction(EditorContainer c)

@@ -33,6 +33,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class ScalePatcherAction extends EditorAction
 {
+   public ScalePatcherAction()
+   {
+	  super("Rescale patcher", "scale", KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED, true);
+   }
+
   public void doAction(EditorContainer container)
   {
       Point aPoint = container.getContainerLocation();

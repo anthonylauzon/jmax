@@ -42,8 +42,10 @@ public class HelpMenu extends DefaultHelpMenu
 {
   public HelpMenu()
   {
-    super();    
-    insert(Actions.openHelpPatchAction, "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), Platform.HELP_KEY, 0);
+    super();
+	objectSummariesOffset = 2;
+    insert(Actions.openHelpPatchAction, 0); // , "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), Platform.HELP_KEY, 0);
+	insertSeparator(1);
   }
 }
 

@@ -40,11 +40,13 @@ public class OpenAction extends EditorAction
   
   public OpenAction()
   {
+	 super("Open...", "open", KeyEvent.VK_O, KeyEvent.VK_O, true);
     preset_file = null;
   }
 
-  public OpenAction(File file)
+  public OpenAction(File file, int index)
   {
+	 super((index + 1) + " " + file.getName(), "open", KeyEvent.VK_1 + index, KeyEvent.VK_1 + index, true);
      preset_file = file;
   }
   

@@ -23,6 +23,7 @@ package ircam.jmax.editors.patcher.actions;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
@@ -34,12 +35,13 @@ public class CutAction extends EditorAction
 {
   public CutAction()
   {
-    super("cut");
+    super("Cut", "cut", KeyEvent.VK_C, KeyEvent.VK_X, false);
   }
 
   public void doAction(EditorContainer container)
   {
-    PatcherClipboardManager.getManager().Cut(container);
+	PatcherClipboardManager.getManager().Cut(container);
+	((ErmesSketchWindow)container).getEditMenu().pasteAction.setEnabled(!PatcherClipboardManager.getManager().isEmpty());
   }
 }
 

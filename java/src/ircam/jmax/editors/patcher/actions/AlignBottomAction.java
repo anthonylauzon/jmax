@@ -35,7 +35,7 @@ public class AlignBottomAction extends EditorAction
 {
   public AlignBottomAction()
   {
-    super("align bottom");
+    super("Align bottom", "align bottom", KeyEvent.VK_B, KeyEvent.VK_DOWN, false);
   }
 
   public  void doAction(EditorContainer container)

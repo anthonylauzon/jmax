@@ -30,6 +30,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.actions.*;
 
 import ircam.jmax.toolkit.*;
 
@@ -50,6 +51,7 @@ public class PatcherClipboardManager implements ClipboardOwner
   public static PatcherClipboardManager clipboardManager = null;
   
   private static FtsClipboard ftsClipboard;
+   private static boolean empty = true;
 
   private EditorContainer currentContainer;
   /****************************************************************************/
@@ -115,7 +117,9 @@ public class PatcherClipboardManager implements ClipboardOwner
 	ErmesSelection.patcherSelection.deleteAll();
 
 	container.getFrame().setCursor( temp);
-      }
+	  }
+
+	empty = false;
   }
 
   public void Copy( EditorContainer container)
@@ -139,6 +143,8 @@ public class PatcherClipboardManager implements ClipboardOwner
 	  sketch.setStartPasteXY( obj.getX(), obj.getY());
 	  container.getFrame().setCursor( temp);
 	}
+
+	empty = false;
   }
 
   /**
@@ -226,6 +232,11 @@ public class PatcherClipboardManager implements ClipboardOwner
   {
     return ftsClipboard.isEmpty();
   }
+
+   public boolean isEmpty()
+	  {
+		 return empty;
+	  }
 
   public void lostOwnership(Clipboard c, Transferable t) 
   {

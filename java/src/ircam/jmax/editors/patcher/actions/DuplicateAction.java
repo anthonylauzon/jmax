@@ -34,7 +34,7 @@ public class DuplicateAction extends EditorAction
 {
   public DuplicateAction()
   {
-    super("duplicate");
+    super("Duplicate", "duplicate", KeyEvent.VK_D, KeyEvent.VK_D, false);
   }
 
   public void doAction(EditorContainer container)

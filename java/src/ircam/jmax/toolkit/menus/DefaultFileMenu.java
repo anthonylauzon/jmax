@@ -50,25 +50,27 @@ public class DefaultFileMenu extends EditorMenu
   {
     super("File");
 
+	setMnemonic(KeyEvent.VK_F);
+
     setHorizontalTextPosition(AbstractButton.LEFT);
     setDefaultNumEntries(10);
 
-    add(DefaultActions.newAction, "New Patcher", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
-    add(DefaultActions.openAction, "Open ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
+    add(DefaultActions.newAction); //, "New Patcher", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
+    add(DefaultActions.openAction); //, "Open ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
 
     addSeparator();
 
-    add(DefaultActions.saveAction,   "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S);
-    add(DefaultActions.saveAsAction, "Save As ...");
+    add(DefaultActions.saveAction); //,   "Save", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_S);
+    add(DefaultActions.saveAsAction); // , "Save As ...");
 
-    add(DefaultActions.closeAction, "Close", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_W);
+    add(DefaultActions.closeAction); //, "Close", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_W);
 
     addSeparator();
 
-    add(DefaultActions.printAction, "Print ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P);
+    add(DefaultActions.printAction); //, "Print ...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_P);
 
-    dspMenuItem = add(DefaultActions.dspAction, "Activate DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
-    add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
+    dspMenuItem = add(DefaultActions.dspAction); // , "Enable DSP", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ENTER);
+    add(DefaultActions.quitAction); //, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
 
     recentFileListener = new ListDataListener(){
       public void contentsChanged(ListDataEvent e){
@@ -96,17 +98,10 @@ public class DefaultFileMenu extends EditorMenu
   {
     if(JMaxApplication.getFtsServer() != null)
       {
-	dspMenuItem.setEnabled(true);
-
-	boolean dspOn = JMaxApplication.getDspControl().getDspOn();
-      
-	if(dspOn) 
-	  dspMenuItem.setText("Desactivate DSP");
-	else
-	  dspMenuItem.setText("Activate DSP");
+		 DefaultActions.dspAction.setEnabled(true);
       }
     else
-      dspMenuItem.setEnabled(false);
+	   DefaultActions.dspAction.setEnabled(false);
   }
 
   void buildRecentFiles()
@@ -132,8 +127,7 @@ public class DefaultFileMenu extends EditorMenu
 	  {
 	    file = (File)recentFileHistory.get(i);
 		  
-	    jMenuItem = add(new OpenAction(file), (i+1)+":  "+file.getName());
-	    jMenuItem.setMnemonic(Character.forDigit(i+1, 10));
+	    jMenuItem = add(new OpenAction(file, i));
 	  }
       }
   }

@@ -33,6 +33,12 @@ import ircam.jmax.toolkit.*;
 public class NewAction extends EditorAction
 {
   Frame frame;
+
+   public NewAction()
+   {
+	  super("New patcher", "new patcher", KeyEvent.VK_N, KeyEvent.VK_N, true);
+   }
+
   public void doAction(EditorContainer container)
   {
     frame = container.getFrame();

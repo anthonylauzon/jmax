@@ -22,6 +22,7 @@
 package ircam.jmax.editors.patcher.actions;
 
 import java.util.*;
+import java.awt.event.KeyEvent;
 
 import ircam.fts.client.*;
 
@@ -35,6 +36,10 @@ import ircam.jmax.toolkit.actions.*;
 
 public class OpenHelpPatchAction extends EditorAction
 {
+   public OpenHelpPatchAction()
+	  {
+		 super("Object help...", null, KeyEvent.VK_O, KeyEvent.VK_F1, true);
+	  }
   public void doAction(EditorContainer container)
   {
     FtsObject object;

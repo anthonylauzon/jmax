@@ -36,6 +36,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import java.awt.event.KeyEvent;
 
 
 import ircam.jmax.*;
@@ -87,6 +88,7 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
   {
     super(title);
     setHorizontalTextPosition(AbstractButton.LEFT);
+	setMnemonic(KeyEvent.VK_W);
     
     this.frame = frame;
     windowList = MaxWindowManager.getWindowManager().getWindowList();
@@ -117,12 +119,14 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
       removeAll();
 
     mi = new JMenuItem("Stack");
+	mi.setMnemonic(KeyEvent.VK_S);
 
     add(mi);
     mi.addActionListener(new ActionListener()
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().stackWindows();}});
     mi = new JMenuItem("Tile");
+	mi.setMnemonic(KeyEvent.VK_T);
     add(mi);
     mi.addActionListener(new ActionListener()
 				{public  void actionPerformed(ActionEvent e)
@@ -138,8 +142,15 @@ public class MaxWindowJMenu extends JMenu implements ListDataListener
 	    
 	    mi = new JMenuItem(toolFinder.getToolName());
 	    if(toolFinder.getToolName().equals("Console"))
-		insert(mi, 3);
-	    else	    
+		{
+		   // insert(mi, 3);
+		   mi.setMnemonic(KeyEvent.VK_C);
+		}
+		else if(toolFinder.getToolName().equals("Errors"))
+		{
+		   mi.setMnemonic(KeyEvent.VK_E);
+		}
+
 		add(mi);
 	    mi.addActionListener(new ToolActionListener(mi, toolFinder));
 	}

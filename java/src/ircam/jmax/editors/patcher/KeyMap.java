@@ -83,10 +83,12 @@ class KeyMap
     add(Actions.resizeToMinHeightAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | Event.SHIFT_MASK, KeyEvent.VK_DOWN);
 
      // Align operations
+	/*
     add(Actions.alignTopAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_UP);
     add(Actions.alignLeftAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_LEFT);
     add(Actions.alignBottomAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_DOWN);
     add(Actions.alignRightAction, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_RIGHT);
+	*/
     
     // Delete selection
 

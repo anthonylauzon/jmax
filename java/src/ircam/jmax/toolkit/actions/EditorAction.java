@@ -25,6 +25,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 // import javax.swing.*;
+import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -39,11 +40,27 @@ abstract public class EditorAction extends AbstractAction
   {
     super("");
   }
+
   public EditorAction(String name)
   {
     super(name);
     this.name = name;
   }
+
+   public EditorAction(String name, String actionCommand, int mnemonic, int keyStroke, boolean enabled)
+   {
+	  super(name);
+	  putValue(AbstractAction.NAME, name);
+	  putValue(AbstractAction.ACTION_COMMAND_KEY, actionCommand);
+
+	  if(mnemonic != KeyEvent.VK_UNDEFINED)
+		 putValue(AbstractAction.MNEMONIC_KEY, new Integer(mnemonic));
+
+	  if(keyStroke != KeyEvent.VK_UNDEFINED)
+		 putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(keyStroke, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+	  setEnabled(enabled);
+   }
 
   public String getName()
   {

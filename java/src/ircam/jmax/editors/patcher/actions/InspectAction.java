@@ -35,7 +35,7 @@ public class InspectAction extends EditorAction
 {
   public InspectAction()
   {
-    super("inspect");
+    super("Inspect", "inspect", KeyEvent.VK_I, KeyEvent.VK_I, false);
   }
 
   public void doAction(EditorContainer container)

@@ -71,6 +71,7 @@ public class TextMenu extends EditorMenu
   {
     super("Text");
     setHorizontalTextPosition(AbstractButton.LEFT);
+	setMnemonic(KeyEvent.VK_T);
 
     JMenuItem item;
     JRadioButtonMenuItem radioItem;

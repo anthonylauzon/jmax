@@ -35,7 +35,7 @@ public class SendToBackAction extends EditorAction
 {
   public SendToBackAction()
   {
-    super("send to back");
+    super("Send to back", "send to back", KeyEvent.VK_UNDEFINED, KeyEvent.VK_B, false);
   }
 
   public  void doAction(EditorContainer container)
