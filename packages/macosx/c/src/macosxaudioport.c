@@ -42,6 +42,7 @@ typedef struct {
 static fts_class_t *macosxaudioport_class;
 
 static int sched_pipe_des[2];
+static int nb_open;
 
 static void macosxaudioport_input(fts_audioport_t* port, float **buffers, int buffsize)
 {
@@ -208,7 +209,14 @@ static void macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, in
   if (select( sched_pipe_des[0] + 1 , &rfds, NULL, NULL, NULL) < 0)
     fts_log( "select() failed\n");
 
+  if (FD_ISSET(sched_pipe_des[0], &rfds))
+  {
+    int val;
+    read(sched_pipe_des[0], &val, sizeof(int));
+  }
+  
   fts_log( "[macosxaudioport] RESTART FTS SCHEDULER \n");
+  self->halted = 0;
   /* @@@@ Need to stop audio device ? @@@@@ */
 }
 
@@ -221,7 +229,7 @@ static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   buffer_size = 2 * sizeof( float) * fifo_size;
   count = sizeof( buffer_size);
-  
+
   if ((err = AudioDeviceSetProperty( self->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &buffer_size)) != noErr)
     {
       post( "cannot set buffer size");
@@ -232,6 +240,32 @@ static void macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, i
 
   fts_sched_add( o, FTS_SCHED_ALWAYS);
 }
+
+static void macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+{
+  macosxaudioport_t *self = (macosxaudioport_t *)o;
+  OSStatus err;
+  int dummy = 0;
+
+
+  if ((err = AudioDeviceStop( self->device, macosxaudioport_ioproc)) != noErr)
+  {
+    post( "cannot stop device\n");
+    return;
+  }
+
+  if ((err = AudioDeviceRemoveIOProc( self->device, macosxaudioport_ioproc)) != noErr)
+  {
+    post( "cannot remove IOProc\n");
+    return;
+  }
+
+  fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+  fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+  
+  write(sched_pipe_des[1], &dummy, sizeof(int));
+}
+
 
 static void
 log_buffer_info( macosxaudioport_t *self, int channels, int direction)
@@ -376,6 +410,9 @@ static void macosxaudioport_instantiate(fts_class_t *cl)
   fts_class_message_varargs( cl, fts_s_open_input, macosxaudioport_open);
   fts_class_message_varargs( cl, fts_s_open_output, macosxaudioport_open);
 
+  fts_class_message_varargs( cl, fts_s_close_input, macosxaudioport_close);
+  fts_class_message_varargs( cl, fts_s_close_output, macosxaudioport_close);
+
   fts_class_message_varargs( cl, fts_s_sched_ready, macosxaudioport_halt);
 }
 
@@ -452,12 +489,14 @@ macosxaudiomanager_scan_devices( void)
       fts_set_int( at, device_list[i]);
       fts_set_symbol( at+1, name);
       port = (fts_audioport_t *)fts_object_create( macosxaudioport_class, 2, at);
+      fts_object_refer((fts_object_t*)port);
       fts_audiomanager_put_port( name, port);
 
       if (device_list[i] == default_input_device && device_list[i] == default_output_device)
 	{
-	  post( "Default: %s\n", name);
-	  fts_audiomanager_put_port( fts_s_default, port);
+           post( "Default: %s\n", name);
+           fts_object_refer((fts_object_t*)port);
+           fts_audiomanager_put_port( fts_s_default, port);
 	}
     }
 
@@ -476,7 +515,7 @@ void macosxaudioport_config( void)
     fts_log("[macosxaudioport] cannot create pipe descriptors \n");
     return;
   }
-
+  nb_open = 0;
   macosxaudiomanager_scan_devices();
 }
 
