@@ -26,6 +26,12 @@
 #include <fts/fts.h>
 #include <ftsprivate/platform.h>
 #include <ftsprivate/package.h>
+
+#include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/audioconfig.h> /* require bmaxfile.h */
+#include <ftsprivate/midi.h> /* require bmaxfile.h */
+#include <ftsprivate/config.h> /* require audioconfig.h and midi.h */
+
 #include <fts/project.h>
 
 
@@ -157,6 +163,42 @@ void fts_load_project( void)
     project = fts_project_open(project_file);
 }
 
+
+void fts_load_config( void)
+{
+  fts_symbol_t config_symbol;
+  fts_symbol_t config_file;
+  fts_package_t* config = NULL;
+
+  config_symbol = fts_new_symbol( "config");
+  
+  /* check if the user specified a config file on the command line  */
+  config_file = fts_cmd_args_get( config_symbol);
+
+  /* check if the user has a config file in the home directory  */
+  if (config_file == NULL) {
+    config_file = fts_get_user_configuration();
+  }
+
+  /* check if there's a system wide config */
+  if (config_file == NULL) {
+    config_file = fts_get_system_configuration();
+  }
+  
+  /* @@@@@@ TODO @@@@@@@@ */
+#if 0
+  /* create an empty config */
+  if (config_file == NULL)
+  {
+    fts_log("[boot]: Starting fts with an empty project. This is probably not what you want. Make sure you have a valid project file.\n");
+    config = fts_package_new(config_symbol);
+    fts_config_set(config);
+  }
+  else
+#endif /* TODO create an empty config */
+    fts_config_open(config_file);
+}
+
 /***********************************************************************
  *
  * Global initialization
@@ -252,6 +294,9 @@ void fts_init( int argc, char **argv)
 
   /* Load the initial project */
   fts_load_project();
+
+  /* Load the initial configuration */
+  fts_load_config();
 }
 
 /***********************************************************************
