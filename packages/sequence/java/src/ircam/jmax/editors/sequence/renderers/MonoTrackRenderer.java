@@ -83,7 +83,7 @@ public class MonoTrackRenderer extends AbstractRenderer{
 		    
       double time = gc.getAdapter().getInvX(x);
 
-      for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
+      for (Enumeration e = gc.getDataModel().intersectionSearch(time -1, time +1); e.hasMoreElements();) 
 	  {      
 	      aTrackEvent = (TrackEvent) e.nextElement();
 	      

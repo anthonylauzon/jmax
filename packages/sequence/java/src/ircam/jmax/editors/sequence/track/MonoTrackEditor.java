@@ -123,7 +123,6 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     public int trackCount()
     {
-	//return gc.getSequenceRemoteData().trackCount();
 	return gc.getFtsSequenceObject().trackCount();
     }
 
@@ -279,4 +278,7 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     static public final int STEPS_VIEW = 3;
     static public final int BREAK_POINTS_VIEW = 4;
 }
+
+
+
 

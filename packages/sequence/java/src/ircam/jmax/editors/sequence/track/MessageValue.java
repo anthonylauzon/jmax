@@ -124,7 +124,7 @@ public class MessageValue extends AbstractEventValue
     public void setText(String text, TrackEvent evt, SequenceGraphicContext gc)
     {	
 	int width, evtLenght, height;
-	
+
 	if(gc!=null)
 	    {
 		if(!text.equals(""))
@@ -152,7 +152,8 @@ public class MessageValue extends AbstractEventValue
 		evt.setProperty("message", text);
 		evt.setProperty("duration", new Integer(width));
 		evt.setProperty("height", new Integer(height));
-		evt.sendThisMessage("set_from_string", info.getName(), getPropertyCount(), getPropertyValues());
+		Object[] obj = {text};
+		evt.sendThisMessage("set_from_string", info.getName(), 1, obj);
 	    }
 	else
 	    {
@@ -160,6 +161,19 @@ public class MessageValue extends AbstractEventValue
 		setProperty("duration", new Integer(width));
 		setProperty("height", new Integer(height));
 	    }
+    }
+
+    public void updateHeight(TrackEvent evt, SequenceGraphicContext gc)
+    {
+	int height;
+	String text = (String) message;
+	
+	if(!text.equals(""))
+	    height = TextRenderer.getRenderer().getTextHeight(text, gc);
+	else
+	    height = DEFAULT_HEIGHT;
+
+	setProperty("height", new Integer(height));
     }
 
     public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
@@ -224,8 +238,8 @@ public class MessageValue extends AbstractEventValue
 	    return MessageValueDataFlavor.getInstance();
 	}
  
-	String defNamesArray[] = {"message", "integer"};
-	int defPropertyCount = 2;
+      String defNamesArray[] = {"integer", "message"};
+      int defPropertyCount = 2;
     }
 
     /**
@@ -292,8 +306,8 @@ public class MessageValue extends AbstractEventValue
 
     public boolean samePropertyValues(Object args[])
     {
-	return (((String)getProperty("message")).equals((String)args[0]) &&
-	    (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
+      return (((String)getProperty("message")).equals((String)args[1]) &&
+	      (((Integer)getProperty("integer")).intValue() == ((Integer)args[0]).intValue()));
     }
 
     //--- Fields
@@ -302,11 +316,11 @@ public class MessageValue extends AbstractEventValue
     public static final String MESSAGE_PUBLIC_NAME = "message";
     public static MessageValueInfo info = new MessageValueInfo();
     public static final int DEFAULT_WIDTH = 290;
-    public static final int DEFAULT_HEIGHT = /*15*/13;
+    public static final int DEFAULT_HEIGHT = 13;
     static String path;
     public static ImageIcon MESSAGE_ICON;
-    static String nameArray[] = {"message", "integer"};
-    static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};
+    static String nameArray[] = {"integer", "message"};
+    static int propertyTypes[] = {INTEGER_TYPE, STRING_TYPE};
     static String localNameArray[] = {"duration", "open", "height"};
     static int propertyCount = 2;
     static int localPropertyCount = 3;
@@ -324,6 +338,10 @@ public class MessageValue extends AbstractEventValue
 	MESSAGE_ICON = new ImageIcon(path+"message.gif");
   }
 }
+
+
+
+
 
 
 

@@ -145,7 +145,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     toolbarPanel.add(toolbar, BorderLayout.CENTER);
     toolbarPanel.validate();
     statusBar.addWidgetAt(toolbarPanel, 2);
-    //statusBar.addWidgetAt(toolbar, 2);
 
     ruler.setSize(300, 20);
 
@@ -167,7 +166,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 		//deve anche controllare che l'evento piu' lontano sia ancora visibile
 		TrackEvent lastEvent = sequenceData.getLastEvent();
 		if(lastEvent!=null)
-		    resizePanelToTime((int)lastEvent.getTime()+((Integer)lastEvent.getProperty("duration")).intValue());
+		    resizePanelToTimeWithoutScroll((int)lastEvent.getTime()+((Integer)lastEvent.getProperty("duration")).intValue());
 	    }
     });
 
@@ -330,6 +329,18 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 		if(time < -geometry.getXTransposition())
 		    itsTimeScrollbar.setValue(time);
     }
+
+    private void resizePanelToTimeWithoutScroll(int time)
+    {
+	int maximumTime = getMaximumTime();
+
+	if(time > maximumTime)
+	{
+	    int delta = maximumTime-itsTimeScrollbar.getMaximum();
+	    itsTimeScrollbar.setMaximum(time-delta);
+	}
+    }
+
     
   ////////////////////////////////////////////////////////////
   public void Copy()

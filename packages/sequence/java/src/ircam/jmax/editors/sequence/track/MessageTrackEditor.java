@@ -239,6 +239,7 @@ public class MessageTrackEditor extends MonoTrackEditor
     {
 	TrackEvent evt = (TrackEvent)obj;
 	((MessageValue)(evt.getValue())).updateLength(evt, gc); 
+	((MessageValue)(evt.getValue())).updateHeight(evt, gc); 
     }
 
     //update "duration" in order to have the same graphic length with the new zoom value

@@ -40,11 +40,11 @@ messevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   event_init(&this->head);
   
   this->s = 0;
-  this->ac = -2;
+  this->ac = -4;
   this->at = 0;
-  this->pos = -1;
+  this->pos = fts_get_int(at + 1);
 
-  messevt_set_message(o, 0, 0, ac - 1, at + 1);
+  messevt_set_message(o, 0, 0, ac - 2, at + 2);
 }
 
 /**************************************************************
@@ -59,11 +59,12 @@ messevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   messevt_t *this = (messevt_t *)o;
   fts_atom_t a[3];
 
-  /*fts_set_float(this->at + 0, 1000.0 * event_get_time(&this->head));*/
   fts_set_float(this->at + 0, event_get_time(&this->head));
   fts_set_symbol(this->at + 1, messevt_symbol);
-
-  fts_client_upload(o, event_symbol, ac + 2, this->at);
+  fts_set_int(this->at + 2, this->pos);
+  fts_set_symbol(this->at + 3, this->s);
+  
+  fts_client_upload(o, event_symbol, this->ac + 4, this->at);
 }
 
 static void
@@ -97,22 +98,22 @@ messevt_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       if(ac != this->ac)
 	{
 	  if(this->at)
-	    fts_block_free(this->at, (this->ac + 2) * sizeof(fts_atom_t)); /* first two atoms reserved for uploading */
+	    fts_block_free(this->at, (this->ac + 4) * sizeof(fts_atom_t)); /* first two atoms reserved for uploading */
 	  
-	  this->at = (fts_atom_t *)fts_block_alloc((ac + 2) * sizeof(fts_atom_t)); /* first two atoms reserved for uploading */
+	  this->at = (fts_atom_t *)fts_block_alloc((ac + 4) * sizeof(fts_atom_t)); /* first two atoms reserved for uploading */
 	}
       
       this->ac = ac;
       
       for(i=0; i<ac; i++)
-	this->at[i + 2] = at[i]; /* first two atoms reserved for uploading */
+	this->at[i + 4] = at[i]; /* first two atoms reserved for uploading */
     }
   else
     {
       this->s = 0;
 
       if(this->at)
-	fts_block_free(this->at, (this->ac + 2) * sizeof(fts_atom_t));
+	fts_block_free(this->at, (this->ac + 4) * sizeof(fts_atom_t));
 	  
       this->ac = 0;
     }
@@ -123,8 +124,8 @@ messevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   messevt_t *this = (messevt_t *)o;
 
-  messevt_set_message(o, 0, 0, ac - 1, at);
-  this->pos = fts_get_int(at + ac - 1);
+  this->pos = fts_get_int(at);
+  messevt_set_message(o, 0, 0, ac - 1, at + 1);
 }
 
 void 
@@ -132,8 +133,8 @@ messevt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   messevt_t *this = (messevt_t *)o;
 
-  post("%s ", fts_symbol_name(this->s));
-  post_atoms(this->ac, this->at);
+  post("(%d) %s", this->pos, fts_symbol_name(this->s));
+  post_atoms(this->ac, this->at + 4);
   post("\n");
 }
 
@@ -188,3 +189,6 @@ messevt_config(void)
 
   fts_class_install(messevt_symbol, messevt_instantiate);
 }
+
+
+

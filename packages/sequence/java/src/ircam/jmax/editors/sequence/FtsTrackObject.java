@@ -142,7 +142,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     for(int i=0; i<nArgs; i++)
 	sendArgs[2+i].setValue(args[i]);
 
-    //sendMessage(FtsObject.systemInlet, "event_new", 2+nArgs, sendArgs);
     sendMessage(FtsObject.systemInlet, "event_add", 2+nArgs, sendArgs);
   }
   
@@ -307,7 +306,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 		med = (max + min) / 2;
 		
 		if (events[med].getTime() >= time)
-		    //if (events[med].getTime() > time)
 		    max = med;
 		else 
 		    min = med;
@@ -385,8 +383,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
 	    return;
 
-	//????????????????
-	
 	notifyObjectChanged(event, propName, propValue);
     }
     
@@ -453,14 +449,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     public void removeAllEvents()
     {
-	// help a little the garbage collector
-	/*for (int i = 0; i<events_fill_p; i++)
-	  {
-	  sendArgs[0].setObject(events[i]);
-	  sendMessage(FtsObject.systemInlet, "event_remove", 1, sendArgs);
-	  events[i] = null;
-	  }
-	  events_fill_p = 0;*/
 	while(events_fill_p != 0)
 	    removeEvent(events[0]);
     }
@@ -476,8 +464,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	
 	deleteRoomAt(removeIndex);
 	
-	// Send the remove command to fts (to be implemented)
-
 	notifyObjectDeleted(event, removeIndex);
     }
 
@@ -536,13 +522,10 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     // ClipableData functionalities
     public void cut()
-    {
-	
+    {	
 	if (SequenceSelection.getCurrent().getModel() != this) return;
 	
 	copy();
-	
-	// ... and remove 
 	
 	beginUpdate(); //cut is undoable
 
@@ -746,17 +729,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	}
     }
 
-
-    /*  FtsRemoteData. To be implemented. Look at ExplodeRemoteData for a 
-     * complete example. */
-    
-    /*public void call( int key, FtsStream stream)
-      throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
-      {
-      return;
-
-      }*/
-
     /**
      * an utility class to implement the intersection with a range */
     class Intersection implements Enumeration {
@@ -954,7 +926,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     {
 	TrackEvent evt;
 	TrackEvent retEvt = null;
-	//per ora ritorna il primo, poi dovra' controllare se e' uguale e continuare la ricerca
 	int index = getFirstEventAt((float)e.getTime());
 		
 	if((index != EMPTY_COLLECTION) && (index < events_fill_p) && (index >= 0))	    
@@ -1004,7 +975,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     private MaxVector listeners;
     private MaxVector tempVector = new MaxVector();
     MaxVector infos = new MaxVector();
-    //SequenceDataModel sequenceData;
     private String name;
     public DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
