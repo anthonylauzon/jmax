@@ -62,10 +62,17 @@ public class DefaultFileMenu extends EditorMenu
 
   public void updateMenu()
   {
-      boolean dspOn = MaxApplication.getFts().getDspController().getDspOn().booleanValue();
+      if(MaxApplication.getFts()!=null)
+	  {
+	      dspMenuItem.setEnabled(true);
+
+	      boolean dspOn = MaxApplication.getFts().getDspController().getDspOn().booleanValue();
       
-      if(dspOn) dspMenuItem.setText("Desactivate DSP");
-      else dspMenuItem.setText("Activate DSP");
+	      if(dspOn) dspMenuItem.setText("Desactivate DSP");
+	      else dspMenuItem.setText("Activate DSP");
+	  }
+      else
+	  dspMenuItem.setEnabled(false);
   }
 }
 
