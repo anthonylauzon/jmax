@@ -214,7 +214,10 @@ char* fts_log_date(char* buf, int len)
   _strtime(t);
   snprintf(buf, len, "%s %s", d, t);
 #else
-  snprintf(buf, len, "%s", ctime(time(NULL)));
+  time_t t;
+
+  time( &t);
+  snprintf(buf, len, "%s", ctime( &t));
 #endif
   return buf;
 }

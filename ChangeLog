@@ -1,3 +1,8 @@
+2001-10-26  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed client.c: a client has a root pacher that is deleted
+	when the client disconnects.
+
 2001-10-23  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* added package to metaclass and template for fts_object_get_package()

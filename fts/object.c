@@ -30,6 +30,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/OLDclient.h>
 #include <ftsprivate/abstraction.h>
+#include <ftsprivate/client.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/doctor.h>
@@ -524,6 +525,10 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
+  /* If object ID belongs to new client, do nothing */
+  if (OBJECT_ID_CLIENT( obj->head.id))
+    return;
+
   /* tell the client to release the Java part */
   if (obj->head.id != FTS_NO_ID)
     fts_client_release_object(obj);
