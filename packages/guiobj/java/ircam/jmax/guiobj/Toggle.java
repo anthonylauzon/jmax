@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.awt.geom.*;
+import java.awt.image.*;
 
 import ircam.jmax.fts.*;
 
@@ -49,15 +50,30 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
   private transient boolean isToggled = false;
 
+  private BufferedImage buff;
+  private Graphics2D buffG;
+
   public Toggle(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);
+
+    updateOffScreenBuffer();
   }
 
   public void setDefaults()
   {
     super.setWidth( DEFAULT_WIDTH);
     super.setHeight( DEFAULT_WIDTH);
+  }
+
+  void updateOffScreenBuffer()
+  {
+    int w = getWidth() - 6;
+    if( w <= 0) w = DEFAULT_WIDTH - 6;
+    
+    buff = new BufferedImage( w, w, BufferedImage.TYPE_INT_RGB);
+    buffG = buff.createGraphics();
+    buffG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
   }
 
   // redefined from base class
@@ -71,12 +87,20 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
     super.setWidth( theWidth);
     super.setHeight( theWidth);
+  
+    updateOffScreenBuffer();
   }
 
   // redefined from base class
 
   public void setHeight( int theHeight)
   {
+  }
+
+  public void setCurrentBounds( int x, int y, int w, int h)
+  {
+    super.setCurrentBounds( x, y, w, h);
+    updateOffScreenBuffer();
   }
 
   public boolean isSquare()
@@ -94,6 +118,7 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
   {
     isToggled = (value == 1);
 
+    drawContent( buffG, 0, 0, getWidth() - 6, getWidth() - 6);
     updateRedraw();
   }
 
@@ -118,9 +143,11 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
     if (isToggled) 
       {
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	g.setColor( itsCrossColor);
 	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
 	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
+	((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       }
     
     super.paint( g);
@@ -128,20 +155,19 @@ public class Toggle extends GraphicObject implements FtsIntValueListener
 
   public void updatePaint(Graphics g) 
   {
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
+    g.drawImage( buff, getX() + 3, getY() + 3, itsSketchPad);  
+  }  
 
+  public void drawContent( Graphics g, int x, int y, int w, int h)
+  {
     g.setColor( Settings.sharedInstance().getUIColor());
-
-    g.fillRect( x + 3, y + 3, w - 6, h - 6);
+    g.fillRect( x, y, w, h);
 
     if (isToggled) 
       {
 	g.setColor( itsCrossColor);
-	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
-	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
+	g.drawLine( x + 1, y + 1, x + w - 3, y + h - 3);
+	g.drawLine( x + w - 3, y + 1, x + 1, y + h - 3);
       }
-  }  
+  }
 }
