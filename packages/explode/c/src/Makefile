@@ -24,7 +24,7 @@ all: $(LIBDIR)/libexplode.a $(LIBDIR)/libexplode.so
 $(LIBDIR)/libexplode.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libexplode.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libexplode.a
+TOCLEAN = $(LIBDIR)/libexplode.a $(LIBDIR)/libexplode.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 

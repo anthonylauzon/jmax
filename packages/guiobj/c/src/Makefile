@@ -21,7 +21,7 @@ all: $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
 $(LIBDIR)/libguiobj.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libguiobj.a $(OBJECTS)
 
-TOCLEAN = $(LIBDIR)/libguiobj.a
+TOCLEAN = $(LIBDIR)/libguiobj.a $(LIBDIR)/libguiobj.so
 
 include $(DISTDIR)/Makefiles/Makefile.lib.end
 
