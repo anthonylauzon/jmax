@@ -38,8 +38,8 @@ makenote_send_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 {
   makenote_t *this = (makenote_t *)o;
 
-  fts_outlet_int(o, 0, 0);
-  fts_outlet_send(o, 0, 0, 1, at);
+  fts_outlet_int(o, 1, 0);
+  fts_outlet_send(o, 0, fts_s_int, 1, at);
 }
 
 static void
