@@ -5,4 +5,6 @@ helpPatch intbox $dir/intbox.help.jmax
 helpPatch floatbox $dir/floatbox.help.jmax
 helpPatch slider $dir/slider.help.jmax
 helpPatch toggle $dir/toggle.help.jmax
+helpPatch key $dir/key.help.jmax
+helpPatch keystat $dir/key.help.jmax
 
