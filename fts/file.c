@@ -53,6 +53,10 @@
 #include <direct.h>
 #endif
 
+
+
+char fts_ext_separator = '.';	/* how to recognise the extension */
+
 #ifdef WIN32
 
 char fts_path_separator = ';';
@@ -99,8 +103,16 @@ fts_is_directory(const char *name)
   return ( stat( name, &statbuf) == 0) && (statbuf.st_mode & S_IFDIR);
 }
 
+
+
+
+/*
+ * file name parsing 
+ */
+
+/** cut off file name, leave only directory part in \p name */
 char *
-fts_dirname( char *name)
+fts_dirname (char *name)
 {
   char *end;
 
@@ -109,6 +121,36 @@ fts_dirname( char *name)
 
   return name;
 }
+
+
+/** return pointer to base file name (without directory) */
+const char *
+fts_basename (const char *name)
+{
+  char *end = strrchr(name, fts_file_separator);
+
+  if (end != NULL)
+    return end + 1;
+  else
+    return name;
+}
+
+
+/** return pointer to extension (anything behind the last '.') */
+const char *
+fts_extension (const char *name)
+{
+  char *base = fts_basename(name);
+  char *end  = strrchr(base, fts_ext_separator);
+
+  if (end != NULL)
+    return end + 1;
+  else
+    return NULL;
+}
+
+
+
 
 static int
 fts_file_correct_separators( char *filename)

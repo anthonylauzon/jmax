@@ -27,7 +27,18 @@ FTS_API int fts_is_file(const char *name);
 
 FTS_API int fts_is_directory(const char *name);
 
-FTS_API char *fts_dirname( char *name);
+
+/* file name parsing */
+
+/** cut off file name, leave only directory part in \p name */
+FTS_API char *fts_dirname (char *name);
+
+/** return pointer to base file name (without directory) */
+FTS_API const char *fts_basename (const char *name);
+
+/** return pointer to extension (anything behind the last '.') */
+FTS_API const char *fts_extension (const char *name);
+
 
 /** 
  * Creates the absolute file path. The result is copied in the buf
