@@ -1,9 +1,8 @@
 import os
 import threading
-#from ircam.fts.client.BinaryProtocolEncoder import BinaryProtocolEncoder
 import BinaryProtocolEncoder
-#from ircam.fts.client.BinaryProtocolDecoder import BinaryProtocolDecoder
 import BinaryProtocolDecoder
+from FtsClientException import FtsClientException
 
 class FtsServerConnection:
     DEFAULT_RECEIVE_BUFFER_SIZE = 65536
@@ -97,11 +96,13 @@ class FtsServerConnection:
     def receiveThread(self):
         byte = []
         while self.runningThread == 1:
-            n, byte = self.read(byte, FtsServerConnection.DEFAULT_RECEIVE_BUFFER_SIZE)
-            if n < 0:
-                raise FtsClientException("Failed to read the input connection", os.errno)
-            if n == 0:
-                raise FtsClientException("End of input", os.errno)
-            self.__decoder.decode(byte)
-        
+            try:
+                n, byte = self.read(byte, FtsServerConnection.DEFAULT_RECEIVE_BUFFER_SIZE)
+                self.__decoder.decode(byte)
+            except FtsClientException, myex:
+                print myex
+                self.runningThread = 0
+                break
+
+
 

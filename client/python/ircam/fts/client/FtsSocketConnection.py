@@ -16,17 +16,28 @@ class FtsSocketConnection(FtsServerConnection):
     
     def close(self):
         FtsServerConnection.stopThread(self)
+        self.sock.close()
         return
     
     def read(self, byte, length):
-        byte = self.sock.recv(length)
-        return (len(byte), byte)
+        try:
+            byte = self.sock.recv(length)
+            n  = len(byte)
+            return (n, byte)
+        except socket.error, err:
+            if n < 0:
+                raise FtsClientException("Failed to read the input connection", err.args[1], err.args[0])
+        if n == 0:
+            raise FtsClientException("End of input", 0, "")
+
     
     def write(self, byte, length):
-        tmp = self.sock.send(byte[:length])
-        if tmp < 0:
-            raise FtsClientException("Error in sending message", os.errno)
-        return
+        try:
+            tmp = self.sock.send(byte[:length])
+            return
+        except socket.error, err:
+            raise FtsClientException("Error in sending message", err.args[1], err.args[0])
+
     
     def __connect(self):
         return
