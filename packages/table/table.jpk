@@ -9,7 +9,7 @@ package provide table
 
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.table.TableExtension
 
-puts "Table Loaded"
+puts "table editor loaded"
 
 
 

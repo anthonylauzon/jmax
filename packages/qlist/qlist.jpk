@@ -9,7 +9,7 @@ package provide qlist
 
 java::load -classpath "$dir/java/classes" ircam.jmax.editors.qlist.QListExtension
 
-puts "QList Loaded"
+puts "qlist editor loaded"
 
 
 
