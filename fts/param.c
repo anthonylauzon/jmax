@@ -251,7 +251,7 @@ param_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  
 	  fts_dumper_send(dumper, fts_s_set, size, atoms);
 	}
-      else
+      else if(!fts_is_void(&this->value))
 	fts_dumper_send(dumper, fts_s_set, 1, &this->value);    
     }
 }
