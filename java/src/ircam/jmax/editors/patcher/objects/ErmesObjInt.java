@@ -8,6 +8,7 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The "integer box" graphic object.
@@ -65,35 +66,40 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
   // mouse handlers
   //--------------------------------------------------------
 
-  public void mouseDown(MouseEvent evt,int x, int y) 
+  boolean dragged = false;
+
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if (!evt.isControlDown())
+    switch (squeack)
       {
-	state = 1;
-	itsSketchPad.setKeyEventClient( this);
+      case Squeack.DOWN:
+	itsFirstY = mouse.x;
+	itsStartingY = itsInteger;
+	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
+	dragged = false;
+	break;
+
+      case Squeack.DRAG:
+	state = 2;
+	itsInteger = itsStartingY + (itsFirstY - mouse.y);
+	((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
+	redraw();
+	dragged = true;
+	break;
+
+      case Squeack.UP:
+	Fts.sync();
+
+	if (! dragged)
+	  {
+	    state = 1;
+	    itsSketchPad.setKeyEventClient( this);
+	  }
+
+	itsFirstY = mouse.x;
+	redraw();
+	break;
       }
-
-    itsFirstY = y;
-
-    itsStartingY = itsInteger;
-
-    ((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
-  }
-
-  public void mouseUp(MouseEvent evt,int x, int y) 
-  {
-    Fts.sync();
-    redraw();
-  }
-
-  public void mouseDrag(MouseEvent evt,int x, int y) 
-  {
-    if (!evt.isControlDown())
-      state = 2;
-
-    itsInteger = itsStartingY + (itsFirstY - y);
-    ((FtsIntValueObject)itsFtsObject).setValue(itsInteger);
-    redraw();
   }
 }
 

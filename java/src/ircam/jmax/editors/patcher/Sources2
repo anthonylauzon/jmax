@@ -9,10 +9,14 @@ include $(INCLUDE_PATH)/Sources2
 INCLUDE_PATH := $(LOCAL_PATH)/menus
 include $(INCLUDE_PATH)/Sources2
 
+INCLUDE_PATH := $(LOCAL_PATH)/interactions
+include $(INCLUDE_PATH)/Sources2
+
 INCLUDE_PATH := $(LOCAL_PATH)
 
 SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/DisplayList.java  \
+	$(INCLUDE_PATH)/DisplayObject.java  \
 	$(INCLUDE_PATH)/ObjectAction.java  \
 	$(INCLUDE_PATH)/ErmesConnection.java  \
 	$(INCLUDE_PATH)/ErmesDataEditor.java  \

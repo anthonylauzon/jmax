@@ -14,6 +14,7 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 
 /** The graphic workbench for the patcher editor.
@@ -34,13 +35,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   }
 
   private Interaction interaction;
-
-
-  Interaction getInteraction()
-  {
-    return interaction;
-
-  }
+  private InteractionEngine engine;
 
   private KeyMap keyMap;
 
@@ -86,9 +81,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   FtsObject itsPatcher;
   FtsPatcherData itsPatcherData;
 
-  private final static int SKETCH_WIDTH = 1200;
-  private final static int SKETCH_HEIGHT = 1200;
-  static Dimension preferredSize = new Dimension(SKETCH_WIDTH, SKETCH_HEIGHT);
+
+  // Shouldn't/Couldn't the popup being static, or created on the fly ?
 
   public ErmesObjInOutPop itsInPop = null;
   public ErmesObjInOutPop itsOutPop = null;
@@ -121,7 +115,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   final void doNothing() 
   {
-    interaction.doNothing();
+    // ??? Should reset the interaction engine ???
   }
   
   final public ErmesSketchWindow getSketchWindow()
@@ -212,8 +206,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	ErmesSelection.patcherSelection.select( connection);
 	connection.redraw();
       }
-
-    interaction.startSelection();
   }
   
   void InitFromFtsContainer( FtsPatcherData theContainerObject)
@@ -285,13 +277,18 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     // Install the display List object
 
     displayList = new DisplayList(this);
-    interaction = new Interaction(this, displayList);
+    interaction = new Interaction(this, displayList); // Obsolete
+    engine      = new InteractionEngine(this);
+
     keyMap = new KeyMap(this);
 
     // Next two temporary (mdc)
 
-    RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
-    setDoubleBuffered(false);
+    if (MaxApplication.getProperty("db") == null)
+      {
+	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
+	setDoubleBuffered(false);
+      }
 
     setOpaque(true);
 
@@ -306,15 +303,10 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     itsEditField.setLocation( -200,-200);
     
     setBackground( Settings.sharedInstance().getEditBackgroundColor());
-    addMouseMotionListener( interaction); 
-    addMouseListener( interaction);
     addKeyListener( interaction);
 
     InitFromFtsContainer( itsPatcherData);
-
-    displayList.getAndFixContainerSize(preferredSize);
-    setPreferredSize(preferredSize);
-
+    
     PrepareInChoice(); 
     PrepareOutChoice();
 
@@ -325,19 +317,80 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   /* To be called to fix the sketchpad size after some changes (move
      and paste); it also assure the selection is in the scrolled area. */
 
+  static Rectangle totalBounds = new Rectangle();
+  static Dimension preferredSize = new Dimension();
+
   public void fixSize()
   {
-    boolean redraw;
+    boolean redraw = false;
 
-    redraw = displayList.getAndFixContainerSize(preferredSize);
-    setPreferredSize(preferredSize);
+    totalBounds.x = 0;
+    totalBounds.y = 0;
+    totalBounds.width = 0;
+    totalBounds.height = 0;
 
-    itsSketchWindow.validate();
+    displayList.getBounds(totalBounds);
+
+    if ((totalBounds.x < 0) || (totalBounds.y < 0))
+      {
+	int dx, dy;
+
+	if (totalBounds.x < 0)
+	  dx = (-1) * totalBounds.x;
+	else
+	  dx = 0;
+
+	if (totalBounds.y < 0)
+	  dy = (-1) * totalBounds.y;
+	else
+	  dy = 0;
+	
+	displayList.moveAllBy(dx, dy);
+
+	redraw = true;
+      }
+
+    // If the objects bounds are bigger than the current sketch bounds
+    // resize the sketch to be 5 points bigger than this size
+
+    if ((totalBounds.width > getWidth()) || (totalBounds.height > getHeight()))
+      {
+	preferredSize.height = totalBounds.height + 5;
+	preferredSize.width  = totalBounds.width  + 5;
+
+	// Test to avoid windows too small 
+
+	if (preferredSize.height < 20)
+	  preferredSize.height = 20;
+
+	if (preferredSize.width < 20)
+	  preferredSize.width = 20;
+
+	setPreferredSize(preferredSize);
+
+	revalidate(); // ???
+      }
+
+    // Finally, if the selection is outside the current visible 
+    // area, rescroll
+
+    Rectangle selectionBounds = ErmesSelection.patcherSelection.getBounds();
+    Rectangle visibleRectangle = itsSketchWindow.itsScrollerView.getViewport().getViewRect();
+
+    if (selectionBounds != null)
+      {
+	if (! SwingUtilities.isRectangleContainingRectangle(visibleRectangle, selectionBounds))
+	  {
+	    scrollRectToVisible(selectionBounds);
+	    revalidate(); // ???
+	  }
+      }
 
     if (redraw)
       redraw();
   }
-  
+
+
   static final private Dimension minSize = new Dimension(30, 20);
 
   public Dimension getMinimumSize() 
@@ -442,10 +495,17 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   {
     repaint();
   }
-       
-  final void setToolBar( ErmesToolBar theToolBar)
+
+  private ErmesToolBar toolBar;
+
+  final void setToolBar( ErmesToolBar toolBar)
   {
-    interaction.setToolBar(theToolBar);
+    this.toolBar = toolBar;
+  }
+
+  final public ErmesToolBar getToolBar( )
+  {
+    return toolBar;
   }
 
   //--------------------------------------------------------
@@ -456,14 +516,14 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   void cleanAll()
   {
+    engine.dispose();
+
     if (ErmesSelection.patcherSelection.ownedBy(this))
       ErmesSelection.patcherSelection.deselectAll();
 
     displayList.disposeAllObjects();
 
     Fts.getServer().removeUpdateGroupListener( this);
-    removeMouseMotionListener( interaction); 
-    removeMouseListener( interaction);
     removeKeyListener( interaction);
 
     remove( itsInPop);
@@ -492,12 +552,12 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	getEditField().transferFocus();
       }
 
-    if (interaction.isEditingObject())
-      {
-	getEditField().LostFocus();
-	requestFocus();
-	interaction.doNothing();
-      }
+    //    if (interaction.isEditingObject())
+    //      {
+    //getEditField().LostFocus();
+    //	requestFocus();
+    //	interaction.doNothing();
+    //      }
   }
   
   // The waiting/stopWaiting service
@@ -523,20 +583,32 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
   // ----------------------------------------------------------------------
   // Mode handling
   // ----------------------------------------------------------------------
+
+  void setAddMode()
+  {
+    engine.setAddMode();
+  }
+
   private boolean locked = false;
+
 
   void setLocked( boolean locked)
   {
     this.locked = locked;
 
+    if (isLocked())
+      engine.setRunMode();
+    else
+      engine.setEditMode();
+
     if (locked)
       {
-	if (interaction.isEditingObject())
-	  {
-	    itsEditField.LostFocus();
-	    requestFocus();
-	    interaction.doNothing();
-	  }
+	// if (interaction.isEditingObject())
+	// {
+	// itsEditField.LostFocus();
+	// requestFocus();
+	// interaction.doNothing();
+	// }
 
 	setBackground( Settings.sharedInstance().getLockBackgroundColor());
 
@@ -559,26 +631,36 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
      
   void pasteText(String text)
   {
-    if (interaction.isEditingObject())
-      itsEditField.insert(text,  itsEditField.getCaretPosition());
+    // !!! @@@
+    // if (interaction.isEditingObject())
+    //itsEditField.insert(text,  itsEditField.getCaretPosition());
   }
 
   boolean canCopyText()
   {
-    return interaction.isEditingObject();
+    // !!!! @@@
+    // return interaction.isEditingObject();
+
+    return false;
   }
 
   boolean canPasteText()
   {
-    return interaction.isEditingObject();
+    // !!! @@@@
+    //    return interaction.isEditingObject();
+
+    return false;
   }
 
   String getSelectedText()
   {
-    if (interaction.isEditingObject())
-      return itsEditField.getSelectedText();
-    else
-      return null;
+    // !!! @@@@
+    // if (interaction.isEditingObject())
+    // return itsEditField.getSelectedText();
+    //     else
+    // return null;
+
+    return "foo";
   }
 
   void deleteSelectedText()

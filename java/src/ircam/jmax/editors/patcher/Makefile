@@ -28,6 +28,10 @@ DisplayList:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) DisplayList.java)
 .PHONY: DisplayList
 
+DisplayObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) DisplayObject.java)
+.PHONY: DisplayObject
+
 ErmesConnection:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesConnection.java)
 .PHONY: ErmesConnection

@@ -16,8 +16,8 @@ import ircam.jmax.editors.patcher.objects.*;
 // methods (mouseclick, move, doubleclick...).
 //
 
-class ErmesConnection implements ErmesDrawable {
-
+public class ErmesConnection implements ErmesDrawable, DisplayObject
+{
   ErmesObject itsFromObject;
   int itsOutletNum;
 
@@ -44,8 +44,8 @@ class ErmesConnection implements ErmesDrawable {
       return itsToObject;
     }
 
-
-  ErmesConnection( ErmesSketchPad theSketchPad, ErmesObject fromObj, int theOutlet, ErmesObject toObj, int theInlet, FtsConnection theFtsConnection) 
+  
+  public ErmesConnection( ErmesSketchPad theSketchPad, ErmesObject fromObj, int theOutlet, ErmesObject toObj, int theInlet, FtsConnection theFtsConnection) 
     {
       itsFtsConnection = theFtsConnection;
       itsFromObject = fromObj;
@@ -80,7 +80,7 @@ class ErmesConnection implements ErmesDrawable {
     selected = v;
   }
 
-  final boolean isSelected()
+  final public boolean isSelected()
   {
     return selected;
   }

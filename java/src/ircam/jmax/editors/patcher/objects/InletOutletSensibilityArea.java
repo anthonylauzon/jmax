@@ -1,6 +1,7 @@
 package ircam.jmax.editors.patcher.objects;
 
-public class InletOutletSensibilityArea extends SensibilityArea {
+public class InletOutletSensibilityArea extends SensibilityArea
+{
   static int height = 4;
 
   void setNumber( int n)

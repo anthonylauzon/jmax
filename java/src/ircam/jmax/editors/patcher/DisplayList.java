@@ -26,6 +26,15 @@ public class DisplayList
 {
   ErmesSketchPad sketch;
 
+  final static int NO_DRAG        = 0;
+  final static int DRAG_RECTANGLE = 1;
+  final static int DRAG_LINE      = 2;
+
+  int dragMode = NO_DRAG;
+  Rectangle dragRectangle = new Rectangle();
+  Point     lineStart      = new Point();
+  Point     lineEnd       = new Point();
+
   ////////////////////////////////////////////////////////////////////////////////
   //                                                                            //
   //                   Constructors                                             //
@@ -194,7 +203,7 @@ public class DisplayList
   //  adding a connection between two objects
   //--------------------------------------------------------
 
-  final void addConnection(ErmesConnection connection)
+  final public void addConnection(ErmesConnection connection)
   {
     connections.addElement(connection);
   }
@@ -249,8 +258,66 @@ public class DisplayList
       {
 	ErmesObject object = (ErmesObject) values[i];
 
+	if (object.getBounds().intersects( rect) && (! object.isSelected()))
+	  {
+	    ErmesSelection.patcherSelection.select( object);
+	    object.redraw();
+	  }
+      }	
+    
+    SelectConnections();
+  }
+
+  public void toggleSelect(Rectangle rect)
+  {
+    Object values[] = objects.getObjectArray();
+    int size = objects.size();
+
+    for (int i = 0; i < size; i++)
+      {
+	ErmesObject object = (ErmesObject) values[i];
+
 	if (object.getBounds().intersects( rect))
-	  ErmesSelection.patcherSelection.select( object);
+	  if (object.isSelected())
+	    {
+	      ErmesSelection.patcherSelection.deselect( object);
+	      object.redraw();
+	    }
+	  else
+	    {
+	      ErmesSelection.patcherSelection.select( object);
+	      object.redraw();
+	    }
+      }	
+    
+    SelectConnections();
+  }
+
+  public void selectExactly(Rectangle rect)
+  {
+    Object values[] = objects.getObjectArray();
+    int size = objects.size();
+
+    for (int i = 0; i < size; i++)
+      {
+	ErmesObject object = (ErmesObject) values[i];
+
+	if (object.getBounds().intersects( rect))
+	  {
+	    if (! object.isSelected())
+	      {
+		ErmesSelection.patcherSelection.select( object);
+		object.redraw();
+	      }
+	  }
+	else
+	  {
+	    if (object.isSelected())
+	      {
+		ErmesSelection.patcherSelection.deselect( object);
+		object.redraw();
+	      }
+	  }
       }	
     
     SelectConnections();
@@ -318,6 +385,30 @@ public class DisplayList
 	paintList( connections, g, clip);
       }
 
+    // Finally, draw the Drag/effermeral thingies
+
+    switch (dragMode)
+      {
+      case DRAG_RECTANGLE:
+	if (clip.intersects(dragRectangle))
+	  {
+	    g.setColor( Color.black);
+	    g.drawRect( dragRectangle.x, dragRectangle.y, dragRectangle.width, dragRectangle.height);
+	  }
+	break;
+
+      case DRAG_LINE:
+	if (clip.intersects(dragRectangle))
+	  {
+	    g.setColor( Color.black);
+	    g.drawLine( lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+	  }
+	break;
+
+      case NO_DRAG:
+	break;
+      }
+
     // Needed in very heavy charge situations
 
     Toolkit.getDefaultToolkit().sync();
@@ -333,7 +424,7 @@ public class DisplayList
 
   /** Compute the rectangle including all the objects, on a rectagle passed as object */
 
-  Rectangle getTotalBounds(Rectangle r)
+  Rectangle getBounds(Rectangle r)
   {
     r.x = 0;
     r.y = 0;
@@ -358,40 +449,13 @@ public class DisplayList
    *  Return true if a coordinate change has been done, false otherwise.
    */
 
-  static Rectangle totalBounds = new Rectangle();
-
-  boolean getAndFixContainerSize(Dimension d)
+  void moveAllBy( int dx, int dy)
   {
-    boolean fixed = false;
-    int dx, dy;
-
-    getTotalBounds(totalBounds);
-
-    if (totalBounds.x < 0)
-      dx = (-1) * totalBounds.x;
-    else
-      dx = 0;
-
-    if (totalBounds.y < 0)
-      dy = (-1) * totalBounds.y;
-    else
-      dy = 0;
-
-    if ((dx > 0) || (dy > 0))
-      {
-	Object values[] = objects.getObjectArray();
-	int size = objects.size();
-
-	for ( int i = 0; i < size; i++)
-	  ((ErmesObject) values[i]).moveBy(dx, dy);
-
-	fixed = true;
-      }
-
-    d.width = totalBounds.width + 20;
-    d.height = totalBounds.height + 20;
-
-    return fixed;
+    Object values[] = objects.getObjectArray();
+    int size = objects.size();
+    
+    for ( int i = 0; i < size; i++)
+      ((ErmesObject) values[i]).moveBy(dx, dy);
   }
 
   // Generic operation on objects in the display List
@@ -407,6 +471,133 @@ public class DisplayList
 
 	action.processObject(object);
       }
+  }
+
+  // Find an display object; for the moment quite an hack, because displayObject
+  // is not really implemented as such
+
+  public DisplayObject getDisplayObjectAt(int x, int y)
+  {
+    ErmesObject object;
+
+    // First, look for the object
+
+    object = getObjectContaining( x, y);
+
+    if (object != null)
+      {
+	// Found, verify if we got a sensibility area
+
+	SensibilityArea area = object.findSensibilityArea( x, y);
+
+	if (area == null)
+	  return object;
+	else
+	  return area;
+      }
+    else
+      {
+	// Return the connection, or null
+
+	return getConnectionNear(x, y);
+      }
+  }
+
+
+  // The Display List also handle a additional DRAG rectangle,
+  // on top of the other stuff; the idea is to use it for select and resize
+  // applications; 
+
+  /** Set the display list drag rectagle; accept a non normalized rectangle,
+    i.e. one with negative width or height, and flip it correctly
+    */
+
+  public void setDragRectangle(int x, int y, int width, int height)
+  {
+    if (height < 0)
+      {
+	height = (-1) * height;
+	y = y - height;
+      }
+
+    if (width < 0)
+      {
+	width = (-1) * width;
+	x = x - width;
+      }
+
+    dragRectangle.x = x;
+    dragRectangle.y = y;
+    dragRectangle.width = width;
+    dragRectangle.height = height;
+  }
+
+  public void setDragLine(int x, int y, int x2, int y2)
+  {
+    // Set the drag rectangle to the rectangle corresponding to
+    // the line, in order to be able to use intersect with the
+    // clipping area during repaint.
+    
+    if (x < x2)
+      {
+	dragRectangle.x = x;
+	dragRectangle.width = x2 - x;
+      }
+    else
+      {
+	dragRectangle.x = x2;
+	dragRectangle.width = x - x2;
+      }
+
+    if (y < y2)
+      {
+	dragRectangle.y = y;
+	dragRectangle.height = y2 - y;
+      }
+    else
+      {
+	dragRectangle.y = y2;
+	dragRectangle.height = y - y2;
+      }
+
+    // Store the two ending points 
+
+    lineStart.x = x;
+    lineStart.y = y;
+
+    lineEnd.x = x2;
+    lineEnd.y = y2;
+  }
+
+
+  public Rectangle getDragRectangle()
+  {
+    return dragRectangle;
+  }
+
+  public void dragRectangle()
+  {
+    dragMode = DRAG_RECTANGLE;
+  }
+
+  public void dragLine()
+  {
+    dragMode = DRAG_LINE;
+  }
+
+  public void noDrag()
+  {
+    dragMode = NO_DRAG;
+  }
+
+  public void redrawDragRectangle()
+  {
+    sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
+  }
+
+  public void redrawDragLine()
+  {
+    sketch.repaint(dragRectangle.x, dragRectangle.y, dragRectangle.width + 1, dragRectangle.height + 1);
   }
 }
 

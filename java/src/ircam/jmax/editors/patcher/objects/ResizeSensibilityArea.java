@@ -1,4 +1,5 @@
 package ircam.jmax.editors.patcher.objects;
 
-public class ResizeSensibilityArea extends SensibilityArea {
+public class ResizeSensibilityArea extends SensibilityArea
+{
 }

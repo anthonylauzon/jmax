@@ -6,6 +6,8 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
+
 //
 // The "message box" graphic object.
 //
@@ -90,23 +92,24 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
     g.dispose();
   }
 
-  public void mouseUp( MouseEvent e, int x, int y)
-  {
-    if (itsFlashing) 
-      {
-	itsFlashing = false;
 
-	redraw();
-      }
-  }
-  
-  public void mouseDown(MouseEvent evt,int x, int y) 
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    if (itsFtsObject != null)
+    switch (squeack)
       {
+      case Squeack.DOWN:
 	itsFtsObject.sendMessage( 0, "bang", null);
 	itsFlashing = true;
 	redraw();
+	break;
+      case Squeack.UP:
+	if (itsFlashing) 
+	  {
+	    itsFlashing = false;
+
+	    redraw();
+	  }
+	break;
       }
   }
 

@@ -6,6 +6,7 @@ import java.util.*;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interaction.*;
 
 //
 // The "bang" graphic object.
@@ -45,9 +46,10 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
   {
   }
 
-  public void mouseDown(MouseEvent evt,int x, int y) 
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    itsFtsObject.sendMessage( 0, "bang", null);
+    if (squeack == Squeack.DOWN)
+      itsFtsObject.sendMessage( 0, "bang", null);
   }
 
   static Color bangColors[] = 

@@ -1,8 +1,10 @@
 package ircam.jmax.editors.patcher;
 
-import java.awt.*; 
 import java.util.*;
+import java.awt.*; 
 import java.awt.datatransfer.*;
+import javax.swing.*; 
+
 
 import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
@@ -178,9 +180,9 @@ public class ErmesSelection implements Transferable
     return (! objects.isEmpty());
   }
 
-  public boolean hasObjectsIn(ErmesSketchPad owner)
+  public boolean hasConnections() 
   {
-    return ((this.owner == owner) && (! objects.isEmpty()));
+    return (! connections.isEmpty());
   }
 
   public void setOwner(ErmesSketchPad owner)
@@ -244,7 +246,7 @@ public class ErmesSelection implements Transferable
   //	Move the selected elements
   //--------------------------------------------------------
 
-  public void moveAll( int dh, int dv)
+  public void moveAllBy( int dx, int dy)
   {
     ErmesObject object;
 
@@ -256,12 +258,12 @@ public class ErmesSelection implements Transferable
 	object = (ErmesObject) values[i];
 
 	object.redraw();
-	object.moveBy(dh, dv);
+	object.moveBy(dx, dy);
 	object.redraw();
       }
   }
 
-  void resizeAll( int dh, int dv)
+  void resizeAllBy( int dx, int dy)
   {
     ErmesObject object;
 
@@ -273,7 +275,7 @@ public class ErmesSelection implements Transferable
 	object = (ErmesObject) values[i];
 
 	object.redraw();
-	object.resizeBy( dh, dv);
+	object.resizeBy( dx, dy);
 	object.redraw();
       }
   }
@@ -489,37 +491,27 @@ public class ErmesSelection implements Transferable
   }
 
   // The bounds of the selection as a rectangle
+  // Still miss the connections (but should be ok like this)
+
+  Rectangle bounds = new Rectangle();
 
   Rectangle getBounds()
   {
-    int top, left, bottom, right;
-    ErmesObject object;
-
-    left = Integer.MAX_VALUE;
-    top = Integer.MAX_VALUE;
-    bottom = 0;
-    right = 0;
-
-    for( int i = 0; i < objects.size(); i++)
+    if (hasObjects())
       {
-	object = (ErmesObject) objects.elementAt( i);
-	
-	Rectangle aRect = object.getBounds();
+	bounds.setBounds(((ErmesObject) objects.elementAt(0)).getBounds());
 
-	if (aRect.x < left)
-	  left = aRect.x;
+	for( int i = 1; i < objects.size(); i++)
+	  {
+	    Rectangle r;
 
-	if (aRect.y < top)
-	  top = aRect.y;
-
-	if ( aRect.y + aRect.height > bottom)
-	  bottom = aRect.y + aRect.height;
-
-	if ( aRect.x  + aRect.width > right)
-	  right = aRect.x + aRect.width;
+	    r = ((ErmesObject) objects.elementAt(i)).getBounds();
+	    SwingUtilities.computeUnion(r.x, r.y, r.width, r.height, bounds);
+	  }
+	return bounds;
       }
-
-    return new Rectangle( left, top, right-left, bottom-top);
+    else
+      return null;
   }
 }
 

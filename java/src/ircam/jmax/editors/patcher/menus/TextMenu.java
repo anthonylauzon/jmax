@@ -63,7 +63,8 @@ public class TextMenu extends JMenu
     {
       //if we are here, a font size have been choosen from the FONT menu
 
-      if (ErmesSelection.patcherSelection.hasObjectsIn(editor.itsSketchPad))
+      if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad) && 
+	  ErmesSelection.patcherSelection.hasObjects())
 	{
 	  try
 	    {
@@ -113,7 +114,8 @@ public class TextMenu extends JMenu
 
     public void actionPerformed(ActionEvent ev) 
     {
-      if (ErmesSelection.patcherSelection.hasObjectsIn(editor.itsSketchPad))
+      if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad) && 
+	  ErmesSelection.patcherSelection.hasObjects())
 	{
 	  try
 	    {

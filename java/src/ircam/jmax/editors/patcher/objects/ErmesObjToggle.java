@@ -7,6 +7,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The "toggle" graphic object.
@@ -53,13 +54,14 @@ class ErmesObjToggle extends ErmesObject implements FtsIntValueListener {
     setWidth( getWidth() + theDeltaW);
   }
 
-  public void mouseDown( MouseEvent evt,int x, int y) 
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    itsToggled = !itsToggled;
-
-    ((FtsIntValueObject)itsFtsObject).setValue(itsToggled ? 1 : 0);
-
-    redraw();
+    if (squeack == Squeack.DOWN)
+      {
+	itsToggled = !itsToggled;
+	((FtsIntValueObject)itsFtsObject).setValue(itsToggled ? 1 : 0);
+	redraw();
+      }
   }
 
   public void valueChanged(int value) 

@@ -111,6 +111,7 @@ public class ErmesToolBar extends JPanel  {
 	  selectedButton.setSelected(false);
 
 	selectedButton = button;
+	sketch.setAddMode();
       }
     else
       {
@@ -124,7 +125,7 @@ public class ErmesToolBar extends JPanel  {
     return selectedButton != null;
   }
 
-  void makeObject(int x, int y)
+  public void makeObject(int x, int y)
   {
     if (selectedButton != null)
       selectedButton.makeObject(sketch, x, y);

@@ -19,7 +19,6 @@ SOURCES := \
 	$(INCLUDE_PATH)/InletSensibilityArea.java \
 	$(INCLUDE_PATH)/OutletSensibilityArea.java \
 	$(INCLUDE_PATH)/HResizeSensibilityArea.java \
-	$(INCLUDE_PATH)/NothingSensibilityArea.java \
 	$(INCLUDE_PATH)/InletOutletSensibilityArea.java \
 	$(INCLUDE_PATH)/ResizeSensibilityArea.java \
 	$(INCLUDE_PATH)/SensibilityArea.java \

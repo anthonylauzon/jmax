@@ -22,7 +22,7 @@ import ircam.jmax.editors.patcher.*;
 
 // A survivor...
 
-abstract public class ErmesObject implements ErmesDrawable {
+abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   static class ErmesObjInOutlet
   {
@@ -46,11 +46,10 @@ abstract public class ErmesObject implements ErmesDrawable {
   private Rectangle itsRectangle = new Rectangle();
 
   // Sensibility areas
-  private static InletSensibilityArea inletArea= new InletSensibilityArea();
-  private static OutletSensibilityArea outletArea= new OutletSensibilityArea();
-  private static InletOutletSensibilityArea inletOutletArea= new InletOutletSensibilityArea();
+  private static InletSensibilityArea inletArea = new InletSensibilityArea();
+  private static OutletSensibilityArea outletArea = new OutletSensibilityArea();
+  private static InletOutletSensibilityArea inletOutletArea = new InletOutletSensibilityArea();
   private static HResizeSensibilityArea hResizeArea = new HResizeSensibilityArea();
-  private static NothingSensibilityArea nothingArea = new NothingSensibilityArea();
 
 
   // A Static method that work as a virtual constructor;
@@ -402,7 +401,10 @@ abstract public class ErmesObject implements ErmesDrawable {
       if ( mouseX >= x + w - HResizeSensibilityArea.width 
 	   && mouseY > y + InletOutletSensibilityArea.height
 	   && mouseY < y + h - InletOutletSensibilityArea.height)
-	return hResizeArea;
+	{
+	  hResizeArea.setObject(this);
+	  return hResizeArea;
+	}
       else if ( mouseY < y + InletOutletSensibilityArea.height)
 	{
 	  int inlet = findNearestInOutlet( mouseX, itsFtsObject.getNumberOfInlets());
@@ -410,11 +412,11 @@ abstract public class ErmesObject implements ErmesDrawable {
 	  if (inlet >= 0)
 	    {
 	      inletArea.setNumber( inlet);
-
+	      inletArea.setObject(this);
 	      return inletArea;
 	    }
 
-	  return nothingArea;
+	  return null;
 	}
       else if (mouseY >= y + h - InletOutletSensibilityArea.height)
 	{
@@ -423,14 +425,14 @@ abstract public class ErmesObject implements ErmesDrawable {
 	  if ( outlet >= 0)
 	    {
 	      outletArea.setNumber( outlet);
-
+	      outletArea.setObject(this);
 	      return outletArea;
 	    }
 
-	  return nothingArea;
+	  return null;
 	}
 
-      return nothingArea;
+      return null;
     }
 
   public SensibilityArea findConnectionSensibilityArea( int mouseX, int mouseY)
@@ -440,10 +442,11 @@ abstract public class ErmesObject implements ErmesDrawable {
       if ( inlet >= 0)
 	{
 	  inletOutletArea.setNumber( inlet);
+	  inletOutletArea.setObject(this);
 	  return inletOutletArea;
 	}
 
-      return nothingArea;
+      return null;
     }
 
   // This method is called whenever we want to edit the content of
@@ -453,15 +456,10 @@ abstract public class ErmesObject implements ErmesDrawable {
   {
   }
 
-  public void mouseDrag( MouseEvent e,int x,int y) 
-  {
-  }
+  // Squeack handling; note that squeacks delivered to objects
+  // have the locations fields masked to zero, to simplify code writing.
 
-  public void mouseDown( MouseEvent e,int x, int y) 
-  {
-  }
-
-  public void mouseUp( MouseEvent e, int x, int y)
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
   }
 

@@ -9,6 +9,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The "slider" graphic object
@@ -329,9 +330,16 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     itsSliderDialog.ReInit( String.valueOf( itsRangeMax), String.valueOf( itsRangeMin), String.valueOf( itsInteger), this, itsSketchPad.getSketchWindow());
   }
 
-  public void mouseDown( MouseEvent evt, int x, int y)
-  {
-    if( IsInThrottle( x,y))
+  public void sliderDown(Point mouse)
+  {  
+    System.err.println("ErmesObjSlider: gotMouseDown " + mouse);
+
+    int x, y;
+
+    x = mouse.x;
+    y = mouse.y;
+
+    if( IsInThrottle( x, y))
       {
 	itsMovingThrottle = true;
 	return;
@@ -360,8 +368,15 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     redraw();
   }
 
-  public void mouseDrag( MouseEvent evt,int x, int y)
+  public void sliderDrag(Point mouse)
   {
+    System.err.println("ErmesObjSlider: gotMouseDrag " + mouse);
+
+    int x, y;
+
+    x = mouse.x;
+    y = mouse.y;
+
     if (itsMovingThrottle )
       {
 	if( getY() + getHeight() - BOTTOM_OFFSET >= y && getY() + UP_OFFSET <=y )
@@ -395,7 +410,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
       }
   }
 
-  public void mouseUp( MouseEvent evt,int x, int y)
+  public void sliderUp(Point mouse)
   {
     if (itsMovingThrottle)
       {
@@ -404,6 +419,24 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 	Fts.sync();
       }
   }
+
+
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
+  {
+    switch (squeack)
+      {
+      case Squeack.DOWN:
+	sliderDown(mouse);
+	break;
+      case Squeack.DRAG:
+	sliderDrag(mouse);
+	break;
+      case Squeack.UP:
+	sliderUp(mouse);
+	break;
+      }
+  }
+	
 
   public boolean IsInThrottle( int theX, int theY)
   {
@@ -446,7 +479,10 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     if (mouseY >= y + h - VResizeSensibilityArea.height
 	 && mouseX >= x + w / 2)
-      return vResizeArea;
+      {
+	vResizeArea.setObject(this);
+	return vResizeArea;
+      }
     else
       return super.findSensibilityArea( mouseX, mouseY);
   }

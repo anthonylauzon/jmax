@@ -8,6 +8,7 @@ import java.text.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The graphic "float box" object.
@@ -84,60 +85,55 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
   // mouse handlers
   //--------------------------------------------------------
 
-  public void mouseDown(MouseEvent evt,int x, int y) 
+  public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
-    velocity = 0;
-    previousVelocity = 0;
-    acceleration = 0;
-    previousY = y;
-
-    if (! evt.isControlDown())
+    if ((squeack & Squeack.DOWN) != 0)
       {
+	velocity = 0;
+	previousVelocity = 0;
+	acceleration = 0;
+	previousY = mouse.y;
 	state = 1;
-	itsSketchPad.setKeyEventClient( this);
+	itsSketchPad.setKeyEventClient(this);
+	itsStartingValue = itsFloat;
+	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+	redraw();
+
       }
+    else if ((squeack & Squeack.UP) != 0)
+      {
+	velocity = 0;
+	previousVelocity = 0;
+	acceleration = 0;
+	
+	((FtsFloatValueObject)itsFtsObject).updateValue();
+	Fts.sync();
+	redraw();
+      }
+    else if ((squeack & Squeack.DRAG) != 0)
+      {
+	previousVelocity = velocity;
+	velocity = (previousY- mouse.y);
+	acceleration = Math.abs(velocity-previousVelocity);
+	previousY= mouse.y;
 
-    itsStartingValue = itsFloat;
+	state = 2;
 
-    ((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+	float increment;
 
-    redraw();
-  }
+	if (velocity*previousVelocity > 0)
+	  increment = (velocity/1000) + ((velocity>0)?acceleration:-acceleration)/10;
+	else
+	  increment = velocity/1000;
 
-  public void mouseUp( MouseEvent evt,int x, int y) 
-  {
-    velocity = 0;
-    previousVelocity = 0;
-    acceleration = 0;
+	if (squeack & Squeack.SHIFT)
+	  increment*=10;
 
-    ((FtsFloatValueObject)itsFtsObject).updateValue();
-    Fts.sync();
-    redraw();
-  }
+	itsFloat += increment;
 
-  public void mouseDrag(MouseEvent evt,int x, int y) 
-  {
-    previousVelocity = velocity;
-    velocity = (previousY-y);
-    acceleration = Math.abs(velocity-previousVelocity);
-    previousY=y;
-
-    if (!evt.isControlDown())
-      state = 2;
-
-    float increment;
-    if (velocity*previousVelocity > 0)
-      increment = (velocity/1000) + ((velocity>0)?acceleration:-acceleration)/10;
-    else
-      increment = velocity/1000;
-
-    if (evt.isShiftDown())
-      increment*=10;
-
-    itsFloat += increment;
-
-    ((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
-    redraw();
+	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
+	redraw();
+      }
   }
 }
 

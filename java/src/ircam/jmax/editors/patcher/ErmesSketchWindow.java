@@ -174,13 +174,15 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     else
       setLocked( true);
 
+    // Fix the sketch size if needed ????
+
+    itsSketchPad.fixSize();
+
     // Finally, activate the updates
 
     itsPatcherData.startUpdates();
 
-
     // Make it visible, at the end
-
 
     setVisible( true);
   }
