@@ -8,6 +8,7 @@ help_DATA=\
  bus~.help.jmax		\
  clip~.help.jmax	\
  delay~.help.jmax	\
+ delayline~.help.jmax   \
  edge~.help.jmax	\
  env~.help.jmax		\
  iir~.help.jmax		\
