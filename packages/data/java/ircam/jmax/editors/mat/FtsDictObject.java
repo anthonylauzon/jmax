@@ -214,8 +214,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   
   public void requestAppendRow()
   {
+    args.clear();
+    args.addSymbol(FtsSymbol.get("<empty key>"));
+    args.addSymbol(FtsSymbol.get("<empty value>"));
     try{
-      send( FtsSymbol.get("append"));
+      send( FtsSymbol.get("set"), args);
     }
     catch(IOException e)
     {
