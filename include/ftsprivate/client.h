@@ -37,4 +37,7 @@
 
 #define MAX_CLIENTS (1<<(32-OBJECT_ID_BITS))
 
+#define fts_get_client_id(O) OBJECT_ID_CLIENT(fts_object_get_id(O))
+#define fts_get_object_id(O) OBJECT_ID_OBJ(fts_object_get_id(O))
+
 #endif

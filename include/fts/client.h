@@ -127,3 +127,16 @@ FTS_API void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *
  * @ingroup client
  */
 FTS_API void fts_client_done_message( fts_object_t *obj);
+
+/**
+ * Upload the object: assign an id to the object and send upload_child message to the parent
+ *
+ * @fn void fts_client_upload_object( fts_object_t *obj, int client_id);
+ * @param obj the object to upload
+ * @param client_id the client id 
+ *
+ * @ingroup client
+ */
+FTS_API void fts_client_upload_object( fts_object_t *obj, int client_id);
+
+

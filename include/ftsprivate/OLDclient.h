@@ -119,13 +119,12 @@ FTS_API void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac
 
 #if 0
 extern int fts_client_is_up( void);
-
 extern void fts_client_start_msg(int type);
 extern void fts_client_add_connection(fts_connection_t *c);
 extern void fts_client_add_string(const char *sp);
+extern void fts_client_upload_object(fts_object_t *obj);
 #endif
 
-extern void fts_client_upload_object(fts_object_t *obj);
 extern void fts_client_upload_connection(fts_connection_t *c);
 
 extern void fts_client_release_connection(fts_connection_t *c);

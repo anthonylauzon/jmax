@@ -308,6 +308,8 @@ struct _client_t {
   int client_id;
   /* Object table */
   fts_hashtable_t object_table;
+  /* object id count */
+  int object_id_count;
   /* Root patcher */
   fts_object_t *root_patcher;
   /* Protocol stream */
@@ -340,6 +342,16 @@ static fts_object_t *client_get_object( client_t *this, int id)
     return NULL;
 
   return fts_get_object( &v);
+}
+
+static void client_register_object( client_t *this, fts_object_t *object)
+{
+  fts_atom_t k, v;
+
+  int id = this->object_id_count;
+  this->object_id_count += 2; 
+  client_put_object( this, id, object);
+  object->head.id = OBJECT_ID( id, this->client_id);
 }
 
 /*----------------------------------------------------------------------
@@ -890,6 +902,24 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
   newobj->head.id = OBJECT_ID( id, this->client_id);
 }
 
+static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  if ((ac == 3) &&
+      fts_is_object(&at[0]) &&
+      fts_is_symbol(&at[1]))
+    {
+      fts_object_t *obj;
+      fts_symbol_t name;
+
+      obj  = fts_get_object(&at[0]);
+      name = fts_get_symbol(&at[1]);
+
+      fts_object_put_prop(obj, name, &at[2]);
+    }
+  else
+    fts_log("[client]: System Error set_object_property: bad args\n");
+}
+
 static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -954,6 +984,8 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   fts_hashtable_init( &this->object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_MEDIUM);
 
+  this->object_id_count = 17;
+
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
   fts_set_int( &k, 0);
   fts_set_object( &v, (fts_object_t *)fts_get_root_patcher());
@@ -1016,6 +1048,7 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
 
@@ -1281,6 +1314,31 @@ void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, 
   fts_client_done_message( obj);
 }
 
+
+void fts_client_upload_object(fts_object_t *obj, int id)
+{
+  int client_id;
+  client_t *client;
+  fts_atom_t a[1];
+
+  if(id == -1)
+    client_id = fts_get_client_id((fts_object_t *)fts_object_get_patcher(obj));
+  else
+    client_id = id;
+  
+  client = client_table_get(client_id);
+
+  if ( !client)
+    {
+      fts_log("[client] fts_client_upload_object: Cannot upoload object\n");      
+      return;
+    }
+
+  client_register_object( client, obj);
+
+  fts_set_object( a, obj);
+  fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);
+}
 
 
 /***********************************************************************

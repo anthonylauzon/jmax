@@ -79,14 +79,14 @@ public class ErmesToolBar extends JPanel implements /*MaxDocumentListener,*/ Com
     lockEditButton.setSelectedIcon( SystemIcons.get( "_edit_mode_"));
     lockEditButton.setFocusPainted( false);
     lockEditButton.addItemListener( new ItemListener() {
-      public void itemStateChanged(ItemEvent e)
+	public void itemStateChanged(ItemEvent e)
 	{
 	  if (e.getStateChange() == ItemEvent.SELECTED)
 	    sketch.setLocked( false);
 	  else
 	    sketch.setLocked( true);
 	}
-    });
+      });
 
     add( lockEditButton, BorderLayout.WEST);
     numButtons++;
@@ -101,11 +101,11 @@ public class ErmesToolBar extends JPanel implements /*MaxDocumentListener,*/ Com
     toSaveButton.setDoubleBuffered( false);
     toSaveButton.setMargin( new Insets(0,0,0,0));
     toSaveButton.addActionListener( new ActionListener() {
-      public void actionPerformed( ActionEvent e)
+	public void actionPerformed( ActionEvent e)
 	{
-	    PatcherSaveManager.save(sketch.getEditorContainer());
+	  PatcherSaveManager.save(sketch.getEditorContainer());
 	}
-    });
+      });
     toSaveButton.setToolTipText("save file");
     toSaveButton.setEnabled(false);
     toSaveButton.setVisible(false);
@@ -121,11 +121,11 @@ public class ErmesToolBar extends JPanel implements /*MaxDocumentListener,*/ Com
 	upButton.setMargin( new Insets(0,0,0,0));
 	upButton.setToolTipText("show parent patcher");
 	upButton.addActionListener( new ActionListener() {
-	  public void actionPerformed( ActionEvent e)
+	    public void actionPerformed( ActionEvent e)
 	    {
-		sketch.waiting();
-		((FtsPatcherObject)sketch.getFtsPatcher().getParent()).requestOpenEditor();
-		sketch.getFtsPatcher().requestStopWaiting(null);
+	      sketch.waiting();
+	      ((FtsPatcherObject)sketch.getFtsPatcher().getParent()).requestOpenEditor();
+	      sketch.getFtsPatcher().requestStopWaiting(null);
 	    }});
 
 	widgets.add( upButton);
@@ -203,35 +203,36 @@ public class ErmesToolBar extends JPanel implements /*MaxDocumentListener,*/ Com
 
   private void addButton(String className, String pname)
   {
-      /*
-	WARNING:
-	Waiting for a method to get the packagePath from the package name
-       */
-      /*String path;
-	try{
-	path = MaxApplication.getPackageHandler().locatePackage(pname).getPath();	 
-	}
-	catch(FileNotFoundException e){
-	path = MaxApplication.getProperty(pname+"PackageDir");    
-	}*/
-      String path = MaxApplication.getProperty("jmaxRoot")+"/packages/"+pname;//??????????????????	 
-      /*************************************************************/
+    /*
+      WARNING:
+      Waiting for a method to get the packagePath from the package name
+    */
+    /*String path;
+      try{
+      path = MaxApplication.getPackageHandler().locatePackage(pname).getPath();	 
+      }
+      catch(FileNotFoundException e){
+      path = MaxApplication.getProperty(pname+"PackageDir");    
+      }*/
+    String path = MaxApplication.getProperty("jmaxRoot")+"/packages/"+pname;//??????????????????	 
+    /*************************************************************/
 
-      if(path != null) path = path+File.separator+"images"+File.separator;
+    if(path != null) path = path+File.separator+"images"+File.separator;
 
-      if(SystemIcons.get(className) == null)
-	  SystemIcons.loadIcon(className, path+className+".gif");
+    if(SystemIcons.get(className) == null)
+      SystemIcons.loadIcon(className, path+className+".gif");
 
-      ImageIcon icon = SystemIcons.get(className);
-      JToggleButton button = new ErmesToolButton(this, className, icon, path+className+"_cursor.gif",
-						   "Adding New "+className+" Object");
-      toolBar.add( button);
-      if(!AddPopUp.initDone)
-	  AddPopUp.addAbbreviation(className, icon, true);
+    ImageIcon icon = SystemIcons.get(className);
+    JToggleButton button = new ErmesToolButton(this, className, icon, path+className+"_cursor.gif",
+					       "Adding New "+className+" Object");
+    toolBar.add( button);
+    if(!AddPopUp.initDone)
+      AddPopUp.addAbbreviation(className, icon, true);
 	
-      bGroup.add( button);
-      numButtons++;
+    bGroup.add( button);
+    numButtons++;
   }
+
   private void insertButtons()
   {
     String path = MaxApplication.getProperty("jmaxRoot")+File.separator+"images"+File.separator;
@@ -243,88 +244,75 @@ public class ErmesToolBar extends JPanel implements /*MaxDocumentListener,*/ Com
 
     String cname;
     for(Enumeration en = ObjectCreatorManager.getClassNames(); en.hasMoreElements();)
-	{
-	    cname = (String)en.nextElement();
-	    addButton(cname, ObjectCreatorManager.getPackageName(cname));
-	}
+      {
+	cname = (String)en.nextElement();
+	addButton(cname, ObjectCreatorManager.getPackageName(cname));
+      }
     AddPopUp.initDone();//????
   }
 
-  //MaxDocumentListener interface
-    /*boolean isSaved = true;
-      public void documentChanged(boolean saved)
-      {
-      if(isSaved!=saved)
-      {
-      toSaveButton.setEnabled(!saved);
-      toSaveButton.setVisible(!saved);
-      if(saved) repaint();
-      isSaved = saved;
-      }
-      }*/
-
-   // Component Listener Interface
+  // Component Listener Interface
   Vector removedButtons = new Vector();
   final static int BUTTON_WIDTH = 21;
   MoreObjectsButton moreButton = null;
   public void componentResized( ComponentEvent e) 
   {
-      int toolbarwidth = getSize().width - 2*BUTTON_WIDTH-10;
-      int visibleButtons = ((toolbarwidth/BUTTON_WIDTH)> numButtons)? numButtons: toolbarwidth/BUTTON_WIDTH;
-      int numPopButtons = numButtons - visibleButtons;
+    int toolbarwidth = getSize().width - 2*BUTTON_WIDTH-10;
+    int visibleButtons = ((toolbarwidth/BUTTON_WIDTH)> numButtons)? numButtons: toolbarwidth/BUTTON_WIDTH;
+    int numPopButtons = numButtons - visibleButtons;
 
-      if(numPopButtons == 1) 
-	  {
-	      numPopButtons = 0;
-	      visibleButtons++;
-	  }
-      if(numPopButtons==removedButtons.size()) return;
-
-      if(numPopButtons > removedButtons.size())
+    if(numPopButtons == 1) 
       {
-	  ErmesToolButton button;
-	  int where = numButtons - removedButtons.size();
-	  int toRemove = numPopButtons-removedButtons.size();
-
-	  for(int i = 0; i < toRemove; i++)
-	  {
-	      if(where-2 >= 0)
-		  {
-		      button = (ErmesToolButton)(toolBar.getComponent(where-2));
-		      toolBar.remove(where-2);
-		      removedButtons.add(button);
-		      where--;	   
-		  }   
-	  }
-	  if(moreButton!=null)
-	      moreButton.update(removedButtons.elements(), removedButtons.size());
-	  else
-	      {
-		  moreButton = new MoreObjectsButton(removedButtons.elements());
-		  toolBar.add(moreButton);
-	      }
+	numPopButtons = 0;
+	visibleButtons++;
       }
-      else
+    if(numPopButtons==removedButtons.size()) return;
+
+    if(numPopButtons > removedButtons.size())
       {
-	  ErmesToolButton button;
-	  int where = removedButtons.size()-numPopButtons;
-	  toolBar.remove(moreButton);
+	ErmesToolButton button;
+	int where = numButtons - removedButtons.size();
+	int toRemove = numPopButtons-removedButtons.size();
+
+	for(int i = 0; i < toRemove; i++)
+	  {
+	    if(where-2 >= 0)
+	      {
+		button = (ErmesToolButton)(toolBar.getComponent(where-2));
+		toolBar.remove(where-2);
+		removedButtons.add(button);
+		where--;	   
+	      }   
+	  }
+	if(moreButton!=null)
+	  moreButton.update(removedButtons.elements(), removedButtons.size());
+	else
+	  {
+	    moreButton = new MoreObjectsButton(removedButtons.elements());
+	    toolBar.add(moreButton);
+	  }
+      }
+    else
+      {
+	ErmesToolButton button;
+	int where = removedButtons.size()-numPopButtons;
+	toolBar.remove(moreButton);
 	  
-	  for(int i = 0; i<where; i++)
+	for(int i = 0; i<where; i++)
 	  {
 	    button = (ErmesToolButton)(removedButtons.lastElement());
 	    toolBar.add(button);
 	    removedButtons.remove(button);
 	  }
-	  if(removedButtons.size()>0)
+	if(removedButtons.size()>0)
 	  {
-	      toolBar.add(moreButton);
-	      moreButton.update(removedButtons.elements(), removedButtons.size());
+	    toolBar.add(moreButton);
+	    moreButton.update(removedButtons.elements(), removedButtons.size());
 	  }
-	  else
-	      moreButton=null;
+	else
+	  moreButton=null;
       }
-      toolBar.validate();
+    toolBar.validate();
   }
   public void componentMoved( ComponentEvent e){}
   public void componentShown( ComponentEvent e){}

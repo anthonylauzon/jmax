@@ -419,7 +419,6 @@ public class FtsGraphicObject extends FtsObject {
 	    System.err.println("FtsGraphicObject: I/O Error sending setFontStyle Message!");
 	    e.printStackTrace(); 
 	  }  
-	//fts.getServer().putObjectProperty(this, "fst", fontStyle);
 	this.fontStyle = fontStyle;
 	setDirty();
       }

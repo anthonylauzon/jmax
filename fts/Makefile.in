@@ -119,7 +119,6 @@ midifile.c \
 object.c \
 objectlist.c \
 objectset.c \
-objtable.c \
 package.c \
 param.c \
 patcher.c \
@@ -145,8 +144,8 @@ vm.c
 
 bin_PROGRAMS = fts
 fts_SOURCES = main.c
-#fts_LDADD=-L.libs -lfts @FTS_SYS_LIBS@ -lm
-fts_LDADD = -lfts @FTS_SYS_LIBS@ -lm
+fts_LDADD = -L.libs -lfts @FTS_SYS_LIBS@ -lm
+#fts_LDADD=-lfts @FTS_SYS_LIBS@ -lm
 
 EXTRA_DIST = linux.c sgi.c macosx.c win32.c
 
@@ -168,11 +167,11 @@ atom.lo atomfile.lo audio.lo audiofile.lo autosave.lo bytestream.lo \
 class.lo client.lo clipboard.lo connection.lo doctor.lo dsp.lo \
 dspgraph.lo errobj.lo expression.lo file.lo fpe.lo ftl.lo ftlmem.lo \
 fts.lo hashtable.lo label.lo list.lo loader.lo mem.lo message.lo \
-midi.lo midifile.lo object.lo objectlist.lo objectset.lo objtable.lo \
-package.lo param.lo patcher.lo patparser.lo post.lo project.lo \
-property.lo saver.lo sched.lo selection.lo sigconn.lo soundfile.lo \
-soundfile_af.lo srconv.lo stack.lo symbol.lo template.lo time.lo \
-variable.lo version.lo vm.lo
+midi.lo midifile.lo object.lo objectlist.lo objectset.lo package.lo \
+param.lo patcher.lo patparser.lo post.lo project.lo property.lo \
+saver.lo sched.lo selection.lo sigconn.lo soundfile.lo soundfile_af.lo \
+srconv.lo stack.lo symbol.lo template.lo time.lo variable.lo version.lo \
+vm.lo
 bin_PROGRAMS =  fts$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)
 
@@ -199,10 +198,10 @@ DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/abstraction.P \
 .deps/file.P .deps/fpe.P .deps/ftl.P .deps/ftlmem.P .deps/fts.P \
 .deps/hashtable.P .deps/label.P .deps/list.P .deps/loader.P \
 .deps/main.P .deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
-.deps/object.P .deps/objectlist.P .deps/objectset.P .deps/objtable.P \
-.deps/package.P .deps/param.P .deps/patcher.P .deps/patparser.P \
-.deps/post.P .deps/project.P .deps/property.P .deps/saver.P \
-.deps/sched.P .deps/selection.P .deps/sigconn.P .deps/soundfile.P \
+.deps/object.P .deps/objectlist.P .deps/objectset.P .deps/package.P \
+.deps/param.P .deps/patcher.P .deps/patparser.P .deps/post.P \
+.deps/project.P .deps/property.P .deps/saver.P .deps/sched.P \
+.deps/selection.P .deps/sigconn.P .deps/soundfile.P \
 .deps/soundfile_af.P .deps/srconv.P .deps/stack.P .deps/symbol.P \
 .deps/template.P .deps/time.P .deps/variable.P .deps/version.P \
 .deps/vm.P

@@ -126,7 +126,7 @@ public class FtsServer {
 
   public int getNewObjectID()
   {
-    return newObjectID++;
+    return newObjectID+=2;
   }
 
   FtsProtocolEncoder getEncoder()

@@ -53,6 +53,7 @@
 #include <stdio.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/client.h>
 #include <ftsprivate/OLDclient.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
@@ -1297,14 +1298,27 @@ static void
 fts_patcher_add_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *obj;
+  fts_object_t *obj = fts_eval_object_description((fts_patcher_t *)this, ac - 2, at + 2);
 
-  obj = fts_eval_object_description((fts_patcher_t *)this, ac - 2, at + 2);
-      
+  fts_object_put_prop(obj, fts_s_x, at);
+  fts_object_put_prop(obj, fts_s_y, at+1);
+
+  fts_client_upload_object(obj, -1);
+}
+
+static void 
+fts_patcher_upload_child( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_patcher_t *this = (fts_patcher_t *)o;
+  fts_object_t *obj = fts_get_object(&at[0]);
+  fts_atom_t a[2];
+  fts_object_get_prop(obj, fts_s_x, a);
+  fts_object_get_prop(obj, fts_s_y, a+1);
+
   fts_client_start_message((fts_object_t *)this, sym_addObject);
-  fts_client_add_int((fts_object_t *)this, fts_object_get_id(obj));
-  fts_client_add_int((fts_object_t *)this, fts_get_int(&at[0]));
-  fts_client_add_int((fts_object_t *)this, fts_get_int(&at[1]));
+  fts_client_add_int((fts_object_t *)this, fts_get_object_id(obj));
+  fts_client_add_int((fts_object_t *)this, fts_get_int(a));
+  fts_client_add_int((fts_object_t *)this, fts_get_int(a+1));
   fts_client_add_atoms((fts_object_t *)this, obj->argc, obj->argv);
   fts_client_done_message((fts_object_t *)this);
 
@@ -1566,6 +1580,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, patcher_delete);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, fts_patcher_upload);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload_child, fts_patcher_upload_child);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, patcher_find);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find_errors, patcher_find_errors);
