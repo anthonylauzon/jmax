@@ -19,18 +19,32 @@
    Description:
      a hidden structure to encode a set of values in a buffer
 */
-typedef struct _protoencode_t protoencode_t;
+typedef struct _protoencode_t {
+  unsigned char *buffer;
+  int buffer_size;
+  int current;
+} protoencode_t;
 
 /*
    Function: protoencode_init
    Description:
-     Initializes a protoencode structure.
+     Initializes a protoencode structure and allocates the internal
+     buffer.
    Arguments:
      pr: a pointer to a protoencode structure
-     size: the size of the message buffer.
    Returns:
 */
-extern void protoencode_init( protoencode_t *pr, int buffer_size);
+extern void protoencode_init( protoencode_t *pr);
+
+/*
+   Function: protoencode_destroy
+   Description:
+     Deinitializes a protoencode structure and frees the internal buffer.
+   Arguments:
+     pr: a pointer to a protoencode structure
+   Returns:
+*/
+extern void protoencode_destroy( protoencode_t *pr);
 
 /*
    Function: protoencode_get_mess
