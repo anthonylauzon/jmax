@@ -26,21 +26,29 @@ public class StripeSelecter extends Selecter {
    */
   public void XORDraw(int dx, int dy) 
   {
+
+    tempRect.setBounds(movingPoint.x, 0, dx, gc.getGraphicDestination().getSize().height);
+    normalizeRectangle(tempRect);
+
     Graphics g = gc.getGraphicDestination().getGraphics();
+    drawGrayRect(g, tempRect);
+    g.dispose();
+
+    movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy); 
+  }
+
+  /**
+   * draws the selection */
+  public static void drawGrayRect(Graphics g, Rectangle r)
+  {
 
     g.setColor(Color.gray);
     g.setXORMode(Color.white); 
-
-    tempRect.setBounds(movingPoint.x, 0, dx, gc.getGraphicDestination().getSize().height);
-
-    normalizeRectangle(tempRect);
-
-    g.fillRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+    g.fillRect(r.x, r.y, r.width, r.height);
 
     g.setPaintMode();
     g.setColor(Color.black);
-    g.dispose();
-    movingPoint.setLocation(movingPoint.x+dx, movingPoint.y+dy); 
+
   }
 
   //--- Fields

@@ -3,6 +3,7 @@ package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.widgets.*;
 
 import java.awt.*;
 import java.util.*;
@@ -10,6 +11,7 @@ import java.awt.event.*;
 import java.io.*;
 import tcl.lang.*;
 import javax.swing.*;
+import javax.swing.border.*;
 
 /**
  * The panel in the Table editor's window, containing the toolbar, the CenterPanel 
@@ -42,6 +44,9 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     
     //... the vertical position controller
     prepareVerticalScrollbar();
+
+    //... the panel that will contain the toolbar
+    prepareToolbarPanel();
 
     //... the widgets in the statusBar
     addWidgets();
@@ -122,6 +127,23 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
 
   }
 
+  private void prepareToolbarPanel()
+  {
+    toolbarPanel = new Box(BoxLayout.Y_AXIS) {
+      public Dimension getMinimumSize()
+	{
+	  return toolbarDimension;
+	}
+      
+      public Dimension getPreferredSize()
+	{
+	  return toolbarDimension;
+	}
+    };
+    toolbarPanel.setSize(toolbarDimension.width, toolbarDimension.height);
+    
+  }
+  
   /**
    * note: can't create the toolbar in the constructor,
    * because the Frame is not available yet.
@@ -171,20 +193,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     
     c.setSize(30, 200);
     
-    toolbarPanel = new JPanel() {
-      public Dimension getMinimumSize()
-	{
-	  return toolbarDimension;
-	}
-
-      public Dimension getPreferredSize()
-	{
-	  return toolbarDimension;
-	}
-    };
-    toolbarPanel.setSize(toolbarDimension.width, toolbarDimension.height);
-    toolbarPanel.setLayout(new BorderLayout());
-    toolbarPanel.add(c, BorderLayout.CENTER);
+    toolbarPanel.add(c);
 
     add(toolbarPanel, BorderLayout.WEST);
 
@@ -219,60 +228,95 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   }
   
 
+  /**
+   * Prepare and add the zoom widgets in the toolbar */
   private void addWidgets()
   {
-    itsXZoom = new ZoomWidget("x Zoom", (int)(gc.getAdapter().getXZoom()*100), ZoomWidget.HORIZONTAL);
-    itsYZoom = new ZoomWidget("y Zoom", (int)(gc.getAdapter().getYZoom()*100), ZoomWidget.VERTICAL);
 
-    itsXZoom.setSize(150, InfoPanel.INFO_HEIGHT);
-    itsYZoom.setSize(150, InfoPanel.INFO_HEIGHT);
-
-    itsYZoom.getLessButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
+    // ------ the "x" label and zoom factor
+    JLabel xLabel = new JLabel("x");
+    xLabel.setSize(15,InfoPanel.INFO_HEIGHT );
+    xLabel.setVerticalAlignment(JLabel.CENTER);
+    
+    currentXZoom = new JLabel(((int)(INITIAL_X_ZOOM*100))+"%");
+    currentXZoom.setFont(new Font(currentXZoom.getFont().getName(), Font.BOLD, 10));
+    currentXZoom.setBorder(new EtchedBorder());
+    currentXZoom.setSize(40, InfoPanel.INFO_HEIGHT);
+    currentXZoom.setOpaque(true);
+    currentXZoom.setBackground(Color.white);
+    currentXZoom.setForeground(Color.black);
+    
+    gc.getAdapter().addXZoomListener(new ZoomListener() {
+      public void zoomChanged(float zoom)
 	{
-	  float  newValue = gc.getAdapter().getYZoom()/2;
-	  gc.getAdapter().setYZoom(newValue);
-	  itsYZoom.setValue((int)(newValue*100));
-	  repaint();
+	  currentXZoom.setText(((int)(zoom*100))+"%");
 	}
     });
 
-    itsYZoom.getMoreButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
+    // ------ the "y" label and zoom factor
+    JLabel yLabel = new JLabel("y");
+    yLabel.setSize(15,InfoPanel.INFO_HEIGHT );
+    yLabel.setVerticalAlignment(JLabel.CENTER);
+
+    currentYZoom = new JLabel(((int)(INITIAL_Y_ZOOM*100))+"%");
+    currentYZoom.setFont(new Font(currentYZoom.getFont().getName(), Font.BOLD, 10));
+    currentYZoom.setBorder(new EtchedBorder());
+    currentYZoom.setOpaque(true);
+    currentYZoom.setBackground(Color.white);
+    currentYZoom.setForeground(Color.black);
+    currentYZoom.setSize(40, InfoPanel.INFO_HEIGHT);
+
+    gc.getAdapter().addYZoomListener(new ZoomListener() {
+      public void zoomChanged(float zoom)
 	{
-	  float  newValue = gc.getAdapter().getYZoom()*2;
-		  
-	  gc.getAdapter().setYZoom(newValue);
-	  itsYZoom.setValue((int) (newValue*100));
-	  repaint();
+	  currentYZoom.setText(((int)(zoom*100))+"%");
 	}
     });
 
-    itsXZoom.getLessButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
+    //-- increment listeners and controllers
+    IncrementListener xil = new IncrementListener() {
+      public void increment()
 	{
-	  float newValue = gc.getAdapter().getXZoom()/2;
-
-	  gc.getAdapter().setXZoom(newValue);
-	  itsXZoom.setValue((int)(newValue*100));
-	  repaint();
+	  TableAdapter a = gc.getAdapter();
+	  a.setXZoom(a.getXZoom()*2);
 	}
-    });
 
-    itsXZoom.getMoreButton().addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e)
+      public void decrement()
 	{
-	  float newValue = gc.getAdapter().getXZoom()*2;
-	  gc.getAdapter().setXZoom(newValue);
-	  
-	  itsXZoom.setValue((int)(newValue*100));
-	  repaint();
+	  TableAdapter a = gc.getAdapter();
+	  a.setXZoom(a.getXZoom()/2);
 	}
-    });
+    };
 
-    itsStatusBar.addWidget(itsYZoom);
-    itsStatusBar.addWidget(itsXZoom);
 
+    IncrementListener yil = new IncrementListener() {
+      public void increment()
+	{
+	  TableAdapter a = gc.getAdapter();
+	  a.setYZoom(a.getYZoom()*2);
+	}
+
+      public void decrement()
+	{
+	  TableAdapter a = gc.getAdapter();
+	  a.setYZoom(a.getYZoom()/2);
+	}
+    };
+
+    IncrementController xic = new IncrementController(xil);
+    IncrementController yic = new IncrementController(yil);
+    xic.setSize(20, 20);
+    yic.setSize(20, 20);
+    xic.setOpaque(false);
+    yic.setOpaque(false);
+    
+    // everything in the status bar!
+    itsStatusBar.addWidget(xLabel);
+    itsStatusBar.addWidget(currentXZoom);
+    itsStatusBar.addWidget(xic);
+    itsStatusBar.addWidget(yLabel);
+    itsStatusBar.addWidget(currentYZoom);
+    itsStatusBar.addWidget(yic);
 
   }
 
@@ -299,6 +343,21 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
       gc.setRenderManager(new TableRenderer(gc));
       gc.setStatusBar(itsStatusBar);
       TableAdapter ta = new TableAdapter();
+      
+      //do a repaint() when zoom changes 
+      ta.addXZoomListener(new ZoomListener() {
+	public void zoomChanged(float zoom)
+	  {
+	    repaint();
+	  }
+      });
+      ta.addYZoomListener(new ZoomListener() {
+	public void zoomChanged(float zoom)
+	  {
+	    repaint();
+	  }
+      });
+
       setOriginAndZoom(ta);
       gc.setAdapter(ta);
       gc.setStatusBar(itsStatusBar);
@@ -464,16 +523,18 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   CenterPanel itsCenterPanel;
 
   static boolean toolbarAnchored = true;
-  JPanel toolbarPanel;
-  static Dimension toolbarDimension = new Dimension(40, 200);
+  Box toolbarPanel;
 
-  ZoomWidget itsXZoom;
-  ZoomWidget itsYZoom;
+  static Dimension toolbarDimension = new Dimension(30, 200);
+
   static TablePanel instance;
 
   public static int INITIAL_X_ZOOM = 2;
   public static int INITIAL_Y_ZOOM = 1;
   public static int INITIAL_Y_ORIGIN = 128;
+
+  private JLabel currentXZoom;
+  private JLabel currentYZoom;
 }
 
 

@@ -40,7 +40,6 @@ SOURCES = \
 	UndoableDelete.java		\
 	UndoableEventTransformation.java		\
 	UndoableMove.java		\
-	ZoomListener.java		\
 	ZoomTool.java		\
 	VelocityMapper.java	
 

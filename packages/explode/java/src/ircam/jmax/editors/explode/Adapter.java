@@ -1,6 +1,8 @@
 
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.util.*;
 import java.awt.Frame;
 
@@ -102,7 +104,7 @@ abstract public class Adapter implements MappingListener{
   public void setXZoom(int factor) 
   {
     xZoomFactor = factor/(float)100;
-    notifyZoom(factor);
+    notifyZoom(xZoomFactor);
   }
 
 
@@ -216,7 +218,7 @@ abstract public class Adapter implements MappingListener{
     zoomListeners.removeElement(listener);
   }
 
-  private void notifyZoom(int newZoom)
+  private void notifyZoom(float newZoom)
   {
     ZoomListener aListener;
 

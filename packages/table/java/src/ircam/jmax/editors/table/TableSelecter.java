@@ -50,7 +50,7 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
   public void selectionChoosen(int x, int y, int w, int h) 
   {
     TableAdapter a = getGc().getAdapter();
-    TableSelection.getSelection().select(new Point(a.getInvX(x), a.getInvX(x+w)));
+    TableSelection.getSelection().select(a.getInvX(x), a.getInvX(x+w));
   }
 
   /**

@@ -1,6 +1,9 @@
 
 package ircam.jmax.editors.table;
 
+import ircam.jmax.toolkit.*;
+import ircam.jmax.utils.*;
+
 /**
  * A simple coordinates converter in a Table window. 
  * It handles the conversion of x, y coordinates, an origin, and two zoom factors.
@@ -10,6 +13,35 @@ public class TableAdapter {
 
   public TableAdapter()
   {
+  }
+
+  /**
+   * add a listener for the xZoom factor */
+  public void addXZoomListener(ZoomListener zl)
+  {
+    xZoomListeners.addElement(zl);
+  }
+
+  /**
+   * add a listener for the yZoom factor */
+  public void addYZoomListener(ZoomListener zl)
+  {
+    yZoomListeners.addElement(zl);
+  }
+
+
+  /**
+   * remove a listener for the xZoom factor */
+  public void removeXZoomListener(ZoomListener zl)
+  {
+    xZoomListeners.removeElement(zl);
+  }
+
+  /**
+   * remove a listener for the yZoom factor */
+  public void removeYZoomListener(ZoomListener zl)
+  {
+    yZoomListeners.removeElement(zl);
   }
 
   /**
@@ -43,9 +75,31 @@ public class TableAdapter {
     return (int) ((oY-y)/itsYZoom);
   }
 
+  private void notifyZoomChanged(int whichOne, float value)
+  {
+    MaxVector listeners;
+    if (whichOne == X_ZOOM) listeners = xZoomListeners; 
+    else if (whichOne == Y_ZOOM) listeners = yZoomListeners; 
+    else return; //can add other zooms here
+
+    ZoomListener zl;
+    for (int i = 0; i< listeners.size(); i++)
+      {
+	zl = (ZoomListener) listeners.elementAt(i);
+	zl.zoomChanged(value);
+      }
+  }
+
   //--- Fields & accessors ---//
   float itsXZoom;
   float itsYZoom;
+
+  MaxVector xZoomListeners = new MaxVector();
+  MaxVector yZoomListeners = new MaxVector();
+
+  public static int X_ZOOM = 0;
+  public static int Y_ZOOM = 1;
+
   /** the first index in the table we're showing */
   int oX; 
   /** the graphic x offset of oX */
@@ -63,6 +117,7 @@ public class TableAdapter {
   public void setXZoom(float zoom)
   {
     itsXZoom = zoom;
+    notifyZoomChanged(X_ZOOM, zoom);
   }
 
   public float getYZoom()
@@ -73,6 +128,7 @@ public class TableAdapter {
   public void setYZoom(float zoom)
   {
     itsYZoom = zoom;
+    notifyZoomChanged(Y_ZOOM, zoom);
   }
 
   public int getOY()

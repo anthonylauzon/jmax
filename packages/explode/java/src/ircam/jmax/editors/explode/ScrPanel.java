@@ -98,9 +98,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     itsZoomLabel = new JLabel("Zoom: "+INITIAL_ZOOM+"%");
     
     gc.getAdapter().addZoomListener( new ZoomListener() {
-      public void zoomChanged(int zoom)
+      public void zoomChanged(float zoom)
 	{
-	  itsZoomLabel.setText("Zoom: "+zoom+"%"); 
+	  itsZoomLabel.setText("Zoom: "+((int)(zoom*100))+"%"); 
 	  repaint();
 	}
     });
