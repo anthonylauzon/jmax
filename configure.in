@@ -305,10 +305,6 @@ packages/ispwmath/Makefile
 packages/ispwmath/c/Makefile
 packages/ispwmath/c/src/Makefile
 packages/ispwmath/help/Makefile
-packages/lists/Makefile
-packages/lists/c/Makefile
-packages/lists/c/src/Makefile
-packages/lists/help/Makefile
 packages/macosx/Makefile
 packages/macosx/c/Makefile
 packages/macosx/c/src/Makefile
