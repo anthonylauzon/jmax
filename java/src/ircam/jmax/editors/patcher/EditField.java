@@ -218,22 +218,32 @@ public class EditField extends JTextArea
     owner = null;
   }
 
-
+  /** Resize the box if needed; must be done in an invoke later,
+    otherwise we get one character of error; don't ask me why
+    */
+    
   void resizeIfNeeded()
   {
-    if (getText() != null)
-      {
-	Dimension d = getPreferredSize();
-
-	owner.redraw();
-	owner.redrawConnections();
-	owner.setHeight(d.height + owner.getTextHeightOffset());
-	owner.redraw();
-	owner.redrawConnections();
-	setSize(d);
-	sketch.fixSize();
-      }
+    SwingUtilities.invokeLater(new Runnable()
+			       {
+				 public void run()
+				   {
+				     if (getText() != null)
+				       {
+					 Dimension d = getPreferredSize();
+					 
+					 owner.redraw();
+					 owner.redrawConnections();
+					 owner.setHeight(d.height + owner.getTextHeightOffset());
+					 owner.redraw();
+					 owner.redrawConnections();
+					 setSize(d);
+					 sketch.fixSize();
+				       }
+				   }
+			       });
   }
+				 
        
   // Support for cut editing operations
 
