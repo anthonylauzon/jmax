@@ -1,3 +1,10 @@
+2003-09-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* utils/m4/jmax.m4: added a new m4 macro: AC_CHECK_JMAX_VERSION.
+	This macro could be used in external packages to be sure that version of installed jMax is enough.
+	Changed AM_JMAX_CONFIG to call AC_SUBST(JMAX_VERSION) with JMAX_VERSION set by the output
+	of "$jmax-config --version" or "$pkg-config --modversion jmax".
+
 2003-09-24  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* fts/hashtable.c: added missing break in fts_hashtable_init
