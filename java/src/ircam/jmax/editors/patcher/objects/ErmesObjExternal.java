@@ -77,11 +77,7 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
     });
   }
 
-  public void startEditing() 
-  {
-    isError = 0; // to get the edited object green
-    super.startEditing();
-  }
+
 
   // ----------------------------------------
   // White area offset
@@ -156,10 +152,10 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorL
     // For 18 pixels height
 //     g.draw3DRect( x+1, y+1, w-3, h-3, true);
 
-    if (! isSelected())
-      g.setColor( Color.white);
+    if (isSelected())
+      g.setColor( Settings.sharedInstance().getSelectedColor());
     else
-      g.setColor( Settings.sharedInstance().getObjColor());
+      g.setColor( Color.white);
 
     int whiteXOffset = getWhiteXOffset();
     int whiteYOffset = getWhiteYOffset();

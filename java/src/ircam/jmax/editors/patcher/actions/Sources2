@@ -14,6 +14,7 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/PasteAction.java  \
 	$(INCLUDE_PATH)/DuplicateAction.java  \
 	$(INCLUDE_PATH)/SelectAllAction.java  \
+	$(INCLUDE_PATH)/DeleteSelectionAction.java  \
 	$(INCLUDE_PATH)/FindAction.java  \
 	$(INCLUDE_PATH)/FindErrorsAction.java  \
 	$(INCLUDE_PATH)/InspectAction.java  \

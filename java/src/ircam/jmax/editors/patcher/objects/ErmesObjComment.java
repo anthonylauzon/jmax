@@ -89,6 +89,15 @@ public class ErmesObjComment extends ErmesObjEditableObject {
     DrawParsedString( g);
   }
 
+  // ----------------------------------------
+  // ``TextBackground'' property
+  // ----------------------------------------
+
+  public Color getTextBackground()
+  {
+    return itsSketchPad.getBackground();
+  }
+
   //--------------------------------------------------------
   // minimumSize()
   //--------------------------------------------------------

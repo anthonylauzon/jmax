@@ -25,10 +25,10 @@ public class ErmesObjIn extends ErmesObjInOut {
 
   public void Paint(Graphics g) 
   {
-    if (!isSelected())
-      g.setColor( Settings.sharedInstance().getObjColor());
-    else
+    if (isSelected())
       g.setColor( Settings.sharedInstance().getSelectedColor());
+    else
+      g.setColor( Settings.sharedInstance().getObjColor());
 
     int x = getX();
     int y = getY();

@@ -56,12 +56,12 @@ public class DisplayList
 
   /* Objects */
 
-  void addObject(ErmesObject object)
+  void add(ErmesObject object)
   {
     displayObjects.addElement( object);
   }
 
-  public void removeObject( ErmesObject object)
+  public void remove( ErmesObject object)
   {
     displayObjects.removeElement( object);
   }
@@ -108,20 +108,20 @@ public class DisplayList
 
   public void objectToFront(ErmesObject object)
   {
-    removeObject(object);
-    addObject(object);
+    remove(object);
+    add(object);
     sortDisplayList();
   }
 
   /* Connections */
 
-  final public void addConnection(ErmesConnection connection)
+  final public void add(ErmesConnection connection)
   {
     displayObjects.addElement(connection);
     sortDisplayList();
   }
 
-  void removeConnection( ErmesConnection connection)
+  void remove( ErmesConnection connection)
   {
     displayObjects.removeElement( connection);
   }
@@ -304,14 +304,6 @@ public class DisplayList
   //                   PAINTING                                            //
   //                                                                            //
   ////////////////////////////////////////////////////////////////////////////////
-
-
-  private void paintList( MaxVector theList, Graphics g, Rectangle clip)
-  {
-
-
-
-  }
 
 
   public void paint( Graphics g)

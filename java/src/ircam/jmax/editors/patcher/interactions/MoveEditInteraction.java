@@ -66,7 +66,7 @@ class MoveEditInteraction extends SubInteraction
 	  {
 	    ErmesSelection.patcherSelection.redraw();
 	    ErmesSelection.patcherSelection.deselectAll();
-	    engine.getSketch().textEditObject((ErmesObjEditableObject)object);
+	    engine.getSketch().textEditObject((ErmesObjEditableObject)object, mouse);
 	  }
 	end();
 	break;

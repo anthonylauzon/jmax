@@ -52,9 +52,9 @@ ErmesModule:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesModule.java)
 .PHONY: ErmesModule
 
-ErmesObjEditField:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjEditField.java)
-.PHONY: ErmesObjEditField
+EditField:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) EditField.java)
+.PHONY: EditField
 
 ErmesObjInOutPop:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjInOutPop.java)

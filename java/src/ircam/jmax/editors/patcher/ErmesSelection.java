@@ -214,12 +214,12 @@ public class ErmesSelection implements Transferable
 
   // Operations on selection
 
-  void deleteAll()
+  public void deleteAll()
   {
     while (! connections.isEmpty())
       ((ErmesConnection) connections.elementAt( 0)).delete();
     
-    while (! objects.isEmpty()) 
+    while (! objects.isEmpty())
       ((ErmesObject) objects.elementAt( 0)).delete();
 
     owner.selectionChanged();

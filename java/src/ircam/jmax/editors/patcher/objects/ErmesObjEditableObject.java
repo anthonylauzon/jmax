@@ -13,17 +13,13 @@ import ircam.jmax.editors.patcher.*;
 // The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
 //
 
-abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener, ErmesObjEditable
+abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener
 {
-//   boolean itsInEdit = true;
-
   protected MultiLineText itsText = new MultiLineText();
 
   ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
-
-//     itsInEdit = false;
 
     itsText.setFontMetrics( getFontMetrics());
     itsText.setText( getArgs());
@@ -80,6 +76,13 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     updateDimensions();
   }
 
+  // get the number of rows in the multiline text;
+  // needed in editing
+
+  public int getRows()
+  {
+    return itsText.getRows();
+  }
 
   public void dispose()
   {
@@ -120,60 +123,28 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
   abstract public String getArgs();
 
   // ----------------------------------------
+  // ``TextBackground'' property
+  // ----------------------------------------
+
+  public Color getTextBackground()
+  {
+    return Color.white;
+  }
+
+  // ----------------------------------------
   // Property handling
   // ----------------------------------------
 
   public void inletsChanged(int n)
   {
-    // (***fd) Should do something ??
-
     redraw();
     redrawConnections();
   }
 
   public void outletsChanged(int n)
   {
-    // (***fd) Should do something ??
-
     redraw();
     redrawConnections();
-  }
-    
-  // actually starts the edit operation.
-  // The inset parameter specify the relative position of the editfield
-  private void doEdit( int editFieldInset) 
-  {
-    if (itsSketchPad.getEditField() != null)
-      itsSketchPad.getEditField().setEditable( true);
-
-    itsSketchPad.getEditField().setFont( getFont());
-    itsSketchPad.getEditField().setText( getArgs());
-    itsSketchPad.getEditField().setOwner(this);
-
-    if ( itsText.getRows() == 0)
-      itsSketchPad.getEditField().setBounds( getX() + editFieldInset/2,
-					     getY() + 1,
-					     getWidth() - editFieldInset,
-					     getFontMetrics().getHeight() + 20);
-    else
-      itsSketchPad.getEditField().setBounds( getX() + editFieldInset/2,
-					     getY() + 1,
-					     getWidth() - editFieldInset,
-					     getFontMetrics().getHeight() * (itsText.getRows()+1));
-
-    itsSketchPad.getEditField().setVisible( true);
-    itsSketchPad.getEditField().requestFocus();
-    itsSketchPad.getEditField().setCaretPosition( getArgs().length());
-  }
-
-  public void restartEditing()  // (fd) public, because public in ErmesEditable...
-  {
-    doEdit( 0); 
-  }
-
-  public void startEditing()  // (fd) public, because public in ErmesEditable...
-  {
-    doEdit( 6);
   }
     
   protected void DrawParsedString( Graphics theGraphics) 

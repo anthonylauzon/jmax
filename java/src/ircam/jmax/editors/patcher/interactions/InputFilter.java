@@ -282,6 +282,7 @@ final class InputFilter implements MouseMotionListener, MouseListener
 
   public void mousePressed( MouseEvent e)
   {
+    sketch.setKeyEventClient(null);
     sketch.stopTextEditing();
     sketch.requestFocus();
 

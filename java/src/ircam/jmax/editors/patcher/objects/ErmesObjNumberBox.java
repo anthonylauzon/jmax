@@ -13,8 +13,7 @@ import ircam.jmax.editors.patcher.*;
  */
 
 abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
-
-  protected int state;
+  boolean valueValid = true;
   private StringBuffer currentText;
   private String filter;
   private static final int DEFAULT_WIDTH = 40;
@@ -25,7 +24,6 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   {
     super( theSketchPad, theFtsObject);
 
-    state = 0;
     currentText = new StringBuffer();
 
     this.filter = filter;
@@ -113,28 +111,27 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 
     g.setColor( Color.black);
     // Draw or fill the triangle
-    if ( state != 0 ) 
-      {
-	int xPoints[] = { xp1, xp1 + hd2, xp1};
-	int yPoints[] = { y, y + hd2, y + hm1};
-	g.fillPolygon( xPoints, yPoints, 3);
-      } 
-    else 
+
+    if ( valueValid) 
       {
 	//g.setColor( Settings.sharedInstance().getUIColor().brighter());
 	g.drawLine( xp1, y, xp1 + hd2, y + hd2);
 	g.drawLine( xp1 + hd2, y + hd2, xp1, y + hm1);
       }
+    else 
+      {
+	int xPoints[] = { xp1, xp1 + hd2, xp1};
+	int yPoints[] = { y, y + hd2, y + hm1};
+	g.fillPolygon( xPoints, yPoints, 3);
+      } 
 
     // Draw the value
     String aString;
 
-    if (state != 3)
+    if (valueValid)
       aString = getVisibleString( getValueAsText());
     else 
-      {
-	aString = getVisibleString(currentText.toString());
-      }
+      aString = getVisibleString(currentText.toString());
     
     g.setColor( Color.black);
     g.setFont( getFont());
@@ -172,23 +169,21 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
     return aString;
   }
 
-  // public void keyPressed( KeyEvent e) 
-  public void keyTyped( KeyEvent e) 
+  public void keyPressed( KeyEvent e) 
   {
-    state = 3;
-
     if ( !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown()) 
       {
-	int c = e.getKeyChar();
-
-	if ( c == '\r')
+	if (e.getKeyCode()== KeyEvent.VK_ENTER)
 	  {
 	    setValueAsText( currentText.toString());
 
 	    currentText.setLength(0);
-	    state = 0;
+	    valueValid = true;
+
+	    itsSketchPad.setKeyEventClient(null);	    
 	  } 
-	else if ( ( c == 8) ||  ( c == 127))
+	else if ((e.getKeyCode()== KeyEvent.VK_DELETE) ||
+		 (e.getKeyCode()== KeyEvent.VK_BACK_SPACE))
 	  {
 	    /* The test is agains ^H and ^?, the standard backspace
 	       and delete characters */
@@ -199,8 +194,10 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 
 	    currentText.setLength( l);
 	  }
-	else if (filter.indexOf(c) != -1)
-	  currentText.append( (char)c);
+	else if (filter.indexOf(e.getKeyCode()) != -1)
+	  currentText.append( (char)e.getKeyCode());
+
+	e.consume();
 
 	redraw();
       }
@@ -210,19 +207,18 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   {
   }
 
-  public void keyPressed( KeyEvent e) 
+  public void keyTyped( KeyEvent e) 
   {
   }
 
   public void keyInputGained() 
   {
-    getSketchPad().requestFocus();
     redraw();
   }
 
   public void keyInputLost() 
   {
-    state = 0;
+    valueValid = true;
     currentText.setLength(0);
     redraw();
   }

@@ -22,16 +22,15 @@ import ircam.jmax.editors.patcher.actions.*;
 
 class KeyMap
 {
-  ErmesSketchPad  sketch;
+  JComponent  component;
   ErmesSketchWindow editor;
 
-  KeyMap(ErmesSketchPad sketch)
+  KeyMap(JComponent component, ErmesSketchWindow editor)
   {
     // Set local variables
 
-    this.sketch = sketch;
-    this.editor = sketch.getSketchWindow();
-
+    this.component = component;
+    this.editor = editor;
 
     // Install the keyboard actions
 
@@ -64,6 +63,11 @@ class KeyMap
     add(new ResizeToMaxWidthAction(editor));
     add(new ResizeToMaxHeightAction(editor));
 
+    // Delete selection
+
+    add(new DeleteSelectionAction(editor, 0, KeyEvent.VK_DELETE));
+    add(new DeleteSelectionAction(editor, 0, KeyEvent.VK_BACK_SPACE));
+
     // Annotation 
 
     add(new ShowErrorAction(editor));
@@ -81,9 +85,9 @@ class KeyMap
   {
     if (action.haveMnemonic())
       {
-	sketch.registerKeyboardAction(action, 
-				      KeyStroke.getKeyStroke(action.getMnemonic(), action.getModifiers()),
-				      condition);
+	component.registerKeyboardAction(action, 
+					 KeyStroke.getKeyStroke(action.getMnemonic(), action.getModifiers()),
+					 condition);
       }
   }
 }

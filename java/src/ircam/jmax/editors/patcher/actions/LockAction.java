@@ -19,7 +19,7 @@ public class LockAction extends PatcherAction
     this.editor = editor;
   }
 
-  public  void actionPerformed(ActionEvent e)
+  public void actionPerformed(ActionEvent e)
   {
     editor.setLocked(! editor.isLocked());
   }

@@ -71,7 +71,7 @@ class DragConnectInteraction extends SubInteraction
 						 inlet,
 						 fc);
 		
-		engine.getDisplayList().addConnection(connection);
+		engine.getDisplayList().add(connection);
 		connection.redraw();
 	      }
 	    catch (FtsException e)

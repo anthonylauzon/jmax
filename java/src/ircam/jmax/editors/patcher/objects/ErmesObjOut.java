@@ -11,8 +11,8 @@ import ircam.jmax.editors.patcher.*;
 // The "out" graphic object used in subpatchers.
 //
 
-public class ErmesObjOut extends ErmesObjInOut {
-
+public class ErmesObjOut extends ErmesObjInOut
+{
   public ErmesObjOut(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject, ((FtsOutletObject) theFtsObject).getPosition());
@@ -25,10 +25,10 @@ public class ErmesObjOut extends ErmesObjInOut {
   
   public void Paint(Graphics g) 
   {
-    if ( !isSelected())
-      g.setColor( Settings.sharedInstance().getObjColor());
-    else 
+    if (isSelected())
       g.setColor( Settings.sharedInstance().getSelectedColor());
+    else 
+      g.setColor( Settings.sharedInstance().getObjColor());
 
     int x = getX();
     int y = getY();

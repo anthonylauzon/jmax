@@ -19,6 +19,7 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   // ----------------------------------------
   // Constructor
   // ----------------------------------------
+
   ErmesObjPatcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
@@ -97,18 +98,13 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   //--------------------------------------------------------
   public void Paint( Graphics g) 
   {
-    if( !isSelected()) 
-      g.setColor( Settings.sharedInstance().getObjColor());
-    else 
+    if (isSelected()) 
       g.setColor( Settings.sharedInstance().getSelectedColor());
+    else 
+      g.setColor( Settings.sharedInstance().getObjColor());
 
-    int x = getX();
-    int y = getY();
-    int w = getWidth();
-    int h = getHeight();
-
-    g.fill3DRect( x+1, y+1, w-2, h-2, true);
-    g.draw3DRect( x+2, y+2, w-5, h-5, false);
+    g.fill3DRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2, true);
+    g.draw3DRect( getX() + 2, getY() + 2, getWidth() - 5, getHeight() - 5, false);
     
     g.setColor( Color.black);
     g.setFont( getFont());
@@ -116,4 +112,14 @@ class ErmesObjPatcher extends ErmesObjEditableObject
 
     super.Paint( g);
   }
+
+  // ----------------------------------------
+  // ``TextBackground'' property
+  // ----------------------------------------
+
+  public Color getTextBackground()
+  {
+    return Settings.sharedInstance().getObjColor();
+  }
+
 }

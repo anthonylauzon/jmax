@@ -120,11 +120,10 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
 	  g.setColor( Settings.sharedInstance().getSelectedColor());
 	else
 	  {
-	    if( !isSelected()) 
-	      g.setColor( Color.white);
-	    //g.setColor( Settings.sharedInstance().getUIColor());
+	    if(isSelected()) 
+	      g.setColor( Settings.sharedInstance().getSelectedColor());
 	    else
-	      g.setColor( Settings.sharedInstance().getObjColor());
+	      g.setColor( Color.white);
 	  }
       }
     else 

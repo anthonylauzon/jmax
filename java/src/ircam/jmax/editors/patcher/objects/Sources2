@@ -2,7 +2,6 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/ErmesObject.java    \
 	$(INCLUDE_PATH)/ErmesObjBang.java    \
 	$(INCLUDE_PATH)/ErmesObjComment.java    \
-	$(INCLUDE_PATH)/ErmesObjEditable.java    \
 	$(INCLUDE_PATH)/ErmesObjEditableObject.java    \
 	$(INCLUDE_PATH)/ErmesObjExternal.java    \
 	$(INCLUDE_PATH)/ErmesObjFloat.java    \

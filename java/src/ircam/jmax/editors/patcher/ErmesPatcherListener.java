@@ -1,5 +1,7 @@
 package ircam.jmax.editors.patcher;
 
+import javax.swing.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
@@ -54,7 +56,28 @@ class ErmesPatcherListener implements FtsPatcherListener
 
   public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
   {
-    window.DeleteGraphicConnection(connection);
+    final FtsConnection c = connection;
+
+    /* Do the delete thru an invoke later, so that the code
+       is executed within the event thread and there are no
+       races with the paint work; a way to serialize editing on the
+       display list.
+       */
+
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+	{
+	  ErmesConnection conn;
+
+	  conn = window.itsSketchPad.getDisplayList().getErmesConnectionFor(c);
+
+	  // conn may be null if the connection has been delete by Ermes
+	  // first; a little hack, the whole deleting business should be cleaned up.
+    
+	  if (conn != null)
+	    conn.delete();
+	}
+    });
   }
 
   public void patcherChangedNumberOfInlets(FtsPatcherData data, int nins)

@@ -93,7 +93,6 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	previousVelocity = 0;
 	acceleration = 0;
 	previousY = mouse.y;
-	state = 1;
 	itsSketchPad.setKeyEventClient(this);
 	itsStartingValue = itsFloat;
 	((FtsFloatValueObject)itsFtsObject).setValue(itsFloat);
@@ -116,8 +115,6 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
 	velocity = (previousY- mouse.y);
 	acceleration = Math.abs(velocity-previousVelocity);
 	previousY= mouse.y;
-
-	state = 2;
 
 	float increment;
 

@@ -65,9 +65,8 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
 
     if (selected)
       ErmesSelection.patcherSelection.deselect(this);
-	
     redraw();
-    itsSketchPad.getDisplayList().removeConnection(this);
+    itsSketchPad.getDisplayList().remove(this);
   }
 
   //--------------------------------------------------------

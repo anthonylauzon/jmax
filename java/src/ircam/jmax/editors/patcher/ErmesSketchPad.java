@@ -34,7 +34,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     return displayList;
   }
 
-  private Interaction interaction;
   private InteractionEngine engine;
 
   private KeyMap keyMap;
@@ -86,7 +85,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
   public ErmesObjInOutPop itsInPop = null;
   public ErmesObjInOutPop itsOutPop = null;
-  private ErmesObjEditField itsEditField = null;
+  private EditField itsEditField = null;
 
   // FONT HANDLING
 
@@ -145,7 +144,8 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     numberOfPaste += 1;
 
-    resetFocus();
+    if (isTextEditingObject())
+      stopTextEditing();
 
     ErmesSelection.patcherSelection.setOwner(this); 
 
@@ -183,7 +183,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	fo.setY( newPosY);
 
 	object = ErmesObject.makeErmesObject( this, fo);
-	displayList.addObject( object);
+	displayList.add( object);
 	ErmesSelection.patcherSelection.select( object);
 	object.redraw();
       }
@@ -201,7 +201,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 					  fc.getToInlet(),
 					  fc);
 
-	displayList.addConnection( connection);
+	displayList.add( connection);
 
 	ErmesSelection.patcherSelection.select( connection);
 	connection.redraw();
@@ -218,10 +218,10 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     for ( int i = 0; i < osize; i++)
       {
 	ErmesObject object = ErmesObject.makeErmesObject( this, (FtsObject)objects[i]);
-	displayList.addObject( object);
+	displayList.add( object);
       }
 		
-    // chiama tanti AddConnection...
+    // chiama tanti add...
 
     MaxVector connectionVector = aFtsPatcherData.getConnections();	//usefull?
 
@@ -240,7 +240,7 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 					  fc.getToInlet(),
 					  fc);
 
-	displayList.addConnection(connection);
+	displayList.add(connection);
       }
   }
 
@@ -277,14 +277,13 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     // Install the display List object
 
     displayList = new DisplayList(this);
-    interaction = new Interaction(this, displayList); // Obsolete
     engine      = new InteractionEngine(this);
 
-    keyMap = new KeyMap(this);
+    keyMap = new KeyMap(this, this.getSketchWindow());
 
     // Next two temporary (mdc)
 
-    if (MaxApplication.getProperty("db") == null)
+    if (MaxApplication.getProperty("nodb") != null)
       {
 	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
 	setDoubleBuffered(false);
@@ -296,21 +295,23 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 
     setLayout( null);
 
-    itsEditField = new ErmesObjEditField( this);
+    itsEditField = new EditField( this);
     add( itsEditField);
 
     itsEditField.setVisible( false);
-    itsEditField.setLocation( -200,-200);
     
     setBackground( Settings.sharedInstance().getEditBackgroundColor());
-    addKeyListener( interaction);
+
 
     InitFromFtsContainer( itsPatcherData);
 
+    itsInPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfInlets() + 4);
+    add( itsInPop);
+
+    itsOutPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfOutlets() + 4);
+    add( itsOutPop);
+
     fixSize();
-    
-    PrepareInChoice(); 
-    PrepareOutChoice();
 
     requestDefaultFocus(); // ???
   }
@@ -459,10 +460,10 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
 	fo.setY( y);
 
 	object = ErmesObject.makeErmesObject( this, fo);
-	displayList.addObject( object);
+	displayList.add( object);
 
-	if (object instanceof ErmesObjEditable)
-	  ((ErmesObjEditable)object).startEditing();
+	if (object instanceof ErmesObjEditableObject)
+	  textEditObject((ErmesObjEditableObject)object);
 
 	object.redraw();
       }
@@ -473,11 +474,50 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
       }
   }
 
-  final public ErmesObjEditField getEditField()
+  /* Handling of the object text editing */
+
+  ErmesObjEditableObject editedObject = null;
+
+  final public EditField getEditField()
   {
     return itsEditField;
   }
-  
+
+  final public boolean isTextEditingObject()
+  {
+    return editedObject != null;
+  }
+
+  final public ErmesObjEditableObject getTextEditedObject()
+  {
+    return editedObject;
+  }
+
+  final public void textEditObject(ErmesObjEditableObject object)
+  {
+    textEditObject(object, null);
+  }
+
+  final public void textEditObject(ErmesObjEditableObject object, Point p)
+  {
+    if (editedObject != null)
+      stopTextEditing();
+
+    editedObject = object;
+    itsEditField.doEdit(object, p);
+  }
+
+  final public void stopTextEditing()
+  {
+    if (editedObject != null)
+      {
+	itsEditField.endEdit();
+	editedObject.redraw();
+      }
+
+    editedObject = null;
+  }
+
   public void showObject( Object obj)
   {
     // Should select or highlight obj if it is an FtsObject
@@ -508,29 +548,12 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
       }
   }
 
-
-  // public Dimension getPreferredSize() 
-  // {
-  // return preferredSize;
-  // }
   
-  void PrepareInChoice() 
-  {
-    itsInPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfInlets() + 4);
-    add( itsInPop);
-  }
-
   final void RedefineInChoice()
   {
     itsInPop.Redefine(itsPatcher.getNumberOfInlets() + 4);
   }
 
-  void PrepareOutChoice()
-  {
-    itsOutPop = new ErmesObjInOutPop( itsSketchWindow, itsPatcher.getNumberOfOutlets() + 4);
-    add( itsOutPop);
-  }
-  
   void RedefineOutChoice()
   {
     itsOutPop.Redefine( itsPatcher.getNumberOfOutlets() + 4);
@@ -574,7 +597,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     displayList.disposeAllObjects();
 
     Fts.getServer().removeUpdateGroupListener( this);
-    removeKeyListener( interaction);
 
     remove( itsInPop);
     remove( itsOutPop);
@@ -589,25 +611,6 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     itsOutPop = null;
     itsEditField = null;
     anOldPastedObject = null;
-  }
-
-  //
-  // This function handles the Focus change and updates the menus.
-  //
-
-  void resetFocus()
-  {
-    if (getEditField() != null && getEditField().HasFocus())
-      {
-	getEditField().transferFocus();
-      }
-
-    //    if (interaction.isEditingObject())
-    //      {
-    //getEditField().LostFocus();
-    //	requestFocus();
-    //	interaction.doNothing();
-    //      }
   }
   
   // The waiting/stopWaiting service
@@ -651,14 +654,10 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
     else
       engine.setEditMode();
 
-    if (locked)
+    if (isLocked())
       {
-	// if (interaction.isEditingObject())
-	// {
-	// itsEditField.LostFocus();
-	// requestFocus();
-	// interaction.doNothing();
-	// }
+	if (isTextEditingObject())
+	  stopTextEditing();
 
 	setBackground( Settings.sharedInstance().getLockBackgroundColor());
 
@@ -681,36 +680,26 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
      
   void pasteText(String text)
   {
-    // !!! @@@
-    // if (interaction.isEditingObject())
-    //itsEditField.insert(text,  itsEditField.getCaretPosition());
+    if (isTextEditingObject())
+      itsEditField.insert(text,  itsEditField.getCaretPosition());
   }
 
   boolean canCopyText()
   {
-    // !!!! @@@
-    // return interaction.isEditingObject();
-
-    return false;
+    return isTextEditingObject();
   }
 
   boolean canPasteText()
   {
-    // !!! @@@@
-    //    return interaction.isEditingObject();
-
-    return false;
+    return isTextEditingObject();
   }
 
   String getSelectedText()
   {
-    // !!! @@@@
-    // if (interaction.isEditingObject())
-    // return itsEditField.getSelectedText();
-    //     else
-    // return null;
-
-    return "foo";
+     if (isTextEditingObject())
+       return itsEditField.getSelectedText();
+     else
+       return null;
   }
 
   void deleteSelectedText()
@@ -741,12 +730,32 @@ public class ErmesSketchPad extends JPanel implements FtsUpdateGroupListener {
       }
   }
 
-  // Key Client; should go in the interaction
+  // Support for keeping a unique supplementary keylistener
+  // in the sketchpad; used currently by the number box, the other
+  // are Swing components and use the focus.
 
-  public void setKeyEventClient( KeyEventClient keyEventClient)
+  KeyEventClient keyEventClient;
+
+  public void setKeyEventClient( KeyEventClient kv)
   {
-    interaction.setKeyEventClient(keyEventClient);
+    if (kv == keyEventClient)
+      return;
+
+    if (keyEventClient != null)
+      {
+	removeKeyListener( keyEventClient);
+	this.keyEventClient.keyInputLost();
+      }
+
+    keyEventClient = kv;
+
+    if (keyEventClient != null)
+      {
+	addKeyListener(keyEventClient);
+	keyEventClient.keyInputGained();
+      }
   }
+
 
   // Selection change handling
 

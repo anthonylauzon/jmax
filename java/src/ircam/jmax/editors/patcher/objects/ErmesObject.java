@@ -120,10 +120,9 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   {
     if (selected)
       ErmesSelection.patcherSelection.deselect(this);
-
+    
     redraw();
-
-    itsSketchPad.getDisplayList().removeObject(this);
+    itsSketchPad.getDisplayList().remove(this);
 
     dispose();
     itsFtsObject.delete();
@@ -280,12 +279,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   {
   }
 
-  void UpdateOnly( Graphics g) 
-  {
-    g.setColor( itsSketchPad.getBackground());
-    g.fillRect( itsRectangle.x, itsRectangle.y, itsRectangle.width, itsRectangle.height);
-  }
-
   // Add one to cope with the inlet/outlets
 
   public void redraw()
@@ -329,6 +322,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   // This is a try to handle the "bug 20" problem.
   // To re-establish the old situation, just comment this method and
   // erase "_old" from the next method.
+
   private int findNearestInOutlet( int mouseX, int n)
   {
     // (em) consider the sensibility areas as centered in the

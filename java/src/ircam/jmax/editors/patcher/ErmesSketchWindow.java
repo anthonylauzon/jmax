@@ -401,12 +401,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
       {
 	ErmesObject obj = (ErmesObject)ErmesSelection.patcherSelection.getSingleton();
 
-	if (obj instanceof ErmesObjEditable)
+	if (obj instanceof ErmesObjEditableObject)
 	  {
 	    ErmesSelection.patcherSelection.deselectAll();
 
-	    ((ErmesObjEditable)obj).restartEditing();
-
+	    itsSketchPad.textEditObject((ErmesObjEditableObject)obj);
 	    itsSketchPad.getEditField().selectAll();
 	  }
       }
@@ -430,29 +429,6 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     ftsConnectionsPasted.addElement( c);
   }
-
-  // 
-  // Methods to handle changes in the patcher data.
-  // Move to the display List directly !!
-  
-  void DeleteGraphicObject( FtsObject object)
-  {
-    itsSketchPad.getDisplayList().getErmesObjectFor(object).delete();
-  }
-
-  void DeleteGraphicConnection( FtsConnection c)
-  {
-    ErmesConnection conn;
-
-    conn = itsSketchPad.getDisplayList().getErmesConnectionFor(c);
-
-    // conn may be null if the connection has been delete by Ermes
-    // first; a little hack, the whole deleting business should be cleaned up.
-    
-    if (conn != null)
-      conn.delete();
-  }
-
 
   public void Close(boolean doCancel)
   {
@@ -608,6 +584,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   public void Print()
   {
+    RepaintManager.currentManager(itsSketchPad).setDoubleBufferingEnabled(false);
+
     PrintJob aPrintjob = getToolkit().getPrintJob( this, "Printing Patcher", MaxApplication.getProperties());
 
     if (aPrintjob != null)
@@ -621,6 +599,8 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	  }
 	aPrintjob.end();
       }
+
+    RepaintManager.currentManager(itsSketchPad).setDoubleBufferingEnabled(true);
   }
 
   /****************************************************************************/
