@@ -18,31 +18,32 @@
 ##
 
 # Max 0.26 compatibilty package
-
 package require ispw
 
-
 # Table object and editor
-
 package require table
 
-
 # Qlist object and editor
-
 package require qlist
 
-
 # Explode object and editor
-
 package require explode
 
+# new control flow classes
+package require control
 
-# List handling package
+# new message classes
+package require mess
 
+# new atom classes
+package require generic
+
+# new numeric classes
+package require numeric
+
+# List handling classes
 package require lists
 
-
 # I/O package
-
 package require io
 
