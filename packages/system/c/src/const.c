@@ -98,7 +98,7 @@ const_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 	}
       else
 	{
-	  fts_type_t t = fts_get_selector(at + 1);
+	  fts_symbol_t t = fts_get_selector(at + 1);
 
 	  fts_class_init(cl, sizeof(const_t), 1, 1, 0);
 	  

@@ -23,7 +23,6 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.bpf.*;
-import ircam.jmax.guiobj.*;
 import ircam.jmax.editors.table.*;
 import ircam.fts.client.*;
 

@@ -21,6 +21,7 @@
  */
 
 #ifndef WIN32
+#include "config.h"
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -30,7 +31,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <unistd.h>
-#ifdef HAVE_DLOPEN
+#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
 #include <signal.h>
@@ -1403,8 +1404,10 @@ FtsPlugin::openLibrary(char* name)
 {
 #ifdef WIN32
   return LoadLibrary(name);
-#else
+#elif defined(HAVE_DLFCN_H)
   return dlopen(name, RTLD_NOW | RTLD_GLOBAL);
+#else
+  return 0;
 #endif
 }
 
@@ -1413,7 +1416,7 @@ FtsPlugin::closeLibrary(library_t lib)
 {
 #ifdef WIN32
   FreeLibrary(lib);
-#else
+#elif defined(HAVE_DLFCN_H)
   dlclose(lib);
 #endif
 }
@@ -1423,8 +1426,10 @@ FtsPlugin::getSymbol(library_t lib, char* name)
 {	
 #ifdef WIN32
   return GetProcAddress(lib, name);
-#else
+#elif defined(HAVE_DLFCN_H)
   return dlsym(lib, name);
+#else
+  return 0;
 #endif
 }
 

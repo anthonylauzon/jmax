@@ -431,7 +431,6 @@ static void readsf_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int n_channels, i;
-  fts_type_t a[4];
 
   n_channels = fts_get_int_arg(ac, at, 1, 1);
 

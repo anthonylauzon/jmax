@@ -17,7 +17,7 @@ AM_INIT_AUTOMAKE($PACKAGE,$VERSION, no-define)
 
 AC_PREFIX_DEFAULT(/usr)
 
-dnl AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(include/config.h)
 
 dnl Checks for programs.
 AC_PROG_CXX
@@ -47,6 +47,7 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
+AC_HAVE_HEADERS( dlfcn.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
