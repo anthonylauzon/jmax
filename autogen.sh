@@ -2,7 +2,7 @@
 set -x
 aclocal -I m4
 # On Mac OS X, libtoolize is glibtoolize
-libtoolize --automake --copy 
+libtoolize --automake --copy || glibtoolize --automake --copy
 autoconf
 automake --foreign --add-missing --copy
 (
