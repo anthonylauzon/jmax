@@ -63,9 +63,13 @@ struct _sequence_event
   /*fts_atom_t value;*/
 };
 
-/*extern sequence_event_t *sequence_event_new(double time, fts_atom_t value);*/
-extern sequence_event_t *sequence_event_new(double time, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void sequence_event_init(sequence_event_t *event, float time, fts_symbol_t selector, int ac, const fts_atom_t *at);
 extern void sequence_event_delete(sequence_event_t *event);
+
+extern void sequence_event_set_value(sequence_event_t *event, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void sequence_event_reset_value(sequence_event_t *event);
+
+extern void sequence_event_post(sequence_event_t *event);
 
 #define sequence_event_set_time(e, t) ((e)->time = (t))
 #define sequence_event_get_time(e) ((e)->time)
@@ -187,7 +191,7 @@ extern void sequence_destroy(sequence_t *sequence);
 
 /* tracks */
 extern sequence_track_t *sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type);
-extern void sequence_remove_track(sequence_t *sequence, int index);
+extern void sequence_remove_track(sequence_t *sequence, fts_symbol_t name);
 extern sequence_track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 extern sequence_track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
 

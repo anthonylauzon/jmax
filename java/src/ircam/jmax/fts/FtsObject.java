@@ -745,10 +745,15 @@ public class FtsObject
 
     releaseData();
 
-    parent.setDirty();
+    if(parent != null)
+      {
+	parent.setDirty();
+	
+	if((isError())||(hasErrorsInside()))
+	  parent.removeErrorObject(this);
 
-    if((isError())||(hasErrorsInside()))
-      parent.removeErrorObject(this);
+	parent = null;
+      }
 
     // Take away the object from the container, if any
 
@@ -763,7 +768,6 @@ public class FtsObject
     // non functioning, so to catch use of the object
     // after the release/delete.
 
-    parent = null;
     className = null;
     description = null;
 

@@ -19,21 +19,17 @@
 static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_addEvent = 0;
+
 static fts_symbol_t sym_seqevent = 0;
 
 void
 seqevt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_event_t *this = (sequence_event_t *)o;
-  sequence_t *sequence = (sequence_t *)fts_get_object(at + 1);
-  fts_symbol_t track_name = fts_get_symbol(at + 2);
-  double time = fts_get_float(at + 3);
-  fts_symbol_t selector = fts_get_symbol(at + 4);
+  double time = fts_get_float(at + 1);
+  fts_symbol_t selector = fts_get_symbol(at + 2);
 
-  sequence_event_set_time(this, time);
-  sequence_event_set_value(this, selector, ac - 5, at + 5);
-
-  sequence_add_event(sequence, sequence_get_track_by_name(sequence, track_name), this);
+  sequence_event_init(this, time, selector, ac - 3, at + 3);
 }
 
 void
@@ -44,33 +40,11 @@ seqevt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   sequence_event_reset_value(this);
 }
 
-void
-seqevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_event_t *this = (sequence_event_t *)o;
-  sequence_track_t *track = sequence_event_get_track(this);
-  fts_atom_t a[64];  
-  int i;
-
-  fts_set_object(a + 0, (fts_object_t *)sequence_track_get_sequence(track));
-  fts_set_symbol(a + 1, sequence_track_get_name(track));
-  fts_set_float(a + 2, sequence_event_get_time(this));
-  fts_set_symbol(a + 3, this->s);
-
-  for(i=0; i<this->ac; i++)
-    a[i + 4] = this->at[i];
-
-  /* send event to client */
-  fts_client_upload(o, sym_seqevent, this->ac + 4, a);
-}
-
 static fts_status_t
 seqevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_class_init(cl, sizeof(sequence_event_t), 0, 0, 0); 
   
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), seqevt_upload);
-
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqevt_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqevt_delete);
 
@@ -122,6 +96,86 @@ seqobj_track_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_symbol_t type = fts_get_symbol(at + 1);
 
   sequence_add_track(this, name, fts_type_get_by_name(type));
+}
+
+void
+seqobj_track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_symbol_t track_name = fts_get_symbol(at + 0);
+  sequence_track_t *track = sequence_get_track_by_name(this, track_name);
+  sequence_event_t *event = sequence_get_begin(this);
+
+  /* empty track */
+  while(event)
+    {
+      sequence_event_t *next = sequence_event_get_next(event);
+
+      if(sequence_event_get_track(event) == track)
+	{
+	  sequence_remove_event(event);
+	  fts_object_delete((fts_object_t *)event);
+	}
+      
+      event = next;
+    }
+
+  /* and delete it */
+  sequence_remove_track(this, track_name);
+}
+
+void
+seqobj_event_new(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_symbol_t track_name = fts_get_symbol(at + 0);
+  double time = fts_get_float(at + 1);
+  fts_symbol_t selector = fts_get_symbol(at + 2);
+  fts_object_t *evtobj;
+
+  /* create event object */
+  {
+    fts_atom_t a[64];
+    int i;
+
+    fts_set_symbol(a + 0, sym_seqevent);    
+    fts_set_float(a + 1, time);
+    fts_set_symbol(a + 2, selector);
+    
+    for(i=3; i<ac; i++)
+      a[i] = at[i];
+    
+    fts_object_new(0, ac, a, &evtobj);
+  }
+
+  /* add event to sequence */
+  sequence_add_event(this, sequence_get_track_by_name(this, track_name), (sequence_event_t *)evtobj);
+
+  /* create event at client */
+  fts_client_upload(evtobj, sym_seqevent, ac - 1, at + 1);
+
+  /* add event to sequence at client */
+  {
+    fts_atom_t a[2];
+
+    fts_set_symbol(a + 0, track_name);
+    fts_set_object(a + 1, evtobj);
+    
+    fts_client_send_message(o, sym_addEvent, 2, a);
+  }
+}
+
+void
+seqobj_event_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_object_t *event = fts_get_object(at);
+
+  /* remove event from sequence */
+  sequence_remove_event((sequence_event_t *)event);
+
+  /* delete event object and remove from client */
+  fts_object_delete(event);
 }
 
 void
@@ -180,6 +234,8 @@ seqobj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), seqobj_open_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("track_add"), seqobj_track_add);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_new"), seqobj_event_new);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("event_remove"), seqobj_event_remove);
 
       fts_method_define_varargs(cl, 0, fts_new_symbol("print"), seqobj_print);
       

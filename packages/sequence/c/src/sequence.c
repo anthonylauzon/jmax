@@ -52,30 +52,23 @@ sequence_event_reset_value(sequence_event_t *event)
   */
 }
 
-/*
-sequence_event_t *
-sequence_event_new(double time, fts_atom_t value)
+void
+sequence_event_init(sequence_event_t *event, float time, fts_symbol_t selector, int ac, const fts_atom_t *at)
 {
-  sequence_event_t *event = (sequence_event_t *)fts_block_zalloc(sizeof(sequence_event_t));
-
-  event->time = time;
-  sequence_event_init(event, value);
-
-  return event;
+  sequence_event_set_time(event, time);
+  sequence_event_set_value(event, selector, ac - 3, at + 3);
 }
-*/
 
 void
 sequence_event_delete(sequence_event_t *event)
 {
   sequence_event_reset_value(event);
-  fts_block_free(event, sizeof(sequence_event_t));
 }
 
 void 
 sequence_event_post(sequence_event_t *event)
 {
-  post("@%f (%s): %s", event->time, fts_symbol_name(event->track->name), fts_symbol_name(event->s));
+  post("@%f (%s): %s ", event->time, fts_symbol_name(event->track->name), fts_symbol_name(event->s));
   post_atoms(event->ac, event->at);
   post("\n");
 }
@@ -340,33 +333,36 @@ sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
 }
 
 void
-sequence_remove_track(sequence_t *sequence, int index)
+sequence_remove_track(sequence_t *sequence, fts_symbol_t name)
 {
-  if(sequence->tracks)
+  sequence_track_t *track = sequence->tracks;
+
+  if(track)
     {
-      if(index == 0)
+      if(sequence_track_get_name(track) == name)
 	{
-	  sequence_track_t *track = sequence->tracks;
-	  
 	  sequence->tracks = track->next;
-	  sequence_track_delete(track);      
+	  sequence_track_delete(track);
 	}
       else
 	{
-	  sequence_track_t *prev = sequence_get_track_by_index(sequence, index - 1);
-	  
-	  if(prev && prev->next)
+	  sequence_track_t *prev = track;
+	  track = track->next;
+
+	  while(track)
 	    {
-	      sequence_track_t *track = prev->next;
-	      
-	      prev->next = track->next;
-	      sequence_track_delete(track);
+	      if(sequence_track_get_name(track) == name)
+		{
+		  prev->next = track->next;
+		  sequence_track_delete(track);
+		  break;
+		}
+
+	      prev = track;
+	      track = track->next;
 	    }
 	}
-
-      sequence->n_tracks--;
-    }
-
+    } 
 }
 
 /*********************************************************

@@ -459,24 +459,6 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
       else
 	printf_mess("System Error in FOS message NEW:  parent not found", ac, av);
     }
-  else if (ac >= 1 && fts_is_int(&av[0]))
-    {
-      /* (nos:) This is a real HACK!!!!
-       * We are reusing the NEW_OBJECT_CODE for an asychronous object creation, 
-       * which has in addition the particularity, that it uses the "upload" message 
-       * in a different sence than "fts_mess_client_download_object".
-       * Here ths upload method of an object decides itself, what to do for the upload
-       * using the fts_client_upload function (new!).
-       */
-
-      int id  = fts_get_int(&av[0]);
-      fts_object_t *obj;
-      
-      fts_object_new(0, ac - 1, av + 1, &obj);
-      fts_object_set_id(obj, id);
-      
-      fts_message_send(obj, fts_SystemInlet, fts_s_upload, 0, 0);
-    }
   else
     printf_mess("System Error in FOS message NEW: bad args", ac, av);
 }
