@@ -38,16 +38,16 @@ typedef struct _fts_channel_
 
 #define fts_channel_has_target(c) (!fts_object_list_is_empty( &(c)->targets))
 
-extern void fts_channel_init(fts_channel_t *channel);
+FTS_API void fts_channel_init(fts_channel_t *channel);
 
-extern void fts_channel_add_target(fts_channel_t *channel, fts_object_t *target);
-extern void fts_channel_remove_target(fts_channel_t *channel, fts_object_t *target);
+FTS_API void fts_channel_add_target(fts_channel_t *channel, fts_object_t *target);
+FTS_API void fts_channel_remove_target(fts_channel_t *channel, fts_object_t *target);
 
-extern void fts_channel_add_origin(fts_channel_t *channel, fts_object_t *origin);
-extern void fts_channel_remove_origin(fts_channel_t *channel, fts_object_t *origin);
+FTS_API void fts_channel_add_origin(fts_channel_t *channel, fts_object_t *origin);
+FTS_API void fts_channel_remove_origin(fts_channel_t *channel, fts_object_t *origin);
 
-extern void fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-extern void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at);
-extern void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t propagate_fun, void *propagate_context, int outlet);
+FTS_API void fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at);
+FTS_API void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t propagate_fun, void *propagate_context, int outlet);
 
 #endif

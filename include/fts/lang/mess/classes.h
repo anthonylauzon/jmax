@@ -30,32 +30,32 @@
 
 /* Status return values */
 
-extern fts_status_description_t fts_ClassAlreadyInitialized;
-extern fts_status_description_t fts_InletOutOfRange;
-extern fts_status_description_t fts_OutletOutOfRange;
-extern fts_status_description_t fts_OutletAlreadyDefined;
-extern fts_status_description_t fts_CannotInstantiate;
+FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
+FTS_API fts_status_description_t fts_InletOutOfRange;
+FTS_API fts_status_description_t fts_OutletOutOfRange;
+FTS_API fts_status_description_t fts_OutletAlreadyDefined;
+FTS_API fts_status_description_t fts_CannotInstantiate;
 
 /* Meta classes functions */
 
-extern fts_status_t fts_metaclass_install( fts_symbol_t name,
+FTS_API fts_status_t fts_metaclass_install( fts_symbol_t name,
 					   fts_instantiate_fun_t instantiate_fun,
 					   fts_equiv_fun_t equiv_fun);
 
-extern fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
+FTS_API fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 
-extern void fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name);
+FTS_API void fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name);
 
-extern void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name);
+FTS_API void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name);
 
 
 /* Class functions  and macros */
 
 #define FTS_VAR_ARGS  -1
 
-extern fts_status_t fts_class_init(fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
-extern fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at);
-extern fts_class_t *fts_class_get_by_name(fts_symbol_t name);
+FTS_API fts_status_t fts_class_init(fts_class_t *, unsigned int, int ninlets, int noutlets, void *);
+FTS_API fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at);
+FTS_API fts_class_t *fts_class_get_by_name(fts_symbol_t name);
 
 /* method definition */
 
@@ -66,7 +66,7 @@ extern fts_class_t *fts_class_get_by_name(fts_symbol_t name);
   fts_method_define_optargs(class, winlet, s, fun, 0, 0, FTS_VAR_ARGS) 
 
 
-extern fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
+FTS_API fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
 					      fts_method_t fun, int, fts_symbol_t *at, int mandatory_args);
 
 #define fts_method_define_int(class, winlet, fun) \
@@ -98,19 +98,19 @@ extern fts_status_t fts_method_define_optargs(fts_class_t *cl, int winlet, fts_s
 #define fts_outlet_type_define_varargs(class, woutlet, s)  \
           fts_outlet_type_define_optargs(class, woutlet, s, 0, 0, FTS_VAR_ARGS) 
 
-extern fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
+FTS_API fts_status_t fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
 						   int ac, fts_symbol_t *at,  int mandatory_args);
 
-extern fts_symbol_t fts_get_class_name(fts_class_t *cl);
+FTS_API fts_symbol_t fts_get_class_name(fts_class_t *cl);
 
-extern fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s);
+FTS_API fts_method_t fts_class_get_method( fts_class_t *cl, int inlet, fts_symbol_t s);
 
 #define fts_class_has_method(C,I,S) (fts_class_get_method((C),(I),(S))!=0)
 
 #define fts_class_get_user_data(c) ((cl)->user_data)
 #define fts_class_set_user_data(c, d) ((cl)->user_data = (d))
 
-extern const int fts_SystemInlet;
+FTS_API const int fts_SystemInlet;
 
 /*****************************************************************************
  *
@@ -120,20 +120,20 @@ extern const int fts_SystemInlet;
 
 typedef void (*fts_propagate_fun_t)(void *ptr, fts_object_t *object, int outlet);
 
-extern void fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input);
-extern int fts_class_is_thru(fts_class_t *class);
+FTS_API void fts_class_define_thru(fts_class_t *class, fts_method_t propagate_input);
+FTS_API int fts_class_is_thru(fts_class_t *class);
 
 /*****************************************************************************
  *
  *  equivalence function library
  *
  */
-extern int fts_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-extern int fts_arg_equiv_or_float( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-extern int fts_first_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-extern int fts_narg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-extern int fts_never_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-extern int fts_always_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
-extern int fts_arg_type_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_arg_equiv_or_float( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_first_arg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_narg_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_never_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_always_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
+FTS_API int fts_arg_type_equiv( int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1);
 
 #endif

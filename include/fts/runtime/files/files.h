@@ -42,10 +42,10 @@
  *
  * @return 1 if file is found, 0 if not
  */
-extern int fts_file_search_in_path( const char *filename, const char *search_path, char *full_path);
+FTS_API int fts_file_search_in_path( const char *filename, const char *search_path, char *full_path);
 
 
-extern void fts_file_get_write_path(const char *path, char *full_path);
+FTS_API void fts_file_get_write_path(const char *path, char *full_path);
 
 /* Utility to find a given file in the
    a given column separated path list.
@@ -57,11 +57,11 @@ extern void fts_file_get_write_path(const char *path, char *full_path);
    found.
    */
 
-extern int fts_file_get_read_path(const char *name, char *pathname);
+FTS_API int fts_file_get_read_path(const char *name, char *pathname);
 
-extern int fts_file_open(const char *name, const char *mode);
-extern int fts_file_close(int fd);
+FTS_API int fts_file_open(const char *name, const char *mode);
+FTS_API int fts_file_close(int fd);
 
-extern int fts_file_is_text( fts_symbol_t file_name);
+FTS_API int fts_file_is_text( fts_symbol_t file_name);
 
 #endif

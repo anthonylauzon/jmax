@@ -100,11 +100,11 @@
  */
 
 /* Kernel Parameter names */ 
-extern fts_symbol_t fts_s_dsp_on;
-extern fts_symbol_t fts_s_sample_rate;
+FTS_API fts_symbol_t fts_s_dsp_on;
+FTS_API fts_symbol_t fts_s_sample_rate;
 
-extern void fts_dsp_run_tick(void);
-extern int fts_dsp_is_running(void);
+FTS_API void fts_dsp_run_tick(void);
+FTS_API int fts_dsp_is_running(void);
 
 /** 
  * @name Runtime parameters
@@ -127,7 +127,7 @@ extern int fts_dsp_is_running(void);
  *
  * @ingroup dsp
  */
-extern double fts_dsp_get_sample_rate(void);
+FTS_API double fts_dsp_get_sample_rate(void);
 
 /**
  * Get the global tick size of the DSP subsystem
@@ -142,7 +142,7 @@ extern double fts_dsp_get_sample_rate(void);
  *
  * @ingroup dsp
  */
-extern int fts_dsp_get_tick_size(void);
+FTS_API int fts_dsp_get_tick_size(void);
 
 /**
  * Get current time of DSP susystem in milliseconds
@@ -162,7 +162,7 @@ extern int fts_dsp_get_tick_size(void);
  *
  * @ingroup dsp
  */
-extern double fts_dsp_get_time(void);
+FTS_API double fts_dsp_get_time(void);
 
 /*@}*/ /* runtime parameters */
 
@@ -182,7 +182,7 @@ extern double fts_dsp_get_time(void);
  *
  * @ingroup dsp
  */
-extern void fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *));
+FTS_API void fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *));
 
 /**
  * Declare a DSP inlet for a class
@@ -195,7 +195,7 @@ extern void fts_dsp_declare_function(fts_symbol_t name, void (*w)(fts_word_t *))
  *
  * @ingroup dsp
  */
-extern void fts_dsp_declare_inlet(fts_class_t *class, int number);
+FTS_API void fts_dsp_declare_inlet(fts_class_t *class, int number);
 
 /**
  * Declare a DSP outlet for a class
@@ -208,7 +208,7 @@ extern void fts_dsp_declare_inlet(fts_class_t *class, int number);
  *
  * @ingroup dsp
  */
-extern void fts_dsp_declare_outlet(fts_class_t *class, int number);
+FTS_API void fts_dsp_declare_outlet(fts_class_t *class, int number);
 
 /*@}*/ /* Class declarations */
 
@@ -230,7 +230,7 @@ extern void fts_dsp_declare_outlet(fts_class_t *class, int number);
  *
  * @ingroup dsp
  */
-extern void fts_dsp_add_object(fts_object_t *object);
+FTS_API void fts_dsp_add_object(fts_object_t *object);
 
 /** 
  * Remove object from the DSP graph.
@@ -245,11 +245,11 @@ extern void fts_dsp_add_object(fts_object_t *object);
  *
  * @ingroup dsp
  */
-extern void fts_dsp_remove_object(fts_object_t *object);
+FTS_API void fts_dsp_remove_object(fts_object_t *object);
 
 /* test inputs */
-extern int fts_dsp_is_sig_inlet(fts_object_t *object, int number);
-extern int fts_dsp_is_input_null(fts_dsp_descr_t *descriptor, int in);
+FTS_API int fts_dsp_is_sig_inlet(fts_object_t *object, int number);
+FTS_API int fts_dsp_is_input_null(fts_dsp_descr_t *descriptor, int in);
 
 /*@}*/ /* Object declarations */
 
@@ -273,7 +273,7 @@ extern int fts_dsp_is_input_null(fts_dsp_descr_t *descriptor, int in);
  *
  * @ingroup dsp
  */
-extern fts_symbol_t fts_dsp_get_input_name(fts_dsp_descr_t *descriptor, int number);
+FTS_API fts_symbol_t fts_dsp_get_input_name(fts_dsp_descr_t *descriptor, int number);
 
 /**
  * Get input vector size
@@ -293,7 +293,7 @@ extern fts_symbol_t fts_dsp_get_input_name(fts_dsp_descr_t *descriptor, int numb
  * @ingroup dsp
  */
 /* see macros down */
-extern int fts_dsp_get_input_size(fts_dsp_descr_t *descriptor, int number);
+FTS_API int fts_dsp_get_input_size(fts_dsp_descr_t *descriptor, int number);
 
 /**
  * Get input sample rate
@@ -312,7 +312,7 @@ extern int fts_dsp_get_input_size(fts_dsp_descr_t *descriptor, int number);
  *
  * @ingroup dsp
  */
-extern int fts_dsp_get_input_srate(fts_dsp_descr_t *descriptor, int number);
+FTS_API int fts_dsp_get_input_srate(fts_dsp_descr_t *descriptor, int number);
 
 /**
  * Get name of output
@@ -329,7 +329,7 @@ extern int fts_dsp_get_input_srate(fts_dsp_descr_t *descriptor, int number);
  *
  * @ingroup dsp
  */
-extern fts_symbol_t fts_dsp_get_output_name(fts_dsp_descr_t *descriptor, int number);
+FTS_API fts_symbol_t fts_dsp_get_output_name(fts_dsp_descr_t *descriptor, int number);
 
 /**
  * Get output vector size
@@ -348,7 +348,7 @@ extern fts_symbol_t fts_dsp_get_output_name(fts_dsp_descr_t *descriptor, int num
  *
  * @ingroup dsp
  */
-extern int fts_dsp_get_output_size(fts_dsp_descr_t *descriptor, int number);
+FTS_API int fts_dsp_get_output_size(fts_dsp_descr_t *descriptor, int number);
 
 /**
  * Get output sample rate
@@ -367,7 +367,7 @@ extern int fts_dsp_get_output_size(fts_dsp_descr_t *descriptor, int number);
  *
  * @ingroup dsp
  */
-extern int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number);
+FTS_API int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number);
 
 /**
  * Insert DSP function to DSP chain
@@ -382,7 +382,7 @@ extern int fts_dsp_get_output_srate(fts_dsp_descr_t *descriptor, int number);
  *
  * @ingroup dsp
  */
-extern void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *av);
+FTS_API void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *av);
 
 /*@}*/ /* Functions of the put method */
 
@@ -397,13 +397,13 @@ extern void fts_dsp_add_function(fts_symbol_t name, int ac, fts_atom_t *av);
 #define fts_dsp_get_output_srate(DESC, OUT) ((DESC)->out[(OUT)]->srate)
 
 /* internal misc */
-extern fts_object_t *dsp_get_current_object(void);
-extern void dsp_add_signal(fts_symbol_t name, int size);
-extern void dsp_chain_post(void);
-extern void dsp_chain_post_signals(void);
-extern void dsp_chain_fprint(FILE *f);
-extern void dsp_chain_fprint_signals(FILE *f);
-extern ftl_program_t *dsp_get_current_dsp_chain( void);
+FTS_API fts_object_t *dsp_get_current_object(void);
+FTS_API void dsp_add_signal(fts_symbol_t name, int size);
+FTS_API void dsp_chain_post(void);
+FTS_API void dsp_chain_post_signals(void);
+FTS_API void dsp_chain_fprint(FILE *f);
+FTS_API void dsp_chain_fprint_signals(FILE *f);
+FTS_API ftl_program_t *dsp_get_current_dsp_chain( void);
 
 /* old names of user API */
 #define dsp_list_insert(o) fts_dsp_add_object(o)

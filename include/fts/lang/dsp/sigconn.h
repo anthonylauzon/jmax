@@ -34,8 +34,8 @@ typedef struct _fts_signal_connection_table_
   int alloc;
 } fts_signal_connection_table_t;
 
-extern void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
-extern void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
-extern void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
+FTS_API void fts_signal_connection_table_init(fts_signal_connection_table_t *table);
+FTS_API void fts_signal_connection_add(fts_signal_connection_table_t *table, fts_connection_t* connection);
+FTS_API void fts_signal_connection_remove_all(fts_signal_connection_table_t *table);
 
 #endif

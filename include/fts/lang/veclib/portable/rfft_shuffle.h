@@ -56,8 +56,8 @@
  *      (Note: the lookup tables just contain half of the sine/cosine period in size points)
  */
  
-extern void rfft_shuffle_after_fft_inplc(complex *buf, float *coef_re, float *coef_im, int size);
-extern void rfft_shuffle_after_fft_outplc(complex *in, complex *out, float *coef_re, float *coef_im, int size);
+FTS_API void rfft_shuffle_after_fft_inplc(complex *buf, float *coef_re, float *coef_im, int size);
+FTS_API void rfft_shuffle_after_fft_outplc(complex *in, complex *out, float *coef_re, float *coef_im, int size);
 
-extern void rfft_shuffle_before_ifft_inplc(complex *buf, float *coef_re, float *coef_im, int size);
-extern void rfft_shuffle_before_ifft_outplc(complex *in, complex *out, float *coef_re, float *coef_im, int size);
+FTS_API void rfft_shuffle_before_ifft_inplc(complex *buf, float *coef_re, float *coef_im, int size);
+FTS_API void rfft_shuffle_before_ifft_outplc(complex *in, complex *out, float *coef_re, float *coef_im, int size);

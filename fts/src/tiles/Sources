@@ -26,6 +26,7 @@
 SOURCES = \
 messtile.c	\
 startup.c	\
+main.c		\
 ucs.c		\
 
 

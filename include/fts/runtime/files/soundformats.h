@@ -34,7 +34,7 @@ typedef struct fts_soundfile_format
 } fts_soundfile_format_t;
 
 /* platform dependend init routine */
-extern void fts_soundfile_format_platform_init(void);
+FTS_API void fts_soundfile_format_platform_init(void);
 
 /**********************************************************************************
  *
@@ -43,35 +43,35 @@ extern void fts_soundfile_format_platform_init(void);
  */
 
 /* standard soundfile format symbols */
-extern fts_symbol_t fts_s_aiffc; /* extended Audio Interchange File Format (AIFF-C) */
-extern fts_symbol_t fts_s_aiff; /* Audio Interchange File Format (AIFF) */
-extern fts_symbol_t fts_s_next; /* NeXT .snd and Sun .au */
-extern fts_symbol_t fts_s_snd;
-extern fts_symbol_t fts_s_au;
-extern fts_symbol_t fts_s_bicsf; /* Berkeley/IRCAM/CARL Sound File format */
-extern fts_symbol_t fts_s_sf;
-extern fts_symbol_t fts_s_sdII; /* Sound Designer File Format II */
-extern fts_symbol_t fts_s_wav; /* Microsoft .wav */
-extern fts_symbol_t fts_s_unknown; /* unknown file format */
+FTS_API fts_symbol_t fts_s_aiffc; /* extended Audio Interchange File Format (AIFF-C) */
+FTS_API fts_symbol_t fts_s_aiff; /* Audio Interchange File Format (AIFF) */
+FTS_API fts_symbol_t fts_s_next; /* NeXT .snd and Sun .au */
+FTS_API fts_symbol_t fts_s_snd;
+FTS_API fts_symbol_t fts_s_au;
+FTS_API fts_symbol_t fts_s_bicsf; /* Berkeley/IRCAM/CARL Sound File format */
+FTS_API fts_symbol_t fts_s_sf;
+FTS_API fts_symbol_t fts_s_sdII; /* Sound Designer File Format II */
+FTS_API fts_symbol_t fts_s_wav; /* Microsoft .wav */
+FTS_API fts_symbol_t fts_s_unknown; /* unknown file format */
 
 /* raw format symbols */
 /* fts_s_float ... raw 32 bit floats */
-extern fts_symbol_t fts_s_signed8; /* raw 8 bit twos complement integers */
-extern fts_symbol_t fts_s_signed16; /* raw 16 bit twos complement integers */
-extern fts_symbol_t fts_s_signed24; /* raw 24 bit twos complement integers */
-extern fts_symbol_t fts_s_signed32; /* raw 32 bit twos complement integers */
+FTS_API fts_symbol_t fts_s_signed8; /* raw 8 bit twos complement integers */
+FTS_API fts_symbol_t fts_s_signed16; /* raw 16 bit twos complement integers */
+FTS_API fts_symbol_t fts_s_signed24; /* raw 24 bit twos complement integers */
+FTS_API fts_symbol_t fts_s_signed32; /* raw 32 bit twos complement integers */
 
-extern void fts_soundfile_format_add(fts_symbol_t name, fts_soundfile_format_t *format);
-extern void fts_soundfile_format_remove(fts_symbol_t name);
-extern int fts_soundfile_format_exists(fts_symbol_t name);
+FTS_API void fts_soundfile_format_add(fts_symbol_t name, fts_soundfile_format_t *format);
+FTS_API void fts_soundfile_format_remove(fts_symbol_t name);
+FTS_API int fts_soundfile_format_exists(fts_symbol_t name);
 
 /* get explain and platform dependend descriptor for a soundfile format by name */
-extern char *fts_soundfile_format_get_explain(fts_symbol_t name);
-extern fts_atom_t *fts_soundfile_format_get_descriptor(fts_symbol_t name);
+FTS_API char *fts_soundfile_format_get_explain(fts_symbol_t name);
+FTS_API fts_atom_t *fts_soundfile_format_get_descriptor(fts_symbol_t name);
 
-extern void fts_soundfile_format_set_default(fts_symbol_t name);
-extern fts_symbol_t fts_soundfile_format_get_default(void);
+FTS_API void fts_soundfile_format_set_default(fts_symbol_t name);
+FTS_API fts_symbol_t fts_soundfile_format_get_default(void);
 
-extern int fts_soundfile_format_is_raw(fts_symbol_t name);
+FTS_API int fts_soundfile_format_is_raw(fts_symbol_t name);
 
 #endif

@@ -27,23 +27,23 @@
 #ifndef _FTS_MIDI_H_
 #define _FTS_MIDI_H_
 
-extern fts_module_t fts_midi_module;
+FTS_API fts_module_t fts_midi_module;
 
 struct _fts_midi_port;
 typedef struct _fts_midi_port fts_midi_port_t;
 
 /* The function that is called by the scheduler */
-extern void fts_midi_poll( void);
+FTS_API void fts_midi_poll( void);
 
-extern fts_midi_port_t *fts_midi_get_port(int idx);
+FTS_API fts_midi_port_t *fts_midi_get_port(int idx);
 
 /* return a pointer to a long keeping the midi time code of the port */
-extern double *fts_get_midi_time_code_p(int idx); 
+FTS_API double *fts_get_midi_time_code_p(int idx); 
 
 typedef  void (* midi_action_t) (fts_midi_port_t *p, int midi_ev, void *user_data, int argc, fts_atom_t *at);
 
-extern void fts_midi_install_fun(fts_midi_port_t *port, int midi_ev, midi_action_t fun, void *user_data);
-extern void fts_midi_deinstall_fun(fts_midi_port_t *port, int midi_ev, midi_action_t fun, void *user_data);
+FTS_API void fts_midi_install_fun(fts_midi_port_t *port, int midi_ev, midi_action_t fun, void *user_data);
+FTS_API void fts_midi_deinstall_fun(fts_midi_port_t *port, int midi_ev, midi_action_t fun, void *user_data);
 
 
 /* Macros identifing the MIDI_EV  in the above call.
@@ -69,5 +69,5 @@ extern void fts_midi_deinstall_fun(fts_midi_port_t *port, int midi_ev, midi_acti
 
 #define MAX_FTS_MIDI_EV                     FTS_MIDI_MTC
 
-extern void fts_midi_send(fts_midi_port_t *p, long val);
+FTS_API void fts_midi_send(fts_midi_port_t *p, long val);
 #endif

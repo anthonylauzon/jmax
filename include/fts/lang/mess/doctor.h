@@ -28,7 +28,7 @@
 #define _FTS_DOCTOR_H_
 
 
-extern void fts_register_object_doctor(fts_symbol_t class_name,
+FTS_API void fts_register_object_doctor(fts_symbol_t class_name,
 				       fts_object_t *(* fun)(fts_patcher_t *patcher,
 							     int ac,
 							     const fts_atom_t *at));

@@ -27,7 +27,7 @@
 #ifndef _LANG_MESS_H_
 #define _LANG_MESS_H_
 
-extern fts_module_t fts_mess_module;
+FTS_API fts_module_t fts_mess_module;
 
 #include <fts/lang/mess/atomarray.h>
 #include <fts/lang/mess/atoms.h>

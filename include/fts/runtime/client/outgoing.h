@@ -28,42 +28,42 @@
 #define _FTS_OUTGOING_H_
 
 /* Sending a message */
-extern void fts_client_mess_start_msg(int type);
-extern void fts_client_mess_add_int(int value);
+FTS_API void fts_client_mess_start_msg(int type);
+FTS_API void fts_client_mess_add_int(int value);
 #define fts_client_mess_add_long fts_client_mess_add_int
-extern void fts_client_mess_add_float(float value);
-extern void fts_client_mess_add_symbol(fts_symbol_t s);
-extern void fts_client_mess_add_symbol_as_string(fts_symbol_t s);
-extern void fts_client_mess_add_object(fts_object_t *obj);
-extern void fts_client_mess_add_connection(fts_connection_t *c);
-extern void fts_client_mess_add_data( fts_data_t *data);
-extern void fts_client_mess_add_string(const char *sp);
-extern void fts_client_mess_add_atoms(int ac, const fts_atom_t *args);
-extern void fts_client_mess_send_msg(void);
+FTS_API void fts_client_mess_add_float(float value);
+FTS_API void fts_client_mess_add_symbol(fts_symbol_t s);
+FTS_API void fts_client_mess_add_symbol_as_string(fts_symbol_t s);
+FTS_API void fts_client_mess_add_object(fts_object_t *obj);
+FTS_API void fts_client_mess_add_connection(fts_connection_t *c);
+FTS_API void fts_client_mess_add_data( fts_data_t *data);
+FTS_API void fts_client_mess_add_string(const char *sp);
+FTS_API void fts_client_mess_add_atoms(int ac, const fts_atom_t *args);
+FTS_API void fts_client_mess_send_msg(void);
 
 /* client API */
-extern void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
-extern void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list);
+FTS_API void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
+FTS_API void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list);
 
-extern void fts_client_start_msg(int type);
-extern void fts_client_add_int(int value);
-extern void fts_client_add_float(float value);
-extern void fts_client_add_symbol(fts_symbol_t s);
-extern void fts_client_add_object(fts_object_t *obj);
-extern void fts_client_add_connection(fts_connection_t *c);
-extern void fts_client_add_data( fts_data_t *data);
-extern void fts_client_add_string(const char *sp);
-extern void fts_client_add_atoms(int ac, const fts_atom_t *args);
-extern void fts_client_done_msg(void);
-extern void fts_client_message_send(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args);
+FTS_API void fts_client_start_msg(int type);
+FTS_API void fts_client_add_int(int value);
+FTS_API void fts_client_add_float(float value);
+FTS_API void fts_client_add_symbol(fts_symbol_t s);
+FTS_API void fts_client_add_object(fts_object_t *obj);
+FTS_API void fts_client_add_connection(fts_connection_t *c);
+FTS_API void fts_client_add_data( fts_data_t *data);
+FTS_API void fts_client_add_string(const char *sp);
+FTS_API void fts_client_add_atoms(int ac, const fts_atom_t *args);
+FTS_API void fts_client_done_msg(void);
+FTS_API void fts_client_message_send(fts_object_t *obj, fts_symbol_t selector, int argc, const fts_atom_t *args);
 
-extern void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at);
-extern void fts_client_upload_object(fts_object_t *obj);
-extern void fts_client_upload_connection(fts_connection_t *c);
+FTS_API void fts_client_upload(fts_object_t *obj, fts_symbol_t classname, int ac, const fts_atom_t *at);
+FTS_API void fts_client_upload_object(fts_object_t *obj);
+FTS_API void fts_client_upload_connection(fts_connection_t *c);
 
-extern void fts_client_release_connection(fts_connection_t *c);
-extern void fts_client_redefine_connection(fts_connection_t *c);
-extern void fts_client_release_object(fts_object_t *c);
-extern void fts_client_release_object_data(fts_object_t *obj);
+FTS_API void fts_client_release_connection(fts_connection_t *c);
+FTS_API void fts_client_redefine_connection(fts_connection_t *c);
+FTS_API void fts_client_release_object(fts_object_t *c);
+FTS_API void fts_client_release_object_data(fts_object_t *obj);
 
 #endif

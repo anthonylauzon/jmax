@@ -31,13 +31,13 @@
 #include <fts/lang/dsp/signal.h>
 #include <fts/lang/dsp/sigconn.h>
 
-extern fts_symbol_t fts_s_sig_zero;
-extern fts_symbol_t fts_s_dsp_upsampling;
-extern fts_symbol_t fts_s_dsp_downsampling;
-extern fts_symbol_t fts_s_dsp_outputsize;
-extern fts_symbol_t fts_s_dsp_descr;
+FTS_API fts_symbol_t fts_s_sig_zero;
+FTS_API fts_symbol_t fts_s_dsp_upsampling;
+FTS_API fts_symbol_t fts_s_dsp_downsampling;
+FTS_API fts_symbol_t fts_s_dsp_outputsize;
+FTS_API fts_symbol_t fts_s_dsp_descr;
 
-extern fts_dsp_signal_t *sig_zero;
+FTS_API fts_dsp_signal_t *sig_zero;
 
 typedef struct 
 {

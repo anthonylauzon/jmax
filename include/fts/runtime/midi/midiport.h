@@ -235,9 +235,9 @@ typedef struct fts_midiport
  * @ingroup midiport
  */
 
-extern void fts_midiport_class_init(fts_class_t *cl);
-extern void fts_midiport_init(fts_midiport_t *port);
-extern void fts_midiport_delete(fts_midiport_t *port);
+FTS_API void fts_midiport_class_init(fts_class_t *cl);
+FTS_API void fts_midiport_init(fts_midiport_t *port);
+FTS_API void fts_midiport_delete(fts_midiport_t *port);
 
 /**
  * Declare initialized MIDI port as input.
@@ -258,8 +258,8 @@ extern void fts_midiport_delete(fts_midiport_t *port);
  * @ingroup midiport
  */
 
-extern void fts_midiport_set_input(fts_midiport_t *port);
-extern void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *functions);
+FTS_API void fts_midiport_set_input(fts_midiport_t *port);
+FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_functions_t *functions);
 
 /*@}*/ /* Initializing a MIDI port */
 
@@ -349,15 +349,15 @@ extern void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_fu
  * @ingroup midiport
  */
 
-extern void fts_midiport_input_note(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_input_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_input_control_change(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_input_program_change(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_input_channel_pressure(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_input_pitch_bend(fts_midiport_t *port, int channel, int value, double time);
+FTS_API void fts_midiport_input_note(fts_midiport_t *port, int channel, int number, int value, double time);
+FTS_API void fts_midiport_input_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time);
+FTS_API void fts_midiport_input_control_change(fts_midiport_t *port, int channel, int number, int value, double time);
+FTS_API void fts_midiport_input_program_change(fts_midiport_t *port, int channel, int value, double time);
+FTS_API void fts_midiport_input_channel_pressure(fts_midiport_t *port, int channel, int value, double time);
+FTS_API void fts_midiport_input_pitch_bend(fts_midiport_t *port, int channel, int value, double time);
 
-extern void fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value);
-extern void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, double time);
+FTS_API void fts_midiport_input_system_exclusive_byte(fts_midiport_t *port, int value);
+FTS_API void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, double time);
 
 /*@}*/ /* Handling incoming MIDI events */
 
@@ -420,9 +420,9 @@ extern void fts_midiport_input_system_exclusive_call(fts_midiport_t *port, doubl
  *
  * @ingroup midiport_io
  */
-extern int fts_object_is_midiport(fts_object_t *obj);
-extern int fts_midiport_is_input(fts_midiport_t *port);
-extern int fts_midiport_is_output(fts_midiport_t *port);
+FTS_API int fts_object_is_midiport(fts_object_t *obj);
+FTS_API int fts_midiport_is_input(fts_midiport_t *port);
+FTS_API int fts_midiport_is_output(fts_midiport_t *port);
 
 /*@}*/ /* Refering to a MIDI port.*/
 
@@ -514,13 +514,13 @@ extern int fts_midiport_is_output(fts_midiport_t *port);
  * @ingroup midiport_io
  */
 
-extern void fts_midiport_add_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
-extern void fts_midiport_add_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
-extern void fts_midiport_add_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
-extern void fts_midiport_add_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
-extern void fts_midiport_add_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
-extern void fts_midiport_add_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
-extern void fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj, fts_midiport_sysex_fun_t fun);
+FTS_API void fts_midiport_add_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
+FTS_API void fts_midiport_add_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
+FTS_API void fts_midiport_add_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj, fts_midiport_poly_fun_t fun);
+FTS_API void fts_midiport_add_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
+FTS_API void fts_midiport_add_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
+FTS_API void fts_midiport_add_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj, fts_midiport_channel_fun_t fun);
+FTS_API void fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj, fts_midiport_sysex_fun_t fun);
 
 /**
  * Remove note event listener from a MIDI port.
@@ -591,13 +591,13 @@ extern void fts_midiport_add_listener_system_exclusive(fts_midiport_t *port, fts
  * @ingroup midiport_io
  */
 
-extern void fts_midiport_remove_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
-extern void fts_midiport_remove_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
-extern void fts_midiport_remove_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
-extern void fts_midiport_remove_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj);
-extern void fts_midiport_remove_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj);
-extern void fts_midiport_remove_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj);
-extern void fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_note(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_poly_pressure(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_control_change(fts_midiport_t *port, int chan, int num, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_program_change(fts_midiport_t *port, int chan, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_channel_pressure(fts_midiport_t *port, int chan, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_pitch_bend(fts_midiport_t *port, int chan, fts_object_t *obj);
+FTS_API void fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, fts_object_t *obj);
 
 /*@}*/ /* MIDI port listeners */
 
@@ -690,14 +690,14 @@ extern void fts_midiport_remove_listener_system_exclusive(fts_midiport_t *port, 
  * @ingroup midiport_io
  */
 
-extern void fts_midiport_output_note(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_output_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_output_control_change(fts_midiport_t *port, int channel, int number, int value, double time);
-extern void fts_midiport_output_program_change(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_output_channel_pressure(fts_midiport_t *port, int channel, int value, double time);
-extern void fts_midiport_output_pitch_bend(fts_midiport_t *port, int channel, int bend, double time);
-extern void fts_midiport_output_system_exclusive_byte(fts_midiport_t *port, int value);
-extern void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double time);
+FTS_API void fts_midiport_output_note(fts_midiport_t *port, int channel, int number, int value, double time);
+FTS_API void fts_midiport_output_poly_pressure(fts_midiport_t *port, int channel, int number, int value, double time);
+FTS_API void fts_midiport_output_control_change(fts_midiport_t *port, int channel, int number, int value, double time);
+FTS_API void fts_midiport_output_program_change(fts_midiport_t *port, int channel, int value, double time);
+FTS_API void fts_midiport_output_channel_pressure(fts_midiport_t *port, int channel, int value, double time);
+FTS_API void fts_midiport_output_pitch_bend(fts_midiport_t *port, int channel, int bend, double time);
+FTS_API void fts_midiport_output_system_exclusive_byte(fts_midiport_t *port, int value);
+FTS_API void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, double time);
 
 /*@}*/ /* MIDI port output */
 
@@ -707,8 +707,8 @@ extern void fts_midiport_output_system_exclusive_flush(fts_midiport_t *port, dou
  *
  */
 
-extern fts_midiport_t *fts_midiport_get_default(void);
-extern void fts_midiport_set_default( int argc, const fts_atom_t *argv);
+FTS_API fts_midiport_t *fts_midiport_get_default(void);
+FTS_API void fts_midiport_set_default( int argc, const fts_atom_t *argv);
 
 
 #endif

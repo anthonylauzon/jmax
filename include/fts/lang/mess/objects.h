@@ -29,16 +29,16 @@
 #define _FTS_OBJECTS_H_
 
 /* init function */
-extern void fts_objects_init(void);
+FTS_API void fts_objects_init(void);
 
 #define FTS_NO_ID -1
 
-extern fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
-extern void fts_object_set_id(fts_object_t *obj, int id);
+FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
+FTS_API void fts_object_set_id(fts_object_t *obj, int id);
 
 /* create/destroy object without patcher (attention: hack in fts_object_create()!) */
-extern fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
-extern void fts_object_destroy(fts_object_t *obj);
+FTS_API fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
+FTS_API void fts_object_destroy(fts_object_t *obj);
 
 #define fts_object_refer(o) ((o)->refcnt++)
 #define fts_object_release(o) ((--((o)->refcnt) > 0)? 0: (fts_object_destroy(o), 0))
@@ -46,22 +46,22 @@ extern void fts_object_destroy(fts_object_t *obj);
 #define fts_object_has_only_one_reference(o) ((o)->refcnt == 1)
 
 /* traditional object in patcher functions */
-extern fts_status_t fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
-extern void fts_object_delete_from_patcher(fts_object_t *obj);
+FTS_API fts_status_t fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
+FTS_API void fts_object_delete_from_patcher(fts_object_t *obj);
 
 /* support for redefinition */
-extern fts_object_t *fts_object_recompute(fts_object_t *old);
-extern fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at);
+FTS_API fts_object_t *fts_object_recompute(fts_object_t *old);
+FTS_API fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at);
 
 /* properties */
-extern void fts_object_send_properties(fts_object_t *obj);
-extern void fts_object_send_ui_properties(fts_object_t *obj);
+FTS_API void fts_object_send_properties(fts_object_t *obj);
+FTS_API void fts_object_send_ui_properties(fts_object_t *obj);
 
 /* object description (system functions) */
-extern void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
-extern void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name, int argc, const fts_atom_t *argv);
-extern void fts_object_reset_description(fts_object_t *obj);
-extern int fts_object_description_defines_variable(int ac, const fts_atom_t *at);
+FTS_API void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv);
+FTS_API void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name, int argc, const fts_atom_t *argv);
+FTS_API void fts_object_reset_description(fts_object_t *obj);
+FTS_API int fts_object_description_defines_variable(int ac, const fts_atom_t *at);
 
 /* object access */
 #define fts_object_get_outlet_type(O, WOUTLET) (((fts_object_t *)(O))->head.cl->outlets[(WOUTLET)].tmess.symb)
@@ -69,7 +69,7 @@ extern int fts_object_description_defines_variable(int ac, const fts_atom_t *at)
 #define fts_object_get_inlets_number(O) (((fts_object_t *)(O))->head.cl->ninlets)
 #define fts_object_get_patcher(O) (((fts_object_t *)(O))->patcher)
 
-extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
+FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 
 /* variables */
 #define fts_object_get_variable(o) ((o)->varname)
@@ -82,20 +82,20 @@ extern fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_user_data(o) ((o)->head.cl->user_data)
 
 /* return true if the object is being deleted, i.e. if the patcher (or an ancestor of the patcher) is being deleted */
-extern int fts_object_being_deleted(fts_object_t *obj);
+FTS_API int fts_object_being_deleted(fts_object_t *obj);
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
-extern int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
+FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 
 /* messages for the status line */
-extern void fts_object_blip(fts_object_t *obj, const char *format , ...);
+FTS_API void fts_object_blip(fts_object_t *obj, const char *format , ...);
 
 /* change number of outlets */
-extern void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets);
+FTS_API void fts_object_change_number_of_outlets(fts_object_t *o, int new_noutlets);
 
 /* debug print */
-extern void fprintf_object(FILE *f, fts_object_t *obj);
-extern void post_object(fts_object_t *obj);
+FTS_API void fprintf_object(FILE *f, fts_object_t *obj);
+FTS_API void post_object(fts_object_t *obj);
 
 #define fts_object_inlet_is_connected(o, i) ((o)->in_conn[(i)] != 0)
 #define fts_object_outlet_is_connected(o, i) ((o)->out_conn[(i)] != 0)

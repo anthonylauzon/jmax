@@ -154,3 +154,14 @@ char* win32_realpath(const char* path, char* resolved_path)
 {
   return strcpy(resolved_path, path);
 }
+
+
+/* *************************************************************************** */
+/*                                                                             */
+/* Platform specific initialization                                            */
+/*                                                                             */
+/* *************************************************************************** */
+
+void fts_platform_init( int argc, char **argv)
+{
+}

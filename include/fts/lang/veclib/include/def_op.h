@@ -156,14 +156,14 @@
  */
  
 #define DECLARE_FTS_VEC_OP(name, t_in0, t_in1, t_out, op)\
- extern void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size);
+ FTS_API void fts_vec_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size);
  
 #define DECLARE_FTS_VECX_OP(name, t_in0, t_in1, t_out, op)\
- extern void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size);
+ FTS_API void fts_vecx_ ## name(t_in0 *in0, t_in1 *in1, t_out *out, int size);
  
 #define DECLARE_FTL_VEC_OP(name, t_in0, t_in1, t_out, op)\
- extern void ftl_vec_ ## name(FTL_ARG);
+ FTS_API void ftl_vec_ ## name(FTL_ARG);
  
 #define DECLARE_FTL_VECX_OP(name, t_in0, t_in1, t_out, op)\
- extern void ftl_vecx_ ## name(FTL_ARG);
+ FTS_API void ftl_vecx_ ## name(FTL_ARG);
 

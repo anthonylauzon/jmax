@@ -39,7 +39,7 @@ typedef struct{
   float re, im;
 } complex;
 
-extern complex CZERO;
+FTS_API complex CZERO;
 
 #endif /* _MATHTYPES_H_ */
 

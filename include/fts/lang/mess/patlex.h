@@ -63,10 +63,10 @@ typedef struct fts_patlex
 
 #define fts_patlex_push_back(this) ((this)->pushedBack = 1)
 
-extern fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv);
-extern fts_patlex_t *fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv);
-extern void fts_patlex_close(fts_patlex_t *this);
-extern void fts_patlex_next_token(fts_patlex_t *this);
+FTS_API fts_patlex_t *fts_patlex_open(const char *filename, int env_argc, const fts_atom_t *env_argv);
+FTS_API fts_patlex_t *fts_patlex_open_file(FILE *file, int env_argc, const fts_atom_t *env_argv);
+FTS_API void fts_patlex_close(fts_patlex_t *this);
+FTS_API void fts_patlex_next_token(fts_patlex_t *this);
 
 #define  fts_patparse_set_messbox_mode(in) ((in)->messbox_mode = 1)
 #define  fts_patparse_set_normal_mode(in) ((in)->messbox_mode = 0)

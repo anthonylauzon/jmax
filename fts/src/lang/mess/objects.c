@@ -62,8 +62,6 @@ void fts_objects_init()
  *
  */
 
-static fts_status_description_t fts_CannotInstantiate = {"Cannot instantiate class"};
-
 fts_object_t *
 fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
 {

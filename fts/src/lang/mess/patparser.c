@@ -50,7 +50,6 @@ static fts_symbol_t fts_s_newobj;
 static fts_symbol_t fts_s_vpatcher;
 static fts_symbol_t fts_s_vtable;
 static fts_symbol_t fts_s_slider;
-static fts_symbol_t fts_s_number;
 static fts_symbol_t fts_s_flonum;
 static fts_symbol_t fts_s_intbox;
 static fts_symbol_t fts_s_floatbox;

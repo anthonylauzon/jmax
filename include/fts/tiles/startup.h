@@ -27,8 +27,9 @@
 #ifndef _FTS_STARTUP_H_
 #define _FTS_STARTUP_H_
 
-extern char *fts_get_root_dir( void);
-extern char *fts_get_arch( void);
-extern char *fts_get_mode( void);
+FTS_API int fts_init(int argc, char **argv);
+FTS_API char *fts_get_root_dir( void);
+FTS_API char *fts_get_arch( void);
+FTS_API char *fts_get_mode( void);
 
 #endif

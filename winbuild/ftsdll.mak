@@ -37,7 +37,7 @@ INTDIR=.\Release
 OutDir=.\Release
 # End Custom Macros
 
-ALL : "$(OUTDIR)\ftsdll.dll"
+ALL : "$(OUTDIR)\fts.dll"
 
 
 CLEAN :
@@ -121,6 +121,7 @@ CLEAN :
 	-@erase "$(INTDIR)\soundfiles.obj"
 	-@erase "$(INTDIR)\soundformats.obj"
 	-@erase "$(INTDIR)\srconv.obj"
+	-@erase "$(INTDIR)\startup.obj"
 	-@erase "$(INTDIR)\status.obj"
 	-@erase "$(INTDIR)\symbols.obj"
 	-@erase "$(INTDIR)\sync.obj"
@@ -207,9 +208,9 @@ CLEAN :
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "$(INTDIR)\vm.obj"
 	-@erase "$(INTDIR)\win32.obj"
-	-@erase "$(OUTDIR)\ftsdll.dll"
-	-@erase "$(OUTDIR)\ftsdll.exp"
-	-@erase "$(OUTDIR)\ftsdll.lib"
+	-@erase "$(OUTDIR)\fts.dll"
+	-@erase "$(OUTDIR)\fts.exp"
+	-@erase "$(OUTDIR)\fts.lib"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -221,7 +222,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\ftsdll.pdb" /machine:I386 /out:"$(OUTDIR)\ftsdll.dll" /implib:"$(OUTDIR)\ftsdll.lib" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\fts.pdb" /machine:I386 /out:"$(OUTDIR)\fts.dll" /implib:"$(OUTDIR)\fts.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\atomarray.obj" \
 	"$(INTDIR)\atomfiles.obj" \
@@ -238,6 +239,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\clipboard.obj" \
 	"$(INTDIR)\complex.obj" \
 	"$(INTDIR)\connections.obj" \
+	"$(INTDIR)\cubic.obj" \
 	"$(INTDIR)\datalib.obj" \
 	"$(INTDIR)\devconf.obj" \
 	"$(INTDIR)\devices.obj" \
@@ -302,6 +304,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\soundfiles.obj" \
 	"$(INTDIR)\soundformats.obj" \
 	"$(INTDIR)\srconv.obj" \
+	"$(INTDIR)\startup.obj" \
 	"$(INTDIR)\status.obj" \
 	"$(INTDIR)\symbols.obj" \
 	"$(INTDIR)\sync.obj" \
@@ -386,10 +389,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\vecx_trigon.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj" \
-	"$(INTDIR)\cubic.obj"
+	"$(INTDIR)\win32.obj"
 
-"$(OUTDIR)\ftsdll.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -402,7 +404,7 @@ INTDIR=.\Debug
 OutDir=.\Debug
 # End Custom Macros
 
-ALL : "$(OUTDIR)\ftsdll.dll"
+ALL : "$(OUTDIR)\fts.dll"
 
 
 CLEAN :
@@ -486,6 +488,7 @@ CLEAN :
 	-@erase "$(INTDIR)\soundfiles.obj"
 	-@erase "$(INTDIR)\soundformats.obj"
 	-@erase "$(INTDIR)\srconv.obj"
+	-@erase "$(INTDIR)\startup.obj"
 	-@erase "$(INTDIR)\status.obj"
 	-@erase "$(INTDIR)\symbols.obj"
 	-@erase "$(INTDIR)\sync.obj"
@@ -573,11 +576,11 @@ CLEAN :
 	-@erase "$(INTDIR)\version.obj"
 	-@erase "$(INTDIR)\vm.obj"
 	-@erase "$(INTDIR)\win32.obj"
-	-@erase "$(OUTDIR)\ftsdll.dll"
-	-@erase "$(OUTDIR)\ftsdll.exp"
-	-@erase "$(OUTDIR)\ftsdll.ilk"
-	-@erase "$(OUTDIR)\ftsdll.lib"
-	-@erase "$(OUTDIR)\ftsdll.pdb"
+	-@erase "$(OUTDIR)\fts.dll"
+	-@erase "$(OUTDIR)\fts.exp"
+	-@erase "$(OUTDIR)\fts.ilk"
+	-@erase "$(OUTDIR)\fts.lib"
+	-@erase "$(OUTDIR)\fts.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -589,7 +592,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\ftsdll.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\ftsdll.pdb" /debug /machine:I386 /out:"$(OUTDIR)\ftsdll.dll" /implib:"$(OUTDIR)\ftsdll.lib" /pdbtype:sept 
+LINK32_FLAGS=ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\fts.pdb" /debug /machine:I386 /out:"$(OUTDIR)\fts.dll" /implib:"$(OUTDIR)\fts.lib" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\atomarray.obj" \
 	"$(INTDIR)\atomfiles.obj" \
@@ -606,6 +609,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\clipboard.obj" \
 	"$(INTDIR)\complex.obj" \
 	"$(INTDIR)\connections.obj" \
+	"$(INTDIR)\cubic.obj" \
 	"$(INTDIR)\datalib.obj" \
 	"$(INTDIR)\devconf.obj" \
 	"$(INTDIR)\devices.obj" \
@@ -670,6 +674,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\soundfiles.obj" \
 	"$(INTDIR)\soundformats.obj" \
 	"$(INTDIR)\srconv.obj" \
+	"$(INTDIR)\startup.obj" \
 	"$(INTDIR)\status.obj" \
 	"$(INTDIR)\symbols.obj" \
 	"$(INTDIR)\sync.obj" \
@@ -754,10 +759,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\vecx_trigon.obj" \
 	"$(INTDIR)\version.obj" \
 	"$(INTDIR)\vm.obj" \
-	"$(INTDIR)\win32.obj" \
-	"$(INTDIR)\cubic.obj"
+	"$(INTDIR)\win32.obj"
 
-"$(OUTDIR)\ftsdll.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\fts.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1282,6 +1286,12 @@ SOURCE=..\fts\src\runtime\files\soundformats.c
 SOURCE=..\fts\src\lang\utils\srconv.c
 
 "$(INTDIR)\srconv.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\fts\src\tiles\startup.c
+
+"$(INTDIR)\startup.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

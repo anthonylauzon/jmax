@@ -35,12 +35,12 @@ typedef struct _fts_dsp_signal_
   float srate;
 } fts_dsp_signal_t;
 
-extern fts_dsp_signal_t *fts_dsp_signal_new( int vector_size, float sample_rate);
-extern void fts_dsp_signal_free( fts_dsp_signal_t *sig);
-extern int fts_dsp_signal_is_pending( fts_dsp_signal_t *sig);
-extern void fts_dsp_signal_unreference(fts_dsp_signal_t *sig);
-extern void fts_dsp_signal_reference(fts_dsp_signal_t *sig);
-extern void fts_dsp_signal_print(fts_dsp_signal_t *sig);
-extern void fts_dsp_signal_init( void);
+FTS_API fts_dsp_signal_t *fts_dsp_signal_new( int vector_size, float sample_rate);
+FTS_API void fts_dsp_signal_free( fts_dsp_signal_t *sig);
+FTS_API int fts_dsp_signal_is_pending( fts_dsp_signal_t *sig);
+FTS_API void fts_dsp_signal_unreference(fts_dsp_signal_t *sig);
+FTS_API void fts_dsp_signal_reference(fts_dsp_signal_t *sig);
+FTS_API void fts_dsp_signal_print(fts_dsp_signal_t *sig);
+FTS_API void fts_dsp_signal_init( void);
 
 #endif

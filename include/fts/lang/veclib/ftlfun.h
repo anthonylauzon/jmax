@@ -205,6 +205,6 @@ typedef struct{
   ftl_one_type_fun_t round;
 } ftl_function_symbols_t;
 
-extern ftl_function_symbols_t ftl_sym;
+FTS_API ftl_function_symbols_t ftl_sym;
 
 #endif /* _FTLFUN_H_ */

@@ -36,15 +36,15 @@ struct fts_list
   int alloc;
 };
 
-extern fts_symbol_t fts_s_list;
+FTS_API fts_symbol_t fts_s_list;
 
-extern fts_list_t *fts_list_new(int ac, const fts_atom_t *at);
-extern void fts_list_delete(fts_list_t *this);
+FTS_API fts_list_t *fts_list_new(int ac, const fts_atom_t *at);
+FTS_API void fts_list_delete(fts_list_t *this);
 
-extern void fts_list_copy(fts_list_t *in, fts_list_t *out);
-extern void fts_list_void(fts_list_t *array);
+FTS_API void fts_list_copy(fts_list_t *in, fts_list_t *out);
+FTS_API void fts_list_void(fts_list_t *array);
 
-extern void fts_list_set_size(fts_list_t *array, int size);
+FTS_API void fts_list_set_size(fts_list_t *array, int size);
 #define fts_list_get_size(array) ((array)->size)
 
 #define fts_list_get_ptr(array) ((array)->atoms)

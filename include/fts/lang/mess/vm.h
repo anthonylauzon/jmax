@@ -122,13 +122,13 @@
 #define FVM_MAKE_TOP_OBJ_L    (FVM_MAKE_TOP_OBJ | FVM_L_ARG)
 
 
-extern fts_object_t *fts_run_mess_vm(fts_object_t *parent,
+FTS_API fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 				     unsigned char *program,
 				     fts_symbol_t symbol_table[],
 				     int ac, const fts_atom_t *at,
 				     fts_expression_state_t *e);
 
-extern void fts_vm_substitute_object(fts_object_t *old, fts_object_t *new);
+FTS_API void fts_vm_substitute_object(fts_object_t *old, fts_object_t *new);
 
 #endif
 

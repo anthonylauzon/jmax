@@ -65,8 +65,8 @@ struct ftl_data_handle
 
 typedef struct ftl_data_handle *ftl_data_t;
 
-extern ftl_data_t ftl_data_alloc(unsigned int size);
-extern void ftl_data_free(ftl_data_t obj);
+FTS_API ftl_data_t ftl_data_alloc(unsigned int size);
+FTS_API void ftl_data_free(ftl_data_t obj);
 
 #define ftl_data_get_ptr(OBJ) (OBJ)->ptr
 
@@ -112,8 +112,8 @@ but are more than symbols.
 
 /* Private definition for the dsp module: don't use */
 
-extern void ftl_mem_start_memory_relocation(void);
-extern void ftl_mem_end_memory_relocation(void);
-extern void *ftl_data_relocate_and_get(struct ftl_data_handle *h);
+FTS_API void ftl_mem_start_memory_relocation(void);
+FTS_API void ftl_mem_end_memory_relocation(void);
+FTS_API void *ftl_data_relocate_and_get(struct ftl_data_handle *h);
 
 #endif

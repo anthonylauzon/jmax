@@ -27,6 +27,6 @@
 #ifndef _FTS_PARSER_H_
 #define _FTS_PARSER_H_
 
-void fts_atom_parse(const char *p, fts_atom_t *value);
+FTS_API void fts_atom_parse(const char *p, fts_atom_t *value);
 
 #endif

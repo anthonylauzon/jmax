@@ -24,22 +24,24 @@
  *
  */
 
-#ifndef _FTS_STATUS_H_
-#define _FTS_STATUS_H_
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
 
-/* General status return values for FTS. */
-typedef struct 
+#include <fts/fts.h>
+
+
+int main(int argc, char **argv)
 {
-  const char *description;
-} fts_status_description_t;
+  /* Fts initialization */
+  fts_init( argc, argv);
 
+  /* Run the audio scheduler */
+  fts_sched_run();
 
-typedef fts_status_description_t *fts_status_t;
+  /* When and if the scheduler exit, run the shutdown functions and return */
+  fts_modules_shutdown();
 
-#define fts_Success ((fts_status_t) 0)
+  return 0;
+}
 
-#define fts_status_get_description(s) ((s)->description)
-
-extern FTS_API fts_status_t fts_new_status(const char *description);
-
-#endif

@@ -94,7 +94,7 @@ struct fts_clock
  *
  * @ingroup time
  */
-extern void fts_clock_init(fts_clock_t *clock);
+FTS_API void fts_clock_init(fts_clock_t *clock);
 
 /**
  * Reset clock to zero and reset all active alarms.
@@ -104,7 +104,7 @@ extern void fts_clock_init(fts_clock_t *clock);
  *
  * @ingroup time
  */
-extern void fts_clock_reset(fts_clock_t *clock);
+FTS_API void fts_clock_reset(fts_clock_t *clock);
 
 /**
  * Get current clock time.
@@ -115,7 +115,7 @@ extern void fts_clock_reset(fts_clock_t *clock);
  *
  * @ingroup time
  */
-extern double fts_clock_get_time(fts_clock_t *clock);
+FTS_API double fts_clock_get_time(fts_clock_t *clock);
 
 /**
  * Set current clock time (doesn't fire alarms).
@@ -126,7 +126,7 @@ extern double fts_clock_get_time(fts_clock_t *clock);
  *
  * @ingroup time
  */
-extern void fts_clock_set_time(fts_clock_t *clock, double time);
+FTS_API void fts_clock_set_time(fts_clock_t *clock, double time);
 
 /**
  * Advance clock to given time and sequencially fire pending alarms set to the given time or earlier.
@@ -141,7 +141,7 @@ extern void fts_clock_set_time(fts_clock_t *clock, double time);
  *
  * @ingroup time
  */
-extern void fts_clock_advance(fts_clock_t *clock, double time);
+FTS_API void fts_clock_advance(fts_clock_t *clock, double time);
 
 /*@}*/ /* clocks */
 
@@ -185,7 +185,7 @@ struct fts_alarm
  *
  * @ingroup time
  */
-extern void fts_alarm_init(fts_alarm_t *alarm, fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg);
+FTS_API void fts_alarm_init(fts_alarm_t *alarm, fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg);
 
 /**
  * Create and initialize new alarm.
@@ -198,7 +198,7 @@ extern void fts_alarm_init(fts_alarm_t *alarm, fts_clock_t *clock, void (* fun)(
  *
  * @ingroup time
  */
-extern fts_alarm_t *fts_alarm_new(fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg);
+FTS_API fts_alarm_t *fts_alarm_new(fts_clock_t *clock, void (* fun)(fts_alarm_t *, void *), void *arg);
 
 /**
  * Free alarm created with fts_alarm_new().
@@ -208,7 +208,7 @@ extern fts_alarm_t *fts_alarm_new(fts_clock_t *clock, void (* fun)(fts_alarm_t *
  *
  * @ingroup time
  */
-extern void fts_alarm_free(fts_alarm_t *alarm);
+FTS_API void fts_alarm_free(fts_alarm_t *alarm);
 
 /**
  * Check if alarm is activated.
@@ -220,7 +220,7 @@ extern void fts_alarm_free(fts_alarm_t *alarm);
  * @ingroup time
  */
 
-extern int fts_alarm_is_active(fts_alarm_t *alarm);
+FTS_API int fts_alarm_is_active(fts_alarm_t *alarm);
 
 /**
  * Activate alarm for given time.
@@ -234,7 +234,7 @@ extern int fts_alarm_is_active(fts_alarm_t *alarm);
  *
  * @ingroup time
  */
-extern void fts_alarm_set_time(fts_alarm_t *alarm, double time);
+FTS_API void fts_alarm_set_time(fts_alarm_t *alarm, double time);
 
 /**
  * Activate alarm for given delay.
@@ -248,7 +248,7 @@ extern void fts_alarm_set_time(fts_alarm_t *alarm, double time);
  *
  * @ingroup time
  */
-extern void fts_alarm_set_delay(fts_alarm_t *alarm, double delay);
+FTS_API void fts_alarm_set_delay(fts_alarm_t *alarm, double delay);
 
 /**
  * Reset and desactivate alarm.
@@ -260,7 +260,7 @@ extern void fts_alarm_set_delay(fts_alarm_t *alarm, double delay);
  *
  * @ingroup time
  */
-extern void fts_alarm_reset(fts_alarm_t *alarm);
+FTS_API void fts_alarm_reset(fts_alarm_t *alarm);
 
 /*@}*/ /* alarms */
 
@@ -302,7 +302,7 @@ struct fts_timer
  *
  * @ingroup time
  */
-extern void fts_timer_init(fts_timer_t *timer, fts_clock_t *clock);
+FTS_API void fts_timer_init(fts_timer_t *timer, fts_clock_t *clock);
 
 /**
  * Create and initialize new timer.
@@ -313,7 +313,7 @@ extern void fts_timer_init(fts_timer_t *timer, fts_clock_t *clock);
  *
  * @ingroup time
  */
-extern fts_timer_t *fts_timer_new(fts_clock_t *clock);
+FTS_API fts_timer_t *fts_timer_new(fts_clock_t *clock);
 
 /**
  * Free timer created with fts_timer_new().
@@ -323,7 +323,7 @@ extern fts_timer_t *fts_timer_new(fts_clock_t *clock);
  *
  * @ingroup time
  */
-extern void fts_timer_free(fts_timer_t *timer);
+FTS_API void fts_timer_free(fts_timer_t *timer);
 
 /**
  * Get current timer time.
@@ -334,7 +334,7 @@ extern void fts_timer_free(fts_timer_t *timer);
  *
  * @ingroup time
  */
-extern double fts_timer_get_time(fts_timer_t *timer);
+FTS_API double fts_timer_get_time(fts_timer_t *timer);
 
 /**
  * Start timer.
@@ -344,7 +344,7 @@ extern double fts_timer_get_time(fts_timer_t *timer);
  *
  * @ingroup time
  */
-extern void fts_timer_start(fts_timer_t *timer);
+FTS_API void fts_timer_start(fts_timer_t *timer);
 
 /**
  * Stop timer.
@@ -354,7 +354,7 @@ extern void fts_timer_start(fts_timer_t *timer);
  *
  * @ingroup time
  */
-extern void fts_timer_stop(fts_timer_t *timer);
+FTS_API void fts_timer_stop(fts_timer_t *timer);
 
 /**
  * Reset timer to zero.
@@ -364,7 +364,7 @@ extern void fts_timer_stop(fts_timer_t *timer);
  *
  * @ingroup time
  */
-extern void fts_timer_reset(fts_timer_t *timer);
+FTS_API void fts_timer_reset(fts_timer_t *timer);
 
 /*@}*/ /* timers */
 

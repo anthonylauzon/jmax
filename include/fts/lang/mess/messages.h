@@ -30,23 +30,23 @@
 
 /* Return status values */
 
-extern fts_status_description_t fts_MethodNotFound;
-extern fts_status_description_t fts_ArgumentMissing;
-extern fts_status_description_t fts_ArgumentTypeMismatch;
-extern fts_status_description_t fts_ExtraArguments;
-extern fts_status_description_t fts_InvalidMessage;
+FTS_API fts_status_description_t fts_MethodNotFound;
+FTS_API fts_status_description_t fts_ArgumentMissing;
+FTS_API fts_status_description_t fts_ArgumentTypeMismatch;
+FTS_API fts_status_description_t fts_ExtraArguments;
+FTS_API fts_status_description_t fts_InvalidMessage;
 
 /* init function */
 
-extern void fts_messages_init(void);
+FTS_API void fts_messages_init(void);
 
 /* The object stack; used for fpe handling, debug and who know what else in the future */
 
 #define DO_OBJECT_STACK
 
 #ifdef DO_OBJECT_STACK
-extern int fts_objstack_top; /* Next free slot; can overflow, must be checked */
-extern fts_object_t *fts_objstack[];
+FTS_API int fts_objstack_top; /* Next free slot; can overflow, must be checked */
+FTS_API fts_object_t *fts_objstack[];
 
 #define FTS_OBJSTACK_SIZE  8*1024
 
@@ -72,19 +72,19 @@ extern fts_object_t *fts_objstack[];
 /* Messaging */
 
 #define fts_message_send  fts_send_message
-extern fts_status_t fts_send_message(fts_object_t *, int winlet, fts_symbol_t , int,  const fts_atom_t *);
+FTS_API fts_status_t fts_send_message(fts_object_t *, int winlet, fts_symbol_t , int,  const fts_atom_t *);
 
 /* NOt to be used by users, but called by the optimized macros ... */
 
-extern fts_status_t fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
+FTS_API fts_status_t fts_send_message_cache(fts_object_t *o, int winlet, fts_symbol_t s,
 					   int ac, const fts_atom_t *at, fts_symbol_t *symb_cache, fts_method_t *mth_cache);
 
 
-extern fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t , int, const fts_atom_t *);
+FTS_API fts_status_t fts_outlet_send(fts_object_t *, int woutlet, fts_symbol_t , int, const fts_atom_t *);
 
 
-extern void fts_mess_set_run_time_check(int flag);
-extern int fts_mess_get_run_time_check(void);
+FTS_API void fts_mess_set_run_time_check(int flag);
+FTS_API int fts_mess_get_run_time_check(void);
 
 /* argument macros and functions */
 
@@ -107,10 +107,10 @@ extern int fts_mess_get_run_time_check(void);
 #define fts_get_long_arg(AC, AT, N, DEF)   fts_get_int_arg(AC, AT, N, DEF)
 
 #define fts_get_long_by_name(AC, AR, NAME, DEF)   fts_get_int_by_name(AC, AR, NAME, DEF) 
-extern long fts_get_int_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int def);
-extern float fts_get_float_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, float def);
-extern fts_symbol_t fts_get_symbol_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, fts_symbol_t def);
-extern long fts_get_boolean_by_name(int argc, const fts_atom_t *at,  fts_symbol_t name, int def);
+FTS_API long fts_get_int_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, int def);
+FTS_API float fts_get_float_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, float def);
+FTS_API fts_symbol_t fts_get_symbol_by_name(int argc, const fts_atom_t *at, fts_symbol_t name, fts_symbol_t def);
+FTS_API long fts_get_boolean_by_name(int argc, const fts_atom_t *at,  fts_symbol_t name, int def);
 
 /* inlined macros for message sending (active only if compiled optimized */
 
@@ -206,11 +206,11 @@ do { \
    with the macros !!!  
 */
 
-extern void fts_outlet_bang(fts_object_t *o, int woutlet);
-extern void fts_outlet_int(fts_object_t *o, int woutlet, int n);
-extern void fts_outlet_float(fts_object_t *o, int woutlet, float f);
-extern void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s);
-extern void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at);
+FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
+FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);
+FTS_API void fts_outlet_float(fts_object_t *o, int woutlet, float f);
+FTS_API void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s);
+FTS_API void fts_outlet_list(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at);
 #endif
 
 #endif

@@ -81,7 +81,7 @@ typedef struct _fts_midiparser_
   double mtc_time;
 } fts_midiparser_t;
 
-extern void fts_midiparser_init(fts_midiparser_t *parser);
-extern void fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
+FTS_API void fts_midiparser_init(fts_midiparser_t *parser);
+FTS_API void fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
 
 #endif

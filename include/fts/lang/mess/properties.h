@@ -59,14 +59,14 @@
 /* the non underscored functions will run the daemon (look to the .c file for comments) */
 /* also included are shortcuts to avoid type conversions to atoms */
 
-extern void  fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
-extern void _fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
+FTS_API void  fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
+FTS_API void _fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
 
-extern void  fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
-extern void _fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
+FTS_API void  fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
+FTS_API void _fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
 
-extern void _fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
-extern void  fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+FTS_API void _fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+FTS_API void  fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 
 /* Class version
 
@@ -76,9 +76,9 @@ extern void  fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_a
    be used after class initialization.
 */
 
-extern void fts_class_put_prop(fts_class_t *cl, fts_symbol_t property, const fts_atom_t *value);
-extern void fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property);
-extern const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
+FTS_API void fts_class_put_prop(fts_class_t *cl, fts_symbol_t property, const fts_atom_t *value);
+FTS_API void fts_class_remove_prop(fts_class_t *cl, fts_symbol_t property);
+FTS_API const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t property);
 
 /* 
    Daemon handling
@@ -86,17 +86,17 @@ extern const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t proper
 
 /* class daemons */
 
-extern void fts_class_add_daemon(fts_class_t *cl,
+FTS_API void fts_class_add_daemon(fts_class_t *cl,
 				 fts_daemon_action_t  action,
 				 fts_symbol_t        property,
 				 fts_property_daemon_t daemon);
 
-extern void fts_class_remove_daemon(fts_class_t *cl, 
+FTS_API void fts_class_remove_daemon(fts_class_t *cl, 
 				    fts_daemon_action_t  action, 
 				    fts_symbol_t        property,
 				    fts_property_daemon_t daemon);
 
-extern void fts_obj_prop_init(void);
+FTS_API void fts_obj_prop_init(void);
 
 
 #endif

@@ -29,7 +29,7 @@
 
 #include <fts/lang/mess/messages.h>
 
-extern void fts_data_module_init(void);
+FTS_API void fts_data_module_init(void);
 
 /************************************************************************
  *
@@ -47,11 +47,11 @@ struct fts_data_class {
   fts_data_fun_t functions_table[FUNCTION_TABLE_SIZE];
 };
 
-extern fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name);
-extern void fts_data_class_define_export_function( fts_data_class_t *class, fts_data_export_fun_t export_fun);
-extern void fts_data_class_define_remote_constructor( fts_data_class_t *class, fts_data_remote_constructor_t constructor);
-extern void fts_data_class_define_remote_destructor( fts_data_class_t *class, fts_data_remote_destructor_t destructor);
-extern void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t fun);
+FTS_API fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name);
+FTS_API void fts_data_class_define_export_function( fts_data_class_t *class, fts_data_export_fun_t export_fun);
+FTS_API void fts_data_class_define_remote_constructor( fts_data_class_t *class, fts_data_remote_constructor_t constructor);
+FTS_API void fts_data_class_define_remote_destructor( fts_data_class_t *class, fts_data_remote_destructor_t destructor);
+FTS_API void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t fun);
 
 
 /************************************************************************
@@ -66,26 +66,26 @@ struct fts_data
   int id;
 };
 
-extern void fts_data_init( fts_data_t *data, fts_data_class_t *class);
-extern void fts_data_delete( fts_data_t *data);
+FTS_API void fts_data_init( fts_data_t *data, fts_data_class_t *class);
+FTS_API void fts_data_delete( fts_data_t *data);
 
 /* class name */
 #define fts_data_get_class_name(data) ((data)->class->data_class_name)
 #define fts_data_is(data, cl_name) ((data)->class->data_class_name == (cl_name))
 
-extern int fts_data_get_id( fts_data_t *data);
-extern void fts_data_id_init(void);
+FTS_API int fts_data_get_id( fts_data_t *data);
+FTS_API void fts_data_id_init(void);
 
-extern void fts_data_export( fts_data_t *data);
+FTS_API void fts_data_export( fts_data_t *data);
 
-extern void fts_data_call( fts_data_t *data, int key, int ac, const fts_atom_t *at);
-extern void fts_data_remote_call( fts_data_t *data, int key, int ac, const fts_atom_t *at);
-extern void fts_data_start_remote_call( fts_data_t *data, int key);
-extern void fts_data_end_remote_call(void);
+FTS_API void fts_data_call( fts_data_t *data, int key, int ac, const fts_atom_t *at);
+FTS_API void fts_data_remote_call( fts_data_t *data, int key, int ac, const fts_atom_t *at);
+FTS_API void fts_data_start_remote_call( fts_data_t *data, int key);
+FTS_API void fts_data_end_remote_call(void);
 
-extern void fprintf_data(FILE *f, fts_data_t *data);
+FTS_API void fprintf_data(FILE *f, fts_data_t *data);
 
-extern int fts_data_is_exported( fts_data_t *data);
+FTS_API int fts_data_is_exported( fts_data_t *data);
 
 #endif
 

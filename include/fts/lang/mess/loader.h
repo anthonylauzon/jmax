@@ -56,12 +56,12 @@ typedef struct fts_binary_file_header_t {
    Description: loads and run a FTS binary file.
 */
 
-extern fts_object_t *fts_binary_file_load(const char *name,
+FTS_API fts_object_t *fts_binary_file_load(const char *name,
 					  fts_object_t *parent,
 					  int ac, const fts_atom_t *at,
 					  fts_expression_state_t *e);
 
-extern fts_object_t *fts_binary_filedesc_load(FILE *f,
+FTS_API fts_object_t *fts_binary_filedesc_load(FILE *f,
 					      fts_object_t *parent,
 					      int ac, const fts_atom_t *at,
 					      fts_expression_state_t *e);

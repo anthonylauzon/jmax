@@ -38,8 +38,8 @@ typedef struct _fts_signal_bus_
   int n_tick;
 } fts_signal_bus_t;
 
-extern fts_symbol_t fts_signal_bus_symbol;
-extern fts_class_t *fts_signal_bus_class;
+FTS_API fts_symbol_t fts_signal_bus_symbol;
+FTS_API fts_class_t *fts_signal_bus_class;
 
 
 #define fts_signal_bus_get_size(b) ((b)->n_channels)

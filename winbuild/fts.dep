@@ -1,8 +1,7 @@
 # Microsoft Developer Studio Generated Dependency File, included by fts.mak
 
-..\fts\src\tiles\startup.c : \
-	"..\fts\src\tiles\messtile.h"\
-	"..\fts\src\tiles\ucs.h"\
+..\fts\src\tiles\main.c : \
+	"..\include\fts\fts.h"\
 	"..\include\fts\lang.h"\
 	"..\include\fts\lang\datalib.h"\
 	"..\include\fts\lang\datalib\atomlist.h"\
@@ -12,7 +11,6 @@
 	"..\include\fts\lang\dsp\dspgraph.h"\
 	"..\include\fts\lang\dsp\sigbus.h"\
 	"..\include\fts\lang\dsp\sigconn.h"\
-	"..\include\fts\lang\dsp\signal.h"\
 	"..\include\fts\lang\ftl.h"\
 	"..\include\fts\lang\ftl\ftl.h"\
 	"..\include\fts\lang\ftl\ftlmem.h"\
@@ -63,31 +61,8 @@
 	"..\include\fts\lang\veclib.h"\
 	"..\include\fts\lang\veclib\complex.h"\
 	"..\include\fts\lang\veclib\ftlfun.h"\
-	"..\include\fts\lang\veclib\include\declare_ftl.h"\
 	"..\include\fts\lang\veclib\include\declare_fts.h"\
-	"..\include\fts\lang\veclib\include\def_cfun.h"\
-	"..\include\fts\lang\veclib\include\def_cop.h"\
-	"..\include\fts\lang\veclib\include\def_dot.h"\
-	"..\include\fts\lang\veclib\include\def_fill.h"\
-	"..\include\fts\lang\veclib\include\def_fun.h"\
-	"..\include\fts\lang\veclib\include\def_op.h"\
-	"..\include\fts\lang\veclib\include\def_opscl.h"\
-	"..\include\fts\lang\veclib\include\def_set.h"\
-	"..\include\fts\lang\veclib\include\def_twoscl.h"\
-	"..\include\fts\lang\veclib\include\def_vecscl.h"\
-	"..\include\fts\lang\veclib\include\kern_fun.h"\
-	"..\include\fts\lang\veclib\include\kern_misc.h"\
-	"..\include\fts\lang\veclib\include\kern_op.h"\
-	"..\include\fts\lang\veclib\include\unroll.h"\
-	"..\include\fts\lang\veclib\include\unwrap.h"\
-	"..\include\fts\lang\veclib\include\vec_arith.h"\
-	"..\include\fts\lang\veclib\include\vec_bit.h"\
-	"..\include\fts\lang\veclib\include\vec_cmp.h"\
-	"..\include\fts\lang\veclib\include\vec_cpy.h"\
 	"..\include\fts\lang\veclib\include\vec_fft.h"\
-	"..\include\fts\lang\veclib\include\vec_fun.h"\
-	"..\include\fts\lang\veclib\include\vec_misc.h"\
-	"..\include\fts\lang\veclib\include\vecdef.h"\
 	"..\include\fts\lang\veclib\include\vecftl.h"\
 	"..\include\fts\lang\veclib\include\veclib.h"\
 	"..\include\fts\runtime.h"\
@@ -96,7 +71,6 @@
 	"..\include\fts\runtime\client\client.h"\
 	"..\include\fts\runtime\client\incoming.h"\
 	"..\include\fts\runtime\client\outgoing.h"\
-	"..\include\fts\runtime\client\protocol.h"\
 	"..\include\fts\runtime\client\updates.h"\
 	"..\include\fts\runtime\devices\bytestream.h"\
 	"..\include\fts\runtime\devices\devices.h"\
@@ -105,7 +79,6 @@
 	"..\include\fts\runtime\files\directories.h"\
 	"..\include\fts\runtime\files\files.h"\
 	"..\include\fts\runtime\files\midifiles.h"\
-	"..\include\fts\runtime\files\parser.h"\
 	"..\include\fts\runtime\files\post.h"\
 	"..\include\fts\runtime\files\soundfiles.h"\
 	"..\include\fts\runtime\files\soundformats.h"\
@@ -113,12 +86,11 @@
 	"..\include\fts\runtime\midi\midiparser.h"\
 	"..\include\fts\runtime\midi\midiport.h"\
 	"..\include\fts\runtime\sched\sched.h"\
-	"..\include\fts\runtime\time\time.h"\
 	"..\include\fts\sys.h"\
 	"..\include\fts\sys\hw.h"\
 	"..\include\fts\sys\mem.h"\
 	"..\include\fts\sys\modules.h"\
 	"..\include\fts\sys\platform.h"\
 	"..\include\fts\sys\status.h"\
-	"..\include\fts\sys\version.h"\
+	"..\include\fts\tiles\startup.h"\
 	

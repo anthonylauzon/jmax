@@ -33,7 +33,7 @@ typedef struct _fts_label_
   fts_channel_t channel;
 } fts_label_t;
 
-extern fts_class_t *fts_label_class;
+FTS_API fts_class_t *fts_label_class;
 
 #define fts_label_get_channel(l) (&(l)->channel)
 

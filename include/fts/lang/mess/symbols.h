@@ -52,7 +52,7 @@
  * a pointer to an opaque structure
  * @ingroup symbols
 */
-extern fts_symbol_t fts_new_symbol( const char *name);
+FTS_API fts_symbol_t fts_new_symbol( const char *name);
 
 /**
  * Lookup a symbol and create a new definition if symbol
@@ -68,7 +68,7 @@ extern fts_symbol_t fts_new_symbol( const char *name);
  * a pointer to an opaque structure
  * @ingroup symbols
  */
-extern fts_symbol_t fts_new_symbol_copy( const char *name);
+FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 
 
 /**
@@ -106,7 +106,7 @@ extern fts_symbol_t fts_new_symbol_copy( const char *name);
   Predefined symbols. See predefsymbols.h
 */
 #undef PREDEF_SYMBOL
-#define PREDEF_SYMBOL(V,S) extern fts_symbol_t V;
+#define PREDEF_SYMBOL(V,S) FTS_API fts_symbol_t V;
 #include <fts/lang/mess/predefsymbols.h>
 
 /* (fd)

@@ -32,11 +32,11 @@
 
 
 /* 31 bit random number generator */
-extern void fts_random_set_seed(unsigned long ul);
-extern unsigned long fts_random(void);
+FTS_API void fts_random_set_seed(unsigned long ul);
+FTS_API unsigned long fts_random(void);
 
 /* float random between -1. and 1. */
-extern float fts_random_float(void);
+FTS_API float fts_random_float(void);
 
 #define fts_random_range(min, max) ((min) + (((max) - (min)) * fts_random() / (double)FTS_RANDOM_MAX))
 

@@ -28,8 +28,8 @@
 #define _FTS_VARIABLES_H_
 
 /* Lower level functions */
-extern void fts_env_init(fts_env_t *env, fts_object_t *patcher);
-extern void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object);
+FTS_API void fts_env_init(fts_env_t *env, fts_object_t *patcher);
+FTS_API void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object);
 
 /* Bind a value/object to a variable in the inner scope corresponding to the
  * passed object ; cause automatic redefinition of any object
@@ -43,16 +43,16 @@ extern void fts_binding_remove_user(fts_binding_t *var, fts_object_t *object);
  * the recursively dependent objects are redefined, and their bindings recursively
  * redefined.
  */
-extern void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name);
+FTS_API void fts_variable_define(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Verify if a fts_variable_define can be issued in the passed scope.
  * Note that this is not like testing if a variable is bound; the binding can be 
  * inherited from a surrounding patcher.
  */
-extern int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name);
+FTS_API int fts_variable_can_define(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Return 1 if the variable exists *and* it is suspended */
-extern int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name);
+FTS_API int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Remove the variable bound to the name in the scope represented by the object.
  * Can be called also on suspended variables; in this case, it recursively resolve
@@ -60,10 +60,10 @@ extern int fts_variable_is_suspended(fts_patcher_t *scope, fts_symbol_t name);
  * case to redefine the object, and either redefine or undefine the object
  * binding.
  */
-extern void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *owner);
+FTS_API void fts_variable_undefine(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *owner);
 
 /* Like fts_variable_undefine, but act on all the variables in the current scope defined by 'owner' */
-extern void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner);
+FTS_API void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner);
 
 /* Suspend  the variable bound to the name in the scope represented by the object;
  * To suspend means to keep the dependency structure and value, but don't consider
@@ -73,27 +73,27 @@ extern void fts_variables_undefine(fts_patcher_t *scope, fts_object_t *owner);
  * Note that a variable should be suspended only temporarly; i.e. variables are
  * never suspended between two user level atomic operations.
  */
-extern void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name);
+FTS_API void fts_variable_suspend(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Like fts_variable_suspend, but act on all the variables in the current scope defined by 'owner' */
-extern void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner);
+FTS_API void fts_variables_suspend(fts_patcher_t *scope, fts_object_t *owner);
 
 /* Undefine all the variables in the given scope that are suspended */
-extern void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner);
+FTS_API void fts_variables_undefine_suspended(fts_patcher_t *scope, fts_object_t *owner);
 
 /* Restore a variable */
-extern void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner);
+FTS_API void fts_variable_restore(fts_patcher_t *scope, fts_symbol_t name, fts_atom_t *value, fts_object_t *owner);
 
 /* Access the value of a variable in the scope represented by an object */
-extern fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
+FTS_API fts_atom_t *fts_variable_get_value(fts_patcher_t *scope, fts_symbol_t name);
 
 /* Add a user to a variable in a given scope.
  * A user is an object that referentiate the variable and so need to 
  * be redefined when the variable change value.
  */
-extern void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
-extern void fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
+FTS_API void fts_variable_add_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
+FTS_API void fts_variable_remove_user(fts_patcher_t *scope, fts_symbol_t name, fts_object_t *user);
 
-extern fts_object_t *fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_class_t *class);
+FTS_API fts_object_t *fts_variable_get_object_always(fts_patcher_t *scope, fts_symbol_t name, fts_class_t *class);
 
 #endif

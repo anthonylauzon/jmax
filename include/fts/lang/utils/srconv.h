@@ -44,11 +44,11 @@ typedef struct _fts_srconv
 } fts_srconv_t;
 
 /* new/delete conversion buffer object */
-extern fts_srconv_t *fts_srconv_new(double ratio, int size, int n_channels);
-extern void fts_srconv_delete(fts_srconv_t *srconv);
+FTS_API fts_srconv_t *fts_srconv_new(double ratio, int size, int n_channels);
+FTS_API void fts_srconv_delete(fts_srconv_t *srconv);
 
 /* do conversion and return the number of output samples */
-extern int fts_srconv(fts_srconv_t *srconv, float *in, float *out, int size, int out_size, int n_channels);
+FTS_API int fts_srconv(fts_srconv_t *srconv, float *in, float *out, int size, int out_size, int n_channels);
 
 #define fts_srconv_check_ratio(r) ((r) > FTS_SRCONV_MAX_RATIO || 1./(r) > FTS_SRCONV_MAX_RATIO)
 

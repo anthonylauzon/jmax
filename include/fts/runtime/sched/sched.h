@@ -112,7 +112,7 @@ extern double fts_get_time(void);
  *
  * @ingroup sched
  */
-extern int fts_sched_add( fts_object_t *obj, int flags, ...);
+FTS_API int fts_sched_add( fts_object_t *obj, int flags, ...);
 
 
 /**
@@ -123,7 +123,7 @@ extern int fts_sched_add( fts_object_t *obj, int flags, ...);
  * @return -1 if an error occured, 0 if not
  * @ingroup sched
  */
-extern int fts_sched_remove( fts_object_t *obj);
+FTS_API int fts_sched_remove( fts_object_t *obj);
 
 /*@}*/ /* Handling scheduler callbacks */
 
@@ -141,7 +141,7 @@ extern int fts_sched_remove( fts_object_t *obj);
  * @fn fts_clock_t *fts_sched_get_clock()
  * @return a pointer to the scheduler clock
  */
-extern fts_clock_t *fts_sched_get_clock( void);
+FTS_API fts_clock_t *fts_sched_get_clock( void);
 
 /**
  * Advance scheduler clock
@@ -149,7 +149,7 @@ extern fts_clock_t *fts_sched_get_clock( void);
  * @fn void fts_sched_advance_clock( double time)
  * @param time given time 
  */
-extern void fts_sched_advance_clock( double time);
+FTS_API void fts_sched_advance_clock( double time);
 
 /**
  * Set scheduler time
@@ -157,7 +157,7 @@ extern void fts_sched_advance_clock( double time);
  * @fn void fts_sched_set_time( double time)
  * @param time given time 
  */
-extern void fts_sched_set_time( double time);
+FTS_API void fts_sched_set_time( double time);
 
 /**
  * @}
@@ -165,7 +165,7 @@ extern void fts_sched_set_time( double time);
 
 
 /* system functions */
-extern void fts_sched_run( void);
-extern void fts_sched_halt( void);
+FTS_API void fts_sched_run( void);
+FTS_API void fts_sched_halt( void);
 
 #endif

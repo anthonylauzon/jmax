@@ -61,10 +61,18 @@
  * This documentation is generated automatically from the comments in the header files of FTS.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <fts/sys.h>
 #include <fts/lang.h>
 #include <fts/runtime.h>
 #include <fts/tiles/startup.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -30,24 +30,24 @@
 */
 
 #include <string.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
 
-#include <fts/sys.h>
-#include <fts/lang.h>
-#include <fts/runtime.h>
-
-#include "lang/veclib/vecmod.h"
+#include <fts/fts.h>
 
 #include "ucs.h"
 #include "messtile.h"
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 extern fts_module_t fts_files_module;
 extern fts_module_t fts_audio_module;
 extern fts_module_t fts_time_module;
 extern fts_module_t fts_sched_module;
 extern fts_module_t fts_dsp_module;
+extern fts_module_t fts_veclib_module;
 
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
@@ -102,7 +102,7 @@ char *fts_get_mode( void)
 /* ********************************************************************** */
 
 
-int main(int argc, char **argv)
+int fts_init(int argc, char **argv)
 {
   fts_set_root_dir( argv[0]);
 
@@ -145,12 +145,6 @@ int main(int argc, char **argv)
 
   post( "%s\n", FTS_ARCH_NAME);
 #endif
-
-  /* Run the audio scheduler */
-  fts_sched_run();
-
-  /* When and if the scheduler exit, run the shutdown functions and return */
-  fts_modules_shutdown();
 
   return 0;
 }

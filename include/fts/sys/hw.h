@@ -42,7 +42,7 @@
   Returns: a "handle" to be used for further invocation of fts_dl_lookup
   0 if an error occured.
 */
-extern void *fts_dl_open( const char *filename, char *error);
+FTS_API void *fts_dl_open( const char *filename, char *error);
 
 /*
   Function: fts_dl_lookup
@@ -59,7 +59,7 @@ extern void *fts_dl_open( const char *filename, char *error);
    in case of error.
   Returns: 1 if symbol is found, 0 if not
 */
-extern int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error);
+FTS_API int fts_dl_lookup( void *handle, const char *symbol, void **address, char *error);
 
 /*
    Function: fts_enable_fpe_traps
@@ -74,7 +74,7 @@ extern int fts_dl_lookup( void *handle, const char *symbol, void **address, char
    Arguments: none
    Returns: none
 */
-extern void fts_enable_fpe_traps( void);
+FTS_API void fts_enable_fpe_traps( void);
 
 /*
    Function: fts_disable_fpe_traps
@@ -87,7 +87,7 @@ extern void fts_enable_fpe_traps( void);
    Arguments: none
    Returns: none
 */
-extern void fts_disable_fpe_traps( void);
+FTS_API void fts_disable_fpe_traps( void);
 
 /* 
  * Bit masks returned with fts_check_fpe;
@@ -110,7 +110,7 @@ extern void fts_disable_fpe_traps( void);
    Returns: one of (0, FTS_INVALID_FPE, FTS_DIVIDE0_FPE, FTS_OVERFLOW_FPE, 
    FTS_INEXACT_FPE, FTS_UNDERFLOW_FPE)
 */
-extern unsigned int fts_check_fpe( void);
+FTS_API unsigned int fts_check_fpe( void);
 
 
 /*
@@ -120,7 +120,7 @@ extern unsigned int fts_check_fpe( void);
    Arguments: none
    Returns: 1 if memory has been unlocked, 0 if not
 */
-extern int fts_unlock_memory( void);
+FTS_API int fts_unlock_memory( void);
 
 /*
   Function: fts_platform_init
@@ -129,6 +129,6 @@ extern int fts_unlock_memory( void);
   Arguments: none
   Returns: none
 */
-extern void fts_platform_init( int argc, char **argv);
+FTS_API void fts_platform_init( int argc, char **argv);
 
 #endif

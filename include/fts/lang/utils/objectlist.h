@@ -32,12 +32,12 @@ typedef struct {
   fts_object_list_cell_t *head;
 } fts_object_list_t;
 
-extern void fts_object_list_init( fts_object_list_t *list);
-extern void fts_object_list_destroy( fts_object_list_t *list);
+FTS_API void fts_object_list_init( fts_object_list_t *list);
+FTS_API void fts_object_list_destroy( fts_object_list_t *list);
 
-extern void fts_object_list_insert( fts_object_list_t *list, fts_object_t *object);
+FTS_API void fts_object_list_insert( fts_object_list_t *list, fts_object_t *object);
 
-extern void fts_object_list_remove( fts_object_list_t *list, fts_object_t *object);
+FTS_API void fts_object_list_remove( fts_object_list_t *list, fts_object_t *object);
 
 #define fts_object_list_is_empty(L) (!(L)->head)
 #endif

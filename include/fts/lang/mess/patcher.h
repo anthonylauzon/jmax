@@ -27,14 +27,14 @@
 #ifndef _FTS_PATCHER_H_
 #define _FTS_PATCHER_H_
 
-extern fts_metaclass_t *patcher_metaclass;
+FTS_API fts_metaclass_t *patcher_metaclass;
 
 #define fts_object_is_patcher(o) ((o)->head.cl->mcl == patcher_metaclass)
 
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
 #define fts_patcher_set_abstraction(p)   ((p)->type = fts_p_abstraction)
 #define fts_patcher_set_error(p)         ((p)->type = fts_p_error)
-extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template);
+FTS_API void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *template);
 
 #define fts_patcher_is_standard(p)       ((p)->type == fts_p_standard)
 #define fts_patcher_is_abstraction(p)    ((p)->type == fts_p_abstraction)
@@ -62,20 +62,20 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 /* thru objects */
 #define fts_object_is_thru(o) fts_class_is_thru((o)->head.cl)
-extern void fts_object_set_thru_type(fts_object_t *obj, fts_connection_type_t type);
-extern fts_connection_type_t fts_object_get_thru_type(fts_object_t *obj);
+FTS_API void fts_object_set_thru_type(fts_object_t *obj, fts_connection_type_t type);
+FTS_API fts_connection_type_t fts_object_get_thru_type(fts_object_t *obj);
 
 #define fts_patcher_is_open(p)    ((p)->open)
 #define fts_object_patcher_is_open(o)    ((fts_object_get_patcher(o))->open)
 
-extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
-extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
+FTS_API void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
+FTS_API void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
 
 
-extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
+FTS_API fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
 
-extern void fts_patcher_blip(fts_patcher_t *this, const char *msg);
+FTS_API void fts_patcher_blip(fts_patcher_t *this, const char *msg);
 
-extern fts_patcher_t *fts_get_root_patcher(void);
+FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
 #endif

@@ -54,6 +54,7 @@
 #undef HAVE_DIRECT_H
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
+#define FTS_API extern
 
 #elif defined(LINUXPPC)
 
@@ -70,6 +71,7 @@
 #undef HAVE_DIRECT_H
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
+#define FTS_API extern
 
 #elif defined(MACOSX)
 
@@ -86,6 +88,7 @@
 #undef HAVE_DIRECT_H
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
+#define FTS_API extern
 
 
 /*********************************************************************
@@ -110,6 +113,7 @@
 #undef HAVE_DIRECT_H
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
+#define FTS_API extern
 
 /*********************************************************************
  *
@@ -129,6 +133,7 @@
 #undef HAVE_DIRECT_H
 #undef HAVE_PROCESS_H
 #undef HAVE_IO_H 
+#define FTS_API extern
 
 /*********************************************************************
  *
@@ -155,8 +160,24 @@
 #define HAVE_PROCESS_H 1
 #define HAVE_IO_H 1
 
-/*  #include <io.h> */
+#define COMPILATION_ARCH_STRING "iX86-win32"
 
+#ifdef _DEBUG
+#define COMPILATION_MODE_STRING "debug"
+#else
+#define COMPILATION_MODE_STRING "opt"
+#endif
+
+#define COMPILATION_INFO_STRING "(compiled for iX86-win32)"
+
+#if defined(FTSDLL_EXPORTS)
+#define FTS_API __declspec(dllexport)
+#else
+#define FTS_API __declspec(dllimport)
+#endif
+
+
+/* mapping standard Unix function names to their win32 equivalent */
 #define MAXPATHLEN _MAX_PATH
 #define open  _open
 #define read  _read
@@ -169,7 +190,7 @@
 #define bcopy(src,dst,n)  memcpy(dst,src,n)
 
 #define realpath  win32_realpath
-char* win32_realpath(const char* path, char* resolved_path);
+FTS_API char* win32_realpath(const char* path, char* resolved_path);
 
 #else
 

@@ -27,14 +27,14 @@
 #ifndef _FTS_ERROBJ_H_
 #define _FTS_ERROBJ_H_
 
-extern fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...);
+FTS_API fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...);
 
-extern void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet);
-extern void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet);
-extern void fts_recompute_errors(void);
-extern void fts_do_recompute_errors(void);
+FTS_API void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet);
+FTS_API void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet);
+FTS_API void fts_recompute_errors(void);
+FTS_API void fts_do_recompute_errors(void);
 
-extern void fts_object_set_error(fts_object_t *obj, const char *format, ...);
-extern void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
+FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
+FTS_API void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
 
 #endif

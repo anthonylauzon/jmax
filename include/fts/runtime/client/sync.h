@@ -27,6 +27,6 @@
 #ifndef _FTS_SYNC_H_
 #define _FTS_SYNC_H_
 
-void fts_client_sync_init(void);
+FTS_API void fts_client_sync_init(void);
 
 #endif

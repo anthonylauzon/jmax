@@ -35,13 +35,13 @@
 
 typedef float (*fts_float_function_t)(float);
 
-extern int fts_ffun_exists(fts_symbol_t name);
-extern int fts_ffun_new(fts_symbol_t name, float (*function)(float));
-extern void fts_ffun_delete(fts_symbol_t name);
-extern float fts_ffun_eval(fts_symbol_t name, float f);
-extern void fts_ffun_fill(fts_symbol_t name, float *out, int size, float min, float max);
-extern void fts_ffun_apply(fts_symbol_t name, float* in, float* out, int size);
-extern fts_float_function_t fts_ffun_get_ptr(fts_symbol_t name);
+FTS_API int fts_ffun_exists(fts_symbol_t name);
+FTS_API int fts_ffun_new(fts_symbol_t name, float (*function)(float));
+FTS_API void fts_ffun_delete(fts_symbol_t name);
+FTS_API float fts_ffun_eval(fts_symbol_t name, float f);
+FTS_API void fts_ffun_fill(fts_symbol_t name, float *out, int size, float min, float max);
+FTS_API void fts_ffun_apply(fts_symbol_t name, float* in, float* out, int size);
+FTS_API fts_float_function_t fts_ffun_get_ptr(fts_symbol_t name);
 
 /***************************************************************************************
  *
@@ -55,20 +55,20 @@ extern fts_float_function_t fts_ffun_get_ptr(fts_symbol_t name);
  */
 
 /* get (or create) table for existing function */
-extern float *fts_fftab_get(fts_symbol_t name, int size, float min, float max);
+FTS_API float *fts_fftab_get(fts_symbol_t name, int size, float min, float max);
 
 /* get sine and cosine tables */
-extern float *fts_fftab_get_sine(int size); /* size must be a multiple of 4 */
-extern float *fts_fftab_get_sine_first_half(int size); /* size must be a multiple of 2 */
-extern float *fts_fftab_get_sine_second_half(int size); /* size must be a multiple of 2 */
-extern float *fts_fftab_get_sine_first_quarter(int size);
-extern float *fts_fftab_get_sine_second_quarter(int size);
-extern float *fts_fftab_get_sine_third_quarter(int size);
-extern float *fts_fftab_get_sine_fourth_quarter(int size);
-extern float *fts_fftab_get_cosine(int size); /* size must be a multiple of 4 */
-extern float *fts_fftab_get_cosine_first_half(int size); /* size must be a multiple of 2 */
-extern float *fts_fftab_get_cosine_second_half(int size); /* size must be a multiple of 2 */
+FTS_API float *fts_fftab_get_sine(int size); /* size must be a multiple of 4 */
+FTS_API float *fts_fftab_get_sine_first_half(int size); /* size must be a multiple of 2 */
+FTS_API float *fts_fftab_get_sine_second_half(int size); /* size must be a multiple of 2 */
+FTS_API float *fts_fftab_get_sine_first_quarter(int size);
+FTS_API float *fts_fftab_get_sine_second_quarter(int size);
+FTS_API float *fts_fftab_get_sine_third_quarter(int size);
+FTS_API float *fts_fftab_get_sine_fourth_quarter(int size);
+FTS_API float *fts_fftab_get_cosine(int size); /* size must be a multiple of 4 */
+FTS_API float *fts_fftab_get_cosine_first_half(int size); /* size must be a multiple of 2 */
+FTS_API float *fts_fftab_get_cosine_second_half(int size); /* size must be a multiple of 2 */
 
 /* get hanning window */
-extern float *fts_fftab_get_hanning(int size); /* hanning (offset cosine) window */
+FTS_API float *fts_fftab_get_hanning(int size); /* hanning (offset cosine) window */
 #endif

@@ -30,13 +30,13 @@
 #include <fts/runtime/devices/devices.h>
 
 /* the function that is called by the scheduler */
-extern void fts_client_poll(void);
+FTS_API void fts_client_poll(void);
 
 /* the client module */
-extern fts_module_t fts_client_module;
+FTS_API fts_module_t fts_client_module;
 
 /* Receive Subsystem installation */
-extern fts_dev_t *client_dev;
+FTS_API fts_dev_t *client_dev;
 
 #endif
 

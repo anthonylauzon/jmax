@@ -116,14 +116,14 @@ typedef struct _fts_ramp
   int n_steps;
 } fts_ramp_t;
 
-extern void fts_ramp_init(fts_ramp_t *ramp, float value);
-extern void fts_ramp_zero(fts_ramp_t *ramp);
+FTS_API void fts_ramp_init(fts_ramp_t *ramp, float value);
+FTS_API void fts_ramp_zero(fts_ramp_t *ramp);
 
-extern void fts_ramp_set_target(fts_ramp_t *ramp, float target, float time, float rate);
-extern void fts_ramp_set_target_hold_and_jump(fts_ramp_t *ramp, float target, float time, float rate);
-extern void fts_ramp_set_interval(fts_ramp_t *ramp, float interval, float time, float rate);
-extern void fts_ramp_set_slope(fts_ramp_t *ramp, float slope, float time, float rate);
-extern void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip);
+FTS_API void fts_ramp_set_target(fts_ramp_t *ramp, float target, float time, float rate);
+FTS_API void fts_ramp_set_target_hold_and_jump(fts_ramp_t *ramp, float target, float time, float rate);
+FTS_API void fts_ramp_set_interval(fts_ramp_t *ramp, float interval, float time, float rate);
+FTS_API void fts_ramp_set_slope(fts_ramp_t *ramp, float slope, float time, float rate);
+FTS_API void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip);
 
 #define fts_ramp_running(r) ((r)->n_steps > 0)
 
@@ -132,14 +132,14 @@ extern void fts_ramp_set_incr_clip(fts_ramp_t *ramp, double incr, float clip);
 #define fts_ramp_get_steps(r) ((r)->n_steps)
 
 /*extern void fts_ramp_jump(fts_ramp_t *ramp);*/
-extern void fts_ramp_freeze(fts_ramp_t *ramp);
-extern void fts_ramp_incr(fts_ramp_t *ramp);
-extern void fts_ramp_incr_by(fts_ramp_t *ramp, int n);
+FTS_API void fts_ramp_freeze(fts_ramp_t *ramp);
+FTS_API void fts_ramp_incr(fts_ramp_t *ramp);
+FTS_API void fts_ramp_incr_by(fts_ramp_t *ramp, int n);
 
 /* vector functions set with control rate (sr / n) */
-extern void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, int size);
-extern void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, int size);
-extern void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size);
+FTS_API void fts_ramp_vec_fill(fts_ramp_t * restrict ramp, float *out, int size);
+FTS_API void fts_ramp_vec_mul(fts_ramp_t * restrict ramp, float *in, float *out, int size);
+FTS_API void fts_ramp_vec_mul_add(fts_ramp_t * restrict ramp, float *in, float *out, int size);
 
 /* macro implementations */
 #define fts_ramp_jump(r) (fts_ramp_value_jump(&(r)->value), (r)->n_steps = 0)

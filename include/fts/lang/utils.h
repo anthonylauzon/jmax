@@ -27,7 +27,7 @@
 #ifndef _LANG_UTILS_H_
 #define _LANG_UTILS_H_
 
-extern fts_module_t fts_utils_module;
+FTS_API fts_module_t fts_utils_module;
 
 #include <fts/lang/utils/floatfuns.h>
 #include <fts/lang/utils/idefix.h>

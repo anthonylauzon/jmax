@@ -60,16 +60,16 @@
  */
 
 /* init function */
-extern void fts_atoms_init(void);
+FTS_API void fts_atoms_init(void);
 
 /* An initializer for empty atoms */
 #define FTS_NULL {(fts_symbol_t)0, {0}}
 
 /* A variable initialized to an empty atom */
-extern const fts_atom_t fts_null;
+FTS_API const fts_atom_t fts_null;
 
-extern void fts_atom_type_register(fts_symbol_t name, fts_class_t *cl);
-extern int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
+FTS_API void fts_atom_type_register(fts_symbol_t name, fts_class_t *cl);
+FTS_API int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 
 /* Macros to deal with any type */
 #define fts_set_type(ap, t) (((ap)->type) = (t))
@@ -156,16 +156,16 @@ extern int fts_atom_type_lookup(fts_symbol_t name, fts_class_t **cl);
 #define fts_same_types(ap1, ap2) (((ap1)->type) == (ap2)->type)
 
 /* equality test between two atoms */
-extern int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
+FTS_API int fts_atom_are_equals(const fts_atom_t *a1, const fts_atom_t *a2);
 
 /* null test: a null content can be a null pointer or a zero value */
-extern int fts_atom_is_null(const fts_atom_t *a);
+FTS_API int fts_atom_is_null(const fts_atom_t *a);
 
 /* Subsequence  testing */
-extern int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av);
+FTS_API int fts_atom_is_subsequence(int sac, const fts_atom_t *sav, int ac, const fts_atom_t *av);
 
 /* Atom printing function, usually for debug */
-void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
-void sprintf_atoms(char *s, int ac, const fts_atom_t *at);
+FTS_API void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at);
+FTS_API void sprintf_atoms(char *s, int ac, const fts_atom_t *at);
 
 #endif

@@ -29,8 +29,8 @@
 
 #include <fts/lang.h>
 
-extern fts_symbol_t fts_s_fifo_size;
+FTS_API fts_symbol_t fts_s_fifo_size;
 
-extern void fts_audio_idle(void);
+FTS_API void fts_audio_idle(void);
 
 #endif

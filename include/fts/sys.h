@@ -37,10 +37,10 @@
   Generic include file for the sys layer.
   */
 
+#include <fts/sys/platform.h>
 #include <fts/sys/hw.h>
 #include <fts/sys/mem.h>
 #include <fts/sys/modules.h>
-#include <fts/sys/platform.h>
 #include <fts/sys/status.h>
 #include <fts/sys/version.h>
 

@@ -27,7 +27,7 @@
 #ifndef _FTS_INCOMING_H_
 #define _FTS_INCOMING_H_
 
-void fts_client_parse_char(char c);
-void fts_client_install(char type, void (* fun) (int, const fts_atom_t *));
+FTS_API void fts_client_parse_char(char c);
+FTS_API void fts_client_install(char type, void (* fun) (int, const fts_atom_t *));
 
 #endif

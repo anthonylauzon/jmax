@@ -29,12 +29,12 @@
 
 /* definition file for  logging functions (post and co) */
 
-extern void post_vector(int n, float *fp);
-extern void post_symbol(fts_symbol_t sym);
-extern void post_atoms(int ac, const fts_atom_t *at);
-extern void post(const char *format , ...); 
+FTS_API void post_vector(int n, float *fp);
+FTS_API void post_symbol(fts_symbol_t sym);
+FTS_API void post_atoms(int ac, const fts_atom_t *at);
+FTS_API void post(const char *format , ...); 
 
-extern void post_error(fts_object_t *obj, const char *format , ...); 
+FTS_API void post_error(fts_object_t *obj, const char *format , ...); 
 
 
 #endif

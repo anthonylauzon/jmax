@@ -64,17 +64,17 @@
 
 /* Exported errors */
 
-extern fts_status_description_t fts_dev_invalid_value_error;
+FTS_API fts_status_description_t fts_dev_invalid_value_error;
 
-extern fts_status_description_t fts_dev_open_error;
-extern fts_status_description_t fts_dev_close_error;
-extern fts_status_description_t fts_dev_eof;
-extern fts_status_description_t fts_dev_io_error;
-extern fts_status_description_t fts_data_not_ready;
+FTS_API fts_status_description_t fts_dev_open_error;
+FTS_API fts_status_description_t fts_dev_close_error;
+FTS_API fts_status_description_t fts_dev_eof;
+FTS_API fts_status_description_t fts_dev_io_error;
+FTS_API fts_status_description_t fts_data_not_ready;
 
 /* Module declaration */
 
-extern fts_module_t fts_dev_module;
+FTS_API fts_module_t fts_dev_module;
 
 /******************************************************************************/
 /*                                                                            */
@@ -195,7 +195,7 @@ typedef struct _fts_dev_class
    Device Classes are never freed.
 */
 
-extern fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type, fts_symbol_t name);
+FTS_API fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type, fts_symbol_t name);
 
 /* Macro to access a fts_dev_class_t structure; you have to use these macros, and 
    you do not access the structure directly !!! */
@@ -210,8 +210,8 @@ extern fts_dev_class_t *fts_dev_class_new(fts_dev_type_t type, fts_symbol_t name
 #define fts_dev_class_char_set_flush_fun(dev_class, fun)      ((dev_class)->methods.char_methods.flush_fun = (fun))
 #define fts_dev_class_char_set_seek_fun(dev_class, fun)     ((dev_class)->methods.char_methods.seek_fun = (fun))
 
-extern void fts_dev_class_sig_set_get_fun(fts_dev_class_t *dev_class,  void (* get_fun)(fts_word_t *));
-extern void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* put_fun)(fts_word_t *));
+FTS_API void fts_dev_class_sig_set_get_fun(fts_dev_class_t *dev_class,  void (* get_fun)(fts_word_t *));
+FTS_API void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* put_fun)(fts_word_t *));
 
 #define fts_dev_class_sig_set_seek_fun(dev_class, fun)     ((dev_class)->methods.sig_methods.seek_fun = (fun))
 
@@ -234,7 +234,7 @@ extern void fts_dev_class_sig_set_put_fun(fts_dev_class_t *dev_class,  void (* p
 /* device classquering */
 
 #define fts_dev_class_get_name(dev_class)   ((dev_class)->class_name)
-extern fts_dev_class_t *fts_dev_class_get_by_name(fts_symbol_t  name);
+FTS_API fts_dev_class_t *fts_dev_class_get_by_name(fts_symbol_t  name);
 
 /******************************************************************************/
 /*                                                                            */
@@ -261,9 +261,9 @@ extern fts_dev_class_t *fts_dev_class_get_by_name(fts_symbol_t  name);
 
 /* device functions */
 
-extern fts_status_t fts_dev_open(fts_dev_t **dret, fts_symbol_t class_name, int nargs, const fts_atom_t *args);
-extern fts_status_t fts_dev_close(fts_dev_t *dev);
-extern fts_status_t fts_dev_ctrl(fts_dev_t *dev, int nargs, fts_atom_t *args);
+FTS_API fts_status_t fts_dev_open(fts_dev_t **dret, fts_symbol_t class_name, int nargs, const fts_atom_t *args);
+FTS_API fts_status_t fts_dev_close(fts_dev_t *dev);
+FTS_API fts_status_t fts_dev_ctrl(fts_dev_t *dev, int nargs, fts_atom_t *args);
 
 /* char dev ops */
 
@@ -329,7 +329,7 @@ extern fts_status_t fts_dev_ctrl(fts_dev_t *dev, int nargs, fts_atom_t *args);
 
 
 
-extern void fts_declare_logical_dev(fts_symbol_t name,
+FTS_API void fts_declare_logical_dev(fts_symbol_t name,
 				    fts_dev_type_t dev_type,
 				    fts_status_t (* set_fun)(fts_dev_t *dev, int ac, const fts_atom_t *at),
 				    fts_dev_t   *(* get_fun)(int ac, const fts_atom_t *at),
@@ -340,25 +340,25 @@ extern void fts_declare_logical_dev(fts_symbol_t name,
  closing and unsetting previous devices */
 
 
-extern fts_status_t fts_set_logical_device(fts_dev_t *dev, fts_symbol_t name, int ac, const fts_atom_t *at);
-extern fts_dev_t *fts_get_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
-extern fts_status_t fts_unset_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
+FTS_API fts_status_t fts_set_logical_device(fts_dev_t *dev, fts_symbol_t name, int ac, const fts_atom_t *at);
+FTS_API fts_dev_t *fts_get_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
+FTS_API fts_status_t fts_unset_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
 
 /* functions to handle logical devices */
 
-extern fts_status_t fts_open_logical_device(fts_symbol_t name, int lac, const fts_atom_t *lat,
+FTS_API fts_status_t fts_open_logical_device(fts_symbol_t name, int lac, const fts_atom_t *lat,
 					    fts_symbol_t pname, int pac, const fts_atom_t *pat);
 
-extern fts_status_t fts_close_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
+FTS_API fts_status_t fts_close_logical_device(fts_symbol_t name, int ac, const fts_atom_t *at);
 
 /* Close all the devices of a logical device */
 
-extern fts_status_t fts_reset_logical_device(fts_symbol_t name);
+FTS_API fts_status_t fts_reset_logical_device(fts_symbol_t name);
 
 
 
 /* (fd) a function that is prototyped here, but defined in lang/dsp/dsp.c !!!! */
-extern void fts_dsp_set_dac_slip_dev( fts_dev_t *dev);
+FTS_API void fts_dsp_set_dac_slip_dev( fts_dev_t *dev);
 
 #endif
 

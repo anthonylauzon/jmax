@@ -151,14 +151,14 @@
  */
  
 #define DECLARE_FTS_VEC_SET(name, t_out, fun)\
- extern void fts_vec_ ## name(t_out *out, int size);
+ FTS_API void fts_vec_ ## name(t_out *out, int size);
  
 #define DECLARE_FTS_VECX_SET(name, t_out, fun)\
- extern void fts_vecx_ ## name(t_out *out, int size);
+ FTS_API void fts_vecx_ ## name(t_out *out, int size);
  
 #define DECLARE_FTL_VEC_SET(name, t_out, fun)\
- extern void ftl_vec_ ## name(FTL_ARG);
+ FTS_API void ftl_vec_ ## name(FTL_ARG);
 
 #define DECLARE_FTL_VECX_SET(name, t_out, fun)\
- extern void ftl_vecx_ ## name(FTL_ARG);
+ FTS_API void ftl_vecx_ ## name(FTL_ARG);
 

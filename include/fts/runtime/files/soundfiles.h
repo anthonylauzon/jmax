@@ -48,15 +48,15 @@ typedef struct fts_soundfile fts_soundfile_t;
  *   sr ... specifies a the sampling rate for the file header as is ignored for all raw data types
  */
 
-extern fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, double sr, int onset);
-extern fts_soundfile_t *fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format, double sr);
-extern void fts_soundfile_close(fts_soundfile_t *soundfile);
+FTS_API fts_soundfile_t *fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, double sr, int onset);
+FTS_API fts_soundfile_t *fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format, double sr);
+FTS_API void fts_soundfile_close(fts_soundfile_t *soundfile);
 
-extern int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size);
-extern int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int size);
+FTS_API int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size);
+FTS_API int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int size);
 
-extern int fts_soundfile_get_size(fts_soundfile_t *soundfile);
-extern double fts_soundfile_get_samplerate(fts_soundfile_t *soundfile);
-extern int fts_soundfile_get_n_channels(fts_soundfile_t *soundfile);
+FTS_API int fts_soundfile_get_size(fts_soundfile_t *soundfile);
+FTS_API double fts_soundfile_get_samplerate(fts_soundfile_t *soundfile);
+FTS_API int fts_soundfile_get_n_channels(fts_soundfile_t *soundfile);
 
 #endif

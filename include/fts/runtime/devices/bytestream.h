@@ -177,8 +177,8 @@ struct fts_bytestream
  * @ingroup bytestream
  */
 
-extern void fts_bytestream_class_init(fts_class_t *cl);
-extern void fts_bytestream_init(fts_bytestream_t *stream);
+FTS_API void fts_bytestream_class_init(fts_class_t *cl);
+FTS_API void fts_bytestream_init(fts_bytestream_t *stream);
 
 /**
  * Declare initialized byte stream as input.
@@ -199,8 +199,8 @@ extern void fts_bytestream_init(fts_bytestream_t *stream);
  * @ingroup bytestream
  */
 
-extern void fts_bytestream_set_input(fts_bytestream_t *stream);
-extern void fts_bytestream_set_output(fts_bytestream_t *stream, 
+FTS_API void fts_bytestream_set_input(fts_bytestream_t *stream);
+FTS_API void fts_bytestream_set_output(fts_bytestream_t *stream, 
 				       fts_bytestream_output_t output, fts_bytestream_output_char_t output_char, fts_bytestream_flush_t flush);
 
 /*@}*/ /* Initializing a byte stream */
@@ -223,7 +223,7 @@ extern void fts_bytestream_set_output(fts_bytestream_t *stream,
  * @ingroup bytestream
  */
 
-extern void fts_bytestream_input(fts_bytestream_t *stream, int n, const unsigned char *c);
+FTS_API void fts_bytestream_input(fts_bytestream_t *stream, int n, const unsigned char *c);
 
 /*@}*/ /* Handling incoming data */
 
@@ -287,9 +287,9 @@ extern void fts_bytestream_input(fts_bytestream_t *stream, int n, const unsigned
  * @ingroup bytestream_io
  */
 
-extern int fts_bytestream_check(fts_object_t *obj);
-extern int fts_bytestream_is_input(fts_bytestream_t *stream);
-extern int fts_bytestream_is_output(fts_bytestream_t *stream);
+FTS_API int fts_bytestream_check(fts_object_t *obj);
+FTS_API int fts_bytestream_is_input(fts_bytestream_t *stream);
+FTS_API int fts_bytestream_is_output(fts_bytestream_t *stream);
 
 /*@}*/ /* Refering to a byte stream.*/
 
@@ -329,8 +329,8 @@ extern int fts_bytestream_is_output(fts_bytestream_t *stream);
  * @ingroup bytestream_io
  */
 
-extern void fts_bytestream_add_listener(fts_bytestream_t *stream, fts_object_t *obj, fts_bytestream_callback_t fun);
-extern void fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *obj);
+FTS_API void fts_bytestream_add_listener(fts_bytestream_t *stream, fts_object_t *obj, fts_bytestream_callback_t fun);
+FTS_API void fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *obj);
 
 /*@}*/ /* Byte stream listeners */
 
@@ -375,9 +375,9 @@ extern void fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_
  * @ingroup bytestream_io
  */
 
-extern void fts_bytestream_output(fts_bytestream_t *stream, int n, const unsigned char *c);
-extern void fts_bytestream_output_char(fts_bytestream_t *stream, unsigned char c);
-extern void fts_bytestream_flush(fts_bytestream_t *stream);
+FTS_API void fts_bytestream_output(fts_bytestream_t *stream, int n, const unsigned char *c);
+FTS_API void fts_bytestream_output_char(fts_bytestream_t *stream, unsigned char c);
+FTS_API void fts_bytestream_flush(fts_bytestream_t *stream);
 
 /*@}*/ /* Output functions */
 
