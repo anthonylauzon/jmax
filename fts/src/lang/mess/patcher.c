@@ -980,7 +980,6 @@ static fts_symbol_t fts_patcher_make_error_msg(const char *format, ...)
   va_list ap;
   char buf[1024];
 
-
   va_start(ap, format);
   vsprintf(buf, format, ap);
   va_end(ap);

@@ -160,7 +160,7 @@ static void fts_binding_suspend(fts_binding_t *var)
 
   var->suspended = 1;
 
-  /* Recursive calls to suspend all the variables bind to users of this
+  /* Recursive calls to suspend all the variables bound to users of this
      binding */
 
   for (u = var->users; u; u = u->next)

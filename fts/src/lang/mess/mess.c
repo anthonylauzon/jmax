@@ -54,9 +54,6 @@ fts_mess_init(void)
   /* Initialize object naming services */
   fts_mess_naming_init();
 
-  /* Initialize the message event/error system */
-  fts_events_init();
-
   /* Create the patcher data */
   fts_patcher_data_config();
 

@@ -17,7 +17,6 @@ classes.c	\
 clipboard.c	\
 doctor.c	\
 errobj.c	\
-events.c	\
 expressions.c	\
 templates.c     \
 ftsdata.c	\

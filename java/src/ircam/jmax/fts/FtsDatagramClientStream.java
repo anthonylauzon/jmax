@@ -135,8 +135,6 @@ class FtsDatagramClientStream extends FtsStream
 	receivedPacketSize = ((in_data[1] < 0 ? in_data[1] + 256 : in_data[1]) * 256 +
 			      ((in_data[2] < 0 ? in_data[2] + 256 : in_data[2])));
 
-	System.err.println("Received Packet of length " + receivedPacketSize);
-
 	in_fill_p = 3;
       }
 

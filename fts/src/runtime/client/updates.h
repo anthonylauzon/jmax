@@ -27,8 +27,10 @@ extern void fts_updates_set_updates_per_ticks(int upt);
 extern void fts_updates_set_update_period(int upt);
 extern void fts_client_updates_sync(void);
 
-/* Used to switch to fts_object_property_changed */
+/* Changes handling */
 
-extern void fts_client_send_property(fts_object_t *obj, fts_symbol_t name);
+extern void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
+extern void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
+extern void fts_object_reset_changed(fts_object_t *obj);
 
 #endif

@@ -88,12 +88,6 @@ extern void fts_class_remove_daemon(fts_class_t *cl,
 extern void fts_obj_prop_init(void);
 
 
-/* Changes handling */
-
-extern int  fts_object_get_next_change(fts_symbol_t *property, fts_object_t **object);
-extern void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property);
-extern void fts_object_ui_property_changed(fts_object_t *obj, fts_symbol_t property);
-extern void fts_object_reset_changed(fts_object_t *obj);
 
 #endif
 

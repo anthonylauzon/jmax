@@ -30,7 +30,6 @@ extern fts_module_t fts_mess_module;
 #include "mess/patcher.h"
 #include "mess/patcherdata.h"
 #include "mess/properties.h"
-#include "mess/events.h"
 #include "mess/errobj.h"
 #include "mess/send.h"
 #include "mess/objtable.h"
