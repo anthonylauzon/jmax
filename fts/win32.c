@@ -20,13 +20,13 @@
  *
  */
 #include <fts/fts.h>
-#include <windows.h>
+#include <ftsconfig.h>
 #include <direct.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fts/thread.h>
 
-#include "ftsconfig-win32.h"
 
 HINSTANCE fts_hinstance = NULL;
 
@@ -271,21 +271,15 @@ fts_get_default_root_directory( void)
 
 fts_symbol_t 
 fts_get_user_project( void)
-{
-  char cwd[_MAX_PATH];
+{  
+  char *cwd = NULL;
   char path[_MAX_PATH];
-
-  /* check for a config file in the current directory */
-  if (GetCurrentDirectory(_MAX_PATH, cwd) == 0) {
-    return NULL;
-  }
-
-  fts_make_absolute_path(cwd, "config.jmax", path, _MAX_PATH);
-  if (fts_file_exists(path) && fts_is_file(path)) {
-    return fts_new_symbol(path);
-  }
-
-  return NULL;
+  cwd = (char*)fts_get_default_root_directory();
+  strcat(cwd,"\\config");
+  
+  fts_make_absolute_path(cwd, fts_s_default_project, path, _MAX_PATH);
+  return fts_new_symbol(path);
+  
 }
 
 fts_symbol_t 
@@ -395,3 +389,128 @@ win_close(int socket)
  * c-basic-offset:2
  * End:
  */
+
+void* WINAPI 
+thread_manager_run_thread(void* arg)
+{
+    fts_thread_function_t* thread_func = (fts_thread_function_t*)arg;
+    fts_object_t* object = thread_func->object;
+    fts_method_t method = thread_func->method;
+    fts_symbol_t symbol = thread_func->symbol;
+    int ac = thread_func->ac;
+    fts_atom_t* at = thread_func->at;
+    int delay_ms = thread_func->delay_ms;
+   
+	unsigned long timeToSleep = delay_ms * 1000 * 1000;
+
+    while(1)
+    {
+	if (0 == thread_func->is_dead)
+	{
+	    method(object, fts_system_inlet, symbol, ac, at);
+	}
+	Sleep(timeToSleep);
+    }
+
+    return 0;
+}
+
+FTS_API int
+thread_manager_start(thread_manager_t * self)
+{
+
+	 HANDLE hThread; 	
+   
+   hThread = CreateThread(
+	   NULL,
+	   0,
+	   thread_manager_main,
+	   &(void*)self,
+	   0,
+	   &self->thread_manager_ID);
+	if(hThread != NULL)
+		return 0;
+	CloseHandle(hThread);
+	return -1;
+}
+
+/** 
+ * Main function of the thread manager
+ * 
+ * @param arg 
+ * 
+ * @return 
+ */
+void* WINAPI
+thread_manager_main(void* arg)
+{
+    int work_done;
+	DWORD threadCheck;
+    HANDLE success;
+    thread_manager_t* manager = (thread_manager_t*)arg;
+
+    while(1)
+    {
+		work_done = 0;
+		/* Is there some data in create FIFO */
+		if (fts_fifo_read_level(&manager->create_fifo) >= sizeof(fts_atom_t))
+		{
+			fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->create_fifo);	    
+			fts_thread_worker_t* worker;
+
+		    fts_fifo_incr_read(&manager->create_fifo, sizeof(fts_atom_t));
+
+		    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
+
+			success = CreateThread(NULL,
+									0,
+									thread_manager_run_thread,
+									(void*)worker->thread_function,
+									0,
+									&worker->id);
+			worker->threadHandle = success;
+			if (NULL == success)
+			{
+				post("[thread_manager] cannot start a new thread \n");
+			}
+			else
+			{
+		
+				work_done++;
+
+			}
+
+		}
+		/* Is there some data in cancel FIFO */
+		if (fts_fifo_read_level(&manager->cancel_fifo) >= sizeof(fts_atom_t))
+		{
+			fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->cancel_fifo);	    
+			fts_thread_worker_t* worker;
+
+			fts_fifo_incr_read(&manager->cancel_fifo, sizeof(fts_atom_t));
+
+			worker = (fts_thread_worker_t*)fts_get_pointer(atom);
+			success = worker->threadHandle;
+			threadCheck = TerminateThread(success, GetExitCodeThread(success, 0));
+			
+			if (0xFFFFFFFF == threadCheck)
+			{
+				if (NULL == success)
+				{
+					post("[thread manager] no such thread \n");
+				}
+				else{ CloseHandle(success);}
+				post("[thread manager] error while cancelling thread \n");
+			}
+			work_done++;
+		}
+		if (0 == work_done)
+		{	
+			int delay_ms = manager->delay_ms;
+			unsigned long timeToSleep = delay_ms * 1000 * 1000;
+			Sleep(timeToSleep);
+		}
+    }
+    
+    return 0;
+}

@@ -52,7 +52,7 @@ static void jmax_get_default_jvm(char* buffer, int size);
 static void jmax_append_jvm(char* path);
 static void jmax_free_available_jvm(void);
 static char* jmax_get_jvm(int i);
-static char* jmax_get_classpath(char* path);
+static char* jmax_get_classpath(void);
 static int jmax_log(const char *format, ...);
 jint JNICALL jmax_vfprintf(FILE *fp, const char *format, va_list args);
 
@@ -89,83 +89,60 @@ static int jmax_num_jvm = 0;
 static char* jmax_root = NULL;
 static char* jmax_server_root = NULL;
 
+
 /*
  * start the JVM and run MaxApplication
  *
  */
-int jmax_run(int argc, char** argv)
-{ 
-  JDK1_1InitArgs vm_args;
-  JavaVM *jvm;
-  JNIEnv *env;
-  jclass cls;
-  jmethodID mid;
-  jobjectArray args;
-  jstring jstr;
-  char* classpath;
-  char* library;
-  jni_init_args_t init_args;
-  jni_create_jvm_t create_jvm;
-  jmax_dl_t handle;
-  int i, err;
 
-  /* find the available virtual machines */
-  jmax_get_available_jvm();
 
-  /* load the jvm library */
-  for (i = 0; ; i++) {
+int jmax_run(int argc, char **argv)
+{
+	JNIEnv *env;
+	JavaVM *jvm;
+	int i;
+   jint res;
+   jmethodID mid;
+   jobjectArray args;
+   jstring jstr;
 
-    library = jmax_get_jvm(i);
+   jclass cls; 
+   
+   
+   char prep[1000];
+   char *classpath = "";
 
-    if (library == NULL) {
-      return -2;
-    }
+   JavaVMInitArgs vm_args;
+   JavaVMOption options[1];
+   
+   vm_args.version = 0x00010002;
+     
+   vm_args.nOptions = 1;
+   vm_args.ignoreUnrecognized = TRUE;
 
-    jmax_log("Trying to load %s\n", library);
+	classpath = jmax_get_classpath();
+	
+	if (classpath == NULL) { return -1;}
+	
+	strcpy(prep, "-Djava.class.path=");
+	strcat(prep, classpath);
+  
+	options[0].optionString = prep;
 
-    handle = jmax_dl_load(library);
-    if (handle == NULL) {
-      continue;
-    }
+	jmax_log("classpath=%s\n", classpath);
 
-    jmax_log("Succeeded\n");
-
-    init_args  = (jni_init_args_t) jmax_dl_symbol(handle, "JNI_GetDefaultJavaVMInitArgs");
-    create_jvm  = (jni_create_jvm_t) jmax_dl_symbol(handle, "JNI_CreateJavaVM");
-
-    if ((init_args != NULL) && (create_jvm != NULL)) {
-      break;
-    }
-
-    jmax_log("Didn't find the JVM entry points\n");
-
-    jmax_dl_close(handle);
-  }
-
-  /* get the default initialization arguments and set the class 
-   * path */
-  vm_args.version = 0x00010001; /* New in 1.1.2: VM version */
-  init_args((void*) &vm_args);
-
-  classpath = jmax_get_classpath(vm_args.classpath);
-  if (classpath == NULL) {
-    return -1;
-  }
-
-  jmax_log("classpath=%s\n", classpath);
-  vm_args.classpath = classpath;
-
-/*    vm_args.vfprintf = jmax_vfprintf; */
-
-  /* load and initialize a Java VM, return a JNI interface 
-   * pointer in env */
-  err = create_jvm(&jvm, (void**) &env, (void*) &vm_args);
-  if (err != 0) {
-    return -3;
-  }
+	vm_args.options = options;
+	
+	/* Create the Java VM */
+     res = JNI_CreateJavaVM(&jvm, (void**)&env, &vm_args);
+ 
+	if (res < 0) {
+         fprintf(stderr, "Can't create Java VM\n");
+         exit(1);
+     }
 
   /* get a reference to the MaxApplication class */
-  cls = (*env)->FindClass(env, "ircam/jmax/MaxApplication");
+  cls = (*env)->FindClass(env, "ircam/jmax/JMaxApplication");
   if (cls == NULL) {
     return -4;
   }
@@ -196,15 +173,16 @@ int jmax_run(int argc, char** argv)
   /* cleanup */
   (*jvm)->DestroyJavaVM(jvm);
 
-  jmax_dl_close(handle);
+
 
   jmax_free_available_jvm();
 
   return 0;
-} 
+
+}
 
 static char* 
-jmax_get_classpath(char* path)
+jmax_get_classpath()
 {
   char* root;
 
@@ -217,13 +195,13 @@ jmax_get_classpath(char* path)
     return NULL;
   }
 
-  jmax_classpath = (char*) malloc(strlen(path) + 1 + 3 * (strlen(root) + 24));
+  jmax_classpath = (char*) malloc(1 + 3 * (strlen(root) + 24));
   if (jmax_classpath == NULL) {
     return NULL;
   }
 
-  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
-	  path, PATH_SEPARATOR,
+  sprintf(jmax_classpath, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s", 
+
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "jmax.jar", PATH_SEPARATOR,
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "jacl.jar", PATH_SEPARATOR,
 	  root, FILE_SEPARATOR, "java", FILE_SEPARATOR, "lib", FILE_SEPARATOR, "jacl", FILE_SEPARATOR, "tcljava.jar");
@@ -346,7 +324,9 @@ jmax_vfprintf(FILE *fp, const char *format, va_list args)
 #define IBM_RELEASE_13  "1.3" 
 #define IBM_JRE_13	"Software\\IBM\\Java2 Runtime Environment"
 #define SUN_RELEASE_13  "1.3" 
+#define SUN_RELEASE_14  "1.4" 
 #define SUN_JRE_13	"Software\\JavaSoft\\Java Runtime Environment"
+#define SUN_JRE_14	"Software\\JavaSoft\\Java Runtime Environment"
 #define LOG_FILE        "C:\\jmax_log.txt"
 
 static int jmax_get_jvm_from_registry(char *buf, jint bufsize, char* key, char* release);
@@ -444,6 +424,14 @@ jmax_get_available_jvm(void)
       jmax_append_jvm(buf);
     }
   }
+
+  if (jmax_get_jvm_from_registry(buf, _MAX_PATH, SUN_JRE_14, SUN_RELEASE_14)) {
+    if (_stat(buf, &statbuf) == 0) {
+      jmax_append_jvm(buf);
+    }
+  }
+
+
 }
 
 static int
