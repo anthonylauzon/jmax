@@ -1,10 +1,14 @@
+2003-08-04  Carl Seleborg  <seleborg@licorne.ircam.fr>
+	
+	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v" in Track and Sequence editors.
+	* (see 2003-07-21).
+
 2003-08-01  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/template.c (fts_template_make_instance): fixed cyclic definition crash in template. (quick hack)
 
 	* fts/package.c (fts_package_require): fixed cyclic dependency crash in package requiremenet (quick hack).
 
-	
 2003-07-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fts/package.c (fts_package_load): fixed bug "[ 777046 ] No error if a symbol is missing in a library"
@@ -55,6 +59,10 @@
 	
 	* m4/ac_prog_javac.m4 : since jMax can't compile with gcj, I have removed gcj from the list of checked java compiler.
 
+2003-07-24  Carl Seleborg  <seleborg@licorne.ircam.fr>
+
+	* packages/guiobj/help/messconst.help.jmax : Added parentheses around expressions (to work with the new syntax).
+
 2003-07-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in, m4/ac_check_java_version.m4: added a m4 macro for checking version of java.
@@ -85,7 +93,6 @@
 	* Modified menus to use actions instead of menu items.
 	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v".
 
->>>>>>> 1.252
 2003-07-18  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
 	* changed post() to fts_post() and post_atoms() to fts_post_atoms()
