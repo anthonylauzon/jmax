@@ -6,6 +6,8 @@ help_DATA=\
  seqstep.help.jmax \
  locate.help.jmax \
  find.help.jmax \
+ pop.mid \
+ jazz.mid \
  sequence.help.jmax \
  track.help.jmax \
  sequence.summary.jmax 
