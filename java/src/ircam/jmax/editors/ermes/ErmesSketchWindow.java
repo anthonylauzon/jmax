@@ -226,7 +226,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     editMenu.add(aMenuItem = new MenuItem("Clear"));
     aMenuItem.addActionListener(this);
     editMenu.add(new MenuItem("-"));
-    editMenu.add(aMenuItem = new MenuItem("Select All"));
+    editMenu.add(aMenuItem = new MenuItem("Select All  Ctrl+A"));
     aMenuItem.addActionListener(this);
     editMenu.add(new MenuItem("-"));
     editMenu.add(aCheckItem = new CheckboxMenuItem("Snap to Grid"));
@@ -273,9 +273,8 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
   private boolean IsInEditMenu(String theName) {
     return(theName.equals("Cut") || theName.equals("Copy") || theName.equals("Paste") 
-	   || theName.equals("Clear") || theName.equals("Select All") 
-	   || theName.equals("Snap to Grid") || theName.equals("Autorouting") 
-	   || IsInResizeObjectMenu(theName));
+	   || theName.equals("Clear") || theName.equals("Select All  Ctrl+A") 
+	   || theName.equals("Snap to Grid") || theName.equals("Autorouting"));
   }
   
   private Menu CreateTextMenu() {
@@ -628,6 +627,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     int aInt = e.getKeyCode();
     if(e.isControlDown()){
       if(aInt == 74) MaxApplication.GetConsoleWindow().ToFront();//j
+      else if(aInt == 65) itsSketchPad.SelectAll();//a
       else if(aInt == 77) MaxApplication.GetProjectWindow().toFront();//m
       else if(aInt == 78) MaxApplication.itsProjectWindow.New();//n
       else if(aInt == 79) MaxApplication.itsProjectWindow.Open();//o
@@ -737,6 +737,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       if (IsInTextMenu(itemName)) TextMenuAction(aCheckItem, itemName);
       if (IsInSizesMenu(itemName)) SizesMenuAction(aCheckItem, itemName);
       if (IsInJustificationMenu(itemName)) JustificationMenuAction(aCheckItem, itemName);
+      if (IsInResizeObjectMenu(itemName)) ResizeObjectMenuAction(aCheckItem, itemName);
     }
   }
 
@@ -868,18 +869,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
   private void EditMenuAction(MenuItem theMenuItem, String theString) {
     CheckboxMenuItem aCheckItem;
-    if (theString.equals("Select All")) {
-      // Should move to a SketchPad method
-      ErmesObject aObject;
-      Vector aElementsList = GetSketchPad().GetElements();
-      Vector aSelectedList = GetSketchPad().GetSelectedList();
-      for (Enumeration e = aElementsList.elements() ; e.hasMoreElements() ;) {
-	aObject = (ErmesObject) e.nextElement();
-	aSelectedList.addElement(aObject);
-	aObject.Select();
-      }
-      GetSketchPad().repaint();
-    }
+    if (theString.equals("Select All  Ctrl+A")) GetSketchPad().SelectAll();
     if (theString.equals("Snap to Grid")) {
       MaxApplication.ObeyCommand(MaxApplication.SNAP_TO_GRID);
 
@@ -893,7 +883,6 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       if(aCheckItem.getState())aCheckItem.setState(false);
       else aCheckItem.setState(true);
     }
-    else ResizeObjectMenuAction(theMenuItem, theString);
   }
 
   private void AlignObjectsMenuAction(MenuItem theMenuItem, String theString){

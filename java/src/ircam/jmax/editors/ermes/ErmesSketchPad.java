@@ -1163,6 +1163,18 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     itsStartInclusionRect = itsHelper.StartMoveInclusionRect();
   }
 
+  public void SelectAll(){
+    ErmesObject aObject;
+    for (Enumeration e = itsElements.elements() ; e.hasMoreElements() ;) {
+      aObject = (ErmesObject) e.nextElement();
+      itsSelectedList.addElement(aObject);
+      aObject.Select();
+    }
+    repaint();
+  }
+
+
+
   //--------------------------------------------------------
   //	OutletConnect
   //--------------------------------------------------------
