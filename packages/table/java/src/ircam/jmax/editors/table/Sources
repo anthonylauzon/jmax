@@ -3,5 +3,20 @@ SOURCES = \
 	  TableExtension.java \
 	  TableFactory.java \
 	  TableDataEditor.java \
+	  TableDataModel.java \
+	  TableRemoteData.java \
+	  TableSelection.java \
+	  FreeHandDrawer.java \
+	  TableRenderer.java \
+	  TableGraphicContext.java \
+	  LinerTool.java \
+	  TableCutter.java \
+	  LineDrawer.java \
+	  TableSelecter.java \
+	  PencilTool.java \
+	  ZoomWidget.java \
 	  TablePanel.java
+
+
+
 

@@ -9,12 +9,12 @@ import ircam.jmax.mda.*;
  * The table extension; install the table data type
  * and the table file data handler
  */
-
 public class TableExtension extends tcl.lang.Extension
 {
   public void init(Interp interp)
   {
     Mda.installEditorFactory(new TableFactory());
+
   }
 }
 
