@@ -37,6 +37,7 @@ SSOURCES = \
           ErmesSelection.java \
 	FindPanel.java		\
 	FontCache.java		\
+	MultiLineText.java	\
 
 
 SOURCES = $(SSOURCES) $(DSOURCES) 

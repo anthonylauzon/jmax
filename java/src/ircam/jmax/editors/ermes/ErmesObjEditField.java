@@ -10,24 +10,29 @@ import ircam.jmax.utils.*;
 //
 public class ErmesObjEditField extends TextArea implements KeyListener, FocusListener {
 
-  boolean focused = false;
-  ErmesObjEditableObject itsOwner= null;
-  ErmesSketchPad itsSketchPad = null;
+  protected ErmesObjEditableObject itsOwner = null;
+  private ErmesSketchPad itsSketchPad = null;
+  private boolean focused = false;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesObjEditField(ErmesSketchPad theSketchPad) 
+  ErmesObjEditField( ErmesSketchPad theSketchPad) 
   {
     super(" ", 1, 20, TextArea.SCROLLBARS_NONE);
-    setFont( new Font( ircam.jmax.utils.Platform.FONT_NAME, 
-		       Font.PLAIN, 
-		       ircam.jmax.utils.Platform.FONT_SIZE));
+
+    setBackground(Color.white);
+
+    setFont( new Font( ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));
+
     setEditable(true);
+
     selectAll();
-    itsSketchPad = theSketchPad;
+
     addKeyListener(this);
     addFocusListener(this);
+
+    itsSketchPad = theSketchPad;
   }
 
   public void removeNotify()
@@ -37,17 +42,18 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
     super.removeNotify();
   }
 
-  public void AbortEdit() 
+  protected void AbortEdit() 
   {
     setVisible( false);
+
     setLocation( -200, -200);
+
     focused = false;
 
     if (itsSketchPad.itsToolBar.locked)
       itsSketchPad.editStatus = ErmesSketchPad.START_ADD;
     else
       itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
-    itsOwner.itsInEdit = false;
 
     itsOwner = null;
   }
@@ -60,47 +66,37 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
   {
     if (! focused)
       return ;
-    else 
-      {
-	focused = false;
-	itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
-	itsSketchPad.itsSketchWindow.requestFocus();
-      }
+
+    focused = false;
+    itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
+    itsSketchPad.itsSketchWindow.requestFocus();
 
     String aTextString = getText().trim();
 
-    if (itsOwner == null)
-      return; //this happens when the instatiation fails
-
-    if ( itsOwner.itsArgs != null && itsOwner.itsArgs.equals(aTextString) && !aTextString.equals("")) 
+    if ( !itsOwner.getArgs().equals( aTextString) )
       {
-	itsOwner.ParseText(aTextString);
-	AbortEdit();
-	return;
+	itsOwner.redefine( aTextString);
+
+	if ( itsOwner.itsOutletList.size() > 0)
+	  itsOwner.MoveOutlets();
+
+	// Probably called by redefine
+	itsOwner.updateInOutlets();
+
+	itsSketchPad.markSketchAsDirty();
+	itsSketchPad.paintDirtyList();
       } 
 
-    itsOwner.itsArgs = aTextString;
-    itsOwner.ParseText(aTextString);
-    itsOwner.redefineFtsObject();
+    setRows( 2);
+    setColumns( 20);
 
-    if ( itsOwner.itsOutletList.size() > 0)
-      itsOwner.MoveOutlets();
-
-    itsOwner.update(itsOwner.itsFtsObject);
-    itsOwner.itsSketchPad.markSketchAsDirty();
-    itsOwner.itsSketchPad.paintDirtyList();
-    setRows(2);
-    setColumns(20);
-
-    AbortEdit(); //after this, itsOwner = null.
+    AbortEdit();
   }
 
   public void focusGained( FocusEvent e) 
   {
     itsSketchPad.editStatus = ErmesSketchPad.EDITING_OBJECT;
-    if (focused)
-      return;
-    else
+    if (!focused)
       focused = true;
   }
 
@@ -254,18 +250,18 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
       }
   }
 
-  public void paint(Graphics g) 
-  {
-    setBackground(Color.white);
-  }
+//   public void paint(Graphics g) 
+//   {
+//     setBackground(Color.white);
+//   }
 
+
+  private Dimension minimumSize = new Dimension();
 
   public Dimension getMinimumSize() 
   {
-    Dimension r = itsOwner.getPreferredSize();
-    Dimension d = new Dimension( r.width - itsOwner.getWhiteOffset(), 
-				 r.height - itsOwner.HEIGHT_DIFF);
-    return d;
+    minimumSize.setSize( itsOwner.getWidth() - itsOwner.getWhiteXOffset(), itsOwner.getHeight() - itsOwner.getWhiteYOffset());
+    return minimumSize;
   }
 
   public Dimension getPreferredSize() 

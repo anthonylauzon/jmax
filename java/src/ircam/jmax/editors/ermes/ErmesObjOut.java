@@ -16,19 +16,14 @@ class ErmesObjOut extends ErmesObject {
   public ErmesObjOut(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
-  }
-	
-  public void Init()
-  {
+
     itsId = ((FtsOutletObject) itsFtsObject).getPosition();
-
-    super.Init();
   }
 
 
-  public void redefineFtsObject()
+  void redefine( String text)
   {
-    ((FtsOutletObject)itsFtsObject).setPosition(itsId);
+    ((FtsOutletObject)itsFtsObject).setPosition( itsId);
   }
   
   public void MouseDown_specific(MouseEvent evt, int x, int y) 
@@ -40,7 +35,7 @@ class ErmesObjOut extends ErmesObject {
     else 
       {	//we want to choose among the different Outlet number
 	itsSketchPad.itsOutPop.SetNewOwner( this); //make the Choice pointing to this
-	itsSketchPad.itsOutPop.show( itsSketchPad, getItsX(), getItsY());
+	itsSketchPad.itsOutPop.show( itsSketchPad, getX(), getY());
       }
   }
 
@@ -49,7 +44,7 @@ class ErmesObjOut extends ErmesObject {
     if ( itsId != numberChoosen) 
       {
 	itsId = numberChoosen;
-	redefineFtsObject();
+	redefine( "");
       }
     itsSketchPad.repaint();
   }
@@ -61,26 +56,26 @@ class ErmesObjOut extends ErmesObject {
     else 
       g.setColor(itsLangSelectedColor);
 
-    g.fillRect( getItsX()+1, getItsY()+1, getItsWidth()-2,  getItsHeight()-2);
-    g.fill3DRect( getItsX()+2, getItsY()+2, getItsWidth()-4,  getItsHeight()-4, true);
+    g.fillRect( getX()+1, getY()+1, getWidth()-2,  getHeight()-2);
+    g.fill3DRect( getX()+2, getY()+2, getWidth()-4,  getHeight()-4, true);
     g.setColor( Color.black);
 
     //the box
-    g.drawRect( getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
+    g.drawRect( getX()+0, getY()+0, getWidth()-1, getHeight()-1);
 
     //the triangle
-    g.drawLine( getItsX() + 1, 
-		getItsY() + getItsHeight()-1, 
-		getItsX() + getItsWidth()/2, 
-		getItsY() + getItsHeight()/2);
+    g.drawLine( getX() + 1, 
+		getY() + getHeight()-1, 
+		getX() + getWidth()/2, 
+		getY() + getHeight()/2);
 
-    g.drawLine( getItsX() + getItsWidth()/2,
-		getItsY() + getItsHeight()/2,
-		getItsX() + getItsWidth()-1,
-		getItsY() + getItsHeight()-1);
+    g.drawLine( getX() + getWidth()/2,
+		getY() + getHeight()/2,
+		getX() + getWidth()-1,
+		getY() + getHeight()-1);
 
     g.setFont( getFont());
-    g.drawString( "" + (itsId+1), getItsX() + 2, getItsY() + getItsHeight() + itsFontMetrics.getHeight() - 1);
+    g.drawString( "" + (itsId+1), getX() + 2, getY() + getHeight() + itsFontMetrics.getHeight() - 1);
   }
 	
   void ResizeToNewFont(Font theFont) 
@@ -90,8 +85,8 @@ class ErmesObjOut extends ErmesObject {
 
   public void ResizeToText( int theDeltaX, int theDeltaY)
   {
-    int aWidth = getItsWidth() + theDeltaX;
-    int aHeight = getItsHeight() + theDeltaY;
+    int aWidth = getWidth() + theDeltaX;
+    int aHeight = getHeight() + theDeltaY;
 
     if ( aWidth < getMinimumSize().width)
       aWidth = getMinimumSize().width;
@@ -99,7 +94,7 @@ class ErmesObjOut extends ErmesObject {
     if( aHeight < getMinimumSize().height) 
       aHeight = getMinimumSize().height;
 
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
+    resizeBy( aWidth - getWidth(), aHeight - getHeight());
   }
 
   static Dimension minimumSize = new Dimension(15,15); 
@@ -107,12 +102,5 @@ class ErmesObjOut extends ErmesObject {
   public Dimension getMinimumSize() 
   {
     return minimumSize;
-  }
-
-  static Dimension preferredSize = new Dimension(20, 20);
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
   }
 }

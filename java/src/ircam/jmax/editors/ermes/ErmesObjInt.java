@@ -23,37 +23,28 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
   public ErmesObjInt( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super(theSketchPad, theFtsObject);
+    super( theSketchPad, theFtsObject);
 
     state = 0;
     currentText = new StringBuffer();
-  }
 
-  public void Init() 
-  {
-    super.Init();
     itsFtsObject.watch("value", this);
 
     itsInteger = ((Integer)itsFtsObject.get("value")).intValue();
-    DEFAULT_HEIGHT = itsFontMetrics.getHeight();
 
-    DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..");
+    int w = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..") +17;
+    if (getWidth() < w) 
+      setWidth( w);
 
-    if ( getItsHeight() < DEFAULT_HEIGHT + 4)
-      {
-	preferredSize.height = DEFAULT_HEIGHT+4;
-	resizeBy(0, getPreferredSize().height - getItsHeight());
-      }
-    if ( getItsWidth() < DEFAULT_WIDTH + 17) 
-      {
-	preferredSize.width = DEFAULT_WIDTH + 17;
-	setItsWidth(preferredSize.width);
-      }
+    int h = itsFontMetrics.getHeight() + 4;
+    if ( getHeight() < h)
+      setHeight( h);
+
+    recomputeInOutletsPositions();
   }
 
   public void propertyChanged(FtsObject obj, String name, Object value) 
   {
-
     int temp = ((Integer) value).intValue();
 
     if (itsInteger != temp) 
@@ -76,14 +67,14 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
   void ResizeToNewFont(Font theFont) 
   {
-    resizeBy( 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..") - getItsWidth(),
-	      itsFontMetrics.getHeight() + 4 -getItsHeight());
+    resizeBy( 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..") - getWidth(),
+	      itsFontMetrics.getHeight() + 4 -getHeight());
   }
 
   public void ResizeToText(int theDeltaX, int theDeltaY) 
   {
-    int aWidth = getItsWidth()+theDeltaX;
-    int aHeight = getItsHeight()+theDeltaY;
+    int aWidth = getWidth()+theDeltaX;
+    int aHeight = getHeight()+theDeltaY;
 
     if ( (aWidth < aHeight/2 + 17 + itsFontMetrics.stringWidth("0"))
 	 && (aHeight < itsFontMetrics.getHeight() + 4)) 
@@ -98,13 +89,13 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 	  if (aHeight < itsFontMetrics.getHeight() + 4)
 	    aHeight = itsFontMetrics.getHeight() + 4;
         }
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
+    resizeBy( aWidth - getWidth(), aHeight - getHeight());
   }
 
   public boolean canResizeBy( int theDeltaX, int theDeltaY) 
   {
-    if ( (getItsWidth() + theDeltaX < getItsHeight()/2 + 17 + itsFontMetrics.stringWidth("0"))
-	 || ( getItsHeight() + theDeltaY < itsFontMetrics.getHeight() + 4))
+    if ( (getWidth() + theDeltaX < getHeight()/2 + 17 + itsFontMetrics.stringWidth("0"))
+	 || ( getHeight() + theDeltaY < itsFontMetrics.getHeight() + 4))
       return false;
     else
       return true;
@@ -117,7 +108,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     aHeight = itsFontMetrics.getHeight() + 4;
     aWidth = 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..");
 
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
+    resizeBy( aWidth - getWidth(), aHeight - getHeight());
   }
 
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
@@ -152,17 +143,15 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
     new ErmesObjIntegerDialog(itsSketchPad.GetSketchWindow(), String.valueOf(itsInteger), this);
   }
 
-  public boolean MouseUp(MouseEvent evt,int x, int y) 
+  void MouseUp(MouseEvent evt,int x, int y) 
   {
     if (itsSketchPad.itsRunMode || evt.isControlDown()) 
       {
 	Fts.sync();
-
 	DoublePaint();
-	return true;
       }
     else
-      return super.MouseUp(evt, x, y);
+      super.MouseUp(evt, x, y);
   }
 
   public boolean MouseDrag_specific(MouseEvent evt,int x, int y) 
@@ -194,13 +183,13 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
   public void Paint_specific( Graphics g) 
   {
-    int x = getItsX();
+    int x = getX();
     int xp1 = x + 1;
-    int y = getItsY();
-    int h = getItsHeight();
+    int y = getY();
+    int h = getHeight();
     int hd2 = h / 2;
     int hm1 = h - 1;
-    int w = getItsWidth();
+    int w = getWidth();
     int wm1 = w - 1;
 
     if (g == null)
@@ -258,7 +247,7 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
     int aStringLength = theString.length();
 
-    int aCurrentSpace = getItsWidth() - (getItsHeight()/2+5) - 5;
+    int aCurrentSpace = getWidth() - (getHeight()/2+5) - 5;
     int aStringWidth = itsFontMetrics.stringWidth( aString);
 
     if ( aStringWidth < aCurrentSpace)
@@ -282,17 +271,10 @@ class ErmesObjInt extends ErmesObject implements FtsPropertyHandler, KeyEventCli
 
   public Dimension getMinimumSize() 
   {
-    if (getItsHeight()==0 || getItsWidth() == 0)
+    if (getHeight()==0 || getWidth() == 0)
       return minimumSize;
     else
-      return new Dimension( getItsHeight()/2 + 13 + itsFontMetrics.stringWidth("0"), itsFontMetrics.getHeight()+4);
-  }
-
-  Dimension preferredSize = new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT);
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
+      return new Dimension( getHeight()/2 + 13 + itsFontMetrics.stringWidth("0"), itsFontMetrics.getHeight()+4);
   }
 
   public void keyPressed( KeyEvent e) 

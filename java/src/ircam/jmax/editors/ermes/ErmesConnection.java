@@ -82,10 +82,7 @@ class ErmesConnection implements ErmesDrawable {
 
     try 
       {
-	itsFtsConnection = Fts.makeFtsConnection( itsFromObject.itsFtsObject,
-						  theOutlet.GetOutletNum(),
-						  itsToObject.itsFtsObject,
-						  theInlet.GetInletNum());
+	itsFtsConnection = Fts.makeFtsConnection( itsFromObject.itsFtsObject, theOutlet.getNum(), itsToObject.itsFtsObject, theInlet.getNum());
       } 
     catch ( FtsException e) 
       {
@@ -97,47 +94,6 @@ class ErmesConnection implements ErmesDrawable {
     itsSelected = false;
   }
 
-
-  //--------------------------------------------------------
-  // Repaint
-  //--------------------------------------------------------
-  public void Repaint() 
-  {
-    Update( itsSketchPad.GetOffGraphics());
-    Paint( itsSketchPad.GetOffGraphics());
-
-    Graphics g = itsSketchPad.getGraphics();
-    itsSketchPad.CopyTheOffScreen( g);
-    g.dispose();
-  }
-
-  //--------------------------------------------------------
-  // Update
-  //--------------------------------------------------------
-  public void Update( Graphics g) 
-  {
-
-    if ( !itsSketchPad.itsGraphicsOn)
-      return;
-
-    Rectangle aRect;
-    Point start = getStartPoint();
-    Point end = getEndPoint();
-
-    g.setColor( itsSketchPad.getBackground());
-    //if is not autorouted (or is an error connection)
-
-    if ( java.lang.Math.abs( start.x-end.x)>50) 
-      {
-	g.drawLine( start.x, start.y, end.x, end.y);
-	g.drawLine( start.x, start.y+1, end.x, end.y+1);
-      } 
-    else 
-      {
-	g.drawLine( start.x, start.y, end.x, end.y);
-	g.drawLine( start.x-1, start.y, end.x-1, end.y);
-      }
-  }
 
   public ErmesConnection( ErmesObject fromObj, ErmesObject toObj, ErmesSketchPad theSketchPad, int theOutlet, int theInlet, FtsConnection theFtsConnection) 
   {
@@ -156,9 +112,9 @@ class ErmesConnection implements ErmesDrawable {
     itsInlet = (ErmesObjInlet) itsToObject.itsInletList.elementAt( itsInletNum);
     itsOutlet = (ErmesObjOutlet)itsFromObject.itsOutletList.elementAt( itsOutletNum);
     itsOutlet.AddConnection( this);
-    itsOutlet.ChangeState( false, true, false);
+    itsOutlet.setSelected( false);
     itsInlet.AddConnection( this);
-    itsInlet.ChangeState( false, true, false);
+    itsInlet.setSelected( false);
     itsSketchPad.itsConnections.addElement( this);
   }
 

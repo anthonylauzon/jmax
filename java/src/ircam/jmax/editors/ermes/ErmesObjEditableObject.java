@@ -11,312 +11,262 @@ import ircam.jmax.utils.*;
 // The base class of the ermes objects which are user-editable (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
 //
 abstract class ErmesObjEditableObject extends ErmesObject implements FtsPropertyHandler, ErmesObjEditable {
-  public MaxVector itsParsedTextVector = new MaxVector();
-  public String itsMaxString = "";
-  public boolean itsInEdit = true;
 
-  static final int HEIGHT_DIFF = 3;
-  static final int TEXT_INSET = 2;
+//   boolean itsInEdit = true;
 
-  int TEXT_OFFSET;
-  int itsMaxStringWidth = 0; // (fd)
-  String itsArgs;
-  String itsBackupText = new String();
-  Dimension preferredSize = new Dimension(100, 25);//hu-hu
-  Dimension currentMinimumSize = new Dimension();
+  protected MultiLineText itsText = new MultiLineText();
 
-  public ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
-    TEXT_OFFSET = getWhiteOffset()+TEXT_INSET;
+
+//     itsInEdit = false;
+
+    itsFtsObject.watch( "ins", this);
+    itsFtsObject.watch( "outs", this);
+
+    itsText.setFontMetrics( itsFontMetrics);
+    itsText.setText( getArgs());
+
+    if (getWidth() == -1)
+      setWidth( itsFontMetrics.stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+    else
+      updateDimensions();
+  }
+
+  private void updateDimensions()
+  {
+    itsText.setWidth( getWidth() - 2*getTextXOffset());
+    super.setHeight( itsFontMetrics.getHeight()*itsText.getRows() + 2*getTextYOffset());
+
+    recomputeInOutletsPositions();
   }
 
   void cleanAll()
   {
-    itsParsedTextVector = null;
+    itsText = null;
     super.cleanAll();
   }
 
-  protected int getWhiteOffset() 
+  // redefined from base class
+  protected void setWidth( int theWidth) 
+  {
+    int minWidth = itsFontMetrics.stringWidth( "m ") + 2*getTextXOffset();
+
+    if (theWidth < minWidth)
+      theWidth = minWidth;
+
+    super.setWidth( theWidth);
+
+    updateDimensions();
+  }
+
+  // redefined from base class
+  // This way, changing the height from outside is forbidden
+  protected void setHeight( int theHeight)
+  {
+  }
+
+  // redefined from base class
+  void resizeBy( int theDeltaW, int theDeltaH) 
+  {
+    setWidth( getWidth() + theDeltaW);
+  }
+
+
+  // ----------------------------------------
+  // White and text area offset
+  // for now, this base class provides default value.
+  // These methods should be abstracts.
+  // ----------------------------------------
+
+  protected int getWhiteXOffset()
   {
     return 0;
   }
 
-  //--------------------------------------------------------
-  // Init from ftsObjects
-  //--------------------------------------------------------
-
-  public void Init() 
+  protected int getWhiteYOffset()
   {
-    int fieldHeight;
-
-    FontMetrics temporaryFM =  itsSketchPad.getFontMetrics(itsSketchPad.getFont());
-    fieldHeight = temporaryFM.getHeight();
-
-    if (itsArgs.equals("")) 
-      {
-	preferredSize = new Dimension(70, fieldHeight+2*HEIGHT_DIFF);
-      } 
-    else 
-      {
-	int length = temporaryFM.stringWidth(itsArgs); 
-	preferredSize = new Dimension( length + 2*TEXT_OFFSET, fieldHeight+2*HEIGHT_DIFF); 
-      }
-
-    super.Init();
-
-    itsInEdit = false;
-
-    itsFtsObject.watch("ins", this);
-    itsFtsObject.watch("outs", this);
+    return 0;
   }
 
-  /* Property handling */
+  protected int getTextXOffset()
+  {
+    return 0;
+  }
+
+  protected int getTextYOffset()
+  {
+    return 0;
+  }
+
+  // ----------------------------------------
+  // ``Args'' property
+  // ----------------------------------------
+  abstract String getArgs();
+
+
+  // ----------------------------------------
+  // Property handling
+  // ----------------------------------------
   public void propertyChanged(FtsObject obj, String name, Object value) 
   {
     if ((name == "ins") || (name == "outs"))
-      update(itsFtsObject);
+      updateInOutlets();
   
     itsSketchPad.repaint();
   }
     
-  public void MouseDown_specific(MouseEvent evt,int x, int y) 
+  void MouseDown_specific( MouseEvent evt,int x, int y) 
   {
-    itsSketchPad.ClickOnObject(this, evt, x, y);
+    itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 
-  void backupText() 
-  {
-    itsBackupText = itsArgs.toString();
-  }
-
-  void restoreText() 
-  {
-    itsArgs = itsBackupText.toString();
-  }
-    
   // actually starts the edit operation.
   // The inset parameter specify the relative position of the editfield
-  private void doEdit(int editFieldInset) 
+  private void doEdit( int editFieldInset) 
   {
     if (itsSketchPad.GetEditField() != null)
-      itsSketchPad.GetEditField().setEditable(true);
+      itsSketchPad.GetEditField().setEditable( true);
 
-    itsSketchPad.GetEditField().setFont(getFont());
-    itsSketchPad.GetEditField().setText(itsArgs);
+    itsSketchPad.GetEditField().setFont( getFont());
+    itsSketchPad.GetEditField().setText( getArgs());
     itsSketchPad.GetEditField().itsOwner = this;
 
-    if ( itsParsedTextVector.size() == 0)
-      itsSketchPad.GetEditField().setBounds( getItsX() + editFieldInset/2,
-					     getItsY()+1, 
-					     getItsWidth() - editFieldInset,
-					     itsFontMetrics.getHeight()+20);
+    if ( itsText.getRows() == 0)
+      itsSketchPad.GetEditField().setBounds( getX() + editFieldInset/2,
+					     getY() + 1,
+					     getWidth() - editFieldInset,
+					     itsFontMetrics.getHeight() + 20);
     else
-      itsSketchPad.GetEditField().setBounds( getItsX() + editFieldInset/2,
-					     getItsY()+1, 
-					     getItsWidth()-editFieldInset,
-					     itsFontMetrics.getHeight() *(itsParsedTextVector.size()+1));
+      itsSketchPad.GetEditField().setBounds( getX() + editFieldInset/2,
+					     getY() + 1,
+					     getWidth() - editFieldInset,
+					     itsFontMetrics.getHeight() * (itsText.getRows()+1));
 
-    itsMaxString = "";
-    itsParsedTextVector.removeAllElements();
-
-    itsSketchPad.GetEditField().setVisible(true);
+    itsSketchPad.GetEditField().setVisible( true);
     itsSketchPad.GetEditField().requestFocus();
-    itsSketchPad.GetEditField().setCaretPosition(itsArgs.length());
+    itsSketchPad.GetEditField().setCaretPosition( getArgs().length());
   }
 
-  public void restartEditing() 
+  public void restartEditing()  // (fd) public, because public in ErmesEditable...
   {
     doEdit( 0);
   }
 
-  public void startEditing() 
+  public void startEditing()  // (fd) public, because public in ErmesEditable...
   {
     doEdit( 6);
   }
     
-  public boolean MouseUp(MouseEvent evt,int x,int y) 
-  {
-    if (itsInEdit)
-      return true;
-    else
-      return super.MouseUp(evt, x, y);
-  }
+//   void MouseUp( MouseEvent evt,int x,int y) 
+//   {
+//     if (itsInEdit)
+//       return;
 
-  public void RestoreDimensions(boolean paintNow) 
+//     super.MouseUp(evt, x, y);
+//   }
+
+  void RestoreDimensions( boolean paintNow) 
   {
-    int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( itsMaxString) + TEXT_OFFSET +  getWhiteOffset(),
+    int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( "ZOB") + 2*getTextXOffset(),
 			      itsInletList.size()*12,
 			      itsOutletList.size()*12);
 
-    int aHeightDiff = itsFontMetrics.getHeight() * itsParsedTextVector.size() + 2 * HEIGHT_DIFF-getItsHeight();
-    int aWidthDiff = aMaxWidth - getItsWidth();
+    int aHeightDiff = itsFontMetrics.getHeight() * itsText.getRows() + 2*getTextYOffset() - getHeight();
+    int aWidthDiff = aMaxWidth - getWidth();
+
     if (aHeightDiff == 0 && aWidthDiff == 0)
       return;
 
     resizeBy( aWidthDiff, aHeightDiff);
+
     if (paintNow) 
       {
-	if (aHeightDiff < 0 || aWidthDiff <0)
+	if (aHeightDiff < 0 || aWidthDiff < 0)
 	  itsSketchPad.repaint();
 	else
 	  DoublePaint();
-      } else 
+      }
+    else 
 	{
 	  if (aHeightDiff < 0 || aWidthDiff <0)
 	    itsSketchPad.markSketchAsDirty();
 	  else
-	    itsSketchPad.addToDirtyObjects(this);
+	    itsSketchPad.addToDirtyObjects( this);
         }
   }
 
-  public int MaxWidth( int uno, int due, int tre) 
+  int MaxWidth( int uno, int due, int tre) 
   {
     int MaxInt = uno;
 
-    if (due>MaxInt)
-      MaxInt=due;
-    if (tre>MaxInt)
-      MaxInt=tre;
+    if (due > MaxInt)
+      MaxInt = due;
+
+    if (tre > MaxInt)
+      MaxInt = tre;
+
     return MaxInt;
-  }
-
-
-  protected void SetFieldText(String theString) 
-  {
-    FontMetrics fm = itsSketchPad.GetEditField().getFontMetrics(itsSketchPad.getFont());
-    int lenght = fm.stringWidth(theString);
-    Dimension d1 = preferredSize;
-
-    while (lenght > d1.width-20)
-      d1.width += 20;
-
-    preferredSize = d1;
-    resize(d1.width, d1.height);
-
-    itsSketchPad.GetEditField().setText(theString);
-    itsSketchPad.GetEditField().setSize(d1.width-TEXT_OFFSET, d1.height-HEIGHT_DIFF);
-
-    itsSketchPad.GetEditField().repaint();
-    itsSketchPad.repaint();
   }
 
   void ResizeToNewFont(Font theFont) 
   {
-    ResizeToText(0,0);
+    ResizeToText( 0,0);
   }
 
-  public void ResizeToText(int theDeltaX, int theDeltaY) 
+  void ResizeToText( int theDeltaX, int theDeltaY) 
   {
-    int aWidth = getItsWidth()+theDeltaX;
-    int aHeight = getItsHeight()+theDeltaY;
+    int aWidth = getWidth() + theDeltaX;
+    int aHeight = getHeight() + theDeltaY;
 
-    if ( aWidth < itsFontMetrics.stringWidth(itsMaxString) + TEXT_OFFSET + getWhiteOffset())
-      aWidth = itsFontMetrics.stringWidth(itsMaxString) + TEXT_OFFSET + getWhiteOffset();
+    int minWidth = itsFontMetrics.stringWidth( "m ") + 2*getTextXOffset();
+    if ( aWidth < minWidth)
+      aWidth = minWidth;
 
-    if ( aHeight < itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF)
-      aHeight = itsFontMetrics.getHeight() * itsParsedTextVector.size() + HEIGHT_DIFF;
+    int minHeight = itsFontMetrics.getHeight() * itsText.getRows() + 2*getWhiteYOffset();
+    if ( aHeight < minHeight)
+      aHeight = minHeight;
 
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
+    resizeBy( aWidth - getWidth(), aHeight - getHeight());
   }
 
-  public boolean canResizeBy(int theDeltaX, int theDeltaY) 
+  boolean canResizeBy( int theDeltaX, int theDeltaY) 
   {
-    if ((getItsWidth() + theDeltaX < itsFontMetrics.stringWidth( itsMaxString) + TEXT_OFFSET + getWhiteOffset())
-	|| (getItsHeight() + theDeltaY < itsFontMetrics.getHeight()*itsParsedTextVector.size() + HEIGHT_DIFF))
-      return false;
-    else
-      return true;
+    return getWidth() + theDeltaX >= itsFontMetrics.stringWidth( "m ");
   }
 
-  public void ParseText(String theString) 
+  void MoveOutlets() 
   {
-    int aIndex = theString.indexOf( "\n");
-    int aOldIndex = -1;
-    int aLastIndex = theString.lastIndexOf( "\n");
-    String aString;
-    int width = 0;
-    int i = 0;
-
-    while ( aIndex != -1) 
+    for ( Enumeration e = itsOutletList.elements(); e.hasMoreElements(); )
       {
-
-	aString = theString.substring( aOldIndex + 1, aIndex);
-	width = itsFontMetrics.stringWidth( aString);
-
-	if ( width > itsMaxStringWidth) 
-	  {
-	    itsMaxString = aString;
-	    itsMaxStringWidth = width;
-	  }
-
-	itsParsedTextVector.addElement( aString);
-	aOldIndex = aIndex;
-	aIndex = theString.indexOf( "\n", aOldIndex + 1);
-	i++;
-      }
-
-    aString = theString.substring( aOldIndex + 1);
-    width = itsFontMetrics.stringWidth( aString);
-
-    if ( width > itsMaxStringWidth) 
-      {
-	itsMaxString = aString;
-	itsMaxStringWidth = width;
-      }
-
-    itsParsedTextVector.addElement( aString);
-  }
-
-  public void MoveBy(int theDeltaH, int theDeltaV) 
-  {
-    super.MoveBy( theDeltaH, theDeltaV);
-  }
-
-  public void MoveOutlets() 
-  {
-    ErmesObjOutlet aOutlet;
-
-    for (Enumeration e=itsOutletList.elements(); e.hasMoreElements();) 
-      {
-	aOutlet = (ErmesObjOutlet) e.nextElement();
-	aOutlet.MoveTo(aOutlet.itsX, getItsY()+getItsHeight());
+	ErmesObjOutlet aOutlet = (ErmesObjOutlet) e.nextElement();
+	aOutlet.MoveTo( aOutlet.itsX, getY() + getHeight());
       }
   }
 
-  abstract protected void Paint_specific(Graphics g);
+  abstract protected void Paint_specific( Graphics g);
 
-  protected void DrawParsedString(Graphics theGraphics) 
+  protected void DrawParsedString( Graphics theGraphics) 
   {
-    String aString;
-    int i=0;
-    int insetY = (getItsHeight() - itsFontMetrics.getHeight()*itsParsedTextVector.size()) / 2;
+    int x = getX() + getTextXOffset();
+    int y = getY() + getTextYOffset() + itsFontMetrics.getAscent();
+    int height = itsFontMetrics.getHeight();
 
-    for ( Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements(); ) 
+    for ( Enumeration e = itsText.elements(); e.hasMoreElements(); ) 
       {
-	aString = (String)e.nextElement();
-	theGraphics.drawString( aString, 
-				getItsX() + TEXT_OFFSET, 
-				getItsY() + itsFontMetrics.getAscent() + insetY + itsFontMetrics.getHeight()*i);
-	i++;
+	theGraphics.drawString( (String)e.nextElement(), x, y);
+	y += height;
       }
   }
 
-  public Dimension getMinimumSize() 
+  // ----------------------------------------
+  // old stuff
+  // ----------------------------------------
+  Dimension getMinimumSize()
   {
-    if (itsParsedTextVector.size()==0)
-      return getPreferredSize();
-    else 
-      {
-	currentMinimumSize.width = itsFontMetrics.stringWidth(itsMaxString) + 2*getWhiteOffset();
-	currentMinimumSize.height = itsFontMetrics.getHeight()*itsParsedTextVector.size()+HEIGHT_DIFF;
-	return currentMinimumSize;
-      }
-  }
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
+    new Throwable( this.getClass().getName()).printStackTrace();
+    return new Dimension( 100, 17);
   }
 }
-  
+

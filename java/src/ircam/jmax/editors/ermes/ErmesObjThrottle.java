@@ -6,41 +6,50 @@ import java.awt.*;
 // The graphic throttle contained into a 'slider' object.
 //
 class ErmesObjThrottle {
-  int itsX, itsY;
-  ErmesObjSlider itsSlider;
-  Dimension preferredSize = null;
-  Rectangle bounds = new Rectangle();
+  protected int itsX, itsY;
+  protected int itsWidth, itsHeight;
 
-  final int LATERAL_OFFSET = 2;
-  final int THROTTLE_HEIGHT = 5;
+  private ErmesObjSlider itsSlider;
+
+  private Rectangle bounds = new Rectangle();
+
+  private final int LATERAL_OFFSET = 2;
+  private final int THROTTLE_HEIGHT = 5;
   
-  int itsPreviousX;
-  int itsPreviousY;
+  private int itsPreviousX;
+  private int itsPreviousY;
 
-  boolean erased=true;
+  private boolean erased = true;
 
-  static final int XOR_MODE = 0;
-  static final int PAINT_MODE = 1;
+  private static final int XOR_MODE = 0;
+  private static final int PAINT_MODE = 1;
   
-  public ErmesObjThrottle( ErmesObjSlider theSlider, int x, int y) 
+  public ErmesObjThrottle( ErmesObjSlider theSlider) 
   {
     itsSlider = theSlider;
-    itsX = x + LATERAL_OFFSET;
-    itsY = y + theSlider.getItsHeight() - theSlider.BOTTOM_OFFSET - 2;
+    itsX = itsSlider.getX() + LATERAL_OFFSET;
+    itsY = itsSlider.getY() + theSlider.getHeight() - theSlider.BOTTOM_OFFSET - 2;
     itsPreviousX = itsX;
     itsPreviousY = itsY;
-    
-    preferredSize = new Dimension( theSlider.getItsWidth() - 2*LATERAL_OFFSET, THROTTLE_HEIGHT);
+
+    itsWidth = theSlider.getWidth() - 2*LATERAL_OFFSET;
+    itsHeight = THROTTLE_HEIGHT;
+  }
+
+  protected Rectangle getBounds()
+  {
+    bounds.setBounds( itsX, itsY, itsWidth, itsHeight);
+    return bounds;
   }
 
   //coordinate conversion, not inverted and clipped  
   int AbsoluteToSlider( int theAbsoluteY) 
   {
-    if ( theAbsoluteY >= itsSlider.getItsY())
-      if ( theAbsoluteY <= itsSlider.getItsY() + itsSlider.getItsHeight()) 
-	return ( theAbsoluteY - itsSlider.getItsY());
+    if ( theAbsoluteY >= itsSlider.getY())
+      if ( theAbsoluteY <= itsSlider.getY() + itsSlider.getHeight()) 
+	return ( theAbsoluteY - itsSlider.getY());
       else 
-	return itsSlider.getItsHeight();
+	return itsSlider.getHeight();
     else
       return 0;
   }
@@ -60,7 +69,7 @@ class ErmesObjThrottle {
   boolean IsInDragArea( int absoluteY)
   { 
     return ( AbsoluteToSlider( absoluteY) > itsSlider.UP_OFFSET 
-	     && AbsoluteToSlider( absoluteY) < itsSlider.getItsHeight()- itsSlider.BOTTOM_OFFSET);
+	     && AbsoluteToSlider( absoluteY) < itsSlider.getHeight()- itsSlider.BOTTOM_OFFSET);
   }
 
   //coordinate conversion, inverted and clipped
@@ -79,7 +88,7 @@ class ErmesObjThrottle {
     else if ( theDragCoord >= itsSlider.itsPixelRange) 
       normalizedDrag = itsSlider.itsPixelRange;
 
-    return itsSlider.getItsY() + itsSlider.UP_OFFSET + (itsSlider.itsPixelRange - normalizedDrag);
+    return itsSlider.getY() + itsSlider.UP_OFFSET + (itsSlider.itsPixelRange - normalizedDrag);
   }
   
   void eraseAndPaint( Graphics g) 
@@ -96,11 +105,11 @@ class ErmesObjThrottle {
 
   void Paint_specific( Graphics g, int mode) 
   {
-    int deltaX = itsSlider.getItsX() + LATERAL_OFFSET;
+    int deltaX = itsSlider.getX() + LATERAL_OFFSET;
     int deltaY;
 
     if ( mode == PAINT_MODE) 
-      deltaY = itsSlider.getItsY() + AbsoluteToSlider( itsY);
+      deltaY = itsSlider.getY() + AbsoluteToSlider( itsY);
     else
       deltaY = itsPreviousY;
 
@@ -111,13 +120,14 @@ class ErmesObjThrottle {
 	if ( mode == XOR_MODE) 
 	  g.setXORMode( itsSlider.itsUINormalColor);
 
-	g.fillRect( deltaX+1, deltaY+1, getPreferredSize().width-2, getPreferredSize().height-2);
+	g.fillRect( deltaX + 1, deltaY + 1, itsWidth - 2, itsHeight - 2);
       }
 
     g.setColor( Color.black);
     if ( mode == XOR_MODE)
       g.setXORMode( itsSlider.itsSelected?itsSlider.itsUISelectedColor:itsSlider.itsUINormalColor);
-    g.drawRect( deltaX, deltaY, getPreferredSize().width-1, getPreferredSize().height-1);
+
+    g.drawRect( deltaX, deltaY, itsWidth - 1, itsHeight - 1);
     if ( mode == XOR_MODE) 
       {
 	g.setPaintMode();//reset mode to normal
@@ -127,16 +137,10 @@ class ErmesObjThrottle {
       erased = false;
   }
   
-  public Rectangle Bounds() 
-  {
-    bounds.setBounds( itsX, itsY, getPreferredSize().width, getPreferredSize().height);
-    return bounds;
-  }
-
   public void Resize( int theWidth, int theHeight)
   {
-    preferredSize.width = theWidth;
-    preferredSize.height = theHeight;
+    itsWidth = theWidth;
+    itsHeight = theHeight;
   }
 
   void MoveAbsolute( int theX, int theY) 
@@ -169,15 +173,5 @@ class ErmesObjThrottle {
   {
     itsPreviousX = itsX;
     itsPreviousY = itsY;
-  }
-
-  public Dimension getMinimumSize() 
-  {
-    return getPreferredSize();
-  }
-  
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
   }
 }

@@ -14,41 +14,37 @@ import ircam.jmax.utils.*;
 
 class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandler {
 
-  // (UNUSED) (fd) Dimension preferredSize = new Dimension(80,24);
- 
-  final static int PATCHER_HEIGHT_DIFF = 5;
-
-  public ErmesObjPatcher(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  // ----------------------------------------
+  // Constructor
+  // ----------------------------------------
+  ErmesObjPatcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
-  }
-	
-  public void Init()
-  {
-    itsArgs = itsFtsObject.getDescription().trim();
-
-    super.Init();
-    resizeBy( 0, itsFontMetrics.getHeight()+2*PATCHER_HEIGHT_DIFF-getItsHeight());
-    ParseText( itsArgs);
-    
-    if ( (! itsArgs.equals( "")) &&( ! canResizeBy( 0, 0)))
-      RestoreDimensions();
 
     itsFtsObject.watch( "ins", this);
     itsFtsObject.watch( "outs", this);    
   }
 
-  public void redefineFtsObject()
+  // ----------------------------------------
+  // ``Args'' property
+  // ----------------------------------------
+  String getArgs()
+  {
+    // Get the correct String from the object
+    return itsFtsObject.getDescription().trim();
+  }
+
+  void redefine( String text) 
   {
     //the parent patcher could destroy connections...
-    GetSketchWindow().itsPatcher.watch( "deletedConnection",GetSketchWindow());
+    GetSketchWindow().itsPatcher.watch( "deletedConnection", GetSketchWindow());
 
     //the children could destroy connections AND objects: NO MORE<
     // changed: FTS do not destroy the patcher content, and never will again
 
     ( (FtsPatcherObject)itsFtsObject).redefinePatcher( itsArgs);
+    itsText.setText( text);
   }
-  
 	
   public int MaxWidth( int uno, int due, int tre)
   {
@@ -65,8 +61,6 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-	  
-
   public void MouseDown_specific( MouseEvent evt,int x, int y) 
   {
     if ( evt.getClickCount() > 1)
@@ -82,15 +76,57 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
       itsSketchPad.ClickOnObject( this, evt, x, y);
   }
 
-  /* Inspector */
+  public void RestoreDimensions()
+  {
+    int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( "ZOB")+(itsFontMetrics.getHeight()+10)/2+5+5,
+			      (itsInletList.size())*12,
+			      (itsOutletList.size())*12);
 
+    resizeBy( aMaxWidth - getWidth(), itsFontMetrics.getHeight() + 10 - getHeight());
+  }
+
+  // ----------------------------------------
+  // White area offset
+  // ----------------------------------------
+  private static final int WHITE_X_OFFSET = 4;
+  private static final int WHITE_Y_OFFSET = 4;
+
+  protected final int getWhiteXOffset()
+  {
+    return WHITE_X_OFFSET;
+  }
+
+  protected final int getWhiteYOffset()
+  {
+    return WHITE_Y_OFFSET;
+  }
+
+  // ----------------------------------------
+  // Text area offset
+  // ----------------------------------------
+  private static final int TEXT_X_OFFSET = 5;
+  private static final int TEXT_Y_OFFSET = 4;
+
+  protected final int getTextXOffset()
+  {
+    return TEXT_X_OFFSET;
+  }
+
+  protected final int getTextYOffset()
+  {
+    return TEXT_Y_OFFSET;
+  }
+
+  // ----------------------------------------
+  // Inspector
+  // ----------------------------------------
   public void inspect() 
   {
     ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
   }
-	
+
   //--------------------------------------------------------
-  // paint
+  // Paint stuff
   //--------------------------------------------------------
   public void Paint_specific( Graphics g) 
   {
@@ -99,59 +135,20 @@ class ErmesObjPatcher extends ErmesObjEditableObject implements FtsPropertyHandl
     else 
       g.setColor( itsLangSelectedColor);
 
-    g.fill3DRect( getItsX()+1, getItsY()+1, getItsWidth()-2, getItsHeight()-2, true);
-    g.draw3DRect( getItsX()+3, getItsY()+3, getItsWidth()-6, getItsHeight()-6, false);
-    
-    int xPoints[] = { getItsX()+7, getItsX()+7, getItsX()+13};
-    int yPoints[] = { getItsY()+6, getItsY()+18, getItsY()+12};
-    g.fillPolygon( xPoints, yPoints, 3);
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
 
-    g.setColor( Color.black);
-    g.drawRect( getItsX()+0,getItsY()+ 0, getItsWidth()-1, getItsHeight()-1);
-    g.drawRect( getItsX()+4, getItsY()+4, getItsWidth()-8, getItsHeight()-8);
+    g.fill3DRect( x+1, y+1, w-2, h-2, true);
+    g.draw3DRect( x+3, y+3, w-7, h-7, false);
     
+    g.setColor( Color.black);
+    g.drawRect( x,y, w-1, h-1);
+    if( !itsSketchPad.itsRunMode) 
+      g.fillRect( x + w - DRAG_DIMENSION, y + h - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+
     g.setFont( getFont());
     DrawParsedString( g);
-
-    g.setColor( Color.black);
-    if( !itsSketchPad.itsRunMode) 
-      g.fillRect( getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
-  }
-	
-  void ResizeToNewFont( Font theFont)
-  {
-    ResizeToText( 0,0);
-  }
-	
-  public void ResizeToText( int theDeltaX, int theDeltaY)
-  {
-    int aWidth = getItsWidth() + theDeltaX;
-    int aHeight = getItsHeight() + theDeltaY;
-
-    if ( aHeight < itsFontMetrics.getHeight() + 10) 
-      aHeight = itsFontMetrics.getHeight() + 10;
-
-    if( aWidth < itsFontMetrics.stringWidth( itsMaxString) + aHeight/2 + 5 + 5) 
-      aWidth = itsFontMetrics.stringWidth( itsMaxString) + aHeight/2 + 5 + 5;
-
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
-  }
-  
-  public boolean canResizeBy( int theDeltaX, int theDeltaY)
-  {
-    if ( ( getItsWidth() + theDeltaX < itsFontMetrics.stringWidth( itsMaxString) + getItsHeight()/2 + 5 + 5)
-	 ||( getItsHeight() + theDeltaY < itsFontMetrics.getHeight() + 10))
-      return false;
-    else 
-      return true;
-  }
-
-    public void RestoreDimensions()
-  {
-    int aMaxWidth = MaxWidth( itsFontMetrics.stringWidth( itsMaxString)+(itsFontMetrics.getHeight()+10)/2+5+5,
-			      (itsInletList.size())*12,
-			      (itsOutletList.size())*12);
-
-    resizeBy( aMaxWidth - getItsWidth(), itsFontMetrics.getHeight() + 10 - getItsHeight());
   }
 }

@@ -11,51 +11,34 @@ import ircam.jmax.fts.*;
 //
 
 class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
-  float itsFloat = (float) 0.;
-  int DEFAULT_WIDTH = 50;
-  int DEFAULT_HEIGHT = 15;
-  int DEFAULT_VISIBLE_DIGIT = 3;
-  float itsStartingValue;
+  private float itsFloat = (float) 0.;
 
-  // (fd) ??? final int HEIGHT_DIFF = 2;
+  private final int DEFAULT_VISIBLE_DIGIT = 3;
+  private float itsStartingValue;
 
   // values relative to mouse dragging motion
-  float acceleration;
-  float velocity;
-  float previousVelocity;
-  int previousY;
+  private float acceleration;
+  private float velocity;
+  private float previousVelocity;
+  private int previousY;
 
-  int itsFirstY;
-  boolean firstClick = true;
-  Dimension preferredSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
-  Dimension minimumSize = new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT);
-
-  public ErmesObjFloat( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  ErmesObjFloat( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
-  }
 
-  public void Init() 
-  {
-    super.Init();
-    itsFtsObject.watch("value", this);
+    itsFtsObject.watch( "value", this);
 
-    itsFloat = ((Float)itsFtsObject.get("value")).floatValue();
+    itsFloat = ((Float)itsFtsObject.get( "value")).floatValue();
 
-    DEFAULT_HEIGHT = itsFontMetrics.getHeight();
-    DEFAULT_WIDTH = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("...");
+    int h = itsFontMetrics.getHeight() + 4;
+    if ( getHeight() < h) 
+      setHeight( h);
 
-    if (getItsHeight()<DEFAULT_HEIGHT+4) 
-      {
-	preferredSize.height = DEFAULT_HEIGHT+4;
-	resizeBy(0, getPreferredSize().height - getItsHeight());
-      }
+    int w = itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("...") + 17;
+    if (getWidth() < w) 
+      setWidth( w);
 
-    if (getItsWidth()<DEFAULT_WIDTH+17) 
-      {
-	preferredSize.width = DEFAULT_WIDTH+17;
-	setItsWidth(preferredSize.width);
-      }
+    recomputeInOutletsPositions();
   }
 
   public void propertyChanged(FtsObject obj, String name, Object value) 
@@ -67,7 +50,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     g.dispose();
   }
 
-  public void FromDialogValueChanged(float theFloat) 
+  void FromDialogValueChanged(float theFloat) 
   {
     itsFloat = theFloat;
 
@@ -75,21 +58,15 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     DoublePaint();
   }
 
-  public String GetFloatString() 
-  {
-    return String.valueOf(itsFloat);
-  }
-
   void ResizeToNewFont(Font theFont) 
   {
-
     ResizeToText(0,0);
   }
 
-  public void ResizeToText(int theDeltaX, int theDeltaY) 
+  void ResizeToText(int theDeltaX, int theDeltaY) 
   {
-    int aWidth = getItsWidth()+theDeltaX;
-    int aHeight = getItsHeight()+theDeltaY;
+    int aWidth = getWidth()+theDeltaX;
+    int aHeight = getHeight()+theDeltaY;
 
     if (( aWidth < aHeight/2 + 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..."))
 	&& (aHeight < itsFontMetrics.getHeight()+4)) 
@@ -103,47 +80,42 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
 	  if ( aHeight < itsFontMetrics.getHeight() + 4)
 	    aHeight = itsFontMetrics.getHeight() + 4;
         }
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
+    resizeBy( aWidth - getWidth(), aHeight - getHeight());
   }
 
-  public boolean canResizeBy(int theDeltaX, int theDeltaY) 
+  boolean canResizeBy(int theDeltaX, int theDeltaY) 
   {
-    if ( ( getItsWidth() + theDeltaX < getItsHeight()/2 + 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..."))
-	 || ( getItsHeight() + theDeltaY < itsFontMetrics.getHeight() + 4))
+    if ( ( getWidth() + theDeltaX < getHeight()/2 + 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("..."))
+	 || ( getHeight() + theDeltaY < itsFontMetrics.getHeight() + 4))
       return false;
     else
       return true;
   }
 
 
-  public void RestoreDimensions() 
+  void RestoreDimensions() 
   {
     int tempWidth = 17 + itsFontMetrics.stringWidth("0")*DEFAULT_VISIBLE_DIGIT + itsFontMetrics.stringWidth("...");
     int tempHeight = itsFontMetrics.getHeight()+4;
-    resizeBy(tempWidth - getItsWidth(), tempHeight - getItsHeight());
+    resizeBy(tempWidth - getWidth(), tempHeight - getHeight());
+    // itsSketchPad.repaint(); // @@@ BARBOGIO
   }
 
   //--------------------------------------------------------
   // mouseDown
   //--------------------------------------------------------
-  public void MouseDown_specific(MouseEvent evt,int x, int y) 
+  void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
     velocity = 0;
     previousVelocity = 0;
     acceleration = 0;
-    itsFirstY = y;
     previousY = y;
 
     if (itsSketchPad.itsRunMode || evt.isControlDown()) 
       {
-	if (firstClick) 
-	  {
-	    itsStartingValue = itsFloat;
-	    firstClick = false;
-	  } 
-	else
-	  itsStartingValue = itsFloat;
-	itsFtsObject.put("value", itsFloat);
+	itsStartingValue = itsFloat;
+
+	itsFtsObject.put( "value", itsFloat);
 
 	DoublePaint();
       } 
@@ -156,26 +128,27 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     new ErmesObjFloatDialog(itsSketchPad.GetSketchWindow(), String.valueOf(itsFloat), this);
   }
 
-  public boolean MouseUp( MouseEvent evt,int x, int y) 
+  void MouseUp( MouseEvent evt,int x, int y) 
   {
     velocity = 0;
     previousVelocity = 0;
     acceleration = 0;
+
     if (itsSketchPad.itsRunMode) 
       {
 	itsFtsObject.ask("value");
 	Fts.sync();
 	DoublePaint();
-	return true;
+	return;
       } 
-    else
-      return super.MouseUp(evt, x, y);
+
+    super.MouseUp(evt, x, y);
   }
 
   //--------------------------------------------------------
   // mouseDrag
   //--------------------------------------------------------
-  public boolean MouseDrag_specific(MouseEvent evt,int x, int y) 
+  boolean MouseDrag_specific(MouseEvent evt,int x, int y) 
   {
     previousVelocity = velocity;
     velocity = (previousY-y);
@@ -205,7 +178,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
       return false;
   }
 
-  public boolean isUIController() 
+  boolean isUIController() 
   {
     return true;
   }
@@ -213,26 +186,26 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
   //--------------------------------------------------------
   // paint
   //--------------------------------------------------------
-  public void Paint_specific(Graphics g) 
+  protected void Paint_specific(Graphics g) 
   {
     //draw the white area
     if (g == null)
       return;
 
     int xWhitePoints[] = {
-      getItsX() + 3, 
-      getItsX() + getItsWidth() - 3,
-      getItsX() + getItsWidth() - 3, 
-      getItsX()+3,
-      getItsX()+getItsHeight()/2+3
+      getX() + 3, 
+      getX() + getWidth() - 3,
+      getX() + getWidth() - 3, 
+      getX()+3,
+      getX()+getHeight()/2+3
     };
 
     int yWhitePoints[] = {
-      getItsY()+1,
-      getItsY()+1,
-      getItsY()+getItsHeight()-1,
-      getItsY()+getItsHeight()-1,
-      getItsY()+getItsHeight()/2
+      getY()+1,
+      getY()+1,
+      getY()+getHeight()-1,
+      getY()+getHeight()-1,
+      getY()+getHeight()/2
     };
 
     if (!itsSelected)
@@ -247,15 +220,15 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     else
       g.setColor( itsUISelectedColor);
 
-    g.fill3DRect( getItsX() + getItsWidth() - 4, getItsY() + 1, 3, getItsHeight()-2, true);
+    g.fill3DRect( getX() + getWidth() - 4, getY() + 1, 3, getHeight()-2, true);
 
-    int xPoints[]= { getItsX()+1, getItsX()+getItsHeight()/2+1, getItsX()+1};
-    int yPoints[]= { getItsY(), getItsY() + getItsHeight()/2, getItsY()+getItsHeight()-1};
+    int xPoints[]= { getX()+1, getX()+getHeight()/2+1, getX()+1};
+    int yPoints[]= { getY(), getY() + getHeight()/2, getY()+getHeight()-1};
     g.fillPolygon(xPoints, yPoints, 3);
 
     //draw the outline
     g.setColor(Color.black);
-    g.drawRect( getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
+    g.drawRect( getX()+0, getY()+0, getWidth()-1, getHeight()-1);
 
     //draw the triangle
     if (!itsSelected)
@@ -263,8 +236,8 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     else
       g.setColor(Color.black);
 
-    g.drawLine( getItsX()+1, getItsY(), getItsX()+ getItsHeight()/2+1,getItsY()+getItsHeight()/2);
-    g.drawLine( getItsX()+getItsHeight()/2+1, getItsY()+getItsHeight()/2, getItsX()+1, getItsY()+getItsHeight()-1);
+    g.drawLine( getX()+1, getY(), getX()+ getHeight()/2+1,getY()+getHeight()/2);
+    g.drawLine( getX()+getHeight()/2+1, getY()+getHeight()/2, getX()+1, getY()+getHeight()-1);
 
     //draw the value
     String aString;
@@ -277,12 +250,12 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     g.setColor(Color.black);
 
     g.drawString( aString, 
-		  getItsX()+getItsHeight()/2+5, 
-		  getItsY()+itsFontMetrics.getAscent() + (getItsHeight()-itsFontMetrics.getHeight())/2+1);
+		  getX()+getHeight()/2+5, 
+		  getY()+itsFontMetrics.getAscent() + (getHeight()-itsFontMetrics.getHeight())/2+1);
 
     if (!itsSketchPad.itsRunMode)
-      g.fillRect( getItsX() + getItsWidth()-DRAG_DIMENSION,
-		  getItsY()+getItsHeight()-DRAG_DIMENSION,
+      g.fillRect( getX() + getWidth()-DRAG_DIMENSION,
+		  getY()+getHeight()-DRAG_DIMENSION,
 		  DRAG_DIMENSION, 
 		  DRAG_DIMENSION);
   }
@@ -292,7 +265,7 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     String aString = theString;
     String aString2 = "..";
     int aStringLength = theString.length();
-    int aCurrentSpace = getItsWidth() - (getItsHeight()/2 + 8) - 3;
+    int aCurrentSpace = getWidth() - (getHeight()/2 + 8) - 3;
     int aStringWidth = itsFontMetrics.stringWidth( aString);
 
     if (aStringWidth < aCurrentSpace)
@@ -312,17 +285,14 @@ class ErmesObjFloat extends ErmesObject implements FtsPropertyHandler {
     return aString;
   }
 
-  public Dimension getMinimumSize() 
-  {
-    if (getItsHeight() == 0 || getItsWidth() == 0)
-      return minimumSize;
-    else
-      return new Dimension(  itsFontMetrics.stringWidth("0.0")+ itsFontMetrics.getHeight()/2 + 15,
-			     itsFontMetrics.getHeight()+4);
-  }
 
-  public Dimension getPreferredSize() 
+
+  // ----------------------------------------
+  // old stuff
+  // ----------------------------------------
+  Dimension getMinimumSize() 
   {
-    return preferredSize;
+    new Throwable( this.getClass().getName()).printStackTrace();
+    return new Dimension(  400, 400);
   }
 }

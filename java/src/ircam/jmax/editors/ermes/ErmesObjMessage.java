@@ -8,40 +8,75 @@ import ircam.jmax.fts.*;
 //
 // The "message box" graphic object.
 //
-
 class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandler {
-  boolean itsFlashing = false;
 
-  public static final int WHITE_OFFSET = 4;
+  boolean itsFlashing = false;
 
   public ErmesObjMessage(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
-  }
 
-  public void Init()
-  {
-    // Added by MDC; get the correct String from the object, and then call super
-    // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
-    // to get the string from the object.
-
-    itsArgs = (String) itsFtsObject.get( "value");
-    super.Init();
     itsFtsObject.watch( "value", this);
-    ParseText( itsArgs);
-    if( !canResizeBy( 0, 0)) 
-      RestoreDimensions( false);
+
+    itsText.setText( getArgs());
+    itsText.setWidth( getWidth());
+    itsText.setFontMetrics( itsFontMetrics);
+
+//     if( !canResizeBy( 0, 0)) 
+//       RestoreDimensions( false);
+  }
+
+  // ----------------------------------------
+  // ``Args'' property
+  // ----------------------------------------
+  String getArgs()
+  {
+    // Get the correct String from the object's "value" property, that may change
+    return (String)itsFtsObject.get( "value");
+  }
+
+  // ----------------------------------------
+  // White area offset
+  // ----------------------------------------
+//   private static final int WHITE_X_OFFSET = 3;
+//   private static final int WHITE_Y_OFFSET = 3;
+  private static final int WHITE_X_OFFSET = 4;
+  private static final int WHITE_Y_OFFSET = 2;
+
+  protected final int getWhiteXOffset()
+  {
+    return WHITE_X_OFFSET;
+  }
+
+  protected final int getWhiteYOffset()
+  {
+    return WHITE_Y_OFFSET;
+  }
+
+  // ----------------------------------------
+  // Text area offset
+  // ----------------------------------------
+//   private static final int TEXT_X_OFFSET = 4;
+//   private static final int TEXT_Y_OFFSET = 3;
+  private static final int TEXT_X_OFFSET = 3;
+  private static final int TEXT_Y_OFFSET = 2;
+
+  protected final int getTextXOffset()
+  {
+    return TEXT_X_OFFSET;
+  }
+
+  protected final int getTextYOffset()
+  {
+    return TEXT_Y_OFFSET;
   }
 
 
-  protected int getWhiteOffset() 
+  void redefine( String text)
   {
-    return WHITE_OFFSET;
-  }
+    ((FtsMessageObject)itsFtsObject).setMessage( text);
 
-  public void redefineFtsObject()
-  {
-    ((FtsMessageObject)itsFtsObject).setMessage( itsArgs);
+    itsText.setText( text);
   }
 
   // Set the text; it is a try; the message box object in the
@@ -52,8 +87,9 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
   {
     if (name == "value")
       {
-	itsArgs = (String) value;
-	ParseText(itsArgs);
+	// BUG: must clear the vector before.
+	//ParseText( getArgs());
+
 	if ( !canResizeBy( 0, 0)) 
 	  {
 	    ResizeToText( 0,0);
@@ -75,22 +111,16 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     return true;
   }
 
-  public boolean MouseUp_specific( MouseEvent e, int x, int y)
+  void MouseUp_specific( MouseEvent e, int x, int y)
   {
-    if ( !itsSketchPad.itsRunMode && !e.isControlDown()) 
-      return false;
-    else 
+    if (itsFlashing) 
       {
-	if (itsFlashing) 
-	  {
-	    itsFlashing = false;
+	itsFlashing = false;
 
-	    Graphics g = itsSketchPad.getGraphics();
-	    Paint_specific( g);
-	    g.dispose();
-	  }
+	Graphics g = itsSketchPad.getGraphics();
+	Paint_specific( g);
+	g.dispose();
       }
-    return true;
   }
   
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
@@ -126,7 +156,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
     else 
       g.setColor(itsUINormalColor);
  
-    g.fillRect( getItsX() + 1, getItsY() + 1, getItsWidth() - 2, getItsHeight() - 2);
+    g.fillRect( getX() + 1, getY() + 1, getWidth() - 2, getHeight() - 2);
     
     
     if ( !itsSketchPad.itsRunMode) 
@@ -149,18 +179,15 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsPropertyHandl
 	  g.setColor(Color.white);
       }
   
-    g.fillRect( getItsX()+getWhiteOffset(), getItsY()+1, getItsWidth()-(getWhiteOffset()*2), getItsHeight()-HEIGHT_DIFF);
+    g.fillRect( getX()+getWhiteXOffset(), getY()+1, getWidth()-(getWhiteXOffset()*2), getHeight());
     
     g.setColor( Color.black);
-    g.drawRect( getItsX()+0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
+    g.drawRect( getX()+0, getY()+0, getWidth()-1, getHeight()-1);
     
     g.setColor( Color.black);
 
     if( !itsSketchPad.itsRunMode) 
-      g.fillRect( getItsX()+getItsWidth()-DRAG_DIMENSION,
-		  getItsY()+getItsHeight()-DRAG_DIMENSION, 
-		  DRAG_DIMENSION, 
-		  DRAG_DIMENSION);
+      g.fillRect( getX()+getWidth()-DRAG_DIMENSION, getY()+getHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
     
     g.setFont( getFont());
     DrawParsedString( g);

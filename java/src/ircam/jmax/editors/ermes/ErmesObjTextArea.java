@@ -10,21 +10,27 @@ import ircam.jmax.utils.*;
 //
 class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
 
-  ErmesObjComment itsOwner = null;
-  ErmesSketchPad itsSketchPad = null;
-  boolean focused = false;
+  protected ErmesObjComment itsOwner = null;
+  private ErmesSketchPad itsSketchPad = null;
+  private boolean focused = false;
   
+  //--------------------------------------------------------
+  // CONSTRUCTOR
+  //--------------------------------------------------------
   ErmesObjTextArea( ErmesSketchPad theSketchPad) 
   {
     super( " ", 5, 20, TextArea.SCROLLBARS_NONE);
+
     setFont( new Font( ircam.jmax.utils.Platform.FONT_NAME,Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE));
+
     setEditable( true);
+
     selectAll();
-    itsSketchPad = theSketchPad;
-    focused = true;
     
     addKeyListener( this);
     addFocusListener( this);
+
+    itsSketchPad = theSketchPad;
   }
 
   public void removeNotify()
@@ -37,7 +43,9 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
   public void AbortEdit()
   {
     setVisible( false);
+
     setLocation( -200,-200);
+
     focused = false;
     
     if( itsSketchPad.itsToolBar.locked) 
@@ -55,7 +63,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
     itsOwner = null;  
   }
 
-  public void LostFocus() 
+  protected void LostFocus() 
   {
     if ( !focused) 
       return;
@@ -64,59 +72,26 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
     itsSketchPad.editStatus = ErmesSketchPad.DOING_NOTHING;
     itsSketchPad.itsSketchWindow.requestFocus();
 
-    //try to test if this lost foscus happens in the following conditions:
-    // an object was put on the sketchpad without writing into it
-    // the TEXT into an object was deleted (this would require a delete of the object... see next comment)
-    String aTextString = getText();
-    if ( aTextString.compareTo( "") == 0 || aTextString.compareTo( " ") == 0) 
+    String aTextString = getText().trim();
+
+    if ( !itsOwner.getArgs().equals( aTextString) )
       {
-	AbortEdit();
-	return; 
+	itsOwner.redefine( aTextString);
+
+	itsSketchPad.markSketchAsDirty();
+	itsSketchPad.paintDirtyList();
       }
-
-    //try to test if the object was already instantiated; in case, delete the object... (how?)
-    
-    //qui si prova a togliere gli spazi in fondo dalla parola....
-    aTextString = aTextString.trim();
-    
-    if ( itsOwner == null) 
-      return; //this happens when the instatiation fails
-    
-    itsOwner.itsArgs = aTextString;
-    itsOwner.ParseText( aTextString);
-    itsOwner.redefineFtsObject();
-    
-    itsOwner.UpdateOnly( itsSketchPad.GetOffGraphics());
-
-    int length = getFontMetrics( getFont()).stringWidth( itsOwner.itsMaxString);
-    
-    if( ( length < getSize().width - 20) )
-      {
-	Dimension d1 = itsOwner.Size();
-	d1.width = length+10;
-	itsOwner.setSize( d1.width, d1.height);
-      }
-
-    int height = getFontMetrics(getFont()).getHeight() * itsOwner.itsParsedTextVector.size();
-
-    if( (height < getSize().height - 10))
-      {
-	Dimension d1 = itsOwner.Size();
-	d1.height = height;
-	itsOwner.setSize( d1.width, d1.height);
-      }
-    
-    itsOwner.ResizeToText( 0,0);
-    
-    AbortEdit();
 
     setRows( 5);
     setColumns( 20);
+
+    AbortEdit();
   }
 	
   public void focusGained( FocusEvent e)
   {
     itsSketchPad.editStatus = ErmesSketchPad.EDITING_COMMENT;
+
     if ( !focused)
       focused = true;
   }
@@ -148,16 +123,8 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
       {
 	if( e.getKeyCode() == ircam.jmax.utils.Platform.ENTER_KEY
 	    || e.getKeyCode() == ircam.jmax.utils.Platform.RETURN_KEY)
-	  {//return
-	    itsOwner.itsTextRowNumber++;
-	    if( (itsOwner.itsTextRowNumber > 4) || ( getRows() <= 5))
-	      {
-		setRows( getRows()+1);
-		Dimension d2 = itsOwner.Size();
-		itsOwner.setSize( d2.width, d2.height + fm.getHeight());
-		setSize( getSize().width, getSize().height + fm.getHeight());
-		requestFocus();
-	      }
+	  {
+	    requestFocus();
 	    return;
 	  }
 	else if( (e.getKeyCode() == 37) || (e.getKeyCode() == 38) 
@@ -199,7 +166,7 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
 		else
 		  step = 30;
   
-		itsOwner.setSize( itsOwner.Size().width + step, itsOwner.Size().height);
+		//itsOwner.setSize( itsOwner.Size().width + step, itsOwner.Size().height);
 		setSize( getSize().width + step, getSize().height);
 		requestFocus();
 	      } 
@@ -262,11 +229,12 @@ class ErmesObjTextArea extends TextArea implements KeyListener, FocusListener {
       }
   }
 
+  private Dimension minimumSize = new Dimension();
+
   public Dimension getMinimumSize() 
   {
-    Dimension r = itsOwner.getPreferredSize();
-    Dimension d = new Dimension( r.width - 2, r.height - 2);
-    return d;
+    minimumSize.setSize( itsOwner.getWidth() - itsOwner.getWhiteXOffset(), itsOwner.getHeight() - itsOwner.getWhiteYOffset());
+    return minimumSize;
   }
 
   public Dimension getPreferredSize() 

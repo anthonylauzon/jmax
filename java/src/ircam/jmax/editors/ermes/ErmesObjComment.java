@@ -10,190 +10,62 @@ import ircam.jmax.utils.*;
 //
 // The "comment" graphic object
 //
-/* $$$$$$$$ */
+class ErmesObjComment extends ErmesObjEditableObject {
 
-public class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
-  public String itsMaxString = "";
-
-  Dimension preferredSize;
-  String itsArgs;
-  MaxVector itsParsedTextVector = new MaxVector();
-  int itsTextRowNumber = 0;
-
-  final static int TEXT_INSET = 10;
-
-  public ErmesObjComment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  //--------------------------------------------------------
+  // CONSTRUCTOR
+  //--------------------------------------------------------
+  ErmesObjComment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
   }
 
-  
-  void cleanAll()
+  // ----------------------------------------
+  // ``Args'' property
+  // ----------------------------------------
+  String getArgs()
   {
-    itsParsedTextVector = null;
-    super.cleanAll();
+    // Get the correct String from the object
+    return itsFtsObject.getDescription().trim();
   }
 
-  //--------------------------------------------------------
-  // Init
-  //--------------------------------------------------------
-  public void Init() 
+  void redefine( String text) 
   {
-    int FIELD_HEIGHT;
+    ((FtsCommentObject)itsFtsObject).setComment( text);
 
-    FontMetrics temporaryFM = itsSketchPad.getFontMetrics(itsSketchPad.getFont());
-    FIELD_HEIGHT = temporaryFM.getHeight();
-
-    itsArgs = itsFtsObject.getDescription();
-
-    if (itsArgs.equals(""))
-      // preferredSize = new Dimension(70,FIELD_HEIGHT*5);
-      // Since the comments are currently single lines, we initialize it to a single line.
-
-      preferredSize = new Dimension(70,FIELD_HEIGHT + 3);
-    else
-      preferredSize = new Dimension( temporaryFM.stringWidth(itsArgs),FIELD_HEIGHT*5);
-
-    super.Init();
-
-    itsSketchPad.GetTextArea().setBackground( Color.white);
-
-    ParseText(itsArgs);
-    RestoreDimensions();
+    itsText.setText( text);
   }
 
+  // ----------------------------------------
+  // White area offset
+  // ----------------------------------------
+  private static final int WHITE_X_OFFSET = 2;
+  private static final int WHITE_Y_OFFSET = 2;
 
-  public void redefineFtsObject() 
+  protected final int getWhiteXOffset()
   {
-    ((FtsCommentObject)itsFtsObject).setComment(itsArgs);
+    return WHITE_X_OFFSET;
   }
 
-  public void RestoreDimensions() 
+  protected final int getWhiteYOffset()
   {
-    if (! itsMaxString.equals(""))
-      resizeBy( itsFontMetrics.stringWidth(itsMaxString) + TEXT_INSET - getItsWidth(), 
-		itsFontMetrics.getHeight() * itsParsedTextVector.size() - getItsHeight());
-    // itsSketchPad.repaint(); // BARBOGIO
+    return WHITE_Y_OFFSET;
   }
 
+  // ----------------------------------------
+  // Text area offset
+  // ----------------------------------------
+  private static final int TEXT_X_OFFSET = 2;
+  private static final int TEXT_Y_OFFSET = 2;
 
-  public void MouseDown_specific(MouseEvent evt, int x, int y) 
+  protected final int getTextXOffset()
   {
-    if (itsSketchPad.itsRunMode)
-      return;
-    itsSketchPad.ClickOnObject(this, evt, x, y);
+    return TEXT_X_OFFSET;
   }
 
-  public void startEditing() 
+  protected final int getTextYOffset()
   {
-    restartEditing();
-  }
-
-  public void restartEditing() 
-  {
-    if (itsSketchPad.GetTextArea() != null)
-      itsSketchPad.GetTextArea().setEditable(true);
-
-    itsSketchPad.GetTextArea().setFont(getFont());
-
-    if (itsArgs == null)
-      itsSketchPad.GetTextArea().setText("");
-    else
-      itsSketchPad.GetTextArea().setText(itsArgs);
-
-    itsSketchPad.GetTextArea().itsOwner = this;
-
-    if ( itsParsedTextVector.size() == 0)
-      itsSketchPad.GetTextArea().setBounds( getItsX(), getItsY(), 
-					    getItsWidth()+20, itsFontMetrics.getHeight()*5);
-    else
-      itsSketchPad.GetTextArea().setBounds( getItsX(), getItsY(), 
-					    getItsWidth()+10, 
-					    itsFontMetrics.getHeight()*(itsParsedTextVector.size()+1));
-
-    itsMaxString = "";
-    itsParsedTextVector.removeAllElements();
-
-    itsSketchPad.GetTextArea().setVisible( true);
-    itsSketchPad.GetTextArea().requestFocus();
-    itsSketchPad.GetTextArea().setCaretPosition( itsArgs.length());
-  }
-
-  public void setSize(int theH, int theV) 
-  {
-    resize(theH, theV);
-    itsSketchPad.repaint();
-  }
-
-  public void setSize(Dimension d) 
-  {
-    setSize(d.width, d.height);
-  }
-
-
-  public void ResizeToText(int theDeltaX, int theDeltaY) 
-  {
-    int aWidth = getItsWidth()+theDeltaX;
-    int aHeight = getItsHeight()+theDeltaY;
-
-    if ( aWidth < itsFontMetrics.stringWidth( itsMaxString) + TEXT_INSET)
-      aWidth = itsFontMetrics.stringWidth( itsMaxString) + TEXT_INSET;
-
-    if (aHeight < itsFontMetrics.getHeight() * itsParsedTextVector.size())
-      aHeight = itsFontMetrics.getHeight() * itsParsedTextVector.size();
-
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
-  }
-
-  public boolean canResizeBy(int theDeltaX, int theDeltaY) 
-  {
-    String temp = itsArgs;
-    if ( ( getItsWidth() + theDeltaX < itsFontMetrics.stringWidth( itsMaxString) + TEXT_INSET)
-	 || ( getItsHeight() + theDeltaY < itsFontMetrics.getHeight()*itsParsedTextVector.size()) )
-      return false;
-    else
-      return true;
-  }
-
-  public void ParseText(String theString) 
-  {
-    // (fd) {
-    // See ErmesObjEditableObject for comments on fonts
-    // PLUS: a nice example of copy/paste programming..
-
-    // int aIndex = theString.indexOf( "\n");
-    // int aOldIndex = -1;
-    // int aLastIndex = theString.lastIndexOf( "\n");
-    // String aString;
-    // int length = 0;
-    // int i = 0;
-
-    // while ( aIndex != -1)
-    // {
-    // aString = theString.substring( aOldIndex + 1, aIndex);
-    // length = itsFontMetrics.stringWidth( aString);
-
-    // if ( length > itsFontMetrics.stringWidth(itsMaxString))
-    // itsMaxString = aString;
-
-    // itsParsedTextVector.addElement( aString);
-    // aOldIndex = aIndex;
-    // aIndex = theString.indexOf( "\n", aOldIndex+1);
-    // i++;
-    // }
-
-    // aString = theString.substring( aOldIndex+1);
-    // length = itsFontMetrics.stringWidth( aString);
-
-    // if ( length > itsFontMetrics.stringWidth( itsMaxString))
-    // itsMaxString = aString;
-
-    // itsParsedTextVector.addElement( aString);
-
-    itsParsedTextVector.removeAllElements();
-    itsParsedTextVector.addElement( theString);
-    itsMaxString = theString;
-    // } (fd)
+    return TEXT_Y_OFFSET;
   }
 
   public void Paint_specific(Graphics g) 
@@ -205,39 +77,20 @@ public class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
 	else
 	  g.setColor(itsSketchPad.getBackground());
 
-	g.fill3DRect( getItsX(), getItsY(), getItsWidth(), getItsHeight(), true);
+	g.fill3DRect( getX(), getY(), getWidth(), getHeight(), true);
 
 	//drag box
 	if (itsSelected) 
 	  {
 	    g.setColor(Color.gray.darker());
-	    g.fillRect( getItsX() + getItsWidth() - DRAG_DIMENSION, getItsY() + getItsHeight() - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+	    g.fillRect( getX() + getWidth() - DRAG_DIMENSION, getY() + getHeight() - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
 	  }
       }
 
     //text
-    if (itsArgs != null) 
-      {
-	g.setColor( Color.black);
-	g.setFont( getFont());
-	DrawParsedString( g);
-      }
-  }
-
-  private void DrawParsedString(Graphics theGraphics) 
-  {
-    String aString;
-    int i=0;
-    int insetY = (getItsHeight() - itsFontMetrics.getHeight() * itsParsedTextVector.size()) / 2;
-
-    for ( Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements(); )
-      {
-	aString = (String)e.nextElement();
-	theGraphics.drawString( aString, 
-				getItsX()+2, 
-				getItsY() + itsFontMetrics.getAscent() + insetY + itsFontMetrics.getHeight()*i);
-	i++;
-      }
+    g.setColor( Color.black);
+    g.setFont( getFont());
+    DrawParsedString( g);
   }
 
   //--------------------------------------------------------
@@ -245,15 +98,6 @@ public class ErmesObjComment extends ErmesObject implements ErmesObjEditable {
   //--------------------------------------------------------
   public Dimension getMinimumSize() 
   {
-    if ( itsParsedTextVector.size() == 0)
-      return getPreferredSize();
-    else
-      return new Dimension( itsFontMetrics.stringWidth( itsMaxString) + TEXT_INSET, 
-			    itsFontMetrics.getHeight() * itsParsedTextVector.size());
-  }
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
+    return null;
   }
 }

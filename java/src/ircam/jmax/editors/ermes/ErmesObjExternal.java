@@ -6,64 +6,37 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.editors.ermes.*;
 import ircam.jmax.mda.*;
 
 //
 // The generic "extern" object in ermes. (example: adc1~)
 //
-
 class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHandler {
 
-  public boolean iAmPatcher = false;
-  public static final int WHITE_OFFSET = 6;
-
-  private String itsBackupText = new String();
-
-  int isError = -1; // cache of the error property, to speed up paint
-
+  private int isError = -1; // cache of the error property, to speed up paint
 
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjExternal( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  ErmesObjExternal( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super(theSketchPad, theFtsObject);
+    super( theSketchPad, theFtsObject);
   }
 
-  public boolean AreYouPatcher() 
+  // ----------------------------------------
+  // ``Args'' property
+  // ----------------------------------------
+  String getArgs()
   {
-    return iAmPatcher;
+    // Get the correct String from the object
+    return itsFtsObject.getDescription().trim();
   }
 
-  protected int getWhiteOffset() 
+
+  public void propertyChanged( FtsObject obj, String name, Object value) 
   {
-    return WHITE_OFFSET;
-  }
-
-  public void Init() 
-  {
-    // Added by MDC; get the correct String from the object, and then call super
-    // It is needed because ErmesObjExternal and ErmesObjMessage use different methods
-    // to get the string from the object.
-
-    itsArgs = itsFtsObject.getDescription().trim();
-
-    super.Init();
-
-    if ( itsFtsObject instanceof FtsContainerObject)
-      this.YouArePatcher( true);
-
-    ParseText( itsArgs);
-
-    if ((! itsArgs.equals("")) &&(! canResizeBy( 0, 0)))
-      RestoreDimensions( false);
-  }
-
-  public void propertyChanged(FtsObject obj, String name, Object value) 
-  {
-    //handle the "error" property, the only one we're listening at
-    // call super for the others
+    // Handle the "error" property, the only one we're listening at.
+    // Call super for the others
 
     if (name == "error") 
       {
@@ -72,8 +45,9 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 	    isError = ((Integer)value).intValue();
 	    DoublePaint();
 	  }
-      } else
-	super.propertyChanged(obj, name, value);
+      } 
+    else
+	super.propertyChanged( obj, name, value);
   }
 
   public void YouArePatcher( boolean what) 
@@ -85,38 +59,36 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
 
   public void inspect() 
   {
-    if (iAmPatcher)
+    if ( itsFtsObject instanceof FtsContainerObject)
       ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
   }
 
-  public void redefineFtsObject() 
+  void redefine( String text) 
   {
     try 
       {
-	itsFtsObject = Fts.redefineFtsObject(itsFtsObject, itsArgs);
+	itsFtsObject = Fts.redefineFtsObject( itsFtsObject, text);
 
 	itsFtsObject.watch("ins", this);
 	itsFtsObject.watch("outs", this);
 	itsFtsObject.watch("error", this);
+
 	isError = -1;
       } 
     catch (FtsException e) 
       {
 	System.out.println("Error in redefining object, action cancelled");
-	restoreText();
-	ParseText(itsArgs);
       }
 
-    this.YouArePatcher(itsFtsObject instanceof FtsContainerObject);
+    itsText.setText( text);
   }
 
-  public void MouseDown_specific(MouseEvent evt,int x, int y) 
+  public void MouseDown_specific( MouseEvent evt,int x, int y) 
   {
     if ( evt.getClickCount() > 1 ) 
       {
 	itsSketchPad.waiting();
-	Fts.editPropertyValue(itsFtsObject, "data",
-			      new MaxDataEditorReadyListener() {
+	Fts.editPropertyValue( itsFtsObject, "data", new MaxDataEditorReadyListener() {
 	  public void editorReady(MaxDataEditor editor)
 	    {itsSketchPad.stopWaiting();}
 	});
@@ -131,46 +103,89 @@ class ErmesObjExternal extends ErmesObjEditableObject implements FtsPropertyHand
     super.startEditing();
   }
 
+  // ----------------------------------------
+  // White area offset
+  // ----------------------------------------
+  // Settings for 20 pixels height
+//   private static final int WHITE_X_OFFSET = 3;
+//   private static final int WHITE_Y_OFFSET = 3;
+  // Settings for 18 pixels height
+  private static final int WHITE_X_OFFSET = 2;
+  private static final int WHITE_Y_OFFSET = 2;
+
+  protected final int getWhiteXOffset()
+  {
+    return WHITE_X_OFFSET;
+  }
+
+  protected final int getWhiteYOffset()
+  {
+    return WHITE_Y_OFFSET;
+  }
+
+  // ----------------------------------------
+  // Text area offset
+  // ----------------------------------------
+  // Settings for 20 pixels height
+//   private static final int TEXT_X_OFFSET = 4;
+//   private static final int TEXT_Y_OFFSET = 2;
+  // Settings for 18 pixels height
+  private static final int TEXT_X_OFFSET = 3;
+  private static final int TEXT_Y_OFFSET = 1;
+
+  protected final int getTextXOffset()
+  {
+    return TEXT_X_OFFSET;
+  }
+
+  protected final int getTextYOffset()
+  {
+    return TEXT_Y_OFFSET;
+  }
+
+  // ----------------------------------------
+  // Paint stuff
+  // ----------------------------------------
   public void Paint_specific(Graphics g) 
   {
     if (isError == -1)
-      isError = ((Integer)itsFtsObject.get("error")).intValue();
+      isError = ((Integer)itsFtsObject.get( "error")).intValue();
 
     if (isError == 0) 
       {
 	if (! itsSelected)
-	  g.setColor(itsLangNormalColor);
+	  g.setColor( itsLangNormalColor);
 	else
-	  g.setColor(itsLangSelectedColor);
+	  g.setColor( itsLangSelectedColor);
       } 
     else
       g.setColor(Color.red);
 
-    g.fillRect( getItsX()+1, getItsY()+1, getItsWidth()-2, getItsHeight()-2);
-    g.fill3DRect( getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
 
-    //paint white square
+    // For 20 pixels height
+    //g.fill3DRect( x+1, y+1, w-2, h-2, true);
+    // For 18 pixels height
+    g.draw3DRect( x+1, y+1, w-3, h-3, true);
+
     if (! itsSelected)
       g.setColor(Color.white);
     else
       g.setColor(itsLangNormalColor);
 
-    g.fillRect( getItsX() + getWhiteOffset(), 
-		getItsY()+2, 
-		getItsWidth() - (getWhiteOffset()*2),
-                getItsHeight()-2*HEIGHT_DIFF);
+    int whiteXOffset = getWhiteXOffset();
+    int whiteYOffset = getWhiteYOffset();
+    g.fillRect( x + whiteXOffset, y + whiteYOffset, w - 2*whiteXOffset, h - 2*whiteYOffset);
 
     g.setColor(Color.black);
-    g.drawRect( getItsX() + 0, getItsY()+0, getItsWidth()-1, getItsHeight()-1);
-
-    g.setColor(Color.black);
+    g.drawRect( x, y, w-1, h-1);
     if (!itsSketchPad.itsRunMode)
-      g.fillRect( getItsX() + getItsWidth() - DRAG_DIMENSION,
-		  getItsY() + getItsHeight() - DRAG_DIMENSION,
-		  DRAG_DIMENSION,
-		  DRAG_DIMENSION);
+      g.fillRect( x + w - DRAG_DIMENSION, y + h - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
 
     g.setFont( getFont());
-    DrawParsedString(g);
+    DrawParsedString( g);
   }
 }

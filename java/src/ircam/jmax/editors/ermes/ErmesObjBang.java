@@ -13,30 +13,50 @@ import ircam.jmax.editors.ermes.*;
 
 class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
 
-  boolean itsFlashing = false;
-  Color itsFlashColor = Color.yellow;
+  private boolean itsFlashing = false;
+  private Color itsFlashColor = Color.yellow;
+  private static final int DEFAULT_WIDTH = 20;
+  private static final int MINIMUM_WIDTH = 10;
 
   public ErmesObjBang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
-    super(theSketchPad, theFtsObject);
+    super( theSketchPad, theFtsObject);
+
+    itsFtsObject.watch( "value", this);
+
+    int width = getWidth();
+    if (width == -1)
+      setWidth( DEFAULT_WIDTH);
+    else if (width <= MINIMUM_WIDTH)
+      setWidth( width);
+  }
+
+  // redefined from base class
+  protected void setWidth( int theWidth)
+  {
+    if (theWidth < MINIMUM_WIDTH)
+      theWidth = MINIMUM_WIDTH;
+
+    super.setWidth( theWidth);
+    super.setHeight( theWidth);
+
+    recomputeInOutletsPositions();
+  }
+
+  // redefined from base class
+  protected void setHeight( int theHeight)
+  {
+    setWidth( theHeight);
   }
 
   public void MouseDown_specific(MouseEvent evt,int x, int y) 
   {
     if ( itsSketchPad.itsRunMode || evt.isControlDown() ) 
       {
-
 	itsFtsObject.sendMessage( 0, "bang", null);
       } 
     else
       itsSketchPad.ClickOnObject( this, evt, x, y);
-  }
-
-
-  public void Init() 
-  {
-    super.Init();
-    itsFtsObject.watch( "value", this);
   }
 
   static Color bangColors[] = 
@@ -52,7 +72,6 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     Color.white,
     Color.black
   };
-
 
   public void propertyChanged(FtsObject obj, String name, Object value) 
   {
@@ -92,15 +111,15 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
     else
       g.setColor( itsUINormalColor);
 
-    g.fillOval( getItsX() + 5, getItsY() + 5, getItsWidth() - 10, getItsHeight() - 10);
+    g.fillOval( getX() + 5, getY() + 5, getWidth() - 10, getHeight() - 10);
   }
 
   public void Paint_specific( Graphics g) 
   {
-    int x = getItsX();
-    int y = getItsY();
-    int w = getItsWidth();
-    int h = getItsHeight();
+    int x = getX();
+    int y = getY();
+    int w = getWidth();
+    int h = getHeight();
 
     if ( itsSelected)
       g.setColor( itsUISelectedColor);
@@ -121,21 +140,11 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
   }
 
 
-
   //--------------------------------------------------------
   // minimum and preferred sizes
   //--------------------------------------------------------
-  static Dimension preferredSize = new Dimension(20,20);
-
-  static Dimension minimumSize = new Dimension(15, 15);
-
   public Dimension getMinimumSize() 
   {
-    return minimumSize;
-  }
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
+    return null;
   }
 }

@@ -6,237 +6,160 @@ import java.util.*;
 import ircam.jmax.utils.*;
 
 //
-// The abstract base class for (object's) graphic inlet and outlets
+// The abstract base class for (object's) graphic inlet and outlet
 //
-abstract public class ErmesObjInOutlet implements ErmesDrawable {
-  public MaxVector itsConnections;
+abstract class ErmesObjInOutlet implements ErmesDrawable {
+
+  protected static final int VISIBLE_WIDTH = 5;
+//   protected static final int VISIBLE_HEIGHT = 2;
+  protected static final int VISIBLE_HEIGHT = 3;
+  protected static final int SENSIBLE_WIDTH = 10;
+  protected static final int SENSIBLE_HEIGHT = 10;
+
+  private final MaxVector itsConnections = new MaxVector();
   
-  ErmesObject itsOwner;
-  boolean itsAlreadyMoveIn = false;
-  Rectangle currentBounds = new Rectangle();
-  Rectangle currentSensibleBounds = new Rectangle();
-  Point itsAnchorPoint = new Point();
+  private ErmesObject itsOwner;
 
-  protected final int UPDATE_AND_DRAW = 0;
-  protected final int DRAW = 1;
+  private final Rectangle sensibleBounds = new Rectangle();
 
-  protected boolean selected = false;
-  protected boolean connected = false; //ignore the connected flag
-  protected int itsX, itsY;
-  protected int itsCurrentDrawingMethod = DRAW;
+  protected int itsX;
+  protected int itsY;
+
+  private final Point itsAnchorPoint = new Point();
+
+  private boolean selected;
+
+  private int itsNum;
+
+  // (fd) Used by ErmesSketchPad... and only there
+  boolean itsAlreadyMoveIn;
 
   //--------------------------------------------------------
   //	CONSTRUCTOR
   //--------------------------------------------------------
-  public ErmesObjInOutlet( ErmesObject theOwner, int x_coord, int y_coord)
+  ErmesObjInOutlet( int theNum, ErmesObject theOwner, int x, int y)
   {
-    itsConnections = new MaxVector();
-    itsX = x_coord;
-    itsY = y_coord;
-
+    itsNum = theNum;
     itsOwner = theOwner;
+    
+    itsX = x;
+    itsY = y;
+
+    itsAlreadyMoveIn = false;
     selected = false;
-    connected = false;
-    preferredSize = new Dimension(7,9);
-
-    if (IsInlet())
-      itsY -= 9;
-    else
-      itsY += itsOwner.getItsHeight();
-
-    recomputeBounds();
-    updateAnchorPoint();
+    
+    updateSensibleBounds();
   }
 
+  void MoveBy( int theDeltaX, int theDeltaY) 
+  {
+    MoveTo( itsX + theDeltaX, itsY + theDeltaY);
+  }
+  
+  void MoveTo( int theX, int theY) 
+  {
+    itsX = theX;
+    itsY = theY;
+
+    updateSensibleBounds();
+  }
+
+  void AddConnection( ErmesConnection theConnection)
+  {
+    itsConnections.addElement( theConnection);
+  }
+
+  // ----------------------------------------
+  // Paint methods
+  // ----------------------------------------
   public void Paint(Graphics g) 
   {
-    if (g== null) 
+    if (g == null) 
       return;
-    if ( itsCurrentDrawingMethod == DRAW) 
-      Paint_specific(g);
-    else 
-      Update(g);
-  }
 
-  abstract protected void Paint_specific(Graphics g);
-
-  protected void DoublePaint() {
-    Graphics aGraphics = itsOwner.itsSketchPad.getGraphics();
-    if (aGraphics != null) 
-      {
-	Paint(aGraphics);	
-      }
-    
-    if (itsOwner.itsSketchPad.offScreenPresent) 
-      Paint(itsOwner.itsSketchPad.GetOffGraphics());
-  }
-
-  void Repaint(boolean paintNow) 
-  {
-    ErmesSketchPad mySketch = itsOwner.itsSketchPad;
-
-    if (paintNow) 
-      {
-	Graphics g = mySketch.getGraphics();
-	Update(g);
-	g.dispose();
-
-	Update(mySketch.offGraphics);
-
-	for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) 
-	  {
-	    ((ErmesConnection)e.nextElement()).DoublePaint();
-	  }
-	mySketch.removeDirtyInOutlet(this);
-      }
-    else 
-      {
-	mySketch.addToDirtyInOutlets(this);
-	for (Enumeration e = itsConnections.elements(); e.hasMoreElements();) 
-	  {
-	    mySketch.addToDirtyConnections((ErmesConnection)e.nextElement());
-	  }
-      }
-  }
-
-  public void Update(Graphics g) 
-  {
-    int aHeight;
-
-    if( !itsOwner.itsSketchPad.itsGraphicsOn || g == null) 
-      return;
-    g.setColor( itsOwner.itsSketchPad.getBackground());
-    if ( IsInlet())
-      aHeight = preferredSize.height;
+    if (selected)
+      g.setColor( Color.red); // (fd) should use global selection color
     else
-      aHeight = preferredSize.height+1;
+      g.setColor( Color.black);
 
-    g.fillRect( itsX, itsY, preferredSize.width, aHeight);
-
-    Paint_specific(g);
+    g.fillRect( getVisibleX(), getVisibleY(), VISIBLE_WIDTH, VISIBLE_HEIGHT);
   }
-    
-  final Rectangle Bounds()
+
+  protected void DoublePaint()
   {
-    return currentBounds;
+    Paint( itsOwner.itsSketchPad.getGraphics());
+
+    if (itsOwner.itsSketchPad.offScreenPresent) 
+      Paint( itsOwner.itsSketchPad.GetOffGraphics());
+  }
+
+  // ----------------------------------------
+  // SensibleBounds property
+  // ----------------------------------------
+  Rectangle getSensibleBounds() 
+  {
+    return sensibleBounds;
+  }
+
+  private void updateSensibleBounds() 
+  {
+    sensibleBounds.setBounds( itsX, itsY, SENSIBLE_WIDTH, SENSIBLE_HEIGHT);
+  }
+
+  // ----------------------------------------
+  // Change "selected" state
+  // ----------------------------------------
+  void setSelected( boolean selected)
+  {
+    this.selected = selected;
+
+    DoublePaint();
   }
   
-  final Rectangle getSensibleBounds() 
-  {
-    return currentSensibleBounds;
-  }
-
-  private final void recomputeBounds() 
-  {
-    if (IsInlet())
-      currentSensibleBounds.setBounds( itsX-2, itsY+4, preferredSize.width+4, preferredSize.height);
-    else 
-      currentSensibleBounds.setBounds( itsX-2, itsY-4,preferredSize.width+4, preferredSize.height);
-
-    currentBounds.setBounds( itsX, itsY, preferredSize.width, preferredSize.height);
-
-  }
-
-  public void SetConnected( boolean theConnected, boolean paintNow)
-  {
-    ChangeState( selected, theConnected, paintNow);
-  }
-  
-  public int GetItsX()
-  {
-    return itsX; 
-  }
-	
-  public int GetItsY()
-  {
-    return itsY; 
-  }
-  
-  public boolean GetConnected()
-  {
-    return connected; 
-  }
-	
-  public boolean GetSelected()
+  boolean GetSelected()
   {
     return selected;
   }
   
-  public ErmesObject GetOwner(){
+  // ----------------------------------------
+  // Accessor methods
+  // ----------------------------------------
+  ErmesObject GetOwner()
+  {
     return itsOwner;
   }
   
-  public MaxVector GetConnections()
+  MaxVector GetConnections()
   {
     return itsConnections;
   }
-  
-  abstract boolean IsInlet();
-  
+
+  int getNum() 
+  {
+    return itsNum;
+  }
+
   Point GetAnchorPoint() 
   {
+    itsAnchorPoint.setLocation( getAnchorX(), getAnchorY());
+
     return itsAnchorPoint;
   }  
-  
 
-  public void ChangeState( boolean theSelState, boolean theConState, boolean paintNow)
+  // ----------------------------------------
+  // Coordinates properties
+  // ----------------------------------------
+  protected final int getAnchorX()
   {
-    ErmesSketchPad mySketch = itsOwner.itsSketchPad;
-    boolean toPaint = false;
+    return itsX + (SENSIBLE_WIDTH - VISIBLE_WIDTH) - 1;
+  }
 
-    if (selected != theSelState) 
-      {
-	toPaint = true;
-	itsCurrentDrawingMethod = UPDATE_AND_DRAW;
-	selected = theSelState;
-      }
+  protected abstract int getAnchorY();
 
-    connected = theConState;
+  protected final int getVisibleX()
+  {
+    return itsX + (SENSIBLE_WIDTH - VISIBLE_WIDTH)/2;
+  }
 
-    if (toPaint) 
-      {
-	Graphics g = mySketch.getGraphics();
-	Paint(g);
-	g.dispose();
-
-	Paint(mySketch.offGraphics);
-	for ( Enumeration e = itsConnections.elements(); e.hasMoreElements(); ) 
-	  {
-	    ((ErmesConnection)e.nextElement()).DoublePaint();	  
-	  }
-      }
-  }
-  
-  public void MoveBy(int theDeltaX, int theDeltaY) 
-  {
-    MoveTo( itsX + theDeltaX, itsY += theDeltaY);
-  }
-  
-  public void MoveTo(int theX, int theY) 
-  {
-    itsX = theX; 
-    itsY = theY;
-    recomputeBounds();
-    updateAnchorPoint();
-    itsCurrentDrawingMethod = DRAW;
-  }
-  
-  public void AddConnection(ErmesConnection theConnection)
-  {
-    itsConnections.addElement( theConnection);
-  }
-	
-  abstract void updateAnchorPoint();
-	
-  public Dimension getMinimumSize() 
-  {
-    return getPreferredSize();
-  }
-  
-  static Dimension preferredSize;
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
-  }
+  protected abstract int getVisibleY();
 }

@@ -16,18 +16,13 @@ class ErmesObjIn extends ErmesObject {
   public ErmesObjIn(ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
-  }
 
-  public void Init() 
-  {
     itsId = ((FtsInletObject) itsFtsObject).getPosition();
-    super.Init();
   }
 
-
-  public void redefineFtsObject() 
+  void redefine( String text) 
   {
-    ((FtsInletObject)itsFtsObject).setPosition(itsId);
+    ((FtsInletObject)itsFtsObject).setPosition( itsId);
   }
 
   public void Paint_specific(Graphics g) 
@@ -39,20 +34,20 @@ class ErmesObjIn extends ErmesObject {
     else
       g.setColor(itsLangSelectedColor);
 
-    g.fillRect( getItsX()+1, getItsY()+1, getItsWidth()-2, getItsHeight()-2);
-    g.fill3DRect(getItsX()+2, getItsY()+2, getItsWidth()-4, getItsHeight()-4, true);
+    g.fillRect( getX()+1, getY()+1, getWidth()-2, getHeight()-2);
+    g.fill3DRect(getX()+2, getY()+2, getWidth()-4, getHeight()-4, true);
     g.setColor(Color.black);
     //the box
-    g.drawRect( getItsX()+0, getItsY()+ 0, getItsWidth()-1, getItsHeight()-1);
+    g.drawRect( getX()+0, getY()+ 0, getWidth()-1, getHeight()-1);
     //the triangle
-    g.drawLine( getItsX()+ 1, getItsY()+1, getItsX() + getItsWidth()/2, getItsY()+getItsHeight()/2);
-    g.drawLine( getItsX() + getItsWidth()/2, 
-		getItsY() + getItsHeight()/2, 
-		getItsX() + getItsWidth() - 1,
-		getItsY() + 1);
+    g.drawLine( getX()+ 1, getY()+1, getX() + getWidth()/2, getY()+getHeight()/2);
+    g.drawLine( getX() + getWidth()/2, 
+		getY() + getHeight()/2, 
+		getX() + getWidth() - 1,
+		getY() + 1);
 
     g.setFont(getFont());
-    g.drawString( "" + (itsId+1), getItsX()+2, getItsY()-2);
+    g.drawString( "" + (itsId+1), getX()+2, getY()-2);
   }
 
   void ResizeToNewFont(Font theFont) 
@@ -68,30 +63,30 @@ class ErmesObjIn extends ErmesObject {
       } else 
 	{ //we want to choose among the different Inlet number
 	  itsSketchPad.itsInPop.SetNewOwner(this);
-	  itsSketchPad.itsInPop.show(itsSketchPad, getItsX(), getItsY());
+	  itsSketchPad.itsInPop.show(itsSketchPad, getX(), getY());
         }
   }
 
-  void ChangeInletNo(int numberChoosen) 
+  void ChangeInletNo( int numberChoosen) 
   {
     if (itsId != numberChoosen) 
       {
 	itsId = numberChoosen;
-	redefineFtsObject();
+	redefine( "");
       }
     itsSketchPad.repaint();
   }
 
   public void ResizeToText(int theDeltaX, int theDeltaY) 
   {
-    int aWidth = getItsWidth()+theDeltaX;
-    int aHeight = getItsHeight()+theDeltaY;
+    int aWidth = getWidth()+theDeltaX;
+    int aHeight = getHeight()+theDeltaY;
 
     if ( aWidth < getMinimumSize().width)
       aWidth = getMinimumSize().width;
     if ( aHeight < getMinimumSize().height)
       aHeight = getMinimumSize().height;
-    resizeBy( aWidth - getItsWidth(), aHeight - getItsHeight());
+    resizeBy( aWidth - getWidth(), aHeight - getHeight());
   }
 
 
@@ -100,12 +95,5 @@ class ErmesObjIn extends ErmesObject {
   public Dimension getMinimumSize() 
   {
     return minimumSize;
-  }
-
-  static Dimension preferredSize = new Dimension(20, 20);
-
-  public Dimension getPreferredSize() 
-  {
-    return preferredSize;
   }
 }

@@ -122,8 +122,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
   CheckboxMenuItem itsSketchSizeMenu;     //the SketchPad size MenuItem
   CheckboxMenuItem itsSketchFontMenu;     //the SketchPad font MenuItem
   CheckboxMenuItem itsSelectedFontMenu;   //the Selected objects font MenuItem
-  CheckboxMenuItem itsCurrentResizeMenu;
-  CheckboxMenuItem itsAutoroutingMenu;
+
   MenuItem itsRunModeMenuItem;
   MenuItem itsSelectAllMenuItem;
 
@@ -363,6 +362,14 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     FillExecutionMenu( itsExecutionMenu);
   }
 
+  public void inspectAction()
+  {
+    if ( itsSketchPad.currentSelection.isEmpty() )
+      ErmesPatcherInspector.inspect( itsPatcher);
+    else
+      itsSketchPad.inspectSelection();
+  }
+
   protected void Cut()
   {
     Copy();
@@ -418,52 +425,11 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
   private void FillGraphicsMenu( Menu graphicsMenu)
   {
-    Menu resizeObjectMenu =  new Menu( "Resize Object");
-    graphicsMenu.add( resizeObjectMenu);
-    FillResizeObjectMenu( resizeObjectMenu);
-
     itsAlignObjectMenu =  new Menu( "Align Objects");
     graphicsMenu.add( itsAlignObjectMenu);
     FillAlignObjectsMenu( itsAlignObjectMenu);
   }
 
-  class ResizeMenuAdapter extends MaxItemListener
-  {
-    CheckboxMenuItem item;
-    int resize;
-
-    ResizeMenuAdapter( CheckboxMenuItem item, int resize)
-    {
-      super(item);
-      this.item = item;
-      this.resize = resize;
-    }
-
-    public  void itemStateChanged( ItemEvent e)
-    {
-      ResizeObjectMenuAction( item, resize);
-    }
-  }
-
-  private void FillResizeObjectMenu( Menu resizeObjectMenu)
-  {
-    CheckboxMenuItem aCheckItem;
-
-    aCheckItem = new CheckboxMenuItem( "Both");
-    resizeObjectMenu.add( aCheckItem);
-    aCheckItem.setState( true);
-    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, ErmesSketchPad.BOTH_RESIZING));
-    itsCurrentResizeMenu = aCheckItem;
-
-    aCheckItem = new CheckboxMenuItem( "Horizontal");
-    resizeObjectMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, ErmesSketchPad.BOTH_RESIZING));
-
-    aCheckItem = new CheckboxMenuItem( "Vertical");
-    resizeObjectMenu.add( aCheckItem);
-    aCheckItem.addItemListener( new ResizeMenuAdapter( aCheckItem, ErmesSketchPad.BOTH_RESIZING));
-  }
-  
   class AlignMenuAdapter extends MaxActionListener
   {
     String align;
@@ -604,7 +570,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 	aCheckItem.addItemListener( new FontMenuAdapter( aCheckItem, aString));
       }
   }
-
 
   private void CheckDefaultSizeFontMenuItem()
   {
@@ -982,10 +947,8 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     if ( itsSelectedSizeMenu != null)
       itsSelectedSizeMenu.setState( false);
     itsSelectedSizeMenu = itsSketchSizeMenu;
-
     itsSelectedSizeMenu.setState( true);
   }
-
 
   public void SelectionUpdateMenu( String theFont, Integer theSize)
   {
@@ -1056,18 +1019,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     return true;
   }
 
-
-  private boolean ResizeObjectMenuAction( MenuItem theMenuItem, int resize)
-  {
-    itsCurrentResizeMenu.setState( false);
-    itsSketchPad.ChangeResizeMode( resize);
-    itsCurrentResizeMenu = (CheckboxMenuItem)theMenuItem;
-    itsCurrentResizeMenu.setState( true);
-
-    return true;
-  }
-
-	
   public void focusGained( FocusEvent e)
   {
     itsSketchPad.RequestOffScreen();
