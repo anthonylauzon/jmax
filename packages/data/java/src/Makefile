@@ -31,7 +31,7 @@ include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 DOC_PACKAGES =  ircam.jmax.editors.bpf
 
-JAR_FILE= control.jar
+JAR_FILE= data.jar
 
 ALL_CLASSES=$(shell find $(JAVA_CLASSES_ROOT)/ircam -name '*.class')
 
