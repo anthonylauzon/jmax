@@ -150,7 +150,7 @@ asio_driver_t* asio_util_create_driver(HKEY regKey, char* regKeyName, int driver
   DWORD datasize;
   LONG err;
   LONG ret;
-  asio_driver_t* driver;
+  asio_driver_t* driver = NULL;
 
   err = RegOpenKeyEx(regKey, (LPCSTR)regKeyName, 0, KEY_READ, &regSubKey);
   if (ERROR_SUCCESS == err)
@@ -227,20 +227,23 @@ unsigned int asio_util_scan_drivers()
     if (err == ERROR_SUCCESS)
     {	  
 	    driver = asio_util_create_driver(regKeyEnum, regKeyName, index);
-	    asio_open_driver(driver);	  
-	    if (0 != driver)
-	    {
-	      asio_audioport_t* port;
+
+	    if(NULL == driver)
+        return -1;
+
+	    asio_open_driver(driver);
+      if(NULL != driver)
+      {
+        asio_audioport_t* port;
 	      fts_set_pointer(&at, driver);
 	      port = (asio_audioport_t*)fts_object_create(asio_audioport_type, 1, &at);
 	      if (NULL != port)
 		    {
-
 		      fts_object_refer((fts_object_t*)port);
 		      fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
 		      fts_log("[asio_audioport] put port : %s\n", port->driver->name);
 		    }
-	    }
+      }  
 	  }
     else
 	  {
