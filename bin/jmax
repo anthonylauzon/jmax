@@ -4,8 +4,10 @@ help ()
     cat << HELP_EOF
 
 Usage:
-    jmax [-javaopt <java-option>] [-install <installation>] 
+    jmax [-javaopt <java-option>]
+	    [-install <installation>] 
 	    [-highpriority]
+	    [-nofork]
 	    [-verbose] [<other-jmax-options>]
 
 Starts jMax by running the Java interpreter with the required arguments.
@@ -32,6 +34,10 @@ Options and arguments:
     Starts the FTS server with a raised priority in order to run more real-time
     Defaults to false.
 
+  -nofork
+    Do not go into the background.  By default, jMax forks itself to give control 
+    back to the shell.
+
   <other-jmax-options>       (optional)
     Defines jMax options that are passed directly to ircam.jmax.MaxApplication as 
     command line options (for instance, jmaxArch, jmaxMode, ...)
@@ -53,6 +59,7 @@ opt="none"
 JAVAOPT=""
 JMAXOPT=""
 VERBOSE=
+NOFORK=
 INSTALL="standard"
 
 for arg in $@
@@ -68,7 +75,9 @@ do
 	    help ;
 	    exit 2 ;;
 	\-verbose | \-v)
-	    VERBOSE=YES ;;
+	    VERBOSE="yes" ;;
+	\-nofork)
+	    NOFORK="yes" ;;
 	*)
 	    JMAXOPT="${JMAXOPT} $arg" ;;
 	esac
@@ -109,15 +118,19 @@ JAVA_BIN_DIR=`dirname $JAVA`
 JAVA_DIR=`dirname $JAVA_BIN_DIR`
 if [ -f ${JAVA_DIR}/lib/rt.jar ]
 then
+    # JDK 1.1.5 on IRIX
     JAVA_CLASSES=${JAVA_DIR}/lib/rt.jar
 elif [ -f ${JAVA_DIR}/lib/classes.zip ]
 then
+    # JDK 1.1.5 on Linux
     JAVA_CLASSES=${JAVA_DIR}/lib/classes.zip
 elif [ -f ${JAVA_DIR}/lib/classes.jar ]
 then
+    # JDK 1.1.3 on Solaris
     JAVA_CLASSES=${JAVA_DIR}/lib/classes.jar
 elif [ -f /System/Library/Frameworks/JavaVM.framework/Classes/classes.jar ]
-then 
+then
+    # Java on Rhapsody !!!
     JAVA_CLASSES=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Classes/awt.jar
 else
     echo Java System classes not found.
@@ -138,9 +151,19 @@ then
     echo "   CLASSPATH   set to ${CLASSPATH}"
     echo "   JMAXOPT     set to ${JMAXOPT}"
     echo "Command line:"
-    echo "java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
+    if [ $NOFORK ]
+    then
+	echo "java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT"
+    else
+	echo "java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &"
+    fi
 fi
 
+if [ $NOFORK ]
+then
+    java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT
+else
+    java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT &
+fi
 
-java -noclassgc -noasyncgc -mx64m -ms2m $JAVAOPT -classpath $CLASSPATH ircam.jmax.MaxApplication -root $ROOTDIR $JMAXOPT 
 

@@ -27,58 +27,176 @@ help ()
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-make-distrib-list  -arch <arch>  -type <type> [-verbose] <directory>
+    jmax-make-distrib-list  -arch <arch>  -type <type> [-verbose] [-check-permission] <directory>
 
-Writes on its standard output a list of files needed by jMax release
+Writes on its standard output a list of files needed by jMax distribution
 for architecture ``arch'' and of type ``type''
-This script is not intended for direct use, it is called by jmax-make-release.
+This script is called by jmax-make-release and jmax-tar-distrib.
 
 Options and arguments:
   -arch <architecture>           (mandatory)
     defines the architecture of the release (origin, linuxpc, ...)
   -type <type>                   (mandatory)
     defines the type of the release (free, forum, ...)
-  <directory>                    (mandatory)
+  -check-permission              (optional)
+    checks permissions of source file and changes it, according to:
+	. if file is readable by user, it is made readable by all
+	. if file is executable by user, it is made executable by all
+  <directory>                    (optional)
     defines the source directory from which to start the list
+    Default: .
 
 HELP_EOF
 }
 
 check_permissions ()
 {
-    if ls -l $1 | awk '{ exit substr($1,2,1)!="r"; }'
+    LLS=`ls -l $1`
+
+    if echo $LLS | awk '{ exit substr($1,8,1)=="r" && substr($1,2,1)!="r"; }'
     then
-	if ls -l $1 | awk '{ exit substr($1,8,1)=="r"; }'
+	if chmod go+r $1
  	then
- 	    if chmod go+r $1
- 	    then
- 		echo "Warning: $1 was not readable by others (corrected)" >&2
- 	    else
- 		echo "Error: $1 is not readable by others (cannot correct)" >&2
-		exit 2
- 	    fi
- 	fi
+	    echo "Warning: $1 was not readable by others (corrected)" >&2
+ 	else
+	    echo "Error: $1 is not readable by others (cannot correct)" >&2
+	    exit 2
+	fi
     fi
 
-    if ls -l $1 | awk '{ exit substr($1,4,1)!="x"; }'
+    if echo $LLS | awk '{ exit substr($1,10,1)=="x" && substr($1,4,1)!="x"; }'
     then
-	if ls -l $1 | awk '{ exit substr($1,10,1)=="x"; }'
- 	then
-	    if chmod go+x $1
-	    then
-		echo "Warning: $1 was not executable by others (corrected)" >&2
-	    else
-		echo "Error: $1 is not executable by others (cannot correct)" >&2
-		exit 2
-	    fi
- 	fi
+	if chmod go+x $1
+	then
+	    echo "Warning: $1 was not executable by others (corrected)" >&2
+	else
+	    echo "Error: $1 is not executable by others (cannot correct)" >&2
+	    exit 2
+	fi
     fi
 }
+
+# args: ARCH TYPE DIR
+do_it_non_verbose_no_check ()
+{
+    if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
+
+    {
+	read ARCH_F TYPE_F NAME OTHERS
+	while [ $ARCH_F ] 
+	do
+	    if [ \( $ARCH_F = $1 -o $ARCH_F = "all" \) -a \( $TYPE_F = $2 -o $TYPE_F = "all" \) ]
+	    then
+		if [ -f "$3/$NAME" ]
+		then
+		    echo $3/$NAME
+		elif [ -d "$3/$NAME" ]
+		then
+		    do_it_non_verbose_no_check $1 $2 $3/$NAME
+		else
+		    echo "File or directory $3/$NAME not found" >&2
+		fi
+	    fi
+	    read ARCH_F TYPE_F NAME OTHERS
+	done
+    }  < $3/distrib
+}
+
+# args: ARCH TYPE DIR
+do_it_non_verbose_check ()
+{
+    if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
+
+    {
+	read ARCH_F TYPE_F NAME OTHERS
+	while [ $ARCH_F ] 
+	do
+	    if [ \( $ARCH_F = $1 -o $ARCH_F = "all" \) -a \( $TYPE_F = $2 -o $TYPE_F = "all" \) ]
+	    then
+		if [ -f "$3/$NAME" ]
+		then
+		    check_permissions $3/$NAME
+		    echo $3/$NAME
+		elif [ -d "$3/$NAME" ]
+		then
+		    do_it_non_verbose_check $1 $2 $3/$NAME
+		else
+		    echo "File or directory $3/$NAME not found" >&2
+		fi
+	    fi
+	    read ARCH_F TYPE_F NAME OTHERS
+	done
+    }  < $3/distrib
+}
+
+# args: ARCH TYPE DIR
+do_it_verbose_check ()
+{
+    if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
+
+    {
+	read ARCH_F TYPE_F NAME OTHERS
+	if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
+
+	while [ $ARCH_F ] 
+	do
+	    if [ \( $ARCH_F = $1 -o $ARCH_F = "all" \) -a \( $TYPE_F = $2 -o $TYPE_F = "all" \) ]
+	    then
+		if [ -f "$3/$NAME" ]
+		then
+		    if [ $VERBOSE ] ; then echo File $3/$NAME >&2 ; fi
+		    check_permissions $3/$NAME
+		    echo $3/$NAME
+		elif [ -d "$3/$NAME" ]
+		then
+		    if [ $VERBOSE ] ; then echo Directory $3/$NAME >&2 ; fi
+		    do_it_verbose_check $1 $2 $3/$NAME
+		else
+		    echo "File or directory $3/$NAME not found" >&2
+		fi
+	    fi
+	    read ARCH_F TYPE_F NAME OTHERS
+	    if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
+	    done
+    }  < $3/distrib
+}
+
+# args: ARCH TYPE DIR
+do_it_verbose_no_check ()
+{
+    if [ \! -f $3/distrib ]; then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
+
+    {
+	read ARCH_F TYPE_F NAME OTHERS
+	if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
+
+	while [ $ARCH_F ] 
+	do
+	    if [ \( $ARCH_F = $1 -o $ARCH_F = "all" \) -a \( $TYPE_F = $2 -o $TYPE_F = "all" \) ]
+	    then
+		if [ -f "$3/$NAME" ]
+		then
+		    if [ $VERBOSE ] ; then echo File $3/$NAME >&2 ; fi
+		    echo $3/$NAME
+		elif [ -d "$3/$NAME" ]
+		then
+		    if [ $VERBOSE ] ; then echo Directory $3/$NAME >&2 ; fi
+		    do_it_verbose_no_check $1 $2 $3/$NAME
+		else
+		    echo "File or directory $3/$NAME not found" >&2
+		fi
+	    fi
+	    read ARCH_F TYPE_F NAME OTHERS
+	    if [ $VERBOSE ] ; then echo Read $ARCH_F $TYPE_F $NAME >&2 ; fi
+	    done
+    }  < $3/distrib
+}
+
 
 OPT="none"
 ARCH="none"
 TYPE="none"
-DIR="none"
+DIR=.
 
 for ARG in $@
 do
@@ -93,7 +211,7 @@ do
 	    help ;
 	    exit 2 ;;
 	*)
-	    if [ $DIR = "none" ]
+	    if [ $DIR = . ]
 	    then
 		DIR=$ARG
 	    else
@@ -113,75 +231,32 @@ do
 done
 
 # Check that we have what we need
-case $ARCH in
-none )
-    help ;
-    exit 2 ;;
-esac
-
-case $TYPE in
-none )
-    help ;
-    exit 2 ;;
-esac
-
-case $DIR in
-none )
-    help ;
-    exit 2 ;;
-esac
-
-## Parameters
-
-if [ -f $DIR/distrib ]
+if [ $ARCH = "none" ]
 then
-    {
-	read ARCH_FILTER TYPE_FILTER NAME OTHERS
-	
-	if [ $VERBOSE ] 
-	then
-	    echo Read $ARCH_FILTER $TYPE_FILTER $NAME >&2
-	fi
+    help
+    exit 2
+fi
 
-	while [ $ARCH_FILTER ] 
-	do
-	    {
-		if [ $ARCH_FILTER = $ARCH ] || [ $ARCH_FILTER = "all" ]
-		then 
-		    if [ $TYPE_FILTER = $TYPE ] || [ $TYPE_FILTER = "all" ]
-		    then
-			{
-			    if [ -f "$DIR/$NAME" ]
-			    then
-				check_permissions $DIR/$NAME
-				if [ $VERBOSE ] 
-				then
-				    echo File $DIR/$NAME >&2
-				fi
-				echo $DIR/$NAME
-			    elif [ -d "$DIR/$NAME" ]
-			    then
-				if [ $VERBOSE ] 
-				then
-				    echo Directory $DIR/$NAME >&2
-				fi
-				jmax-make-distrib-list -arch $ARCH -type $TYPE $VERBOSE $DIR/$NAME
-			    else
-				echo "File or directory $DIR/$NAME not found" >&2
-			    fi
-			}
-		    fi
-		fi
+if [ $TYPE = "none" ]
+then
+    help
+    exit 2
+fi
 
-		read ARCH_FILTER TYPE_FILTER NAME OTHERS
-
-		if [ $VERBOSE ] 
-		then
-		    echo Read $ARCH_FILTER $TYPE_FILTER $NAME >&2
-		fi
-
-	    }
-	done
-    }  < $DIR/distrib
+if [ $VERBOSE ]
+then
+    if [ $CHECK ]
+    then
+	do_it_verbose_check $ARCH $TYPE $DIR
+    else
+	do_it_verbose_no_check $ARCH $TYPE $DIR
+    fi
+else
+    if [ $CHECK ]
+    then
+	do_it_non_verbose_check $ARCH $TYPE $DIR
+    else
+	do_it_non_verbose_no_check $ARCH $TYPE $DIR
+    fi
 fi
 

@@ -5,10 +5,9 @@ help ()
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-make-new-version [-type patch|minor|major]
+    jmax-make-new-version -type [patch|minor|major] [-nomail]
 
 Makes a new version of jMax:
-  - tags the sources with the current version number
   - increments the version number in file VERSION
   - generates new files for FTS and Java to know the new version number
   - send a mail to the development team to inform of the change
@@ -16,14 +15,19 @@ Makes a new version of jMax:
 Options:
   -type patch|minor|major           (mandatory)
     defines which number will change in the new version number
+  -nomail                           (optional)
+    tells jmax-make-new-version not to send a mail after doing his job
 
 HELP_EOF
 }
 
 # ---------------------------------------------------------------------------
+HOST_FOR_CVS=maelzel
+
 # Options decrypting
 OPT="none"
 TYPE="none"
+MAIL="true"
 
 for ARG in $@
 do
@@ -32,6 +36,8 @@ do
 	case $ARG in
 	\-type )
 	    OPT=$ARG ;;
+	\-nomail )
+	    MAIL=
 	\-help | \-h | \-\? )
 	    help ;
 	    exit 2 ;;
@@ -58,9 +64,9 @@ patch | minor | major )
     exit 2 ;;
 esac
 
-if [ `hostname` != maelzel ]
+if [ `hostname` != $HOST_FOR_CVS ]
 then
-    echo "Incorrect host (log on maelzel to call this script, because CVS ...)"
+    echo "Incorrect host (log on $HOST_FOR_CVS to call this script, because CVS ...)"
     exit 1
 fi
 
@@ -94,22 +100,6 @@ patch )
 esac
 
 NEW_VERSION=$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH_LEVEL
-
-echo "OK to change version number from $OLD_VERSION to $NEW_VERSION ? "
-read R
-if [ $R != "yes" -a $R != "y" ]
-then
-    echo "OK. Nothing changed. Bye."
-    exit 2
-fi
-
-# ---------------------------------------------------------------------------
-# Tag the sources with the current version number
-TAG=`echo $OLD_VERSION | sed -e 's/^/V_/' -e 's/\./_/g'`
-
-echo "... Tagging sources with tag $TAG"
-cvs tag -F $TAG
-
 
 # ---------------------------------------------------------------------------
 # Generate new file VERSION
@@ -168,8 +158,11 @@ echo "... Commiting file java/src/ircam/jmax/MaxVersion.java"
 # ---------------------------------------------------------------------------
 # Send a mail to the team
 TEAM="dechelle@ircam.fr dececco@ircam.fr maggi@ircam.fr schnell@ircam.fr"
-echo "... Sending a mail to $TEAM"
-echo "Don't forget to do 'cvs update'\n" | Mail -s "New jMax version is now $NEW_VERSION" $TEAM
+if [ $MAIL ]
+then
+    echo "... Sending a mail to $TEAM"
+    echo "Don't forget to do 'cvs update'\n" | Mail -s "New jMax version is now $NEW_VERSION" $TEAM
+fi
 
 # ---------------------------------------------------------------------------
 echo "... Done"
