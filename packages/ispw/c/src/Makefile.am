@@ -158,14 +158,18 @@ wavetab.h
 
 libispw_la_LDFLAGS= -module
 
-#voxalloc make gcc crash
-VOXALLOC_LTCOMPILE=$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) -Wall -Wno-unused 
-voxalloc.lo: voxalloc.c
-	@echo '$(VOXALLOC_LTCOMPILE) -c $<'; \
-	$(VOXALLOC_LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
-	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
-	  < .deps/$(*F).pp > .deps/$(*F).P; \
-	tr ' ' '\012' < .deps/$(*F).pp \
-	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
-	    >> .deps/$(*F).P; \
-	rm -f .deps/$(*F).pp
+# Comment this rule, gcc crash was on Mac OS X.
+# On Mac OS X, autoconf is no more use
+#
+# #voxalloc make gcc crash
+#
+# VOXALLOC_LTCOMPILE=$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) -Wall -Wno-unused 
+# voxalloc.lo: voxalloc.c
+# 	@echo '$(VOXALLOC_LTCOMPILE) -c $<'; \
+# 	$(VOXALLOC_LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+# 	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+# 	  < .deps/$(*F).pp > .deps/$(*F).P; \
+# 	tr ' ' '\012' < .deps/$(*F).pp \
+# 	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+# 	    >> .deps/$(*F).P; \
+# 	rm -f .deps/$(*F).pp
