@@ -116,6 +116,10 @@ class RootPatcher extends FtsPatcherObject {
   {
     super( server, null, FtsObject.NO_ID, "jpatcher", null, 0, 0);
   }
+  public void releaseObject( FtsObject obj)
+  { 
+    obj.dispose();
+  }
 }
 
 class JMaxClient extends FtsObject {
@@ -640,9 +644,6 @@ public class JMaxApplication {
 	
 	String ftsDir = (String)properties.get( "jmaxServerDir");
 	String ftsName = (String)properties.get( "jmaxServerName");
-
-	System.err.println( ftsDir);
-	System.err.println( ftsName);
 
 	if (ftsName == null)
 	  ftsName = "fts";
