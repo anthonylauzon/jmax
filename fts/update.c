@@ -145,7 +145,7 @@ static update_group_t *object_get_update_group( fts_object_t *obj)
 
   id = fts_object_get_id( obj);
 
-  if (id == FTS_NO_ID)
+  if (id <= FTS_NO_ID)
     return NULL;
 
   index = OBJECT_ID_CLIENT( id );

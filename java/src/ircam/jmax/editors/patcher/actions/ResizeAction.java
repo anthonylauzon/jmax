@@ -60,10 +60,18 @@ public class ResizeAction extends EditorAction
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
 	  public void processObject(GraphicObject object)
 	    {
+	      int w = object.getWidth() + dx;
+	      int h = object.getHeight() + dy;
+
 	      object.redraw();
 	      object.redrawConnections();
-	      object.setWidth(object.getWidth() + dx);
-	      object.setHeight(object.getHeight() + dy);
+
+	      if(w > 0)
+		object.setWidth(w);
+
+	      if(h > 0)
+		object.setHeight(h);
+
 	      object.redraw();
 	      object.redrawConnections();
 	    }});

@@ -23,7 +23,7 @@
 #ifndef _FTS_PRIVATE_OBJECT_H_
 #define _FTS_PRIVATE_OBJECT_H_
 
-extern void fts_object_set_id(fts_object_t *obj, int id);
+#define fts_object_set_id(o, i) ((o)->head.id = (i))
 
 /* support for redefinition */
 extern fts_object_t *fts_object_recompute(fts_object_t *old);

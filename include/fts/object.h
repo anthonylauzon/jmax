@@ -23,7 +23,7 @@
 
 
 #define FTS_NO_ID -1
-#define FTS_HIDDEN -2
+#define FTS_DELETE -2
 
 struct fts_simple_object
 {

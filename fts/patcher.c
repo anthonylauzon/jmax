@@ -1465,19 +1465,15 @@ static void
 fts_patcher_redefine_object_from_client( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *)o;
-  fts_object_t *obj;
+  fts_object_t *oldobj = fts_get_object(&at[0]);
+  fts_object_t *obj = fts_object_redefine(oldobj, ac - 1, at + 1);
   fts_atom_t a[1];
   int do_var = 0;
 
-  fts_object_t *oldobj = fts_get_object(&at[0]);
-      
-  obj = fts_object_redefine(oldobj, ac - 1, at + 1);
-      
   fts_client_upload_object(obj, -1);
-
-  /* qui dovrebbe uploadare le connessioni sull'oggetto */
+  
   fts_object_upload_connections(obj);
-
+  
   fts_set_object(a, obj);
   fts_client_send_message(o, sym_objectRedefined, 1, a);
 
@@ -1540,11 +1536,32 @@ fts_patcher_delete_objects_from_client( fts_object_t *o, int winlet, fts_symbol_
   
       for(i=0; i<ac; i++)
 	{
-	  obj = fts_get_object(&at[i]);
+	  obj = fts_get_object(at + i);
+
 	  if (obj)
-	      fts_object_delete_from_patcher(obj);
+	    {
+	      if (fts_object_has_id(obj))
+		{
+		  fts_object_reset_changed(obj);
+		    
+		  fts_client_release_object(obj);
+		  fts_object_set_id(obj, FTS_DELETE);
+		}
+	    }
 	  else
-	    fts_log("[patcher] delete_objects_from_client: System Error deleting a non existing object\n");
+	    {
+	      fts_log("[patcher] delete_objects_from_client: System Error deleting a non existing object\n");
+	      return;
+	    }
+	}
+      
+
+      for(i=0; i<ac; i++)
+	{
+	  obj = fts_get_object(at + i);
+
+	  if (obj)
+	    fts_object_delete_from_patcher(obj);
 	}
       
         fts_patcher_set_dirty((fts_patcher_t *)o, 1);
@@ -1799,7 +1816,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 {
   fts_object_t *obj;
   fts_expression_state_t *e;
-  fts_symbol_t var = 0;
   int ac;
   fts_atom_t at[1024];
   int rac;
@@ -1814,7 +1830,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
   /* check for the "var : <obj> syntax" and ignore the variable if any */
   if (fts_object_description_defines_variable(aoc, aot))
     {
-      /* var = fts_get_symbol(&aot[0]); */
       rat = aot + 2;
       rac = aoc - 2;
     }
@@ -1826,50 +1841,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 
   /* change the patcher definition */
   fts_object_set_description(obj, rac, rat);
-
-  /* if the old patcher defines a variable, and the new definition
-   * doesn't define the same variable, delete the variable,
-   * if the new object defines the same variable, just suspend it.
-   */
-  if (var)
-    {
-      if (obj->varname == var)
-	{
-	  fts_variable_suspend(obj->patcher, obj->varname);
-	  fts_variable_undefine(obj->patcher, obj->varname, obj);
-	}
-      else
-	{
-	  /* if the variable already exists in this local context, make an double definition patcher  */
-	  if (! fts_variable_can_define(obj->patcher, var))
-	    {
-	      fts_variable_define(obj->patcher, var);
-	      fts_variables_undefine_suspended(this, obj);
-	      fts_object_set_error(obj, "Variable %s already defined", var);
-
-	      if (fts_object_has_id(obj))
-		{
-		  fts_object_property_changed(obj, fts_s_error);
-		  fts_object_property_changed(obj, fts_s_error_description);
-		}
-
-	      return this;
-	    }
-	  else if ( ! fts_variable_is_suspended(obj->patcher, var))
-	    {
-	      /* define the variable, suspended
-	       * (this will also steal all the objects referring to the same variable name
-	       * in the local scope from any variable defined outside the scope)
-	       */
-	      fts_variable_define(obj->patcher, var);
-	    }
-	}
-    }
-  else if (obj->varname)
-    {
-      fts_variable_undefine(obj->patcher, obj->varname, obj);
-      obj->varname = 0;
-    }
 
   /* suspend  the patcher internal variables if any */
   fts_variables_suspend(this, obj);
@@ -1906,15 +1877,6 @@ fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot)
 
       /* undefine all the locals that are still suspended  */
       fts_variables_undefine_suspended(this, obj);
-    }
-
-  /* recover the variable this patcher define, if any */
-  if (var != 0)
-    {
-      fts_set_object(&a, obj);
-
-      fts_variable_restore(obj->patcher, var, &a, obj);
-      obj->varname = var;
     }
 
   /* free the expression state structure */
@@ -2388,7 +2350,6 @@ fts_create_root_patcher()
 
   fts_set_symbol(a, fts_new_symbol("root"));
   fts_root_patcher = (fts_patcher_t *)fts_object_create(patcher_metaclass, 1, a);
-  fts_object_set_id((fts_object_t *)fts_root_patcher, 1);  
 }
 
 static void fts_delete_root_patcher(void)

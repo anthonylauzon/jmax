@@ -224,7 +224,7 @@ static void messconst_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       this->at = (fts_atom_t *)fts_malloc( sizeof( fts_atom_t) * this->ac);
 
       for ( i = 0; i < this->ac; i++)
-	fts_set_void( this->at + i);
+	fts_set_int( this->at + i, 0);
     }
 }
 
@@ -298,7 +298,7 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->at = (fts_atom_t *)fts_malloc( sizeof( fts_atom_t) * this->ac);
 
   for ( i = 0; i < this->ac; i++)
-    fts_set_void( this->at + i);
+    fts_set_int( this->at + i, 0);
 
   /* Do we have a new object description (i.e. "ins <INT> outs <INT>") or an old one ? */
   if ( ! (ac == 4 

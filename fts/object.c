@@ -200,17 +200,19 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
       /* extract the variable name */
       var = fts_object_description_get_variable_name(aoc, aot);
 
-      /* if the variable already exists in this local context, make a double definition error object  */
+      /* skip the variable for the evaluation */
+      ac = aoc - 2;
+      at = aot + 2;
+
+      /* check if the variable already exists */
       if(!fts_variable_can_define(patcher, var))
 	{
-	  /* error: redefined variable */
-	  obj = fts_error_object_new(patcher, aoc, aot, "Variable %s doubly defined", var);
-	}
-      else
-	{
-	  /* otherwise, set the ac/at pair to skip the variable */
-	  ac = aoc - 2;
-	  at = aot + 2;
+	  /* don't use definition of doubly defined variable */
+	  var = 0;
+
+	  /* remove variable definition from object description */
+	  aoc -= 2;
+	  aot += 2;
 	}
     }
   else
@@ -221,7 +223,7 @@ fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *a
     }
 
   /* prepare the variable, if defined */
-  if ((var != 0) && ( ! fts_variable_is_suspended(patcher, var)))
+  if ((var != 0) && (!fts_variable_is_suspended(patcher, var)))
     {
       /* Define the variable, suspended;
 	 this will also steal all the objects referring to the same variable name
@@ -512,7 +514,7 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
-  if (obj->head.id != FTS_NO_ID)
+  if (obj->head.id > FTS_NO_ID)
     fts_client_release_object(obj);
 }
 
@@ -627,7 +629,7 @@ fts_object_recompute(fts_object_t *old)
     {
       /* If we have an object with data, data must be released,
 	 because the object will be deleted */
-	/*if (old->head.id != FTS_NO_ID)
+	/*if (old->head.id > FTS_NO_ID)
 	  fts_client_release_object_data(old);*/
 
       obj = fts_object_redefine(old, old->argc, old->argv);
@@ -638,7 +640,7 @@ fts_object_recompute(fts_object_t *old)
 	 the error property daemon should be a global daemon !
       */
 
-      if(old_id != FTS_NO_ID)
+      if(obj != NULL && old_id != FTS_NO_ID)
 	{
 	  fts_object_send_kernel_properties(obj);
 	  fts_client_upload_object(obj, -1);
@@ -653,64 +655,67 @@ fts_object_recompute(fts_object_t *old)
 fts_object_t *
 fts_object_redefine(fts_object_t *old, int ac, const fts_atom_t *at)
 {
-  int do_client;
-  fts_symbol_t  var;
-  fts_object_t  *new;
-
-  /* check for the "var : <obj> syntax" and  extract the variable name if any */
-  if (fts_object_description_defines_variable(ac, at))
-    var = fts_object_description_get_variable_name(ac, at);
-  else
-    var = 0;
-
-  /* unbind variables */
-  fts_object_unbind(old);
-
-  /* unreference by hand */
-  old->refcnt--;
-
-  /* call deconstructor */
-  if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
-    fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
-
-  /* make the new object  */
-  new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
-  
-  /* Update the loading vm */
-  fts_vm_substitute_object(old, new);
-
-  /* If new is an error object, assure that there are enough inlets
-     and outlets for the connections */
-  if (fts_object_is_error(new))
+  /* redefine object if not scheduled for removal */
+  if(old->head.id != FTS_DELETE)
     {
-      fts_error_object_fit_inlet(new, old->head.cl->ninlets - 1);
-      fts_error_object_fit_outlet(new, old->head.cl->noutlets - 1);
+      fts_object_t  *new;
+      
+      /* unbind variables */
+      fts_object_unbind(old);
+      
+      /* unreference by hand */
+      old->refcnt--;
+      
+      /* call deconstructor */
+      if(old->refcnt == 0 && fts_class_get_deconstructor(old->head.cl))
+	fts_class_get_deconstructor(old->head.cl)(old, fts_SystemInlet, fts_s_delete, 0, 0);
+      
+      /* make the new object  */
+      new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
+      
+      /* Update the loading vm */
+      fts_vm_substitute_object(old, new);
+      
+      /* If new is an error object, assure that there are enough inlets
+	 and outlets for the connections */
+      if (fts_object_is_error(new))
+	{
+	  fts_error_object_fit_inlet(new, old->head.cl->ninlets - 1);
+	  fts_error_object_fit_outlet(new, old->head.cl->noutlets - 1);
+	}
+      
+      /* 1. move the properties
+       * 2. upload the object (so the properties will be known to the client)
+       * 3. move the connections (the object need to be uploaded in order to move the connections) 
+       */
+      fts_object_move_properties(old, new);
+      
+      /* move the connections from the old to the new object, tell the client if needed */
+      fts_object_move_connections(old, new);
+      
+      /* remove old from client */
+      fts_object_unclient(old);
+      
+      /* remove the object from the patcher */
+      if(old->patcher)
+	fts_patcher_remove_object(old->patcher, old);
+      
+      fts_object_reset_changed(old);
+      
+      if(old->refcnt == 0)
+	fts_object_free(old);
+      else
+	old->patcher = 0;
+      
+      return new;
     }
-
-  /* 1. move the properties
-   * 2. upload the object (so the properties will be known to the client)
-   * 3. move the connections (the object need to be uploaded in order to move the connections) 
-   */
-  fts_object_move_properties(old, new);
-
-  /* move the connections from the old to the new object, tell the client if needed */
-  fts_object_move_connections(old, new);
-
-  /* remove old from client */
-  fts_object_unclient(old);
-
-  /* remove the object from the patcher */
-  if(old->patcher)
-    fts_patcher_remove_object(old->patcher, old);
-
-  fts_object_reset_changed(old);
-
-  if(old->refcnt == 0)
-    fts_object_free(old);
   else
-    old->patcher = 0;
+    {
+      /* unbind variables */
+      fts_object_unbind(old);
+    }      
 
-  return new;
+  return NULL;
 }
 
 void
@@ -842,24 +847,6 @@ fts_object_reset_description(fts_object_t *obj)
       obj->argv = 0;
       obj->argc = 0;
     }
-}
-
-
-/* add the id to the object (called when we know the id, usually in messtiles.c) */
-void 
-fts_object_set_id(fts_object_t *obj, int id)
-{
-#if 0
-  /* set the id and put the object in the object table */
-  if (obj->head.id != FTS_NO_ID)
-    fts_object_table_remove(obj->head.id);
-
-  if (id != FTS_NO_ID) 
-    {
-      obj->head.id = id;
-      fts_object_table_put(id, obj);
-    }
-#endif
 }
 
 /* change number of outlets */

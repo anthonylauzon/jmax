@@ -205,9 +205,9 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     g.setColor(getTextBackground());
     
     if(itsSketchPad.isLocked())
-      g.fillRect( x + 1, y + 1, w - 2, h - 2);
+      g.fillRect( x + 1, y + 1, w - 1, h - 2);
     else
-      g.fill3DRect( x, y + 1, w - 1, h - 2, true);
+      g.fill3DRect( x, y + 1, w, h - 2, true);
     
     if(ftsObject.isError())
       {
@@ -219,14 +219,14 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     else
       g.setColor(Color.black);
 
-    g.drawLine( x, y, x + cornerSize, y);
-    g.drawLine( x, y, x, y + cornerSize/3);
-    g.drawLine( x, y + h - 1, x + cornerSize, y + h - 1);
-    g.drawLine( x, y + h - 1, x, y + h - 1 - cornerSize/3);
+    g.drawLine( x, y, x + w - 1, y);
+    g.drawLine( x, y, x, y + h/4);
+    g.drawLine( x, y + h - 1, x + minWidth, y + h - 1);
+    g.drawLine( x, y + h - 1, x, y + h - 1 - h/4);
 
     paintInlets(g);
     paintOutlets(g);
-    
+
     drawContent(g);
   }
 
@@ -238,10 +238,10 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     int h = getHeight();
 
     g.setColor(getTextBackground());
-    g.fillRect( x + 1, y + 1, w - 2, h - 2);
+    g.fillRect( x + 1, y + 1, w - 1, h - 2);
     
     g.setColor(Color.black);
-    g.drawLine( x, y, x + cornerSize, y);
+    g.drawLine( x, y, x + w - 1, y);
     g.drawLine( x, y, x, y + cornerSize/3);
     g.drawLine( x, y + h - 1, x + cornerSize, y + h - 1);
     g.drawLine( x, y + h - 1, x, y + h - 1 - cornerSize/3);
@@ -249,9 +249,3 @@ public class MessConst extends Editable implements FtsObjectErrorListener, FtsIn
     drawContent(g);
   }
 }
-
-
-
-
-
-

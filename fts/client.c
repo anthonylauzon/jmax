@@ -151,7 +151,7 @@ client_t *object_get_client( fts_object_t *obj)
 
   id = fts_object_get_id( obj);
 
-  if (id == FTS_NO_ID)
+  if (id <= FTS_NO_ID)
     return NULL;
 
   index = OBJECT_ID_CLIENT( id );
@@ -357,7 +357,7 @@ static void client_register_object( client_t *this, fts_object_t *object, int ob
 {
   fts_atom_t k, v;
 
-  if (object_id == FTS_NO_ID)
+  if (object_id <= FTS_NO_ID)
     {
       object_id = this->object_id_count;
       this->object_id_count += 2; 
@@ -1444,7 +1444,7 @@ void fts_client_register_object(fts_object_t *obj, int client_id)
   client_t *client;
   fts_atom_t a[1];
 
-  if(client_id == FTS_NO_ID)
+  if(client_id <= FTS_NO_ID)
     client_id = fts_get_client_id((fts_object_t *)fts_object_get_patcher(obj));
   
   client = client_table_get(client_id);
