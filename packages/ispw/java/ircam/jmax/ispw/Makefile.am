@@ -1,5 +1,7 @@
 packagedir=$(pkgdatadir)/packages/ispw/java/classes
 package_JAVA = \
+FtsAtomList.java \
+FtsAtomListListener.java \
 FtsMessageObject.java \
 Message.java 
 

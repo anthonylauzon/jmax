@@ -39,6 +39,7 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.qlist.actions.*;
+import ircam.jmax.ispw.*;
 
 /**
  * A panel that is able to show the content of a FtsAtomList (qlist).
@@ -115,9 +116,10 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
    * Sets the content to the given FtsAtomList object */
   public void fillContent(FtsQListObject theContent) 
   {
-    if(!theContent.getAtomList().getValuesAsText().equals(itsTextArea.getText())){
+    String text = QListUnparse.unparseDescription( theContent.getAtomList().getValues());
+    if( ! text.equals( itsTextArea.getText())){
       caretPosition = itsTextArea.getCaretPosition();
-      itsTextArea.setText( theContent.getAtomList().getValuesAsText());
+      itsTextArea.setText( text);
       itsTextArea.requestFocus();
       // (em) added a control to avoid setting impossible caret positions.
       // FtsAtomList.getValueAsText() can infact reformat the text,
@@ -276,14 +278,6 @@ public class QListPanel extends JPanel implements Editor, ClipboardOwner
   {
     File file;
     Writer w;
-
-//      JFileChooser fileChooser;
-
-//      fileChooser = new JFileChooser();
-
-//      fileChooser.setSelectedFile( new File("qlist.txt"));
-
-//      fileChooser.showDialog( itsEditorContainer.getFrame(), "Export");
 
     file = MaxFileChooser.chooseFileToSave(itsEditorContainer.getFrame(), new File("qlist.txt"),  "Export");
 

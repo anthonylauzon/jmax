@@ -6,6 +6,7 @@ FtsQListObject.java \
 KeyConsumer.java \
 QListFindDialog.java \
 QListPanel.java \
+QListUnparse.java \
 QListWindow.java
 
 JAVAC = @JAVACX@

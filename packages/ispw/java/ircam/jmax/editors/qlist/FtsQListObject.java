@@ -30,6 +30,7 @@ import ircam.jmax.fts.*;
 import ircam.fts.client.*;
 
 import java.io.*;
+import ircam.jmax.ispw.*;
 
 /**
  * A concrete implementation of the SequenceDataModel,

@@ -32,6 +32,7 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.ispw.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.qlist.menus.*;

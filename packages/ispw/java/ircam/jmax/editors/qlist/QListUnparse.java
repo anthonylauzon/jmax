@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.editors.qlist;
 
 import java.util.*;
 import java.text.*;
@@ -31,28 +31,13 @@ import java.text.*;
 import ircam.jmax.*;
 import ircam.fts.client.*;
 
-public class FtsUnparse
+public class QListUnparse
 {
-  final static int lex_int_start = 0;
-  final static int lex_int_in_value = 1;
-  final static int lex_int_in_sign = 2;
-  final static int lex_int_end = 3;
-
   final static int lex_float_start = 0;
   final static int lex_float_in_value = 1;
   final static int lex_float_in_sign = 2;
   final static int lex_float_after_point = 3;
   final static int lex_float_end = 4;
-
-  final static int lex_qstring_start = 0;
-  final static int lex_qstring_in_value = 1;
-  final static int lex_qstring_qchar = 2;
-  final static int lex_qstring_end = 3;
-
-  final static int lex_string_start = 0;
-  final static int lex_string_in_value = 1;
-  final static int lex_string_qchar = 2;
-  final static int lex_string_end = 3;
 
   /* To unparse floating point numbers */
 
@@ -363,85 +348,87 @@ public class FtsUnparse
     return buff;
   }
 
-  /*  Unparse a description passed as a array of FtsAtom */
-  //static public String unparseArguments(int nArgs, FtsAtom args[])
-  static public String unparseArguments(FtsAtom args[], int offset, int nArgs)
+  /*  Unparse a description passed as a vector of values
+      Used by atom list, available as a service for anybody. */
+  public static String unparseDescription(MaxVector values)
   {
-    if (nArgs > 0)
+    boolean doNewLine = false;
+    boolean addBlank = false;
+    boolean noNewLine = false;
+    Object value1 = null;
+    Object value2 = null;
+
+    Enumeration en = values.elements();
+    StringBuffer descr = new StringBuffer();
+
+    if ( ! en.hasMoreElements())
+      return "";
+
+    value2 = en.nextElement();
+    value1 = value2;
+
+    while (value1 != null)
       {
-	boolean doNewLine = false;
-	boolean addBlank = false;
-	boolean noNewLine = false;
-	StringBuffer descr = new StringBuffer();
-	FtsAtom value1;
-	FtsAtom value2;
-	int i;
+	if (doNewLine)
+	  descr.append("\n");
+	else if (addBlank)
+	  descr.append(" ");
 
-	value2 = args[offset];
-	value1 = value2;
-	i = offset+1;
+	doNewLine = false;
 
-	while (value1 != null)
+	if (! en.hasMoreElements())
+	  value2 = null;
+	else
+	  value2 = en.nextElement();
+
+	if (value1 instanceof Float)
+	  descr.append(removeZeroAtEnd(formatter.format(value1)));
+	else if (value1 instanceof Integer)
+	  descr.append(value1);
+	else if (value1 instanceof String)
 	  {
-	    if (doNewLine)
-	      descr.append("\n");
-	    else if (addBlank)
-	      descr.append(" ");
+	    /* Lexical quoting check */
 
-	    doNewLine = false;
-
-	    if (i >= nArgs+offset)
-	      value2 = null;
-	    else
-	      value2 = args[i++];
-
-	    if(value1.isInt())
-	      descr.append(value1.intValue);
-	    else if(value1.isFloat())
-	      descr.append(removeZeroAtEnd(formatter.format(value1.floatValue)));
-	    else if(value1.isString())
-	      noNewLine = unparseString( value1.stringValue, descr);
-	    else if(value1.isSymbol())
-	      noNewLine = unparseString( value1.symbolValue.toString(), descr);
-	    else descr.append("??");
-
-	    /* decide to put or not a blank between the two */
-	    if (wantASpaceAfter(value1))
-	      addBlank = true;
-	    else if (dontWantASpaceAfter(value1))
-	      addBlank = false;
-	    else if (value2 != null)
+	    if (isAnInt((String) value1) || 
+		isAFloat((String) value1) ||
+		((! isAKeyword((String) value1)) &&
+		includeStartToken((String) value1)))
 	      {
-		if (wantASpaceBefore(value2))
-		  addBlank = true;
-		else if (dontWantASpaceBefore(value2))
-		  addBlank = false;
-		else
-		  addBlank = true;	// if no body care, do a blank
+		descr.append("\"");
+		descr.append(value1);
+		descr.append("\"");
 	      }
+	    else
+	      descr.append(value1);
 
-	    value1 = value2;
+	    if (value1.equals("'"))
+	      noNewLine = true;
+	    else
+	      noNewLine = false;
+	  }
+	else
+	  descr.append(value1);
+
+	/* decide to put or not a blank between the two */
+	if (wantASpaceAfter(value1))
+	  addBlank = true;
+	else if (dontWantASpaceAfter(value1))
+	  addBlank = false;
+	else if (value2 != null)
+	  {
+	    if (wantASpaceBefore(value2))
+	      addBlank = true;
+	    else if (dontWantASpaceBefore(value2))
+	      addBlank = false;
+	    else
+	      addBlank = true;	// if no body care, do a blank
 	  }
 
-	return descr.toString();
+	value1 = value2;
       }
-    else
-      return "";
-  }
 
-  static boolean unparseString(String s, StringBuffer descr)
-  {
-     if (isAnInt(s) || isAFloat(s) || (!isAKeyword(s) && includeStartToken(s)))
-       {
-	 descr.append("\"");
-	 descr.append(s);
-	 descr.append("\"");
-       }
-     else
-       descr.append(s);
-     
-     return s.equals("'");
-  }
+    return descr.toString();
+  }  
 }
 
 

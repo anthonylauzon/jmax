@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.ispw;
 
 /**
   This interface define a listener of the changes

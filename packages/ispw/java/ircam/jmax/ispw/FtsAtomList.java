@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.fts;
+package ircam.jmax.ispw;
 
 import java.io.*;
 import java.util.*;
@@ -92,23 +92,13 @@ public class FtsAtomList extends FtsObject
     return name;
   }
 
-  /** Get the content of the atom list as text. */
-
-  public String getValuesAsText()
-  {
-    return FtsUnparse.unparseDescription(values);
-  }
-
-
   /** Set the content of the atom list as text. */
   
   public void setValuesAsText(String value)
   {
-    /*values.removeAllElements();
-      FtsParse.parseAtoms(value, values);*/
     changed( value);
+    forceUpdate();
   }
-
 
   /** Update the content of the atom list from the server. */
 
@@ -132,8 +122,6 @@ public class FtsAtomList extends FtsObject
   public void changed( String value)
   {
     args.clear();
-    /*for(int i = 0; i < values.size(); i++)
-      args.add(values.elementAt(i));*/
     args.addRawString( value);
       
     try{
