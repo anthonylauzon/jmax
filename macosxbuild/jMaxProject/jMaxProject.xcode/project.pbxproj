@@ -11820,7 +11820,6 @@
 				5C74563506098F4800B69585,
 				5C74563606098F4800B69585,
 				5C74563706098F4800B69585,
-				5C74563806098F4800B69585,
 				5C74563906098F4800B69585,
 				5C74563A06098F4800B69585,
 				5C74563B06098F4800B69585,
@@ -11866,7 +11865,6 @@
 				5C74565C06098F6800B69585,
 				5C74565D06098F6800B69585,
 				5C74565E06098F6800B69585,
-				5C74565F06098F6800B69585,
 				5C74566006098F6800B69585,
 				5C74566106098F6800B69585,
 				5C74566206098F6800B69585,
@@ -12256,15 +12254,6 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
-		5C74563806098F4800B69585 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = sched.h;
-			path = ../../include/fts/sched.h;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
 		5C74563906098F4800B69585 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -12595,15 +12584,6 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = protocol.h;
 			path = ../../include/ftsprivate/protocol.h;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		5C74565F06098F6800B69585 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = sched.h;
-			path = ../../include/ftsprivate/sched.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
