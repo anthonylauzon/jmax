@@ -122,6 +122,19 @@ public class FtsConfig extends FtsObjectWithEditor
       }
   }
 
+  public void saveAsDefault()
+  {
+    try
+      {
+        send(FtsSymbol.get("save_as_default"));
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsConfig: I/O Error sending saveAsDefault Message!");
+	e.printStackTrace();
+      }
+  }
+
 //   public void load( String fileName)
 //   {
 //     args.clear();

@@ -143,7 +143,7 @@ public class DefaultActions
   public static EditorAction saveAsDefaultConfigurationAction    = new EditorAction(){
       public void doAction(EditorContainer container)
       {
-	System.err.println( "Not yet implemented");
+	  JMaxApplication.getConfig().saveAsDefault();
       }
     };
 }
