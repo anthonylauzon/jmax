@@ -82,19 +82,28 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     toolbar.addAncestorListener(new AncestorListener(){
 	public void ancestorAdded(AncestorEvent event)
 	{
-	  Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
-	  if(!(frame instanceof ConsoleWindow))
+	  Window window = SwingUtilities.getWindowAncestor( event.getAncestor());
+
+	  if(!(window instanceof ConsoleWindow))
 	    {
-	      if(frame.getState()==Frame.ICONIFIED)
-		frame.setState(Frame.NORMAL);
-	      MaxWindowManager.getWindowManager().addWindow(frame);
+	      if( window instanceof Frame)
+		{
+		  if(( (Frame)window).getState() == Frame.ICONIFIED)
+		    ((Frame)window).setState( Frame.NORMAL);
+		  MaxWindowManager.getWindowManager().addWindow( (Frame)window);
+		}
 	    }
 	}
 	public void ancestorRemoved(AncestorEvent event)
 	{
-	  Frame frame = (Frame)SwingUtilities.getWindowAncestor(event.getAncestor());
-	  if(!(frame instanceof ConsoleWindow))
-	    MaxWindowManager.getWindowManager().removeWindow(frame);
+	  Window window = (Window)SwingUtilities.getWindowAncestor( event.getAncestor());
+	  if(!(window instanceof ConsoleWindow))
+	    {
+	      if( window instanceof Frame)
+		{
+		  MaxWindowManager.getWindowManager().removeWindow( (Frame)window);
+		}
+	    }
 	}
 	public void ancestorMoved(AncestorEvent event){}
       });
