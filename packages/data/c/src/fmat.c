@@ -3130,7 +3130,7 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  
     if(max != 0.0)
     {
-      float scale = max;
+      float scale = 1.0 / max;
       
       for(i=0; i<size; i++)
         ptr[i] *= scale;
