@@ -75,11 +75,11 @@ class FtsDatagramStream extends FtsStream
       {
 	if ( host.equals( "local") || host.equals( InetAddress.getLocalHost().getHostName()))
 	  {
-	    command = ftsDir + File.separator + ftsName + " udp 127.0.0.1:" + socket.getLocalPort();
+	    command = ftsDir + File.separator + ftsName + " --udp --host=127.0.0.1 --port=" + socket.getLocalPort();
 	  }
 	else
 	  {
-	    command = "rsh " + host + " " + ftsDir + File.separator + ftsName + " udp " + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort();
+	    command = "rsh " + host + " " + ftsDir + File.separator + ftsName + " --udp --host=" + InetAddress.getLocalHost().getHostAddress() + " --port=" + socket.getLocalPort();
 	  }
 
 	command += " " + ftsOptions;

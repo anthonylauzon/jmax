@@ -45,7 +45,7 @@ if {[systemProperty "jmaxServerDir"] != ""} then {
 } else { 
     if [catch {set foo $jmaxServerDir}] then {
 	## set directory for jMax server executable
-	set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
+	set jmaxServerDir "$jmaxRootDir/bin"
     }
 }
 
