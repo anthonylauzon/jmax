@@ -44,6 +44,10 @@
 (require-package "table" "0.0.0")
 (require-package "qlist" "0.0.0")
 (require-package "explode" "0.0.0")
+(require-package "sequence" "0.0.0")
+(require-package "spat-pkg" "0.0.0")
+(require-package "circle" "0.0.0")
+
 
 ; I/O package
 (require-package "io" "0.0.0")

@@ -275,6 +275,8 @@ sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
   if(!sequence->tracks)
     {
       sequence->tracks = track;
+      sequence->n_tracks = 1;
+
       track->sequence = sequence;
     }
   else
@@ -286,6 +288,8 @@ sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
 
       track->next = 0;
       last->next = track;
+
+      sequence->n_tracks++;
     }
 
   return track;
@@ -294,25 +298,31 @@ sequence_add_track(sequence_t *sequence, fts_symbol_t name, fts_type_t type)
 void
 sequence_remove_track(sequence_t *sequence, int index)
 {
-  if(index == 0 && sequence->tracks)
+  if(sequence->tracks)
     {
-      sequence_track_t *track = sequence->tracks;
-
-      sequence->tracks = track->next;
-      sequence_track_delete(track);      
-    }
-  else
-    {
-      sequence_track_t *prev = sequence_get_track_by_index(sequence, index - 1);
-      
-      if(prev && prev->next)
+      if(index == 0)
 	{
-	  sequence_track_t *track = prev->next;
-
-	  prev->next = track->next;
-	  sequence_track_delete(track);
+	  sequence_track_t *track = sequence->tracks;
+	  
+	  sequence->tracks = track->next;
+	  sequence_track_delete(track);      
 	}
+      else
+	{
+	  sequence_track_t *prev = sequence_get_track_by_index(sequence, index - 1);
+	  
+	  if(prev && prev->next)
+	    {
+	      sequence_track_t *track = prev->next;
+	      
+	      prev->next = track->next;
+	      sequence_track_delete(track);
+	    }
+	}
+
+      sequence->n_tracks--;
     }
+
 }
 
 /*********************************************************
