@@ -84,15 +84,17 @@ VERSION = @VERSION@
 
 SUBDIRS = ircam
 
-packagedir = $(pkgdatadir)/packages/qlist/java
-JAR = qlist.jar
-package_DATA = $(JAR)
+packagedir = $(pkgdatadir)/packages/qlist/java/classes
 package_JAVA = Qlist.java
 
 JAVAC = @JAVACX@
 JAVACFLAGS = @JAVACFLAGSX@
 JAVAROOT = @top_srcdir@/packages/qlist/java
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):@top_srcdir@/java/src:@top_srcdir@/client/java/ftsclient.jar
+
+jardir = $(pkgdatadir)/packages/qlist/java
+JAR = qlist.jar
+jar_DATA = $(JAR)
 
 JAR_DEP = \
 classpackage.stamp \
@@ -105,7 +107,7 @@ CLEANFILES = ${JAR}
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
-DATA =  $(package_DATA)
+DATA =  $(jar_DATA)
 
 DIST_COMMON =  $(package_JAVA) Makefile.am Makefile.in
 
@@ -150,23 +152,23 @@ classpackage.stamp: $(package_JAVA)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
 	echo timestamp > classpackage.stamp
 
-install-packageDATA: $(package_DATA)
+install-jarDATA: $(jar_DATA)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(packagedir)
-	@list='$(package_DATA)'; for p in $$list; do \
+	$(mkinstalldirs) $(DESTDIR)$(jardir)
+	@list='$(jar_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(packagedir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(packagedir)/$$p; \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(jardir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(jardir)/$$p; \
 	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(packagedir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(packagedir)/$$p; \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(jardir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(jardir)/$$p; \
 	  fi; fi; \
 	done
 
-uninstall-packageDATA:
+uninstall-jarDATA:
 	@$(NORMAL_UNINSTALL)
-	list='$(package_DATA)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(packagedir)/$$p; \
+	list='$(jar_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(jardir)/$$p; \
 	done
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -299,13 +301,13 @@ installcheck: installcheck-recursive
 install-exec-am:
 install-exec: install-exec-recursive
 
-install-data-am: install-packageJAVA install-packageDATA
+install-data-am: install-packageJAVA install-jarDATA
 install-data: install-data-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-recursive
-uninstall-am: uninstall-packageJAVA uninstall-packageDATA
+uninstall-am: uninstall-packageJAVA uninstall-jarDATA
 uninstall: uninstall-recursive
 all-am: Makefile classpackage.stamp $(DATA)
 all-redirect: all-recursive
@@ -313,7 +315,7 @@ install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs: installdirs-recursive
 installdirs-am:
-	$(mkinstalldirs)  $(DESTDIR)$(packagedir) $(DESTDIR)$(packagedir)
+	$(mkinstalldirs)  $(DESTDIR)$(packagedir) $(DESTDIR)$(jardir)
 
 
 mostlyclean-generic:
@@ -350,7 +352,7 @@ maintainer-clean: maintainer-clean-recursive
 
 .PHONY: mostlyclean-packageJAVA distclean-packageJAVA clean-packageJAVA \
 maintainer-clean-packageJAVA uninstall-packageJAVA install-packageJAVA \
-uninstall-packageDATA install-packageDATA install-data-recursive \
+uninstall-jarDATA install-jarDATA install-data-recursive \
 uninstall-data-recursive install-exec-recursive \
 uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \

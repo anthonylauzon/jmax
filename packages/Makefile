@@ -20,7 +20,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /u/worksta/borghesi/projects/jmax-install
+prefix = /net/lichtung/u.lichtung/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin

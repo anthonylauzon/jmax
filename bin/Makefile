@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-prefix = /u/worksta/borghesi/projects/jmax-install
+prefix = /net/lichtung/u.lichtung/worksta/borghesi/projects/jmax-install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -82,7 +82,7 @@ ROOTDIR = ${prefix}/share/jmax
 STRIP = strip
 VERSION = 3.1.0_latest_cvs
 
-bin_SCRIPTS = jmax
+bin_SCRIPTS = jmax fts.wrapper
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES =  jmax

@@ -171,11 +171,16 @@ public class JMaxApplication extends FtsClient {
 	MaxWindowManager.getTopFrame().dispose();
       }
 
-    if ( singleInstance.server != null)
-      try{
-	singleInstance.server.shutdown();
-      }
-      catch(FtsClientException e){}
+    if(singleInstance.killFtsOnQuit)
+      if ( singleInstance.server != null)
+	try{
+	  singleInstance.server.shutdown();
+	}
+	catch(FtsClientException e){}
+	catch(IOException e)
+	  {
+	    System.err.println("JMaxApplication: IOEception quitting application "+e);
+	  }
     
     Runtime.getRuntime().exit(0);
   }
@@ -429,10 +434,15 @@ public class JMaxApplication extends FtsClient {
 	FtsProcess fts = null;
 
 	if (o != null && ((String)o).equals( "true"))
-	  System.out.println( "Attaching to FTS on host " + hostName);
+	  {
+	    System.out.println( "Attaching to FTS on host " + hostName);
+	    killFtsOnQuit = false;
+	  }	
 	else
-	  fts = new FtsProcess( argc, argv);
-		
+	  {
+	    fts = new FtsProcess( argc, argv);
+	    killFtsOnQuit = true;
+	  }
 	FtsServerConnection connection;
 		
 	if (connectionType.equals("pipe"))
@@ -551,4 +561,5 @@ public class JMaxApplication extends FtsClient {
   private ConsoleWindow consoleWindow;
   private MaxVector toOpen;
   private boolean noConsole;
+  private boolean killFtsOnQuit;
 }

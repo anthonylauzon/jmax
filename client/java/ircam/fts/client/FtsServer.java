@@ -95,8 +95,11 @@ public class FtsServer {
    * Send a "shutdown" message to remote FTS.
    * This message will halt the FTS scheduler and make FTS exit.
    */
-  public void shutdown() throws FtsClientException
+  public void shutdown() throws FtsClientException, IOException
   {
+    encoder.writeObject( client);
+    encoder.writeSymbol( FtsSymbol.get("shutdown"));    
+    encoder.flush();
   }
 
   public FtsObject getRoot()
