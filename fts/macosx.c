@@ -128,7 +128,7 @@ fts_get_system_configuration(void)
 /*                                                                             */
 /* *************************************************************************** */
 
-/* The MacOS-X implementation uses undocumented NEXTSTEP rld()...
+/* The MacOS-X implementation uses undocumented NEXTSTEP rld()... */
 
 /* 
 #define odbc_private_extern __private_extern__ 

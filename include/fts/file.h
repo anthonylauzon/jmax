@@ -82,4 +82,3 @@ FTS_API int fts_file_find_in_env( const char *root, fts_symbol_t path, const cha
 
 FTS_API char fts_file_separator;
 FTS_API char fts_path_separator;
-

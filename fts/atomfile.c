@@ -22,6 +22,7 @@
 
 #include <fts/fts.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include <ftsconfig.h>
 
@@ -50,6 +51,37 @@ struct fts_atom_file
 
   /* write part: nothing needed */
 };
+
+int 
+fts_atomfile_check( fts_symbol_t file_name)
+{
+  char full_path[1024];
+  int n, i;
+  char buff[256];
+  FILE* fd;
+  
+  if (fts_file_find(file_name, full_path, 256) == NULL)
+    return 0;
+  
+  if ( (fd = fopen( full_path, "rb")) == NULL)
+    return 0;
+  
+  if( (n = fread( buff, 1, 256, fd)) < 256)
+  {
+    fclose( fd);
+    return 0;
+  }
+  
+  for ( i = 0; i < n; i++)
+  {
+    if ( !isgraph(buff[i]) && !isspace(buff[i]))
+      return 0;
+  }
+  
+  fclose( fd);
+  
+  return 1;
+}
 
 fts_atom_file_t *
 fts_atom_file_open(const char *name, const char *mode)

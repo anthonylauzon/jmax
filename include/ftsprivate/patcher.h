@@ -61,4 +61,14 @@ extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 extern void fts_patcher_order_inoutlets_regarding_position(fts_patcher_t *this);
 extern fts_patcher_t *fts_patcher_get_by_file_name( fts_symbol_t file_name);
 
+#define fts_patcher_set_wx(p, n) ((p)->wx = (n))
+#define fts_patcher_set_wy(p, n) ((p)->wy = (n))
+#define fts_patcher_set_ww(p, n) ((p)->ww = (n))
+#define fts_patcher_set_wh(p, n) ((p)->wh = (n))
+
+#define fts_patcher_get_wx(p) ((p)->wx)
+#define fts_patcher_get_wy(p) ((p)->wy)
+#define fts_patcher_get_ww(p) ((p)->ww)
+#define fts_patcher_get_wh(p) ((p)->wh)
+
 #endif

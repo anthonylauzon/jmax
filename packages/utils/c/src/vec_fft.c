@@ -20,7 +20,6 @@
  * 
  */
 
-#include <fts/config.h>
 #include <fts/packages/utils/utils.h>
 #include "rfft_shuffle.h"
 #include "cfft.h"

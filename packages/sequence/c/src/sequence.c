@@ -145,7 +145,7 @@ void
 sequence_set_dirty(sequence_t *sequence)
 {
   if(sequence->persistence == 1)
-    fts_patcher_set_dirty( fts_object_get_patcher( (fts_object_t *)sequence), 1);
+    fts_object_set_dirty((fts_object_t *)sequence);
 }
 
 /******************************************************

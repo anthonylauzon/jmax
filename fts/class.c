@@ -93,57 +93,6 @@ fts_class_alias(fts_class_t *cl, fts_symbol_t alias)
   fts_package_add_class(fts_get_current_package(), cl, alias);
 }
 
-static fts_class_t *
-get_class( fts_symbol_t package_name, fts_symbol_t class_name)
-{
-  fts_package_t *pkg;
-
-  pkg = fts_package_get( package_name);
-  if (pkg == NULL)
-    return NULL;
-
-  return fts_package_get_class( pkg, class_name);
-}
-
-fts_class_t *
-fts_class_get_by_name(fts_symbol_t package_name, fts_symbol_t class_name)
-{
-  fts_package_t *pkg;
-  fts_class_t *cl;
-  fts_iterator_t iter;
-
-  if (package_name != NULL)
-    return get_class( package_name, class_name);
-
-  /* ask the kernel package before any other package. The kernel
-     classes should not be redefined anyway. If we search the kernel
-     package before the required packages, we avoid the loading of all
-     (required) packages to find the patcher class.  */
-  pkg = fts_get_system_package();
-
-  if ((cl = fts_package_get_class(pkg, class_name)) != NULL)
-    return cl;
-
-  /* ask the current package */
-  pkg = fts_get_current_package();
-  if ((cl = fts_package_get_class(pkg, class_name)) != NULL)
-    return cl;
-
-  /* ask the required packages of the current package */
-  fts_package_get_required_packages(pkg, &iter);
-
-  while ( fts_iterator_has_more( &iter)) 
-    {
-      fts_atom_t a;
-
-      fts_iterator_next( &iter, &a);
-      if ((cl = get_class( fts_get_symbol( &a), class_name)) != NULL)
-	return cl;
-  }
-
-  return NULL;
-}
-
 /********************************************
  *
  * inlet/outlet utils

@@ -97,7 +97,7 @@ comment_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	  fts_client_send_message( o, fts_s_color, 1, &a);
 	}
 
-      fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+      fts_object_set_dirty(o);
     }
 }
 

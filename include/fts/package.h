@@ -146,3 +146,4 @@ FTS_API void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* ite
  * @ingroup package */
 FTS_API fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
+FTS_API fts_class_t *fts_get_class_by_name(fts_symbol_t class_name);

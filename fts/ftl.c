@@ -484,7 +484,8 @@ typedef enum {
 static fts_status_t ftl_state_machine( fts_array_t *array, state_fun_t fun, void *user_data)
 {
   fts_atom_t *a = 0;
-  int i, size, state, newstate, argc;
+  int newstate = 0;
+  int i, size, state, argc;
   fts_status_t ret;
 
   state = ST_OPCODE;

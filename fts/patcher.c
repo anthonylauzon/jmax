@@ -33,6 +33,7 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/errobj.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/package.h>
@@ -1161,26 +1162,26 @@ patcher_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 patcher_set_wx( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  _fts_object_put_prop(o, fts_s_wx, at);
+  fts_object_put_prop(o, fts_s_wx, at);
 }
 
 static void
 patcher_set_wy( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  _fts_object_put_prop(o, fts_s_wy, at);
+  fts_object_put_prop(o, fts_s_wy, at);
 }
 
 static void
 patcher_set_ww( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  _fts_object_put_prop(o, fts_s_ww, at);
+  fts_object_put_prop(o, fts_s_ww, at);
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
 static void
 patcher_set_wh( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  _fts_object_put_prop(o, fts_s_wh, at);
+  fts_object_put_prop(o, fts_s_wh, at);
   fts_patcher_set_dirty((fts_patcher_t *)o, 1);
 }
 
@@ -1866,6 +1867,7 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   /* init object list */
   self->objects = NULL;
+  self->definitions = NULL;
 
   /* init flags */
   self->open = 0; /* start as closed */
@@ -1948,6 +1950,10 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* delete arguments */
   fts_object_release(self->args);
+  
+  /* clear definitions */
+  if(self->definitions != NULL)
+    fts_hashtable_destroy(self->definitions);
   
   /* delete the inlet and outlet tables */
   if (self->inlets)
@@ -2043,8 +2049,6 @@ fts_get_root_patcher(void)
 {
   return fts_root_patcher;
 }
-
-
 
 /***********************************************************************
 *

@@ -118,7 +118,7 @@ track_create_event_by_client_request(int ac, const fts_atom_t *at)
     event = (event_t *)fts_object_create(event_class, 1, at + 1);
   else
   {
-    fts_class_t *type = fts_class_get_by_name(NULL, class_name);
+    fts_class_t *type = fts_get_class_by_name(class_name);
 
     if(type)
     {
@@ -165,7 +165,7 @@ track_event_new(int ac, const fts_atom_t *at)
 
   class_name = fts_get_symbol(at);
   
-  type = fts_class_get_by_name(NULL, class_name);
+  type = fts_get_class_by_name(class_name);
   
   if(type)
     {
@@ -1264,11 +1264,11 @@ track_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 void
 track_set_dirty(track_t *track)
 {
-  if( track_get_sequence( track))
-    sequence_set_dirty( track_get_sequence( track));
+  if(track_get_sequence(track))
+    sequence_set_dirty(track_get_sequence(track));
   else
     if(track->persistence == 1)
-      fts_patcher_set_dirty(  fts_object_get_patcher( (fts_object_t *)track), 1);
+      fts_object_set_dirty((fts_object_t *)track);
 }
 
 static void
@@ -1483,7 +1483,7 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
         else if(class_name == fts_s_symbol)
           this->type = fts_symbol_class;
         else
-          this->type = fts_class_get_by_name(NULL, class_name);
+          this->type = fts_get_class_by_name(class_name);
 
         if(this->type == NULL)
           fts_object_error(o, "cannot create track of %s", class_name);

@@ -39,6 +39,7 @@
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/loader.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/package.h>

@@ -42,6 +42,7 @@
 #include <ftsprivate/connection.h>
 #include <ftsprivate/loader.h>
 #include <ftsprivate/patcher.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/selection.h>
 #include <ftsprivate/template.h>
@@ -1635,14 +1636,25 @@ static void
 fts_bmax_code_new_property(fts_bmax_file_t *f, fts_object_t *obj, fts_symbol_t prop)
 {
   fts_atom_t value;
-  
+
   fts_object_get_prop(obj, prop, &value);
 
   if(!fts_is_void(&value))
-    {
-      fts_bmax_code_set_atom(f, &value);
-      fts_bmax_code_put_prop(f, prop);
-    }
+  {
+    fts_bmax_code_set_atom(f, &value);
+    fts_bmax_code_put_prop(f, prop);
+  }
+}
+
+static void
+fts_bmax_code_new_property_int(fts_bmax_file_t *f, fts_object_t *obj, fts_symbol_t prop, int v)
+{
+  fts_atom_t value;
+
+  fts_set_int(&value, v);
+
+  fts_bmax_code_set_atom(f, &value);
+  fts_bmax_code_put_prop(f, prop);
 }
 
 /* Code a new object, and leave him in the top of the object stack */
@@ -1688,12 +1700,13 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_layer);
   
   if (fts_object_is_patcher(obj))
-    {
-      fts_bmax_code_new_property(f, obj, fts_s_wx);
-      fts_bmax_code_new_property(f, obj, fts_s_wy);
-      fts_bmax_code_new_property(f, obj, fts_s_wh);
-      fts_bmax_code_new_property(f, obj, fts_s_ww);
-    }
+  {
+    fts_patcher_t *patobj = (fts_patcher_t *)obj;
+    fts_bmax_code_new_property_int(f, obj, fts_s_wx, fts_patcher_get_wx(patobj));
+    fts_bmax_code_new_property_int(f, obj, fts_s_wy, fts_patcher_get_wy(patobj));
+    fts_bmax_code_new_property_int(f, obj, fts_s_ww, fts_patcher_get_ww(patobj));
+    fts_bmax_code_new_property_int(f, obj, fts_s_wh, fts_patcher_get_wh(patobj));
+  }
 
   /* if argc is zero, we pop the 0 value pushed above */
   if (fts_object_get_description_size(obj) == 0)
@@ -1711,6 +1724,7 @@ void fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 static void
 fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 {
+  fts_patcher_t *patobj = (fts_patcher_t *)obj;
   fts_atom_t a;
 
   /* Push the object arguments, make the object, and put it in the object table, then push the args 
@@ -1733,10 +1747,10 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
   fts_bmax_code_new_property(f, obj, fts_s_fontSize);
   fts_bmax_code_new_property(f, obj, fts_s_fontStyle);
 
-  fts_bmax_code_new_property(f, obj, fts_s_wx);
-  fts_bmax_code_new_property(f, obj, fts_s_wy);
-  fts_bmax_code_new_property(f, obj, fts_s_wh);
-  fts_bmax_code_new_property(f, obj, fts_s_ww);
+  fts_bmax_code_new_property_int(f, obj, fts_s_wx, fts_patcher_get_wx(patobj));
+  fts_bmax_code_new_property_int(f, obj, fts_s_wy, fts_patcher_get_wy(patobj));
+  fts_bmax_code_new_property_int(f, obj, fts_s_ww, fts_patcher_get_ww(patobj));
+  fts_bmax_code_new_property_int(f, obj, fts_s_wh, fts_patcher_get_wh(patobj));
 
   fts_bmax_code_new_property(f, obj, fts_s_layer);
 

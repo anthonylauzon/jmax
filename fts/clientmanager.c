@@ -34,6 +34,7 @@
 
 #include "ftsprivate/client.h"
 #include "ftsprivate/clientmanager.h"
+#include "ftsprivate/patcherobject.h"
 #include "ftsprivate/object.h"
 #include "ftsprivate/patcher.h"
 
@@ -93,6 +94,11 @@ typedef struct {
   fts_object_t base;
   socket_t socket;
 } client_manager_t;
+
+/* system byte stream implementations */
+extern fts_class_t *fts_socketstream_class;
+extern fts_class_t *fts_udpstream_class;
+extern fts_class_t *fts_pipestream_class;
 
 static fts_class_t *client_manager_class;
 

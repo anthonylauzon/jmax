@@ -293,37 +293,6 @@ fvec_write_atom_file(fvec_t *vec, fts_symbol_t file_name)
   return (i);
 }
 
-static int 
-fvec_file_is_text( fts_symbol_t file_name)
-{
-  char full_path[1024];
-  int n, i;
-  char buff[256];
-  FILE* fd;
-
-  if (fts_file_find(file_name, full_path, 256) == NULL)
-     return 0;
-
-  if ( (fd = fopen( full_path, "rb")) == NULL)
-    return 0;
-
-  if ( (n = fread( buff, 1, 256, fd)) < 256)
-    {
-      fclose( fd);
-      return 0;
-    }
-
-  for ( i = 0; i < n; i++)
-    {
-      if ( !isgraph(buff[i]) && !isspace(buff[i]))
-	return 0;
-    }
-
-  fclose( fd);
-
-  return 1;
-}
-
 static int
 fvec_load_audiofile(fvec_t *vec, fts_symbol_t file_name, int onset, int n_read)
 {
@@ -1556,10 +1525,10 @@ fvec_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       else
 	n_read = 0;
 
-      if (fvec_file_is_text( file_name))
-	size = fvec_read_atom_file(this, file_name);
+      if (fts_atomfile_check( file_name))
+        size = fvec_read_atom_file(this, file_name);
       else
-	size = fvec_load_audiofile(this, file_name, onset, n_read);
+        size = fvec_load_audiofile(this, file_name, onset, n_read);
     
       if( this->editor)
 	tabeditor_send( (tabeditor_t *)this->editor);
@@ -1910,10 +1879,10 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_symbol_t file_name = fts_get_symbol(at);
       int size = 0;
       
-      if (fvec_file_is_text( file_name))
-	size = fvec_read_atom_file(this, file_name);
+      if (fts_atomfile_check( file_name))
+        size = fvec_read_atom_file(this, file_name);
       else
-	size = fvec_load_audiofile(this, file_name, 0, 0);
+        size = fvec_load_audiofile(this, file_name, 0, 0);
 
       if(size == 0)
 	fts_object_error(o, "cannot load fvec from file \"%s\"", file_name);

@@ -72,6 +72,7 @@ typedef struct _seqmidi_read_data_
   int track_index;
   int size; /* number of event read */
   event_t *note_is_on[n_midi_channels][n_midi_notes]; /* table for reading notes */
+  int n_note_on[n_midi_channels][n_midi_notes]; /* counter for overlapping notes */
   event_t *last;
 } seqmidi_read_data_t;
 
@@ -132,11 +133,17 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
     
     if(velocity == 0 && data->note_is_on[channel - 1][pitch] != 0)
       {
-        event_t *event = data->note_is_on[channel - 1][pitch];
-        scoob_t *scoob = (scoob_t *)event_get_object(event);
-        
-        scoob_set_duration(scoob, time - event_get_time(event));
-        data->note_is_on[channel - 1][pitch] = 0;
+        if(data->n_note_on[channel - 1][pitch] == 1)
+        {
+          event_t *event = data->note_is_on[channel - 1][pitch];
+          scoob_t *scoob = (scoob_t *)event_get_object(event);
+          
+          scoob_set_duration(scoob, time - event_get_time(event));
+          data->note_is_on[channel - 1][pitch] = 0;
+          data->n_note_on[channel - 1][pitch] = 0;
+        }
+      else
+        data->n_note_on[channel - 1][pitch]--;
       }
     else if(velocity > 0)
       {
@@ -170,6 +177,7 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
         
         /* register note as on */
         data->note_is_on[channel - 1][pitch] = event;
+        data->n_note_on[channel - 1][pitch]++;
         data->last = event;
       }
   }
@@ -232,6 +240,7 @@ scoobtrack_read_track_end(fts_midifile_t *file)
             
             scoob_set_duration(scoob, time - event_get_time(event));
             data->note_is_on[i][j] = 0;
+            data->n_note_on[i][j] = 0;
           }
     }
 
@@ -329,7 +338,10 @@ track_import_from_midifile(track_t *track, fts_midifile_t *file)
       /* set oll notes to off */
       for(i=0; i<n_midi_channels; i++)
         for(j=0; j<n_midi_notes; j++)
+        {
           data.note_is_on[i][j] = 0;
+          data.n_note_on[i][j] = 0;
+        }
       
       read.track_end = scoobtrack_read_track_end;
       read.midi_event = scoobtrack_read_midievent;

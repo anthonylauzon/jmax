@@ -21,6 +21,7 @@
  */
 
 #include <fts/fts.h>
+#include <ftsprivate/outlet.h>
 #include <ftsprivate/fpe.h>
 
 static fts_objectset_t *fpe_objects = 0;

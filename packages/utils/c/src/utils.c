@@ -20,7 +20,6 @@
  *
  */
 
-#include <fts/config.h>
 #include <fts/packages/utils/utils.h>
 
 extern void fts_ffuns_init(void);

@@ -1,3 +1,31 @@
+2003-12-01  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* separated fts kernel files
+		fts/define.c from fts/variable.c
+		fts/outlet.c from fts/message.c (to be cleaned soon)
+		fts/midievent.c from fts/midi.c
+		fts/patcherobject.c from fts/object.c
+		fts/pipestream.c from fts/bytestream.c
+
+		include/fts/midievent.h from include/fts/midi.h
+		include/fts/patcherobject.h from include/fts/object.h
+		include/fts/socketstream.h from include/fts/bytestream.h
+
+		include/ftsprivate/outlet.h from include/ftsprivate/message.h
+		include/ftsprivate/patcherobject.h from include/ftsprivate/object.h
+	
+	* updated Xcode projet and fts/Makefile.am (not tested!)
+
+	* changed fts_object_t by moving the property list into the the patcher_data structure
+	
+	* changed fts_patcher_t (patcher.h) by introducing the fields wx, wy, ww and wh instead of properties
+	  (now properties are used only for the graphical properties of the objects: x, y, w, h, font properties, layer, etc.)
+	
+	* updated all concerned files included to the MacOS X projet (maybe some updates left for Linux or Windows specific files)
+	
+	* changed osc~, phi~ and wave~ classes for MacOS X for using DSP code based on fts_intphase_t instead of fts_wrapper_t (both in <fts/packages/utils/utils.h>)
+	  (only by including osc_intphase.c and wave_intphase.c instead of the _ieeewrap.c files to the Xcode projet)
+
 2003-11-14  Riccardo Borghesi  <borghesi@livorno.ircam.fr>
 
 	* macosxbuild/jMaxProject/jMaxProject.xcode: added a new xcode project for jMax compilation

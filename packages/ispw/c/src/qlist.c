@@ -204,7 +204,7 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, sym_atomlist_update, 0, 0);
 
-  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+  fts_object_set_dirty(o);
 }
 
 /* Method for message "set" [<arg>*] inlet 0 */
@@ -219,7 +219,7 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, sym_atomlist_update, 0, 0);
 
-  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+  fts_object_set_dirty(o);
 }
 
 /* Method for message "clear" inlet 0 */
@@ -234,7 +234,7 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   fts_send_message_varargs((fts_object_t *)this->atom_list, sym_atomlist_update, 0, 0);
 
-  fts_patcher_set_dirty(fts_object_get_patcher(o), 1);
+  fts_object_set_dirty(o);
 }
 
 /* Method for message "flush" inlet 0 */

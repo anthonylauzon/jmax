@@ -20,9 +20,11 @@
  * 
  */
 
+#ifndef _FTS_MESSAGE_H_
+#define _FTS_MESSAGE_H_
 
 /**
- * Messaging
+ * Messages
  *
  * @defgroup message message 
  */
@@ -181,43 +183,6 @@ FTS_API void fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const
  *
  */
 
-/* Return status values */
-FTS_API fts_status_description_t fts_ArgumentMissing;
-FTS_API fts_status_description_t fts_ArgumentTypeMismatch;
-
-/* The object stack; used for fpe handling, debug and who know what else in the future */
-#define DO_OBJECT_STACK
-
-#ifdef DO_OBJECT_STACK
-FTS_API int fts_objstack_top; /* Next free slot; can overflow, must be checked */
-FTS_API fts_object_t *fts_objstack[];
-
-#define FTS_OBJSTACK_SIZE  8*1024
-#define FTS_CALL_DEPTH     16*1024
-
-#define FTS_REACHED_MAX_CALL_DEPTH()     (fts_objstack_top >= FTS_CALL_DEPTH) 
-
-#define FTS_OBJSTACK_PUSH(obj)   { if (fts_objstack_top < FTS_OBJSTACK_SIZE)  \
-                                      fts_objstack[fts_objstack_top++] = (obj); \
-				   else \
-				      fts_objstack_top++; \
-				 }
-
-#define FTS_OBJSTACK_POP(obj)    (fts_objstack_top--)
-
-#define fts_get_current_object() (((fts_objstack_top > 0) && (fts_objstack_top <= FTS_OBJSTACK_SIZE)) ? \
-				  fts_objstack[fts_objstack_top - 1] : \
-				  (fts_object_t *)0)
-#else
-
-#define FTS_OBJSTACK_FULL()     (0) 
-#define FTS_OBJSTACK_PUSH(obj)
-#define FTS_OBJSTACK_POP(obj)
-#define fts_get_current_object() (0)
-
-#endif
-
-
 /* argument macros and functions */
 #define fts_get_symbol_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_symbol(&(AT)[N]) : (DEF))
 #define fts_get_string_arg(AC, AT, N, DEF) ((N) < (AC) ? fts_get_string(&(AT)[N]) : (DEF))
@@ -285,100 +250,6 @@ FTS_API int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_
 FTS_API int fts_send_message_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /**
- * Output bang (void) from outlet.
- *
- * @fn void fts_outlet_bang(fts_object_t *o, int woutlet)
- * @param o the object
- * @param woutlet outlet index
- */
-FTS_API void fts_outlet_bang(fts_object_t *o, int woutlet);
-
-/**
- * Output integer value from outlet.
- *
- * @fn void fts_outlet_int(fts_object_t *o, int woutlet, int n)
- * @param o the object
- * @param woutlet outlet index
- * @param n the value
- */
-FTS_API void fts_outlet_int(fts_object_t *o, int woutlet, int n);
-
-/**
- * Output (double) float value from outlet.
- *
- * @fn void fts_outlet_float(fts_object_t *o, int woutlet, double f)
- * @param o the object
- * @param woutlet outlet index
- * @param f the value
- */
-FTS_API void fts_outlet_float(fts_object_t *o, int woutlet, double f);
-
-/**
- * Output symbol from outlet.
- *
- * @fn void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s)
- * @param o the object
- * @param woutlet outlet index
- * @param s the symbol
- */
-FTS_API void fts_outlet_symbol(fts_object_t *o, int woutlet, fts_symbol_t s);
-
-/**
-* Output object value from outlet.
- *
- * @fn void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj)
- * @param o the object
- * @param woutlet outlet index
- * @param obj the object value
- */
-FTS_API void fts_outlet_object(fts_object_t *o, int woutlet, fts_object_t *obj);
-
-/**
- * Output any atom from outlet.
- *
- * @fn void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* at)
- * @param o the object
- * @param woutlet outlet index
- * @param at the atom
- */
-FTS_API void fts_outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t* at);
-
-/**
- * Output array of values from outlet.
- *
- * @fn void fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at)
- * @param o the object
- * @param woutlet outlet index
- * @param ac argument count
- * @param at argument values
- */
-FTS_API void fts_outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t* at);
-
-/**
- * Output message (with varargs) from outlet.
- *
- * @fn void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
- * @param o the object
- * @param woutlet outlet index
- * @param s the message symbol
- * @param ac argument count
- * @param at argument values
- */
-FTS_API void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-/**
- * Output message (with varargs) or any values from outlet.
- *
- * @fn void fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at)
- * @param o the object
- * @param woutlet outlet index
- * @param s the message symbol or NULL to output values
- * @param ac argument count
- * @param at argument values
- */
-FTS_API void fts_outlet_send(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-
-/**
  * Return a value from a method.
  * The returned value is an atom that is copied by the calling code.
  *
@@ -394,4 +265,4 @@ FTS_API void fts_return_object(fts_object_t *x);
 
 FTS_API fts_atom_t *fts_get_return_value( void);
 
-
+#endif

@@ -66,7 +66,6 @@ tuple_equals(const fts_atom_t *a, const fts_atom_t *b)
   {
     fts_atom_t *ap = fts_tuple_get_atoms(b_tup);
     fts_atom_t *bp = fts_tuple_get_atoms(a_tup);
-    int sum = 0;
     int i;
 
     for(i=0; i<a_n; i++)
@@ -84,20 +83,7 @@ tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
-  /* avoid creation of tuple as an object in a patcher */
-  if (0 != fts_object_is_in_patcher(o, fts_get_root_patcher()))
-  {
-      /* @@@@@ REMOVE THIS LOG AFTER MORE CHECKING @@@@@ 
-	 This log should be removed once this fix is validated...
-	 I have add it to check for some side effects
-      */	 
-      fts_log("[tuple] tuple is an internal class, it can't be used in a patch\n");
-      fts_object_error(o, "tuple is an internal class, it can't be used in a patch");
-  }
-  else
-  {
-      fts_array_init(&this->args, ac, at);
-  }
+  fts_array_init(&this->args, ac, at);
 }
 
 static void

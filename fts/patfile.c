@@ -29,6 +29,7 @@
 #include <fcntl.h>
 
 #include <fts/fts.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/loader.h>
@@ -1420,11 +1421,6 @@ static void fts_patparse_parse_window_properties(fts_object_t *parent, fts_patle
   /* If patcher window has big negative coordinates */
   if (x_left < -10000 || y_top < -10000)
     {
-      fts_atom_t a;
-
-      fts_set_int( &a, 1);
-      fts_object_put_prop( parent, fts_new_symbol( "no_upload"), &a);
-
       x_left = -x_left;
       y_top = -y_top;
 

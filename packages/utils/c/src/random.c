@@ -39,12 +39,13 @@
 
 /* just another one to remind: seed = 1664525 * seed + 1013904223; */
 
+#include <ftsconfig.h>
+
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #else
 #include <time.h>
 #endif
-#include <fts/config.h>
 #include <fts/packages/utils/utils.h>
 
 #define RA 16807 /* multiplier */

@@ -269,12 +269,13 @@ void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_atom_init);
   _K_DECNCALL( fts_kernel_post_init);
   _K_DECNCALL( fts_kernel_list_init);
-  _K_DECNCALL( fts_kernel_property_init);
   _K_DECNCALL( fts_kernel_package_init);
   _K_DECNCALL( fts_kernel_tuple_init);
   _K_DECNCALL( fts_kernel_connection_init);
   _K_DECNCALL( fts_kernel_variable_init);
+  _K_DECNCALL( fts_kernel_define_init);
   _K_DECNCALL( fts_kernel_bytestream_init); /* Must be before patcher_init */
+  _K_DECNCALL( fts_kernel_pipestream_init); /* Must be before patcher_init */
   _K_DECNCALL( fts_kernel_socketstream_init);
   _K_DECNCALL( fts_kernel_patcher_init);
   _K_DECNCALL( fts_kernel_parser_init);
@@ -300,6 +301,7 @@ void fts_kernel_init( void)
   _K_DECNCALL( fts_kernel_update_init);
   _K_DECNCALL( fts_kernel_clipboard_init);
   _K_DECNCALL( fts_kernel_label_init);
+  _K_DECNCALL( fts_kernel_midievent_init);
   _K_DECNCALL( fts_kernel_midi_init);
   _K_DECNCALL( fts_kernel_config_init);
   _K_DECNCALL( fts_kernel_objectset_init);
@@ -332,7 +334,7 @@ void fts_init( int argc, char **argv)
   if (fts_cmd_args_get(fts_new_symbol("no-client")) == NULL)
   {
     /* check whether we should use a piped connection thru the stdio file handles */
-    if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL ) 
+    if ( fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL )
       fts_client_manager_pipe_start();
     else
       fts_client_manager_tcp_start();

@@ -66,11 +66,6 @@ struct fts_class {
 
   int size;
   fts_heap_t *heap;
-
-  /* property list handling */
-  fts_plist_t *properties;		/* class' dynamic properties */
-
-  struct daemon_list *daemons;
 };
 
 #define fts_class_get_name(C) ((C)->name)
@@ -86,16 +81,6 @@ struct fts_class {
 #define fts_class_set_equals_function( cl, fun) ((cl)->equals_function = fun)
 
 #define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
-
-/**
- * Get a class by name.
- *
- * @fn void fts_class_get_by_name(fts_symbol_t package_name, fts_symbol_t class_name)
- * @param package_name name of the package (if NULL required packages of current project will be searched)
- * @param class_name name of rthe class
- * @return the class
- */
-FTS_API fts_class_t *fts_class_get_by_name(fts_symbol_t package_name, fts_symbol_t class_name);
 
 /**
  * Get a method of a class by its message symbol and argument type

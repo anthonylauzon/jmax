@@ -35,6 +35,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/bmaxfile.h>
 #include <ftsprivate/patcher.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 
 /* Implement autosave functions; autosave is implemented

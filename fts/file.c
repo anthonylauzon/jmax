@@ -313,10 +313,9 @@ fts_file_find( const char *filename, char *buf, int len)
   return NULL;
 }
 
-
 /** EMACS **
- * Local variables:
- * mode: c
- * c-basic-offset:2
- * End:
- */
+* Local variables:
+* mode: c
+* c-basic-offset:2
+* End:
+*/

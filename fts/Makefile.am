@@ -19,6 +19,7 @@ clientmanager.c \
 clipboard.c \
 config.c \
 connection.c \
+define.c \
 dsp.c \
 dspgraph.c \
 errobj.c \
@@ -36,14 +37,18 @@ loader.c \
 mem.c \
 message.c \
 midi.c \
+midievent.c \
 midifile.c \
 object.c \
 objectlist.c \
 objectset.c \
+outlet.c \
 package.c \
 param.c \
 patcher.c \
+patcherobject.c \
 patfile.c \
+pipestream.c \
 post.c \
 preset.c \
 project.c \

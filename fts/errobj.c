@@ -121,29 +121,35 @@ fts_class_t *
 fts_error_object_get_class(fts_error_object_t *obj)
 {
   fts_object_t *o = (fts_object_t *)obj;
-  fts_symbol_t package_name = NULL;
   fts_symbol_t class_name = NULL;
   fts_class_t *class = NULL;
+  fts_package_t *package = NULL;
   int argc = fts_object_get_description_size(o);
   fts_atom_t *argv = fts_object_get_description_atoms(o);
 
   if(argc > 1 && fts_is_symbol(argv) && fts_get_symbol(argv) == fts_s_colon && fts_is_symbol(argv + 1))
     class_name = fts_get_symbol(argv + 1);
   else if(argc > 2 && 
-	  fts_is_symbol(argv) &&
-	  fts_is_symbol(argv + 1) && 
-	  fts_is_symbol(argv + 2) && 
-	  fts_get_symbol(argv + 1) == fts_s_colon)
-    {
-      package_name = fts_get_symbol(argv);
-      class_name = fts_get_symbol(argv + 2);
-    }
+          fts_is_symbol(argv) &&
+          fts_is_symbol(argv + 1) && 
+          fts_is_symbol(argv + 2) && 
+          fts_get_symbol(argv + 1) == fts_s_colon)
+  {
+    fts_symbol_t package_name = fts_get_symbol(argv);
+    package = fts_package_get(package_name);
+    class_name = fts_get_symbol(argv + 2);
+  }
   else if(argc > 0 && fts_is_symbol(argv))
     class_name = fts_get_symbol(argv);
 
   if(class_name != NULL)
-    class = fts_class_get_by_name( package_name, class_name);
-
+  {
+    if(package != NULL)
+      class = fts_package_get_class(package, class_name);
+    else
+      class = fts_get_class_by_name(class_name);
+  }
+  
   if(class != NULL)
     return class;
   else

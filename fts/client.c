@@ -37,6 +37,7 @@
 
 #include <ftsprivate/sched.h>
 #include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
@@ -659,8 +660,7 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
     name = fts_get_symbol(&at[1]);
 
     fts_object_put_prop(obj, name, &at[2]);
-
-    fts_patcher_set_dirty(fts_object_get_patcher(obj), 1);
+    fts_object_set_dirty(obj);
   }
   else
     fts_log("[client]: System Error set_object_property: bad args\n");

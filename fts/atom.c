@@ -27,7 +27,6 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
-#include <ftsprivate/connection.h>
 #include <ftsprivate/message.h>
 
 static fts_atom_t __fts_null;
@@ -100,37 +99,37 @@ fts_atom_equals( const fts_atom_t *p1, const fts_atom_t *p2)
  *
  */
 
-static fts_class_t void_class = { 
+static fts_class_t void_class = 
+{
+  /* class object header */
   {
-    0,
-    {0,0,0},
-    0,
-    0,
-    0,
-    0,
+    0, /* class */
+    {0,0,0}, /* flags */
+    0, /* reference counter */
+    0, /* message cache */
     0,
     0,
     0,
-    0
+    0, /* name definition */
+    0 /* patcher data */
   },
-  0,
-  FTS_TYPEID_VOID,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
+  /* class structure */
+  0, /*  */
+  FTS_TYPEID_VOID, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0, /*  */
+  0 /*  */
 };
 
 fts_class_t *fts_void_class = &void_class;
@@ -138,8 +137,7 @@ fts_class_t *fts_void_class = &void_class;
 static fts_class_t int_class = { 
   {
     0,
-    {0,0,0},
-    0,
+  {0,0,0},
     0,
     0,
     0,
@@ -163,8 +161,6 @@ static fts_class_t int_class = {
   0,
   0,
   0,
-  0,
-  0,
   0
 };
 fts_class_t *fts_int_class = &int_class;
@@ -172,8 +168,7 @@ fts_class_t *fts_int_class = &int_class;
 static fts_class_t float_class = { 
   {
     0,
-    {0,0,0},
-    0,
+  {0,0,0},
     0,
     0,
     0,
@@ -197,8 +192,6 @@ static fts_class_t float_class = {
   0,
   0,
   0,
-  0,
-  0,
   0
 };
 fts_class_t *fts_float_class = &float_class;
@@ -206,8 +199,7 @@ fts_class_t *fts_float_class = &float_class;
 static fts_class_t symbol_class = { 
   {
     0,
-    {0,0,0},
-    0,
+  {0,0,0},
     0,
     0,
     0,
@@ -231,8 +223,6 @@ static fts_class_t symbol_class = {
   0,
   0,
   0,
-  0,
-  0,
   0
 };
 fts_class_t *fts_symbol_class = &symbol_class;
@@ -240,8 +230,7 @@ fts_class_t *fts_symbol_class = &symbol_class;
 static fts_class_t pointer_class = { 
   {
     0,
-    {0,0,0},
-    0,
+  {0,0,0},
     0,
     0,
     0,
@@ -265,8 +254,6 @@ static fts_class_t pointer_class = {
   0,
   0,
   0,
-  0,
-  0,
   0
 };
 fts_class_t *fts_pointer_class = &pointer_class;
@@ -274,8 +261,7 @@ fts_class_t *fts_pointer_class = &pointer_class;
 static fts_class_t string_class = { 
   {
     0,
-    {0,0,0},
-    0,
+  {0,0,0},
     0,
     0,
     0,
@@ -286,8 +272,6 @@ static fts_class_t string_class = {
   },
   0,
   FTS_TYPEID_STRING,
-  0,
-  0,
   0,
   0,
   0,

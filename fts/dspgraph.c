@@ -29,6 +29,7 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/sigconn.h>

@@ -24,6 +24,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>

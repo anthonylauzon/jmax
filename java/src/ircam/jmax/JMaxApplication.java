@@ -638,9 +638,11 @@ public class JMaxApplication {
 	String connectionType = ((String)properties.get("jmaxConnection"));
 	String hostName = (String)properties.get("jmaxHost");
 
+        if(hostName == null)
+          hostName = "localhost";
+        
 	System.out.println( "jMax starting server on "
-			    + ((hostName == null) ? "localhost" : hostName)
-			    + " via "+ connectionType + " connection"); 
+			    + hostName + " via "+ connectionType + " connection"); 
 	
 	String ftsDir = (String)properties.get( "jmaxServerDir");
 	String ftsName = (String)properties.get( "jmaxServerName");
@@ -667,8 +669,8 @@ public class JMaxApplication {
 
 	FtsProcess fts = null;
 
-        /* if(true) @tt@ch */
-        if (o != null && ((String)o).equals( "true"))
+        if(true)
+        /*if (o != null && ((String)o).equals( "true"))*/
 	  {
 	    System.out.println( "Attaching to FTS on host " + hostName);
 	    killFtsOnQuit = true;
@@ -683,7 +685,8 @@ public class JMaxApplication {
 	  }
 	FtsServerConnection connection;
 		
-	if (connectionType.equals("pipe"))
+        if(false)
+	/*if (connectionType.equals("pipe"))*/
 	  {
 	    if (fts == null)
 	      {

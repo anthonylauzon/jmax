@@ -83,6 +83,7 @@ extern "C" {
 #include <fts/objectlist.h>
 #include <fts/variable.h>
 #include <fts/atom.h>
+#include <fts/patcherobject.h>
 #include <fts/object.h>
 #include <fts/class.h>
 #include <fts/connection.h>
@@ -91,6 +92,7 @@ extern "C" {
 #include <fts/array.h>
 #include <fts/tuple.h>
 #include <fts/message.h>
+#include <fts/outlet.h>
 #include <fts/patcher.h>
 #include <fts/errobj.h>
 #include <fts/label.h>
@@ -104,9 +106,11 @@ extern "C" {
 #include <fts/fpe.h>
 #include <fts/file.h>
 #include <fts/atomfile.h>
+#include <fts/midievent.h>
 #include <fts/midi.h>
 #include <fts/midifile.h>
 #include <fts/bytestream.h>
+#include <fts/socketstream.h>
 #include <fts/post.h>
 #include <fts/sched.h>
 #include <fts/audio.h>

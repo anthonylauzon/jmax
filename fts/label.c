@@ -23,6 +23,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/label.h>
+#include <ftsprivate/patcherobject.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/variable.h>
 

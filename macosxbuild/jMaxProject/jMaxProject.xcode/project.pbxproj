@@ -241,6 +241,121 @@
 //3B2
 //3B3
 //3B4
+//5C0
+//5C1
+//5C2
+//5C3
+//5C4
+		5C65D33D057B413D00198EB4 = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = osc_intphase.c;
+			path = ../../packages/signal/c/src/osc_intphase.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C65D33E057B413D00198EB4 = {
+			fileRef = 5C65D33D057B413D00198EB4;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		5C65D352057B459400198EB4 = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = wave_intphase.c;
+			path = ../../packages/signal/c/src/wave_intphase.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5C65D353057B459400198EB4 = {
+			fileRef = 5C65D352057B459400198EB4;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		5C779685056D008B00F72388 = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = patcherobject.c;
+			path = ../../fts/patcherobject.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CC83F4C056D14FA00EEF904 = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = midievent.c;
+			path = ../../fts/midievent.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CC83F4D056D14FA00EEF904 = {
+			fileRef = 5CC83F4C056D14FA00EEF904;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		5CC84007056D2DD600EEF904 = {
+			fileRef = 5C779685056D008B00F72388;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		5CE316CA056ED1CD00DBD41F = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = outlet.c;
+			path = ../../fts/outlet.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CE316CB056ED1CD00DBD41F = {
+			fileRef = 5CE316CA056ED1CD00DBD41F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		5CE31817056EE94600DBD41F = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = pipestream.c;
+			path = ../../fts/pipestream.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CE31818056EE94600DBD41F = {
+			fileRef = 5CE31817056EE94600DBD41F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		5CE31838056EEA8D00DBD41F = {
+			expectedFileType = sourcecode.c.c;
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = define.c;
+			path = ../../fts/define.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		5CE31839056EEA8D00DBD41F = {
+			fileRef = 5CE31838056EEA8D00DBD41F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//5C0
+//5C1
+//5C2
+//5C3
+//5C4
 //F50
 //F51
 //F52
@@ -737,6 +852,11 @@
 				F567FA7703FC1B4B016640F1,
 				F7E5D349043B319501664058,
 				F783BA96043D971401664058,
+				5CC83F4D056D14FA00EEF904,
+				5CC84007056D2DD600EEF904,
+				5CE316CB056ED1CD00DBD41F,
+				5CE31818056EE94600DBD41F,
+				5CE31839056EEA8D00DBD41F,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1863,6 +1983,8 @@
 			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				OPTIMIZATION_CFLAGS = "-g";
 				OTHER_CFLAGS = "";
 			};
@@ -3627,7 +3749,7 @@
 				F8EE4B5B031CE6C301664092,
 				F844693D028BCB2301664092,
 				F8446940028BCB2301664092,
-				F844693E028BCB2301664092,
+				5C65D33D057B413D00198EB4,
 				F820646902AE1EDE01664092,
 				F8446943028BCB2301664092,
 				F8446944028BCB2301664092,
@@ -3642,7 +3764,7 @@
 				F844694B028BCB2301664092,
 				F8EE4B62031CE6C301664092,
 				F844694E028BCB2301664092,
-				F844694C028BCB2301664092,
+				5C65D352057B459400198EB4,
 				F8446950028BCB2301664092,
 				F8EE4B64031CE6C301664092,
 			);
@@ -3776,7 +3898,6 @@
 				F8446958028BCB2401664092,
 				F8446959028BCB2401664092,
 				F844695A028BCB2401664092,
-				F844695B028BCB2401664092,
 				F844695D028BCB2401664092,
 				F844695F028BCB2401664092,
 				F8446960028BCB2401664092,
@@ -3785,7 +3906,6 @@
 				F8446963028BCB2401664092,
 				F8446964028BCB2401664092,
 				F8446965028BCB2401664092,
-				F8446966028BCB2401664092,
 				F8446968028BCB2401664092,
 				F8446969028BCB2401664092,
 				F820646A02AE1EDE01664092,
@@ -3802,6 +3922,8 @@
 				F8EE4B74031CE6C301664092,
 				F5632C2B0349A14001664092,
 				F87A3038040F011001E6D181,
+				5C65D33E057B413D00198EB4,
+				5C65D353057B459400198EB4,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3862,15 +3984,6 @@
 			isa = PBXFileReference;
 			name = matrix.c;
 			path = ../../packages/signal/c/src/matrix.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F844693E028BCB2301664092 = {
-			expectedFileType = sourcecode.c.c;
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			name = osc_ieeewrap.c;
-			path = ../../packages/signal/c/src/osc_ieeewrap.c;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3946,15 +4059,6 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
-		F844694C028BCB2301664092 = {
-			expectedFileType = sourcecode.c.c;
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			name = wave_ieeewrap.c;
-			path = ../../packages/signal/c/src/wave_ieeewrap.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
 		F844694E028BCB2301664092 = {
 			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
@@ -4003,12 +4107,6 @@
 			settings = {
 			};
 		};
-		F844695B028BCB2401664092 = {
-			fileRef = F844693E028BCB2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F844695D028BCB2401664092 = {
 			fileRef = F8446940028BCB2301664092;
 			isa = PBXBuildFile;
@@ -4053,12 +4151,6 @@
 		};
 		F8446965028BCB2401664092 = {
 			fileRef = F844694B028BCB2301664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F8446966028BCB2401664092 = {
-			fileRef = F844694C028BCB2301664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -14993,10 +15085,9 @@
 				F88000900283072101664092,
 			);
 			buildSettings = {
-				DEBUGGING_SYMBOLS = NO;
 				FRAMEWORK_SEARCH_PATHS = build;
 				HEADER_SEARCH_PATHS = "../../packages/utils/c/include ../../include";
-				OPTIMIZATION_CFLAGS = "-O3";
+				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -15251,6 +15342,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				ZERO_LINK = NO;
 			};
 			isa = PBXBuildStyle;
@@ -15617,6 +15709,7 @@
 				F880FD500282FA3901664092,
 				F52946EA039E799A01664092,
 				F880FD510282FA3901664092,
+				5CE31838056EEA8D00DBD41F,
 				F880FD530282FA3901664092,
 				F880FD540282FA3901664092,
 				F880FD550282FA3901664092,
@@ -15635,16 +15728,20 @@
 				F880FD630282FA3901664092,
 				F880FD640282FA3901664092,
 				F880FD650282FA3901664092,
+				5CC83F4C056D14FA00EEF904,
 				F880FD660282FA3901664092,
 				F880FD670282FA3901664092,
 				F880FD680282FA3901664092,
 				F880FD690282FA3901664092,
+				5CE316CA056ED1CD00DBD41F,
 				F880FD6A0282FA3901664092,
 				F82C2A0902E5DB1001664092,
 				F880FD6B0282FA3901664092,
 				F5EF54340352D8FC01664092,
 				F88000960283082801664092,
 				F880FD6F0282FA3901664092,
+				5C779685056D008B00F72388,
+				5CE31817056EE94600DBD41F,
 				F880FD710282FA3901664092,
 				F5BE0CA1035DAA3201664092,
 				F880FD720282FA3901664092,

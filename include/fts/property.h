@@ -90,13 +90,3 @@ typedef enum fts_daemon_action {
 
 typedef void (* fts_property_daemon_t)(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 
-FTS_API void fts_class_add_daemon(fts_class_t *cl,
-				 fts_daemon_action_t  action,
-				 fts_symbol_t        property,
-				 fts_property_daemon_t daemon);
-
-FTS_API void fts_class_remove_daemon(fts_class_t *cl, 
-				    fts_daemon_action_t  action, 
-				    fts_symbol_t        property,
-				    fts_property_daemon_t daemon);
-
