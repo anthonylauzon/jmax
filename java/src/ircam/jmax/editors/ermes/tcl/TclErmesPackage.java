@@ -46,7 +46,7 @@ public class TclErmesPackage
     /* graphics */
     interp.createCommand("graphicson", new ErmesGraphicsOnCmd());
     interp.createCommand("graphicsoff", new ErmesGraphicsOffCmd());
-    interp.createCommand("show", new ErmesShowCmd());
+    //no more used interp.createCommand("show", new ErmesShowCmd());
 
     /* obsolete */
     interp.createCommand("new",	new ErmesPatNewCmd());
