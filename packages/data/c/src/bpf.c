@@ -416,17 +416,16 @@ bpf_get_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   bpf_t *this = (bpf_t *)o;
   int size = bpf_get_size(this);
   fts_array_t *array = fts_get_array(at);
-  int onset = fts_array_get_size(array);
   fts_atom_t *atoms;
   int i;
   
-  fts_array_set_size(array, onset + size * 2); 
-  atoms = fts_array_get_atoms(array) + onset;
+  fts_array_set_size(array, size * 2);
+  atoms = fts_array_get_atoms(array);
 
   for(i=0; i<size; i++)
     {
-      fts_set_float(atoms + 2 * i - 1, bpf_get_time(this, i));
-      fts_set_float(atoms + 2 * i, bpf_get_value(this, i));
+      fts_set_float(atoms + 2 * i, bpf_get_time(this, i));
+      fts_set_float(atoms + 2 * i + 1, bpf_get_value(this, i));
     }
 }
 

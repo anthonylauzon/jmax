@@ -223,13 +223,6 @@ count_int_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-count_int_stepement(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  count_int_t *this = (count_int_t *)o;
-
-}
-
-static void
 count_int_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   count_int_t *this = (count_int_t *)o;
@@ -277,7 +270,6 @@ count_float_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   double target = (reverse > 0)? end: begin;
   double sign = (begin < end)? reverse: -reverse;
   double step = sign * this->step;
-  int i;
   
   if((value - target) * sign >= 0)
     {
@@ -465,6 +457,9 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 { 
   count_int_t *this = (count_int_t *)o;
 
+  ac--;
+  at++;
+  
   this->mode = mode_clip;
   this->value = 0;
   this->begin = 0;
@@ -472,7 +467,7 @@ count_int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   this->step = 1;
   this->reverse = 1;
 
-  count_int_set_parameters(o, 0, 0, ac - 1, at + 1);
+  count_int_set_parameters(o, 0, 0, ac, at);
   count_int_reset(o, 0, 0, 0, 0);
 }
 
@@ -480,6 +475,9 @@ static void
 count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   count_float_t *this = (count_float_t *)o;
+
+  ac--;
+  at++;
   
   this->mode = mode_clip;
   this->value = 0.0;
@@ -488,7 +486,7 @@ count_float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->step = 0.01;
   this->reverse = 1;
 
-  count_float_set_parameters(o, 0, 0, ac - 1, at + 1);
+  count_float_set_parameters(o, 0, 0, ac, at);
   count_float_reset(o, 0, 0, 0, 0);
 }
 
