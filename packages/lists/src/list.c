@@ -92,26 +92,6 @@ list_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   list_bang(o, 0, 0, 0, 0);
 }
 
-static void
-list_data_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  list_t *this = (list_t *)o;
-  fts_data_t *data = fts_get_data(at);
-  long size = fts_data_get_size(data);
-
-  list_resize_buffer(this, size);
-  fts_data_get_atoms(data, size, this->list);
-}
-
-static void
-list_data(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  list_t *this = (list_t *)o;
-
-  list_data_store(o, 0, 0, ac, at);
-  list_bang(o, 0, 0, 0, 0);
-}
-
 /************************************************
  *
  *    class
@@ -139,9 +119,6 @@ list_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, 0, fts_s_list, list_list);
   fts_method_define_varargs(cl, 1, fts_s_list, list_list_store);
-
-  fts_method_define_data(cl, 0, list_data);
-  fts_method_define_data(cl, 1, list_data_store);
 
   /* type the outlet */
   fts_outlet_type_define_varargs(cl, 0,	fts_s_list);
