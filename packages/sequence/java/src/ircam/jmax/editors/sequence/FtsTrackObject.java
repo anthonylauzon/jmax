@@ -26,6 +26,7 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.track.*;
+import ircam.jmax.editors.sequence.track.LockListener;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
@@ -56,8 +57,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	
 	listeners = new MaxVector();
 	hhListeners = new MaxVector();
+	lockListeners = new MaxVector();
 
-	this.name = name;
+	this.trackName = name;
 	
 	/* prepare the flavors for the clipboard */
 	if (flavors == null)
@@ -155,25 +157,37 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     setDirty();
   }
-    
+
+  public void moveEvent(int nArgs , FtsAtom args[])
+  {
+      TrackEvent evt = (TrackEvent)(args[0].getObject());
+      double time = (double)(args[1].getFloat());
+
+      evt.moveTo(time);
+  }  
+
+  public void lock(int nArgs , FtsAtom args[])
+  {
+      notifyLock(true);
+  }
+
+  public void unlock(int nArgs , FtsAtom args[])
+  {
+      notifyLock(false);
+  }
+
   public void highlightEvents(int nArgs , FtsAtom args[])
   {
     int selIndex;
     TrackEvent event = null;
     MaxVector events = new MaxVector();
 
-    //SequenceSelection.getCurrent().deselectAll();
-    /*if(nArgs == 1) SequenceSelection.getCurrent().select(args[0].getObject());
-      else
-      {*/
     for(int i=0; i<nArgs; i++)
-	{
-	    event = (TrackEvent)(args[i].getObject());
-	    //selIndex = indexOf(event);
-	    events.addElement(event);
-	}
-    //SequenceSelection.getCurrent().select(events.elements());
-    //}
+    {
+	event = (TrackEvent)(args[i].getObject());
+	events.addElement(event);
+    }
+    
     double time = ((TrackEvent)args[0].getObject()).getTime();
     notifyHighlighting(events, time);
   }
@@ -197,8 +211,6 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendArgs[0].setFloat(time); 
     sendArgs[1].setString(type);
       
-    /*for(int i=0; i<nArgs; i++)
-      sendArgs[2+i].setValue(args[i]);*/
     for(int i=0; i<nArgs; i++)
       {
 	if(args[i] instanceof Double)
@@ -210,6 +222,13 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     sendMessage(FtsObject.systemInlet, "make_event", 2+nArgs, sendArgs);
   }
     
+    public void requestEventMove(TrackEvent evt, double newTime)
+    {
+	sendArgs[0].setObject(evt); 
+	sendArgs[1].setDouble(newTime);
+	sendMessage(FtsObject.systemInlet, "move_event", 2, sendArgs);
+    }
+
     public void export()
     {
 	sendMessage(FtsObject.systemInlet, "export_midi_dialog", 0, null);
@@ -505,7 +524,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     public void removeEvent(TrackEvent event)
     {
 	sendArgs[0].setObject(event);
-	sendMessage(FtsObject.systemInlet, "remove_event", 1, sendArgs);
+	sendMessage(FtsObject.systemInlet, "remove_events", 1, sendArgs);
     }
     public void removeEvents(Enumeration events)
     {
@@ -513,7 +532,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       for (Enumeration e = events; e.hasMoreElements();) 
 	    sendArgs[i++].setObject((TrackEvent) e.nextElement());
       
-      sendMessage(FtsObject.systemInlet, "remove_event", i, sendArgs);
+      sendMessage(FtsObject.systemInlet, "remove_events", i, sendArgs);
     }
 
     public void removeAllEvents()
@@ -576,6 +595,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	for (Enumeration e = hhListeners.elements(); e.hasMoreElements();) 
 	    ((HighlightListener) e.nextElement()).highlight(hhobj.elements(), time);
     }
+    private void notifyLock(boolean lock)
+    {
+	for (Enumeration e = lockListeners.elements(); e.hasMoreElements();) 
+	    ((LockListener) e.nextElement()).lock(lock);
+    }
     /**
      * requires to be notified when the database changes
      */
@@ -589,6 +613,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     public void addHighlightListener(HighlightListener listener)
     {
 	hhListeners.addElement(listener);
+    }
+
+    public void addLockListener(LockListener listener)
+    {
+	lockListeners.addElement(listener);
     }
     
     /**
@@ -604,6 +633,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     public void removeHighlightListener(HighlightListener theListener)
     {
 	hhListeners.removeElement(theListener);
+    }
+
+    public void removeLockListener(LockListener theListener)
+    {
+	lockListeners.removeElement(theListener);
     }
 
     // ClipableData functionalities
@@ -989,7 +1023,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
     public String getName()
     {
-	return name;
+	return trackName;
     }
 
     public int getNumProperty()
@@ -1059,9 +1093,10 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     TrackEvent events[] = new TrackEvent[256];
     private MaxVector listeners;
     private MaxVector hhListeners;
+    private MaxVector lockListeners;
     private MaxVector tempVector = new MaxVector();
     MaxVector infos = new MaxVector();
-    private String name;
+    private String trackName;
     public DataFlavor flavors[];
     public static DataFlavor sequenceFlavor = new DataFlavor(ircam.jmax.editors.sequence.SequenceSelection.class, "SequenceSelection");
 

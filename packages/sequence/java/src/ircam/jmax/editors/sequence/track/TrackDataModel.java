@@ -28,6 +28,7 @@ package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+
 import ircam.jmax.editors.sequence.*;
 import java.util.Enumeration;
 
@@ -180,6 +181,9 @@ public interface TrackDataModel {
 
     public abstract void addHighlightListener(HighlightListener listener);
     public abstract void removeHighlightListener(HighlightListener listener);
+
+    public abstract void addLockListener(LockListener listener);
+    public abstract void removeLockListener(LockListener listener);
     /**
      * Move all the events of the given model in this model, and
      * remove them from the original one. After this operation, the old

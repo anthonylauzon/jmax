@@ -65,10 +65,13 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-      if(selected)
-	  render(obj, g, Event.SELECTED, theGc); 
+      if(((Event)obj).isHighlighted())
+	  render(obj, g, Event.HIGHLIGHTED, theGc); 
       else
-	  render(obj, g, Event.DESELECTED, theGc); 
+	  if(selected)
+	      render(obj, g, Event.SELECTED, theGc); 
+	  else
+	      render(obj, g, Event.DESELECTED, theGc); 
   }
   
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 

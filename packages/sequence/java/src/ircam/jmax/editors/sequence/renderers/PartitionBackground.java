@@ -58,6 +58,13 @@ public class PartitionBackground implements Layer, ImageObserver{
 			toRepaintBack = true;
 			gc.getGraphicDestination().repaint();
 		    }
+		else
+		    if(e.getPropertyName().equals("locked"))
+			{
+			    locked = ((Boolean)e.getNewValue()).booleanValue();
+			    toRepaintBack = true;
+			    gc.getGraphicDestination().repaint();
+			}
 	    }
     });
   }
@@ -72,7 +79,11 @@ public class PartitionBackground implements Layer, ImageObserver{
 
     Dimension d = gc.getGraphicDestination().getSize();
 
-    g.setColor(Color.white);
+    if(!locked)
+	g.setColor(Color.white);
+    else
+	g.setColor(ScoreBackground.OUT_RANGE_COLOR);
+
     g.fillRect(0, 0, d.width, d.height);
 
     g.setColor(ScoreBackground.OUT_RANGE_COLOR);
@@ -267,6 +278,7 @@ public class PartitionBackground implements Layer, ImageObserver{
   SequenceGraphicContext gc;
   Image itsImage;
   boolean toRepaintBack = false;
+  boolean locked = false;
   public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
   public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
   public static final int KEYX = 27;

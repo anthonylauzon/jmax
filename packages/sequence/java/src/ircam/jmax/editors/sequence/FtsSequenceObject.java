@@ -52,11 +52,11 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
    */
     public FtsSequenceObject(Fts fts, FtsObject parent, String variableName, String classname)
     {
-      super(fts, parent, variableName, "sequence", "sequence");
+	super(fts, parent, variableName, "sequence", "sequence");
 	
-      listeners = new MaxVector();
-      initValueInfoTable();
-      SequenceImages.init();
+	listeners = new MaxVector();
+	initValueInfoTable();
+	SequenceImages.init();
     }
 
     private final void initValueInfoTable()
@@ -65,9 +65,6 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	ValueInfoTable.registerInfo(IntegerValue.info);
 	ValueInfoTable.registerInfo(MessageValue.info);
 	ValueInfoTable.registerInfo(FloatValue.info);
-	//ValueInfoTable.registerInfo(LogicValue.info);
-	//ValueInfoTable.registerInfo(CueValue.info);
-	//ValueInfoTable.registerInfo(FricativeValue.info);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +141,20 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 	  }    
       setDirty();
   }
- 
+
+    public void moveTrack(int nArgs , FtsAtom args[])
+    {
+	int time;
+	int trackTime = 0;
+      
+	FtsTrackObject trackObj = (FtsTrackObject)(args[0].getObject());
+	Track track = getTrack(trackObj);
+	int position = args[1].getInt();
+	
+	sequence.itsSequencePanel.moveTrackTo(track, position);
+
+	setDirty();
+    }
   /**
    * return how many tracks in the sequence
    */
@@ -232,6 +242,13 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     {
 	sendArgs[0].setString(type); 
 	sendMessage(FtsObject.systemInlet, "add_track", 1, sendArgs);
+    }
+
+    public void requestTrackMove(Track track, int position)
+    {
+	sendArgs[0].setObject(track.getFtsTrack()); 
+	sendArgs[1].setInt(position); 
+	sendMessage(FtsObject.systemInlet, "move_track", 2, sendArgs);
     }
 
     public void importMidiFile()

@@ -23,33 +23,15 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.track;
 
 import java.util.*;
+import ircam.jmax.editors.sequence.*;
 
-public interface HighlightListener
+public interface LockListener
 {
-  public abstract void highlight(Enumeration elements, double time);
+  public abstract void lock(boolean lock);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -49,7 +49,8 @@ public class MoveMidiTrackToAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-    ((SequencePanel)container.getEditor()).moveTrackTo( MidiTrackPopupMenu.getPopupTarget(), position);    
+      ((SequencePanel)container.getEditor()).getFtsSequenceObject().
+	  requestTrackMove( MidiTrackPopupMenu.getPopupTarget().getTrack(), position);    
   }
 }
 

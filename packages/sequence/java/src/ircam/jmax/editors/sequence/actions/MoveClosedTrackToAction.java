@@ -49,7 +49,8 @@ public class MoveClosedTrackToAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-    ((SequencePanel)container.getEditor()).moveTrackTo( ClosedTrackPopupMenu.getPopupTarget(), position);    
+      ((SequencePanel)container.getEditor()).getFtsSequenceObject().
+	  requestTrackMove( ClosedTrackPopupMenu.getPopupTarget().getTrack(), position);  
   }
 }
 

@@ -33,16 +33,23 @@ public class AmbitusValue extends AbstractEventValue
     
     setProperty("duration", new Double(100.0));
     setProperty("ambitus", new Integer(0));
+    setProperty("midi_channel", new Integer(1));
+    setProperty("midi_velocity", new Integer(64));
   }
 
-  Object duration;
+  Object duration, channel, velocity;
+  
   public void setProperty(String name, Object value)
   {
       if(name.equals("duration"))
 	  duration = value;
       else if(name.equals("pitch") && ((Integer)value).intValue() > 127)
 	  value = new Integer(127);
-	  
+      else if(name.equals("midi_channel"))
+	channel = value;
+      else if(name.equals("midi_velocity"))
+	velocity = value;
+
       super.setProperty(name, value);
   }
   public Object getProperty(String name)
@@ -50,7 +57,13 @@ public class AmbitusValue extends AbstractEventValue
       if(name.equals("duration"))
 	  return duration;
       else
-	  return super.getProperty(name);
+	if(name.equals("midi_channel"))
+	  return channel;
+	else
+	  if(name.equals("midi_velocity"))
+	    return velocity;
+	  else
+	    return super.getProperty(name);
   }
 
   public ValueInfo getValueInfo()
@@ -115,9 +128,9 @@ public class AmbitusValue extends AbstractEventValue
 	      return Integer.class;
       }
  
-      String defNamesArray[] = {"pitch", "duration"};
-      Class propertyTypesArray[] = {Integer.class, Double.class};
-      int defPropertyCount = 2;
+      String defNamesArray[] = {"pitch", "duration", "midi_channel", "midi_velocity"};
+      Class propertyTypesArray[] = {Integer.class, Double.class, Integer.class, Integer.class};
+      int defPropertyCount = 4;
   }
 
   public JPopupMenu getPopupMenu()
@@ -166,7 +179,9 @@ public class AmbitusValue extends AbstractEventValue
     public boolean samePropertyValues(Object args[])
     {
       return ((((Integer)getProperty("pitch")).intValue() == ((Integer)args[0]).intValue()) &&
-	      (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()));
+	      (((Double)getProperty("duration")).floatValue() == ((Double)args[1]).floatValue()) &&
+	      (((Integer)getProperty("midi_channel")).intValue() == ((Integer)args[2]).intValue()) &&
+	      (((Integer)getProperty("midi_velocity")).intValue() == ((Integer)args[3]).intValue()));
     }
 
   //--- Fields
@@ -192,9 +207,9 @@ public class AmbitusValue extends AbstractEventValue
     AMBITUS_ICON = new ImageIcon(path+"note.gif");
   }
 
-    static String nameArray[] = {"pitch", "duration"};
-    static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE};
-    static int propertyCount = 2;
+    static String nameArray[] = {"pitch", "duration", "midi_channel", "midi_velocity"};
+    static int propertyTypes[] = {INTEGER_TYPE, DOUBLE_TYPE, INTEGER_TYPE, INTEGER_TYPE};
+    static int propertyCount = 4;
 }
 
  

@@ -49,7 +49,8 @@ public class MoveMonoTrackToAction extends EditorAction
 
   public void doAction(EditorContainer container)
   {
-      ((SequencePanel)container.getEditor()).moveTrackTo( MonoTrackPopupMenu.getPopupTarget(), position);    
+      ((SequencePanel)container.getEditor()).getFtsSequenceObject().
+	  requestTrackMove( MonoTrackPopupMenu.getPopupTarget().getTrack(), position); 
   }
 }
 

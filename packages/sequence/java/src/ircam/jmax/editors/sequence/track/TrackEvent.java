@@ -85,24 +85,32 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
      * keeping the data base consistency */
     public void move(double time)
     {
-	if (time < 0) time = 0;
-	if (itsTrackDataModel != null)
-	  {
-	    if (((UndoableData) itsTrackDataModel).isInGroup())
-		((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this, time));
-		
-		itsTrackDataModel.moveEvent(this, time);
-		
-		//send the move message to the fts event object
-		//sendArgs[0].setFloat((float)time); 
-		sendArgs[0].setDouble(time); 
-		sendMessage(FtsObject.systemInlet, "move", 1, sendArgs);
-	    }
-	else setTime(time);
-
-	((FtsTrackObject)itsTrackDataModel).setDirty();
+	((FtsTrackObject)itsTrackDataModel).requestEventMove(this, time);
     }
 
+    public void moveTo(double time)
+    {
+	if (((UndoableData) itsTrackDataModel).isInGroup())
+	    ((UndoableData) itsTrackDataModel).postEdit(new UndoableMove(this, time));
+	
+	((FtsTrackObject)itsTrackDataModel).beginUpdate();
+	
+	itsTrackDataModel.moveEvent(this, time);
+		
+	((FtsTrackObject)itsTrackDataModel).endUpdate();
+
+	((FtsTrackObject)itsTrackDataModel).setDirty();    
+    }
+    
+
+    public boolean isHighlighted()
+    {
+	return highlighted;
+    }
+    public void setHighlighted(boolean hh)
+    {
+	highlighted = hh;
+    }
     /**
      * Set the named property */
     public void setProperty(String name, Object theValue)
@@ -274,6 +282,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     private double time;
     private EventValue value;
     private boolean inGroup = false;
+    private boolean highlighted = false;
 
     public static double DEFAULT_TIME = 0;
 

@@ -57,6 +57,13 @@ public class ScoreBackground implements Layer{
 		    toRepaintBack = true;
 		    gc.getGraphicDestination().repaint();
 		}
+		else
+		    if(e.getPropertyName().equals("locked"))
+			{
+			    locked = ((Boolean)e.getNewValue()).booleanValue();
+			    toRepaintBack = true;
+			    gc.getGraphicDestination().repaint();
+			}
 	    }
     });
   }
@@ -72,7 +79,10 @@ public class ScoreBackground implements Layer{
 
       Dimension d = gc.getGraphicDestination().getSize();
 
-      g.setColor(Color.white);
+      if(!locked)
+	  g.setColor(Color.white);
+      else
+	  g.setColor(ScoreBackground.OUT_RANGE_COLOR);
       g.fillRect(0, 0, d.width, d.height);
 
       g.setColor(OUT_RANGE_COLOR);
@@ -282,11 +292,11 @@ public class ScoreBackground implements Layer{
 
     //--- Fields
     SequenceGraphicContext gc;
-    //static Image itsImage;
     private Image itsImage;
     boolean toRepaintBack = false;
-    //static boolean imageReady = true;
+    boolean locked = false;
     boolean imageReady = true;
+
     public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
     //  public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
     public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);

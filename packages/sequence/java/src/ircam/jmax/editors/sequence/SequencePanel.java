@@ -315,20 +315,16 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	return ((y >= r.y)&&(y <= r.y +r.height));
     }
 
-  public void moveTrackTo(TrackEditor editor, int pos)
-  {
-      TrackContainer trackContainer = (TrackContainer) trackContainers.get(editor.getTrack());
-
-      if(trackPanel.getComponent(pos)==trackContainer)
-	  return;
-      trackPanel.remove(trackContainer);
-      trackPanel.add(trackContainer, pos);
-      trackPanel.validate();
-      scrollTracks.validate();
-      scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
-      editor.getTrack().setProperty("active", Boolean.TRUE);
-  }
-
+    public void moveTrackTo(Track track, int pos)
+    {
+	TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
+	trackPanel.remove(trackContainer);
+	trackPanel.add(trackContainer, pos);
+	trackPanel.validate();
+	scrollTracks.validate();
+	scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
+	track.setProperty("active", Boolean.TRUE);
+    }
    /**
      * called when the database is changed: DataTrackListener interface
      */
@@ -477,7 +473,7 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
   {
     return MaxApplication.getFts();
   }
-
+    
     public MaxDocument getDocument()
     {
 	return ftsSequenceObject.getDocument();

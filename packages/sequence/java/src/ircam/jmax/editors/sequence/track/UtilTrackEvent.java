@@ -184,6 +184,11 @@ public class UtilTrackEvent implements Event, Drawable
 	else return NullEditor.getInstance();
     }
 
+    public boolean isHighlighted()
+    {
+	return false;
+    }
+
     //--- Fields
     private double time;
     private EventValue value;

@@ -93,6 +93,17 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	});
 
 	track.getTrackDataModel().addListener(this);
+
+	track.getTrackDataModel().addLockListener(new LockListener(){
+		public void lock(boolean lock)
+		{
+		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+			((TrackEvent) e.nextElement()).setHighlighted(false);
+
+		    oldElements.removeAllElements();
+		    getTrack().setProperty("locked", new Boolean(lock));
+		}
+	    });
 	
 	track.getTrackDataModel().addHighlightListener(new HighlightListener(){
 		public void highlight(Enumeration elements, double time)
@@ -106,7 +117,8 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
 			{
 			    temp = (TrackEvent) e.nextElement();
-			    temp.getRenderer().render(temp, g, false, gc);
+			    temp.setHighlighted(false);
+			    temp.getRenderer().render(temp, g, false, gc);			    
 			}
 		    oldElements.removeAllElements();
 
@@ -119,8 +131,9 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 				    first = false;
 				}
 			    //temp.getRenderer().render(temp, g, true, gc);
+			    temp.setHighlighted(true);
 			    temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
-			    oldElements.addElement(temp);
+			    oldElements.addElement(temp);			    
 			}
 		}
 	    });
