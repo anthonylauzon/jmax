@@ -31,9 +31,7 @@ include Sources
 
 PACKAGELIB=$(LIBDIR)/libispwmath.so
 
-MODULE_CFLAGS=
-
-all: $(PACKAGELIB)
+all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
 
 TOCLEAN = $(PACKAGELIB)
 

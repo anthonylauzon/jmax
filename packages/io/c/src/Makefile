@@ -36,7 +36,7 @@ PACKAGELIB=$(LIBDIR)/libio.so
 MODULE_CFLAGS= -I$(JMAXROOTDIR)/lib/protocol/c/src
 MORESOLIBS=$(JMAXROOTDIR)/lib/protocol/c/lib/$(ARCH)/libProtocol.a
 
-all: $(PACKAGELIB)
+all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
 
 TOCLEAN = $(PACKAGELIB)
 

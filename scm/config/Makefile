@@ -23,17 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts/
-PACKAGEROOT = ../..
-
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
-PACKAGELIB=$(LIBDIR)/libcontrol.so
-
-all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
-
-TOCLEAN = $(PACKAGELIB)
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
+install-exec:
+	$(INSTALL_DIR) $(lib_install_dir)/scm/config
+	for f in *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/scm/config ; done
+.PHONY: install-exec
 

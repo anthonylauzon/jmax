@@ -124,13 +124,6 @@ http://www.68k.org/~michael/audiofile/</a> for information and download.
 
 <h3> Building source tree </h3>
 
-<p>
-In order to create all the sub-directories for objects and libraries,
-the script
-<a href="../../bin/jmax"><code>jmax-make-dirs</code></a>,
-located in <i>jMax root dir</i>/bin,
-has to be launched prior to any compilation.
-
 <h3> Environment variables </h3>
 
 <p>
@@ -139,15 +132,24 @@ in the <code>CLASSPATH</code> environment variable, i.e. <br>
 <code>setenv CLASSPATH <i>Swing's home</i>/swingall.jar</code> for csh <br>
 <code>export CLASSPATH=<i>Swing's home</i>/swingall.jar</code> for bash <br>
 
-<h3> Compiling C parts </h3>
+<h3> Compiling</h3>
+
+<h4>Compiling for Linux</h4>
 
 <p>
-To recompile C parts, use the following command line (in jMax root directory):<br>
-<code>make ARCH=<i>your_architecture</i> MODE=opt all_c</code> (on Linux), or <br>
-<code>gmake ARCH=<i>your_architecture</i> MODE=opt all_c</code> (on SGI), <br>
+To recompile jMax for Linux, use the following command line (after cd'ing to jMax sources
+root directory):<br>
+<code>make ARCH=linuxpc all</code>
+
+
+<h4>Compiling for SGI</h4>
+
+<p>
+To recompile jMax for SGI, use the following command line (after cd'ing to jMax sources
+root directory):<br>
+<code>gmake ARCH=<i>your_architecture</i> all</code>, <br>
 where <i>your_architecture</i> is:
 <ul>
-<li> <code>linuxpc</code> for Linux platform on Intel compatible processors
 <li> <code>irix65r4k</code> for SGI platform, IRIX 6.5, R4000 processor
 <li> <code>irix65r5k</code> for SGI platform, IRIX 6.5, R5000 processor
 <li> <code>irix65r10k</code> for SGI platform, IRIX 6.5, R10000 processor
@@ -156,12 +158,22 @@ where <i>your_architecture</i> is:
 </ul>
 
 
-<h3> Compiling JAVA parts </h3>
+<h3> Compiling C parts only </h3>
+
+<p>
+To recompile C parts, use the following command line (in jMax root directory):<br>
+<code>make ARCH=<i>your_architecture</i> all_c</code> (on Linux), or <br>
+<code>gmake ARCH=<i>your_architecture</i> all_c</code> (on SGI), <br>
+where <i>your_architecture</i> is one of the previously defined architecture
+for SGI platforms.
+
+
+<h3> Compiling JAVA parts only</h3>
 
 <p>
 To recompile JAVA parts, use the following command line (in jMax root directory):<br>
-<code>make MODE=debug all_java</code> (on Linux), or <br>
-<code>gmake MODE=debug all_java</code> (on SGI) <br>
+<code>make all_java</code> (on Linux), or <br>
+<code>gmake all_java</code> (on SGI) <br>
 (JAVA parts are acutally compiled with debug on)
 
 

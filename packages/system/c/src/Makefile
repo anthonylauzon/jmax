@@ -32,7 +32,7 @@ include Sources
 PACKAGELIB=$(LIBDIR)/libsystem.so
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../reftype/c/src
 
-all: $(PACKAGELIB)
+all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
 
 TOCLEAN = $(PACKAGELIB)
 

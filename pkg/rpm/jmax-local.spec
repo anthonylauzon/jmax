@@ -13,7 +13,7 @@ for developing real-time, interactive audio applications.
 %prep
 
 %build
-make all ARCH=linuxpc
+make clean all ARCH=linuxpc
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -26,7 +26,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root)
-%doc LICENCE.fr LICENSE README VERSION doc/*
+/usr/doc/%{NAME}-%{VERSION}
 /usr/bin/jmax
 /usr/lib/jmax
 /usr/include/fts

@@ -33,7 +33,7 @@ include Sources
 
 PACKAGELIB=$(LIBDIR)/libpitch.so
 
-all: $(PACKAGELIB)
+all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
 
 TOCLEAN = $(PACKAGELIB)
 

@@ -33,7 +33,7 @@ PACKAGELIB=$(LIBDIR)/libcontrol.so
 
 MODULE_CFLAGS=-I$(PACKAGEROOT)/../../data/c/src/
 
-all: $(PACKAGELIB)
+all: $(PACKAGELIB) $(LIBDIR) $(OBJDIR) 
 
 TOCLEAN = $(PACKAGELIB)
 
