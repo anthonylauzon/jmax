@@ -4,7 +4,7 @@
 ## generate libtool files
 ## libtoolize --automake -c
 ## automake --add-missing --copy --foreign
-SUBDIRS=client fts include java packages bin images tutorials config utils help
+SUBDIRS=client fts include java packages bin images tutorials config utils help doc
 
 EXTRA_DIST= AUTHORS CHANGES ChangeLog JMAX-VERSION LICENCE.fr LICENSE README LISEZMOI
 
