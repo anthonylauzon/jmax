@@ -112,6 +112,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %{_sysconfdir}/X11/applnk/Multimedia/%{name}.desktop
 %endif
 %{_pixmaps_dir}/*
+%{_datadir}/aclocal/*
 
 
 %files common -f /var/tmp/rpm.jmax.common.list
@@ -128,6 +129,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/fts/packages
 %{_libdir}/libfts.la
 %{_libdir}/pkgconfig/jmax.pc
+%{_datadir}/aclocal/*
 
 %files java -f /var/tmp/rpm.jmax.java.list
 %defattr(-,root,root)
@@ -144,6 +146,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/jmax/packages/jack
 
 %changelog
+* Thu May 22 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
+- added installation of jmax.m4 
 * Wed Mar  5 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 - add jMax in RedHat 8.0 menu
 * Mon Mar  3 2003 Patrice Tisserand <Patrice.Tisserand@ircam.fr>
