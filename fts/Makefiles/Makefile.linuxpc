@@ -85,5 +85,3 @@ FTS_ARCH_LIBS = $(LIBDIR)/libPortableVecLib.a
 
 
 
-
-

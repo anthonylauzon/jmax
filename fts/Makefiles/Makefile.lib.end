@@ -47,19 +47,23 @@ cleanall:
 
 $(OBJDIR)/%.o : %.c
 	$(CC) -c  $(CFLAGS) $< -o $@
+.PRECIOUS: $(OBJDIR)/%.o
+
+$(LIBDIR)/%.a: $(OBJECTS)
+	$(AR) $(ARFLAGS) $(LIBDIR)/$*.a $?
 
 ifeq ($(VENDOR),sgi)
-$(LIBDIR)/%.so : $(LIBDIR)/%.a
+$(LIBDIR)/%.so : $(LIBDIR)/%.a $(LIBDIR) $(OBJDIR) 
 	ld $(FTS_SOFLAGS) -elf -shared -rdata_shared -o $@ $(LD_ALL_FLAG) $(LIBDIR)/$*.a $(LD_NONE_FLAG) $(SOLIBS) -lc $(MORESOLIBS)
 endif
 
 ifeq ($(VENDOR),gnu)
-$(LIBDIR)/%.so : $(LIBDIR)/%.a
+$(LIBDIR)/%.so : $(LIBDIR)/%.a $(LIBDIR) $(OBJDIR) 
 	ld $(FTS_SOFLAGS) -export-dynamic -shared -o $@ $(LD_ALL_FLAG) $(LIBDIR)/$*.a  $(LD_NONE_FLAG) $(SOLIBS) -lc $(MORESOLIBS)
 endif
 
 ifeq ($(VENDOR),solaris2)
-$(LIBDIR)/%.so : $(OBJECTS)
+$(LIBDIR)/%.so : $(OBJECTS) $(LIBDIR) $(OBJDIR) 
 	ld $(FTS_SOFLAGS) -o $@ $(LD_ALL_FLAG) $+ $(LD_NONE_FLAG) $(MORESOLIBS) -lc -lm
 endif
 

@@ -103,6 +103,10 @@ CC_NONE_FLAG = -none
 ## includes
 
 include $(ROOTDIR)/Makefiles/Makefile.$(ARCH)
+
+ifndef MODE
+MODE=opt
+endif
 include $(ROOTDIR)/Makefiles/Makefile.$(MODE)
 
 ##
