@@ -30,14 +30,9 @@ fts_object_t *fts_error_object_new(fts_patcher_t *parent, int id, int ac, const 
 
   obj = fts_object_new(parent, id, 4, description);
 
-  /* Change the description in the object */
-
-  fts_object_set_description(obj, ac, at);
-
   /* flag the patcher as error */
 
   fts_patcher_set_error((fts_patcher_t *)obj);
-
 
   /* Return the object  */
 

@@ -91,5 +91,32 @@ fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2)
     return 0;
 }
 
+int
+fts_atom_is_null(fts_atom_t *a)
+{
+  if (fts_is_void(a))
+    return 1;
+  else if (fts_is_symbol(a))
+    return fts_get_symbol(a) == 0;
+  else if (fts_is_string(a))
+    return fts_get_string(a) == 0;
+  else if (fts_is_ptr(a))
+    return fts_get_ptr(a) == 0;
+  else if (fts_is_int(a))
+    return fts_get_int(a) == 0;
+  else if (fts_is_long(a))
+    return fts_get_long(a) == 0;
+  else if (fts_is_float(a))
+    return fts_get_float(a) == 0.0;
+  else if (fts_is_object(a))
+    return fts_get_object(a) == 0;
+  else if (fts_is_true(a))
+    return 0;
+  else if (fts_is_false(a))
+    return 1;
+  else
+    return 0;
+}
+
 
 

@@ -107,6 +107,25 @@ extern fts_symbol_t fts_s_times;
 extern fts_symbol_t fts_s_div;
 extern fts_symbol_t fts_s_open_par;
 extern fts_symbol_t fts_s_closed_par;
+extern fts_symbol_t fts_s_dot;
+extern fts_symbol_t fts_s_remainder;
+extern fts_symbol_t fts_s_shift_left;
+extern fts_symbol_t fts_s_shift_right;
+extern fts_symbol_t fts_s_bit_and;
+extern fts_symbol_t fts_s_bit_or;
+extern fts_symbol_t fts_s_bit_xor;
+extern fts_symbol_t fts_s_bit_not;
+extern fts_symbol_t fts_s_logical_and;
+extern fts_symbol_t fts_s_logical_or;
+extern fts_symbol_t fts_s_logical_not;
+extern fts_symbol_t fts_s_equal;
+extern fts_symbol_t fts_s_not_equal;
+extern fts_symbol_t fts_s_greater;
+extern fts_symbol_t fts_s_greater_equal;
+extern fts_symbol_t fts_s_smaller;
+extern fts_symbol_t fts_s_smaller_equal;
+extern fts_symbol_t fts_s_conditional;
+extern fts_symbol_t fts_s_else;
 
 #endif
 

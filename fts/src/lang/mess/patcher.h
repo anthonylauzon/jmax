@@ -40,6 +40,12 @@ extern void fts_outlet_reposition(fts_object_t *o, int pos);
 extern void fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, int new_noutlets);
 extern fts_object_t *fts_patcher_get_inlet(fts_object_t *patcher, int inlet);
 extern fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet);
+
+/* Variables */
+
+extern fts_atom_t *fts_variable_get_value(fts_object_t *obj, fts_symbol_t name);
+extern fts_status_t fts_variable_define(fts_object_t *obj, fts_symbol_t name, fts_atom_t *value);
+
 extern void fts_create_root_patcher(void);
 
 #endif

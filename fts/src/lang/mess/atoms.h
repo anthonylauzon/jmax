@@ -101,6 +101,10 @@
 
 extern int fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2);
 
+/* null test: a null content can be a null pointer or a zero value */
+
+extern int fts_atom_is_null(fts_atom_t *a);
+
 /* Convenience macro for symbols */
 
 #define fts_is_operator(a)        (fts_is_symbol((a)) && fts_symbol_is_operator(fts_get_symbol(a)))

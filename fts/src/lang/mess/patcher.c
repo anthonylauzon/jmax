@@ -43,6 +43,7 @@ fts_metaclass_t *patcher_metaclass;
 fts_metaclass_t *inlet_metaclass;
 fts_metaclass_t *outlet_metaclass;
 
+static fts_heap_t variables_heap;
 
 /* INlets; inlets are only placeholders for the internal connections
    they receive no messages, send no messages; the messages are sent
@@ -406,6 +407,18 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   while (this->objects)
     fts_object_delete(this->objects);
+
+  /* Delete all the variables */
+
+  while (this->env)
+    {
+      fts_variable_t *v;
+
+      v = this->env;
+      this->env = this->env->next;
+
+      fts_heap_free((char *) v, &variables_heap);
+    }
 
   /* delete the inlets and inlets tables */
 
@@ -892,11 +905,99 @@ fts_patcher_equiv(int ac0, const fts_atom_t *at0, int ac1,  const fts_atom_t *at
 }
 
 
+/* Variable handling */
+
+static fts_status_description_t fts_redefinedVariable = {"Redefined variable"};
+
+static fts_variable_t *fts_patcher_variable_new(fts_patcher_t *p, fts_symbol_t name, fts_atom_t *value)
+{
+  fts_variable_t *v;
+
+  v = (fts_variable_t *) fts_heap_alloc(&variables_heap);
+
+  v->name = name;
+  v->next = p->env;
+  v->value = *value;
+
+  p->env = v;
+
+  return v;
+}
+
+static void fts_patcher_variable_remove(fts_patcher_t *p, fts_symbol_t name)
+{
+  /* ??? */
+}
+
+static fts_variable_t *fts_patcher_variable_get(fts_patcher_t *patcher, fts_symbol_t name)
+{
+  fts_variable_t *p;
+
+  for (p = patcher->env; p ; p = p->next)
+    if (p->name == name)
+      return p;
+
+  return 0;
+}
+
+
+fts_atom_t *fts_variable_get_value(fts_object_t *obj, fts_symbol_t name)
+{
+  fts_patcher_t *patcher;
+
+  if (fts_object_is_patcher(obj))
+    patcher = (fts_patcher_t *) obj;
+  else
+    patcher = fts_object_get_patcher(obj);
+
+  while (patcher)
+    {
+      fts_variable_t *v;
+
+      v = fts_patcher_variable_get(patcher, name);
+
+      if (v)
+	return &(v->value);
+      
+      patcher = fts_object_get_patcher(obj);
+    }
+
+  return 0;
+}
+
+
+fts_status_t
+fts_variable_define(fts_object_t *obj, fts_symbol_t name, fts_atom_t *value)
+{
+  fts_patcher_t *patcher;
+  fts_variable_t *v;
+
+  if (fts_object_is_patcher(obj))
+    patcher = (fts_patcher_t *) obj;
+  else
+    patcher = fts_object_get_patcher(obj);
+
+  v = fts_patcher_variable_get(patcher, name);
+
+  if (v)
+    return &fts_redefinedVariable;
+  else
+    {
+      fts_patcher_variable_new(patcher, name, value);
+
+      return fts_Success;
+    }
+}
+
+
+
 static void
 internal_patcher_config(void)
 {
   fts_metaclass_create(fts_s_patcher, patcher_instantiate, fts_patcher_equiv);
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
+
+  fts_heap_init(&variables_heap, sizeof(fts_variable_t), 256);
 }
 
 

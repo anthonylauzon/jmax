@@ -6,18 +6,16 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.24 $ IRCAM $Date: 1998/05/26 17:43:05 $
+ *      $Revision: 1.25 $ IRCAM $Date: 1998/06/02 10:06:54 $
  *
  *  Eric Viara for Ircam, January 1995
  */
-
-#include <stdio.h>		/* TMp @@@ */
-
 
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
 
+/* #define DO_EXPRESSIONS */
 
 extern void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at); /* @@@ */
 static fts_heap_t connection_heap;
@@ -73,10 +71,6 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
   obj     = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;
-
-  /* Copying the arguments */
-
-  fts_object_set_description(obj, ac, at);
 
   /* Other Initializations */
 
@@ -165,70 +159,129 @@ fts_make_object(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
 
 
 fts_object_t *
-fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
+fts_object_new(fts_patcher_t *patcher, long id, int aoc, const fts_atom_t *aot)
 {
-  fts_object_t  *obj;
+  fts_object_t  *obj = 0;
   fts_metaclass_t *mcl;
-
+  fts_symbol_t  var;
+#ifdef DO_EXPRESSIONS
+  int ac;
+  fts_atom_t at[1024]; /* Actually, the evaluated atom vector
+			   should be the copy for the object,
+			   and the expression parser should be able
+			   to tell how many atoms we need before
+			   evaluating the expression !! */
+#else
+#define at aot  
+#define ac aoc
+#endif
 
   /* Explicit check for zero arguments; in this case, we
      just make an error object 
      */
 
+  if (aoc == 0)
+    obj = fts_error_object_new(patcher, id, aoc, aot);
 
-  if (ac == 0)
-    return fts_error_object_new(patcher, id, ac, at);
-
-  if (! fts_is_symbol(&at[0]))
+#ifdef DO_EXPRESSIONS
+  if (! obj)
     {
-      fprintf(stderr,"Non symbol class name in object creation\n"); /* @@@@ ERROR !!! */
-      return 0;
+      if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_else))
+	{
+	  /* foo : <obj> syntax; extract the variable name */
+      
+	  var = fts_get_symbol(&aot[0]);
+
+	  /* Compute the expressions with the correct offset */
+
+	  ac = fts_expression_eval((fts_object_t *)patcher, aoc - 2, aot + 2, 1024, at);
+	}
+      else
+	{
+	  /* variable less syntax, consider everything as expressions */
+	  var = 0;
+	  ac = fts_expression_eval((fts_object_t *)patcher, aoc, aot, 1024, at);
+	}
+
+      if (ac == -1)
+	obj = fts_error_object_new(patcher, id, aoc, aot);
+    }
+#endif
+
+  if (! obj)
+    {
+      if (! fts_is_symbol(&at[0]))
+	{
+	  fprintf(stderr,"Non symbol class name in object creation\n"); /* @@@@ ERROR !!! */
+	  return 0;
+	}
+
+      /* First of all, try an explicitly declared abstraction */
+
+      obj =  fts_abstraction_new_declared(patcher, id, ac, at);
     }
 
-  /* First of all, try an explicitly declared abstraction */
-
-  obj =  fts_abstraction_new_declared(patcher, id, ac, at);
-
-  if (obj) 
-    return obj;
-
-  /* If not there, look for the metaclass: if there,
-     try to make an object, and if fail a path abstraction */
-
-  mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
-
-  if (mcl != 0)
+  if (! obj)
     {
-      obj =  fts_make_object(patcher, id, ac, at);
+      /* If not there, look for the metaclass: if there,
+	 try to make an object; if the meta class is there
+	 but we cannot make the object, do an error object */
 
-      if (obj)
-	return obj;
+      mcl = fts_metaclass_get_by_name(fts_get_symbol(&at[0]));
 
-      obj = fts_abstraction_new_search(patcher, id, ac, at);
+      if (mcl != 0)
+	obj =  fts_make_object(patcher, id, ac, at);
 
-      if (obj)
-	return obj;
+      if (!obj)
+	obj = fts_error_object_new(patcher, id, aoc, aot);
     }
-     
 
-  /* Try with an object doctor */
+  /* NO object yet; try with a  path abstraction */
 
-  obj = fts_call_object_doctor(patcher, id, ac, at);
+  if (! obj)
+    obj = fts_abstraction_new_search(patcher, id, ac, at);
 
-  if (obj)
-    return obj;
+  /* No object yet, Try with an object doctor */
+
+  if (! obj)
+    obj = fts_call_object_doctor(patcher, id, ac, at);
 
   /* if an obj */
 
-  obj = fts_error_object_new(patcher, id, ac, at);
+  if (! obj)
+    obj = fts_error_object_new(patcher, id, aoc, aot);
+
+  if (obj)
+    {
+      /* Object created: do the last operations, like setting 
+	 the object description, variables and properties;
+	 We check if the argv exists already; a doctor may have
+	 changed the object definition, for persistent fixes !!
+	 */
+
+      if (! obj->argv)
+	fts_object_set_description(obj, aoc, aot);
+
+#ifdef DO_EXPRESSIONS
+      if (! fts_object_is_error(obj))
+	{
+	  fts_atom_t a;
+	  
+	  fts_set_object(&a, obj);
+	  fts_variable_define(obj, var, &a);
+	}
+#endif
+    }
 
   return obj;
 }
 
 /* This is to support "changing" objects; usefull during 
-   .pat loading, where not all the information is available 
-   at the right place; used currently explode in the fts1.5 package.
-   */
+ * .pat loading, where not all the information is available 
+ *    at the right place; used currently explode in the fts1.5 package.
+ * WARNING: user object should never call this function, otherwise they risk
+ * to loose the expressions definition.
+ */
 
 void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *argv)
 {
@@ -266,9 +319,10 @@ void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *a
 
 
 /* This is to support "changing" objects; usefull during 
-   .pat loading, where not all the information is available 
-   at the right place; used currently explode in the fts1.5 package.
-   */
+ * .pat loading, where not all the information is available 
+ * at the right place; used currently for explode in the fts1.5 package.
+ * 
+ */
 
 void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_name,
 					  int argc, const fts_atom_t *argv)

@@ -88,11 +88,31 @@ fts_symbol_t fts_s_times;
 fts_symbol_t fts_s_div;
 fts_symbol_t fts_s_open_par;
 fts_symbol_t fts_s_closed_par;
+fts_symbol_t fts_s_dot;
+fts_symbol_t fts_s_remainder;
+fts_symbol_t fts_s_shift_left;
+fts_symbol_t fts_s_shift_right;
+fts_symbol_t fts_s_bit_and;
+fts_symbol_t fts_s_bit_or;
+fts_symbol_t fts_s_bit_xor;
+fts_symbol_t fts_s_bit_not;
+fts_symbol_t fts_s_logical_and;
+fts_symbol_t fts_s_logical_or;
+fts_symbol_t fts_s_logical_not;
+fts_symbol_t fts_s_equal;
+fts_symbol_t fts_s_not_equal;
+fts_symbol_t fts_s_greater;
+fts_symbol_t fts_s_greater_equal;
+fts_symbol_t fts_s_smaller;
+fts_symbol_t fts_s_smaller_equal;
+fts_symbol_t fts_s_conditional;
+fts_symbol_t fts_s_else;
 
 static void
 fts_predefine_symbols(void)
 {
-  /* In ANY case, do not change the association symbol value in the following;
+  /* **************** WARNING *************************
+     In ANY case, do not change the association symbol value in the following;
      just add new pairs, in any order, but do not change existing values;
      this code are part of the binary format, and of the client protocol; you
      would simply screw up compatibility with existing files;
@@ -104,6 +124,9 @@ fts_predefine_symbols(void)
   fts_s_int        = fts_new_builtin_symbol("int",    2);
   fts_s_number     = fts_new_builtin_symbol("number", 3);
   fts_s_ptr        = fts_new_builtin_symbol("ptr",    4);
+
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_string     = fts_new_builtin_symbol("string", 5);
   fts_s_symbol     = fts_new_builtin_symbol("symbol", 6);
   fts_s_object     = fts_new_builtin_symbol("object", 7);
@@ -111,12 +134,17 @@ fts_predefine_symbols(void)
   fts_s_true       = fts_new_builtin_symbol("true",   9);
   fts_s_false      = fts_new_builtin_symbol("false",  10);
 
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_init 	   = fts_new_builtin_symbol("$init",   11);
   fts_s_delete	   = fts_new_builtin_symbol("$delete", 12);
   fts_s_ninlets    = fts_new_builtin_symbol("ins",     13);
   fts_s_noutlets   = fts_new_builtin_symbol("outs",    14);
   fts_s_bang       = fts_new_builtin_symbol("bang",    15);
   fts_s_list       = fts_new_builtin_symbol("list",    16);
+
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_set        = fts_new_builtin_symbol("set",     17);
   fts_s_append     = fts_new_builtin_symbol("append",  18);
   fts_s_print      = fts_new_builtin_symbol("print",   19);
@@ -124,12 +152,18 @@ fts_predefine_symbols(void)
   fts_s_stop       = fts_new_builtin_symbol("stop",    21);
   fts_s_start      = fts_new_builtin_symbol("start",   22);
   fts_s_restore    = fts_new_builtin_symbol("restore", 23);
+
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_open       = fts_new_builtin_symbol("open",    24);
   fts_s_upload     = fts_new_builtin_symbol("upload",  57);
   fts_s_close      = fts_new_builtin_symbol("close",   25);
   fts_s_load       = fts_new_builtin_symbol("load",    26);
   fts_s_read       = fts_new_builtin_symbol("read",    27);
   fts_s_write      = fts_new_builtin_symbol("write",   28);
+
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_save_bmax  = fts_new_builtin_symbol("save_bmax", 29);
   fts_s_anything   = fts_new_builtin_symbol("anything", 30);
   fts_s_comma      = fts_new_builtin_symbol(",",       31);
@@ -137,17 +171,25 @@ fts_predefine_symbols(void)
   fts_s_dollar     = fts_new_builtin_symbol("$",       33);
   fts_s_semi       = fts_new_builtin_symbol(";",       34);
 
+  /* WARNING: read the warning at the beginning of the function */
+
   /* Predefined symbol for properties */
 
   fts_s_value      = fts_new_builtin_symbol("value",    35);
   fts_s_max_value  = fts_new_builtin_symbol("maxValue", 36);
   fts_s_min_value  = fts_new_builtin_symbol("minValue", 37);
   fts_s_name       = fts_new_builtin_symbol("name",     38);
+
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_x          = fts_new_builtin_symbol("x",        39);
   fts_s_wx         = fts_new_builtin_symbol("wx",       40);
   fts_s_y          = fts_new_builtin_symbol("y",        41);
   fts_s_wy         = fts_new_builtin_symbol("wy",       42);
   fts_s_width      = fts_new_builtin_symbol("w",        43);
+
+  /* WARNING: read the warning at the beginning of the function */
+
   fts_s_ww         = fts_new_builtin_symbol("ww",       44);
   fts_s_height     = fts_new_builtin_symbol("h",        45);
   fts_s_wh         = fts_new_builtin_symbol("wh",       46);
@@ -157,6 +199,7 @@ fts_predefine_symbols(void)
   fts_s_error      = fts_new_builtin_symbol("error",    56);
 
   /* Symbols related to builtin classes */
+  /* WARNING: read the warning at the beginning of the function */
 
   fts_s_patcher    = fts_new_builtin_symbol("patcher", 50);
   fts_s_inlet      = fts_new_builtin_symbol("inlet",   51);
@@ -166,6 +209,7 @@ fts_predefine_symbols(void)
   fts_s_explode    = fts_new_builtin_symbol("explode", 55);
 
   /* Espression operators */
+  /* WARNING: read the warning at the beginning of the function */
 
   fts_s_plus       = fts_new_builtin_symbol("+", 58);
   fts_s_minus      = fts_new_builtin_symbol("-", 59);
@@ -174,7 +218,33 @@ fts_predefine_symbols(void)
   fts_s_open_par   = fts_new_builtin_symbol("(", 62);
   fts_s_closed_par = fts_new_builtin_symbol(")", 63);
 
-  /* Last number user: 64 (max, 255 predefined symbols !! ) */
+  /* WARNING: read the warning at the beginning of the function */
+
+  fts_s_dot        = fts_new_builtin_symbol(".",    65);
+  fts_s_remainder  = fts_new_builtin_symbol("%",    66);
+  fts_s_shift_left = fts_new_builtin_symbol("<<",   67);
+  fts_s_shift_right = fts_new_builtin_symbol(">>",  68);
+  fts_s_bit_and    = fts_new_builtin_symbol("&",    69);
+  fts_s_bit_or     = fts_new_builtin_symbol("|",    70);
+  fts_s_bit_xor     = fts_new_builtin_symbol("^",   71);
+  fts_s_bit_not    = fts_new_builtin_symbol("~",    72);
+
+  /* WARNING: read the warning at the beginning of the function */
+
+  fts_s_logical_and = fts_new_builtin_symbol("&&",  73);
+  fts_s_logical_or  = fts_new_builtin_symbol("||",   74);
+  fts_s_logical_not = fts_new_builtin_symbol("!",    75);
+  fts_s_equal       = fts_new_builtin_symbol("==",   76);
+  fts_s_not_equal   = fts_new_builtin_symbol("!=",   77);
+  fts_s_greater     = fts_new_builtin_symbol(">",    78);
+  fts_s_greater_equal = fts_new_builtin_symbol(">=", 79);
+  fts_s_smaller     = fts_new_builtin_symbol("<",    80);
+  fts_s_smaller_equal = fts_new_builtin_symbol("<=", 81);
+  fts_s_conditional = fts_new_builtin_symbol("?", 82);
+  fts_s_else        = fts_new_builtin_symbol(":", 83);
+
+  /* Last number user: 83 (max, 255 predefined symbols !! ) */
+  /* WARNING: read the warning at the beginning of the function */
 }
 
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.10 $ IRCAM $Date: 1998/05/18 14:59:03 $
+ *      $Revision: 1.11 $ IRCAM $Date: 1998/05/27 13:36:46 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -46,6 +46,7 @@ typedef struct fts_inlet		 fts_inlet_t;
 typedef struct fts_outlet		 fts_outlet_t;
 
 typedef struct fts_selection		 fts_selection_t;
+typedef struct fts_variable		 fts_variable_t;
 
 
 /*
@@ -278,6 +279,15 @@ struct fts_object
   fts_plist_t **outlets_properties;	
 };
 
+/* Variable structure */
+
+struct fts_variable
+{
+  fts_symbol_t  name;
+  fts_atom_t    value;
+  fts_variable_t *next;
+};
+
 /* Patcher structure */
 
 struct fts_patcher
@@ -294,6 +304,10 @@ struct fts_patcher
   int load_init_fired;		/* the multiple load init protection flag*/
 
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
+
+  /* Variables */
+
+  fts_variable_t *env;
 };    
 
 

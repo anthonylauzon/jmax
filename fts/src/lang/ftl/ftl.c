@@ -1,3 +1,5 @@
+#define PTHREADS /* MDC @@@ */
+
 #ifdef PTHREADS
 #include <pthread.h>
 #endif
@@ -10,6 +12,8 @@
 #include "lang/ftl.h"
 #include "lang/veclib/include/veclib.h"
 #include "runtime/files/post.h"
+
+
 
 #define ASSERT(e) if (!(e)) { fprintf( stderr, "Assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
