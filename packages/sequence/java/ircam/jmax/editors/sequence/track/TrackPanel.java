@@ -338,11 +338,24 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void copy()
   {
     ((ClipableData) trackData).copy();
+
+	if(itsContainer instanceof TrackWindow)
+	{
+	   TrackWindow window = (TrackWindow)itsContainer;
+	   window.getEditMenu().pasteAction.setEnabled(true);
+	}
+
   }
 
   public void cut()
   {
     ((ClipableData) trackData).cut();
+
+	if(itsContainer instanceof TrackWindow)
+	{
+	   TrackWindow window = (TrackWindow)itsContainer;
+	   window.getEditMenu().pasteAction.setEnabled(true);
+	}
   }
 
   public void paste()
@@ -362,7 +375,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       {
 	((UndoableData) trackData).undo();
       } catch (CannotUndoException e1) {
-	System.out.println("can't undo");
+	System.out.println("Can't undo");
       }
   }
 
@@ -372,7 +385,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
       {
 	((UndoableData) trackData).redo();
       } catch (CannotRedoException e1) {
-	System.out.println("can't redo");
+	System.out.println("Can't redo");
       }
   }
 
@@ -431,11 +444,21 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
    */    
   public void valueChanged(ListSelectionEvent e)
   {
-    if ( trackEditor.getSelection().size() == 1)
+	 int numSelected = trackEditor.getSelection().size();
+
+    if (numSelected == 1)
       {
-	TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
-	makeVisible(evt);
+		 TrackEvent evt = (TrackEvent)trackEditor.getSelection().getSelected().nextElement();
+		 makeVisible(evt);
       }
+
+	if(itsContainer instanceof TrackWindow)
+	{
+	   TrackWindow window = (TrackWindow)itsContainer;
+	   window.getEditMenu().copyAction.setEnabled(numSelected > 0);
+	   window.getEditMenu().cutAction.setEnabled(numSelected > 0);
+	   window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+	}
   }
     
   public boolean eventIsVisible(Event evt)

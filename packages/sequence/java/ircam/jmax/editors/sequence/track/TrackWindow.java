@@ -46,6 +46,7 @@ public class TrackWindow extends JFrame implements EditorContainer{
   //------------------- fields
   transient TrackPanel trackPanel;
   FtsTrackObject trackData;
+   EditMenu editMenu;
   
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
@@ -115,13 +116,19 @@ public class TrackWindow extends JFrame implements EditorContainer{
     mb.add( new FileMenu());
     
     // Build the edit menu
-    mb.add(new EditMenu(this)); 
+	editMenu = new EditMenu(this);
+    mb.add(editMenu); 
     
     // New Window Manager based Menu
     mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
     
     setJMenuBar(mb);
   }
+
+   public EditMenu getEditMenu()
+	  {
+		 return editMenu;
+	  }
     
   // ------ editorContainer interface ---------------
   public Editor getEditor(){

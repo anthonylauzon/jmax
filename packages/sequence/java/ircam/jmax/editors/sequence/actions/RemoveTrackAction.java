@@ -35,6 +35,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class RemoveTrackAction extends EditorAction
 {
+   public RemoveTrackAction()
+	  {
+		 super("Remove track", null, KeyEvent.VK_R, KeyEvent.VK_UNDEFINED, true);
+	  }
+
   public void doAction(EditorContainer container)
   {
       ((SequencePanel)container.getEditor()).removeActiveTrack();    

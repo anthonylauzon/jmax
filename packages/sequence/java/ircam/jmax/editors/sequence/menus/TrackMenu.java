@@ -42,20 +42,23 @@ public class TrackMenu extends EditorMenu
   public TrackMenu(EditorContainer container, SequenceDataModel sequenceModel)
   {
     super("Track");
+	setMnemonic(KeyEvent.VK_T);
+
     this.sequenceModel = sequenceModel;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
+
     JMenu addTrackMenu = new JMenu("Add Track");
     FillAddTrackMenu(addTrackMenu);
+
     add(addTrackMenu);
+	add(Actions.removeTrackAction);
     
-    JMenuItem removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
+	// JMenuItem removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
 
     addSeparator();
-    add(Actions.exportAction, "Export Track");
-
-    //******** Merge reintroduction *******************//
-    add(Actions.mergeAction, "Merge Active Tracks", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_M);
+    add(Actions.exportAction);
+	add(Actions.mergeAction);
 
     addSeparator();
     JMenuItem item;

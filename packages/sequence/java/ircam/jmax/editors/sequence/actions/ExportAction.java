@@ -36,6 +36,12 @@ import ircam.jmax.toolkit.actions.*;
 
 public class ExportAction extends EditorAction
 {
+   public ExportAction()
+	  {
+		 super("Export track...", null, KeyEvent.VK_X, KeyEvent.VK_UNDEFINED, true);
+	  }
+
+
   public void doAction(EditorContainer container)
   {
       SequencePanel panel = (SequencePanel)container.getEditor();

@@ -35,6 +35,10 @@ import ircam.jmax.toolkit.actions.*;
 
 public class MergeAction extends EditorAction
 {
+   public MergeAction()
+	  {
+		 super("Merge active tracks", null, KeyEvent.VK_M, KeyEvent.VK_UNDEFINED, true);
+	  }
   public void doAction(EditorContainer container)
   {
     ((SequencePanel)container.getEditor()).Merge();    

@@ -36,6 +36,11 @@ import ircam.jmax.toolkit.actions.*;
 
 public class ImportAction extends EditorAction
 {
+   public ImportAction()
+	  {
+		 super("Import track...", null, KeyEvent.VK_I, KeyEvent.VK_UNDEFINED, true);
+	  }
+
   public void doAction(EditorContainer container)
   {
     if( container instanceof SequenceWindow)

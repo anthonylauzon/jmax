@@ -39,42 +39,82 @@ public class Actions
 {
   public static EditorAction exportAction    = new ExportAction();
   public static EditorAction importAction    = new ImportAction();
-  public static EditorAction cutAction = new EditorAction(){
+
+  public static class CutAction extends EditorAction
+  {
+	 public CutAction()
+		{
+		   super("Cut", null, KeyEvent.VK_C, KeyEvent.VK_X, false);
+		}
+
       public void doAction(EditorContainer container)
       {
 	((SequenceEditor)container.getEditor()).cut();
       }
-    };
-  public static EditorAction copyAction = new EditorAction(){
+  }
+
+   public static class CopyAction extends EditorAction
+   {
+	  public CopyAction()
+		 {
+			super("Copy", null, KeyEvent.VK_C, KeyEvent.VK_C, false);
+		 }
+
       public void doAction(EditorContainer container)
       {
 	((SequenceEditor)container.getEditor()).copy();
       }
-    };
-  public static EditorAction pasteAction = new EditorAction(){
+   }
+
+   public static class PasteAction extends EditorAction
+   {
+	  public PasteAction()
+		 {
+			super("Paste", null, KeyEvent.VK_P, KeyEvent.VK_V, false);
+		 }
       public void doAction(EditorContainer container)
       {
 	((SequenceEditor)container.getEditor()).paste();
       }
-    };
-  public static EditorAction duplicateAction = new EditorAction(){
+
+   }
+
+   public static class DuplicateAction extends EditorAction
+   {
+	  public DuplicateAction()
+		 {
+			super("Duplicate", null, KeyEvent.VK_D, KeyEvent.VK_D, false);
+		 }
       public void doAction(EditorContainer container)
       {
 	((SequenceEditor)container.getEditor()).duplicate();
       }
-    };
-  public static EditorAction undoAction = new EditorAction(){
+   }
+
+   public static class UndoAction extends EditorAction
+   {
+	  public UndoAction()
+		 {
+			super("Undo", null, KeyEvent.VK_U, KeyEvent.VK_Z, true);
+		 }
       public void doAction(EditorContainer container)
       {
 	((SequenceEditor)container.getEditor()).undo();
       }
-    };
-  public static EditorAction redoAction = new EditorAction(){
+   }
+
+   public static class RedoAction extends EditorAction
+   {
+	  public RedoAction()
+		 {
+			super("Redo", null, KeyEvent.VK_R, KeyEvent.VK_Y, true);
+		 }
       public void doAction(EditorContainer container)
       {
 	((SequenceEditor)container.getEditor()).redo();
       }
-    };
+   }
+
   public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
   //******** Merge reintroduction *******************//

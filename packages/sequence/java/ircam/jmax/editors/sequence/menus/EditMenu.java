@@ -37,19 +37,23 @@ import ircam.jmax.editors.sequence.actions.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
+import ircam.jmax.toolkit.actions.*;
+
+
+
 
 
 public class EditMenu extends EditorMenu
 {
   EditorContainer container;
 
-  JMenuItem undoItem;
-  JMenuItem redoItem;
-  JMenuItem cutItem;
-  JMenuItem copyItem;
-  JMenuItem pasteItem;
-  JMenuItem duplicateItem;
-  
+  public EditorAction cutAction       			= new Actions.CutAction();
+  public EditorAction copyAction      			= new Actions.CopyAction();
+  public EditorAction pasteAction     			= new Actions.PasteAction();
+  public EditorAction duplicateAction 			= new Actions.DuplicateAction();
+  public EditorAction undoAction				= new Actions.UndoAction();
+  public EditorAction redoAction				= new Actions.RedoAction(); 
+
   public EditMenu(EditorContainer container)
   {
     super("Edit");
@@ -57,39 +61,40 @@ public class EditMenu extends EditorMenu
     this.container = container;
 
     setHorizontalTextPosition(AbstractButton.LEFT);
+	setMnemonic(KeyEvent.VK_E);
 
-    undoItem      = add(Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Z);
-    redoItem      = add(Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_R);
-
+	add(undoAction);
+	add(redoAction);
     addSeparator();
-    
-    cutItem       = add(Actions.cutAction, "Cut", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_X);
-    copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
-    pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
-    duplicateItem = add(Actions.duplicateAction, "Duplicate", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_D);
+	add(cutAction);
+	add(copyAction);
+	add(pasteAction);
+	add(duplicateAction);
+
+    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
+    DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
+    pasteAction.setEnabled((flavors != null) &&
+			 clipboardContent.isDataFlavorSupported(SequenceDataFlavor.getInstance()));
   }
 
   public void updateMenu()
   {
-    Transferable clipboardContent = JMaxApplication.getSystemClipboard().getContents(this);
-    DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
-
+/*
     if((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()))
       {
 	//Empty selection	
-	cutItem.setEnabled(false);
-	copyItem.setEnabled(false);
-	duplicateItem.setEnabled(false);
+	cutAction.setEnabled(false);
+	copyAction.setEnabled(false);
+	duplicateAction.setEnabled(false);
       }
     else
       {
 	// Object selection
-	cutItem.setEnabled(true);
-	copyItem.setEnabled(true);
-	duplicateItem.setEnabled(true);
+	cutAction.setEnabled(true);
+	copyAction.setEnabled(true);
+	duplicateAction.setEnabled(true);
       }
-    pasteItem.setEnabled((flavors != null) &&
-			 clipboardContent.isDataFlavorSupported(SequenceDataFlavor.getInstance()));
+*/
   }
 }
 

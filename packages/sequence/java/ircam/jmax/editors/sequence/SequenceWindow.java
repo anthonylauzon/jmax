@@ -46,6 +46,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
   //------------------- fields
   SequencePanel itsSequencePanel;
   FtsSequenceObject sequenceData;
+   EditMenu editMenu;
   
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
@@ -63,7 +64,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     sequenceData = data;
 
     //initTrackEditorFactoryTable();
-    TrackEditorFactoryTable.init();
+	TrackEditorFactoryTable.init();
 
     makeTitle();
     
@@ -111,6 +112,11 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
 
+   public EditMenu getEditMenu()
+	  {
+		 return editMenu;
+	  }
+
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
     
@@ -118,7 +124,8 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     mb.add( new FileMenu());
     
     // Build the edit menu
-    mb.add(new EditMenu(this)); 
+	editMenu = new EditMenu(this);
+    mb.add(editMenu); 
     
     // Build the track menu
     mb.add(new TrackMenu(this, sequenceData)) ; 	

@@ -25,6 +25,7 @@ import ircam.jmax.editors.sequence.tools.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.track.Event;
 import ircam.jmax.editors.sequence.renderers.*;
+import ircam.jmax.editors.sequence.menus.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -50,6 +51,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   transient EditorToolbar toolbar;
   SequenceDataModel sequenceData;
   transient EditorContainer itsContainer;
+   private EditMenu editMenu;
   transient public InfoPanel statusBar;
   transient public SequenceRuler ruler;
   
@@ -77,6 +79,12 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   {  
     itsContainer = container;
     sequenceData = data;
+
+	if(itsContainer instanceof SequenceWindow)
+	{
+	   SequenceWindow window = (SequenceWindow)itsContainer;
+	   editMenu = window.getEditMenu();
+	}
 
     setDoubleBuffered(false);
     ftsSequenceObject = (FtsSequenceObject)data;
@@ -501,22 +509,30 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
   {
     Track track = mutex.getCurrent();
     if(track!=null)
+	{
       ((ClipableData) track.getTrackDataModel()).copy();
+	  editMenu.pasteAction.setEnabled(true);
+	}
+	  
   }
 
   public void cut()
   {
     Track track = mutex.getCurrent();
     if(track!=null)
+	{
       ((ClipableData) track.getTrackDataModel()).cut();
+	  editMenu.pasteAction.setEnabled(true);
+	}
   }
   
   public void paste()
   {
     Track track = mutex.getCurrent();
     if(track!=null)
-      ((ClipableData) track.getTrackDataModel()).paste();
-  }
+	  ((ClipableData) track.getTrackDataModel()).paste();
+
+    }
   
   public void duplicate()
   {
@@ -532,7 +548,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 	{
 	  ((UndoableData) track.getTrackDataModel()).undo();
 	} catch (CannotUndoException e1) {
-	  System.out.println("can't undo");
+	  System.out.println("Can't undo");
 	}
   }
 
@@ -544,7 +560,7 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
 	{
 	  ((UndoableData) track.getTrackDataModel()).redo();
 	} catch (CannotRedoException e1) {
-	  System.out.println("can't redo");
+	  System.out.println("Can't redo");
 	}
   }
 
@@ -602,11 +618,22 @@ public class SequencePanel extends JPanel implements SequenceEditor, TrackListen
    */    
   public void valueChanged(ListSelectionEvent e)
   {
-    if (SequenceSelection.getCurrent().size()==1)
+	 int numSelected = SequenceSelection.getCurrent().size();
+
+    if (numSelected == 1)
       {
 	TrackEvent evt = (TrackEvent)SequenceSelection.getCurrent().getSelected().nextElement();
 	makeVisible(evt);
       }
+
+   if(itsContainer instanceof SequenceWindow)
+   {
+	  SequenceWindow window = (SequenceWindow)itsContainer;
+	  window.getEditMenu().copyAction.setEnabled(numSelected > 0);
+	  window.getEditMenu().cutAction.setEnabled(numSelected > 0);
+	  window.getEditMenu().duplicateAction.setEnabled(numSelected > 0);
+   }
+	
   }
     
     public boolean eventIsVisible(Event evt)
