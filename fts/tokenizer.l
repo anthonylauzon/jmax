@@ -48,7 +48,7 @@ hexint		0x[0-9a-fA-F]+
 float		[\-\+]?[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?
 
 /* $;,(){}[] cannot appear inside a symbol (unless quoted) */
-symbol		[^\$\;\,\(\)\{\}\[\] \t\n\r]+
+symbol		[^\$\;\,\(\)\{\}\[\] \t\n\r\']+
 quoted_symbol	\'[^\']+\'
 
 %%
