@@ -13,3 +13,7 @@ all: $(CLASSES)
 # Use: make run MAIN=UDPMessageTest ARGS="linotte.ircam.fr 2002 freq vol mod"
 run:
 	( CLASSPATH=$$CLASSPATH:$(JMAX_PROTOCOL_CLASSES) ; export CLASSPATH ; $(JAVA) $(MAIN) $(ARGS) )
+
+clean:
+	rm *.class
+
