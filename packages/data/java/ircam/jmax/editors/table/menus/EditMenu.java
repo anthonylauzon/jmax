@@ -64,15 +64,15 @@ public class EditMenu extends EditorMenu
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    undoItem      = add(Actions.undoAction, "Undo", Event.CTRL_MASK, KeyEvent.VK_Z);
-    redoItem      = add(Actions.redoAction, "Redo", Event.CTRL_MASK, KeyEvent.VK_R);
+    undoItem      = add(Actions.undoAction, "Undo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Z);
+    redoItem      = add(Actions.redoAction, "Redo", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_R);
 
     addSeparator();
     
-    cutItem       = add(Actions.cutAction, "Cut", Event.CTRL_MASK, KeyEvent.VK_X);
-    copyItem      = add(Actions.copyAction, "Copy", Event.CTRL_MASK, KeyEvent.VK_C);
-    pasteItem     = add(Actions.pasteAction, "Paste", Event.CTRL_MASK, KeyEvent.VK_V);
-    insertItem    = add(Actions.insertAction, "Insert", Event.CTRL_MASK, KeyEvent.VK_I);
+    cutItem       = add(Actions.cutAction, "Cut", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_X);
+    copyItem      = add(Actions.copyAction, "Copy", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_C);
+    pasteItem     = add(Actions.pasteAction, "Paste", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_V);
+    insertItem    = add(Actions.insertAction, "Insert", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_I);
 
     addSeparator();
 

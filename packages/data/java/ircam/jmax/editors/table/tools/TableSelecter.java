@@ -68,6 +68,7 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
 	getGc().getSelection().deselectAll();
 	getGc().getSelection().setCaretPosition(getGc().getAdapter().getInvX(x));
       }
+    gc.getGraphicDestination().requestFocus();
   }
 
   /**
@@ -83,6 +84,8 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
     int start = (a.getInvX(x)>0) ? a.getInvX(x) : 0;
     int end = (a.getInvX(x+w) < getGc().getFtsObject().getSize()) ? a.getInvX(x+w) : (getGc().getFtsObject().getSize());
     getGc().getSelection().select(start, end);
+
+    gc.getGraphicDestination().requestFocus();
   }
 
     /**
