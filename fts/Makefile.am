@@ -12,6 +12,7 @@ atom.c \
 atomfile.c \
 audio.c \
 autosave.c \
+buffer.c \
 class.c \
 clipboard.c \
 connection.c \
