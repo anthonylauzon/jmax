@@ -28,12 +28,17 @@
 #include "seqmidi.h"
 #include "seqmess.h"
 
+
 #define TRACK_BLOCK_SIZE 256
 #define MAX_CLIENT_MSG_ATOMS 64		/* max. number of atoms to send */
 
+
 fts_class_t *track_class = 0;
 
-static void track_upload_event(track_t *self, event_t *event, fts_array_t *temp_array);
+
+static void track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array);
+static void track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 
 /*********************************************************
 *
@@ -568,6 +573,19 @@ track_description_function(fts_object_t *o,  fts_array_t *array)
   fts_array_append_symbol(array, seqsym_track);
   fts_array_append_symbol(array, fts_class_get_name(type));
 }
+
+
+/* upload all changed events if editor is visible */
+void track_update_editor (track_t *self)
+{
+    if (track_editor_is_open(self))
+	track_upload((fts_object_t *) self, 0, NULL, 0, NULL);
+}
+
+
+
+
+
 
 /******************************************************
  *
@@ -1656,72 +1674,57 @@ _track_get_markers(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_return_object((fts_object_t *)track_get_markers(self));
 }
 
+
+
+
 /******************************************************
 *
-*  MIDI files
+*  import/export
 *
 */
 
+/* default import handler: midifile */
 static void
 track_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   track_t *self = (track_t *)o;
   fts_symbol_t name = fts_get_symbol(at);
   fts_midifile_t *file = fts_midifile_open_read(name);
-  
-  if(file)
+  fts_atom_t ret = *fts_null;
+  fts_class_t *type = track_get_type(self);
+
+  if (type == fts_midievent_type || type == scoob_class ||
+      type == fts_int_class      || type == NULL)
   {
-    int size;
-    char *error;
+      if(file)
+      {
+	  int size;
+	  char *error;
     
-    _track_clear(o, 0, NULL, 0, NULL);
+	  _track_clear(o, 0, NULL, 0, NULL);
     
-    size = track_import_from_midifile(self, file);
-    error = fts_midifile_get_error(file);
-    
-    if(error)
-      fts_object_error(o, "import: read error in \"%s\" (%s)", fts_symbol_name(name), error);
-    else if(size <= 0)
-      fts_object_error(o, "import: couldn't get any data from \"%s\"", fts_symbol_name(name));
-    
-    fts_midifile_close(file);
-    
-    if(track_editor_is_open(self))
-      track_upload(o, 0, NULL, 0, NULL);
+	  size  = track_import_from_midifile(self, file);
+	  error = fts_midifile_get_error(file);
+
+	  if (!error && size > 0)	/* set return value: sucess */
+	  {
+	      fts_set_int(&ret, size);
+
+	      if (track_editor_is_open(self))
+		  track_upload(o, 0, NULL, 0, NULL);
+	  }
+
+	  fts_midifile_close(file);
+      }
   }
-  else
-    fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
+
+  fts_return(&ret);
 }
 
-static void
-track_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Open standard MIDI file"));
-}
 
-static void
-track_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *self = (track_t *)o;
-  fts_class_t *type = track_get_type(self);
-  
-  if(type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL)
-    track_import_midifile(o, 0, 0, 1, at);
-  else
-    fts_object_error(o, "import: cannot import MIDI file to track of type %s", fts_symbol_name(fts_class_get_name(type)));
-}
 
-static void
-track_import_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  track_t *self = (track_t *)o;
-  fts_class_t *type = track_get_type(self);
-  
-  if(type == fts_midievent_type || type == scoob_class || type == fts_int_class || type == NULL)
-    track_import_midifile_dialog(o, 0, 0, 0, 0);
-  else
-    fts_object_error(o, "import: cannot import MIDI file to track of type %s", fts_symbol_name(fts_class_get_name(type)));
-}
+
+/* exporting */
 
 static void
 track_export_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -2025,8 +2028,8 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
-	fts_class_message_varargs(cl, seqsym_save_editor, track_set_save_editor);
-	fts_class_message_varargs(cl, seqsym_set_editor, track_set_editor_at_client);
+  fts_class_message_varargs(cl, seqsym_save_editor, track_set_save_editor);
+  fts_class_message_varargs(cl, seqsym_set_editor, track_set_editor_at_client);
   
   fts_class_message_varargs(cl, fts_s_dump_state, track_dump_state);
   fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui);
@@ -2041,12 +2044,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_upload, track_upload);
   
   fts_class_message_varargs(cl, fts_s_print, _track_print);
-  
-  fts_class_message_varargs(cl, seqsym_import_midifile_dialog, track_import_midifile_dialog);
-  fts_class_message_varargs(cl, seqsym_import_midifile, track_import_midifile);
-  
-  fts_class_message_varargs(cl, seqsym_export_midifile_dialog, track_export_midifile_dialog);
-  fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
   
   fts_class_message_varargs(cl, seqsym_endPaste, track_end_paste);
   fts_class_message_varargs(cl, fts_new_symbol("endUpdate"), track_end_update);
@@ -2067,18 +2064,22 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_append, _track_append);
   fts_class_message_varargs(cl, seqsym_remove, _track_remove);
   
-  fts_class_message_varargs(cl, fts_new_symbol("shift"), _track_shift);
-  fts_class_message_varargs(cl, fts_new_symbol("stretch"), _track_stretch);
+  fts_class_message_varargs(cl, fts_new_symbol("shift"),    _track_shift);
+  fts_class_message_varargs(cl, fts_new_symbol("stretch"),  _track_stretch);
   fts_class_message_varargs(cl, fts_new_symbol("quantize"), _track_quantize);
+  fts_class_message_void   (cl, fts_new_symbol("duration"), _track_get_duration);
+  fts_class_message_void   (cl, fts_new_symbol("size"),     _track_get_size);
   
-  fts_class_message_void(cl, fts_s_import, track_import_dialog);
-  fts_class_message_symbol(cl, fts_s_import, track_import);
+
+  /* im/export */
+  fts_class_message_void   (cl, fts_s_import, fts_object_import_dialog);
+  fts_class_message_symbol (cl, fts_s_import, fts_object_import);
+  fts_class_message_varargs(cl, seqsym_import_midifile, track_import_midifile);
   
-  fts_class_message_void(cl, fts_s_export, track_export_dialog);
-  fts_class_message_symbol(cl, fts_s_export, track_export);
-  
-  fts_class_message_void(cl, fts_new_symbol("duration"), _track_get_duration);
-  fts_class_message_void(cl, fts_new_symbol("size"), _track_get_size);
+  fts_class_message_void   (cl, fts_s_export, track_export_dialog);
+  fts_class_message_symbol (cl, fts_s_export, track_export);
+  fts_class_message_varargs(cl, seqsym_export_midifile_dialog, track_export_midifile_dialog);
+  fts_class_message_varargs(cl, seqsym_export_midifile, track_export_midifile);
   
   /* DON'T EVER TELL ANYBODY!! */
   fts_class_message_void(cl, seqsym_markers, _track_get_markers);
@@ -2086,7 +2087,7 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_inlet_thru(cl, 0);
   
-	fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_from_client);
+  fts_class_message_varargs(cl, seqsym_addEvent, track_add_event_from_client);
   fts_class_message_varargs(cl, seqsym_makeEvent, track_make_event_from_client);
   fts_class_message_varargs(cl, seqsym_removeEvents, track_remove_events_from_client);
   fts_class_message_varargs(cl, seqsym_moveEvents, track_move_events_from_client);
@@ -2096,6 +2097,11 @@ track_instantiate(fts_class_t *cl)
   fts_class_set_copy_function(cl, track_copy_function);
   fts_class_set_description_function(cl, track_description_function);
   
+
+  /*
+   * track class documentation
+   */
+
   fts_class_doc(cl, seqsym_track, "[<sym: type>]", "sequence of time-tagged values");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all events");
   fts_class_doc(cl, seqsym_insert, "<num: time> <any: value>", "insert event at given time");
@@ -2110,4 +2116,10 @@ void
 track_config(void)
 {
   track_class = fts_class_install(seqsym_track, track_instantiate);
+
+  /* the midifile importer will be the last handler tried */
+  fts_class_add_import_handler(track_class, track_import_midifile);
+  
+  content_dumper_class = fts_class_install(NULL, content_dumper_instantiate);
+  content_dumper = (content_dumper_t *)fts_object_create(content_dumper_class, 0, 0);
 }

@@ -26,6 +26,7 @@
 #include <fts/fts.h>
 #include <fts/packages/sequence/sequence.h>
 
+
 extern fts_class_t *track_class;
 
 struct _track_
@@ -79,6 +80,7 @@ extern void track_append_event(track_t *track, double time, event_t *event);
 extern void track_remove_event(track_t *track, event_t *event);
 extern void track_remove_event_and_upload(track_t *track, event_t *event);
 extern void track_move_event(track_t *track, event_t *event, double time);
+extern void track_update_editor (track_t *self);
 
 extern void track_merge(track_t *track, track_t *merge);
 extern void track_clear(track_t *track);
@@ -157,4 +159,4 @@ extern void track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 extern void track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 extern void track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-#endif
+#endif  /* _SEQUENCE_TRACK_H_ */
