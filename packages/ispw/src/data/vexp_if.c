@@ -12,6 +12,7 @@
  * 
  */
 
+#include <stdio.h>
 
 #include "fts.h"
 #include "vexp.h"
@@ -180,8 +181,10 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
     case ET_FLT:
       /* CHANGE do we need a fts_set_float_outlet here */
-      fts_set_float(&a, x->exp_res.ex_flt);
-      fts_outlet_send((fts_object_t *)x, 0, fts_s_float, 1, &a);
+/*       fts_set_float(&a, x->exp_res.ex_flt); */
+/*       fts_outlet_send((fts_object_t *)x, 0, fts_s_float, 1, &a); */
+
+       fts_outlet_float((fts_object_t *)x, 0, x->exp_res.ex_flt);
       break;
 
     case ET_SYM:
