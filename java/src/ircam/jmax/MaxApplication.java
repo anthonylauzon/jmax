@@ -294,8 +294,8 @@ public class MaxApplication extends Object
     if (jmaxProperties.get("jmaxInterp") == null)
       {
 	//user didn't specify the interp. Take default.
-	//jmaxProperties.put("jmaxInterp", "jacl");
-	jmaxProperties.put("jmaxInterp", "silk");
+	jmaxProperties.put("jmaxInterp", "jacl");
+	//jmaxProperties.put("jmaxInterp", "silk");
       }
 
     //the version number as a system property
