@@ -1,3 +1,3 @@
-SUBDIRS=c help
+SUBDIRS=c 
 
 packagedir=$(pkgdatadir)/packages/oss
