@@ -109,6 +109,22 @@ fts_dirname(const char *name, char* buf, int size)
   }
 }
 
+void
+fts_path_to_dirname(char *path) {
+    int i;
+    i = strlen(path);
+    while((--i>0) && (path[i]!=fts_file_separator));
+    path[i] = 0;
+}
+
+const char *
+fts_get_basename(const char *path) {
+    int i;
+    i = strlen(path);
+    while((--i>0) && (path[i]!=fts_file_separator));
+    return &path[i+1];
+}
+
 int 
 fts_file_correct_separators( char *filename)
 {
@@ -428,3 +444,107 @@ void fts_file_get_write_path(const char *path, char *full_path)
 	}
     }
 }
+
+
+#define FTS_COPY_FILE_BUFSIZE 32768
+// [RS]: Copies a file. The dest is overwritten.
+int fts_copy_file(const char *src, const char *dest)
+{
+    FILE *fsrc, *fdst;
+    unsigned long size, div, rem;
+    const unsigned long bufsize = FTS_COPY_FILE_BUFSIZE;
+    unsigned long i;
+    char *buffer;
+        
+    fsrc = fopen(src, "rb");
+    if(!fsrc) {
+        return -1;
+    }
+        
+    fdst = fopen(dest, "wb");
+    if(!fdst) {
+        fclose(fsrc);
+        return -2;
+    }
+
+    if(fseek(fsrc, 0, 2) != 0) {
+        fclose(fsrc);
+        fclose(fdst);
+        return -6;
+    }
+    
+    size = ftell(fsrc);
+    if( size<0 ) {
+        fclose(fsrc);
+        fclose(fdst);
+        return -7;
+    }
+
+    if(fseek(fsrc, 0, 0) != 0) {
+        fclose(fsrc);
+        fclose(fdst);
+        return -10;
+    }
+
+    div = size / bufsize;
+    rem = size % bufsize;
+        
+    if(div == 0)
+        buffer = (char *)malloc(rem);
+    else {
+        if (rem != 0)
+            buffer = (char *)malloc(bufsize);
+    }
+
+    if(!buffer) {
+        fclose(fsrc);
+        fclose(fdst);
+        return -3;
+    }    
+    
+    for(i=0; i<div; i++) {
+        fread(buffer, bufsize, 1, fsrc);
+        fwrite(buffer, bufsize, 1, fdst);
+        /* FIXME: use feof/ferror below. */
+        /*
+        if( fread(buffer, bufsize, 1, fsrc) < 1) {
+            fclose(fsrc);
+            fclose(fdst);
+            free(buffer);
+            return -4;
+        }
+        if( fwrite(buffer, bufsize, 1, fdst) < 1) {
+            fclose(fsrc);
+            fclose(fdst);
+            free(buffer);
+            return -5;
+        }
+        */
+    }
+    
+    if(rem>0) {
+        fread(buffer, rem, 1, fsrc);
+        fwrite(buffer, rem, 1, fdst);
+        /* FIXME: use feof/ferror below. */
+        /*
+        if( fread(buffer, rem, 1, fsrc) < 1) {
+                fclose(fsrc);
+                fclose(fdst);
+                free(buffer);
+                return -8;
+        }
+        if( fwrite(buffer, rem, 1, fsrc) < 1) {
+                fclose(fsrc);
+                fclose(fdst);
+                free(buffer);
+                return -9;
+        }
+        */
+    }
+    
+    fclose(fsrc);
+    fclose(fdst);
+    free(buffer);
+    return 0;
+}
+
