@@ -1,0 +1,63 @@
+#!/bin/sh
+
+##
+## make-distrib SOURCE ARCH
+##
+## Take all the files from the SOURCE, assuming it is the top of a 
+## Max repository, and generate a distribution list for the ARCH architecture.
+## In SOURCE (and recorsively under its directory), there must be a file 
+## called distrib, containing a line for every file or directory to include
+## in the distribution; each line must be in the format:
+##
+##    arch name [newname]
+##
+## Where arch must be an architecture name: if arch match the current architecture
+## (i.e. the architecture name passed as argument) or it is the word "all", then
+## the file or directory "name" is included in the distribution; if "newname" is
+## specified, then the the file "name" is renamed to "newname" in the distribution;
+## this is useful to include files whose content is architecture dependent.
+##
+## Making multi architecture is possible by simply calling make-distrib multiple times with
+## different ARCH argument, and the same source and destination argument.
+## make-distrib will never overwrite an existing file;
+## to rewrite a distribution, you should delete it first.
+##
+
+
+
+## Parameters
+
+source=$1
+architecture=$2
+
+## Make the distribution directory if it do not exists
+
+if [ -f $source/distrib ]
+then
+    {
+	read arch_filter name others
+	
+	while [ $arch_filter ] 
+	do
+	    {
+		if [ $arch_filter = $architecture ] || [ $arch_filter = "all" ]
+		then
+		    {
+			if [ -f "$source/$name" ]
+			then
+			    echo $source/$name
+			elif [ -d "$source/$name" ]
+			then
+			    make-distrib $source/$name $architecture $verbose
+			else
+			    echo "File or directory $source/$name not found" >&2
+			fi
+		    }
+		fi
+
+		read arch_filter name others
+	    }
+	done
+    }  < $source/distrib
+fi
+
