@@ -29,7 +29,7 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR)/libFtl.a
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libFtl.a
 
 $(LIBDIR)/libFtl.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libFtl.a $(OBJECTS)

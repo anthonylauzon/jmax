@@ -22,14 +22,12 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-
-
 ROOTDIR = ../../..
 
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR)/libClient.a
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libClient.a
 
 $(LIBDIR)/libClient.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libClient.a $(OBJECTS)

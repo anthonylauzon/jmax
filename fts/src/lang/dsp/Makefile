@@ -28,7 +28,7 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR)/libDsp.a
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libDsp.a
 
 $(LIBDIR)/libDsp.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libDsp.a $(OBJECTS)

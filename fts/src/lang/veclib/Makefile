@@ -29,7 +29,7 @@ include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
 
-all: portable $(LIBDIR)/libVecLib.a
+all: $(LIBDIR) $(OBJDIR) portable $(LIBDIR)/libVecLib.a
 
 clean : portable_clean
 

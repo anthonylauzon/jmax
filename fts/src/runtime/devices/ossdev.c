@@ -303,7 +303,7 @@ static int audio_desc_update( audio_desc_t *aud, int cmd)
 
       audio_desc_free( aud);
 
-      assert( fts_hash_table_remove( audio_desc_table, device_name) != 0);
+      fts_hash_table_remove( audio_desc_table, device_name);
 
       return 0;
     }
@@ -318,7 +318,7 @@ static int audio_desc_update( audio_desc_t *aud, int cmd)
 
       audio_desc_free( aud);
 
-      assert( fts_hash_table_remove( audio_desc_table, aud->device_name) != 0);
+      fts_hash_table_remove( audio_desc_table, aud->device_name);
 
       return -1;
     }

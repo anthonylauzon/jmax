@@ -22,14 +22,12 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-
-
 ROOTDIR = ../../..
 
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR)/libSched.a
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libSched.a
 
 $(LIBDIR)/libSched.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libSched.a $(OBJECTS)

@@ -28,7 +28,7 @@ ROOTDIR = ../../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR)/libPortableVecLib.a
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libPortableVecLib.a
 
 $(LIBDIR)/libPortableVecLib.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libPortableVecLib.a $(OBJECTS)

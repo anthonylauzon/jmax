@@ -92,7 +92,14 @@ $(OBJDIR)/%.o : %.c
 #$(OBJDIR)/%.o : %.s $(OBJDIR)
 #	$(AS) -o $@  $<
 
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
 
+$(LIBDIR):
+	mkdir -p $(LIBDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
 
 

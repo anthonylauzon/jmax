@@ -57,7 +57,7 @@ $(FTS_PACKAGE_DIR)/manoury/lib/$(ARCH)/$(MODE)/libmanoury.a \
 $(FTS_PACKAGE_DIR)/qlist/c/lib/$(ARCH)/$(MODE)/libqlist.a \
 $(FTS_PACKAGE_DIR)/system/c/lib/$(ARCH)/$(MODE)/libsystem.a
 
-all: $(FTS_BIN_STATIC)
+all: $(BINDIR) $(LIBDIR) $(OBJDIR) $(FTS_BIN_STATIC)
 
 $(FTS_BIN_STATIC) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN_STATIC)
@@ -67,7 +67,7 @@ else
 
 FTS_BIN = $(BINDIR)/fts
 
-all: $(FTS_BIN)
+all:  $(BINDIR) $(LIBDIR) $(OBJDIR) $(FTS_BIN)
 
 endif
 

@@ -28,7 +28,7 @@ ROOTDIR = ../../..
 include $(ROOTDIR)/Makefiles/Makefile.common
 include Sources
 
-all: $(LIBDIR)/libAudio.a
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libAudio.a
 
 $(LIBDIR)/libAudio.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIBDIR)/libAudio.a $(OBJECTS)
