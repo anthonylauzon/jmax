@@ -992,6 +992,16 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     ObjectPopUp.popup(itsSketchPad, this, p.x, p.y);
   }
 
+  public void runModePopUpEdit(Point p)
+  {
+      JPopupMenu popup = getRunModePopUpMenu();
+      if(popup!=null)
+	   popup.show(itsSketchPad, p.x-2, p.y-2);
+  }
+  public JPopupMenu getRunModePopUpMenu()
+  {
+      return null;
+  }
   public void popUpReset()
   {
   }

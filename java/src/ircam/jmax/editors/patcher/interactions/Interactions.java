@@ -52,7 +52,7 @@ public class Interactions
 
   public static Interaction dragSelectInteraction = new DragSelectInteraction();
   public static Interaction dragToggleSelect = new DragToggleSelect();
-   public static Interaction editCtrlInteraction    = new EditCtrlInteraction();
+  public static Interaction editCtrlInteraction    = new EditCtrlInteraction();
   public static Interaction hResizeInteraction     = new HResizeInteraction();
   public static Interaction vResizeInteraction     = new VResizeInteraction();
   public static Interaction moveEditInteraction    = new MoveEditInteraction();
@@ -65,6 +65,7 @@ public class Interactions
   public static Interaction connSelectInteraction       = new ConnSelectInteraction();
   public static Interaction connToggleSelectInteraction = new ConnToggleSelect();
   public static Interaction popUpInteraction = new PopUpInteraction();
+  public static Interaction runPopUpInteraction = new RunPopUpInteraction();
   public static Interaction bgPopUpInteraction = new BgPopUpInteraction();
 }
 

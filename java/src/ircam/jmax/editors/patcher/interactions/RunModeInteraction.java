@@ -59,6 +59,8 @@ class RunModeInteraction extends Interaction
       case (Squeack.MIDDLE_BUTTON | Squeack.DOWN | Squeack.OBJECT):
 	// Help
 	return Interactions.helpInteraction;
+      case (Squeack.POP_UP | Squeack.OBJECT):
+	  return Interactions.runPopUpInteraction;
       case (Squeack.DOWN | Squeack.OBJECT):
 	// Normal controller operations
 	return Interactions.runCtrlInteraction;

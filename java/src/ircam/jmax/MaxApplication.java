@@ -196,7 +196,6 @@ public class MaxApplication extends Object
 	    // Waiting for an option's value
 
 	    jmaxProperties.put(option.substring(1), args[i]);
-
 	    inOpt  = false;
 	  }
 	else
