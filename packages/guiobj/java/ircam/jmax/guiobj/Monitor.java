@@ -32,6 +32,7 @@ import java.awt.geom.*;
 
 import ircam.jmax.fts.*;
 
+import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -45,10 +46,14 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
   private transient static final Color itsCrossColor = new Color(0, 0, 128);
 
   private transient boolean isOn = false;
+  private int iconWidth;
+  private static Color deselectedColor = new Color(204, 204, 204);
 
   public Monitor(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);
+
+    iconWidth = JMaxIcons.dspOn.getIconWidth() + 10;
 
     super.setWidth( FIXED_WIDTH);
     super.setHeight( FIXED_HEIGHT);
@@ -62,6 +67,9 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
 
   public void setWidth(int w)
   {
+    if(w < iconWidth)
+      w = iconWidth;
+    super.setWidth(w);
   }
 
   public void setHeight(int h)
@@ -71,7 +79,7 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack))
-	((FtsMonitorObject)ftsObject).sendBang();
+      ((FtsMonitorObject)ftsObject).sendBang();
   }
 
   public void valueChanged(int value) 
@@ -89,19 +97,20 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     int h = getHeight();
 
     if ( !isSelected())
-	g.setColor( Settings.sharedInstance().getUIColor());
+      g.setColor( deselectedColor);
     else
-	g.setColor( Settings.sharedInstance().getUIColor().darker());
+      g.setColor( deselectedColor.darker());
     
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
-    if (isOn) 
-      {
-	g.setColor( itsCrossColor);
-	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
-	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
-      }
-    
+    int ix = x + (w - JMaxIcons.dspOn.getIconWidth())/2;
+    int iy = y + (h - JMaxIcons.dspOn.getIconHeight())/2;
+
+    if(isOn)
+      g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
+    else
+      g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
+
     super.paint( g);
   }
 
@@ -112,15 +121,20 @@ public class Monitor extends GraphicObject implements FtsIntValueListener
     int w = getWidth();
     int h = getHeight();
 
-    g.setColor( Settings.sharedInstance().getUIColor());
+    //g.setColor( Settings.sharedInstance().getUIColor());
+    if ( !isSelected())
+      g.setColor( deselectedColor);
+    else
+      g.setColor( deselectedColor.darker());
 
     g.fillRect( x + 3, y + 3, w - 6, h - 6);
 
-    if (isOn) 
-      {
-	g.setColor( itsCrossColor);
-	g.drawLine( x + 4, y + 4, x + w - 6, y + h - 6);
-	g.drawLine( x + w - 6, y + 4, x + 4,y + h - 6);
-      }
+    int ix = x + (w - JMaxIcons.dspOn.getIconWidth())/2;
+    int iy = y + (h - JMaxIcons.dspOn.getIconHeight())/2;
+
+    if(isOn)
+      g.drawImage(JMaxIcons.dspOn.getImage(), ix, iy, JMaxIcons.dspOn.getImageObserver());
+    else
+      g.drawImage(JMaxIcons.dspOff.getImage(), ix, iy, JMaxIcons.dspOff.getImageObserver());
   }  
 }

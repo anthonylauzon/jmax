@@ -101,6 +101,7 @@ guiobj.c \
 key.c \
 keyserver.c \
 messconst.c \
+monitor.c \
 panel.c \
 runtimeerrors.c \
 scope.c \
@@ -130,8 +131,8 @@ LIBS = @LIBS@
 libguiobj_la_LIBADD = 
 libguiobj_la_OBJECTS =  button.lo comment.lo comment_doctor.lo \
 console.lo display.lo dspcontrol.lo errorfinder.lo finder.lo fork.lo \
-gfloat.lo gint.lo guiobj.lo key.lo keyserver.lo messconst.lo panel.lo \
-runtimeerrors.lo scope.lo slider.lo toggle.lo vecdisplay.lo
+gfloat.lo gint.lo guiobj.lo key.lo keyserver.lo messconst.lo monitor.lo \
+panel.lo runtimeerrors.lo scope.lo slider.lo toggle.lo vecdisplay.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -149,9 +150,9 @@ GZIP_ENV = --best
 DEP_FILES =  .deps/button.P .deps/comment.P .deps/comment_doctor.P \
 .deps/console.P .deps/display.P .deps/dspcontrol.P .deps/errorfinder.P \
 .deps/finder.P .deps/fork.P .deps/gfloat.P .deps/gint.P .deps/guiobj.P \
-.deps/key.P .deps/keyserver.P .deps/messconst.P .deps/panel.P \
-.deps/runtimeerrors.P .deps/scope.P .deps/slider.P .deps/toggle.P \
-.deps/vecdisplay.P
+.deps/key.P .deps/keyserver.P .deps/messconst.P .deps/monitor.P \
+.deps/panel.P .deps/runtimeerrors.P .deps/scope.P .deps/slider.P \
+.deps/toggle.P .deps/vecdisplay.P
 SOURCES = $(libguiobj_la_SOURCES)
 OBJECTS = $(libguiobj_la_OBJECTS)
 
