@@ -44,7 +44,23 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   char* s;
   int state = 0;  
 
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+
+  /* DO NOT LOG ANYTHING YET WITH fts_log */
+
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+  /* WARNING - WARNING - WARNING - WARNING - WARNING - WARNING */
+
 /*    DebugBreak(); */
+
+  /* [RS] temp logging stuff
+  int i;
+  FILE *f;
+  f=fopen("c:\\mylog.txt", "w");
+  fprintf(f, "'%s'\n", lpszCmdLine);
+  fclose(f);
+  */
 
   argv[argc++] = "fts";
 
@@ -89,6 +105,15 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     s++;
   }
   argv[argc] = NULL;
+
+  /* [RS] temp logging stuff
+  f=fopen("c:\\mylog.txt", "a");
+  fprintf(f, "\nargv:\n");
+  for(i=0; i<argc; i++) {
+      fprintf(f, "'%s'\n", argv[i]);
+  }
+  fclose(f);
+  */
 
   /* Initialize FTS */
   fts_init( argc, argv);
