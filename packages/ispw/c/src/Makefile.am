@@ -111,7 +111,7 @@ vexp.h \
 vexp_util.h \
 wavetab.h
 
-libispw_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
+libispw_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module -release @JMAX_VERSION@
 
 # Comment this rule, gcc crash was on Mac OS X.
 # On Mac OS X, autoconf is no more use
