@@ -20,6 +20,7 @@ INCLUDES=-I$(top_srcdir)/packages/utils/c/include -I$(top_srcdir)/packages/data/
 
 noinst_HEADERS= \
 col.h \
+floatfuns.h \
 row.h \
 tabeditor.h
 
