@@ -135,10 +135,16 @@ public class UtilTrackEvent implements Event, Drawable
     {
 	return trackEvent;
     }
-
+    
+    int deltaX = 0;
     public int getDeltaX(Adapter adapter)
     {
-	return (adapter.getX(this) - adapter.getX(trackEvent));
+	//return (adapter.getX(this) - adapter.getX(trackEvent));
+	return deltaX;
+    }
+    public void setDeltaX(int dx)
+    {
+	deltaX = dx;
     }
     public int getDeltaY(Adapter adapter)
     {

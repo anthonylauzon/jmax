@@ -147,6 +147,14 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
 	return minValue;
     }
 
+    public boolean isHorizontalMovementBounded()
+    {
+	if(getViewMode() == IntegerTrackEditor.BREAK_POINTS_VIEW)
+	    return true;
+	else
+	    return false;
+    }
+
     ////////////////// PropertyChangeListener interface
     public void propertyChange(PropertyChangeEvent e)
     {

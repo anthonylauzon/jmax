@@ -122,8 +122,8 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
   {
     TrackEvent aEvent;
     TrackEvent newEvent;
-
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    Adapter a = egc.getAdapter();
 
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
@@ -136,9 +136,30 @@ public class ArrowTool extends SelecterTool implements DirectionListener, DragLi
 	    aEvent = (TrackEvent) e.nextElement();
 	
 	    if (deltaX != 0) 
-		egc.getAdapter().setX(aEvent, egc.getAdapter().getX(aEvent)+deltaX);
-	    if ( deltaY != 0)
-	      egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
+		if(!a.isHorizontalMovementBounded())
+		    a.setX(aEvent, a.getX(aEvent)+deltaX);
+		else
+		    {
+			int prevX = 0;
+			int nextX = 0;
+			FtsTrackObject ftsTrk = egc.getTrack().getFtsTrack();
+			TrackEvent next = ftsTrk.getNextEvent(aEvent);
+			if(next!=null)
+			    nextX = a.getX(next)-1;
+			TrackEvent prev = ftsTrk.getPreviousEvent(aEvent);
+			if(prev!=null)
+			    prevX = a.getX(prev)+1;
+
+			if((a.getX(aEvent) + deltaX > nextX)&&(next!=null))
+			    a.setX(aEvent, nextX);
+			else
+			    if((a.getX(aEvent) + deltaX < prevX)&&(prev!=null))
+				a.setX(aEvent, prevX);
+			    else
+				a.setX(aEvent, a.getX(aEvent) + deltaX);
+		    }
+	    if (deltaY != 0)
+		a.setY(aEvent, a.getY(aEvent)+deltaY);
 	}
     
     ((UndoableData) egc.getDataModel()).endUpdate();

@@ -236,6 +236,14 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	else return null;
     }
     
+    public TrackEvent getPreviousEvent(Event evt)
+    {
+	int index = getFirstEventBefore(evt.getTime());
+
+	if((index != EMPTY_COLLECTION) && (index < events_fill_p) && (index >= 0))
+	    return events[index];
+	else return null;
+    }
     public TrackEvent getLastEvent()
     {
 	if(events_fill_p > 0)

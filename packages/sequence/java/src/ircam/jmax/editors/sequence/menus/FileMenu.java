@@ -44,11 +44,10 @@ public class FileMenu extends DefaultFileMenu
   public FileMenu()
   {
      insertSeparator(2);
-     insert(Actions.exportAction, "Export", Event.CTRL_MASK, KeyEvent.VK_S, 3);
-     insert(Actions.importAction, "Import", Event.CTRL_MASK, KeyEvent.VK_I, 4);
+     insert(Actions.importAction, "Import", 3);
 
-     insertSeparator(9/*6*/);
-     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 10/*7*/);
+     insertSeparator(8);
+     insert(Actions.printAction, "Print", Event.CTRL_MASK, KeyEvent.VK_P, 9);
   }
 }
 

@@ -248,10 +248,33 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    a.setLenght(tempEvent, a.getLenght(movTrackEvent));
 	    a.setHeigth(tempEvent, a.getHeigth(movTrackEvent));
 	    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0) 
-		a.setX(tempEvent, a.getX(movTrackEvent) + dx);
-	    
+		if(!a.isHorizontalMovementBounded())
+		    a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+		else
+		    {
+			int prevX = 0;
+			int nextX = 0;
+			FtsTrackObject ftsTrk = ((SequenceGraphicContext)gc).getTrack().getFtsTrack();
+			TrackEvent next = ftsTrk.getNextEvent(movTrackEvent);
+			if(next!=null)
+			    nextX = a.getX(next)-1;
+			TrackEvent prev = ftsTrk.getPreviousEvent(movTrackEvent);
+			if(prev!=null)
+			    prevX = a.getX(prev)+1;
+
+			if((a.getX(movTrackEvent) + dx > nextX)&&(next!=null))
+			    a.setX(tempEvent, nextX);
+			else
+			    if((a.getX(movTrackEvent) + dx < prevX)&&(prev!=null))
+				a.setX(tempEvent, prevX);
+			    else
+				a.setX(tempEvent, a.getX(movTrackEvent) + dx);
+		    }		    
+
 	    if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 		a.setY(tempEvent, a.getY(movTrackEvent)+dy);
+
+	    tempEvent.setDeltaX(dx);//?????
 
 	    movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
 

@@ -105,8 +105,19 @@ public class IntegerEventRenderer implements ObjectRenderer {
 			     g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
 			 else
 			     {//qui anche il next e' selezionato
-				 g.drawLine(x, y, adapter.getX(next)+((UtilTrackEvent)e).getDeltaX(adapter), 
-					    adapter.getY(next)+((UtilTrackEvent)e).getDeltaY(adapter));
+				 //qui deve vedere se il next e' < della sua posizione originale e clipparlo
+				 //deve fare la stessa cosa con se stesso rispetto al prev
+				 int nextX = adapter.getX(next)+((UtilTrackEvent)e).getDeltaX(adapter);
+				 if(nextX < adapter.getX(original)) nextX = adapter.getX(original)+1;
+				 
+
+
+				 //si fa dare il next del next 
+				 TrackEvent nextnext = model.getNextEvent(next);
+				 if(nextnext!=null)
+				     if(nextX > adapter.getX(nextnext)) nextX = adapter.getX(nextnext)-1;		 
+
+				 g.drawLine(x, y, nextX, adapter.getY(next)+((UtilTrackEvent)e).getDeltaY(adapter));
 			     }
 		  }
 	      else //normal paint

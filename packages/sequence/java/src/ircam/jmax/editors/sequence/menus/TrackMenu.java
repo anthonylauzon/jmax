@@ -62,7 +62,9 @@ public class TrackMenu extends EditorMenu
     
     removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
 
-    //addSeparator();
+    addSeparator();
+    add(Actions.exportAction, "Export Track");
+
     //add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
   }
     

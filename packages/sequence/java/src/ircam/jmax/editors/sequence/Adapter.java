@@ -195,6 +195,10 @@ abstract public class Adapter implements MappingListener{
   {
       return false;
   }
+  public boolean isHorizontalMovementBounded()
+  {
+      return false;
+  }
 
   /**
    * MappingListener interface
