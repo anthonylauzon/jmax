@@ -59,6 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
+ADDITIONAL_PACKAGES = @ADDITIONAL_PACKAGES@
 ALSA_CFLAGS = @ALSA_CFLAGS@
 ALSA_LIBS = @ALSA_LIBS@
 AS = @AS@
@@ -73,6 +74,8 @@ ECHO = @ECHO@
 EXEEXT = @EXEEXT@
 FTSDIR = @FTSDIR@
 FTS_SYS_LIBS = @FTS_SYS_LIBS@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LDFLAGS = @JACK_LDFLAGS@
 JAVA = @JAVA@
 JAVACFLAGSX = @JAVACFLAGSX@
 JAVACX = @JAVACX@
@@ -144,9 +147,9 @@ ShowHTMLAction.java
 
 
 JAVAC = @JAVACX@
-JAVACFLAGS = @JAVACFLAGSX@ -sourcepath $(top_srcdir)/java/src
+JAVACFLAGS = @JAVACFLAGSX@
 JAVAROOT = $(top_builddir)/java/src
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV = CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/client/java/ftsclient.jar:$(top_srcdir)/java/src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../../../../include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 

@@ -110,11 +110,11 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
     // Inlet and outlets Max
 
-    public static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
+    public static final int INOUTLET_MAX_SENSIBLE_AREA = /*10*/6;
  
     //dimension of in/outlet sensible area during connection
     
-    public static final int INOUTLET_CONNECTED_SENSIBLE_AREA = /*30*/20;
+    public static final int INOUTLET_CONNECTED_SENSIBLE_AREA = 20;
   }
 
   // This two flags say if the object parts are sensible, and if the in/outlets are sensibles
