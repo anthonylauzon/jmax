@@ -224,16 +224,17 @@ alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
     char label_name_str[NAME_SIZE];
     fts_symbol_t device_name;
     fts_symbol_t label_name;
-
+    fts_symbol_t port_address;
 
     fts_log("[alsaseqmidiport] alsaseqmidiport_init\n");
     this->manager = (alsaseqmidi_t*)fts_get_object(at);
     label_name = fts_get_symbol(at + 1);
     device_name = fts_get_symbol(at + 2);
+    port_address = fts_get_symbol(at + 3);
 
     fts_log("[alsaseqmidiport] label name %s\n", label_name);
     fts_log("[alsaseqmidiport] device name %s\n", device_name);
-
+    fts_log("[alsaseqmidiport] port address %s\n", port_address);
     snd_seq_port_info_malloc(&this->port_info);
     alsaseqmidiport_midi_parser_init(this);
 
@@ -269,7 +270,7 @@ alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
     snd_seq_get_port_info(this->seq, this->port_id, this->port_info);
 
     /* Etablish connection */
-    alsaseqmidiport_etablish_connection(this, device_name, INPUT_TYPE);
+    alsaseqmidiport_etablish_connection(this, port_address, INPUT_TYPE);
     fts_log("[alsaseqmidiport] connection etablished \n");
 
     fts_log("[alsaseqmidiport] set poll descriptors \n");
@@ -317,15 +318,18 @@ alsaseqmidiport_output_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
     char label_name_str[NAME_SIZE];
     fts_symbol_t device_name;
     fts_symbol_t label_name;
+    fts_symbol_t port_address;
 
 
     fts_log("[alsaseqmidiport] alsaseqmidiport_output_init\n");
     this->manager = (alsaseqmidi_t*)fts_get_object(at);
     label_name = fts_get_symbol(at + 1);
     device_name = fts_get_symbol(at + 2);
+    port_address = fts_get_symbol(at + 3);
 
     fts_log("[alsaseqmidiport] label name %s\n", label_name);
     fts_log("[alsaseqmidiport] device name %s\n", device_name);
+    fts_log("[alsaseqmidiport] port address %s\n", port_address);
 
     snd_seq_port_info_malloc(&this->port_info);
     alsaseqmidiport_midi_parser_init(this);
@@ -364,7 +368,7 @@ alsaseqmidiport_output_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
     snd_seq_get_port_info(this->seq, this->port_id, this->port_info);
     
     /* Etablish connection */
-    alsaseqmidiport_etablish_connection(this, device_name, OUTPUT_TYPE);
+    alsaseqmidiport_etablish_connection(this, port_address, OUTPUT_TYPE);
     fts_log("[alsaseqmidiport] connection established \n");
 
     fts_midiparser_init(parser);
