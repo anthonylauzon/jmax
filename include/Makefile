@@ -36,7 +36,6 @@ fts/lang/utils \
 fts/lang/veclib \
 fts/lang/veclib/include \
 fts/lang/veclib/portable \
-fts/runtime \
 fts/runtime/audio \
 fts/runtime/client \
 fts/runtime/devices \
