@@ -158,7 +158,7 @@ jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   if (NULL == client)
   {
-    post("[jackaudioport] cannot create jack client\n"
+    fts_post("[jackaudioport] cannot create jack client\n"
 	 "[jackaudioport] Are you sure than jackd is running ? \n");
     fts_log("[jackaudioport] cannot create jack client \n");
     fts_object_error(o, "[jackaudioport] cannot create jack client \n");

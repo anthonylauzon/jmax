@@ -183,7 +183,7 @@ jackaudiomanager_on_shutdown(void* arg)
   int dummy = 0;
 
   fts_log("[jackaudiomanager] jackd is shutdown \n");
-  post("[jackaudiomanager] jackd is shutdown \n");
+  fts_post("[jackaudiomanager] jackd is shutdown \n");
   fts_hashtable_get_keys(&jack_port_input_ht, &keys);
   fts_hashtable_get_values(&jack_port_input_ht, &values);
   while (fts_iterator_has_more(&keys))
@@ -235,7 +235,7 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
   fts_bytestream_t* bytestream = fts_post_get_stream(0,NULL);
 
   fts_log("[jackaudiomanager] port registration callback port name: %s\n", port_name);
-  post("[jackaudiomanager] registration callback, port name: %s, flag:%d\n", port_name, n);
+  fts_post("[jackaudiomanager] registration callback, port name: %s, flag:%d\n", port_name, n);
 
   if (0 == n)
   {
@@ -246,7 +246,7 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
       fts_log("[jackaudiomanager] port %s (id:%d) is mine \n", port_name, port_id);
       return;
     }    
-    post("[jackaudiomanager] unregistered port : %s\n", port_name);
+    fts_post("[jackaudiomanager] unregistered port : %s\n", port_name);
 
     /* look in hashtable to remove port */
     fts_set_symbol(&k, port_name);
@@ -268,7 +268,7 @@ void jackaudiomanager_port_registration_callback(jack_port_id_t port_id, int n, 
   else
   {
     /* update jack port hashtable */
-    post("[jackaudiomanager] registered port : %s\n", port_name);
+    fts_post("[jackaudiomanager] registered port : %s\n", port_name);
     jackaudiomanager_scan_ports(&jack_port_input_ht, JackPortIsOutput);
     jackaudiomanager_scan_ports(&jack_port_output_ht, JackPortIsInput);    
   }
@@ -1118,7 +1118,7 @@ jackaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 
   fts_sched_running_remove_listener(o);
 #ifdef JACK_AUDIO_MANAGER_DEBUG
-  post("jackaudiomanager_delete called !!!!! \n");
+  fts_post("jackaudiomanager_delete called !!!!! \n");
 #endif /* JACK_AUDIO_MANAGER_DEBUG */
   manager_object = (jackaudiomanager_thread_t*)self->jack_communication;
   run_fifo = &manager_object->run_fifo;
@@ -1177,7 +1177,7 @@ void jackaudiomanager_config( void)
   if (-1 == create_jack_manager_client())
   {
     fts_log("[jackaudiomanager] cannot connect to jack server, so no jackaudioport available \n");
-    post("[jackaudiomanager] cannot connect to jack server, so no jackaudioport available \n");
+    fts_post("[jackaudiomanager] cannot connect to jack server, so no jackaudioport available \n");
     return;
   }
 
