@@ -20,13 +20,14 @@
  *  generic binary operator class
  *
  *  one inlet
- *    <binop> const <constant right operand> ... right operand is constant data type
- *    <binop> static <static right operand> ... right operand can be static reference to non constant data
+ *    binop <binop> const <constant right operand> ... right operand is constant data type
+ *    binop <binop> static <static right operand> ... right operand can be static reference to non constant data
  *
  *  two inlets
- *    <binop> store [initial right operand] ... right operand is set (stored) via right inlet
- *    <binop> trigger [initial right operand] ... right aswell as left inlet set operand and triggers computation
- *    <binop> clear [initial right operand] ... right operand is cleared (released) after computation triggered by left operand
+ *    binop <binop> store [initial right operand] ... right operand is set (stored) via right inlet
+ *    binop <binop> trigger [initial right operand] ... right aswell as left inlet set operand and triggers computation
+ *    binop <binop> clear [initial right operand] ... right operand is cleared (released) after computation triggered by left operand
+ *    binop <binop> inplace [initial right operand] ... like store, but result is stored inplace of right operand
  *
  *  (the keyword which is set as default keyword - see binop_obj_config - is optional)
  *

@@ -17,6 +17,9 @@
 #include "fts.h"
 #include "types.h"
 
+extern fts_symbol_t op_s_recycle;
+extern fts_symbol_t op_s_inplace;
+
 /************************************************
  *
  *  operand types
@@ -111,7 +114,7 @@ do{ \
 
 #define _op_set_data(opp, d) {fts_set_data(opp_get_ap(opp), (d)); fts_data_refer(d);}
 
-#define op_set_int(opp, i) {op_type_set_int(&(opp)->type); fts_set_int(opp_get_ap(opp), (i));}
+#define op_set_int(opp, i) {op_release(opp); op_type_set_int(&(opp)->type); fts_set_int(opp_get_ap(opp), (i));}
 #define op_set_float(opp, f) {op_release(opp); op_type_set_float(&(opp)->type); fts_set_float(opp_get_ap(opp), (f));}
 #define op_set_symbol(opp, s) {op_release(opp); op_type_set_symbol(&(opp)->type); fts_set_symbol(opp_get_ap(opp), (s));}
 #define op_set_integer_vector(opp, iv) \

@@ -30,6 +30,8 @@ data_create(fts_symbol_t type, int ac, const fts_atom_t *at)
     data = fts_float_vector_constructor(ac, at);
   else if(type == fts_s_atom_array)
     data = fts_atom_array_constructor(ac, at);
+  else if(type == fts_s_atom_array)
+    data = fts_atom_array_constructor(ac, at);
 
   return data;
 }
@@ -78,18 +80,49 @@ data_release(fts_data_t *data)
 }
 
 
+/* get data size in # of atoms */
+int 
+data_get_size(fts_data_t *data)
+{
+  if(data->class == fts_integer_vector_data_class)
+    return ((fts_integer_vector_t *)data)->size;
+  else if(data->class == fts_integer_vector_data_class)
+    return ((fts_float_vector_t *)data)->size;
+  else if(data->class == fts_atom_array_data_class)
+    return ((fts_atom_array_t *)data)->size;
+
+  return 0;
+}
+
+/* get data as array of atoms (takes pointer to pre-allocated (!) array) and
+   return original size (might be bigger or smaller than pre-allocated array with ac) */
+int
+data_get_atoms(fts_data_t *data, int ac, fts_atom_t *at)
+{
+  if(data->class == fts_integer_vector_data_class)
+    return fts_integer_vector_get_atoms((fts_integer_vector_t *)data, ac, at);
+  else if(data->class == fts_float_vector_data_class)
+    return fts_float_vector_get_atoms((fts_float_vector_t *)data, ac, at);
+  else if(data->class == fts_atom_array_data_class)
+    return fts_atom_array_get_atoms((fts_atom_array_t *)data, ac, at);
+
+  return 0;
+}
+
 /*****************************************************************
  *
  *  data module
  *
  */
 
-extern void fts_complex_vector_config(void);
-
 extern void data_expr_init(void);
 extern void data_types_init(void);
 
+extern void operators_init(void);
+
 extern void monops_init(void);
+extern void monops_init(void);
+
 extern void binops_init(void);
 extern void binop_arith_init(void);
 extern void binop_arith_inplace_init(void);
@@ -105,18 +138,19 @@ extern void getsize_config(void);
 static void
 data_module_init(void)
 {
-  fts_complex_vector_config();
-
   data_expr_init();
   data_types_init();
 
-  monops_init();
-  binops_init();
+  operators_init();
 
+  monops_init();
+
+  binops_init();
   binop_arith_init();
   binop_arith_inplace_init();
   binop_comp_init();
 
+  monop_obj_config();
   binop_obj_config();
   atom_obj_config();
   post_obj_config();

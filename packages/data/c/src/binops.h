@@ -18,9 +18,6 @@
 #include "types.h"
 #include "operators.h"
 
-extern fts_symbol_t binops_s_recycle;
-extern fts_symbol_t binops_s_inplace;
-
 typedef struct _binop
 {
   fts_symbol_t name;

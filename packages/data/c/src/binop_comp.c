@@ -34,7 +34,6 @@ binop_ee_i_i(op_t *op)
   int l = op_get_int(op[0]);
   int r = op_get_int(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l == r);
 
   return (op + 2);
@@ -46,7 +45,6 @@ binop_ne_i_i(op_t *op)
   int l = op_get_int(op[0]);
   int r = op_get_int(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l != r);
 
   return (op + 2);
@@ -58,7 +56,6 @@ binop_gt_i_i(op_t *op)
   int l = op_get_int(op[0]);
   int r = op_get_int(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l > r);
 
   return (op + 2);
@@ -70,7 +67,6 @@ binop_lt_i_i(op_t *op)
   int l = op_get_int(op[0]);
   int r = op_get_int(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l < r);
 
   return (op + 2);
@@ -82,7 +78,6 @@ binop_ge_i_i(op_t *op)
   int l = op_get_int(op[0]);
   int r = op_get_int(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l >= r);
 
   return (op + 2);
@@ -94,7 +89,6 @@ binop_le_i_i(op_t *op)
   int l = op_get_int(op[0]);
   int r = op_get_int(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l <= r);
 
   return (op + 2);
@@ -113,7 +107,6 @@ binop_ee_f_f(op_t *op)
   float l = op_get_float(op[0]);
   float r = op_get_float(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l == r);
 
   return (op + 2);
@@ -125,7 +118,6 @@ binop_ne_f_f(op_t *op)
   float l = op_get_float(op[0]);
   float r = op_get_float(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l != r);
 
   return (op + 2);
@@ -137,7 +129,6 @@ binop_gt_f_f(op_t *op)
   float l = op_get_float(op[0]);
   float r = op_get_float(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l > r);
 
   return (op + 2);
@@ -149,7 +140,6 @@ binop_lt_f_f(op_t *op)
   float l = op_get_float(op[0]);
   float r = op_get_float(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l < r);
 
   return (op + 2);
@@ -161,7 +151,6 @@ binop_ge_f_f(op_t *op)
   float l = op_get_float(op[0]);
   float r = op_get_float(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l >= r);
 
   return (op + 2);
@@ -173,7 +162,6 @@ binop_le_f_f(op_t *op)
   float l = op_get_float(op[0]);
   float r = op_get_float(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l <= r);
 
   return (op + 2);
@@ -192,7 +180,6 @@ binop_ee_n_n(op_t *op)
   float l = op_get_number(op[0]);
   float r = op_get_number(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l == r);
 
   return (op + 2);
@@ -204,7 +191,6 @@ binop_ne_n_n(op_t *op)
   float l = op_get_number(op[0]);
   float r = op_get_number(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l != r);
 
   return (op + 2);
@@ -216,7 +202,6 @@ binop_gt_n_n(op_t *op)
   float l = op_get_number(op[0]);
   float r = op_get_number(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l > r);
 
   return (op + 2);
@@ -228,7 +213,6 @@ binop_lt_n_n(op_t *op)
   float l = op_get_number(op[0]);
   float r = op_get_number(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l < r);
 
   return (op + 2);
@@ -240,7 +224,6 @@ binop_ge_n_n(op_t *op)
   float l = op_get_number(op[0]);
   float r = op_get_number(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l >= r);
 
   return (op + 2);
@@ -252,7 +235,6 @@ binop_le_n_n(op_t *op)
   float l = op_get_number(op[0]);
   float r = op_get_number(op[1]);
 
-  op_release(&op[2]);
   op_set_int(&op[2], l <= r);
 
   return (op + 2);
@@ -1327,98 +1309,98 @@ binop_comp_init(void)
   sym_le = fts_new_symbol("<=");
 
   /* int @ int = int */
-  binop_declare_fun(sym_ee, binop_ee_i_i, fts_s_int, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_i_i, fts_s_int, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_i_i, fts_s_int, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_i_i, fts_s_int, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_i_i, fts_s_int, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_i_i, fts_s_int, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_i_i, fts_s_int, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_i_i, fts_s_int, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_i_i, fts_s_int, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_i_i, fts_s_int, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_i_i, fts_s_int, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_i_i, fts_s_int, fts_s_int, op_s_recycle);
 
   /* float @ float = float */
-  binop_declare_fun(sym_ee, binop_ee_f_f, fts_s_float, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_f_f, fts_s_float, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_f_f, fts_s_float, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_f_f, fts_s_float, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_f_f, fts_s_float, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_f_f, fts_s_float, fts_s_float, binops_s_recycle);    
+  binop_declare_fun(sym_ee, binop_ee_f_f, fts_s_float, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_f_f, fts_s_float, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_f_f, fts_s_float, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_f_f, fts_s_float, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_f_f, fts_s_float, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_f_f, fts_s_float, fts_s_float, op_s_recycle);    
 
   /* int(number) @ float(number) = float */
-  binop_declare_fun(sym_ee, binop_ee_n_n, fts_s_int, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_n_n, fts_s_int, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_n_n, fts_s_int, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_n_n, fts_s_int, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_n_n, fts_s_int, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_n_n, fts_s_int, fts_s_float, binops_s_recycle); 
+  binop_declare_fun(sym_ee, binop_ee_n_n, fts_s_int, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_n_n, fts_s_int, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_n_n, fts_s_int, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_n_n, fts_s_int, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_n_n, fts_s_int, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_n_n, fts_s_int, fts_s_float, op_s_recycle); 
 
   /* float(number) @ int(number) = float */
-  binop_declare_fun(sym_ee, binop_ee_n_n, fts_s_float, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_n_n, fts_s_float, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_n_n, fts_s_float, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_n_n, fts_s_float, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_n_n, fts_s_float, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_n_n, fts_s_float, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_n_n, fts_s_float, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_n_n, fts_s_float, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_n_n, fts_s_float, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_n_n, fts_s_float, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_n_n, fts_s_float, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_n_n, fts_s_float, fts_s_int, op_s_recycle);
 
   /* integer vector @ integer vector = integer vector */
-  binop_declare_fun(sym_ee, binop_ee_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_recycle);
 
   /* integer vector @ int = integer vector */
-  binop_declare_fun(sym_ee, binop_ee_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_iv_i, fts_s_integer_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_iv_i, fts_s_integer_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_i, fts_s_integer_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_i, fts_s_integer_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_i, fts_s_integer_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_i, fts_s_integer_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_iv_i, fts_s_integer_vector, fts_s_int, op_s_recycle);
 
   /* integer vector @ float = float vector */
-  binop_declare_fun(sym_ee, binop_ee_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_iv_f, fts_s_integer_vector, fts_s_float, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_iv_f, fts_s_integer_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_f, fts_s_integer_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_f, fts_s_integer_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_f, fts_s_integer_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_f, fts_s_integer_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_iv_f, fts_s_integer_vector, fts_s_float, op_s_recycle);
 
   /* float vector @ float vector = float vector */
-  binop_declare_fun(sym_ee, binop_ee_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_recycle);
 
   /* float vector @ int(number) = float vector */
-  binop_declare_fun(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_int, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_int, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_int, op_s_recycle);
 
   /* float vector @ float(number) = float vector */
-  binop_declare_fun(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle); 
-  binop_declare_fun(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle); 
-  binop_declare_fun(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_float, binops_s_recycle); 
+  binop_declare_fun(sym_ee, binop_ee_fv_n, fts_s_float_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_n, fts_s_float_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_n, fts_s_float_vector, fts_s_float, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_n, fts_s_float_vector, fts_s_float, op_s_recycle); 
+  binop_declare_fun(sym_ge, binop_ge_fv_n, fts_s_float_vector, fts_s_float, op_s_recycle); 
+  binop_declare_fun(sym_le, binop_le_fv_n, fts_s_float_vector, fts_s_float, op_s_recycle); 
 
   /* integer vector @ float vector = float vector */ 
-  binop_declare_fun(sym_ee, binop_ee_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle); 
-  binop_declare_fun(sym_le, binop_le_iv_fv, fts_s_integer_vector, fts_s_float_vector, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_iv_fv, fts_s_integer_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_iv_fv, fts_s_integer_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_iv_fv, fts_s_integer_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_iv_fv, fts_s_integer_vector, fts_s_float_vector, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_iv_fv, fts_s_integer_vector, fts_s_float_vector, op_s_recycle); 
+  binop_declare_fun(sym_le, binop_le_iv_fv, fts_s_integer_vector, fts_s_float_vector, op_s_recycle);
 
   /* float vector @ integer vector = float vector */
-  binop_declare_fun(sym_ee, binop_ee_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_ne, binop_ne_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_gt, binop_gt_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_lt, binop_lt_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_ge, binop_ge_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
-  binop_declare_fun(sym_le, binop_le_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_recycle);
+  binop_declare_fun(sym_ee, binop_ee_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_ne, binop_ne_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_gt, binop_gt_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_lt, binop_lt_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_ge, binop_ge_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_recycle);
+  binop_declare_fun(sym_le, binop_le_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_recycle);
 }

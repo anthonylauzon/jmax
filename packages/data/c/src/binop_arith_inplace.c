@@ -704,50 +704,50 @@ binop_arith_inplace_init(void)
   sym_vid = fts_new_symbol("\\");
 
   /* integer vector @ integer vector = integer vector */
-  binop_declare_fun(sym_add, binop_add_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_sub, binop_sub_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_mul, binop_mul_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_div, binop_div_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_bus, binop_bus_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_vid, binop_vid_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, binops_s_inplace);
+  binop_declare_fun(sym_add, binop_add_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_sub, binop_sub_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_mul, binop_mul_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_div, binop_div_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_bus, binop_bus_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_vid, binop_vid_inplace_iv_iv, fts_s_integer_vector, fts_s_integer_vector, op_s_inplace);
 
   /* integer vector @ int = integer vector */
-  binop_declare_fun(sym_add, binop_add_inplace_iv_i, fts_s_integer_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_sub, binop_sub_inplace_iv_i, fts_s_integer_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_mul, binop_mul_inplace_iv_i, fts_s_integer_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_div, binop_div_inplace_iv_i, fts_s_integer_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_bus, binop_bus_inplace_iv_i, fts_s_integer_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_vid, binop_vid_inplace_iv_i, fts_s_integer_vector, fts_s_int, binops_s_inplace);
+  binop_declare_fun(sym_add, binop_add_inplace_iv_i, fts_s_integer_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_sub, binop_sub_inplace_iv_i, fts_s_integer_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_mul, binop_mul_inplace_iv_i, fts_s_integer_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_div, binop_div_inplace_iv_i, fts_s_integer_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_bus, binop_bus_inplace_iv_i, fts_s_integer_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_vid, binop_vid_inplace_iv_i, fts_s_integer_vector, fts_s_int, op_s_inplace);
 
   /* float vector @ float vector = float vector */
-  binop_declare_fun(sym_add, binop_add_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_inplace);
-  binop_declare_fun(sym_sub, binop_sub_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_inplace);
-  binop_declare_fun(sym_mul, binop_mul_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_inplace);
-  binop_declare_fun(sym_div, binop_div_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_inplace);
-  binop_declare_fun(sym_bus, binop_bus_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_inplace);
-  binop_declare_fun(sym_vid, binop_vid_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, binops_s_inplace);
+  binop_declare_fun(sym_add, binop_add_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_inplace);
+  binop_declare_fun(sym_sub, binop_sub_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_inplace);
+  binop_declare_fun(sym_mul, binop_mul_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_inplace);
+  binop_declare_fun(sym_div, binop_div_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_inplace);
+  binop_declare_fun(sym_bus, binop_bus_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_inplace);
+  binop_declare_fun(sym_vid, binop_vid_inplace_fv_fv, fts_s_float_vector, fts_s_float_vector, op_s_inplace);
 
   /* float vector @ int(number) = float vector */
-  binop_declare_fun(sym_add, binop_add_inplace_fv_n, fts_s_float_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_sub, binop_sub_inplace_fv_n, fts_s_float_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_mul, binop_mul_inplace_fv_n, fts_s_float_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_div, binop_div_inplace_fv_n, fts_s_float_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_bus, binop_bus_inplace_fv_n, fts_s_float_vector, fts_s_int, binops_s_inplace);
-  binop_declare_fun(sym_vid, binop_vid_inplace_fv_n, fts_s_float_vector, fts_s_int, binops_s_inplace);
+  binop_declare_fun(sym_add, binop_add_inplace_fv_n, fts_s_float_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_sub, binop_sub_inplace_fv_n, fts_s_float_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_mul, binop_mul_inplace_fv_n, fts_s_float_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_div, binop_div_inplace_fv_n, fts_s_float_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_bus, binop_bus_inplace_fv_n, fts_s_float_vector, fts_s_int, op_s_inplace);
+  binop_declare_fun(sym_vid, binop_vid_inplace_fv_n, fts_s_float_vector, fts_s_int, op_s_inplace);
 
   /* float vector @ float(number) = float vector */
-  binop_declare_fun(sym_add, binop_add_inplace_fv_n, fts_s_float_vector, fts_s_float, binops_s_inplace);
-  binop_declare_fun(sym_sub, binop_sub_inplace_fv_n, fts_s_float_vector, fts_s_float, binops_s_inplace);
-  binop_declare_fun(sym_mul, binop_mul_inplace_fv_n, fts_s_float_vector, fts_s_float, binops_s_inplace);
-  binop_declare_fun(sym_div, binop_div_inplace_fv_n, fts_s_float_vector, fts_s_float, binops_s_inplace);
-  binop_declare_fun(sym_bus, binop_bus_inplace_fv_n, fts_s_float_vector, fts_s_float, binops_s_inplace);
-  binop_declare_fun(sym_vid, binop_vid_inplace_fv_n, fts_s_float_vector, fts_s_float, binops_s_inplace);
+  binop_declare_fun(sym_add, binop_add_inplace_fv_n, fts_s_float_vector, fts_s_float, op_s_inplace);
+  binop_declare_fun(sym_sub, binop_sub_inplace_fv_n, fts_s_float_vector, fts_s_float, op_s_inplace);
+  binop_declare_fun(sym_mul, binop_mul_inplace_fv_n, fts_s_float_vector, fts_s_float, op_s_inplace);
+  binop_declare_fun(sym_div, binop_div_inplace_fv_n, fts_s_float_vector, fts_s_float, op_s_inplace);
+  binop_declare_fun(sym_bus, binop_bus_inplace_fv_n, fts_s_float_vector, fts_s_float, op_s_inplace);
+  binop_declare_fun(sym_vid, binop_vid_inplace_fv_n, fts_s_float_vector, fts_s_float, op_s_inplace);
 
   /* float vector @ integer vector = float vector */
-  binop_declare_fun(sym_add, binop_add_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_sub, binop_sub_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_mul, binop_mul_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_div, binop_div_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_bus, binop_bus_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_inplace);
-  binop_declare_fun(sym_vid, binop_vid_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, binops_s_inplace);
+  binop_declare_fun(sym_add, binop_add_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_sub, binop_sub_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_mul, binop_mul_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_div, binop_div_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_bus, binop_bus_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_inplace);
+  binop_declare_fun(sym_vid, binop_vid_inplace_fv_iv, fts_s_float_vector, fts_s_integer_vector, op_s_inplace);
 }

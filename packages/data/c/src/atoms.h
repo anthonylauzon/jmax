@@ -45,7 +45,4 @@ do{ \
 #define data_atom_release(ap) \
   do{if(fts_is_data(ap)) data_release(fts_get_data(ap));}while(0)
 
-extern int data_get_size(fts_data_t *data);
-extern int data_get_atoms(fts_data_t *data, int ac, fts_atom_t *at);
-
 #endif

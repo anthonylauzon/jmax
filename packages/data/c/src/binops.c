@@ -16,9 +16,6 @@
 #include "binops.h"
 #include "operators.h"
 
-fts_symbol_t binops_s_recycle = 0;
-fts_symbol_t binops_s_inplace = 0;
-
 static fts_hash_table_t binop_table;
 
 static op_t *
@@ -67,9 +64,9 @@ binop_declare_fun(fts_symbol_t name, operator_fun_t fun, fts_symbol_t left_type,
   else
     binop = binop_new(name);
 
-  if(version == binops_s_recycle)
+  if(version == op_s_recycle)
     funs = binop->recycle;
-  else if(version == binops_s_inplace)
+  else if(version == op_s_inplace)
     funs = binop->inplace;	
   else
     return;
@@ -95,7 +92,7 @@ void
 binops_init(void)
 {
   fts_hash_table_init(&binop_table);
-  
-  binops_s_recycle = fts_new_symbol("recycle");
-  binops_s_inplace = fts_new_symbol("inplace");
 }
+
+
+

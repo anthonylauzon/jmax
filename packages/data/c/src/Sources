@@ -17,8 +17,10 @@ atoms.c \
 types.c \
 operators.c \
 utils.c \
-complexvector.c \
+fmx.c \
+fmx_arith.c \
 monops.c \
+monop_obj.c \
 binops.c \
 binop_arith.c \
 binop_arith_inplace.c \
@@ -28,3 +30,6 @@ atom_obj.c \
 post.c \
 getelem.c \
 getsize.c \
+
+COLD = \
+monop_abs.c \

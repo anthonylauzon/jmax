@@ -12,7 +12,6 @@
 #  
 #
 
-
 DISTDIR = ../../../../fts/
 PACKAGEROOT = ..
 

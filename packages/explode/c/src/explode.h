@@ -99,6 +99,6 @@ typedef struct
 
 /* finding an explode by name */
 
-explode_t *explode_get_by_name(fts_symbol_t name);
+extern explode_t *explode_get_by_name(fts_symbol_t name);
 
 

@@ -188,7 +188,6 @@ atom_obj_set_float_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   if(winlet == 0)
     op_outlet(o, 0, *op);
 }
-
 static void
 atom_obj_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {

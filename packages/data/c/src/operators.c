@@ -14,6 +14,9 @@
 #include "fts.h"
 #include "operators.h"
 
+fts_symbol_t op_s_recycle = 0;
+fts_symbol_t op_s_inplace = 0;
+
 fts_integer_vector_t *
 op_recycle_to_integer_vector(op_t *op, int size)
 {
@@ -96,8 +99,9 @@ op_recycle_to_float_vector_replicate(op_t *op, fts_float_vector_t *original)
     }
 }
 
-
-
-
-
-
+void
+operators_init(void)
+{
+  op_s_recycle = fts_new_symbol("recycle");
+  op_s_inplace = fts_new_symbol("inplace");
+}
