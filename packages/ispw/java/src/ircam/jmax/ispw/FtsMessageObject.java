@@ -42,15 +42,15 @@ import ircam.ftsclient.*;
 
 public class FtsMessageObject extends FtsIntValueObject
 {
-    static
-    {
-	FtsObject.registerMessageHandler( FtsMessageObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
-		public void invoke( FtsObject obj, FtsArgs args)
-		{
-		    ((FtsMessageObject)obj).setCurrentMessage(argc, argv);
-		}
-	    });
-    }
+  static
+  {
+    FtsObject.registerMessageHandler( FtsMessageObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsMessageObject)obj).setCurrentMessage(argc, argv);
+	}
+      });
+  }
 
   /*****************************************************************************/
   /*                                                                           */
@@ -58,42 +58,40 @@ public class FtsMessageObject extends FtsIntValueObject
   /*                                                                           */
   /*****************************************************************************/
 
-    String message; // the message content
+  String message; // the message content
   
-    public FtsMessageObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
-    {
-	super(server, parent, className, nArgs, args, id);
-	
-	ninlets = 1;
-	noutlets = 1;
-	
-	message =  FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
+  public FtsMessageObject(FtsServer server, FtsObject parent, FtsSymbol className, int nArgs, FtsAtom args[], int id)
+  {
+    super(server, parent, className, nArgs, args, id);
+    
+    ninlets = 1;
+    noutlets = 1;
+    
+    message =  FtsMessageObject.preParseMessage(FtsParse.unparseArguments(nArgs, args));
   }
 
-    /** Set the message content. Tell the server, too */
-
-    public void setMessage(String message)
-    {
-	this.message = message;
-
-	MaxVector vec = new MaxVector();
-	FtsParse.parseAtoms(message, vec);
-	
-	args.clear();
-	for(int i=0; i<vec.size(); i++)
-	    args.add(vec.elementAt(i));
-	
-	try{
-	    send(FtsSymbol.get("set"), args);
-	}
-	catch(IOException e)
-	    {
-		System.err.println("FtsMessageObject: I/O Error sending set Message!");
-		e.printStackTrace(); 
-	    }
-	
-	setDirty();
+  /** Set the message content. Tell the server, too */
+  
+  public void setMessage(String message)
+  {
+    this.message = message;
+    
+    MaxVector vec = new MaxVector();
+    FtsParse.parseAtoms(message, vec);
+    
+    args.clear();
+    for(int i=0; i<vec.size(); i++)
+      args.add(vec.elementAt(i));
+    
+    try{
+      send(FtsSymbol.get("set"), args);
     }
+    catch(IOException e)
+      {
+	System.err.println("FtsMessageObject: I/O Error sending set Message!");
+	e.printStackTrace(); 
+      }
+  }
 
     /** Get the message content. */
 

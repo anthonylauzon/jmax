@@ -1,7 +1,6 @@
 noinst_PROGRAMS = package
 package_SOURCES = \
 FtsMessageObject.java \
-Ispw.java \
 Message.java 
 
 JAVACX = @JAVACX@
