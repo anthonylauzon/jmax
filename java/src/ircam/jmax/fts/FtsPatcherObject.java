@@ -949,10 +949,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   {
     removeConnection( c);
     if( getEditorFrame() != null)
-      {
-	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove( c);
-	((ErmesSketchWindow)getEditorFrame()).itsSketchPad.redraw();
-      }
+      ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.getDisplayList().remove( c);
   }
 
   public void objectRedefined(FtsGraphicObject obj)
