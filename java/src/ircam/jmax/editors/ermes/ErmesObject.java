@@ -620,12 +620,12 @@ abstract public class ErmesObject implements ErmesArea, ErmesDrawable {
   }
   
   public void resize(int w, int h) {
-    if (currentRect.width == w && currentRect.height == h) return;
     setItsWidth(w);
     setItsHeight(h);
   }
   
   public void reshape(int x, int y, int width, int height) {
+    
     setItsX(x);
     setItsY(y);
     currentRect.x = itsX;

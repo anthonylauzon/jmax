@@ -666,11 +666,12 @@ Rectangle previousResizeRect = new Rectangle();
     return itsSketchWindow;
   }
   
-  int incrementalPasteOffset = -10;
-  private Point startPastingPoint = new Point();
-  void resetPasteOffset() {
-    incrementalPasteOffset = -10;
-  }
+  int incrementalPasteOffsetX;
+  int incrementalPasteOffsetY;
+  Point pasteDelta = new Point();
+  int numberOfPaste = 0;
+  FtsObject anOldPastedObject;
+  
   // note: the following function is a reduced version of InitFromFtsContainer.
   // better organization urges
   void PasteObjects(Vector objectVector, Vector connectionVector) {
@@ -678,27 +679,36 @@ Rectangle previousResizeRect = new Rectangle();
     FtsConnection fc;
     ErmesObject aObject;
     ErmesConnection aConnection;
-    int pasteDeltaX;
-    int pasteDeltaY;
 
     int objectX;    
     int objectY;
-    
+    int minX=0;
+    int minY=0;
+
+    numberOfPaste += 1;
     itsHelper.deselectAll(false);
 
     if (objectVector == null) return;
-
-    //compute the delta to be applied to the position of pasted objects
-    if (startPastingPoint.x == 0 || startPastingPoint.y == 0) { 
-      //System.err.println("setto a 300, 300");
-      startPastingPoint.setLocation(300, 300);
+    fo = (FtsObject)objectVector.elementAt(0);
+    minX = ((Integer)fo.get("x")).intValue();
+    minY = ((Integer)fo.get("y")).intValue();
+    if (numberOfPaste == 1) {
+      anOldPastedObject = fo;
+      incrementalPasteOffsetX = 20;
+      incrementalPasteOffsetY = 20;
     }
-    fo = (FtsObject)(objectVector.elementAt(0));
-    objectX = ((Integer)fo.get("x")).intValue();
-    objectY = ((Integer)fo.get("y")).intValue();
+    else if (numberOfPaste == 2) {
+      incrementalPasteOffsetX = (((Integer)(anOldPastedObject.get("x"))).intValue()-minX);
+      incrementalPasteOffsetY = (((Integer)(anOldPastedObject.get("y"))).intValue()-minY);
+    }
 
-    pasteDeltaX = startPastingPoint.x - objectX;
-    pasteDeltaY = startPastingPoint.y - objectY;
+    for (Enumeration waste = objectVector.elements(); waste.hasMoreElements();) {
+      fo = (FtsObject)waste.nextElement();
+      objectX = ((Integer)fo.get("x")).intValue();
+      objectY = ((Integer)fo.get("y")).intValue();
+      if (objectX < minX) minX = objectX;
+      if (objectY < minY) minY = objectY;
+    }
 
     for (Enumeration e = objectVector.elements(); e.hasMoreElements();) {
       fo = (FtsObject)e.nextElement();
@@ -713,8 +723,8 @@ Rectangle previousResizeRect = new Rectangle();
       objectX = ((Integer)fo.get("x")).intValue();
       objectY = ((Integer)fo.get("y")).intValue();
 
-      fo.put("x", objectX+pasteDeltaX+incrementalPasteOffset);     
-      fo.put("y", objectY+pasteDeltaY+incrementalPasteOffset);
+      fo.put("x", objectX-minX+itsCurrentScrollingX+pasteDelta.x+numberOfPaste*incrementalPasteOffsetX);     
+      fo.put("y", objectY-minY+itsCurrentScrollingY+pasteDelta.y+numberOfPaste*incrementalPasteOffsetY);
        
       aObject = itsHelper.AddObject(objectClass, fo);
       currentSelection.addObject(aObject);
@@ -725,7 +735,6 @@ Rectangle previousResizeRect = new Rectangle();
       
       if (aObject != null) fo.setRepresentation(aObject);
     }
-    incrementalPasteOffset += 10;
 
     // chiama tanti AddConnection...
 
@@ -994,10 +1003,6 @@ Rectangle previousResizeRect = new Rectangle();
 
   /////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////mouseListener--inizio
-  public void mouseClicked(MouseEvent e){
-    startPastingPoint.setLocation(e.getX(), e.getY());
-    incrementalPasteOffset = -5;
-  }
 
   public void mousePressed(MouseEvent e){
 
@@ -1095,7 +1100,6 @@ Rectangle previousResizeRect = new Rectangle();
     int x = e.getX();
     int y = e.getY();
 
-    startPastingPoint.setLocation(x, y);
     MaxApplication.setCurrentWindow(itsSketchWindow);
     if(itsScrolled) itsScrolled=false;
 
@@ -1207,6 +1211,8 @@ Rectangle previousResizeRect = new Rectangle();
     }
     else if(editStatus == DOING_NOTHING) return;
   }
+
+  public void mouseClicked(MouseEvent e){}
 
   public void mouseEntered(MouseEvent e){}
 
@@ -1888,7 +1894,13 @@ Rectangle previousResizeRect = new Rectangle();
     else paint(g);
   }
 
+  /* keep track of the scrolling values */
+  int itsCurrentScrollingX;
+  int itsCurrentScrollingY;
   public void adjustmentValueChanged(AdjustmentEvent e){
+    itsCurrentScrollingX = itsSketchWindow.itsScrollerView.getHAdjustable().getValue();
+    itsCurrentScrollingY = itsSketchWindow.itsScrollerView.getVAdjustable().getValue();
+    
     itsScrolled = true;
   }
 

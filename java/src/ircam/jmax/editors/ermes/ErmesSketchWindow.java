@@ -63,12 +63,15 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   }
 
   public void componentResized(ComponentEvent e) {
+    //System.err.println("era "+getSize().width+", "+getSize().height);
     if (itsPatcher == null) System.err.println("internal warning: patcher resized while FtsPatcher is null");     
     else {
       itsPatcher.put("ww", getSize().width-horizontalOffset());
       itsPatcher.put("wh", getSize().height-verticalOffset());
+      //System.err.println("e' "+(Integer) itsPatcher.get("ww")+", "+(Integer) itsPatcher.get("wh"));
     }
   }
+
   public void componentMoved(ComponentEvent e) {
     if (itsPatcher == null) System.err.println("internal warning: patcher moved while FtsPatcher is null");    
     else {
@@ -239,7 +242,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     int width=500;
     int height=480;
     Integer x1, y1, width1, height1;
-    //String autorouting;
+    
     //double check the existence of the window properties. If there aren't, use defaults
       
       x1 = (Integer) patcher.get("wx");
@@ -258,7 +261,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       setBounds(x, y, width+horizontalOffset(), height+verticalOffset());
       validate();
       itsSketchPad.InitFromFtsContainer(patcher);
-
+      
       validate();
     }
 
@@ -337,8 +340,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   protected void Copy() {
     Cursor temp = getCursor();
 
+    Rectangle tempRect = itsSketchPad.itsHelper.StartMoveInclusionRect();
+    itsSketchPad.pasteDelta.setLocation(tempRect.x-itsSketchPad.itsCurrentScrollingX, tempRect.y - itsSketchPad.itsCurrentScrollingY);
+    itsSketchPad.numberOfPaste = 0;
+
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    //2705 CreateFtsGraphics(this);
+    
     itsSketchPad.ftsClipboard.copy(Fts.getSelection());
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
     setCursor(temp);
