@@ -4,34 +4,35 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import ircam.jmax.MaxApplication; //using the global probe...
+//import ircam.jmax.MaxApplication; //using the global probe...
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.ermes.*;
-import com.sun.java.swing.Timer;
+//import com.sun.java.swing.Timer;
 
 /**
  * The "bang" graphic object.
  */
-class ErmesObjBang extends ErmesObject implements ActionListener {
+class ErmesObjBang extends ErmesObject /*implements ActionListener */{
 
   boolean itsFlashing = false;
   //FlashingThread	itsFlashingThread;
   static Dimension preferredSize = new Dimension(20,20);
-  Timer itsTimer = new Timer(100, this);
+  //  Timer itsTimer = new Timer(100, this);
+  boolean userInitiatedFlash = false;
 
   public ErmesObjBang(){
     super();
+    //itsTimer.setCoalesce(false);
   }
 
-  public void actionPerformed(ActionEvent e) {
+  /*  public void actionPerformed(ActionEvent e) {
     itsFlashing = false;
     Paint_specific(itsSketchPad.getGraphics());
     itsTimer.stop();
-  }
+  }*/
 
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String theString) {
     super.Init(theSketchPad, x, y, theString);	//set itsX, itsY
-    //itsFlashingThread = new FlashingThread("aFlash");
     return true;
   }
 
@@ -55,27 +56,47 @@ class ErmesObjBang extends ErmesObject implements ActionListener {
   }
   
   public void redefineFtsObject() {
-    // Bang don't redefine itself
   }
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-
     if (itsSketchPad.itsRunMode) {
-      //itsFtsObject.put("value", new Integer(1));//?????
       itsFtsObject.sendMessage(0, "bang", null);
-      //DoublePaint();
+      itsFlashing = true;
+      Paint_specific(itsSketchPad.getGraphics());
+      userInitiatedFlash = true;
     }
     else 
       itsSketchPad.ClickOnObject(this, evt, x, y);
     return true;
   }
 
+  public boolean MouseUp_specific(MouseEvent e, int x, int y) {
+    if (!userInitiatedFlash) return false; //fts is controlling this flash
+    else {
+      itsFlashing = false;
+      Paint_specific(itsSketchPad.getGraphics());
+      return true;
+    }
+  }
+
   protected void FtsValueChanged(Object value) {
 
-    itsFlashing = true;
+    /*if (itsTimer.isRunning()) {
+      // "overlap": lasse-moi terminer!;
+      return;
+    }*/
+    if (userInitiatedFlash) return;
+    if (((Integer) value).intValue() == 1) {
+	itsFlashing = true;
+    }
+    else {
+	itsFlashing = false;
+    }
     Paint_specific(itsSketchPad.getGraphics());
-    itsTimer.setRepeats(false);
-    itsTimer.start(); //end of flash will be done in actionPerformed
+
+
+    /*itsTimer.setRepeats(false);
+    itsTimer.start(); //end of flash will be done in actionPerformed*/
   }
 	
   public boolean NeedPropertyHandler(){
@@ -102,7 +123,7 @@ class ErmesObjBang extends ErmesObject implements ActionListener {
   public void Paint_specific(Graphics g) { 
     if(!itsSelected) g.setColor(itsUINormalColor);
     else g.setColor(itsUISelectedColor);
-    if(itsFlashing) {	//only a simulation for now
+    if(itsFlashing) {
       g.setColor(Color.yellow);
       itsFlashing = false;
     }
@@ -112,11 +133,7 @@ class ErmesObjBang extends ErmesObject implements ActionListener {
     g.drawRect(itsX, itsY, currentRect.width-1, currentRect.height-1);
     g.setColor(Color.darkGray);
     g.drawOval(itsX+5, itsY+5, currentRect.width-10, currentRect.height-10);
-    //if (itsFlashing) {	//only a simulation for now
-    //g.setColor(Color.yellow);
-    //g.fillOval(itsX+5,itsY+ 5, currentRect.width-10, currentRect.height-10);
-    //itsFlashing = false;
-    //}
+ 
     g.setColor(Color.black);
     if(!itsSketchPad.itsRunMode) 
       g.fillRect(itsX+currentRect.width-DRAG_DIMENSION,itsY+currentRect.height-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
