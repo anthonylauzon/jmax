@@ -41,7 +41,7 @@ typedef struct _fmat_
 
 DATA_API fts_class_t *fmat_class;
 DATA_API fts_symbol_t fmat_symbol;
-DATA_API fts_type_t fmat_type;
+DATA_API fts_metaclass_t *fmat_type;
 
 #define fmat_get_m(x) ((x)->m)
 #define fmat_get_n(x) ((x)->n)
@@ -57,7 +57,6 @@ DATA_API void fmat_set_const(fmat_t *mat, float c);
 DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
 
 /* fmat atoms */
-#define fmat_atom_set(ap, x) fts_set_object_with_type((ap), (x), fmat_type)
 #define fmat_atom_get(ap) ((fmat_t *)fts_get_object(ap))
 #define fmat_atom_is(ap) (fts_is_a((ap), fmat_type))
 

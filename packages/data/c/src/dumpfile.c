@@ -167,7 +167,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	{
 	  fts_object_t *object = fts_get_object(at);
 	  fts_class_t *class = fts_object_get_class(object);
-	  fts_symbol_t class_name = fts_get_class_name(class);
+	  fts_symbol_t class_name = fts_class_get_name(class);
 	  fts_method_t meth_dump = fts_class_get_method(class, fts_SystemInlet, fts_s_dump);
 
 	  if(meth_dump)
@@ -216,7 +216,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	  fts_atom_t a;
 	  char c;
 	  
-	  if(this->class != fts_get_class_name(fts_object_get_class(object)))
+	  if(this->class != fts_class_get_name(fts_object_get_class(object)))
 	    {
 	      /* wrong class */
 	      fts_object_signal_runtime_error(o, "restore: %s exspected", fts_symbol_name(this->class));

@@ -29,7 +29,7 @@
 #define FVEC_NO_ALLOC -1
 
 fts_symbol_t fvec_symbol = 0;
-fts_type_t fvec_type = 0;
+fts_metaclass_t *fvec_type = 0;
 fts_class_t *fvec_class = 0;
 
 static fts_symbol_t sym_text = 0;
@@ -306,10 +306,9 @@ fvec_file_is_text( fts_symbol_t file_name)
 static void
 fvec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fvec_t *this = (fvec_t *)o;
   fts_atom_t a[1];
 
-  fvec_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, fvec_symbol, 1, a);
 }
 
@@ -817,9 +816,7 @@ fvec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
 static void
 fvec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fvec_t *this = (fvec_t *)obj;
-
-  fvec_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 static void
@@ -975,7 +972,7 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_save, fvec_save_soundfile);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, fvec_symbol, 1, &fvec_type);      
+  fts_outlet_type_define(cl, 0, fvec_symbol, 1, &fvec_symbol);      
 
   return fts_Success;
 }
@@ -993,10 +990,7 @@ fvec_config(void)
   sym_open_file = fts_new_symbol("open file");
 
   fvec_symbol = fts_new_symbol("fvec");
-  fvec_type = fvec_symbol;
 
-  fts_class_install(fvec_symbol, fvec_instantiate);
+  fvec_type = fts_class_install(fvec_symbol, fvec_instantiate);
   fvec_class = fts_class_get_by_name(fvec_symbol);
-
-  fts_atom_type_register(fvec_symbol, fvec_class);
 }

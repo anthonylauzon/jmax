@@ -46,7 +46,7 @@ typedef struct _ivec_
 
 DATA_API fts_class_t *ivec_class;
 DATA_API fts_symbol_t ivec_symbol;
-DATA_API fts_type_t ivec_type;
+DATA_API fts_metaclass_t *ivec_type;
 
 DATA_API void ivec_set_with_onset_from_atoms(ivec_t *vector, int offset, int ac, const fts_atom_t *at);
 
@@ -70,7 +70,6 @@ DATA_API int ivec_get_min_value(ivec_t *vector);
 DATA_API int ivec_get_max_value(ivec_t *vector);
 
 /* ivec atoms */
-#define ivec_atom_set(ap, x) fts_set_object_with_type((ap), (x), ivec_type)
 #define ivec_atom_get(ap) ((ivec_t *)fts_get_object(ap))
 #define ivec_atom_is(ap) (fts_is_a((ap), ivec_type))
 

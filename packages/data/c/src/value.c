@@ -28,7 +28,7 @@
 #include "value.h"
 
 fts_symbol_t value_symbol = 0;
-fts_type_t value_type = 0;
+fts_metaclass_t *value_type = 0;
 fts_class_t *value_class = 0;
 
 /********************************************************************
@@ -74,7 +74,7 @@ value_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   value_t *this = (value_t *)o;
 
-  fts_atom_void(&this->a);
+  fts_set_void(&this->a);
 }
 
 static void
@@ -153,9 +153,7 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 value_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  value_t *this = (value_t *) obj;
-
-  fts_set_object_with_type(value, this, value_symbol);
+  fts_set_object(value, obj);
 }
 
 static fts_status_t
@@ -192,9 +190,8 @@ void
 value_config(void)
 {
   value_symbol = fts_new_symbol("value");
-  value_type = value_symbol;
 
-  fts_class_install(value_symbol, value_instantiate);
+  value_type = fts_class_install(value_symbol, value_instantiate);
 
   fts_alias_install(fts_new_symbol("val"), value_symbol);
 

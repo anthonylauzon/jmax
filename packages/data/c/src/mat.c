@@ -27,8 +27,8 @@
 #include <fts/fts.h>
 #include "mat.h"
 
-fts_type_t mat_type = 0;
 fts_symbol_t mat_symbol = 0;
+fts_metaclass_t *mat_type = 0;
 fts_class_t *mat_class = 0;
 
 static fts_symbol_t sym_text = 0;
@@ -105,7 +105,7 @@ mat_set_size(mat_t *mat, int m, int n)
 	{
 	  fts_atom_t *ap = mat->data + i;
 
-	  fts_atom_void(ap);
+	  fts_set_void(ap);
 	}
       
       if(size > 0)
@@ -134,7 +134,7 @@ mat_void_element(mat_t *mat, int i, int j)
 {
   fts_atom_t *ap = mat->data + i * mat->n + j;
   
-  fts_atom_void(ap);
+  fts_set_void(ap);
 }
 
 void
@@ -162,7 +162,7 @@ mat_void(mat_t *mat)
     {
       fts_atom_t *ap = mat->data + i;
 
-      fts_atom_void(ap);
+      fts_set_void(ap);
     }
 }
 
@@ -362,7 +362,8 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
       for(k=0; k<ac; k++)
 	{
 	  /* ooops! */
-	  if(a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)
+	  /*if( a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)*/
+	  if( fts_atom_same_type(&a, &at[k]) && a.value.fts_int == at[k].value.fts_int)
 	    {
 	      skip = 1;
 	      break;
@@ -465,10 +466,9 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
 static void
 mat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  mat_t *this = (mat_t *)o;
   fts_atom_t a[1];
 
-  mat_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, mat_symbol, 1, a);
 }
 
@@ -724,9 +724,7 @@ mat_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t propert
 static void
 mat_get_mat(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  mat_t *this = (mat_t *)obj;
-
-  mat_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 /********************************************************************
@@ -833,7 +831,7 @@ mat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_export, mat_export); 
 
   /* type outlet */
-  fts_outlet_type_define(cl, 0, mat_symbol, 1, &mat_type);
+  fts_outlet_type_define(cl, 0, mat_symbol, 1, &mat_symbol);
 
   return fts_Success;
 }
@@ -844,10 +842,7 @@ mat_config(void)
   sym_text = fts_new_symbol("text");
   sym_comma = fts_new_symbol(",");
   mat_symbol = fts_new_symbol("mat");
-  mat_type = mat_symbol;
 
-  fts_class_install(mat_symbol, mat_instantiate);
+  mat_type = fts_class_install(mat_symbol, mat_instantiate);
   mat_class = fts_class_get_by_name(mat_symbol);
-
-  fts_atom_type_register(mat_symbol, mat_class);
 }

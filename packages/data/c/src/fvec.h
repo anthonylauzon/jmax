@@ -41,7 +41,7 @@ typedef struct _fvec_
 
 DATA_API fts_class_t *fvec_class;
 DATA_API fts_symbol_t fvec_symbol;
-DATA_API fts_type_t fvec_type;
+DATA_API fts_metaclass_t *fvec_type;
 
 #define fvec_get_sr(v) ((((v)->sr) > 0)? ((v)->sr): (-(v)->sr))
 
@@ -64,7 +64,6 @@ DATA_API float fvec_get_min_value(fvec_t *vector);
 DATA_API float fvec_get_max_value(fvec_t *vector);
 
 /* fvec atoms */
-#define fvec_atom_set(ap, x) fts_set_object_with_type((ap), (x), fvec_type)
 #define fvec_atom_get(ap) ((fvec_t *)fts_get_object(ap))
 #define fvec_atom_is(ap) (fts_is_a((ap), fvec_type))
 

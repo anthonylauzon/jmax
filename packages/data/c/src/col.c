@@ -27,7 +27,7 @@
 #include <fts/fts.h>
 #include "col.h"
 
-/*fts_type_t col_type = 0;*/
+fts_metaclass_t *col_type = 0;
 fts_symbol_t col_symbol = 0;
 fts_class_t *col_class = 0;
 
@@ -49,7 +49,7 @@ col_void(col_t *this)
     {
       fts_atom_t *elem = &mat_get_element(mat, i, j);
 
-      fts_atom_void(elem);
+      fts_set_void(elem);
     }
 }
 
@@ -97,10 +97,9 @@ col_set_from_atoms(col_t *this, int onset, int ac, const fts_atom_t *at)
 static void
 col_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  col_t *this = (col_t *)o;
   fts_atom_t a[1];
 
-  col_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, col_symbol, 1, a);
 }
 
@@ -174,9 +173,7 @@ col_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 col_getobj(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  col_t *this = (col_t *)obj;
-
-  col_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 /********************************************************************
@@ -244,7 +241,7 @@ col_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, col_set);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, col_symbol, 1, &col_type);
+  fts_outlet_type_define(cl, 0, col_symbol, 1, &col_symbol);
   
   return fts_Success;
 }
@@ -253,10 +250,7 @@ void
 col_config(void)
 {
   col_symbol = fts_new_symbol("col");
-  /*col_type = col_symbol;*/
 
-  fts_class_install(col_symbol, col_instantiate);
+  col_type = fts_class_install(col_symbol, col_instantiate);
   col_class = fts_class_get_by_name(col_symbol);
-
-  /*fts_atom_type_register(col_symbol, col_class);*/
 }

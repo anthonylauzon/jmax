@@ -27,8 +27,8 @@
 #include <fts/fts.h>
 #include "row.h"
 
-fts_type_t row_type = 0;
 fts_symbol_t row_symbol = 0;
+fts_metaclass_t *row_type = 0;
 fts_class_t *row_class = 0;
 
 /********************************************************
@@ -49,7 +49,7 @@ row_void(row_t *this)
     {
       fts_atom_t *elem = &mat_get_element(mat, i, j);
 
-      fts_atom_void(elem);
+      fts_set_void(elem);
     }
 }
 
@@ -97,10 +97,9 @@ row_set_from_atoms(row_t *this, int onset, int ac, const fts_atom_t *at)
 static void
 row_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  row_t *this = (row_t *)o;
   fts_atom_t a[1];
 
-  row_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, row_symbol, 1, a);
 }
 
@@ -174,9 +173,7 @@ row_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 static void
 row_getobj(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  row_t *this = (row_t *)obj;
-
-  row_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 /********************************************************************
@@ -244,7 +241,7 @@ row_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_set, row_set);
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, row_symbol, 1, &row_type);
+  fts_outlet_type_define(cl, 0, row_symbol, 1, &row_symbol);
   
   return fts_Success;
 }
@@ -253,10 +250,7 @@ void
 row_config(void)
 {
   row_symbol = fts_new_symbol("row");
-  row_type = row_symbol;
 
-  fts_class_install(row_symbol, row_instantiate);
+  row_type = fts_class_install(row_symbol, row_instantiate);
   row_class = fts_class_get_by_name(row_symbol);
-
-  fts_atom_type_register(row_symbol, row_class);
 }

@@ -57,7 +57,7 @@ copy_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   copy_t *this = (copy_t *)o;
 
-  fts_atom_void(&this->a);
+  fts_set_void(&this->a);
 }
 
 /******************************************************

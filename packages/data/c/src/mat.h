@@ -29,7 +29,7 @@
 
 #include "data.h"
 
-/*DATA_API fts_type_t mat_type;*/
+DATA_API fts_metaclass_t *mat_type;
 DATA_API fts_symbol_t mat_symbol;
 DATA_API fts_class_t *mat_class;
 
@@ -69,8 +69,7 @@ DATA_API int mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name,
 DATA_API int mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator);
 
 /* mat atoms */
-/*#define mat_atom_set(ap, x) fts_set_object_with_type((ap), (x), mat_type)*/
 #define mat_atom_get(ap) ((mat_t *)fts_get_object(ap))
-/*#define mat_atom_is(ap) (fts_is_a((ap), mat_type))*/
+#define mat_atom_is(ap) (fts_is_a((ap), mat_type))
 
 #endif

@@ -28,7 +28,7 @@
 static fts_symbol_t sym_text = 0;
 
 fts_symbol_t ivec_symbol = 0;
-fts_type_t ivec_type = 0;
+fts_metaclass_t *ivec_type = 0;
 fts_class_t *ivec_class = 0;
 
 static fts_symbol_t sym_local = 0;
@@ -428,10 +428,9 @@ ivec_append_pixels(ivec_t *ivec, int deltax, int deltap)
 static void
 ivec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *this = (ivec_t *)o;
   fts_atom_t a[1];
 
-  ivec_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, ivec_symbol, 1, a);
 }
 
@@ -704,7 +703,7 @@ ivec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   ivec_t *this = (ivec_t *)o;
 
   if(!fts_object_has_id(o))
-    fts_client_upload(o, ivec_symbol, 0, 0);
+    fts_client_upload_object(o, -1);
 
   ivec_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
@@ -1046,9 +1045,7 @@ ivec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t proper
 static void
 ivec_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  ivec_t *this = (ivec_t *)obj;
-
-  ivec_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 /*********************************************************
@@ -1177,7 +1174,7 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("insert_from_client"), ivec_insert_by_client_request);
 
   /* type outlet */
-  fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_type);      
+  fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_symbol);      
 
   return fts_Success;
 }
@@ -1193,7 +1190,6 @@ ivec_config(void)
 {
   sym_text = fts_new_symbol("text");
   ivec_symbol = fts_new_symbol("ivec");
-  ivec_type = ivec_symbol;
 
   sym_local = fts_new_symbol("local");
 
@@ -1213,8 +1209,6 @@ ivec_config(void)
   sym_set_size = fts_new_symbol("setSize");
   sym_set_visible_size = fts_new_symbol("setVisibleSize");
 
-  fts_class_install(ivec_symbol, ivec_instantiate);
+  ivec_type = fts_class_install(ivec_symbol, ivec_instantiate);
   ivec_class = fts_class_get_by_name(ivec_symbol);
-
-  fts_atom_type_register(ivec_symbol, ivec_class);
 }

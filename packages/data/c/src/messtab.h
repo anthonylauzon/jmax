@@ -39,12 +39,11 @@ typedef struct messtab
 
 DATA_API fts_class_t *messtab_class;
 DATA_API fts_symbol_t messtab_symbol;
-DATA_API fts_type_t messtab_type;
+DATA_API fts_metaclass_t *messtab_type;
 
 DATA_API void messtab_get_keys(messtab_t *messtab, fts_array_t *array);
 
 /* messtab atoms */
-#define messtab_atom_set(ap, x) fts_set_object_with_type((ap), (x), messtab_type)
 #define messtab_atom_get(ap) ((messtab_t *)fts_get_object(ap))
 #define messtab_atom_is(ap) (fts_is_a((ap), messtab_type))
 

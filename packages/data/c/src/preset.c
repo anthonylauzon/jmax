@@ -102,7 +102,7 @@ preset_dumper_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
  */
 
 fts_symbol_t preset_symbol = 0;
-fts_type_t preset_type = 0;
+fts_metaclass_t *preset_type = 0;
 fts_class_t *preset_class = 0;
 
 static int
@@ -395,9 +395,7 @@ preset_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 static void
 preset_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  preset_t *this = (preset_t *) obj;
-  
-  fts_set_object_with_type(value, (fts_object_t *)this, preset_symbol);
+  fts_set_object(value, obj);
 }
 
 /******************************************************
@@ -495,13 +493,12 @@ void
 preset_config(void)
 {
   preset_symbol = fts_new_symbol("preset");
-  preset_type = preset_symbol;
 
   sym_new_preset = fts_new_symbol("new_preset");
   sym_dump_mess = fts_new_symbol("dump_mess");
   sym_preset_dumper = fts_new_symbol("preset_dumper");
 
-  fts_class_install(preset_symbol, preset_instantiate);
+  preset_type = fts_class_install(preset_symbol, preset_instantiate);
   preset_class = fts_class_get_by_name(preset_symbol);
 
   fts_class_install(sym_preset_dumper, preset_dumper_instantiate);

@@ -24,7 +24,7 @@
 #include "messtab.h"
 
 fts_symbol_t messtab_symbol = 0;
-fts_type_t messtab_type = 0;
+fts_metaclass_t *messtab_type = 0;
 fts_class_t *messtab_class = 0;
 
 static fts_symbol_t sym_text = 0;
@@ -124,7 +124,7 @@ messtab_remove_all(messtab_t *messtab)
 	  fts_atom_t value;
 		      
 	  fts_iterator_next(&iterator, &value);
-	  fts_atom_void(&value);
+	  fts_set_void(&value);
 	}
 	      
       fts_hashtable_clear(hash);
@@ -631,7 +631,7 @@ getmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	fts_object_set_error(o, "Wrong arguments");
     }
 
-  if(ac > 0 && fts_is_a((at), messtab_symbol))
+  if(ac > 0 && messtab_atom_is( at))
     {
       this->messtab = (messtab_t *)fts_get_object(at);
       fts_object_refer((fts_object_t *)this->messtab);
@@ -668,9 +668,7 @@ messtab_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t pro
 static void
 messtab_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  messtab_t *this = (messtab_t *) obj;
-  
-  fts_set_object_with_type(value, (fts_object_t *)this, messtab_symbol);
+  fts_set_object(value, obj);
 }
 
 static void
@@ -866,13 +864,10 @@ messtab_config(void)
   sym_coll = fts_new_symbol("coll");
 
   messtab_symbol = fts_new_symbol("messtab");
-  messtab_type = messtab_symbol;
 
-  fts_class_install(messtab_symbol, messtab_instantiate);
+  messtab_type = fts_class_install(messtab_symbol, messtab_instantiate);
   messtab_class = fts_class_get_by_name(messtab_symbol);
 
   fts_class_install(fts_new_symbol("getmess"), getmess_instantiate);
   fts_class_install(fts_new_symbol("putmess"), putmess_instantiate);
-
-  fts_atom_type_register(messtab_symbol, messtab_class);
 }

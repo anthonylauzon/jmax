@@ -41,12 +41,11 @@ typedef struct
 
 DATA_API fts_class_t *preset_class;
 DATA_API fts_symbol_t preset_symbol;
-DATA_API fts_type_t preset_type;
+DATA_API fts_metaclass_t *preset_type;
 
 DATA_API void preset_get_keys(preset_t *this, fts_array_t *array);
 
 /* preset atoms */
-#define preset_atom_set(ap, x) fts_set_object_with_type((ap), (x), preset_type)
 #define preset_atom_get(ap) ((preset_t *)fts_get_object(ap))
 #define preset_atom_is(ap) (fts_is_a((ap), preset_type))
 

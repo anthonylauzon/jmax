@@ -28,7 +28,7 @@
 #include "fmat.h"
 
 fts_symbol_t fmat_symbol = 0;
-fts_type_t fmat_type = 0;
+fts_metaclass_t *fmat_type = 0;
 fts_class_t *fmat_class = 0;
 
 static fts_symbol_t sym_text = 0;
@@ -283,7 +283,7 @@ fmat_read_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_t
       for(k=0; k<ac; k++)
 	{
 	  /* ooops! */
-	  if(a.type == at[k].type && a.value.fts_int == at[k].value.fts_int)
+	  if(fts_atom_same_type(&a, &at[k]) && a.value.fts_int == at[k].value.fts_int)
 	    {
 	      skip = 1;
 	      break;
@@ -398,10 +398,9 @@ fmat_write_atom_file_separator(fmat_t *fmat, fts_symbol_t file_name, fts_symbol_
 static void
 fmat_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t *this = (fmat_t *)o;
   fts_atom_t a[1];
 
-  fmat_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, fmat_symbol, 1, a);
 }
 
@@ -554,9 +553,7 @@ fmat_dump(fmat_t *mat, fts_dumper_t *dumper)
 static void
 fmat_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  fmat_t *this = (fmat_t *)obj;
-
-  fmat_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 /*********************************************************
@@ -674,7 +671,7 @@ fmat_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_s_export, fmat_export);
 
       /* type outlet */
-      fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_type);      
+      fts_outlet_type_define(cl, 0, fmat_symbol, 1, &fmat_symbol);      
 
       return fts_Success;
     }
@@ -699,10 +696,7 @@ fmat_config(void)
 {
   sym_text = fts_new_symbol("text");
   fmat_symbol = fts_new_symbol("fmat");
-  fmat_type = fmat_symbol;
 
-  fts_metaclass_install(fmat_symbol, fmat_instantiate, fmat_equiv);
+  fmat_type = fts_metaclass_install(fmat_symbol, fmat_instantiate, fmat_equiv);
   fmat_class = fts_class_get_by_name(fmat_symbol);
-
-  fts_atom_type_register(fmat_symbol, fmat_class);
 }

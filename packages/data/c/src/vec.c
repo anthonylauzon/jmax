@@ -28,8 +28,8 @@
 #include "mat.h"
 #include "vec.h"
 
-fts_type_t vec_type = 0;
 fts_symbol_t vec_symbol = 0;
+fts_metaclass_t *vec_type = 0;
 fts_class_t *vec_class = 0;
 
 static fts_symbol_t sym_text = 0;
@@ -46,10 +46,9 @@ extern void mat_free(mat_t *mat);
 static void
 vec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vec_t *this = (vec_t *)o;
   fts_atom_t a[1];
 
-  vec_atom_set(a, this);
+  fts_set_object(a, o);
   fts_outlet_send(o, 0, vec_symbol, 1, a);
 }
 
@@ -340,9 +339,7 @@ vec_get_keep(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t propert
 static void
 vec_get_vec(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
 {
-  vec_t *this = (vec_t *)obj;
-
-  vec_atom_set(value, this);
+  fts_set_object(value, obj);
 }
 
 /********************************************************************
@@ -430,7 +427,7 @@ vec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_export, vec_export); 
   
   /* type outlet */
-  fts_outlet_type_define(cl, 0, vec_symbol, 1, &vec_type);
+  fts_outlet_type_define(cl, 0, vec_symbol, 1, &vec_symbol);
   
   return fts_Success;
 }
@@ -440,10 +437,7 @@ vec_config(void)
 {
   sym_text = fts_new_symbol("text");
   vec_symbol = fts_new_symbol("vec");
-  vec_type = vec_symbol;
 
-  fts_class_install(vec_symbol, vec_instantiate);
+  vec_type = fts_class_install(vec_symbol, vec_instantiate);
   vec_class = fts_class_get_by_name(vec_symbol);
-
-  fts_atom_type_register(vec_symbol, vec_class);
 }
