@@ -1,6 +1,6 @@
 //
 // jMax
-// Copyright (C) 1999 by IRCAM
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
+// Based on Max/ISPW by Miller Puckette.
+//
 // Authors: Peter Hanappe
+// 
 
 package ircam.jmax.script.scm.silk;
 
@@ -104,6 +107,13 @@ public class SilkInterpreter extends SchemeInterpreter
 		define("jmax-root", root);
 		define("slash", File.separator);
 
+		/* Silk prints out an error message and stops the
+		 * evaluation if you try to lookup a variable name
+		 * that is not defined. To avoid this I define "dir"
+		 * and "this-package" manually */
+		define("dir", root);
+		define("this-package", "");
+
 		/* Load the "jmaxboot.scm" file that will do whatever is needed to
 		 * create the startup configuration, included reading user files
 		 * installing editors, data types and data handlers. */
@@ -156,6 +166,12 @@ public class SilkInterpreter extends SchemeInterpreter
 	return currEnvironment.define(name.toLowerCase().intern(), value);
     }
 
+    /** Returns the value of a variable in the current environment. */
+    public Object lookup(String name) 
+    {
+	return currEnvironment.lookup(name.toLowerCase().intern());
+    }
+
     public Object eval(Script script) throws ScriptException 
     {
 	return script.eval();
@@ -181,21 +197,6 @@ public class SilkInterpreter extends SchemeInterpreter
 	    return load(new InputPort(new FileReader(path)));
 	} catch (IOException e) {
 	    throw new ScriptException(e.getMessage());
-	}
-    }
-
-    /** Loads a file. This method does not throw an exception but
-     *  displays an error message on the current output. */
-    public Object loadSilently(String path) 
-    {
-	try  {
-	    return load(new InputPort(new FileReader(path)));
-	} catch (Exception e) {
-	    // FIXME
-	    //output.println(e.getMessage());
-	    //e.printStackTrace();
-	    System.out.println("Couldn't load " + e.getMessage());
-	    return null;
 	}
     }
 
@@ -244,14 +245,6 @@ public class SilkInterpreter extends SchemeInterpreter
 	    {
 		return false;
 	    }
-    }
-
-    public Package loadPackage(Package pkg, File initfile) throws ScriptException
-    {
-	define("dir", initfile.getParent());
-	define("this-package", pkg);
-	load(initfile);
-	return pkg;
     }
 
     public Project loadProject(Package context, File proj) throws ScriptException

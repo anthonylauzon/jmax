@@ -31,7 +31,7 @@ include $(ROOTDIR)/java/Makefiles/Makefile.common
 
 all: local_all
 	(cd silk ; $(MAKE) $@)
-	if echo $CLASSPATH | grep -s kawa > /dev/null ; then (cd silk ; $(MAKE) $@) ; fi
+	if echo $$CLASSPATH | grep -s kawa > /dev/null ; then (cd kawa ; $(MAKE) $@) ; fi
 .PHONY: all
 
 local_all: $(CLASSES)
@@ -39,7 +39,7 @@ local_all: $(CLASSES)
 
 clean: local_clean
 	(cd silk ; $(MAKE) $@)
-	if echo $CLASSPATH | grep -s kawa > /dev/null ; then (cd silk ; $(MAKE) $@) ; fi
+	if echo $$CLASSPATH | grep -s kawa > /dev/null ; then (cd kawa ; $(MAKE) $@) ; fi
 .PHONY: clean
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

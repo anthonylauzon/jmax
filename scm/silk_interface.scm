@@ -22,7 +22,7 @@
 (define package-handler-get-unknown-script (method "getUnknownScript" "ircam.jmax.script.pkg.PackageHandler"))
 (define package-handler-provide (method "provide" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String" "java.lang.String"))
 (define package-handler-forget (method "forget" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String"))
-(define package-handler-require (method "require" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String" "java.lang.String"))
+(define package-handler-require-silently (method "requireSilently" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String" "java.lang.String"))
 (define package-handler-append-path (method "appendPath" "ircam.jmax.script.pkg.PackageHandler" "java.lang.String"))
 (define package-load-class (method "loadClass" "ircam.jmax.script.pkg.Package" "java.lang.String"))
 (define package-append-local-path (method "appendLocalPath" "ircam.jmax.script.pkg.Package" "java.lang.String"))

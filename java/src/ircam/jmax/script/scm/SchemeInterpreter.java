@@ -1,6 +1,6 @@
 //
 // jMax
-// Copyright (C) 1999 by IRCAM
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,14 +18,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Authors: Peter Hanappe
-
-/**  SchemeInterpreter
- *
- *  Extends the jMax interpreter with some additionnal useful
- *  methods. Provides some basic functions for Scheme interpreters.
- */
-
+// Based on Max/ISPW by Miller Puckette.
+// 
+// Author: Peter Hanappe
+//
 package ircam.jmax.script.scm;
 
 import ircam.jmax.*;
@@ -39,6 +35,11 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
+/**  SchemeInterpreter
+ *
+ *  Extends the jMax interpreter with some additionnal useful
+ *  methods. Provides some basic functions for Scheme interpreters.
+ */
 public abstract class SchemeInterpreter implements Interpreter, ActionListener
 { 
     /** The script menu item hash table will help to find the script
@@ -155,10 +156,42 @@ public abstract class SchemeInterpreter implements Interpreter, ActionListener
      *  to lower-case and internalize the variable name. */
     public abstract Object define(String name, Object value);
 
+    /** Returns the value of a variable in the current environment.*/
+    public abstract Object lookup(String name);
+
+    /** Loads a file. */
+    public abstract Object load(String path) throws ScriptException;
+
+    /** Loads a file. */
+    public abstract Object load(File file) throws ScriptException;
+
     /** Loads a file. This method does not throw an exception but
      *  displays an error message on the current output. */
-    public Object loadSilently(String path) { 
-	return null; 
+    public Object loadSilently(String filename) {
+	try {
+	    File file = new File(filename);
+	    String dir = file.getParent();
+	    Object old_dir = lookup("dir");
+	    // define("dir", dir);
+	    Object result = load(file);
+	    // define("dir", old_dir);
+	    return result;
+	} catch (Exception e) {
+	    System.out.println("Couldn't load " + e.getMessage());
+	    return null; 
+	}
+    }
+
+    public Package loadPackage(Package pkg, File initfile) throws ScriptException
+    {
+	Object old_dir = lookup("dir");
+	Object old_pkg = lookup("this-package");
+	define("dir", initfile.getParent());
+	define("this-package", pkg);
+	load(initfile);
+	define("dir", (old_dir == null) ? "" : old_dir);
+	define("this-package", (old_pkg == null) ? "" : old_pkg);
+	return pkg;
     }
 
     /** Unfortunately, Silk and Kawa don't use Java strings to

@@ -1,6 +1,6 @@
 //
 // jMax
-// Copyright (C) 1999 by IRCAM
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.y
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License

@@ -1,6 +1,6 @@
 //
 // jMax
-// Copyright (C) 1999 by IRCAM
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,19 +18,18 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Authors: Maurizio De Cecco, Francois Dechelle, Peter Hanappe, Enzo Maggi, 
-//          Norbert Schnell.
+// Based on Max/ISPW by Miller Puckette.
 // 
-
-/** DefaultSchemeScript
- *
- */
+// Author: Peter Hanappe
+//
 package ircam.jmax.script.scm;
 import ircam.jmax.script.*;
 
-/** Implements a simple Scheme script consisting of a String
- *  expression. The evaluation expects no arguments. */
-
+/** DefaultSchemeScript
+ *
+ * Implements a simple Scheme script consisting of a String
+ *  expression. The evaluation expects no arguments. 
+ */
 public class DefaultSchemeScript implements Script {
     String expr;
     Interpreter itsInterp;

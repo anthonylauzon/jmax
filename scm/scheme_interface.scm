@@ -279,7 +279,7 @@
 ;; require-package
 ;;
 (define (require-package name version)
-  (package-handler-require (get-package-handler) name version))
+  (package-handler-require-silently (get-package-handler) name version))
 
 ;;
 ;; append-package-path

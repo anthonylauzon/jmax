@@ -1,6 +1,6 @@
 //
 // jMax
-// Copyright (C) 1999 by IRCAM
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,24 +18,30 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Authors: Peter Hanappe
+// Based on Max/ISPW by Miller Puckette.
+// 
+// Author: Peter Hanappe
+//
 
-/**  KawaInterpreter
- *
- *  An implementation of the jMax interpreter using the Kawa
- *  interpreter (Scheme).  */
+package ircam.jmax.script.scm.kawa;
 
-package ircam.jmax.script.scm;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.script.*;
 import ircam.jmax.script.pkg.*;
+import ircam.jmax.script.scm.*;
 import java.awt.event.*;
 import java.io.*;
 import kawa.lang.*;
 import kawa.standard.Scheme;
 import gnu.mapping.*;
 
+/**
+ *  KawaInterpreter
+ *
+ *  An implementation of the jMax interpreter using the Kawa
+ *  interpreter (Scheme).  
+ */
 public class KawaInterpreter extends SchemeInterpreter 
 { 
     /** The Silk object ued for the evaluation. */
@@ -125,6 +131,11 @@ public class KawaInterpreter extends SchemeInterpreter
 	return getCurrentEnvironment().define(name.toLowerCase().intern(), value);
     }
 
+    public Object lookup(String name) 
+    {
+	return getCurrentEnvironment().get(name.toLowerCase().intern());
+    }
+
     public Object eval(Script script) throws ScriptException 
     {
 	return script.eval(this);
@@ -153,21 +164,6 @@ public class KawaInterpreter extends SchemeInterpreter
 	}
     }
 
-    /** Loads a file. This method does not throw an exception but
-     *  displays an error message on the current output. */
-    public Object loadSilently(String path) 
-    {
-	try  {
-	    return load(new InPort(new FileReader(path), path));
-	} catch (Exception e) {
-	    // FIXME
-	    //output.println(e.getMessage());
-	    //e.printStackTrace();
-	    System.out.println("Couldn't load " + e.getMessage());
-	    return null;
-	}
-    }
-
     public Object load(InPort in) throws ScriptException 
     {
 	return itsInterp.eval(in, getCurrentEnvironment()); 
@@ -191,14 +187,6 @@ public class KawaInterpreter extends SchemeInterpreter
     public boolean commandComplete(String s) 
     {
 	return false;
-    }
-
-    public Package loadPackage(Package pkg, File initfile) throws ScriptException
-    {
-	define("dir", initfile.getParent());
-	define("this-package", pkg);
-	load(initfile);
-	return pkg;
     }
 
     public Project loadProject(Package context, File proj) throws ScriptException

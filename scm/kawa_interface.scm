@@ -142,10 +142,10 @@
     "forget" <void> (<java.lang.String>))
    a0 a1))
 
-(define (package-handler-require a0 a1 a2)
+(define (package-handler-require-silently a0 a1 a2)
   ((primitive-virtual-method
     <ircam.jmax.script.pkg.PackageHandler>
-    "require" <void> (<java.lang.String> <java.lang.String>))
+    "requireSilently" <void> (<java.lang.String> <java.lang.String>))
    a0 a1 a2))
 
 (define (package-handler-append-path a0 a1)

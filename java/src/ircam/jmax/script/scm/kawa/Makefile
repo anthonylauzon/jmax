@@ -24,8 +24,8 @@
 
 
 
-ROOTDIR = ../../../../../..
-PACKAGE_DIR = ircam/jmax/script/scm
+ROOTDIR = ../../../../../../..
+PACKAGE_DIR = ircam/jmax/script/scm/kawa
 
 include $(ROOTDIR)/java/Makefiles/Makefile.common
 

@@ -1,6 +1,6 @@
-// 
+//
 // jMax
-// Copyright (C) 1999 by IRCAM
+// Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
-// Authors: Peter Hanappe
+// Based on Max/ISPW by Miller Puckette.
+// 
+// Author: Peter Hanappe
+//
 
 /** PackageHandler
  * 
@@ -94,6 +97,21 @@ public class PackageHandler {
 	packageTable.remove(packageName);
     }
 
+
+    /** Makes sure that a package is loaded. If the package is not
+     *  loaded or known the package's load script and/or the unknown
+     *  script are used to load the package. This method does the same
+     *  as require except that it doesn't throw an exception if the
+     *  package is not found but prints out a message instead. */
+    public void requireSilently(String packageName, String version)
+    {
+	try {
+	    require(packageName, version);
+	} catch (Exception e) {
+	    System.out.println("Error loading package " + packageName + " : package not found");
+	}
+    }
+
     /** Makes sure that a package is loaded. If the package is not
      *  loaded or known the package's load script and/or the unknown
      *  script are used to load the package. */
@@ -165,7 +183,7 @@ public class PackageHandler {
     /** Appends a path to the package path. */
     public void appendPath(String path) 
     {
-	if (itsPkgPath != null) {
+	if (itsPkgPath == null) {
 	    itsPkgPath = path;
 	} else {
 	    itsPkgPath += File.pathSeparator + path;

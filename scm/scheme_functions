@@ -55,7 +55,7 @@ package-handler-set-unknown-script
 package-handler-get-unknown-script
 package-handler-provide
 package-handler-forget
-package-handler-require
+package-handler-require-silently
 package-handler-append-path
 package-append-local-path
 package-load-class
