@@ -760,10 +760,9 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   int m = mat_get_m(self);
   int	n = mat_get_n(self);
   int	pos = 0;	/* col position at which to insert */
-  int numcols = 1;	/* number of rows to insert */
+  int numcols = 1;	/* number of cols to insert */
   int num, tomove, i, j, start, new_n;
   
-  /* check and test args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
@@ -773,11 +772,11 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)	return;	/* nothing to append */
+  if(numcols <= 0)	return;	
   
-  /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m, n + numcols);
   new_n = n+numcols;
+  
   /* move rows */
   start = (m-1)*new_n + pos;
   tomove = new_n-pos-numcols;

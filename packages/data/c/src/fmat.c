@@ -48,6 +48,9 @@ static fts_symbol_t sym_im = 0;
 static fts_symbol_t sym_mag = 0;
 static fts_symbol_t sym_arg = 0;
 
+static fts_symbol_t sym_insert_cols = 0;
+static fts_symbol_t sym_delete_cols = 0;
+
 /********************************************************
  *
  *  fmat format
@@ -1480,8 +1483,222 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(obj);
 }
 
+/** append a row of atoms, augment m, clip row to n 
+* 
+* @method append
+* @param  atoms	row of atoms to append, will be clipped to width of matrix
+*/
+static void
+fmat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *) o;
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  /* clip to row */
+  if (ac > n)
+    ac = n;
+  
+  /* add space, append data */
+  fmat_set_size(self, m + 1, n);
+  
+  if(fmat_editor_is_open(self))
+  {
+    fts_client_send_message(o, fts_s_append, 0, 0);
+    fmat_upload_from_index(self, m, 0, n);
+  }
+  fts_object_set_state_dirty(o);
+}
 
+/** insert @p num rows of atoms at row @p pos
+ *  may insert num rows behind last row m --> append num rows
+ *
+ * @method insert
+ * @param  int: pos    index of row where to insert @p num empty rows, default 0
+ * @param  int: num    number of rows to insert, default 1
+ * 
+ * TODO: give data, clip rows to n, you can use mat_set_row_elements for now
+ * @method insert
+ * @param  int: pos    index of row where to insert
+ * @param  tuples: atoms  list of tuples of rows of atoms to append, 
+ *		       will be clipped to width of matrix
+ */
+static void
+fmat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t	*self = (fmat_t *) o;
+  float *newptr;
+  int m = fmat_get_m(self);
+  int	n = fmat_get_n(self);
+  int	pos = 0;	// row position at which to insert 
+  int numrows = 1;	// number of rows to insert
+  int num, tomove, i;
 
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+
+  if(pos < 0)	pos = 0;
+  else if(pos > m) pos = m;
+
+  if (ac > 1  &&  fts_is_number(at+1))
+    numrows = fts_get_number_int(at+1) ;
+  
+  if(numrows <= 0)	return;	
+
+  fmat_set_size(self, m + numrows, n);
+
+  // move rows
+  newptr = fmat_get_ptr(self) + n * pos;
+  num    = n * numrows;		// atoms to insert 
+  tomove = n * (m - pos);	// atoms to move 
+
+  if(pos < m)	
+    memmove(newptr + num, newptr, tomove * sizeof(float));
+
+  for(i = 0; i < num; i++)
+    self->values[n*pos + i] = 0.0;
+
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
+  fts_object_set_state_dirty(o);
+}
+
+/** insert @p num rows of atoms at row @p pos
+*  may insert num rows behind last row m --> append num rows
+*
+* @method insert
+* @param  int: pos    index of row where to insert @p num empty rows, default 0
+* @param  int: num    number of rows to insert, default 1
+* 
+* TODO: give data, clip rows to n, you can use mat_set_row_elements for now
+* @method insert
+* @param  int: pos    index of row where to insert
+* @param  tuples: atoms  list of tuples of rows of atoms to append, 
+*		       will be clipped to width of matrix
+*/
+static void
+fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t	*self = (fmat_t *) o;
+  int m = fmat_get_m(self);
+  int	n = fmat_get_n(self);
+  int	pos = 0;	// col position at which to insert
+  int numcols = 1;	// number of rows to insert
+  int num, tomove, i, j, start, new_n;
+  
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+  
+  if(pos < 0)	pos = 0;
+  else if(pos > n) pos = n;
+  
+  if (ac > 1  &&  fts_is_number(at+1))
+    numcols = fts_get_number_int(at+1) ;
+  
+  if(numcols <= 0)	return;	
+  
+  fmat_set_size(self, m, n + numcols);
+  new_n = n+numcols;
+
+  start = (m-1)*new_n + pos;
+  tomove = new_n-pos-numcols;
+  
+  for(i = 0; i < m; i++)
+  {
+    for(j=tomove-1; j >= 0; j--)
+      self->values[start+j+numcols] = self->values[start+j];
+    for(j = 0; j < numcols; j++)
+      self->values[start + j] = 0.0;
+    start = start - new_n;
+  }
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
+  fts_object_set_state_dirty(o);
+}
+
+static void
+fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t	*self = (fmat_t *) o;
+  int m = fmat_get_m(self);
+  int	n = fmat_get_n(self);
+  int	pos = 0;	
+  int numcols = 1;	// number of rows to delete
+  int num, tomove, i, j, start;
+  
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+  
+  if(pos < 0)	pos = 0;
+  else if(pos > n) pos = n;
+  
+  if (ac > 1  &&  fts_is_number(at+1))
+    numcols = fts_get_number_int(at+1) ;
+  
+  if(numcols <= 0)	return;	
+  
+  start = pos + numcols;
+  tomove = n-pos-numcols;
+  
+  for(i = 0; i < m; i++)
+  {
+    for(j=0; j < tomove; j++)
+      self->values[start-numcols+j] = self->values[start+j];
+    start = start + n;
+  }
+  
+  fmat_set_size(self, m, n - numcols);
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
+  fts_object_set_state_dirty(o);
+}
+
+/** delete @p num rows of atoms 
+ * 
+ * @method delete
+ * @param  int: pos    index of row where to delete @p num rows, default 0
+ * @param  int: num    number of rows to delete, default 1
+ */
+static void
+fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t	*self = (fmat_t *) o;
+  float *killptr;
+  int m = fmat_get_m(self);
+  int	n = fmat_get_n(self);
+  int	pos = 0;
+  int numrows = 1;
+  int num, tomove, i;
+  
+  if (ac > 0  &&  fts_is_number(at))
+    pos = fts_get_number_int(at);
+    
+  if(pos <  0) pos = 0;
+  else if (pos >= m) return;	
+
+  if (ac > 1  &&  fts_is_number(at+1))
+    numrows = fts_get_number_int(at+1);
+
+  if(numrows <= 0) return;	
+  else if (numrows >  m - pos) numrows = m - pos;
+  
+  killptr = fmat_get_ptr(self) + n * pos;
+  num     = n * numrows;	// number of atoms to insert
+  tomove  = n * (m - pos);	// number of atoms to move 
+
+  memmove(killptr, killptr + num, tomove * sizeof(float));
+  self->m -= numrows; 
+
+  if (fmat_editor_is_open(self))
+    fmat_upload(self);
+
+  fts_object_set_state_dirty(o);
+}
 
 /******************************************************************************
  *
@@ -4035,6 +4252,12 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
   fts_class_message_varargs(cl, fts_new_symbol("zero"), fmat_zero);
   
+  fts_class_message_varargs(cl, fts_s_append, fmat_append_row);
+  fts_class_message_varargs(cl, fts_s_insert, fmat_insert_rows);
+  fts_class_message_varargs(cl, sym_insert_cols, fmat_insert_columns);
+  fts_class_message_varargs(cl, fts_s_delete, fmat_delete_rows);
+  fts_class_message_varargs(cl, sym_delete_cols, fmat_delete_columns);
+  
   fts_class_message_void(cl, fts_s_size, _fmat_get_size);
   fts_class_message_varargs(cl, fts_s_size, _fmat_set_size);
   
@@ -4221,6 +4444,9 @@ fmat_config(void)
   sym_mag = fts_new_symbol("mag");
   sym_arg = fts_new_symbol("arg");
 
+  sym_insert_cols = fts_new_symbol("insert_cols");
+  sym_delete_cols = fts_new_symbol("delete_cols");
+  
   fmat_class = fts_class_install(fmat_symbol, fmat_instantiate);
   fvec_class = fts_class_install(fvec_symbol, fmat_instantiate);
 
