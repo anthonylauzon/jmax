@@ -36,6 +36,8 @@ FTS_API void fts_class_instantiate(fts_class_t *cl);
 /* Predefined typeids */
 #define FTS_FIRST_OBJECT_TYPEID   16
 
+
+
 /**************************************************
  *
  *  class documentation
@@ -56,6 +58,10 @@ typedef struct fts_class_doc_line
 
 FTS_API void fts_class_doc(fts_class_t *cl, fts_symbol_t name, const char *args, const char *comment);
 FTS_API void fts_class_doc_post(fts_class_t *cl);
+/* fts_class_doc_get appends doc atoms to array */
+FTS_API int  fts_class_doc_get (fts_class_t *cl, fts_array_t *output);
+
+
 
 /**************************************************
  *
