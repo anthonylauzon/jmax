@@ -134,10 +134,15 @@ abstract public class Tool implements StatusBarClient{
 
   public void setCursor( ImageIcon icon)
   {
-    this.cursor = loadCursor( icon);
+    this.cursor = loadCursor( icon, null);
   }
 
-  public Cursor loadCursor( ImageIcon cursorIcon)
+  public void setCursor( ImageIcon icon, Point hotSpot)
+  {
+    this.cursor = loadCursor( icon, hotSpot);
+  }
+
+  public Cursor loadCursor( ImageIcon cursorIcon, Point hotSpot)
   {
     if (cursorIcon == null)
       return null;
@@ -156,11 +161,12 @@ abstract public class Tool implements StatusBarClient{
     BufferedImage bi = new BufferedImage( bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
     bi.createGraphics().drawImage( image, 0, 0, observer);
     
-    Point hs;
-    if ( bi.getHeight( observer) < 1)
-      hs = new Point(0,0);
-    else
-      hs = new Point(0, 1);
+    Point hs = hotSpot;
+    if( hs == null)
+      if ( bi.getHeight( observer) < 1)
+	hs = new Point(0,0);
+      else
+	hs = new Point(0, 1);
     
     return Toolkit.getDefaultToolkit().createCustomCursor( bi, hs, itsName + " cursor");
   }
