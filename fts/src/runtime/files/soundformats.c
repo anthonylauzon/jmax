@@ -28,9 +28,6 @@
 #include "lang.h"
 #include "runtime/files/soundformats.h"
 
-/* implemented in platform dependent soundfile code */
-extern void fts_soundfile_formats_platform_declare(void);
-
 /* generally explicitly supported file format symbols (see down for explain) */
 fts_symbol_t fts_s_aiffc = 0;
 fts_symbol_t fts_s_aiff = 0;
@@ -157,6 +154,12 @@ fts_soundfile_format_get_default()
   return default_format_name;
 }
 
+
+int
+fts_soundfile_format_is_raw(fts_symbol_t name)
+{
+  return (name == fts_s_float || name == fts_s_signed8 || name == fts_s_signed16 ||name == fts_s_signed24 || name == fts_s_signed32);
+}
 
 /************************************************************************
  *

@@ -99,7 +99,7 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
       return &fts_CannotInstantiate;
     }
 
-  obj     = (fts_object_t *)fts_block_zalloc(cl->size);
+  obj = (fts_object_t *)fts_block_zalloc(cl->size);
   obj->cl = cl;
 
   /* Other Initializations */

@@ -30,10 +30,10 @@
 extern fts_module_t fts_utils_module;
 
 #include "utils/hashtab.h"
-#include "utils/units.h"
 #include "utils/ramps.h"
 #include "utils/ramp_vectors.h"
 #include "utils/floatfuns.h"
+#include "utils/fourpoint.h"
 #include "utils/ieeewrap.h"
 #include "utils/intphase.h"
 #include "utils/srconv.h"

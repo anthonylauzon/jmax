@@ -24,7 +24,6 @@
  *
  */
 
-
 /*
  * Modified by mdc to work on Linux:
  *
@@ -47,6 +46,11 @@
 #include "lang.h"
 #include "runtime/files/soundfiles.h"
 #include "runtime/files/soundformats.h"
+
+#ifndef HAVE_AF_VIRTUAL_PARAMETERS 
+#define READ_BLOCK_SIZE 1024
+#define WRITE_BLOCK_SIZE 1024
+#endif
 
 /***************************************************************
  *
@@ -99,6 +103,7 @@ fts_af_get_format(fts_symbol_t name)
 struct fts_soundfile
 {
   AFfilehandle af_handle;
+  fts_srconv_t *srconv;
 };
 
 /*****************************************************
@@ -115,6 +120,7 @@ fts_af_soundfile_new(AFfilehandle af_handle)
 {
   fts_soundfile_t *sf = fts_malloc(sizeof(fts_soundfile_t));
   sf->af_handle = af_handle;
+  sf->srconv = 0;
   
   return sf;
 }
@@ -126,35 +132,31 @@ fts_af_soundfile_free(fts_soundfile_t *sf)
 }
 
 
-/* setting internal (virtual) format to float (-1.0 ... 1.0) 
-   (and maybe a rate to convert to) */
-
 #ifdef HAVE_AF_VIRTUAL_PARAMETERS 
+
+/* setting internal (virtual) format to float (-1.0 ... 1.0) (and maybe a rate to convert to) */
 static void
-fts_af_internal_format_set_float(AFfilehandle af_handle, float sr)
+fts_af_internal_format_set_float(AFfilehandle af_handle, double sr)
 {
   /* Set the internal (virtual) audio format parameters */
-
   afSetVirtualSampleFormat(af_handle, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
   afSetVirtualChannels(af_handle, AF_DEFAULT_TRACK, 1);
   
-  if (sr > 0.0f)
-    afSetVirtualRate(af_handle, AF_DEFAULT_TRACK,(double)sr);
+  if (sr > 0.0)
+    afSetVirtualRate(af_handle, AF_DEFAULT_TRACK, sr);
 
   afSetVirtualPCMMapping(af_handle, AF_DEFAULT_TRACK, 1.0, 0.0, 0.0, 0.0);
 }
+
 #endif
 
-/* setting file format to read or write raw floats like internal format
-   (no rate set) */
-
+/* setting file format to read or write raw floats like internal format (no rate set) */
 static void
 fts_af_file_format_set_float(AFfilesetup af_setup)
 {
   afInitFileFormat(af_setup, AF_FILE_RAWDATA);
 
   /* create list of file format parameters */
-  
   afInitSampleFormat(af_setup, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
   afInitChannels(af_setup, AF_DEFAULT_TRACK, 1);
 }
@@ -167,12 +169,13 @@ fts_af_file_format_set_float(AFfilesetup af_setup)
  */
 
 fts_soundfile_t *
-fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float sr, int onset)
+fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, double sr, int onset)
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
   AFfilesetup af_setup = afNewFileSetup();
   AFfilehandle af_handle;
+  fts_soundfile_t *sf;
 
   /* find file in all possible locations */
   if (!fts_file_get_read_path(path, full_path))
@@ -188,7 +191,7 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
 	}
       else /* float is only supported raw format for now */
 	{
-	  post("unsupported raw soundfile format: %s\n", fts_symbol_name(format));
+	  post("soundfile: unsupported raw format: %s\n", fts_symbol_name(format));
 	  return 0;
 	}
     }
@@ -202,28 +205,38 @@ fts_soundfile_open_read_float(fts_symbol_t file_name, fts_symbol_t format, float
 
   /* return fts_soundfile "object" if successfull or 0 if not */
   if (af_handle != AF_NULL_FILEHANDLE)
-    {  
+    {
+      double sr_file = afGetRate(af_handle, AF_DEFAULT_TRACK);
+
       if (onset)
 	{
 	  int n_skip = afSeekFrame(af_handle, AF_DEFAULT_TRACK, onset);
+
 	  if (n_skip < onset)
 	    {
 	      afCloseFile(af_handle);
-	      post("onset failed: %d samples\n", onset);
+	      post("soundfile: onset failed: %d samples\n", onset);
 	      return 0;
 	    }
 	}
+
+      sf = fts_af_soundfile_new(af_handle);
+      
 #ifdef HAVE_AF_VIRTUAL_PARAMETERS 
       fts_af_internal_format_set_float(af_handle, sr);
+#else
+      if(sr > 0.0 && sr != sr_file)
+	sf->srconv = fts_srconv_new(sr / sr_file, READ_BLOCK_SIZE, 1);
 #endif
-      return fts_af_soundfile_new(af_handle);
+
+      return sf;
     }
   else
     return 0;
 }
 
 fts_soundfile_t *
-fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name, float sr)
+fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name, double sr)
 {
   char full_path[1024];
   const char *path = fts_symbol_name(file_name);
@@ -242,7 +255,7 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
 	{
 	case AF_FILE_UNKNOWN:
 	  {
-	    post("unknown soundfile format: %s\n", fts_symbol_name(format_name));
+	    post("soundfile: unknown format: %s\n", fts_symbol_name(format_name));
 	    return 0;
 	  }
 	case AF_FILE_RAWDATA:
@@ -286,9 +299,13 @@ fts_soundfile_open_write_float(fts_symbol_t file_name, fts_symbol_t format_name,
     return 0;
   else
     {
+
 #ifdef HAVE_AF_VIRTUAL_PARAMETERS 
+
       fts_af_internal_format_set_float(af_handle, sr);
+
 #endif
+
       return fts_af_soundfile_new(af_handle);
     }
 }
@@ -298,6 +315,10 @@ void fts_soundfile_close(fts_soundfile_t *soundfile)
   if (soundfile)
     {
       afCloseFile(soundfile->af_handle);
+
+      if(soundfile->srconv)
+	fts_srconv_delete(soundfile->srconv);
+
       fts_af_soundfile_free(soundfile);
     }
 }
@@ -309,6 +330,7 @@ void fts_soundfile_close(fts_soundfile_t *soundfile)
  */
 
 #ifdef HAVE_AF_VIRTUAL_PARAMETERS 
+
 int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size)
 {
   if (soundfile)
@@ -344,17 +366,13 @@ int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int siz
 }
 #else
 
-/* Version without the virtual format; currently, work only 
-   for ...
-*/
-
-#define READ_BLOCK_SIZE 1024
+/* Version without the virtual format; currently, work only for ... */
 
 int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size)
 {
   if (soundfile)
     {
-      int read;
+      int n_read = 0;
       int sampfmt;
       int sampwidth;
 
@@ -363,53 +381,64 @@ int fts_soundfile_read_float(fts_soundfile_t *soundfile, float *buffer, int size
       if ((sampfmt == AF_SAMPFMT_TWOSCOMP) && (sampwidth == 16))
 	{
 	  int read_size;
-	  short buf[READ_BLOCK_SIZE];
-
-	  read = 0;
+	  short short_buf[READ_BLOCK_SIZE];
 
 	  while (size > 0)
 	    {
-	      int i, n;
+	      int n_got;
 
-	      read_size = size > READ_BLOCK_SIZE ? READ_BLOCK_SIZE : size;
+	      read_size = (size > READ_BLOCK_SIZE)? READ_BLOCK_SIZE: size;
 
-	      n = afReadFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)buf, read_size);
+	      n_got = afReadFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)short_buf, read_size);
 
-	      /* Exit in errors */
-
-	      if (n <= 0)
-		return read;
+	      /* exit on errors */
+	      if (n_got <= 0)
+		return n_read;
 		
-	      /* Convert to float */
+	      if(soundfile->srconv)
+		{
+		  float float_buf[READ_BLOCK_SIZE];
+		  int n_got_conv;
+		  int i;
 
-	      for (i = 0; i < n; i++)
-		buffer[read++] =  ((float) buf[i] / 32768.0f);
+		  /* convert to float */
+		  for(i=0; i<n_got; i++)
+		    float_buf[i] =  ((float) short_buf[i] / 32768.0f);
 
+		  /* convert sample rate from float_buffer to buffer */
+		  n_got_conv = fts_srconv(soundfile->srconv, float_buf, buffer + n_read, n_got, size, 1);
 
-	      /* Exit in eofs */
+		  size -= n_got_conv;
+		  n_read += n_got_conv;
+		}
+	      else
+		{
+		  /* just convert to float */
+		  int i;
 
-	      if (n < read_size)
-		return read;
+		  for(i=0; i<n_got; i++)
+		    buffer[n_read + i] =  ((float) short_buf[i] / 32768.0f);
 
-	      /* Update the counter */
+		  size -= n_got;
+		  n_read += n_got;
+		}
 
-	      size -= n;
+	      /* exit if EOF */
+	      if(n_got < read_size)
+		return n_read;
 	    }
 
-	  return read;
+	  return n_read;
 	}
       else
 	{
 	  /* Add other formats here */
-
 	  return 0;
 	}
     }
   else
     return 0;
 }
-
-#define WRITE_BLOCK_SIZE 1024
 
 int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int size)
 {
@@ -435,8 +464,7 @@ int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int siz
 	      frames = (size > WRITE_BLOCK_SIZE ? WRITE_BLOCK_SIZE : size);
 
 	      /* Convert to short  */
-
-	      for (i = 0; i < frames; i++)
+	      for (i=0; i<frames; i++)
 		buf[wrote++] =  (short) (buffer[i] / 32768.0f);
 
 	      n = afWriteFrames(soundfile->af_handle, AF_DEFAULT_TRACK, (void *)buf, frames);
@@ -445,7 +473,6 @@ int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int siz
 		return wrote;
 
 	      /* Update the counter */
-
 	      size -= n;
 	    }
 
@@ -454,11 +481,25 @@ int fts_soundfile_write_float(fts_soundfile_t *soundfile, float *buffer, int siz
       else
 	{
 	  /* Add other formats here */
-
 	  return 0;
 	}
     }
   else
     return 0;
 }
+
 #endif
+
+int 
+fts_soundfile_get_size(fts_soundfile_t *soundfile)
+{
+  return afGetFrameCount(soundfile->af_handle, AF_DEFAULT_TRACK);
+}
+
+double
+fts_soundfile_get_samplerate(fts_soundfile_t *soundfile)
+{
+  return afGetRate(soundfile->af_handle, AF_DEFAULT_TRACK);
+}
+
+
