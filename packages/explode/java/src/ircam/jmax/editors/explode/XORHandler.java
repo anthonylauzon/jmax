@@ -18,6 +18,16 @@ public class XORHandler {
   public XORHandler(XORPainter theClient) 
   {
     itsClient = theClient;
+    form = RELATIVE;
+  }
+
+  /** 
+   * Constructor.
+   */
+  public XORHandler(XORPainter theClient, int theForm) 
+  {
+    itsClient = theClient;
+    form = theForm;
   }
 
   /**
@@ -25,6 +35,8 @@ public class XORHandler {
    */
   public void beginAt(int x, int y) 
   {
+    firstX = x;
+    firstY = y;
     oldX=x;
     oldY = y;
     updated = true;
@@ -36,7 +48,10 @@ public class XORHandler {
   public void moveTo(int x, int y) 
   {
     if (!updated) itsClient.XORErase();
-    itsClient.XORDeltaDraw(x-oldX, y-oldY);
+    if (form == RELATIVE)
+      itsClient.XORDraw(x-oldX, y-oldY);
+    else itsClient.XORDraw(x-firstX, y-firstY);
+    
     updated = false;
     oldX = x;
     oldY = y;
@@ -53,7 +68,14 @@ public class XORHandler {
   //--- Fields
   int oldX;
   int oldY;
+  int firstX;
+  int firstY;
+
   XORPainter itsClient;
 
   boolean updated;
+
+  int form;
+  public static final int ABSOLUTE = 0;
+  public static final int RELATIVE = 1;
 }

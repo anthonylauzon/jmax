@@ -6,7 +6,7 @@ import java.awt.event.*;
 /**
  * A rubber-banding interaction module.
  * It takes care of drawing a "selection rectangle" in a 
- * component, and communicate the result to a SelectionListener
+ * component, and communicate the result to a GraphicSelectionListener
  */
 public class Selecter extends InteractionModule implements XORPainter {
 
@@ -14,9 +14,9 @@ public class Selecter extends InteractionModule implements XORPainter {
    * Constructor. This class uses a XORHandler to draw the shape
    * of the rubber banding rectangle
    */
-  public Selecter(SelectionListener theListener, GraphicContext gc) 
+  public Selecter(GraphicSelectionListener theListener) 
   {
-    super(gc.getGraphicEventSource(), gc.getGraphicDestination());
+    super();
     
     itsXORHandler = new XORHandler(this);
     itsListener = theListener;
@@ -48,6 +48,11 @@ public class Selecter extends InteractionModule implements XORPainter {
    */
   public void mouseDragged(MouseEvent e) 
   {
+    
+    gc.getStatusBar().post(ScrToolbar.getTool(), ""+
+			      (gc.getAdapter().getInvX(e.getX()))+
+			      "       "+
+			      (gc.getAdapter().getInvY(e.getY())));
     itsXORHandler.moveTo(e.getX(), e.getY());
   }
 
@@ -75,15 +80,15 @@ public class Selecter extends InteractionModule implements XORPainter {
    */
   public void XORErase() 
   {
-    XORDeltaDraw(0, 0);
+    XORDraw(0, 0);
   }
 
   /**
    * from the XOR painter interface. The actual drawing routine
    */
-  public void XORDeltaDraw(int dx, int dy) 
+  public void XORDraw(int dx, int dy) 
   {
-    Graphics g = itsGraphicDestination.getGraphics();
+    Graphics g = gc.getGraphicDestination().getGraphics();
 
     g.setColor(Color.gray);
     g.setXORMode(Color.white); //there's an assumption here on the color of the background.
@@ -117,12 +122,12 @@ public class Selecter extends InteractionModule implements XORPainter {
   }
 
   //--- Fields
-  SelectionListener itsListener;
+  GraphicSelectionListener itsListener;
 
   Point startSelection = new Point();
   Point movingPoint = new Point();
   XORHandler itsXORHandler;
-  
+
   Rectangle tempRect = new Rectangle();
 
 }

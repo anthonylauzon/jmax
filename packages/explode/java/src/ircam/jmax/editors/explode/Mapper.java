@@ -18,5 +18,7 @@ public abstract class Mapper {
    * get the value from the given event
    */
   public abstract int get(ScrEvent e);
+
+
 }
 

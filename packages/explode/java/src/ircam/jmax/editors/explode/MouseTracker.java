@@ -14,9 +14,9 @@ public class MouseTracker extends InteractionModule {
   /**
    * constructor.
    */
-  public MouseTracker(PositionListener theListener, GraphicContext gc) 
+  public MouseTracker(PositionListener theListener) 
   {
-    super(gc.getGraphicEventSource(), gc.getGraphicDestination());
+    super();
     itsListener = theListener;
   }
 
@@ -28,8 +28,32 @@ public class MouseTracker extends InteractionModule {
     itsListener.positionChoosen(e.getX(), e.getY(), e.getModifiers());
   } 
 
+  //Mouse interface
+  
+  public void mouseMoved(MouseEvent e) 
+  {  
+
+    gc.getStatusBar().post(ScrToolbar.getTool(), ""+
+			      (gc.getAdapter().getInvX(e.getX()))+
+			      "       "+
+			      (gc.getAdapter().getInvY(e.getY())));
+  } 
+
+  public void interactionBeginAt(int x, int y)
+  {
+    //useless for this kind of interaction module
+  }
+
   //------------- fields
   PositionListener itsListener;
+
 }
+
+
+
+
+
+
+
 
 

@@ -16,21 +16,21 @@ public class ScrAddingTool extends ScrTool implements PositionListener {
    * the Adapter, the model. All these informations are in the
    * given graphic context.
    */
-  public ScrAddingTool(GraphicContext theGc) 
+  public ScrAddingTool(GraphicContext theGc, ImageIcon theImageIcon) 
   {
-    super("adder", new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/adder.gif"));
+    super("adder", theImageIcon);
 
     gc = theGc;
-    itsMouseTracker = new MouseTracker(this, gc);
+    itsMouseTracker = new MouseTracker(this);
   }
 
 
   /**
-   * called when this tool becomes the active tool
+   * the default interaction module for this tool
    */
-  public void activate() 
+  public InteractionModule getDefaultIM() 
   {
-    mountIModule(itsMouseTracker);
+    return itsMouseTracker;
   }
 
 
@@ -57,7 +57,7 @@ public class ScrAddingTool extends ScrTool implements PositionListener {
   
 
   //-------------- Fields
-  GraphicContext gc;
+
   MouseTracker itsMouseTracker;
 }
 

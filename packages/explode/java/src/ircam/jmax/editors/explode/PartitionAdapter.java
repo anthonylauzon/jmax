@@ -13,17 +13,21 @@ public class PartitionAdapter extends Adapter {
    * It creates and assigns its mappers (Time, Pitch, Lenght), 
    * and set the initial values for the zoom, transpose and invertion fields.
    */
-  public PartitionAdapter() 
+  public PartitionAdapter(GraphicContext theGc) 
   {
-    XMapper = new TimeMapper();
-    YMapper = new PitchMapper();
-    LenghtMapper = new DurationMapper();
+    gc = theGc;
+    XMapper = TimeMapper.getMapper();
+    YMapper = PitchMapper.getMapper();
+    LenghtMapper = DurationMapper.getMapper();
+    LabelMapper = PitchMapper.getMapper();
+    
     xZoomFactor = 1;
     yZoomFactor = 1;
     xTranspose = 0;
     yTranspose = 0;
     xInvertion = false;
     yInvertion = false;
+    itsName = "Standard Adapter";
   }
 
 
@@ -49,12 +53,11 @@ public class PartitionAdapter extends Adapter {
    */
   public int getInvX(int x) 
   {
-    int temp;
 
-    if (xInvertion) temp = (int) (xTranspose -x/xZoomFactor);
-    else temp = (int) (x/xZoomFactor - xTranspose);
+    if (xInvertion) return (int) (xTranspose -x/xZoomFactor);
+
+    else return (int) (x/xZoomFactor - xTranspose);
     
-    return temp;
   }
 
 
@@ -122,87 +125,52 @@ public class PartitionAdapter extends Adapter {
    */
   public  void setLenght(ScrEvent e, int l) 
   {
-    super.setLenght(e, (int) (l*xZoomFactor));
+    super.setLenght(e, (int) (l/xZoomFactor));
   }
 
 
-  /**
-   * set the zoom factor for the x coordinates (percentage)
-   */
-  public void setXZoom(int factor) 
+  public void mappingChanged(String graphicName, String scoreName) 
   {
-    xZoomFactor = factor/(float)100;
+
+    if (graphicName.equals("y")) 
+      {
+	if (scoreName.equals("pitch"))
+	  YMapper = PitchMapper.getMapper();
+	else if (scoreName.equals("duration"))
+	  YMapper = DurationMapper.getMapper();
+	else if (scoreName.equals("velocity"))
+	  YMapper = VelocityMapper.getMapper();
+	else if (scoreName.equals("channel"))
+	  YMapper = ChannelMapper.getMapper();
+      }
+    else if (graphicName.equals("lenght")) 
+      {
+	if (scoreName.equals("pitch"))
+	  LenghtMapper = PitchMapper.getMapper();
+	else if (scoreName.equals("duration"))
+	  LenghtMapper = DurationMapper.getMapper();
+	else if (scoreName.equals("velocity"))
+	  LenghtMapper = VelocityMapper.getMapper();
+	else if (scoreName.equals("channel"))
+	  LenghtMapper = ChannelMapper.getMapper();
+      }
+    else if (graphicName.equals("label")) 
+      {
+	if (scoreName.equals("pitch"))
+	  LabelMapper = PitchMapper.getMapper();
+	else if (scoreName.equals("duration"))
+	  LabelMapper = DurationMapper.getMapper();
+	else if (scoreName.equals("velocity"))
+	  LabelMapper = VelocityMapper.getMapper();
+	else if (scoreName.equals("channel"))
+	  LabelMapper = ChannelMapper.getMapper();
+      }
+
+    gc.getGraphicDestination().repaint();
   }
-
-
-  /**
-   * get the zoom factor for the x coordinates (percentage)
-   */
-  public float getXZoom() 
-  {
-    return xZoomFactor;
-  }
-
-  /**
-   * get the zoom factor for the y coordinates (percentage)
-   */
-  public float getYZoom() 
-  {
-    return yZoomFactor;
-  }
-
-  /**
-   * set the zoom factor for the y coordinates (percentage)
-   */
-  public void setYZoom(int factor) 
-  {
-    yZoomFactor = factor/100;
-  }
-
-
-  /**
-   * set the transposition amount for the x coordinates (pixels)
-   */
-  public void setXTransposition(int xT) 
-  {
-    xTranspose = xT;
-  }
-
-  /**
-   * set the transposition amount for the y coordinates (pixels)
-   */
-  public void setYTransposition(int yT) 
-  {
-    yTranspose = yT;
-  } 
-
-
-  /**
-   * set the inversion flag for the x coordinates
-   */
-  public void setXInvertion(boolean b) 
-  {
-    xInvertion = b;
-  }
-
-
-  /**
-   * set the inversion flag for the y coordinates
-   */
-  public void setYInvertion(boolean b) 
-  {
-    yInvertion = b;
-  }
-
   //------------- Fields
-  float xZoomFactor;
-  float yZoomFactor;
-  int xTranspose;
-  int yTranspose;
-  boolean xInvertion;
-  boolean yInvertion;
 
-
+  GraphicContext gc;
 }
 
 

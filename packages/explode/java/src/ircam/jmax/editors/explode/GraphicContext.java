@@ -13,18 +13,18 @@ public class GraphicContext {
    * sets the source of events that is, the components that generates
    * the awt events.
    */
-  public void setGraphicEventSource(Component theGraphicEventSource) 
+  public void setGraphicSource(Component theGraphicSource) 
   {
-    itsGraphicEventSource = theGraphicEventSource;
+    itsGraphicSource = theGraphicSource;
   }
 
 
   /**
    * gets the source
    */
-  public Component getGraphicEventSource() 
+  public Component getGraphicSource() 
   {
-    return itsGraphicEventSource;
+    return itsGraphicSource;
   }
 
 
@@ -80,23 +80,6 @@ public class GraphicContext {
   }
   
   /**
-   * set the SelectionHandler associated to this context
-   */
-  public void setSelection(SelectionHandler theSelection) 
-  {
-    itsSelection = theSelection;
-  }
-
-  
-  /**
-   * returns the Selection (handler) 
-   */
-  public SelectionHandler getSelection() 
-  {
-    return itsSelection;
-  }
-
-  /**
    * sets the DataModel of this context
    */
   public void setDataModel(ExplodeDataModel theDataModel) 
@@ -112,29 +95,72 @@ public class GraphicContext {
   }
 
   /**
-   * set the current tool
+   * set the logical time
    */
-  public void setTool(ScrTool theTool) 
+  public void setLogicalTime(int theTime) 
   {
-    itsTool = theTool;
+    itsLogicalTime = theTime;
   }
 
   /**
-   * returns the current tool
+   * returns the current logical time
    */
-  public ScrTool getTool() 
+  public int getLogicalTime() 
   {
-    return itsTool;
+    return itsLogicalTime;
+  }
+
+  /**
+   * set the logical time
+   */
+  public void setStatusBar(StatusBar theStatusBar) 
+  {
+    itsStatusBar = theStatusBar;
+  }
+
+  /**
+   * returns the current logical time
+   */
+  public StatusBar getStatusBar() 
+  {
+    return itsStatusBar;
+  }
+
+  public void setFrame(Frame f) 
+  {
+    itsFrame = f;
+  }
+
+  public Frame getFrame() 
+  {
+    if (itsFrame != null) 
+      return itsFrame;
+    else return getFrame(itsGraphicDestination);
+  }
+
+  /**
+   * utility function:
+   * returns the Frame containing a component (why it's not in AWT?)
+   */
+  public static Frame getFrame(Component c) {
+    for (Container p = c.getParent(); p != null; p = p.getParent()) {
+      if (p instanceof Frame) {
+	return (Frame) p;
+      }
+    }
+    return null;
   }
 
   //-------------------------------------
-  Component itsGraphicEventSource;
+
+  Component itsGraphicSource;
   Component itsGraphicDestination;
   Adapter itsAdapter;
-  SelectionHandler itsSelection;
-  ScrTool itsTool;
+
   ExplodeDataModel itsDataModel;
 
   Renderer itsRenderer;
-
+  Frame itsFrame;
+  int itsLogicalTime;
+  StatusBar itsStatusBar;
 }

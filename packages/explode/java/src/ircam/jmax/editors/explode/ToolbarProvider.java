@@ -12,4 +12,14 @@ public interface ToolbarProvider {
    * returns the collection of tools to be inserted in the toolbar
    */
   abstract public Enumeration getTools();
+
+  /**
+   * returns the tool that should be used as the default, if any
+   */
+  abstract public ScrTool getDefaultTool();
+
+  /**
+   * returns the graphic context of this provider
+   */
+  abstract GraphicContext getGraphicContext();
 }

@@ -1,27 +1,34 @@
 SOURCES = \
+	AAAReadme.java		\
+	Adapter.java		\
 	ArrowTool.java		\
-	DurationMapper.java	\
-	DragListener.java	\
+	ChannelMapper.java		\
 	DeleteTool.java	\
+	DragListener.java	\
+	DurationMapper.java	\
+	EventRenderer.java	\
 	Explode.java		\
-	ExplodeDataModel.java	\
 	ExplodeDataListener.java	\
+	ExplodeDataModel.java	\
 	ExplodeExtension.java	\
 	ExplodeFactory.java	\
 	ExplodeRemoteData.java	\
 	ExplodeSelection.java	\
-	AAAReadme.java		\
-	Adapter.java		\
-	EventRenderer.java	\
+	GraphicContext.java	\
+	GraphicSelectionListener.java	\
+	InfoPanel.java	\
 	InteractionModule.java	\
 	Mapper.java		\
-	MoverTool.java		\
+	MappingListener.java	\
 	MouseTracker.java	\
+	MoverTool.java		\
 	PartitionAdapter.java	\
 	PartitionEventRenderer.java	\
 	PitchMapper.java	\
 	PositionListener.java	\
+	ProportionalLayout.java	\
 	Renderer.java		\
+	ResizerTool.java		\
 	ScoreRenderer.java	\
 	ScrAddingTool.java	\
 	ScrEvent.java		\
@@ -32,10 +39,15 @@ SOURCES = \
 	SelectionHandler.java	\
 	SelectionListener.java	\
 	SelectionMover.java	\
+	SelectionResizer.java	\
+	SettingsDialog.java	\
+	StatusBar.java		\
+	StatusBarClient.java	\
 	TimeMapper.java		\
 	ToolChangeEvent.java	\
 	ToolListener.java	\
 	ToolbarProvider.java	\
+	VelocityMapper.java	\
 	XORHandler.java		\
 	XORPainter.java
 

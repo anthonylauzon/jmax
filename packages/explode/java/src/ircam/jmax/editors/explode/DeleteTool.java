@@ -13,21 +13,18 @@ public class DeleteTool extends ScrTool implements PositionListener {
   /**
    * Constructor. 
    */
-  public DeleteTool(GraphicContext theGc) 
+  public DeleteTool(GraphicContext theGc, ImageIcon theImageIcon) 
   {
-    super("eraser", new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/eraser.gif"));
+    super("eraser", theImageIcon);
     
     gc = theGc;    
-    itsMouseTracker = new MouseTracker(this, gc);
+    itsMouseTracker = new MouseTracker(this);
   }
 
   
-  /**
-   * called when this tool becomes the active tool
-   */
-  public void activate() 
+  public InteractionModule getDefaultIM() 
   {
-    mountIModule(itsMouseTracker);
+    return itsMouseTracker;
   }
   
 
@@ -51,6 +48,5 @@ public class DeleteTool extends ScrTool implements PositionListener {
   //---- Fields
 
   MouseTracker itsMouseTracker;
-  GraphicContext gc;
 
 }

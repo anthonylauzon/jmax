@@ -36,28 +36,31 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   private final int getIndexAfter(int time)
   {
-    if (events_fill_p == 0)
-      return 0;
-    else if (events[events_fill_p - 1].getTime() <= time)
-      return events_fill_p;
-    else
-      {
-	int min = 0;
-	int max = events_fill_p - 1;
-	
-	while (max > min + 1)
-	  {
-	    int med = (max + min) / 2;
-	    
-	    if (events[med].getTime() <= time) 
-	      min = med;
-	    else 
-	      max = med;
-	  }
 
-	return max;
+    if (events_fill_p == 0) 
+      return EMPTY_COLLECTION;
+    
+    else if (events[events_fill_p - 1].getTime()<= time)  
+      return NO_SUCH_EVENT;
+    
+    
+    int min = 0;
+    int max = events_fill_p - 1;
+    
+    while (max > min+1)
+      {
+	int med = (max + min) / 2;
+	
+	if (events[med].getTime() <= time) 
+	  min = med;
+	else 
+	  max = med;
       }
+    
+    return max;
+  
   }
+
 
   /**
    * utility function to make the event vector bigger
@@ -149,6 +152,8 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
     index = getIndexAfter(event.getTime());
 
+    if (index == EMPTY_COLLECTION) index = 0;
+    else if (index == NO_SUCH_EVENT) index = events_fill_p;
     makeRoomAt(index);
     events[index] = event;
     
@@ -162,7 +167,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
     remoteCall(REMOTE_ADD, args);
 
-    notifyListeners();
+    notifyListeners(GENERIC_CHANGE, event);
   }
 
 
@@ -189,7 +194,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	    args[0] = new Integer(removeIndex);
 	    remoteCall(REMOTE_REMOVE, args);
 
-	    notifyListeners();
+	    notifyListeners(OBJECT_DELETED, event);
 	  }
       }
   }
@@ -197,14 +202,16 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /**
    * utility to notify the data base change to all the listeners
    */
- private void notifyListeners()
+ private void notifyListeners(int cause, Object spec)
   {
     ExplodeDataListener el;
     
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       {
 	el = (ExplodeDataListener) e.nextElement();
-	el.dataChanged(null);
+	if (cause == OBJECT_DELETED) 
+	  el.objectDeleted(spec);
+	else el.dataChanged(spec);
       }
   }
 
@@ -253,18 +260,44 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
 
   /**
+   * access the first event whose ENDING time is 
+   * after a given time
+   */
+  public int indexOfFirstEventEndingAfter(int time)
+  {
+
+    return indexOfLastEventEndingBefore(time) + 1;
+  }
+
+  /**
    * access the last event whose ENDING time is 
    * before a given time
    */
   public int indexOfLastEventEndingBefore(int time) 
   {
+
+    int index = getIndexAfter(time);
+    
+    while(index >= 0 && events[index].getTime()+ events[index].getDuration() > time)
+      index --;
+
+    return index;    
+  }
+
+  /**
+   * access the last event whose starting time is 
+   * before a given time
+   */
+  public int indexOfLastEventStartingBefore(int time) 
+  {
     int index;
-    
+
     index = getIndexAfter(time);
-    
+    if (index == NO_SUCH_EVENT) return events_fill_p-1;
+
     for (;index>=0;index--) 
       {
-	if (events[index].getTime()+events[index].getDuration() < time)
+	if (events[index].getTime() < time)
 	  break;
       }
 
@@ -356,6 +389,12 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   static final int REMOTE_APPEND = 2;
   static final int REMOTE_ADD    = 1;
   static final int REMOTE_REMOVE = 2;
+
+  static final int GENERIC_CHANGE = 10;
+  static final int OBJECT_DELETED = 11;
+
+  static final int EMPTY_COLLECTION = -1;
+  static final int NO_SUCH_EVENT = -2;
 
   int events_size   = 256;	// 
   int events_fill_p  = 0;	// next available position

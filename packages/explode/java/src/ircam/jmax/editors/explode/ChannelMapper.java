@@ -3,30 +3,31 @@ package ircam.jmax.editors.explode;
 /**
  * a mapper into the time value of the ScrEvents
  */
-public class TimeMapper extends Mapper {
+public class ChannelMapper extends Mapper {
   
   /**
-   * set the given starting time in the given event
+   * set the given channel in the given event
    */
   public void set(ScrEvent e, int value) 
   {
-    e.setTime(value);
+    e.setChannel(value);
   }
   
   /**
-   * get the starting time from the given event
+   * get the channel of the given event
    */
   public int get(ScrEvent e) 
   {
-    return e.getTime();
+    return e.getChannel();
   }
 
   static public Mapper getMapper()
   {
-    return itsTimeMapper;
+    return itsChannelMapper;
   }
 
   //--- Fields
 
-  static TimeMapper itsTimeMapper = new TimeMapper();
+  static ChannelMapper itsChannelMapper = new ChannelMapper();
 }
+

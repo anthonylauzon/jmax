@@ -38,4 +38,5 @@ public interface SelectionHandler {
    */
   public abstract void deselectAll();
 
+
 }

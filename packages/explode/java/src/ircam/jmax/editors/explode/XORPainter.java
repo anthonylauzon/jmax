@@ -8,5 +8,5 @@ package ircam.jmax.editors.explode;
 public interface XORPainter {
 
   public abstract void XORErase();
-  public abstract void XORDeltaDraw(int dx, int dy);
+  public abstract void XORDraw(int dx, int dy);
 }

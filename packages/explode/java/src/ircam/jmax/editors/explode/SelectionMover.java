@@ -14,11 +14,10 @@ public class SelectionMover extends InteractionModule implements XORPainter {
    * constructor. 
    * It uses a XORHandler to keep track of the drawing positions.
    */
-  public SelectionMover(DragListener theListener, GraphicContext theGc, int theMovement) 
+  public SelectionMover(DragListener theListener, int theMovement) 
   {
-    super(theGc.getGraphicEventSource(), theGc.getGraphicDestination());
+    super();
     
-    gc = theGc;
     itsListener = theListener;
     itsXORHandler = new XORHandler(this);
     itsStartingPoint = new Point();
@@ -26,6 +25,11 @@ public class SelectionMover extends InteractionModule implements XORPainter {
     itsMovements = theMovement;
   }
   
+
+  public void setDirection(int theDirection) 
+  {
+    itsMovements = theDirection;
+  }
 
   /**
    * sets the point on which to start the movement
@@ -51,7 +55,7 @@ public class SelectionMover extends InteractionModule implements XORPainter {
     
     ScrEvent aEvent;
     
-    Enumeration e=gc.getSelection().getSelected();
+    Enumeration e=ExplodeSelection.getSelection().getSelected();
     aEvent = (ScrEvent) e.nextElement();    
     
     if (aEvent == null) return; //empty selection...
@@ -64,7 +68,7 @@ public class SelectionMover extends InteractionModule implements XORPainter {
       }
 
     Adapter a = gc.getAdapter();
-
+    
     for (; e.hasMoreElements();)
       {
 	aEvent = (ScrEvent) e.nextElement();
@@ -93,6 +97,11 @@ public class SelectionMover extends InteractionModule implements XORPainter {
    */
   public void mouseDragged(MouseEvent e) 
   {
+    int deltaX = gc.getAdapter().getInvX(e.getX()) - gc.getAdapter().getInvX(itsStartingPoint.x);
+    int deltaY = gc.getAdapter().getInvY(e.getY()) - gc.getAdapter().getInvY(itsStartingPoint.y);
+    
+    gc.getStatusBar().post(ScrToolbar.getTool(), " delta x "+(deltaX)+"    delta y"+deltaY);
+
     itsXORHandler.moveTo(e.getX(), e.getY());
   }
 
@@ -120,14 +129,14 @@ public class SelectionMover extends InteractionModule implements XORPainter {
    */
   public void XORErase() 
   {
-    XORDeltaDraw(0, 0);
+    XORDraw(0, 0);
   }
 
 
   /**
    * from the XORPainter interface. The actual drawing function.
    */
-  public void XORDeltaDraw(int dx, int dy) 
+  public void XORDraw(int dx, int dy) 
   {
     Graphics g = gc.getGraphicDestination().getGraphics();
     g.setColor(Color.gray);
@@ -148,7 +157,6 @@ public class SelectionMover extends InteractionModule implements XORPainter {
   DragListener itsListener;
   XORHandler itsXORHandler;  
 
-  GraphicContext gc;
   Rectangle enclosingRect = new Rectangle();
 
   Point itsStartingPoint;

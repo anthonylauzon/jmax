@@ -34,7 +34,10 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
     ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
 
-    getContentPane().add(new ScrPanel(explodeRemoteData));
+    itsPanel = new ScrPanel(explodeRemoteData);
+    getContentPane().add(itsPanel);
+    
+    itsPanel.prepareToolbar();
     
     /*
      * just to be able to exit quickly...*/
@@ -102,9 +105,26 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
    */
   public void SetupMenu()
   {
+    Menu settingsMenu = new Menu("Settings");
+    
+    MenuItem settings = new MenuItem("Settings...");
+    settings.addActionListener(new ActionListener() 
+			     {
+			       public void actionPerformed(ActionEvent e) 
+				 {
+				   itsPanel.settings();
+				 }
+			     }
+			     );
+    
+    settingsMenu.add(settings);
+    getMenuBar().add(settingsMenu);
+  
   }
 
   //------------------- fields
 
   MaxData maxData;
+  ScrPanel itsPanel;
 }  
+

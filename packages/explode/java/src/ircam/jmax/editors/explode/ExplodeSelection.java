@@ -6,15 +6,16 @@ import java.util.*;
 /**
  * A selection of explode events.
  */ 
-public class ExplodeSelection implements SelectionHandler {
+public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
 
   /**
    * constructor
    */
-  public ExplodeSelection(ExplodeDataModel theModel) 
+  private ExplodeSelection(ExplodeDataModel theModel) 
   {
     itsModel = theModel;
     selected = new Hashtable();
+    listeners = new Vector();
   }
 
   /**
@@ -23,6 +24,7 @@ public class ExplodeSelection implements SelectionHandler {
   public void select(Object obj) 
   {
     selected.put(obj, obj);
+    notifyListeners();
   }
 
   /**
@@ -31,6 +33,7 @@ public class ExplodeSelection implements SelectionHandler {
   public void deSelect(Object obj) 
   {
     selected.remove(obj);
+    notifyListeners();
   }
 
 
@@ -58,6 +61,7 @@ public class ExplodeSelection implements SelectionHandler {
   public void deselectAll() 
   {
     selected.clear();
+    notifyListeners();
   }
 
 
@@ -70,11 +74,78 @@ public class ExplodeSelection implements SelectionHandler {
       {
 	select(e.nextElement());
       }
+    notifyListeners();
+  }
+
+  /**
+   * static constructor
+   */
+  static public ExplodeSelection createSelection(ExplodeDataModel ep) 
+  {
+    if (itsSelection == null) 
+      {
+	itsSelection = new ExplodeSelection(ep);
+	ep.addListener(itsSelection);
+      }
+
+    return itsSelection;
+  }
+
+  /**
+   * returns the (unique) selection
+   */
+  public static ExplodeSelection getSelection()
+  {
+    return itsSelection;
+  }
+
+  /**
+   * require to be notified when data change
+   */
+  public static void addListener(ExplodeDataListener theListener) 
+  {
+    listeners.addElement(theListener);
+  }
+
+  /**
+   * remove the listener
+   */
+  public static void removeListener(ExplodeDataListener theListener) 
+  {
+    listeners.removeElement(theListener);
+  }
+
+
+  private static void notifyListeners()
+  {
+    SelectionListener sl;
+
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+      {
+	sl = (SelectionListener) e.nextElement();
+	sl.selectionChanged();
+      }
+  }
+
+
+  // ExplodeDataListener interface
+  public void dataChanged(Object spec) 
+  {
+  }
+
+  // ExplodeDataListener interface
+  public void objectDeleted(Object whichObject) 
+  {
+    if (isInSelection(whichObject))
+      deSelect(whichObject);
   }
 
   //--- Fields
+  private static ExplodeSelection itsSelection; 
   ExplodeDataModel itsModel;
-  Hashtable selected;
+  static Hashtable selected;
+
+  private static Vector listeners;
 }
 
 

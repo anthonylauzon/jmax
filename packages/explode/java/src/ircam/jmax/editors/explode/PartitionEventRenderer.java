@@ -26,12 +26,13 @@ public class PartitionEventRenderer implements EventRenderer {
     int x = gc.getAdapter().getX(e);
     int y = gc.getAdapter().getY(e);
     int lenght = gc.getAdapter().getLenght(e);
+    int label = gc.getAdapter().getLabel(e);
 
     if (selected) g.setColor(Color.red);
     else g.setColor(Color.black);
 
     g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
-    g.drawString(""+e.getPitch(), x, y-5);
+    g.drawString(""+label, x, y-5);
   }
   
   /**

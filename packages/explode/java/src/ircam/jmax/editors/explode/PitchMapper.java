@@ -21,6 +21,15 @@ public class PitchMapper extends Mapper {
   {
     return e.getPitch();
   }
+
+  static Mapper getMapper() 
+  {
+    return itsPitchMapper;
+  }
+
+  //-- Fields
+
+  static PitchMapper itsPitchMapper = new PitchMapper();
 }
 
 

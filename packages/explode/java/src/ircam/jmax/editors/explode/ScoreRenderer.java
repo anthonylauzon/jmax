@@ -19,10 +19,17 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   public ScoreRenderer(GraphicContext theGc) 
   {  
     gc = theGc;
-    
+    gc.setAdapter(new PartitionAdapter(gc));
+    {//-- prepares the parameters for the adapter
+      gc.getAdapter().setXZoom(20);
+      gc.getAdapter().setYZoom(300);
+      gc.getAdapter().setYInvertion(true);
+      gc.getAdapter().setYTransposition(136);
+    }
+
     itsEventRenderer = new PartitionEventRenderer(gc);
     tempList = new Vector();
-    
+
     init();
   }
   
@@ -32,8 +39,11 @@ public class ScoreRenderer implements Renderer, ImageObserver{
    */
   private void init() 
   {    
-    itsImage = Toolkit.getDefaultToolkit().getImage("/u/worksta/maggi/projects/max/packages/explode/images/Portee1.gif");
-    itsImage.getWidth(this); //call any method on the image starts loading it
+    if (itsImage == null) 
+      {
+	itsImage = Toolkit.getDefaultToolkit().getImage("/u/worksta/maggi/projects/max/packages/explode/images/pianoroll2tr.gif");
+	itsImage.getWidth(this); //call any method on the image starts loading it
+      }
   }
 
 
@@ -75,11 +85,12 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   {   
     if (!prepareBackground(g)) return;
 
-    for (int i = startEvent; i< endEvent; i++) 
+    if (startEvent <0 || endEvent < 0) return; //error (or initial) condition
+    for (int i = startEvent; i<= endEvent; i++) 
       {
       
 	temp = gc.getDataModel().getEventAt(i);
-	itsEventRenderer.render(temp, g, gc.getSelection().isInSelection(temp));
+	itsEventRenderer.render(temp, g, ExplodeSelection.getSelection().isInSelection(temp));
 	
       }
 
@@ -105,14 +116,53 @@ public class ScoreRenderer implements Renderer, ImageObserver{
 	g.setColor(Color.white);
 	g.fillRect(0, 0, 1000, 1000);
 
-	if (!g.drawImage(itsImage, 0, -1, this))
+	if (!g.drawImage(itsImage, 0, 18, this))
 	  System.err.println("something wrong: incomplete Image  ");
 
+	// paint the vertical grid
+	int MIN_GRID = 6;
+	int MAX_GRID = 50;
+
+	int windowTime = (int) (gc.getGraphicDestination().getSize().width / gc.getAdapter().getXZoom());
+	int timeStep;
+
+	
+	timeStep = findBestTimeStep(windowTime);
+
+	g.setColor(Color.lightGray);
+
+	int xPosition;
+	int snappedTime;
+	for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
+	  {
+	    snappedTime = (i/timeStep)*timeStep;
+	    xPosition = (int) ((snappedTime-gc.getLogicalTime()) * gc.getAdapter().getXZoom());
+
+	    g.drawLine(xPosition, 20, xPosition, 400);
+	    g.drawString(""+snappedTime, xPosition-20, 15);
+	  }
 	return true;
       }
   }
   
   
+  private int findBestTimeStep(int windowTime) {
+
+    // find a good time interval between two grid
+
+    int pow = 1;
+      
+    while (windowTime/pow>0) 
+      {
+	pow *= 10;
+      }
+
+    pow = pow/10;
+
+    if (windowTime/pow < 5) pow = pow/5;
+    return pow;
+  }
+
   /**
    * returns the event whose graphic representation contains
    * the given point.
@@ -156,12 +206,11 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   //------------------  Fields
   GraphicContext gc;
 
-  Container itsContainer;
   ExplodeDataModel itsExplodeDataModel;
   SelectionHandler itsSelection;
 
-  Image itsImage;
-  boolean imageReady = false;
+  static Image itsImage; //all the ScoreRenderer uses the same .gif
+  static boolean imageReady = false; //all of them depend on the same load
   public EventRenderer itsEventRenderer;
   
   ScrEvent temp = new ScrEvent();

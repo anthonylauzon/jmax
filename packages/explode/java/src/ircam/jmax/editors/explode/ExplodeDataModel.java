@@ -36,10 +36,23 @@ public interface ExplodeDataModel {
 
 
   /**
+   * access the first event whose ENDING time is 
+   * after a given time
+   */
+  public abstract int indexOfFirstEventEndingAfter(int time);
+
+
+  /**
    * access the last event whose ENDING time is 
    * before a given time
    */
   public abstract int indexOfLastEventEndingBefore(int time);
+
+  /**
+   * access the last event whose starting time is 
+   * before a given time
+   */
+  public abstract int indexOfLastEventStartingBefore(int time);
 
 
   /**

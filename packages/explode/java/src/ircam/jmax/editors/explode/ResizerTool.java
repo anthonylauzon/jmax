@@ -6,27 +6,26 @@ import com.sun.java.swing.ImageIcon;
 
 
 /**
- * the tool used to move a selection of events.
+ * the tool used to resize a selection of events.
  * It uses two UI modules: a MouseTracker to establish the starting point
- * of the moving operation, and a SelectionMover to actually move the
+ * of the moving operation, and a SelectionResizer to actually resize the
  * objects.
  */
-public class MoverTool extends ScrTool implements PositionListener, DragListener {
+public class ResizerTool extends ScrTool implements PositionListener, DragListener {
 
   /**
    * constructor.
    */
-  public MoverTool(GraphicContext theGc, ImageIcon theIcon, int theDirection) 
+  public ResizerTool(GraphicContext theGc, ImageIcon theIcon) 
   {
-    super("mover", theIcon);
+    super("Resizer", theIcon);
     
     gc = theGc;
     itsMouseTracker = new MouseTracker(this);
-    itsSelectionMover = new SelectionMover(this, theDirection);
+    itsSelectionResizer = new SelectionResizer(this);
 
     startingPoint = new Point();
   }
-
 
 
   public InteractionModule getDefaultIM() 
@@ -52,33 +51,30 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
     
     if (aScrEvent != null && ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
       {
-
 	startingPoint.setLocation(x, y);
 
-	mountIModule(itsSelectionMover, x, y);
-
+	mountIModule(itsSelectionResizer, x, y);
       }
   }
 
 
   /**
-   * drag listening, called by the SelectionMover UI Module.
-   * Moves the selected objects in the new location,
+   * drag listening, called by the SelectionResizer UI Module.
+   * Resizes all the selected objects,
    * and then mount its default UI Module
    */
   public void dragEnd(int x, int y) 
   {
     ScrEvent aEvent;
 
-    int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
 
     for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aEvent = (ScrEvent) e.nextElement();
-	
-	gc.getAdapter().setX(aEvent, gc.getAdapter().getX(aEvent)+deltaX);
-	gc.getAdapter().setY(aEvent, gc.getAdapter().getY(aEvent)+deltaY);
+
+	if (gc.getAdapter().getLenght(aEvent)+deltaX > 0)
+	  gc.getAdapter().setLenght(aEvent, gc.getAdapter().getLenght(aEvent)+deltaX);
       }
 
     mountIModule(itsMouseTracker);
@@ -87,10 +83,7 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
 
   //------------ Fields
   MouseTracker itsMouseTracker;
-  SelectionMover itsSelectionMover;
-
-  public static int VERTICAL_MOVEMENT = 1;
-  public static int HORIZONTAL_MOVEMENT = 2;
+  SelectionResizer itsSelectionResizer;
 
   Point startingPoint;
 }

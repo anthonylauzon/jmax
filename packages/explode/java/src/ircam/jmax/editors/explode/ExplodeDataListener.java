@@ -7,7 +7,10 @@ package ircam.jmax.editors.explode;
 public interface ExplodeDataListener {
 
   /**
-   * callback
+   * callbacks
    */
   abstract public void dataChanged(Object spec);
+
+  abstract public void objectDeleted(Object whichObject);
 }
+

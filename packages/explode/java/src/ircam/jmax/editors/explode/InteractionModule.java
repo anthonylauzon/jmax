@@ -12,31 +12,32 @@ import java.awt.event.*;
  * from the semantic (example selection of the objects in the rect).
  * This base class acts like a multiple adapter for the derived class.
  */
-public class InteractionModule implements MouseListener, MouseMotionListener, KeyListener{
+public abstract class InteractionModule implements MouseListener, MouseMotionListener, KeyListener{
 
 
   /**
-   * constructor. It needs to know the source of events, and
-   * the destination of the drawing operations
+   * constructor. 
    */
-  public InteractionModule(Component theSource, Component theDestination) 
+  public InteractionModule() 
   {
-    itsEventSource = theSource;
-    itsGraphicDestination = theDestination;
   }
+
 
   /**
    * called when this modules must take the interaction.
    * don't call this function directly: call ScrTool.mountIModule instead
    */ 
-  public void takeInteraction() 
+  public void takeInteraction(GraphicContext theGc) 
   {
-    
+
     if (currentActiveModule != null)
-      currentActiveModule.unBindFromProducer();
-    
+      currentActiveModule.unBindFromProducer(); //of the old gc
+
+    gc = theGc;    
     currentActiveModule = this;
-    bindToProducer(itsEventSource);
+
+    bindToProducer(gc.getGraphicSource()); //in the new gc
+
   }
 
 
@@ -47,11 +48,9 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
   {  
     if (eventProducer != null) 
       {
-	itsEventSource = eventProducer;
-
-	itsEventSource.addMouseListener(this);
-	itsEventSource.addMouseMotionListener(this);
-	itsEventSource.addKeyListener(this);
+	gc.getGraphicSource().addMouseListener(this);
+	gc.getGraphicSource().addMouseMotionListener(this);
+	gc.getGraphicSource().addKeyListener(this);
       }
   }
 
@@ -61,13 +60,16 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
    */
   public void unBindFromProducer() 
   {
-    if (itsEventSource != null) 
+    if (gc.getGraphicSource() != null) 
       {   
-	itsEventSource.removeMouseListener(this);
-	itsEventSource.removeMouseMotionListener(this);
-	itsEventSource.removeKeyListener(this);	
+	gc.getGraphicSource().removeMouseListener(this);
+	gc.getGraphicSource().removeMouseMotionListener(this);
+	gc.getGraphicSource().removeKeyListener(this);	
       }
   }
+
+
+  abstract public void interactionBeginAt(int x, int y);
 
   //----------- Mouse interface ------------
   public void mouseClicked(MouseEvent e) {}
@@ -96,8 +98,7 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
   //--------------- Fields
   static InteractionModule currentActiveModule = null;
 
-  Component itsEventSource;
-  Component itsGraphicDestination;
+  GraphicContext gc;
 
 }
 

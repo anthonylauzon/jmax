@@ -9,7 +9,7 @@ import java.awt.event.*;
  * a generic class implementing a toolbar. It can have a set of listeners
  * to be called when the user selects a new tool
  */
-public class ScrToolbar extends JToolBar implements ActionListener{
+public class ScrToolbar extends JToolBar implements ActionListener, WindowListener{
   
   /**
    * constructor. It inserts the tools provided by the given
@@ -25,10 +25,25 @@ public class ScrToolbar extends JToolBar implements ActionListener{
     for (Enumeration e = theProvider.getTools(); e.hasMoreElements();) 
       {
 	aTool = (ScrTool) e.nextElement();
-	addTool(aTool);
+	if (aTool == null) System.err.println("warning: trying to add a null tool in the toolbar");
+	else addTool(aTool);
       }
+
+    currentContext = theProvider.getGraphicContext();
+    setTool(theProvider.getDefaultTool());
+
   }
 
+
+  private static void setTool(ScrTool t)
+  {
+    currentTool = t;
+  }
+  
+  public static ScrTool getTool()
+  {
+    return currentTool;
+  }
 
   /**
    * inscribe a new listener to this toolbar
@@ -83,16 +98,97 @@ public class ScrToolbar extends JToolBar implements ActionListener{
   /**
    * From the ActionListener interface,
    * called by a button when the user clicks on it.
+   * The new tool will work on the same graphic context then the old.
    */
   public void actionPerformed(ActionEvent e) 
   {    
     JButton aButton = (JButton) e.getSource();
     ScrTool aTool = (ScrTool) itsTools.get(aButton);
+    
+    currentTool.deactivate();
+    aTool.reActivate(currentContext);
+
+    setTool(aTool);
+    
     toolNotification(aTool);
   }
 
+  /**
+   * creates a toolbar, if it doesnt exist already.
+   * Makes the (newly) created toolbar a listener for the
+   * Graphic context's window 
+   */
+  static public void createToolbar(ToolbarProvider theProvider, GraphicContext gc) {
+    
+    currentContext = theProvider.getGraphicContext();
+
+    if (itsToolbar == null) 
+      {
+	itsToolbar = new ScrToolbar(theProvider);
+	JFrame aFrame = new JFrame("tools");    
+	aFrame.getContentPane().add(itsToolbar);
+	
+	aFrame.pack();
+	aFrame.setVisible(true);
+
+	setTool(theProvider.getDefaultTool());
+      }
+
+    // maps a given window with its graphic context
+    itsClients.put(gc.getFrame(), gc);
+    gc.getFrame().addWindowListener(itsToolbar);  
+
+  }
+  
+  static public ScrToolbar getToolbar() 
+  {
+    return itsToolbar;
+  }
+
+
+  // WindowListener interface
+
+  public void windowClosing(WindowEvent e)
+  {
+  }
+
+  
+
+  public void windowOpened(WindowEvent e)
+  {
+  }
+
+  public void windowClosed(WindowEvent e)
+  {
+  }
+
+  public void windowIconified(WindowEvent e)
+  {
+  }       
+
+  public void windowDeiconified(WindowEvent e)
+  {
+  }
+
+  public void windowActivated(WindowEvent e)
+  {
+
+    GraphicContext gc = (GraphicContext) itsClients.get(e.getWindow());
+    currentContext = gc;
+    currentTool.reActivate(gc);
+  }
+
+  public void windowDeactivated(WindowEvent e)
+  {
+  }
+
   //---- Fields 
+  static ScrToolbar itsToolbar; 
   Hashtable itsTools = new Hashtable();
+  static ScrTool currentTool = null;
+  static GraphicContext currentContext;
+
+  static Hashtable itsClients = new Hashtable();
   Vector listeners = new Vector();
 
 }

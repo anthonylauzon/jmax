@@ -6,7 +6,7 @@ import com.sun.java.swing.ImageIcon;
  * The base class for tools: it handles the name and the icon,
  * the mounting of the interaction modules, and the activation/deactivation. 
  */
-abstract public class ScrTool {
+abstract public class ScrTool implements StatusBarClient{
 
   /**
    * constructor 
@@ -17,18 +17,47 @@ abstract public class ScrTool {
     setIcon(theImageIcon);
   }
 
-  abstract public void activate();
+  /**
+   * called when this tool is "mounted" on a Graphic context.
+   * It switches the Graphic context and mount the default IM
+   */ 
+  public void reActivate(GraphicContext theGc)
+  {
+    gc = theGc;
+    mountIModule(getDefaultIM());
+  }
   
+  /**
+   * override to return the default (initial) Interaction module
+   */
+  abstract public InteractionModule getDefaultIM();
+
+
   abstract public void deactivate();
 
-  void mountIModule(InteractionModule im) 
+  /**
+   * the method used to mount another interaction module in a tool
+   */
+  static void mountIModule(InteractionModule im) 
   {
     currentInteractionModule = im;
-    currentInteractionModule.takeInteraction();
+    currentInteractionModule.takeInteraction(gc);
   }
 
 
   /**
+   * the method used to mount an interaction module in a tool
+   * AND specify an initial point for the interaction.
+   * This method is used when the IM is mounted when the interaction
+   * is already begun.
+   */
+  static void mountIModule(InteractionModule im, int x, int y) 
+  {
+    mountIModule(im);
+    currentInteractionModule.interactionBeginAt(x, y);
+  }
+
+  /**  
    * returns its name
    */
   public String getName() 
@@ -65,7 +94,8 @@ abstract public class ScrTool {
   //---- Fields
   String itsName;
   ImageIcon itsIcon;
-  InteractionModule currentInteractionModule;
+  static GraphicContext gc;
+  static InteractionModule currentInteractionModule;
 }
 
 

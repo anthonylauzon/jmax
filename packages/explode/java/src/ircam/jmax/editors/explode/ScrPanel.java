@@ -7,14 +7,14 @@ import java.util.*;
 
   /**
    * The actual panel of a score editor. It contains the "sensible" part.
-   * In a given moment, the graphic representation is handled by 
+   * The graphic representation is handled by 
    * a Renderer that has the responsability to actually draw the score.
-   * The simplest renderer is "ScoreRenderer", a musical score-looking component.
+   * The simplest renderer is "ScoreRenderer", a piano-roll component.
    * The user interaction is handled by the tools.
    * The panel builds also the Graphic context to be used during edit, 
    * and the Toolbar. 
    */
-public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener{
+public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProvider, ToolListener, SelectionListener, StatusBarClient{
   
   /**
    * Constructor based on a ExplodeDataModel. 
@@ -27,41 +27,68 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
     tools = new Vector();
 
+    //-- prepares the NORTH infoPanel
+    
+    JPanel northSection = new JPanel();
+    northSection.setLayout(new BoxLayout(northSection, BoxLayout.Y_AXIS));
+    
+    itsStatusBar = new InfoPanel();
+    itsStatusBar.setSize(300, 20);
+
+    northSection.add(itsStatusBar);
+
+    add(northSection, BorderLayout.NORTH);
+
+    //-- prepares the CENTER panel (the score)
+    // a simple panel, that just uses a Renderer as its paint method...
+    itsScore = new JPanel() {
+      public void update(Graphics g) {}
+
+      public void paint(Graphics g) 
+	{
+	  
+	  int currentTime = gc.getLogicalTime();
+	  int temp1 = gc.getDataModel().indexOfFirstEventEndingAfter(currentTime);
+	  int temp2 = gc.getDataModel().indexOfLastEventStartingBefore(currentTime+windowTimeWidth());
+
+	  gc.getRenderer().render(g, temp1, temp2);	
+	}
+    };
+
+    itsScore.setBounds(0, itsStatusBar.getSize().height, PANEL_WIDTH, PANEL_HEIGHT);
+    add(itsScore, BorderLayout.CENTER);
+
     { //-- prepares the graphic context
       gc = new GraphicContext();
-      gc.setGraphicEventSource(this);
-      gc.setGraphicDestination(this);
+      gc.setGraphicSource(itsScore);
+      gc.setGraphicDestination(itsScore);
+      //gc.setFrame(GraphicContext.getFrame(this));
       gc.setDataModel(ep);
-      gc.setAdapter(new PartitionAdapter());
-      gc.setSelection(new ExplodeSelection(ep));
+      ExplodeSelection.createSelection(ep);
       gc.setRenderer(new ScoreRenderer(gc));
+      gc.setLogicalTime(0);
+      gc.setStatusBar(itsStatusBar);
     }
 
+    ExplodeSelection.addListener(this);
     gc.getDataModel().addListener(this);
 
-    {//-- prepares the parameters for the adapter
-      ((PartitionAdapter) gc.getAdapter()).setXZoom(20);// just a try
-      ((PartitionAdapter) gc.getAdapter()).setYZoom(300);// just a try
-      ((PartitionAdapter) gc.getAdapter()).setYInvertion(true);// just a try
-      ((PartitionAdapter) gc.getAdapter()).setYTransposition(115);// just a try
-    }
     
-    //-- prepares the NORTH label
-    itsLabel = new Label();
-    itsLabel.setBounds(0, 0, 200, 30);
-    add(itsLabel, BorderLayout.NORTH);
+    //-- prepares the zoom scrollbar (time stretching) and its listeners
+    itsTimeZoom = new Scrollbar(Scrollbar.HORIZONTAL, INITIAL_ZOOM, 5, 1, 1000);
 
-    //-- prepares the EAST scrollbar (time stretching) and its listener
-    itsTimeZoom = new Scrollbar(Scrollbar.VERTICAL, 20, 40, 10, 1000);
     itsTimeZoom.addAdjustmentListener(new AdjustmentListener() {
       
       public void adjustmentValueChanged(AdjustmentEvent e) {
-	((PartitionAdapter) gc.getAdapter()).setXZoom(e.getValue());// just a try
-	repaint();
+	
+	gc.getAdapter().setXZoom(e.getValue());
+	itsTimeScrollbar.setVisibleAmount(windowTimeWidth()/2);
+	itsZoomLabel.setText("Zoom: "+e.getValue()+"%"); 
+	itsScore.repaint();
       }
       
     });
-    
+
 
     //-- prepares the SOUTH scrollbar (time scrolling) and its listener
     int totalTime = 1000;
@@ -77,39 +104,49 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     
       public void adjustmentValueChanged(AdjustmentEvent e) {
 	
-	logicalTime = e.getValue();
+	int currentTime = e.getValue();
+	gc.setLogicalTime(currentTime);
 	
-	int firstIndex = gc.getDataModel().indexOfLastEventEndingBefore(logicalTime)+1;
-	int lastIndex = gc.getDataModel().indexOfFirstEventStartingAfter(logicalTime+windowTimeWidth())-1;
+	gc.getAdapter().setXTransposition(-currentTime);
+	itsScore.repaint();
 
-
-	if (firstIndex != -1) 
-	  {
-	    ((PartitionAdapter)gc.getAdapter()).setXTransposition(-logicalTime);
-	    gc.getRenderer().render(getGraphics(), firstIndex, lastIndex);
-	  }
+	gc.getStatusBar().post(ScrPanel.this, "starting time: "+currentTime+"msec"+"                 zoomfactor"+itsTimeZoom.getValue()+"%");
 	
-	itsLabel.setText("starting time: "+logicalTime+"msec"+"                 zoomfactor"+itsTimeZoom.getValue()+"%");
       }
     });
 
-    add(itsTimeScrollbar, BorderLayout.SOUTH);    
-    add(itsTimeZoom, BorderLayout.EAST);
+    JPanel aSliderPanel = new JPanel();
+    aSliderPanel.setLayout(new ProportionalLayout(ProportionalLayout.X_AXIS, (float) 0.75));
+    aSliderPanel.add("", itsTimeScrollbar);
+    Box aZoomBox = new Box(BoxLayout.X_AXIS);
+    aZoomBox.add(itsZoomLabel);
+    aZoomBox.add(itsTimeZoom);
+
+    aSliderPanel.add("", aZoomBox);
+
+    add(aSliderPanel, BorderLayout.SOUTH);
     
-    //---- prepare the tools & the toolbar...
+
     initTools();
-
-    ScrToolbar aToolbar = new ScrToolbar(this);
-    aToolbar.addToolListener(this);
-
-    JFrame aFrame = new JFrame("tools");    
-    aFrame.getContentPane().add(aToolbar);
-    
-    aFrame.pack();
-    aFrame.setVisible(true);
     
   }
   
+  /**
+   * note: can't create the toolbar in the constructor,
+   * because the Frame is not available yet.
+   * The ScrToolbar class uses the Frame information
+   * in order to correctly map tools on windows
+   */
+  public void prepareToolbar() 
+  {
+
+    gc.setFrame(GraphicContext.getFrame(this));
+
+    ScrToolbar.createToolbar(this, gc);
+    ScrToolbar.getToolbar().addToolListener(this);
+  }
+
+
 
   /**
    * prepares the tools that will be used with this editor,
@@ -117,19 +154,24 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   private void initTools() 
   {
-    gc.setTool( new ArrowTool(gc));
-    
-    tools.addElement(gc.getTool());
-    tools.addElement(new ScrAddingTool(gc));
-    tools.addElement(new DeleteTool(gc));
+
+    itsDefaultTool = new ArrowTool(gc);
+
+    tools.addElement( itsDefaultTool);
+
+    tools.addElement(new ScrAddingTool(gc,
+				       new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/adder.gif")));
+    tools.addElement(new DeleteTool(gc,  
+				    new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/eraser.gif")));
     tools.addElement(new MoverTool(gc, 
 				   new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/vmover.gif"), 
 				   MoverTool.VERTICAL_MOVEMENT));
     tools.addElement(new MoverTool(gc, 
 				   new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/hmover.gif"), 
 				   MoverTool.HORIZONTAL_MOVEMENT));
+    tools.addElement(new ResizerTool(gc, 
+				   new ImageIcon("/u/worksta/maggi/projects/max/packages/explode/images/resizer.gif")));
 
-    gc.getTool().activate();
   }
 
 
@@ -141,6 +183,21 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     return tools.elements();
   }
 
+  /**
+   * ToolbarProvider interface
+   */
+  public GraphicContext getGraphicContext() 
+  {
+    return gc;
+  }
+
+  /**
+   * ToolbarProvider interface
+   */
+  public ScrTool getDefaultTool() 
+  {
+    return itsDefaultTool;
+  }
 
   /**
    * Callback from the toolbar when a new tool have been
@@ -148,17 +205,12 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */ 
   public void toolChanged(ToolChangeEvent e) 
   {
-    if (gc.getTool() != null) 
+    if (ScrToolbar.getTool() != null) 
       {
-	gc.getTool().deactivate();
+	gc.getStatusBar().post(ScrToolbar.getTool(), "");
       }
     
-    e.getTool().activate();
-    
-    gc.setTool(e.getTool());
-    repaint();
   }
-
 
   /**
    * called when the database is changed
@@ -167,6 +219,21 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   {
     repaint();
   }
+
+  public void objectDeleted(Object whichObject) 
+  {
+    repaint();
+  }
+
+  /**
+   * SelectionListener interface
+   */
+
+  public void selectionChanged()
+  {
+    repaint();
+  }
+
 
   /* avoid to paint the white background twice */  
   public void update(Graphics g) {}
@@ -178,10 +245,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public void paint(Graphics g) 
   {
-    int temp1 = gc.getDataModel().indexOfFirstEventStartingAfter(logicalTime);
-    int temp2 = gc.getDataModel().indexOfLastEventEndingBefore(logicalTime+windowTimeWidth());
-    
-    gc.getRenderer().render(g, temp1, temp2);
+
+    super.paint(g);
+
   }
 
   /**
@@ -189,8 +255,35 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   int windowTimeWidth() 
   {
-    return (int)(getSize().width/(((PartitionAdapter)gc.getAdapter()).getXZoom()));
+    return (int)(itsScore.getSize().width/(gc.getAdapter().getXZoom()));
   }
+
+
+  /**
+   * from the StatusBarClient interface
+   */
+  public String getName() 
+  {
+    return "Main Editor";
+  }
+
+
+  /**
+   * from the StatusBarClient interface
+   */
+  public ImageIcon getIcon() 
+  {
+    return null;
+  }
+
+
+  /**
+   * invoke the Adapter's editor
+   */
+  public void settings() {
+    gc.getAdapter().edit(gc.getFrame());
+  }
+
 
 
   /**
@@ -217,15 +310,19 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   GraphicContext gc;
 
   Vector tools;
+  ScrToolbar itsToolbar;
 
-  int logicalTime = 0;
+  ScrTool itsDefaultTool;
 
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
   
+  public final int INITIAL_ZOOM = 20;
   Scrollbar itsTimeScrollbar;
   Scrollbar itsTimeZoom;
-  Label itsLabel;  
+  JLabel itsZoomLabel = new JLabel("Zoom: "+INITIAL_ZOOM+"%");
 
+  InfoPanel itsStatusBar;
+  JPanel itsScore;
 }
 
 
