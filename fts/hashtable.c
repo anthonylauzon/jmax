@@ -95,28 +95,32 @@ static int equals_symbol( const fts_atom_t *a, const fts_atom_t *b)
   return fts_get_symbol( a) == fts_get_symbol( b);
 }
 
-static void hashtable_get_functions( fts_hashtable_t *h)
+static void set_key_type( fts_hashtable_t *h, int key_type)
 {
-  if ( h->key_type == fts_s_int)
-    {
-      h->hash_function = hash_int;
-      h->equals_function = equals_int;
-    }
-  else if (h->key_type == fts_s_ptr)
-    {
-      h->hash_function = hash_ptr;
-      h->equals_function = equals_ptr;
-    }
-  else if (h->key_type == fts_s_string)
-    {
-      h->hash_function = hash_string;
-      h->equals_function = equals_string;
-    }
-  else if (h->key_type == fts_s_symbol)
-    {
-      h->hash_function = hash_symbol;
-      h->equals_function = equals_symbol;
-    }
+  h->key_type = key_type;
+
+  switch (h->key_type) {
+  case FTS_HASHTABLE_INT:
+    h->hash_function = hash_int;
+    h->equals_function = equals_int;
+    break;
+  case FTS_HASHTABLE_PTR:
+    h->hash_function = hash_ptr;
+    h->equals_function = equals_ptr;
+    break;
+  case FTS_HASHTABLE_STRING:
+    h->hash_function = hash_string;
+    h->equals_function = equals_string;
+    break;
+  case 0:
+  case FTS_HASHTABLE_SYMBOL:
+    h->hash_function = hash_symbol;
+    h->equals_function = equals_symbol;
+    break;
+  default:
+    fprintf( stderr, "[hashtable] invalid key type (%d)\n", key_type);
+    break;
+  }
 }
 
 static int get_initial_capacity( int initial_capacity)
@@ -133,28 +137,15 @@ static int get_initial_capacity( int initial_capacity)
   }
 }
 
-void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity)
+void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity)
 {
-  if (!key_type)
-    h->key_type = fts_s_symbol;
-  else if (key_type == fts_s_int 
-	   || key_type == fts_s_ptr 
-	   || key_type == fts_s_symbol 
-	   || key_type == fts_s_string)
-    h->key_type = key_type;
-  else
-    {
-      fprintf( stderr, "[hashtable] invalid key type \"%s\"\n", fts_symbol_name( key_type));
-      return;
-    }
+  set_key_type( h, key_type);
 
   h->length = get_initial_capacity( initial_capacity);
   h->count = 0;
   h->rehash_count = (int)(h->length * FTS_HASHTABLE_STANDARD_LOAD_FACTOR);
 
   h->table = (fts_hashtable_cell_t **) fts_zalloc( h->length * sizeof( fts_hashtable_cell_t *));
-
-  hashtable_get_functions( h);
 }
 
 void fts_hashtable_clear( fts_hashtable_t *h)

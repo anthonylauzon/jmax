@@ -149,6 +149,6 @@ fts_connection_t *fts_connection_table_get(int id)
 
 void fts_kernel_objtable_init( void)
 {
-  fts_hashtable_init( &object_table, fts_t_int, FTS_HASHTABLE_BIG);
-  fts_hashtable_init( &connection_table, fts_t_int, FTS_HASHTABLE_BIG);
+  fts_hashtable_init( &object_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_BIG);
+  fts_hashtable_init( &connection_table, FTS_HASHTABLE_INT, FTS_HASHTABLE_BIG);
 }

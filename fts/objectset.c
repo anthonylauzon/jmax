@@ -24,7 +24,7 @@
 
 void fts_objectset_init( fts_objectset_t *set)
 {
-  fts_hashtable_init( &set->hashtable, fts_t_ptr, FTS_HASHTABLE_SMALL);
+  fts_hashtable_init( &set->hashtable, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SMALL);
 }
 
 void fts_objectset_clear( fts_objectset_t *set)

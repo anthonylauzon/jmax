@@ -25,7 +25,7 @@
 int
 main( int argc, char **argv)
 {
-  fts_init();
+  fts_init( argc, argv);
 
   return 0;
 }

@@ -65,7 +65,7 @@ typedef struct {
   int rehash_count;
   fts_hashtable_cell_t **table;
 
-  fts_type_t key_type;
+  int key_type;
   hash_function_t hash_function;
   equals_function_t equals_function;
 
@@ -73,6 +73,10 @@ typedef struct {
 
 /*@}*/
 
+#define FTS_HASHTABLE_INT 1
+#define FTS_HASHTABLE_PTR 2
+#define FTS_HASHTABLE_SYMBOL 3
+#define FTS_HASHTABLE_STRING 4
 
 #define FTS_HASHTABLE_SMALL 1
 #define FTS_HASHTABLE_MEDIUM 2
@@ -81,14 +85,16 @@ typedef struct {
 /**
  * Initializes a hashtable
  *
- * @fn void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity)
+ * @fn void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity)
  * @param h the hashtable
- * @param key_type the type of the key. If 0, the key type will be `symbol'
+ * @param key_type the type of the key.<BR>
+ *  Must be one of FTS_HASHTABLE_INT, FTS_HASHTABLE_PTR, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_STRING
+ *  If 0, the key type will be FTS_HASHTABLE_SYMBOL
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
  * @ingroup hashtable
  */
-FTS_API void fts_hashtable_init( fts_hashtable_t *h, fts_type_t key_type, int initial_capacity);
+FTS_API void fts_hashtable_init( fts_hashtable_t *h, int key_type, int initial_capacity);
 
 /**
  * Clears hashtable's content.<BR>

@@ -352,7 +352,7 @@ static void start_watchdog( void)
 }
 
 
-void fts_platform_init( int argc, char **argv)
+void fts_platform_init( void)
 {
   start_watchdog();
 

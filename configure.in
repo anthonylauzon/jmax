@@ -26,10 +26,21 @@ AM_PROG_LIBTOOL
 
 CFLAGS="-Wall -Wno-unused"
 
+dnl Check for debug
+AC_ARG_ENABLE(debug,
+  [  --enable-debug[=DEBUG]   compile with debug [default=no]],
+  debug="yes",
+  debug="no")
+case "$debug" in
+ yes)
+  CFLAGS="$CFLAGS -g"
+  AC_DEFINE(DEBUG,1,[Define to enable debug])
+  ;;
+esac
+
 dnl Checks for libraries.
 AC_CHECK_LIB(m, sin)
 AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
-
 
 dnl Checks for header files.
 AC_HEADER_STDC

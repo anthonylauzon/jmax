@@ -121,19 +121,15 @@ extern "C" {
 /*
  * FTS global initialization 
  */
-FTS_API void fts_init( void);
+FTS_API void fts_init( int argc, char **argv);
+
+/*
+ * Command line arguments access
+ */
+FTS_API int fts_cmd_args_get( fts_symbol_t name, fts_atom_t *value);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-
-
-
-
-
-
-

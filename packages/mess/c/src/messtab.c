@@ -451,8 +451,8 @@ messtab_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   ac--;
   at++;
 
-  fts_hashtable_init(&this->table_int, fts_t_int, 64);
-  fts_hashtable_init(&this->table_symbol, fts_t_symbol, 64);
+  fts_hashtable_init(&this->table_int, FTS_HASHTABLE_INT, 64);
+  fts_hashtable_init(&this->table_symbol, FTS_HASHTABLE_SYMBOL, 64);
 
   this->locked = 0;
 

@@ -20,8 +20,19 @@
  * 
  */
 
+#include <string.h>
 #include <fts/fts.h>
+#include <ftsprivate/patcher.h>
+#include <ftsprivate/platform.h>
 
+
+/***********************************************************************
+ *
+ * Command line arguments:
+ *  - stored in variable in a subpatcher
+ *  - can be retrieved from C code or in a patcher
+ *
+ */
 
 typedef struct _v_t {
   fts_object_t head;
@@ -29,7 +40,7 @@ typedef struct _v_t {
 } v_t;
 
 static fts_symbol_t s___v;
-static fts_patcher_t *env_patcher;
+static fts_patcher_t *cmd_args_patcher;
 
 static void v_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -55,37 +66,78 @@ static fts_status_t v_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-static void test_define( fts_symbol_t s, int i)
+static int fts_cmd_args_put( fts_symbol_t name, fts_atom_t *value)
 {
   fts_atom_t a[4];
   fts_object_t *newobj;
 
-  fts_set_symbol( a+0, s);
+  fts_set_symbol( a+0, name);
   fts_set_symbol( a+1, fts_s_colon);
   fts_set_symbol( a+2, s___v);
-  fts_set_int( a+3, i);
+  a[3] = *value;
 
-  newobj = fts_eval_object_description( env_patcher, 4, a);
+  newobj = fts_eval_object_description( cmd_args_patcher, 4, a);
 
-  if (!newobj)
+  return !fts_object_is_error( newobj);
+}
+
+int fts_cmd_args_get( fts_symbol_t name, fts_atom_t *value)
+{
+  *value = *fts_variable_get_value( cmd_args_patcher, name);
+
+  return !fts_is_void( value);
+}
+
+static void fts_cmd_args_parse( int argc, char **argv)
+{
+  int filecount = 1, r;
+  char filevar[32];
+  fts_atom_t value;
+  fts_symbol_t name;
+
+  argc--;
+  argv++;
+  while (argc)
     {
-      fprintf( stderr, "Error instantiating v object\n");
+      if (!strncmp( *argv, "--", 2))
+	{
+	  char *p = strchr( *argv, '=');
+
+	  if (p != NULL)
+	    *p = '\0';
+
+	  name = fts_new_symbol_copy( *argv + 2);
+
+	  if (p == NULL || p[1] == '\0')
+	    fts_set_int( &value, 1);
+	  else
+	    {
+	      p++;
+	      if ( sscanf( p, "%d", &r) == 1)
+		fts_set_int( &value, r);
+	      else
+		fts_set_symbol( &value, fts_new_symbol_copy( p));
+	    }
+	}
+      else
+	{
+	  sprintf( filevar, "file%d", filecount++);
+	  name = fts_new_symbol_copy( filevar);
+	  fts_set_symbol( &value, fts_new_symbol_copy( *argv));
+	}
+
+      fprintf( stderr, "Putting %s -> ", fts_symbol_name( name));
+      fprintf_atoms( stderr, 1, &value);
+      fprintf( stderr, "\n");
+
+      fts_cmd_args_put( name, &value);
+
+      argc--;
+      argv++;
     }
 }
 
-static void test_get( fts_symbol_t s)
-{
-  fts_atom_t *p;
-
-  p = fts_variable_get_value( env_patcher, s);
-
-  if (!fts_is_void( p))
-    fprintf( stderr, "%s -> %d\n", fts_symbol_name( s), fts_get_int( p));
-  else
-    fprintf( stderr, "%s undef\n", fts_symbol_name( s));
-}
-
-static void test_variables( void)
+static void fts_kernel_cmd_args_init( void)
 {
   fts_atom_t a[2];
 
@@ -94,23 +146,20 @@ static void test_variables( void)
 
   fts_set_symbol( a+0, fts_s_patcher);
   fts_set_symbol( a+1, fts_new_symbol("environnment"));
-  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, (fts_object_t **)&env_patcher);
-  if ( !env_patcher)
+  fts_object_new_to_patcher( fts_get_root_patcher(), 2, a, (fts_object_t **)&cmd_args_patcher);
+  if ( !cmd_args_patcher)
     {
       fprintf( stderr, "cannot create environnment patcher\n");
       return;
     }
-
-  test_define( fts_new_symbol( "foo"), 1);
-  test_define( fts_new_symbol( "boo"), 2);
-  test_get( fts_new_symbol( "boo"));
-  test_get( fts_new_symbol( "foo"));
-  test_get( fts_new_symbol( "ttt"));
 }
 
 
-
-
+/***********************************************************************
+ *
+ * Global initialization
+ *
+ */
 
 extern void fts_kernel_abstraction_init( void);
 extern void fts_kernel_atom_init( void);
@@ -142,7 +191,7 @@ extern void fts_kernel_symbol_init( void);
 extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
 
-void fts_init( void)
+void fts_init( int argc, char **argv)
 {
   /* *** Attention !!! The order is important *** */
   fts_kernel_hashtable_init();
@@ -175,10 +224,11 @@ void fts_init( void)
   fts_kernel_sched_init();
   fts_kernel_selection_init();
   fts_kernel_soundfile_init();
-
   fts_kernel_oldclient_init();
 
-#if 1
-  test_variables();
-#endif
+  fts_kernel_cmd_args_init();
+
+  fts_cmd_args_parse( argc, argv);
+
+  fts_platform_init();
 }

@@ -101,7 +101,7 @@ void fts_kernel_symbol_init(void)
 {
   symbol_heap = fts_heap_new( sizeof(struct fts_symbol_descr));
 
-  fts_hashtable_init( &symbol_table, fts_t_string, FTS_HASHTABLE_BIG);
+  fts_hashtable_init( &symbol_table, FTS_HASHTABLE_STRING, FTS_HASHTABLE_BIG);
 
   fts_predefine_symbols();
 }
