@@ -424,19 +424,19 @@ public class Fts
 
   static MaxVector editListeners = new MaxVector();
 
-  public static void addEditListener(FtsPatcherListener listener)
+  public static void addEditListener(FtsEditListener listener)
   {
     editListeners.addElement(listener);
   }
 
-  public static void removeEditListener(FtsPatcherListener listener)
+  public static void removeEditListener(FtsEditListener listener)
   {
     editListeners.removeElement(listener);
   }
 
-  public static void fireObjectRemoved(FtsPatcherData data, FtsObject object)
+  public static void fireObjectRemoved(FtsObject object)
   {
     for (int i = 0; i < editListeners.size(); i++)
-      ((FtsPatcherListener) editListeners.elementAt(i)).objectRemoved(data, object);
+      ((FtsEditListener) editListeners.elementAt(i)).objectRemoved(object);
   }
 }

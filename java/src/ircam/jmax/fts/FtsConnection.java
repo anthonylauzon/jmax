@@ -76,7 +76,6 @@ public class FtsConnection
     Fts.getSelection().removeConnection(this);
 
     from.setDirty();
-    to.setDirty();
 	
     Fts.getServer().deleteConnection(this);
   }

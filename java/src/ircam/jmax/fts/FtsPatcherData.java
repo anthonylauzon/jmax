@@ -155,9 +155,6 @@ public class FtsPatcherData extends FtsRemoteData
     if (listener != null)
       listener.objectRemoved(this, object);
 
-    // Fire also the global edit listeners
-
-    Fts.fireObjectRemoved(this, object);
   }
 
   private final void fireConnectionAdded(FtsConnection connection)

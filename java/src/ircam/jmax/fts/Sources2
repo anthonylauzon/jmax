@@ -7,6 +7,8 @@ include $(INCLUDE_PATH)/Sources2
 INCLUDE_PATH := $(FTS_PATH)
 SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/Fts.java			\
+	$(INCLUDE_PATH)/FtsPatcherListener.java		\
+	$(INCLUDE_PATH)/FtsEditListener.java		\
 	$(INCLUDE_PATH)/FtsBmaxRemoteDocumentHandler.java		\
 	$(INCLUDE_PATH)/FtsClientProtocol.java		\
 	$(INCLUDE_PATH)/FtsCommentObject.java		\

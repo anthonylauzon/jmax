@@ -28,7 +28,7 @@ public class FtsObjectSet extends FtsRemoteData
 
   MaxVector list;
   ObjectSetListModel model;
-  FtsPatcherListener editListener;
+  FtsEditListener editListener;
 
   class ObjectSetListModel extends AbstractListModel
   {
@@ -48,27 +48,23 @@ public class FtsObjectSet extends FtsRemoteData
     }
   }
 
-  class ObjectSetEditListener implements FtsPatcherListener
+  class ObjectSetEditListener implements FtsEditListener
   {
-    public void objectAdded(FtsPatcherData data, FtsObject object)
+    public void objectAdded(FtsObject object)
     {
     }
 
-    public void objectRemoved(FtsPatcherData data, FtsObject object)
+    public void objectRemoved(FtsObject object)
     {
       list.removeElement(object);
       model.listChanged();
     }
 
-    public void connectionAdded(FtsPatcherData data, FtsConnection connection)
+    public void connectionAdded(FtsConnection connection)
     {
     }
 
-    public void connectionRemoved(FtsPatcherData data, FtsConnection connection)
-    {
-    }
-    
-    public void patcherChanged(FtsPatcherData data)
+    public void connectionRemoved(FtsConnection connection)
     {
     }
   }

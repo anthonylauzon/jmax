@@ -500,6 +500,7 @@ public class FtsObject
   {
     put("x", new Integer(x));
     this.x = x;
+    setDirty();
   }
 
   public final int getY()
@@ -511,6 +512,7 @@ public class FtsObject
   {
     put("y", new Integer(y));
     this.y = y;
+    setDirty();
   }
 
   public final int getWidth()
@@ -522,6 +524,7 @@ public class FtsObject
   {
     put("w", new Integer(w));
     this.width = w;
+    setDirty();
   }
 
   public final int getHeight()
@@ -533,6 +536,7 @@ public class FtsObject
   {
     put("h", new Integer(h));
     this.height = h;
+    setDirty();
   }
 
   /*****************************************************************************/
@@ -723,6 +727,10 @@ public class FtsObject
 
     if (getPatcherData() != null)
       getPatcherData().removeObject(this);
+
+    // Fire also the global edit listeners
+
+    Fts.fireObjectRemoved(this);
 
     // clean up to help the gc, and make the object
     // non functioning, so to catch use of the object
