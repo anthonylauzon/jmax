@@ -92,7 +92,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   }
 
   public boolean MouseUp_specific(MouseEvent e, int x, int y){
-    if (!itsSketchPad.itsRunMode) return false;
+    if (!itsSketchPad.itsRunMode && !e.isControlDown()) return false;
     else {
       if (itsFlashing) {
 	itsFlashing = false;
@@ -106,7 +106,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   // mouseDown
   //--------------------------------------------------------
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    if (itsSketchPad.itsRunMode) {
+    if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       if (itsFtsObject != null){
 	itsFtsObject.sendMessage(0, "bang", null);
 	itsFlashing = true;
@@ -139,17 +139,27 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   //--------------------------------------------------------
   public void Paint_specific(Graphics g) {
     
-    if((!itsSelected)&&(!itsFlashing)) g.setColor(itsLangNormalColor);
-    else g.setColor(itsLangSelectedColor);
+    if (!itsSketchPad.itsRunMode) {
+      if((!itsSelected)&&(!itsFlashing)) g.setColor(itsLangNormalColor);
+      else g.setColor(itsLangSelectedColor);
+    }
+    else g.setColor(itsUINormalColor);
  
     g.fillRect(itsX+1,itsY+1,currentRect.width-2, currentRect.height-2);
     g.fill3DRect(itsX+2, itsY+2, currentRect.width-4, currentRect.height-4, true);
     
-    if(itsFlashing) g.setColor(itsLangSelectedColor);
-    else{
-      if(!itsSelected) g.setColor(Color.white);
-      else g.setColor(itsLangNormalColor);
+    if (!itsSketchPad.itsRunMode) {
+      if(itsFlashing) g.setColor(itsLangSelectedColor);
+      else{
+	if(!itsSelected) g.setColor(Color.white);
+	else g.setColor(itsLangNormalColor);
+      }
     }
+    else {
+      if(itsFlashing) g.setColor(itsUISelectedColor);
+      else g.setColor(Color.white);
+    }
+  
     g.fillRect(itsX+4, itsY+1, currentRect.width-(WIDTH_DIFF-/*6*/2), currentRect.height-HEIGHT_DIFF);
     g.setColor(Color.black);
     g.drawRect(itsX+0, itsY+0, currentRect.width-1, currentRect.height-1);

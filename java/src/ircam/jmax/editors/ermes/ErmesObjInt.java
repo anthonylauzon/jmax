@@ -176,7 +176,7 @@ class ErmesObjInt extends ErmesObject {
       itsIntegerDialog.setVisible(true);
       return true;
     }
-    if (itsSketchPad.itsRunMode) {
+    if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsFirstY = y;
       if (firstClick) {
 	itsStartingY = itsInteger;
@@ -207,7 +207,7 @@ class ErmesObjInt extends ErmesObject {
   //  mouseUp
   //--------------------------------------------------------
   public boolean MouseUp(MouseEvent evt,int x, int y) {
-    if(itsSketchPad.itsRunMode){
+    if(itsSketchPad.itsRunMode || evt.isControlDown()){
       FtsServer.getServer().syncToFts();
       //itsMovingThrottle = false;
       DoublePaint();
@@ -219,9 +219,9 @@ class ErmesObjInt extends ErmesObject {
   //--------------------------------------------------------
   // mouseDrag
   //--------------------------------------------------------
-  public boolean MouseDrag(MouseEvent evt,int x, int y) {
+  public boolean MouseDrag_specific(MouseEvent evt,int x, int y) {
 
-    if(itsSketchPad.itsRunMode){
+    if(itsSketchPad.itsRunMode || evt.isControlDown()){
       itsInteger = itsStartingY+(itsFirstY-y);
       itsFtsObject.put("value", new Integer(itsInteger));
       //((FtsInteger) itsFtsActive).setValue(itsInteger);	ENZOOO

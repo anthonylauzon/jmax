@@ -141,7 +141,7 @@ class ErmesObjSlider extends ErmesObject {
       SetSliderDialog();
       return true;
     }
-    if(itsSketchPad.itsRunMode){
+    if(itsSketchPad.itsRunMode || evt.isControlDown()){
       if(IsInThrottle(x,y)){
 	itsMovingThrottle = true;
 	return true;
@@ -179,8 +179,9 @@ class ErmesObjSlider extends ErmesObject {
     return false;
   }
   
-  public boolean MouseDrag(MouseEvent evt,int x, int y){
-    if((itsSketchPad.itsRunMode)&&(itsMovingThrottle == true)){
+  public boolean MouseDrag_specific(MouseEvent evt,int x, int y){
+    if((itsSketchPad.itsRunMode || evt.isControlDown())
+       &&(itsMovingThrottle == true)){
       if(itsY+currentRect.height-BOTTOM_OFFSET>=y && itsY+UP_OFFSET<y) {
 	//compute the value and send to FTS
 	itsInteger = (int)(((itsY+currentRect.height)-y-BOTTOM_OFFSET)*itsStep);
@@ -222,7 +223,7 @@ class ErmesObjSlider extends ErmesObject {
   }
 	  
   public boolean MouseUp(MouseEvent evt,int x, int y){
-    if(itsSketchPad.itsRunMode){
+    if(itsSketchPad.itsRunMode || evt.isControlDown()){
       FtsServer.getServer().syncToFts();
       itsMovingThrottle = false;
       DoublePaint();

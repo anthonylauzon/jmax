@@ -45,7 +45,7 @@ class ErmesObjToggle extends ErmesObject {
   }
 
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    if (itsSketchPad.itsRunMode) {
+    if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsToggled = !itsToggled;
       itsFtsObject.put("value", (itsToggled?1:0));
       //((FtsInteger) itsFtsActive).setValue(itsToggled?1:0);	//ENZOOOOO

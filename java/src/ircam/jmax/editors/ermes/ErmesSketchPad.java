@@ -376,6 +376,7 @@ Rectangle previousResizeRect = new Rectangle();
 	aObject.ChangeFont(aFont);
       }
     }
+    repaint();
   }
 
   public void ChangeSizeFont(int fontSize){
@@ -1005,7 +1006,7 @@ Rectangle previousResizeRect = new Rectangle();
       DrawOffScreen(getGraphics());
     }
     
-    if (itsRunMode) {
+    if (itsRunMode || e.isControlDown()) {
       if(itsHelper.IsInObject(x,y)) {
 	itsCurrentObject.MouseDown(e,x,y);
 	itsStartDragObject = itsCurrentObject;	//object FROM WHICH we started drag
@@ -1091,7 +1092,7 @@ Rectangle previousResizeRect = new Rectangle();
     MaxApplication.setCurrentWindow(itsSketchWindow);
     if(itsScrolled) itsScrolled=false;
 
-    if (itsRunMode) {
+    if (itsRunMode || e.isControlDown()) {
       if (itsStartDragObject != null) itsStartDragObject.MouseUp(e, x, y);
       itsStartDragObject = null;
       return;
@@ -1332,7 +1333,7 @@ Rectangle previousResizeRect = new Rectangle();
     int x = e.getX();
     int y = e.getY();
     
-    if(itsRunMode) {
+    if(itsRunMode || e.isControlDown()) {
       if(itsStartDragObject != null) itsStartDragObject.MouseDrag(e, x, y);
       return;
     }

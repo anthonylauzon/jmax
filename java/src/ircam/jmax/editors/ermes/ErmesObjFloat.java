@@ -157,7 +157,7 @@ class ErmesObjFloat extends ErmesObject {
       itsFloatDialog.setVisible(true);
       return true;
     }
-    if (itsSketchPad.itsRunMode) {
+    if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsFirstY = y;
       if (firstClick) {
 	itsStartingValue = itsFloat;
@@ -190,9 +190,9 @@ class ErmesObjFloat extends ErmesObject {
   //--------------------------------------------------------
   // mouseDrag
   //--------------------------------------------------------
-  public boolean MouseDrag(MouseEvent evt,int x, int y) {
+  public boolean MouseDrag_specific(MouseEvent evt,int x, int y) {
     
-    if(itsSketchPad.itsRunMode){
+    if(itsSketchPad.itsRunMode || evt.isControlDown()){
       if (fastMode)
 	itsFloat = (float)(itsStartingValue+ itsFirstY-y);
       else itsFloat = (float)(itsStartingValue+ (float)(itsFirstY-y)/1000.0);

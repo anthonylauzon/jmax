@@ -48,9 +48,7 @@ class ErmesObjBang extends ErmesObject /*implements ActionListener */{
   }
     
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    //itsProbe.stop();
-    //itsProbe.reportToFile("bang_test");
-    if (itsSketchPad.itsRunMode) {
+    if (itsSketchPad.itsRunMode || evt.isControlDown()) {
       itsFtsObject.sendMessage(0, "bang", null);
     }
     else 

@@ -469,7 +469,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
   
   public boolean MouseMove(MouseEvent e,int x,int y){
-    if (itsSketchPad.itsRunMode) return false;
+    if (itsSketchPad.itsRunMode || e.isControlDown()) return false;
     if(IsInDragBox(x,y)){
       GetSketchWindow().setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
       return true;
@@ -478,8 +478,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
   
   public boolean MouseDrag(MouseEvent e,int x,int y){
-    if (itsSketchPad.itsRunMode) return true;
-    else return false;	
+    return MouseDrag_specific(e, x, y);
   }
 		
   public boolean IsInDragBox(int x,int y){
@@ -490,7 +489,7 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
 
   public boolean MouseDown(MouseEvent e,int x, int y) {
-    if (!itsSketchPad.itsRunMode){
+    if (!itsSketchPad.itsRunMode && !e.isControlDown()){
       if((e.getClickCount()>1)&&(e.isShiftDown())) {
 	RestoreDimensions(true);
 	return true;
@@ -508,9 +507,10 @@ public class ErmesObject implements FtsPropertyHandler, ErmesArea, ErmesDrawable
   }
 	
   public boolean MouseUp_specific(MouseEvent e, int x, int y){return false;}
+  public boolean MouseDrag_specific(MouseEvent e, int x, int y) {return false;}
   
   public boolean MouseUp(MouseEvent e,int x,int y) {
-    if (itsSketchPad.itsRunMode) return MouseUp_specific(e, x, y);	       
+    if (itsSketchPad.itsRunMode || e.isControlDown()) return MouseUp_specific(e, x, y);	       
     if(itsDragging) {
       if(itsSketchPad.itsResizeMode == itsSketchPad.BOTH_RESIZING){
 	int aWidth, aHeight;
