@@ -131,6 +131,63 @@ decrypt_options ()
 }
 
 # ---------------------------------------------------------------------------
+check_installation ()
+{
+    if [ $NOJAR ]
+    then
+	if [ ! -f ${ROOTDIR}/java/classes/ircam/jmax/MaxApplication.class ]
+	then
+	    echo "Cannot find file ircam/jmax/MaxApplication.class"
+	    echo "You have probably installed a source distribution and did not compile it !"
+	    exit 1
+	fi
+    else
+	if [ ! -f ${ROOTDIR}/java/classes/jmax.jar ]
+	then
+	    echo "Cannot find file jmax.jar"
+	    echo "You have probably installed a source distribution and did not compile it !"
+	    exit 1
+	fi
+    fi
+}
+
+# ---------------------------------------------------------------------------
+build_classpath ()
+{
+    if [ $NOJAR ]
+    then
+	JMAX_CLASSPATH=${ROOTDIR}/java/classes
+    else
+	JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
+    fi
+
+    if [ $CLASSPATH ]
+    then
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar
+    else
+	CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl/jacl.jar
+    fi
+
+    if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
+    then
+	# Swing found in CLASSPATH. Use it
+	echo > /dev/null
+    elif [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
+    then
+	CLASSPATH=${CLASSPATH}:${ROOTDIR}/java/lib/swing/swingall.jar
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# This fixes the font problem on SGI platform. See /usr/java/webdocs/release_eoe.html for
+# further explainations.
+fix_sgi_fonts ()
+{
+    JAVA_SMALL_FONTS=true
+    export JAVA_SMALL_FONTS
+}
+
+# ---------------------------------------------------------------------------
 start_it ()
 {
     if [ $VERBOSE ]
@@ -160,66 +217,15 @@ start_it ()
     fi
 }
 
-# ---------------------------------------------------------------------------
-build_classpath ()
-{
-    if [ $NOJAR ]
-    then
-	JMAX_CLASSPATH=${ROOTDIR}/java/classes
-    else
-	JMAX_CLASSPATH=${ROOTDIR}/java/classes/jmax.jar
-    fi
-
-    JACL_CLASSPATH=${ROOTDIR}/java/lib/jacl/jacl.jar
-
-    #  if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
-    #  then
-    #      echo > /dev/null
-    #  fi
-
-    if echo $CLASSPATH | grep swing > /dev/null 2>&1 ;
-    then
-	echo > /dev/null
-    else
-	if [ -f ${ROOTDIR}/java/lib/swing/swingall.jar ]
-	then
-	    SWING_DISTRIB_CLASSPATH=${ROOTDIR}/java/lib/swing/swingall.jar
-	else
-	    echo "Swing classes not found. Trying without..."
-	fi
-    fi
-
-    if [ $CLASSPATH ]
-    then
-	if [ $SWING_DISTRIB_CLASSPATH ]
-	then
-	    CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
-	else
-	    CLASSPATH=${CLASSPATH}:${JMAX_CLASSPATH}:${JACL_CLASSPATH}
-	fi
-    else
-	CLASSPATH=${JMAX_CLASSPATH}:${SWING_DISTRIB_CLASSPATH}:${JACL_CLASSPATH}
-    fi
-}
-
-# ---------------------------------------------------------------------------
-# This fixes the font problem on SGI platform. See /usr/java/webdocs/release_eoe.html for
-# further explainations.
-fix_sgi_fonts ()
-{
-    JAVA_SMALL_FONTS=true
-    export JAVA_SMALL_FONTS
-}
-
 # ***************************************************************************
 # Beginning of script
 # ***************************************************************************
 
 decrypt_options $@
 
-build_classpath
+check_installation
 
-#check_root_dir
+build_classpath
 
 fix_sgi_fonts
 
