@@ -50,6 +50,7 @@
 #define DSP_CONTROL_INVALID_FPE_STATE   2
 #define DSP_CONTROL_DIVIDE0_FPE_STATE   3
 #define DSP_CONTROL_OVERFLOW_FPE_STATE  4
+#define DSP_CONTROL_DENORMALIZED_FPE_STATE  41
 #define DSP_CONTROL_SAMPLING_RATE       5
 #define DSP_CONTROL_FIFO_SIZE           6
 #define DSP_CONTROL_DSP_ON              7
@@ -82,6 +83,7 @@ typedef struct fts_dsp_control
   int prev_invalid_fpe;
   int prev_divide0_fpe;
   int prev_overflow_fpe;
+  int prev_denormalized_fpe;
 } fts_dsp_control_t;
 
 
@@ -93,6 +95,7 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
   int invalid_fpe;
   int divide0_fpe;
   int overflow_fpe;
+  int denormalized_fpe;
   unsigned int fpe_state;
 
   if (this->dac_slip_dev &&  dsp_is_running() && fts_sig_dev_get_nerrors(this->dac_slip_dev) > 0)
@@ -139,6 +142,16 @@ static void fts_dsp_control_poll(fts_alarm_t *alarm, void *data)
       fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_OVERFLOW_FPE_STATE, 1, &a);
     }
 
+/*    denormalized_fpe = ((fpe_state & FTS_DENORMALIZED_FPE) ? 1 : 0); */
+
+/*    if (denormalized_fpe != this->prev_denormalized_fpe) */
+/*      { */
+/*        this->prev_denormalized_fpe = denormalized_fpe; */
+
+/*        fts_set_int(&a, denormalized_fpe); */
+/*        fts_data_remote_call((fts_data_t *)this, DSP_CONTROL_DENORMALIZED_FPE_STATE, 1, &a); */
+/*      } */
+
   fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);
   fts_alarm_arm(&(this->poll_alarm));
 }
@@ -167,6 +180,7 @@ static fts_data_t *fts_dsp_control_new(int ac, const fts_atom_t *at)
   this->prev_invalid_fpe = 0;
   this->prev_divide0_fpe = 0;
   this->prev_overflow_fpe = 0;
+  this->prev_denormalized_fpe = 0;
 
   fts_alarm_init(&(this->poll_alarm), 0, fts_dsp_control_poll, this);
   fts_alarm_set_delay(&(this->poll_alarm), this->poll_interval);

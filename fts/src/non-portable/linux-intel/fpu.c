@@ -30,6 +30,11 @@
  * 
  */
 
+/*
+ * #define this if you want denormalized f.p. traps to be reported 
+ */
+#undef ENABLE_DENORMALIZED_TRAPS
+
 #include <signal.h>
 
 #include "sys/hw.h"
@@ -116,6 +121,8 @@ static void linux_fpe_signal_handler( int sig)
     fts_fpe_handler( FTS_UNDERFLOW_FPE);
   else if (s & _FPU_STATUS_PE)
     fts_fpe_handler( FTS_INEXACT_FPE);
+  else if (s & _FPU_STATUS_DE)
+    fts_fpe_handler( FTS_DENORMALIZED_FPE);
   else
     fts_fpe_handler(0);
 }
@@ -139,15 +146,17 @@ void fts_enable_fpe_traps( void)
 
   signal( SIGFPE, linux_fpe_signal_handler);
 
+#ifdef ENABLE_DENORMALIZED_TRAPS
+  cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR /* extended precision + round to nearest */
+    + _FPU_CONTROL_UM /* disable underflow */
+    + _FPU_CONTROL_PM; /* disable precision */
+#else
   cw = 0x1000 + _FPU_CONTROL_EP + _FPU_CONTROL_NR /* extended precision + round to nearest */
     + _FPU_CONTROL_DM /* disable denormalized */
     + _FPU_CONTROL_UM /* disable underflow */
     + _FPU_CONTROL_PM; /* disable precision */
+#endif
 
-    /* enable invalid operand (_FPU_CONTROL_IM) */
-    /* enable divide by zero (_FPU_CONTROL_ZM) */
-    /* enable overflow (_FPU_CONTROL_OM) */
-    
   _FPU_SET_CW( cw);
 }
 

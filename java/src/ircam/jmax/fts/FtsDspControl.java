@@ -44,6 +44,7 @@ import ircam.jmax.fts.*;
   static final int INVALID_FPE_STATE  = 2;
   static final int DIVIDE_BY_ZERO_FPE_STATE  = 3;
   static final int OVERFLOW_FPE_STATE = 4;
+  static final int DENORMALIZED_FPE_STATE = 41;
   static final int SAMPLING_RATE = 5;
   static final int FIFO_SIZE     = 6;
   static final int DSP_ON        = 7;
@@ -62,6 +63,7 @@ import ircam.jmax.fts.*;
   protected Integer invalidFpe;
   protected Integer divideByZeroFpe;
   protected Integer overflowFpe;
+  protected Integer denormalizedFpe;
   protected Integer samplingRate;
   protected Integer fifoSize;
   protected Boolean dspOn;
@@ -76,6 +78,7 @@ import ircam.jmax.fts.*;
     invalidFpe      = new Integer(0);
     divideByZeroFpe = new Integer(0);
     overflowFpe     = new Integer(0);
+    denormalizedFpe = new Integer(0);
     samplingRate    = new Integer(0);
     fifoSize        = new Integer(0);
     dspOn           = new Boolean(false);
@@ -103,6 +106,11 @@ import ircam.jmax.fts.*;
   public Integer getOverflowFpe ()
   {
     return overflowFpe ;
+  }
+
+  public Integer getDenormalizedFpe ()
+  {
+    return denormalizedFpe ;
   }
 
   public Integer getSamplingRate()
@@ -220,6 +228,12 @@ import ircam.jmax.fts.*;
 	overflowFpe = (Integer) newValue;
 	prop     = "overflowFpe";
 	break;
+      case DENORMALIZED_FPE_STATE:
+	oldValue = denormalizedFpe;
+	denormalizedFpe = (Integer) newValue;
+	prop = "denormalizedFpe";
+	break;
+
       case SAMPLING_RATE:
 	oldValue = samplingRate;
 	samplingRate = (Integer) newValue;

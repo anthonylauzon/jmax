@@ -43,6 +43,7 @@ extern void fts_disable_fpe_traps( void);
 #define FTS_OVERFLOW_FPE 0x04
 #define FTS_INEXACT_FPE  0x08
 #define FTS_UNDERFLOW_FPE 0x10
+#define FTS_DENORMALIZED_FPE 0x20
 
 extern int fts_memory_is_locked( void);
 extern int fts_lock_memory( void);

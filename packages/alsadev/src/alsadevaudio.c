@@ -131,12 +131,12 @@ static fts_status_t alsa_dac_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   params.stop_mode = SND_PCM_STOP_ROLLOVER;
 
   params.format.format = SND_PCM_SFMT_S16_LE; 
-  params.format.rate = 44100;
+  params.format.rate = sampling_rate;
   params.format.voices = n_voices;
   params.format.interleave = 1;
 
-  params.buf.block.frag_size = 256;
-  params.buf.block.frags_max = -1;
+  params.buf.block.frag_size = FTS_DEF_TICK_SIZE * n_voices * sizeof( short);
+  params.buf.block.frags_max = fifo_size / FTS_DEF_TICK_SIZE;
   params.buf.block.frags_min = 1;
 
   if ((err = snd_pcm_channel_params( data->handle, &params)) < 0)
@@ -307,10 +307,13 @@ void alsa_dac_init(void)
 
 static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *args)
 {
-  int n_voices;
+  int n_voices, sampling_rate, fifo_size;
   int err, card, device;
   alsa_pcm_dev_data_t *data;
   snd_pcm_channel_params_t params;
+
+  sampling_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
+  fifo_size = fts_param_get_int(fts_s_fifo_size, DEF_FIFO_SIZE);
 
   /* Parameter parsing */
   n_voices = fts_get_int_by_name(nargs, args, fts_new_symbol("voices"), DEFAULT_N_VOICES);
@@ -351,12 +354,12 @@ static fts_status_t alsa_adc_open( fts_dev_t *dev, int nargs, const fts_atom_t *
   params.stop_mode = SND_PCM_STOP_ROLLOVER;
 
   params.format.format = SND_PCM_SFMT_S16_LE; 
-  params.format.rate = 44100;
+  params.format.rate = sampling_rate;
   params.format.voices = n_voices;
   params.format.interleave = 1;
 
-  params.buf.block.frag_size = 256;
-  params.buf.block.frags_max = 10;
+  params.buf.block.frag_size = FTS_DEF_TICK_SIZE * n_voices * sizeof( short);
+  params.buf.block.frags_max = fifo_size / FTS_DEF_TICK_SIZE;
   params.buf.block.frags_min = 1;
 
   if ((err = snd_pcm_channel_params( data->handle, &params)) < 0)

@@ -63,6 +63,7 @@ public class ControlPanelFrame extends JFrame
   private IndicatorWithMemory invalidFpeIndicator;
   private IndicatorWithMemory divideByZeroFpeIndicator;
   private IndicatorWithMemory overflowFpeIndicator;
+  private IndicatorWithMemory denormalizedFpeIndicator;
   private JCheckBox dspOnButton;
 
   // (fd) This lock prevents a "setSelected" ont the dspOnButton to cause
@@ -148,6 +149,10 @@ public class ControlPanelFrame extends JFrame
     exceptionPanel.add(overflowFpeIndicator);
     new DspControlAdapter("overflowFpe", control, overflowFpeIndicator);
 
+//      denormalizedFpeIndicator = new IndicatorWithMemory("Denormalized");
+//      exceptionPanel.add( denormalizedFpeIndicator);
+//      new DspControlAdapter( "denormalizedFpe", control, denormalizedFpeIndicator);
+
     //
     // Temporary code to show sampling rate and fifo size; it should
     // be a bean property editor field, probabily ...
@@ -197,6 +202,7 @@ public class ControlPanelFrame extends JFrame
     fifoSizePanel.add("East", fifoSizeText);
 
     dspPanel.add(fifoSizePanel);
+    dspPanel.add( Box.createVerticalGlue());
 
     optionsPanel = new JPanel();
     optionsPanel.setLayout( new BoxLayout( optionsPanel, BoxLayout.Y_AXIS));
