@@ -30,6 +30,7 @@ static fts_symbol_t sym_meter_4_4 = NULL;
 static scomark_t *marker_track_get_previous_tempo(track_t *marker_track, scomark_t *scomark, double *tempo);
 static scomark_t *marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_symbol_t *meter);
 static void marker_track_tempo_changed(track_t * marker_track, scomark_t *scomark, double old_tempo, double new_tempo, int upload);
+static void marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbol_t old_meter, fts_symbol_t new_meter, int upload);
 
 /**************************************************************************************
  *
@@ -355,13 +356,13 @@ _scomark_set_meter_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
   scomark_t *self = (scomark_t *)o;
   if( scomark_is_bar(self) && ac==1 && fts_is_symbol(at))
   {
-	track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));   
-	fts_symbol_t meter = fts_get_symbol(at);
-	fts_symbol_t old_meter = NULL;
+    track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));   
+    fts_symbol_t meter = fts_get_symbol(at);
+    fts_symbol_t old_meter = NULL;
 	
     scomark_bar_set_meter(self, meter, &old_meter);
 	
-	/*marker_track_meter_changed(marker_track, self, old_meter, meter, 1);*/
+    marker_track_meter_changed(marker_track, self, old_meter, meter, 1);
   }
 }
 static void
@@ -536,6 +537,51 @@ marker_track_get_previous_meter(track_t *marker_track, scomark_t *scomark, fts_s
     return marker;
   else
     return NULL;
+}
+
+static void
+marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbol_t old_meter, fts_symbol_t new_meter, int upload)
+{  
+  if(new_meter != NULL && old_meter != NULL)
+  {
+    track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
+    event_t *first_mark_evt = (event_t *)fts_object_get_context((fts_object_t *)scomark);    
+    event_t *mark_evt = first_mark_evt;
+    double begin = event_get_time(mark_evt);
+    double end = 2.0 * track_get_total_duration(track);
+    double t = -1.0;
+    event_t *first = NULL;
+    event_t *after = NULL;
+    scomark_t *marker = NULL;
+    
+    /*mark_evt = event_get_next(mark_evt);
+    if(mark_evt != NULL)
+    {
+      scomark_bar_get_meter((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
+      
+      while(mark_evt != NULL && t < 0.0)
+      {
+        scomark_get_tempo((scomark_t *)fts_get_object( event_get_value(mark_evt)), &t);
+        mark_evt = event_get_next(mark_evt);
+      }
+      
+      if(mark_evt != NULL)
+        end = event_get_time(mark_evt);
+    }
+    // stretch scoob track 
+    track_segment_get(track, begin, end, &first, &after);
+    if(first != NULL)
+    {
+      track_segment_stretch(track, first, after, begin, end, stretch);
+      if(upload)
+        track_move_events_at_client(track, first, NULL);
+    }
+    
+    // stretch marker track 
+    track_segment_stretch(marker_track, first_mark_evt, mark_evt, begin, end, stretch);  
+    if(upload)
+      track_move_events_at_client(marker_track, first_mark_evt, NULL);*/
+  }
 }
 
 static void
