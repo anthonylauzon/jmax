@@ -11,6 +11,7 @@ AppUpdatesURL=http://www.ircam.fr/jmax
 DefaultDirName={pf}\jMax
 DefaultGroupName=jMax
 AllowNoIcons=yes
+ChangesAssociations=yes
 LicenseFile=..\LICENSE
 
 [Tasks]
@@ -156,6 +157,29 @@ Source: "..\packages\utils\c\utils.dll"; DestDir: "{app}\packages\utils\c\"; Fla
 Name: "{group}\jMax"; Filename: "{app}\bin\jmax.exe"
 Name: "{userdesktop}\jMax"; Filename: "{app}\bin\jmax.exe"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\jMax"; Filename: "{app}\bin\jmax.exe"; Tasks: quicklaunchicon
+
+[Registry]
+;; jMax file Associations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Root: HKCR; Subkey: ".jmax"; ValueType: string; ValueName: ""; ValueData: "jMaxPatchFile"; Flags: uninsdeletevalue
+Root: HKCR; Subkey: "jMaxPatchFile"; ValueType: string; ValueName: ""; ValueData: "jMax Patch File"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "jMaxPatchFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\bin\jmax.exe,0"
+Root: HKCR; Subkey: "jMaxPatchFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\bin\jmax.exe"" ""%1"""
+
+;; HKEY_CURRENT_USER is writable by users (we can certainly put config here ....)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Root: HKCU; Subkey: "Software\Ircam"; Flags: uninsdeletekeyifempty
+Root: HKCU; Subkey: "Software\Ircam\jMax"; Flags: uninsdeletekey
+
+;; HKEY_LOCAL_MACHINE is only writable by authorized uers.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Root: HKLM; Subkey: "Software\Ircam"; Flags: uninsdeletekeyifempty
+Root: HKLM; Subkey: "Software\Ircam\jMax"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "jMaxVersion"; ValueData: "4.1"
+Root: HKLM; Subkey: "Software\Ircam\jMax"; ValueType: string; ValueName: "FtsVersion"; ValueData: "4.1"
+Root: HKLM; Subkey: "Software\Ircam\jMax\4.1"; ValueType: string; ValueName: "ftsRoot"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\Ircam\jMax\4.1"; ValueType: string; ValueName: "jmaxRoot"; ValueData: "{app}"
+
 
 [Run]
 Filename: "{app}\bin\jmax.exe"; Description: "Launch jMax"; Flags: nowait postinstall skipifsilent
