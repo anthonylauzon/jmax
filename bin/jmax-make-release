@@ -131,9 +131,6 @@ check_options()
 check_cvs_sync ()
 {
     inform checking CVS
-
-    date
-
     ME=`whoami`
     HERE=`pwd | sed "s/.*$ME\///"`
     if rsh $HOST_FOR_CVS cd $HERE \; cvs -n update 2>&1 | egrep -s '^[UARMC] ' 
@@ -167,9 +164,6 @@ check_recompile ()
     do
 	for SUB_ARCH in `sub_archs $ARCH`
 	do
-
-    date
-
 	    # Java Makefiles do not allow yet to check recompilation with -q option
 	    # (all is a phony target ...)
 	    gmake -q ARCH=$SUB_ARCH MODE=opt all_c  > /dev/null 2>&1 || error "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
@@ -201,18 +195,9 @@ create_dest_dir()
 }
 
 # ---------------------------------------------------------------------------
-# args: DIR
-create_dir ()
+remove_dest_dir()
 {
-    D=`echo $1 | sed 's+^\.\/++'`
-    mkdir -p $DEST_DIR/$D
-
-    i=$DEST_DIR
-    for d in `echo $D | sed 's+\/+ +g'`
-    do
-	i="$i/$d"
-	chmod 755 $i
-    done
+    /bin/rm -rf ${TMP}/$$
 }
 
 # ---------------------------------------------------------------------------
@@ -224,27 +209,21 @@ copy_files()
 	if [ -f $F ]
   	then
 
-  	    DST=`echo $3/$F | sed 's+^\.\/++'`
+  	    DST=${3}$F
 
   	    D=`dirname $DST`
   	    if [ ! -d $DEST_DIR/$D ]
   	    then
-  		create_dir $D
+  		mkdir -p $DEST_DIR/$D
   	    fi
 
   	    cp $F $DEST_DIR/$DST
-  	    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
-  	    then
-  		chmod 755 $DEST_DIR/$DST
-  	    else
-  		chmod 644 $DEST_DIR/$DST
-  	    fi
 
   	elif [ -d $F ]
   	then
 
-  	    create_dir $3/$F
-  	    (cd $F ; select_files $1 $2 $3/$F )
+  	    mkdir -p $DEST_DIR/${3}$F
+  	    (cd $F ; select_files $1 $2 ${3}$F/ )
 
   	else
 
@@ -261,11 +240,11 @@ select_files ()
 {
     if [ \! -f distrib ]
     then
-	error "file $1/distrib missing"
+	error "file $3/distrib missing"
     fi
 
       {
-#  	inform Processing $3
+  	inform processing \"$3\"
 
   	read TYPE_F ARCH_F PATTERN NEW_NAME
 
@@ -273,7 +252,7 @@ select_files ()
   	do
   	    if [ \( $TYPE_F = $1 -o $TYPE_F = "all" \) -a \( $ARCH_F = $2 -o $ARCH_F = "all" \) ]
   	    then
-  		copy_files $1 $2 $3 "$PATTERN"
+  		copy_files $1 $2 "$3" "$PATTERN"
   	    fi
 
   	    read TYPE_F ARCH_F PATTERN NEW_NAME
@@ -283,9 +262,39 @@ select_files ()
 }
 
 # ---------------------------------------------------------------------------
+set_correct_permissions ()
+{
+    ( cd $DEST_DIR ; 
+	find . -type f \( \( -perm -700 -exec chmod 755 {} \; \) -o \( -perm -600 -exec chmod 644 {} \; \) \) )
+    ( cd $DEST_DIR ; find . -type d -exec chmod 755 {} \; )
+}
+
+# ---------------------------------------------------------------------------
 # Create the tar file
 # args: TYPE ARCH 
 create_tar ()
+{
+    TARFILE=${TARDIR}/jmax.$1.$2.${VERSION_NUMBER}.tar
+
+    if [ -e ${TARFILE} ]
+    then
+	error "file $TARFILE already exists"
+    fi
+
+    if [ -e ${TARFILE}.gz ]
+    then
+	error "file $TARFILE.gz already exists"
+    fi
+
+    inform "creating tar file $TARFILE.gz"
+    (cd ${DEST_DIR}/.. ; tar cf $TARFILE max-${VERSION_NUMBER} )
+    gzip -9 $TARFILE
+
+    chmod 444 ${TARFILE}.gz
+}
+
+# ---------------------------------------------------------------------------
+create_all_tars ()
 {
     TARDIR=${RELEASES_DIR}/${VERSION_NUMBER}
     if [ ! -d ${TARDIR} ]
@@ -297,41 +306,26 @@ create_tar ()
 	chmod u+w ${TARDIR}
     fi
 
-    TARFILE=${TARDIR}/jmax.$1.$2.${VERSION_NUMBER}.tar.gz
-
-    if [ ! -w ${TARFILE} ]
-    then
-	chmod u+w ${TARFILE}
-    fi
-
-    inform "creating tar file $TARFILE"
-    (cd ${DEST_DIR}/.. ; tar cf - max-${VERSION_NUMBER} ) | gzip -9 > $TARFILE
-
-    chmod 444 ${TARFILE}
-    chmod 555 ${TARDIR}
-}
-
-# ---------------------------------------------------------------------------
-create_tars ()
-{
-    create_dest_dir
+    ROOT_DIR=`pwd`
 
     # - for each type { for each architecture { create the tar file } }
     for TYPE in $TYPES
     do
 	for ARCH in $ARCHS
 	do
+	    create_dest_dir
 
-    date
+	    select_files $TYPE $ARCH ''
 
-	    select_files $TYPE $ARCH .
-
-
-    date
+	    set_correct_permissions
 
 	    create_tar $TYPE $ARCH 
+
+	    remove_dest_dir
 	done
     done
+
+    chmod 555 ${TARDIR}
 }
 
 # ---------------------------------------------------------------------------
@@ -341,16 +335,8 @@ tag_files ()
     inform "tagging sources with tag $TAG"
     ME=`whoami`
     HERE=`pwd | sed "s/.*$ME\///"`
-    rsh $HOST_FOR_CVS cd $HERE \; cvs tag -F $TAG
+    rsh $HOST_FOR_CVS cd $HERE \; cvs tag -F $TAG > /dev/null 2>&1
 }
-
-
-# ---------------------------------------------------------------------------
-remove_dest_dir()
-{
-    /bin/rm -rf ${TMP}/$$
-}
-
 
 # ---------------------------------------------------------------------------
 # args: STATUS
@@ -380,7 +366,7 @@ check_recompile
 
 compute_version_number
 
-create_tars
+create_all_tars
 
 tag_files
 

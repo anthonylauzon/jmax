@@ -306,7 +306,6 @@ Messages can be send on the outlets of an object, using the
 <li> <a href="#Message Sending Example">Message Sending Example</a>
 <li> <a href="#Message Arguments Building">Message Arguments Building</a>
 <li> <a href="#Message Selectors">Message Selectors</a>
-<li> <a href="#Shortcuts for bang, int, float and symbol Messages">Shortcuts for <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> Messages</a>
 </ul>
 
 
@@ -406,36 +405,6 @@ containing string s. <strong>Note:</strong> the passed string is not copied.
 containing string s. <strong>Note:</strong> the passed string is copied. This function
 is used when the passed string is not a constant.
 </ul>
-
-
-<a name="Shortcuts for bang, int, float and symbol Messages"><h3>Shortcuts for <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> Messages</h3></a>
-
-<p>
-As sending <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> messages is
-very frequent, a number of shortcuts have been defined:
-<ul>
-<li> <code>fts_outlet_bang( fts_object_t *<i>object</i>, int <i>woutlet</i>)</code>
-<li> <code>fts_outlet_int( fts_object_t *<i>object</i>, int <i>woutlet</i>, int <i>value</i>)</code>
-<li> <code>fts_outlet_float( fts_object_t *<i>object</i>, int <i>woutlet</i>, float <i>value</i>)</code>
-<li> <code>fts_outlet_symbol( fts_object_t *<i>object</i>, int <i>woutlet</i>, fts_symbol_t <i>value</i>)</code>
-</ul>
-
-<p>
-There shortcuts are just wrappers that format a message with a single argument
-and call <code>fts_outlet_send</code>.
-
-<p>
-The previous example of the <code>integer_bang</code> method can then be
-written the following way, which is preferred:
-<pre>
-void integer_bang( fts_object_t *object, int winlet, fts_symbol_t selector,
-                   int ac, const fts_atom_t *at)
-{
-  integer_t *this = (integer_t *)object;
-
-  fts_outlet_int( object, 0, this->n);
-}
-</pre>
 
 
 <!-- ---------------------------------------------------------------------- -->

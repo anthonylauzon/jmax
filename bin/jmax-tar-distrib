@@ -14,37 +14,38 @@
 
 
 # ***************************************************************************
-# Constants
-# ***************************************************************************
-RELEASES_DIR=/u/worksta/jmaxdev/releases
-
-# ***************************************************************************
 # Functions
 # ***************************************************************************
 
 # ---------------------------------------------------------------------------
-help ()
+usage ()
 {
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-tar-distrib -type <type> -arch <arch> [-dest <file>] [-tmp <dir>]
+    jmax-tar-distrib -type <type> -arch <arch> [-tmp <dir>] [-quiet] <file>
 
-Creates tar file of jMax distribution for architecture <arch> and type <type>.
+Creates a tar file of a distribution for architecture <arch> and type <type>.
 
 Options:
   -type <type>                 (mandatory)
     create release type <type> (free, ircam, src, ...)
   -arch <arch>                 (mandatory)
     create release for architecture <arch> (sgi, linuxpc, ...)
-  -dest <file>                 (optional)
-    creates tar file <file>.
   -tmp <dir>                   (optional)
     use <dir> as temporary directory. Defaults to /tmp
+  -verbose                     (optional)
+    print more messages
   -quiet                       (optional)
     do not exit if a file is missing
 
+Arguments:
+  <file>                       (optional)
+    creates tar file <file>.
+
 HELP_EOF
+
+    exit 2
 }
 
 # ---------------------------------------------------------------------------
@@ -53,22 +54,29 @@ decrypt_options ()
     OPT="none"
     ARCH="none"
     TYPE="none"
-    DEST_FILE="none"
     TMP="/tmp"
     QUIET="false"
+    VERBOSE="false"
+    TARFILE="none"
 
     for ARG in $@
     do
 	if [ $OPT = "none" ]
 	then
 	    case $ARG in
-	    \-arch | \-type | \-dest | \-tmp )
+	    \-arch | \-type | \-tmp )
 		OPT=$ARG ;;
 	    \-quiet )
 		QUIET="true" ;;
+	    \-verbose )
+		VERBOSE="true" ;;
 	    *)
-		help ;
-		exit 2 ;;
+		if [ $TARFILE = "none" ]
+		then
+		    TARFILE=$ARG
+		else
+		    usage
+		fi ;;
 	    esac
 	else
 	    case $OPT in
@@ -79,7 +87,7 @@ decrypt_options ()
 	    \-tmp )
 		TMP=$ARG ;;
 	    \-dest )
-		DEST_FILE=$ARG ;;
+		TARFILE=$ARG ;;
 	    esac
 	    OPT="none";
 	fi
@@ -87,42 +95,28 @@ decrypt_options ()
 }
 
 # ---------------------------------------------------------------------------
-check_it ()
+check_options ()
 {
     if [ $ARCH = "none" ]
     then
-	help
-	exit 2
+	usage
     fi
 
     if [ $TYPE = "none" ]
     then
-	help
-	exit 2
+	usage
     fi
 
-    if [ \! -r VERSION ]
+    if [ $TARFILE = "none" ]
     then
-	echo "Cannot find file VERSION (probably you're not in the correct directory ...)"
-	exit 1
+	usage
     fi
-
-}
-
-# ---------------------------------------------------------------------------
-compute_version_number ()
-{
-    MAJOR=`awk '$1=="MAJOR" { print $2; }' VERSION`
-    MINOR=`awk '$1=="MINOR" { print $2; }' VERSION`
-    PATCH_LEVEL=`awk '$1=="PATCH_LEVEL" { print $2; }' VERSION`
-
-    VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
 }
 
 # ---------------------------------------------------------------------------
 create_dest_dir()
 {
-    DEST_DIR=${TMP}/$$/max-${VERSION}
+    DEST_DIR=${TMP}/$$
     if [ -d ${DEST_DIR} ]
     then
 	/bin/rm -rf ${DEST_DIR}
@@ -147,53 +141,33 @@ clean_exit()
 }
 
 # ---------------------------------------------------------------------------
-# args: DIR
-create_dir ()
-{
-    D=`echo $1 | sed 's+^\.\/++'`
-    mkdir -p $DEST_DIR/$D
-
-    i=$DEST_DIR
-    for d in `echo $D | sed 's+\/+ +g'`
-    do
-	i="$i/$d"
-	chmod 755 $i
-    done
-}
-
-# ---------------------------------------------------------------------------
-# args: RELATIVE_DIR PATTERN
+# args: TYPE ARCH RELATIVE_DIR PATTERN
 copy_files()
 {
-    for F in `ls -d $2`
+    for F in `ls -d $4`
     do
 	if [ -f $F ]
   	then
 
-  	    DST=`echo $1/$F | sed 's+^\.\/++'`
+  	    DST=${3}$F
 
   	    D=`dirname $DST`
   	    if [ ! -d $DEST_DIR/$D ]
   	    then
-  		create_dir $D
+  		mkdir -p $DEST_DIR/$D
   	    fi
 
   	    cp $F $DEST_DIR/$DST
-  	    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
-  	    then
-  		chmod 755 $DEST_DIR/$DST
-  	    else
-  		chmod 644 $DEST_DIR/$DST
-  	    fi
 
   	elif [ -d $F ]
   	then
 
-  	    create_dir $1/$F
-  	    (cd $F ; select_files $1/$F )
+  	    mkdir -p $DEST_DIR/${3}$F
+  	    (cd $F ; select_files $1 $2 ${3}$F/ )
 
   	else
-  	    echo "File or directory $F not found" >&2
+
+  	    echo "file or directory $F not found" >&2
 
   	    if [ $QUIET = "false" ]
   	    then
@@ -205,25 +179,28 @@ copy_files()
 
 
 # ---------------------------------------------------------------------------
-# args: RELATIVE_DIR
+# args: TYPE ARCH RELATIVE_DIR
 select_files ()
 {
     if [ \! -f distrib ]
     then
-	echo "jmax-tar-distrib: File $1/distrib missing" >&2
-	clean_exit 1
+	echo "file ${3}distrib missing" >&2
+	exit 1
     fi
 
       {
-  	echo "jmax-tar-distrib: Processing $1"
+	if [ $VERBOSE != "false" ]
+	then
+	    echo Processing \"$3\"
+	fi
 
   	read TYPE_F ARCH_F PATTERN NEW_NAME
 
-  	while [ $ARCH_F ] 
+  	while [ $TYPE_F ] 
   	do
-  	    if [ \( $ARCH_F = $ARCH -o $ARCH_F = "all" \) -a \( $TYPE_F = $TYPE -o $TYPE_F = "all" \) ]
+  	    if [ \( $TYPE_F = $1 -o $TYPE_F = "all" \) -a \( $ARCH_F = $2 -o $ARCH_F = "all" \) ]
   	    then
-  		copy_files $1 "$PATTERN"
+  		copy_files $1 $2 "$3" "$PATTERN"
   	    fi
 
   	    read TYPE_F ARCH_F PATTERN NEW_NAME
@@ -233,37 +210,26 @@ select_files ()
 }
 
 # ---------------------------------------------------------------------------
+set_correct_permissions ()
+{
+    ( cd $DEST_DIR ; 
+	find . -type f \( \( -perm -700 -exec chmod 755 {} \; \) -o \( -perm -600 -exec chmod 644 {} \; \) \) )
+    ( cd $DEST_DIR ; find . -type d -exec chmod 755 {} \; )
+}
+
+# ---------------------------------------------------------------------------
 # Create the tar file
+# args: TARFILE
 create_tar ()
 {
-    if [ $DEST_FILE != "none" ]
+    if [ $VERBOSE != "false" ]
     then
-	echo "(A) Creating tar file $DEST_FILE"
-	(cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $DEST_FILE
-    else
-	TARDIR=${RELEASES_DIR}/${VERSION}
-	if [ ! -d ${TARDIR} ]
-	then
-	    mkdir -p ${TARDIR}
-	fi
-	if [ ! -w ${TARDIR} ]
-	then
-	    chmod u+w ${TARDIR}
-	fi
-
-	TARFILE=${TARDIR}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
-
-	if [ ! -w ${TARFILE} ]
-	then
-	    chmod u+w ${TARFILE}
-	fi
-
-	echo "(B) Creating tar file $TARFILE"
-	(cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
-
-	chmod 444 ${TARFILE}
-	chmod 555 ${TARDIR}
+	echo "creating tar file $1"
     fi
+
+    (cd ${DEST_DIR} ; tar cf - * ) | gzip -9 > $1
+
+    chmod 444 $1
 }
 
 # ***************************************************************************
@@ -272,14 +238,14 @@ create_tar ()
 
 decrypt_options $@
 
-check_it
-
-compute_version_number
+check_options
 
 create_dest_dir
 
-select_files .
+select_files $TYPE $ARCH ''
 
-create_tar
+set_correct_permissions
+
+create_tar $TARFILE
 
 clean_exit 0
