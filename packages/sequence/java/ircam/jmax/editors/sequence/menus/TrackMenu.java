@@ -42,7 +42,7 @@ public class TrackMenu extends EditorMenu
   public TrackMenu(EditorContainer container, SequenceDataModel sequenceModel)
   {
     super("Track");
-	setMnemonic(KeyEvent.VK_T);
+    setMnemonic(KeyEvent.VK_T);
 
     this.sequenceModel = sequenceModel;
 
@@ -52,59 +52,44 @@ public class TrackMenu extends EditorMenu
     FillAddTrackMenu(addTrackMenu);
 
     add(addTrackMenu);
-	add(Actions.removeTrackAction);
+    add(Actions.removeTrackAction);
     
-	// JMenuItem removeTrackItem = add(Actions.removeTrackAction, "Remove Tracks");
-
     addSeparator();
     add(Actions.exportAction);
-	add(Actions.mergeAction);
+    add(Actions.mergeAction);
 
     addSeparator();
     JMenuItem item;
     item = new JMenuItem("Close All Tracks");
     item.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
-	    {
-		((FtsSequenceObject)TrackMenu.this.sequenceModel).setOpenedAllTracks(false);
-	    }
-	});
+	public void actionPerformed(ActionEvent e)
+	{
+	  ((FtsSequenceObject)TrackMenu.this.sequenceModel).setOpenedAllTracks(false);
+	}
+      });
     add(item);
     item = new JMenuItem("Open All Tracks");
     item.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e)
-	    {
-		((FtsSequenceObject)TrackMenu.this.sequenceModel).setOpenedAllTracks(true);
-	    }
-	});
+	public void actionPerformed(ActionEvent e)
+	{
+	  ((FtsSequenceObject)TrackMenu.this.sequenceModel).setOpenedAllTracks(true);
+	}
+      });
     add(item);
   }
     
   private void FillAddTrackMenu(JMenu menu)
   {
     for(Enumeration e = TrackEditorFactoryTable.getTypes(); e.hasMoreElements();)
-	menu.add(new AddTrackAction((ValueInfo)e.nextElement()));
+	menu.add( new AddTrackAction((ValueInfo)e.nextElement(), (FtsSequenceObject)sequenceModel));
   }
-
-
-  class AddTrackAction extends AbstractAction {
-    AddTrackAction(ValueInfo info)
-    {
-      super(info.getPublicName(), info.getIcon());      
-      this.info = info;
-    }
-    
-    public void actionPerformed(ActionEvent e)
-    {
-	((FtsSequenceObject)sequenceModel).requestTrackCreation(info.getName());
-    }
-	
-    ValueInfo info;    
-  }
-
   //---
   SequenceDataModel sequenceModel;
 }
+
+
+
+
 
 
 

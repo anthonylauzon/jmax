@@ -55,53 +55,53 @@ public class Actions
 
    public static class CopyAction extends EditorAction
    {
-	  public CopyAction()
-		 {
-			super("Copy", null, KeyEvent.VK_C, KeyEvent.VK_C, false);
-		 }
+     public CopyAction()
+     {
+       super("Copy", null, KeyEvent.VK_C, KeyEvent.VK_C, false);
+     }
 
-      public void doAction(EditorContainer container)
-      {
-	((SequenceEditor)container.getEditor()).copy();
-      }
+     public void doAction(EditorContainer container)
+     {
+       ((SequenceEditor)container.getEditor()).copy();
+     }
    }
-
+  
    public static class PasteAction extends EditorAction
    {
-	  public PasteAction()
-		 {
-			super("Paste", null, KeyEvent.VK_P, KeyEvent.VK_V, false);
-		 }
-      public void doAction(EditorContainer container)
-      {
-	((SequenceEditor)container.getEditor()).paste();
-      }
-
+     public PasteAction()
+     {
+       super("Paste", null, KeyEvent.VK_P, KeyEvent.VK_V, false);
+     }
+     public void doAction(EditorContainer container)
+     {
+       ((SequenceEditor)container.getEditor()).paste();
+     }
+     
    }
 
    public static class DuplicateAction extends EditorAction
    {
-	  public DuplicateAction()
-		 {
-			super("Duplicate", null, KeyEvent.VK_D, KeyEvent.VK_D, false);
-		 }
-      public void doAction(EditorContainer container)
-      {
-	((SequenceEditor)container.getEditor()).duplicate();
-      }
+     public DuplicateAction()
+     {
+       super("Duplicate", null, KeyEvent.VK_D, KeyEvent.VK_D, false);
+     }
+     public void doAction(EditorContainer container)
+     {
+       ((SequenceEditor)container.getEditor()).duplicate();
+     }
    }
 
-   public static class UndoAction extends EditorAction
-   {
-	  public UndoAction()
-		 {
-			super("Undo", null, KeyEvent.VK_U, KeyEvent.VK_Z, true);
-		 }
-      public void doAction(EditorContainer container)
-      {
-	((SequenceEditor)container.getEditor()).undo();
-      }
-   }
+  public static class UndoAction extends EditorAction
+  {
+    public UndoAction()
+    {
+      super("Undo", null, KeyEvent.VK_U, KeyEvent.VK_Z, true);
+    }
+    public void doAction(EditorContainer container)
+    {
+      ((SequenceEditor)container.getEditor()).undo();
+    }
+  }
 
    public static class RedoAction extends EditorAction
    {

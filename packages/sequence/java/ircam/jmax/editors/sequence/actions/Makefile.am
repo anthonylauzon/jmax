@@ -1,6 +1,7 @@
 packagedir=$(pkglibdir)/packages/sequence/java/classes/ircam/jmax/editors/sequence/actions
 package_JAVA = \
 Actions.java \
+AddTrackAction.java \
 ExportAction.java \
 ImportAction.java \
 LabelTypesAction.java \

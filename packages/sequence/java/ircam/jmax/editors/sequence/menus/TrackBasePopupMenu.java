@@ -109,6 +109,10 @@ public class TrackBasePopupMenu extends JPopupMenu
     
 	add(moveMenu);
 
+	addSeparator();
+
+	addAddTrackMenu();
+
 	removeItem = new JMenuItem("Remove Track");
 	removeItem.addActionListener(new ActionListener(){
 	    public void actionPerformed(ActionEvent e)
@@ -133,6 +137,15 @@ public class TrackBasePopupMenu extends JPopupMenu
     moveToAction = new MoveTrackToAction(target);
 
     pack();
+  }
+
+  void addAddTrackMenu()
+  {
+    JMenu menu = new JMenu("Add Track");
+    FtsSequenceObject seq = (FtsSequenceObject)target.getGraphicContext().getFtsObject();
+    for(Enumeration e = TrackEditorFactoryTable.getTypes(); e.hasMoreElements();)
+      menu.add( new AddTrackAction((ValueInfo)e.nextElement(), seq));
+    add(menu);
   }
 
   boolean addRangeMenu()
