@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib data.lib utils.lib /nologo /dll /machine:I386 /nodefaultlib:"LIBCMT" /libpath:"..\..\data\c" /libpath:"..\..\utils\c" /libpath:"..\..\..\fts\lib" /libpath:"..\..\..\packages\utils\c" /libpath:"..\..\..\packages\data\c"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib data.lib utils.lib /nologo /dll /machine:I386 /libpath:"..\..\data\c" /libpath:"..\..\utils\c" /libpath:"..\..\..\fts\lib" /libpath:"..\..\..\packages\utils\c" /libpath:"..\..\..\packages\data\c"
 
 !ELSEIF  "$(CFG)" == "ispw - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib data.lib utils.lib /nologo /dll /debug /machine:I386 /nodefaultlib:"LIBCMT" /pdbtype:sept /libpath:"..\..\data\c\\" /libpath:"..\..\utils\c\\" /libpath:"..\..\..\fts\lib" /libpath:"..\..\..\packages\utils\c" /libpath:"..\..\..\packages\data\c"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib fts.lib data.lib utils.lib /nologo /dll /debug /machine:I386 /pdbtype:sept /libpath:"..\..\data\c\\" /libpath:"..\..\utils\c\\" /libpath:"..\..\..\fts\lib" /libpath:"..\..\..\packages\utils\c" /libpath:"..\..\..\packages\data\c"
 
 !ENDIF 
 
