@@ -5,6 +5,8 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
+import ircam.jmax.editors.patcher.objects.*;
+
 /**
  * This class implement the listener for the patcher data.
  * It is an adapter that call the proper function in 

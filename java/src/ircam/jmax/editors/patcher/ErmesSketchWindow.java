@@ -48,8 +48,9 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private MaxVector ftsConnectionsPasted = new MaxVector();
 
   public ErmesSketchPad itsSketchPad;
-  JScrollPane itsScrollerView;
+  JScrollPane  itsScrollerView;
   ErmesToolBar itsToolBar;
+  JLabel       itsMessageLabel;
   public FtsObject itsPatcher;
   public FtsPatcherData itsPatcherData;
 
@@ -152,9 +153,13 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     
     Fts.getSelection().clean();
 
-    setSize( new Dimension( 600, 300));
+    // setSize( new Dimension( 600, 300)); // ???
+
+    itsMessageLabel = new JLabel("   ");
+
     getContentPane().add( itsToolBar, BorderLayout.NORTH);
     getContentPane().add( itsScrollerView, BorderLayout.CENTER);
+    getContentPane().add( itsMessageLabel, BorderLayout.SOUTH);
 
     // Compute its Initial Size
 
@@ -689,7 +694,15 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
   }
 
+  public void showMessage(String text)
+  {
+    itsMessageLabel.setText(text);
+  }
 
+  public void resetMessage()
+  {
+    itsMessageLabel.setText("");
+  }
 }
 
 

@@ -23,13 +23,11 @@ class HResizeInteraction extends Interaction
     filter.setAutoScrolling(true);
   }
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    HResizeSensibilityArea area = (HResizeSensibilityArea) dobject;
-
     if (Squeack.isDown(squeack) && Squeack.onHResizeHandle(squeack))
       {
-	object = area.getObject();
+	object = (ErmesObject) area.getTarget();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.E_RESIZE_CURSOR));
       }
     else if (Squeack.isDrag(squeack))

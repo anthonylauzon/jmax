@@ -138,25 +138,19 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   }
 
 
-  final private int getLocationBits(DisplayObject object)
+  final private int getLocationBits(SensibilityArea area)
   {
-    if (object == null)
+    if (area == null)
       return Squeack.BACKGROUND;
-    else if (object instanceof ErmesObject)
-      return Squeack.OBJECT;
-    else if (object instanceof ErmesConnection)
-      return Squeack.CONNECTION;
-    else if (object instanceof SensibilityArea)
-      return ((SensibilityArea)object).getSqueackBits();
     else
-      return Squeack.UNKNOWN;
+      return area.getSqueack();
   }
 
 
   final private void processEvent(int squeack, MouseEvent e)
   {
     ErmesSketchPad editor = (ErmesSketchPad) e.getSource();
-    DisplayObject object = null;
+    SensibilityArea area = null;
 
     editor.cleanAnnotations();
 
@@ -166,15 +160,18 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
     if (followingLocations)
       {
-	object = displayList.getDisplayObjectAt(mouse.x, mouse.y);
+	area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
 
-	squeack |= getLocationBits(object);
+	squeack |= getLocationBits(area);
       }
 
     autoScrollIfNeeded(editor, squeack, mouse, oldMouse);
 
     if (! scrollTimer.isRunning())
-      sendSqueack(editor, squeack, object, mouse, oldMouse);
+      sendSqueack(editor, squeack, area, mouse, oldMouse);
+
+    if (area != null)
+      area.dispose();
   }
 
   // Scroll handling
@@ -307,7 +304,21 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     tos++;
     interactionStack[tos] = interaction;
   }
+
+  // Substitute the top of the stack with a new interaction 
   
+  final public void setInteraction(Interaction interaction)
+  {
+    setFollowingMoves(false);
+    setFollowingLocations(false);
+    setAutoScrolling(false);
+
+    interaction.configureInputFilter(this);
+    interaction.reset();
+
+    interactionStack[tos] = interaction;
+  }
+
   final public Interaction getCurrentInteraction()
   {
     if (tos < 0)
@@ -323,6 +334,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     interactionStack[tos].reset();
   }
 
+
   // Reset the stack and set a top level interaction
 
   final public void setTopInteraction(Interaction interaction)
@@ -333,16 +345,21 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
 
   // Send a squeack to an interaction, but giving the chance to push an interaction before
 
-  final void sendSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  final void sendSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     Interaction delegate;
 
-    delegate = getCurrentInteraction().delegateSqueack(editor, squeack, dobject, mouse, oldMouse);
+    if (area == null)
+      editor.showMessage("Squeack: " + Squeack.describe(squeack) + " point " + mouse);
+    else
+      editor.showMessage("Squeack: " + Squeack.describe(squeack) + " point " + mouse + " area " + area);
+
+    delegate = getCurrentInteraction().delegateSqueack(editor, squeack, area, mouse, oldMouse);
 
     if (delegate != null)
       pushInteraction(delegate);
 
-    getCurrentInteraction().gotSqueack(editor, squeack, dobject, mouse, oldMouse);
+    getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
   }
   
   // Methods following the mouse

@@ -21,7 +21,7 @@ class AddModeInteraction extends Interaction
     filter.setFollowingMoves(true);
   }
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     switch (squeack)
       {

@@ -17,7 +17,7 @@ class HelpInteraction extends Interaction
 {
   boolean locked = false;
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     ErmesObject object = null;
 
@@ -33,10 +33,7 @@ class HelpInteraction extends Interaction
       {
 	locked = true;
 
-	if (Squeack.onObject(squeack))
-	  object = (ErmesObject) dobject;
-	else if (Squeack.onText(squeack))
-	  object = ((TextSensibilityArea) dobject).getObject();
+	object = (ErmesObject) area.getTarget();
 
 	if (object != null)
 	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))

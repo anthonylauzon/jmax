@@ -17,15 +17,14 @@ class PopUpInteraction extends Interaction
 {
   boolean locked = false;
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     ErmesObject object = null;
 
     if ((! locked) && Squeack.isPopUp(squeack))
       {
 	locked = true;
-	object = ((SensibilityArea) dobject).getObject();
-
+	object = (ErmesObject) area.getTarget();
 	object.popUpEdit(mouse);
 	locked = false;
 	editor.endInteraction();

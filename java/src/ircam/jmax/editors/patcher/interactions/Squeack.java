@@ -132,6 +132,80 @@ public class Squeack
   {
     return (squeack & LOCATION_MASK) == TEXT;
   }
+
+  static public String describe(int squeack)
+  {
+    String action = "";
+    String mod ;
+    String location = "";
+    
+    switch (squeack & MOUSE_MASK)
+      {
+      case MOVE:
+	action = "Move";
+	break;
+      case DRAG:
+	action = "Drag";
+	break;
+      case DOWN:
+	action = "Down";
+	break;
+      case UP:
+	action = "Up";
+	break;
+      case DOUBLE_CLICK:
+	action = "DoubleClick";
+	break;
+      case POP_UP:
+	action = "PopUp";
+	break;
+      }
+
+    if (isShift(squeack))
+      mod = "Shift";
+    else
+      mod = "";
+
+    if (isCtrl(squeack))
+      mod = "Ctrl";
+    else
+      mod = "";
+
+    if (isAlt(squeack))
+      mod = "Alt";
+    else
+      mod = "";
+
+    switch (squeack & LOCATION_MASK)
+      {
+      case BACKGROUND:
+	location = "OnBackground";
+	break;
+      case OBJECT:
+	location = "OnObject";
+	break;
+      case CONNECTION:
+	location = "OnConnection";
+	break;
+      case INLET:
+	location = "OnInlet";
+	break;
+      case OUTLET:
+	location = "OnOutlet";
+	break;
+      case TEXT:
+	location = "OnText";
+	break;
+      case HRESIZE_HANDLE:
+	location = "OnHResize";
+	break;
+      case VRESIZE_HANDLE:
+	location = "OnVresize";
+	break;
+      }
+
+    return mod + action + location;
+  }
 }
 
 

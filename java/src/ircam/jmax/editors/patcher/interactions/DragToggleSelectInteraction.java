@@ -3,6 +3,7 @@ package ircam.jmax.editors.patcher.interactions;
 import java.awt.*;
 
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.objects.*;
 
 /** The interaction handling drag-select; 
   started by a click on the background;
@@ -27,7 +28,7 @@ class DragToggleSelectInteraction extends Interaction
     filter.setAutoScrolling(true);
   }
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack) && Squeack.isShift(squeack) && Squeack.onObject(squeack))
       {

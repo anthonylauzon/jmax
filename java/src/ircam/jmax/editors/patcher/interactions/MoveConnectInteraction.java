@@ -9,10 +9,9 @@ import ircam.jmax.editors.patcher.objects.*;
 /** Make a connection from an outlet to an inlet */
 
 
-class DragConnectInteraction extends Interaction
+class MoveConnectInteraction extends Interaction
 {
-  boolean dragged = false;
-  Point dragStart = new Point();
+  Point moveStart = new Point();
   ErmesObject src;
   int outlet;
   ErmesObject dst;
@@ -61,49 +60,41 @@ class DragConnectInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    if (Squeack.isDown(squeack) && Squeack.onOutlet(squeack))
+    if (Squeack.isUp(squeack) && Squeack.onOutlet(squeack))
       {
 	src    = (ErmesObject) area.getTarget();
 	outlet = area.getNumber();
 
-	dragStart.x = src.getOutletAnchorX(outlet);
-	dragStart.y = src.getOutletAnchorY(outlet);
+	moveStart.x = src.getOutletAnchorX(outlet);
+	moveStart.y = src.getOutletAnchorY(outlet);
 	editor.resetHighlightedOutlet();
-	dragged = false;
       }
-    else if (Squeack.isUp(squeack))
+    else if (Squeack.isDown(squeack) && Squeack.isShift(squeack))
       {
-	if (dragged )
+	if (destinationChoosen)
 	  {
-	    // Dragged: 
-	    //  do the connection if we have a destination
-
-	    if (destinationChoosen)
-	      {
-		editor.resetHighlightedInlet(); 
-		doConnection(editor, src, outlet, dst, inlet);
-	      }
-
-	    // clean up
-
-	    editor.getDisplayList().noDrag();
-	    editor.getDisplayList().redrawDragLine();
-	    destinationChoosen = false;
-
-	    editor.endInteraction();
-	  }
-	else
-	  {
-	    // Not dragged, start a move connection
-
-	    editor.getEngine().setInteraction(Interactions.moveConnectInteraction);
-	    editor.getEngine().getCurrentInteraction().gotSqueack(editor, squeack, area, mouse, oldMouse);
+	    editor.resetHighlightedInlet(); 
+	    doConnection(editor, src, outlet, dst, inlet);
 	  }
       }
-    else if (Squeack.isDrag(squeack) && Squeack.onInlet(squeack))
+    else if (Squeack.isDown(squeack))
       {
-	dragged = true;
+	if (destinationChoosen)
+	  {
+	    editor.resetHighlightedInlet(); 
+	    doConnection(editor, src, outlet, dst, inlet);
+	  }
 
+	// clean up
+
+	editor.getDisplayList().redrawDragLine();
+	editor.getDisplayList().noDrag();
+	destinationChoosen = false;
+
+	editor.endInteraction();
+      }
+    else if (Squeack.isMove(squeack) && Squeack.onInlet(squeack))
+      {
 	if ((! destinationChoosen) || dst != (ErmesObject) area.getTarget() || inlet != area.getNumber())
 	  {
 	    dst   = (ErmesObject) area.getTarget();
@@ -116,14 +107,12 @@ class DragConnectInteraction extends Interaction
 
 	editor.getDisplayList().dragLine();
 	editor.getDisplayList().redrawDragLine();
-	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y,
+	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y,
 					    dst.getInletAnchorX(inlet), dst.getInletAnchorY(inlet));
 	editor.getDisplayList().redrawDragLine();
       }
-    else if (Squeack.isDrag(squeack))
+    else if (Squeack.isMove(squeack))
       {
-	dragged = true;
-
 	if (destinationChoosen)
 	  {
 	    editor.resetHighlightedInlet();
@@ -132,7 +121,7 @@ class DragConnectInteraction extends Interaction
 
 	editor.getDisplayList().dragLine();
 	editor.getDisplayList().redrawDragLine();
-	editor.getDisplayList().setDragLine(dragStart.x, dragStart.y, mouse.x, mouse.y);
+	editor.getDisplayList().setDragLine(moveStart.x, moveStart.y, mouse.x, mouse.y);
 	editor.getDisplayList().redrawDragLine();
       }
   }

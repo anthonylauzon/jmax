@@ -22,11 +22,11 @@ class MoveEditInteraction extends Interaction
     filter.setAutoScrolling(true);
   }
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack) && Squeack.onText(squeack))
       {
-	object = ((SensibilityArea) dobject).getObject();
+	object = (ErmesObject) area.getTarget();
 	editor.getDisplayList().objectToFront(object);
 	dragged = false;
       }

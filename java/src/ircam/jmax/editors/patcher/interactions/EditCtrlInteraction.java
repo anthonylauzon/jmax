@@ -26,7 +26,7 @@ class EditCtrlInteraction extends Interaction
     filter.setFollowingMoves(true);
   }
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     // Take away the control modifier (always there)
 
@@ -36,7 +36,7 @@ class EditCtrlInteraction extends Interaction
     switch (squeack)
       {
       case Squeack.DOWN:
-	object = ((SensibilityArea) dobject).getObject();
+	object = (ErmesObject) area.getTarget();
 	object.gotSqueack(squeack, mouse, oldMouse);
 	break;
 

@@ -10,6 +10,7 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 
 // The base class of all the graphic objects on the sketch.
@@ -24,42 +25,53 @@ import ircam.jmax.editors.patcher.*;
 
 // A survivor...
 
-abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
-
-  static class ErmesObjInOutlet
+abstract public class ErmesObject implements DisplayObject
+{
+  static class ObjectGeometry
   {
     // All this parameters can be changed without changing the geometry
     // of the patch, i.e. the connection positions, unless stated otherwise
 
-    protected static final int WIDTH = 5;
-    protected static final int HEIGHT = 3;
-    protected static final int HIGHLIGHTED_HEIGHT = 6;
-    protected static final int HIGHLIGHTED_WIDTH = 6;
+    static final int INOUTLET_WIDTH = 5;
+    static final int INOUTLET_HEIGHT = 3;
+    static final int HIGHLIGHTED_INOUTLET_HEIGHT = 7;
+    static final int HIGHLIGHTED_INOUTLET_WIDTH = 6;
 
     // PAD is the distance between the object border and the 
     // center of the inlet/outlet; CHANGE the Connection geometry
 
-    protected static final int PAD = 4;
+    static final int INOUTLET_PAD = 4;
 
     // INLET_OVERLAP is the part of the inlet rectangle that
     // go inside the object
 
-    protected static final int INLET_OVERLAP = 2;
+    static final int INLET_OVERLAP = 2;
 
     // INLET_OFFSET is the vertical distance between the anchor point
     // and the object; CHANGE the Connection geometry
 
-    protected static final int INLET_OFFSET = 1;
+    static final int INLET_OFFSET = 1;
 
     // OUTLET_OVERLAP is the part of the inlet rectangle that
     // go inside the object
 
-    protected static final int OUTLET_OVERLAP = 2;
+    static final int OUTLET_OVERLAP = 2;
 
     // OUTLET_OFFSET is the vertical distance between the anchor point
     // and the object; CHANGE the Connection geometry
 
-    protected static final int OUTLET_OFFSET = 0;
+    static final int OUTLET_OFFSET = 0;
+
+    // Sensibility areas 
+
+    // Resize area 
+
+    static final int H_RESIZE_SENSIBLE_WIDTH = 4;
+    static final int V_RESIZE_SENSIBLE_HEIGHT = 5;
+
+    // Inlet and outlets
+
+    static final int INOUTLET_SENSIBLE_HEIGHT = 4;
   }
 
   protected ErmesSketchPad itsSketchPad;
@@ -73,13 +85,6 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   protected Font itsFont = null;
   protected FontMetrics itsFontMetrics = null;
-
-  // Sensibility areas
-
-  private static InletSensibilityArea inletArea = new InletSensibilityArea();
-  private static OutletSensibilityArea outletArea = new OutletSensibilityArea();
-  private static HResizeSensibilityArea hResizeArea = new HResizeSensibilityArea();
-
 
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
@@ -258,7 +263,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   public final int getOutletAnchorX(int outlet)
   {
-    return getX() + ErmesObjInOutlet.PAD + outlet * outletDistance;
+    return getX() + ObjectGeometry.INOUTLET_PAD + outlet * outletDistance;
   }
 
   public final int getOutletAnchorY(int outlet)
@@ -268,7 +273,7 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
   public int getInletAnchorX(int inlet)
   {
-    return getX() + ErmesObjInOutlet.PAD + inlet * inletDistance;
+    return getX() + ObjectGeometry.INOUTLET_PAD + inlet * inletDistance;
   }
 
   public int getInletAnchorY(int inlet)
@@ -289,16 +294,16 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
 	if (itsSketchPad.isHighlightedInlet(this, i))
 	  {
-	    w = ErmesObjInOutlet.HIGHLIGHTED_WIDTH;
-	    h = ErmesObjInOutlet.HIGHLIGHTED_HEIGHT;
+	    w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
+	    h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
 	  }
 	else
 	  {
-	    w = ErmesObjInOutlet.WIDTH;
-	    h = ErmesObjInOutlet.HEIGHT;
+	    w = ObjectGeometry.INOUTLET_WIDTH;
+	    h = ObjectGeometry.INOUTLET_HEIGHT;
 	  }
 	
-	g.fillRect( x - w / 2, y - h + ErmesObjInOutlet.INLET_OVERLAP + ErmesObjInOutlet.INLET_OFFSET, w, h);
+	g.fillRect( x - w / 2, y - h + ObjectGeometry.INLET_OVERLAP + ObjectGeometry.INLET_OFFSET, w, h);
       }
   }
 
@@ -315,16 +320,16 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 
 	if (itsSketchPad.isHighlightedOutlet(this, i))
 	  {
-	    w = ErmesObjInOutlet.HIGHLIGHTED_WIDTH;
-	    h = ErmesObjInOutlet.HIGHLIGHTED_HEIGHT;
+	    w = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH;
+	    h = ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT;
 	  }
 	else
 	  {
-	    w = ErmesObjInOutlet.WIDTH;
-	    h = ErmesObjInOutlet.HEIGHT;
+	    w = ObjectGeometry.INOUTLET_WIDTH;
+	    h = ObjectGeometry.INOUTLET_HEIGHT;
 	  }
 	
-	g.fillRect( x - w / 2, y - ErmesObjInOutlet.OUTLET_OVERLAP - ErmesObjInOutlet.OUTLET_OFFSET, w, h);
+	g.fillRect( x - w / 2, y - ObjectGeometry.OUTLET_OVERLAP - ObjectGeometry.OUTLET_OFFSET, w, h);
       }
   }
 
@@ -347,12 +352,12 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   public void redraw()
   {
     itsSketchPad.repaint(ftsObject.getX(),
-			 ftsObject.getY() - ErmesObjInOutlet.HIGHLIGHTED_HEIGHT +
-			 ErmesObjInOutlet.INLET_OFFSET + ErmesObjInOutlet.INLET_OVERLAP,
+			 ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+			 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
 			 ftsObject.getWidth(),
-			 ftsObject.getHeight() + 2 * ErmesObjInOutlet.HIGHLIGHTED_HEIGHT  -
-			 ErmesObjInOutlet.INLET_OFFSET - ErmesObjInOutlet.INLET_OVERLAP -
-			 ErmesObjInOutlet.OUTLET_OFFSET - ErmesObjInOutlet.OUTLET_OVERLAP);
+			 ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+			 ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
 
     itsSketchPad.getDisplayList().redrawConnectionsFor(this); // experimental
   }
@@ -365,14 +370,10 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   private void updateInOutlets()
   {
     if (ftsObject.getNumberOfInlets() > 1)
-      inletDistance = (getWidth() - 2 * ErmesObjInOutlet.PAD) / (ftsObject.getNumberOfInlets() - 1);
-    else
-      inletDistance = 0; // not used in this case
-
+      inletDistance = (getWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfInlets() - 1);
+    
     if (ftsObject.getNumberOfOutlets() > 1)
-      outletDistance = (getWidth() - 2 * ErmesObjInOutlet.PAD) / (ftsObject.getNumberOfOutlets() - 1);
-    else
-      outletDistance = 0; // not used in this case
+      outletDistance = (getWidth() - 2 * ObjectGeometry.INOUTLET_PAD) / (ftsObject.getNumberOfOutlets() - 1);
   }
 
   // redefine provide a default empty implementation
@@ -402,99 +403,156 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   {
     return itsSketchPad;
   }
+  
+  // Utility functions for getSensibilityAreaAt
 
-  // This is a try to handle the "bug 20" problem.
-  // To re-establish the old situation, just comment this method and
-  // erase "_old" from the next method.
-
-  private int findNearestInOutlet( int mouseX, int n)
+  private SensibilityArea makeInletArea(int mouseY, int n, int xcost)
   {
-    // (em) consider the sensibility areas as centered in the
-    // inoutlet's graphic appereance,  slice = distance/3, hole = slice, sensibility_width = 2*slice 
-    if ( n ==0) return -1;
-    if ( n == 1) return 0;
+    final int inletsAnchorY  = getY() - 1;
+    SensibilityArea area = SensibilityArea.get(this, Squeack.INLET);
 
-    int io = -1;
-
-    int firstLetPosition =  ErmesObjInOutlet.PAD  - ErmesObjInOutlet.WIDTH/2;;
-    int distance = (getWidth() - 2*ErmesObjInOutlet.PAD) / (n-1); 
-    int lastLetPosition = firstLetPosition + (n-1)*distance;
-    
-
-    int slice = distance / 3;
-
-    int x = mouseX-getX();
-
-    if ( x < firstLetPosition + slice)
-      io = 0;
-    else if ( x > lastLetPosition - slice)
-      io = n-1;
-    else 
+    if (mouseY < inletsAnchorY)
       {
-	int estimatedLet = (distance > 0)? (x-slice)/distance + 1 : 0;
-	int sensibilityStartX = firstLetPosition + estimatedLet*distance - slice;
-	
-	if (x > sensibilityStartX &&
-	    x < sensibilityStartX + 2*slice + ErmesObjInOutlet.WIDTH)
-	  io = estimatedLet;
-
+	area.setTransparent(true);
+	area.setCost(xcost + Math.abs(mouseY - inletsAnchorY));
       }
 
-    return io;
+    area.setNumber(n);
+
+    return area;
   }
 
-  public DisplayObject getDisplayObjectAt( int mouseX, int mouseY)
+  private SensibilityArea makeOutletArea(int mouseY, int n, int xcost)
   {
-    int x = ftsObject.getX();
-    int y = ftsObject.getY();
-    int w = ftsObject.getWidth();
-    int h = ftsObject.getHeight();
+    final int outletsAnchorY = getY() + getHeight();
+    SensibilityArea area = SensibilityArea.get(this, Squeack.OUTLET);
 
-    if (! ((mouseX >= x) && (mouseX <= x + w) &&
-	   (mouseY >= y) && (mouseY <= y + h)))
+    if (mouseY > outletsAnchorY)
+      {
+	area.setTransparent(true);
+	area.setCost(xcost + Math.abs(mouseY - outletsAnchorY));
+      }
+
+    area.setNumber(n);
+    return area;
+  }
+
+  public SensibilityArea getSensibilityAreaAt( int mouseX, int mouseY)
+  {
+    SensibilityArea area;
+    final int x = ftsObject.getX();
+    final int y = ftsObject.getY();
+    final int w = ftsObject.getWidth();
+    final int h = ftsObject.getHeight();
+    final int verticalInOutletSensibility = h / 4;
+    final int horizontalInletSensibility;
+    final int horizontalOutletSensibility;
+    final int inletsAnchorY  = getY() - 1;
+    final int outletsAnchorY = getY() + getHeight();
+    final int nInlets = ftsObject.getNumberOfInlets();
+    final int nOutlets = ftsObject.getNumberOfOutlets();
+
+    if (nInlets == 1)
+      horizontalInletSensibility  =  w / 2;
+    else
+      horizontalInletSensibility  = inletDistance / 2;
+
+    if (nOutlets == 1)
+      horizontalOutletSensibility  =  w / 2;
+    else
+      horizontalOutletSensibility  = outletDistance / 2;
+
+    // if the point is the vertical inlet zone,
+    // check if the point in an inlet sensibility area
+
+    if ((nInlets > 0) &&
+	(mouseY >= inletsAnchorY - verticalInOutletSensibility) &&
+	(mouseY <= inletsAnchorY + verticalInOutletSensibility))
+      {
+	int start = getInletAnchorX(0);
+	int d;
+
+	if ((nInlets == 1) || (mouseX < start))
+	  {
+	    d = Math.abs(mouseX - start);
+
+	    if (d < horizontalInletSensibility)
+	      return makeInletArea(mouseY, 0, d);
+	  }
+	else if (nInlets > 1)
+	  {
+	    int n = (mouseX - start) / inletDistance;
+	    d = (mouseX - start) % inletDistance;
+
+	    if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
+	      return makeInletArea(mouseY, n, d);
+	    else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
+	      return makeInletArea(mouseY, n + 1, inletDistance - d);
+	  }
+      }
+
+    // if we have outlets, and the point is the vertical outlet zone,
+    // check if the point in an outlet sensibility area
+
+    if ((nOutlets > 0) &&
+	(mouseY >= outletsAnchorY - verticalInOutletSensibility) &&
+	(mouseY <= outletsAnchorY + verticalInOutletSensibility))
+      {
+	int start = getOutletAnchorX(0);
+	int d = 0, n = 0;
+
+	if (nOutlets == 1)
+	  {
+	    n = 0;
+	    d = Math.abs(mouseX - start);
+	  }
+	else if (nOutlets > 1)
+	  {
+	    n = (mouseX - start) / outletDistance;
+	    d = Math.abs((mouseX - start) % outletDistance);
+	  }
+
+	if (n == 0)
+	  {
+	    if (d < horizontalOutletSensibility)
+	      return makeOutletArea(mouseY, 0, d);
+	  }
+	else if (n > 0)
+	  {
+	    if ((d < horizontalOutletSensibility) && (n >= 0) && (n < nOutlets))
+	      return makeOutletArea(mouseY, n, d);
+	    else if ((d > outletDistance - horizontalOutletSensibility) && (n >= 0) && (n < (nOutlets - 1)))
+	      return makeOutletArea(mouseY, n + 1, outletDistance - d);
+	  }
+      }
+
+    // Every other sensibility area is internal, so we check
+    // now if the point is inside the rectangle, and return null if outside
+
+    if ((mouseX < x) || (mouseX > (x + w)) ||
+	(mouseY < y) || (mouseY > (y + h)))
       return null;
 
-    if ( mouseX >= x + w - HResizeSensibilityArea.width 
-	 && mouseY > y + InletOutletSensibilityArea.height
-	 && mouseY < y + h - InletOutletSensibilityArea.height)
-      {
-	hResizeArea.setObject(this);
-	return hResizeArea;
-      }
-    else if ( mouseY < y + InletOutletSensibilityArea.height)
-      {
-	int inlet = findNearestInOutlet( mouseX, ftsObject.getNumberOfInlets());
+    // Check for horizantal resize area (assuming a point inside the rectangle)
 
-	if (inlet >= 0)
-	  {
-	    inletArea.setNumber( inlet);
-	    inletArea.setObject(this);
-	    return inletArea;
-	  }
-      }
-    else if (mouseY >= y + h - InletOutletSensibilityArea.height)
+    if ( mouseX >= x + w - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH 
+	 && mouseY > y + ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH
+	 && mouseY < y + h - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH)
       {
-	int outlet = findNearestInOutlet( mouseX, ftsObject.getNumberOfOutlets());
-
-	if ( outlet >= 0)
-	  {
-	    outletArea.setNumber( outlet);
-	    outletArea.setObject(this);
-	    return outletArea;
-	  }
+	return SensibilityArea.get(this, Squeack.HRESIZE_HANDLE);
       }
 
     // Try subclass specialized methods
 
-    DisplayObject dobject = findSensibilityArea(mouseX, mouseY);
+    area = findSensibilityArea(mouseX, mouseY);
 
-    if (dobject == null)
-      return this;
-    else
-      return dobject;
+    if (area == null)
+      area = SensibilityArea.get(this, Squeack.OBJECT);
+
+    return area;
   }
 
-  protected DisplayObject findSensibilityArea( int mouseX, int mouseY)
+  protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {
     return null;
   }
@@ -548,22 +606,22 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
   public void getBounds(Rectangle bounds) 
   {
     bounds.x = ftsObject.getX();
-    bounds.y = (ftsObject.getY() - ErmesObjInOutlet.HIGHLIGHTED_HEIGHT +
-		ErmesObjInOutlet.INLET_OFFSET + ErmesObjInOutlet.INLET_OVERLAP);
+    bounds.y = (ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+		ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP);
     bounds.width  = ftsObject.getWidth();
-    bounds.height = (ftsObject.getHeight() + 2 * ErmesObjInOutlet.HIGHLIGHTED_HEIGHT  -
-		     ErmesObjInOutlet.INLET_OFFSET - ErmesObjInOutlet.INLET_OVERLAP -
-		     ErmesObjInOutlet.OUTLET_OFFSET - ErmesObjInOutlet.OUTLET_OVERLAP);
+    bounds.height = (ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+		     ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+		     ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
   public final boolean intersects(Rectangle r)
   {
     return !((r.x + r.width <= ftsObject.getX()) ||
-	     (r.y + r.height <= (ftsObject.getY() - ErmesObjInOutlet.HIGHLIGHTED_HEIGHT +
-				 ErmesObjInOutlet.INLET_OFFSET + ErmesObjInOutlet.INLET_OVERLAP)) ||
+	     (r.y + r.height <= (ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP)) ||
 	     (r.x >= ftsObject.getX() + ftsObject.getWidth()) ||
-	     (r.y >= (ftsObject.getY() + ftsObject.getHeight() + ErmesObjInOutlet.HIGHLIGHTED_HEIGHT -
-		      ErmesObjInOutlet.OUTLET_OFFSET - ErmesObjInOutlet.OUTLET_OVERLAP)));
+	     (r.y >= (ftsObject.getY() + ftsObject.getHeight() + ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT -
+		      ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP)));
   }
 
 
@@ -628,6 +686,11 @@ abstract public class ErmesObject implements ErmesDrawable, DisplayObject {
 	    g.dispose();
 	  }
       }
+  }
+
+  public String toString()
+  {
+    return "ErmesObject<" + ftsObject.toString() + ">";
   }
 }
 

@@ -1,5 +1,7 @@
 SOURCES := $(SOURCES)\
+	$(INCLUDE_PATH)/DisplayObject.java    \
 	$(INCLUDE_PATH)/ErmesObject.java    \
+	$(INCLUDE_PATH)/ErmesConnection.java    \
 	$(INCLUDE_PATH)/ErmesObjBang.java    \
 	$(INCLUDE_PATH)/ErmesObjComment.java    \
 	$(INCLUDE_PATH)/ErmesObjEditableObject.java    \
@@ -15,11 +17,5 @@ SOURCES := $(SOURCES)\
 	$(INCLUDE_PATH)/ErmesObjSlider.java    \
 	$(INCLUDE_PATH)/ErmesObjSliderDialog.java    \
 	$(INCLUDE_PATH)/ErmesObjToggle.java    \
-	$(INCLUDE_PATH)/TextSensibilityArea.java \
-	$(INCLUDE_PATH)/InletSensibilityArea.java \
-	$(INCLUDE_PATH)/OutletSensibilityArea.java \
-	$(INCLUDE_PATH)/HResizeSensibilityArea.java \
-	$(INCLUDE_PATH)/InletOutletSensibilityArea.java \
-	$(INCLUDE_PATH)/ResizeSensibilityArea.java \
 	$(INCLUDE_PATH)/SensibilityArea.java \
-	$(INCLUDE_PATH)/VResizeSensibilityArea.java
+

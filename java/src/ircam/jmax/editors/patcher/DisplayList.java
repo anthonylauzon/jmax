@@ -12,7 +12,9 @@ import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
+
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 /** This class represent the display list of the patcher editor.
  *  It keep the data base of graphic objects, handle the paiting,
@@ -120,7 +122,7 @@ public class DisplayList
     displayObjects.addElement(connection);
   }
 
-  void remove( ErmesConnection connection)
+  public void remove(ErmesConnection connection)
   {
     displayObjects.removeElement( connection);
   }
@@ -237,8 +239,8 @@ public class DisplayList
 	  {
 	    ErmesConnection connection2 = (ErmesConnection) do2;
 
-	    return (object1.getLayer() > connection2.getSourceObject().getLayer() ||
-		    object1.getLayer() > connection2.getDestObject().getLayer());
+	    return (object1.getLayer() >= connection2.getSourceObject().getLayer() ||
+		    object1.getLayer() >= connection2.getDestObject().getLayer());
 	  }
 	else
 	  return false;
@@ -278,36 +280,44 @@ public class DisplayList
   //                                                                            //
   ////////////////////////////////////////////////////////////////////////////////
 
-  // Find an display object; for the moment quite an hack
 
-  public DisplayObject getDisplayObjectAt(int x, int y)
+  public SensibilityArea getSensibilityAreaAt(int x, int y)
   {
     Object values[] = displayObjects.getObjectArray();
     int size = displayObjects.size();
-
+    SensibilityArea candidateArea = null;
+      
     /* Look in the reverse order from outside to inside,
        to be consistent with the graphic look */
 
     for ( int i = (size - 1); i >= 0; i--)
       {
-	if (values[i] instanceof ErmesObject)
-	  {
-	    ErmesObject object = (ErmesObject) values[i];
-	    DisplayObject dobject = object.getDisplayObjectAt( x, y);
+	DisplayObject object = (DisplayObject) values[i];
+	SensibilityArea area = object.getSensibilityAreaAt( x, y);
 
-	    if (dobject != null)
-	      return dobject;
-	  }
-	else if (values[i] instanceof ErmesConnection)
+	if (area != null)
 	  {
-	    ErmesConnection  connection = (ErmesConnection) values[i];
-
-	    if (connection.isNear( x, y))
-	      return connection;
+	    if (area.isTransparent())
+	      {
+		if (candidateArea == null)
+		  candidateArea = area;
+		else
+		  {
+		    if (candidateArea.getCost() > area.getCost())
+		      {
+			candidateArea.dispose();
+			candidateArea = area;
+		      }
+		  }
+	      }
+	    else if (candidateArea == null)
+	      return area;
 	  }
       }
 
-    return null;
+    // If nothing returned until now, return the candidate area if any
+
+    return candidateArea;
   }
 
 
@@ -337,7 +347,7 @@ public class DisplayList
 
 	for ( int i = 0; i < size; i++)
 	  {
-	    ErmesDrawable object = (ErmesDrawable) values[i];
+	    DisplayObject object = (DisplayObject) values[i];
 
 	    if (object instanceof ErmesObjEditableObject)
 	      {
@@ -349,7 +359,7 @@ public class DisplayList
 
 	for ( int i = 0; i < size; i++)
 	  {
-	    ErmesDrawable object = (ErmesDrawable) values[i];
+	    DisplayObject object = (DisplayObject) values[i];
 
 	    if (object instanceof ErmesConnection)
 	      ((ErmesConnection)object).updateDimensions();
@@ -372,7 +382,7 @@ public class DisplayList
 
     for ( int i = 0; i < size; i++)
       {
-	ErmesDrawable object = (ErmesDrawable) values[i];
+	DisplayObject object = (DisplayObject) values[i];
 
 	if (object.intersects(clip))
 	  object.paint( g);

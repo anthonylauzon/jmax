@@ -15,7 +15,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class BackgroundPopUpInteraction extends Interaction
 {
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     //Warning: the order is important, because the AddPopUp
     // menu will indirectly invoke an other top level

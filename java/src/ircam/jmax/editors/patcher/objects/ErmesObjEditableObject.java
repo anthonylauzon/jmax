@@ -10,7 +10,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
-
+import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The base class of the ermes objects which are user-editable
@@ -174,9 +174,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   // Text Sensibility area 
 
-  private static SensibilityArea textArea = new TextSensibilityArea();
-
-  protected DisplayObject findSensibilityArea( int mouseX, int mouseY)
+  protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {
     int dx = mouseX - (getX() + getTextXOffset());
     int dy = mouseY - (getY() + getTextYOffset());
@@ -184,8 +182,7 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
     if ((dx >= 0) && (dx < getWidth() - getTextWidthOffset()) &&
 	(dy >= 0) && (dy < getHeight() - getTextHeightOffset()))
       {
-	textArea.setObject(this);
-	return 	textArea;
+	return SensibilityArea.get(this, Squeack.TEXT);
       }
     else
       return super.findSensibilityArea( mouseX, mouseY);

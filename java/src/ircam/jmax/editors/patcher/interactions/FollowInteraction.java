@@ -7,6 +7,7 @@ import ircam.jmax.dialogs.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 /** The interaction handling Moves cursor changes; 
   Note that each interaction should set its initial cursor.
@@ -20,7 +21,7 @@ class FollowInteraction extends Interaction
     filter.setFollowingMoves(true);
   }
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isMove(squeack))
       {
@@ -39,23 +40,17 @@ class FollowInteraction extends Interaction
 	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
 	else if (Squeack.onInlet(squeack))
 	  {
-	    InletSensibilityArea area = (InletSensibilityArea) dobject;
-
-	    if (! editor.isHighlightedInlet(area.getObject(), area.getNumber()))
+	    if (! editor.isHighlightedInlet((ErmesObject) area.getTarget(), area.getNumber()))
 	      {
-		editor.unlockHighlightedInlet();
-		editor.setHighlightedInlet(area.getObject(), area.getNumber());
+		editor.setHighlightedInlet((ErmesObject) area.getTarget(), area.getNumber());
 		editor.setCursor(Cursor.getDefaultCursor());
 	      }
 	  }
 	else if (Squeack.onOutlet(squeack))
 	  {
-	    OutletSensibilityArea area = (OutletSensibilityArea) dobject;
-
-	    if (! editor.isHighlightedOutlet(area.getObject(), area.getNumber()))
+	    if (! editor.isHighlightedOutlet((ErmesObject) area.getTarget(), area.getNumber()))
 	      {
-		editor.unlockHighlightedOutlet();
-		editor.setHighlightedOutlet(area.getObject(), area.getNumber());
+		editor.setHighlightedOutlet((ErmesObject) area.getTarget(), area.getNumber());
 		editor.setCursor(Cursor.getDefaultCursor());
 	      }
 	  }

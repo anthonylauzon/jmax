@@ -24,13 +24,11 @@ class VResizeInteraction extends Interaction
   }
 
 
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    VResizeSensibilityArea area = (VResizeSensibilityArea) dobject;
-
     if (Squeack.isDown(squeack) && Squeack.onVResizeHandle(squeack))
       {
-	object = area.getObject();
+	object = (ErmesObject) area.getTarget();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
       }
     else if (Squeack.isDrag(squeack))

@@ -27,18 +27,21 @@ public class Interactions
 
   public static Interaction dragSelectInteraction = new DragSelectInteraction();
   public static Interaction dragToggleSelectInteraction = new DragToggleSelectInteraction();
-  public static Interaction editCtrlInteraction    = new EditCtrlInteraction();
+   public static Interaction editCtrlInteraction    = new EditCtrlInteraction();
   public static Interaction hResizeInteraction     = new HResizeInteraction();
   public static Interaction vResizeInteraction     = new VResizeInteraction();
   public static Interaction moveEditInteraction    = new MoveEditInteraction();
   public static Interaction moveInteraction        = new MoveInteraction();
   public static Interaction dragConnectInteraction = new DragConnectInteraction();
   public static Interaction dragReverseConnectInteraction = new DragReverseConnectInteraction();
+  public static Interaction moveConnectInteraction = new MoveConnectInteraction();
+  public static Interaction moveReverseConnectInteraction = new MoveReverseConnectInteraction();
   public static Interaction followInteraction      = new FollowInteraction();
   public static Interaction connectionSelectInteraction       = new ConnectionSelectInteraction();
   public static Interaction connectionToggleSelectInteraction = new ConnectionToggleSelectInteraction();
   public static Interaction popUpInteraction = new PopUpInteraction();
   public static Interaction backgroundPopUpInteraction = new BackgroundPopUpInteraction();
 }
+
 
 

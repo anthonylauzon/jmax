@@ -21,7 +21,7 @@ class EditModeInteraction extends Interaction
     filter.setFollowingLocations(true);
   }
 
-  Interaction delegateSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  Interaction delegateSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isMove(squeack))
       {

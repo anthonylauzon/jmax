@@ -423,15 +423,12 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     itsThrottle.moveByAbsolute( theDeltaH, theDeltaV);
   }
 
-  private static VResizeSensibilityArea vResizeArea = new VResizeSensibilityArea();
-
-  protected DisplayObject findSensibilityArea( int mouseX, int mouseY)
+  protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
   {
-    if (mouseY >= getY() + getHeight() - VResizeSensibilityArea.height
-	 && mouseX >= getX() + getWidth() / 2)
+    if ((mouseY >= getY() + getHeight() - ObjectGeometry.V_RESIZE_SENSIBLE_HEIGHT)
+	&& (mouseX >= getX() + getWidth() / 2))
       {
-	vResizeArea.setObject(this);
-	return vResizeArea;
+	return SensibilityArea.get(this, Squeack.VRESIZE_HANDLE);
       }
     else
       return super.findSensibilityArea( mouseX, mouseY);

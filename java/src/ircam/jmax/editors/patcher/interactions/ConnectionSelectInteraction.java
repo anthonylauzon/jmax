@@ -14,11 +14,11 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class ConnectionSelectInteraction extends Interaction
 {
-  void gotSqueack(ErmesSketchPad editor, int squeack, DisplayObject dobject, Point mouse, Point oldMouse)
+  void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (squeack == (Squeack.DOWN | Squeack.CONNECTION))
 	{
-	  ErmesConnection connection = (ErmesConnection) dobject;
+	  ErmesConnection connection = (ErmesConnection) area.getTarget();
 
 	  ErmesSelection.patcherSelection.redraw();
 	  ErmesSelection.patcherSelection.deselectAll();

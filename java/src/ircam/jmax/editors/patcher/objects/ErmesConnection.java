@@ -1,4 +1,4 @@
-package ircam.jmax.editors.patcher;
+package ircam.jmax.editors.patcher.objects;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -7,8 +7,9 @@ import java.lang.Math;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.utils.*;
-import ircam.jmax.editors.patcher.objects.*;
 
+import ircam.jmax.editors.patcher.*;
+import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The graphic connection. It handles the paint, 
@@ -16,7 +17,7 @@ import ircam.jmax.editors.patcher.objects.*;
 // methods (mouseclick, move, doubleclick...).
 //
 
-public class ErmesConnection implements ErmesDrawable, DisplayObject
+public class ErmesConnection implements DisplayObject
 {
   private ErmesObject from;
   private int         outlet;
@@ -52,7 +53,6 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
     selected         = false;
   }
 
-
   public void updateDimensions()
   {
     start.x = from.getOutletAnchorX(outlet);
@@ -67,30 +67,30 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
   }
 
 
-  ErmesObject getSourceObject() 
+  public ErmesObject getSourceObject() 
   {
     return from;
   }
 
-  ErmesObject getDestObject() 
+  public ErmesObject getDestObject() 
   {
     return to;
   }
 
 
-  FtsConnection getFtsConnection()
+  public FtsConnection getFtsConnection()
   {
     return ftsConnection;
   }
 
-  ErmesSketchPad getSketchPad()
+  public ErmesSketchPad getSketchPad()
   {
     return sketch;
   }
 
   // Destructor
 
-  void delete()
+  public void delete()
   {
     ftsConnection.delete();
 
@@ -106,7 +106,7 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
   // select a connection
   //--------------------------------------------------------
 
-  final void setSelected(boolean v ) 
+  final public void setSelected(boolean v ) 
   {
     selected = v;
   }
@@ -116,7 +116,7 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
     return selected;
   }
 
-  boolean isNear( int x, int y)
+  private final boolean isNear( int x, int y)
   {
     // First, answer false for all the points outside a bounding rectangle for
     // the connection
@@ -149,6 +149,14 @@ public class ErmesConnection implements ErmesDrawable, DisplayObject
       return ((z/length) < 4.0);
     else
       return ((z/length) > -4.0);
+  }
+
+  public SensibilityArea getSensibilityAreaAt( int mouseX, int mouseY)
+  {
+    if (isNear(mouseX, mouseY))
+      return SensibilityArea.get(this, Squeack.CONNECTION);
+    else
+      return null;
   }
 
   public void paint( Graphics g) 
