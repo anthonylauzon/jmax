@@ -25,6 +25,9 @@
 #ifndef DTD_BUFFER_H_
 #define DTD_BUFFER_H_ 1
 
+
+#define DTD_COM_BUF_DEFAULT_SIZE 8192
+
 typedef struct
 {
     int size;

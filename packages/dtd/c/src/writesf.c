@@ -98,7 +98,7 @@ static void writesf_dsp( fts_word_t *argv)
       /* swap buffer index */
       self->buffer_index += 1;
       self->buffer_index %= 2;
-
+      /* reset write index */
       self->write_index = 0;
   }
 }
@@ -257,7 +257,7 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   for (i = 0; i < 2; ++i)
   {
       dtd_buffer_t* com_buffer = &self->com_buffer[i];
-      com_buffer->size = 4096;
+      com_buffer->size = DTD_COM_BUF_DEFAULT_SIZE;
       com_buffer->n_channels = n_channels;
       com_buffer->buffer = fts_malloc(n_channels * sizeof(float*));
       for (j = 0; j < n_channels; ++j)

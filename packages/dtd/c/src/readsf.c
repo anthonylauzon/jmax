@@ -27,8 +27,6 @@
 #include "dtd_buffer.h"
 #include "dtd_thread.h"
 
-
-
 /**************************************************
  *
  * readsf~
@@ -121,8 +119,9 @@ static void readsf_dsp( fts_word_t *argv)
   /* check if there is enough place in buffer for next run */
   if ((self->read_index + n_tick) > com_buffer->size)
   {
-      /* set full flag */
+      /* set empty flag */
       com_buffer->full = 0;
+      com_buffer->end_index = 0;
       /* swap index */
       self->buffer_index += 1;
       self->buffer_index %= 2;
@@ -297,7 +296,7 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   for (i = 0; i < 2; ++i)
   {
       dtd_buffer_t* com_buffer = &self->com_buffer[i];
-      com_buffer->size = 4096;
+      com_buffer->size = DTD_COM_BUF_DEFAULT_SIZE;
       com_buffer->n_channels = n_channels;
       com_buffer->buffer = fts_malloc(n_channels * sizeof(float*));
       for (j = 0; j < n_channels; ++j)

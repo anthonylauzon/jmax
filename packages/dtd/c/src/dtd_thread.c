@@ -82,6 +82,7 @@ dtd_thread_write(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 				   com_buffer->n_channels, 
 				   com_buffer->end_index);
 	com_buffer->full = 0;
+	com_buffer->end_index = 0;
     }
 
 }
