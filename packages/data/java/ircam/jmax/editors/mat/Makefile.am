@@ -5,6 +5,7 @@ FtsMatObject.java \
 MatDataListener.java \
 MatDataModel.java \
 MatPanel.java \
+MatRowIndex.java \
 MatTableModel.java \
 MatWindow.java
 

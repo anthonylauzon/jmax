@@ -44,13 +44,14 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   MatDataModel matData;
   EditorContainer itsContainer;
   MatTableModel tableModel;
-  DefaultTableCellRenderer rowsIdRenderer;
+  MatRowIndex rowIndex;
   
   transient JScrollPane scrollPane; 
   transient JTable table;
   public static final Color matGridColor = new Color(220, 220, 220);
   public static final Color rowsIdColor = new Color(245, 245, 245);
   public static final int COLUMN_MIN_WIDTH = 70;
+  public static final int ROW_HEIGHT = 17;
   
   public MatPanel(EditorContainer container, MatDataModel data) 
   {  
@@ -59,6 +60,8 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     matData = data;
     matData.addMatListener(this);
 
+    setBorder(BorderFactory.createEtchedBorder());
+    
     tableModel = new MatTableModel(matData);
     
     createTable();
@@ -82,19 +85,12 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
 		table.setGridColor( matGridColor);
 		table.setShowGrid(true);			
     table.setPreferredScrollableViewportSize(new Dimension( MatWindow.DEFAULT_WIDTH, MatWindow.DEFAULT_HEIGHT));
-    table.setRowHeight(17);
+    table.setRowHeight(ROW_HEIGHT);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
-    if( matData.haveRowIdCol())
-    {
-      table.getColumnModel().getColumn(0).setMinWidth(40);
-      table.getColumnModel().getColumn(0).setMaxWidth(40);
-    }
     table.getTableHeader().setReorderingAllowed(false);
     scrollPane = new JScrollPane(table);
     add(BorderLayout.CENTER, scrollPane);
     
-    rowsIdRenderer = new DefaultTableCellRenderer();
-    rowsIdRenderer.setBackground(rowsIdColor);
     table.addKeyListener(new KeyAdapter(){
       public void keyPressed(KeyEvent e)
       {
@@ -102,8 +98,25 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
           matData.requestAppendRow();
       }
     });
+    
+    if( matData.haveRowIdCol())
+    {
+      rowIndex = new MatRowIndex(matData, this);
+      rowIndex.setBorder(BorderFactory.createEtchedBorder());
+      
+      JPanel topCorner = new JPanel();
+      topCorner.setPreferredSize(new Dimension(38, MatPanel.ROW_HEIGHT));
+      topCorner.setMaximumSize(new Dimension(38, MatPanel.ROW_HEIGHT));
+      topCorner.setBorder(BorderFactory.createEtchedBorder());
+      
+      JPanel panel = new JPanel();
+      panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+      panel.add(topCorner);
+      panel.add(rowIndex);
+      
+      add(BorderLayout.WEST, /*rowIndex*/panel);
+    }    
   }
-  
   void updateTableModel()
   {
     tableModel = new MatTableModel(matData);
@@ -111,13 +124,6 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
     
     for (int i = 1; i < matData.getColumns(); i++) 
       table.getColumnModel().getColumn(i).setMinWidth(COLUMN_MIN_WIDTH);
-    
-    if( matData.haveRowIdCol())
-    {
-      table.getColumnModel().getColumn(0).setMinWidth(40);
-      table.getColumnModel().getColumn(0).setMaxWidth(40);
-      table.getColumnModel().getColumn(0).setCellRenderer(rowsIdRenderer);
-    }    
   }
   
   void updateTableToSize(int width)
