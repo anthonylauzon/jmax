@@ -1,3 +1,8 @@
+2002-12-27  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
+
+	* first modest doc revision for version 4
+	* added user doc for writing FTS classes (doc/classes.html)
+
 2002-12-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* Audio out works with jack.
