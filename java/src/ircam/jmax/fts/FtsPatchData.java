@@ -1,6 +1,9 @@
 package ircam.jmax.fts; 
 
 import java.io.*;
+
+import tcl.lang.*;
+
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
@@ -38,7 +41,6 @@ public class FtsPatchData extends MaxTclData
   {
     patcher = (FtsObject) content;
   }
-
 
   /** Save the content (a patcher) as TCL code */
 

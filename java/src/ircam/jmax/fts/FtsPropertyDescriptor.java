@@ -1,6 +1,7 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+
 import tcl.lang.*;
 
 /** Property descriptor.

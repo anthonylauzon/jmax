@@ -58,3 +58,12 @@ public abstract class  MaxTclData extends MaxData implements MaxTclInterpreter
   }
 }
 
+
+
+
+
+
+
+
+
+

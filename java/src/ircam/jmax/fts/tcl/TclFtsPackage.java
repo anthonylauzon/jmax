@@ -64,6 +64,10 @@ public class TclFtsPackage
 
     interp.createCommand("className", new FtsClassNameCmd());
 
+    // Getting an object by name
+
+    interp.createCommand("getObjectByName", new FtsGetObjectByNameCmd());
+
     // Access to object FTS properties
 
     interp.createCommand("setProperty", new FtsSetPropertyCmd());

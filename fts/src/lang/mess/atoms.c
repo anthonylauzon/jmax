@@ -47,3 +47,38 @@ fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
     }
 }
 
+
+int
+fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2)
+{
+  if (fts_same_types(a1, a2))
+    {
+      if (fts_is_void(a1))
+	return fts_is_void(a2);
+      else if (fts_is_symbol(a1))
+	return fts_get_symbol(a1) == fts_get_symbol(a2);
+      else if (fts_is_string(a1))
+	return ! strcmp(fts_get_string(a1), fts_get_string(a2));
+      else if (fts_is_ptr(a1))
+	return fts_get_ptr(a1) == fts_get_ptr(a2);
+      else if (fts_is_int(a1))
+	return fts_get_int(a1) == fts_get_int(a2);
+      else if (fts_is_long(a1))
+	return fts_get_long(a1) == fts_get_long(a2);
+      else if (fts_is_float(a1))
+	return fts_get_float(a1) == fts_get_float(a2);
+      else if (fts_is_object(a1))
+	return fts_get_object(a1) == fts_get_object(a2);
+      else if (fts_is_true(a1))
+	return fts_is_true(a2);
+      else if (fts_is_false(a1))
+	return fts_is_false(a2);
+      else
+	return 0;
+    }
+  else
+    return 0;
+}
+
+
+

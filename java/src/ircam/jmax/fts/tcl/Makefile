@@ -95,6 +95,10 @@ FtsVersionCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsVersionCmd.java)
 .PHONY: FtsVersionCmd
 
+FtsGetObjectByNameCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsGetObjectByNameCmd.java)
+.PHONY: FtsGetObjectByNameCmd
+
 TclFtsPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) TclFtsPackage.java)
 .PHONY: TclFtsPackage

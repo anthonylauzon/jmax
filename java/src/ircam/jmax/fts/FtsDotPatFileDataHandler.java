@@ -48,7 +48,7 @@ public class FtsDotPatFileDataHandler extends MaxFileDataHandler
 
   protected MaxData makeInstance(File file) throws MaxDataException
   {
-    FtsObject patcher;
+    FtsContainerObject patcher;
 
     try
       {

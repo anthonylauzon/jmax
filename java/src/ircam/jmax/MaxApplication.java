@@ -602,6 +602,16 @@ public class MaxApplication extends Object {
 	new ConnectionDialog(GetConsoleWindow());
 	MaxApplication.runHooks("start");
       }
+
+    // Finally, run forever the notifier loop of the 
+    // Tcl interpreter, so that the TCL event system work
+    // (and in particular, tcl built panels; thanks to the
+    // jacl doc, that make this absolutely unclear.
+
+    Notifier notifier = itsInterp.getNotifier();
+
+    while (true)
+      notifier.doOneEvent(TCL.ALL_EVENTS);
  }
 
   /** This private method build the tcl interpreter, 

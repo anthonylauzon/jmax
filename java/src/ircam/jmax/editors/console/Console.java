@@ -115,14 +115,15 @@ public class Console extends Panel{
 	  PutLine(result);
 	}
       } catch (TclException e) {
-	
-	if (e.compCode == TCL.OK) {
+
+	if (e.getCompletionCode() == TCL.RETURN) {
 	  PutLine(itsInterp.getResult().toString());
-	} else if (e.compCode == TCL.ERROR) {
+	}
+	else if (e.getCompletionCode() == TCL.ERROR) {
 	  PutLine(itsInterp.getResult().toString());
 	} else {
 	  PutLine("command returned bad code: " 
-+ e.compCode);
++ e.getCompletionCode());
 	}
       }
       itsSbuf.setLength(0);

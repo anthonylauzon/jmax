@@ -75,12 +75,12 @@ public class FtsPatcherObject extends FtsContainerObject
   {
     super(parent, "patcher", description);
 
-    String name;
+    String className;
     Vector args;
 
     args = new Vector();
     
-    name = FtsParse.parseObject(description, args);
+    className = FtsParse.parseObject(description, args);
 
     setObjectName((String) args.elementAt(0));
     setNumberOfInlets(((Integer) args.elementAt(1)).intValue());
@@ -88,7 +88,7 @@ public class FtsPatcherObject extends FtsContainerObject
     updateDescription();
 
     FtsServer.getServer().newPatcherObject(parent, this,
-						   name,
+						   getObjectName(),
 						   ninlets,
 						   noutlets);
     if (parent.isOpen())
@@ -135,11 +135,13 @@ public class FtsPatcherObject extends FtsContainerObject
   }
 
 
-  /** update the description */
+  /** update the description;
+    temporary code, waiting for the real thing (the green box)
+   */
 
   void updateDescription()
   {
-    description = objectName + " " + ninlets + " " + noutlets;
+    description = "patcher " + objectName + " " + ninlets + " " + noutlets;
   }
 
   /** Save the object to a TCL stream. 

@@ -92,4 +92,8 @@
 
 #define fts_same_types(ap1, ap2)    (((ap1)->type) == (ap2)->type)
 
+/* equality test between two atoms */
+
+extern int fts_atom_equal(fts_atom_t *a1, fts_atom_t *a2);
+
 #endif

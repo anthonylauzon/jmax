@@ -384,6 +384,54 @@ abstract public class FtsContainerObject extends FtsObject
 	  }
       }
   }
+
+
+  /*****************************************************************************/
+  /*                                                                           */
+  /*                    Object Naming                                          */
+  /*                                                                           */
+  /*****************************************************************************/
+
+  /** Get an object by name; a name is either a single name or a composed
+   *  name; a composed name is interpreted relatively to this container.
+   */
+
+
+  public FtsObject getObjectByName(String name)
+  {
+    if (name.indexOf('.') == -1)
+      return getObjectBySimpleName(name);
+    else
+      {
+	String rootName;
+	String tailName;
+	FtsObject obj;
+	
+	rootName = name.substring(0, name.indexOf('.'));
+	tailName = name.substring(name.indexOf('.') + 1);
+
+	obj = getObjectBySimpleName(rootName);
+
+	if (obj instanceof FtsContainerObject)
+	  return ((FtsContainerObject) obj).getObjectByName(tailName);
+	else
+	  return null;
+      }
+  }
+
+  final private FtsObject getObjectBySimpleName(String name)
+  {
+    for (int i = 0; i < objects.size(); i++)
+      {
+	FtsObject obj   =  (FtsObject) objects.elementAt(i);
+	String objName  =  (String) obj.get("name");
+
+	if ((objName != null) && (objName.equals(name)))
+	  return obj;
+      }
+
+    return null;
+  }
 }
 
 

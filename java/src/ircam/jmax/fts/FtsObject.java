@@ -116,6 +116,8 @@ abstract public class FtsObject implements MaxTclInterpreter
       return new FtsValueObject(parent, className, description);
     else if (className.equals("toggle"))
       return new FtsValueObject(parent, className, description);
+    else if (className.equals("param"))
+      return new FtsValueObject(parent, className, description);
     else if (FtsAbstractionTable.exists(className))
       return new FtsAbstractionObject(parent, className, description);
     else if (FtsTemplateTable.exists(className))
@@ -159,6 +161,37 @@ abstract public class FtsObject implements MaxTclInterpreter
     oldObject.delete();
 
     return newObject;
+  }
+
+
+  /** Static function to get an object by name; it get the 
+   *  object by searching it starting from the roots patchers;
+   *  the first object with the good name is returned.
+   */
+
+  public static FtsObject getObject(String name)
+  {
+    if (FtsServer.getServer() != null)
+      {
+	FtsContainerObject root = FtsServer.getServer().getRootObject();
+	Vector objects = root.getObjects();
+
+	for (int i = 0; i < objects.size(); i++)
+	  {
+	    FtsObject ret;
+	    FtsObject obj   =  (FtsObject) objects.elementAt(i);
+
+	    if (obj instanceof FtsContainerObject)
+	      {
+		ret = ((FtsContainerObject) obj).getObjectByName(name);
+
+		if (ret != null)
+		  return ret;
+	      }
+	  }
+      }
+
+    return null;
   }
 
   /******************************************************************************/
