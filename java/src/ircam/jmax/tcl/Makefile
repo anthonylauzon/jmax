@@ -60,6 +60,10 @@ MaxSplashCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxSplashCmd.java)
 .PHONY: MaxSplashCmd
 
+MaxGetMaxVersionCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxGetMaxVersionCmd.java)
+.PHONY: MaxGetMaxVersionCmd
+
 TclMaxPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclMaxPackage.java)
 .PHONY: TclMaxPackage

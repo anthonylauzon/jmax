@@ -8,5 +8,6 @@ SOURCES = MaxFtsConnectCmd.java\
 	  MaxSourceCmd.java      \
 	  MaxSysSourceCmd.java      \
 	  MaxSplashCmd.java    \
+	  MaxGetMaxVersionCmd.java \
 	  TclMaxPackage.java
 
