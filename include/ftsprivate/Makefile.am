@@ -18,9 +18,11 @@ loader.h \
 message.h \
 midi.h \
 object.h \
+outlet.h \
 package.h \
 parser.h \
 patcher.h \
+patcherobject.h \
 patfile.h \
 platform.h \
 property.h \
