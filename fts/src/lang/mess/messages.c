@@ -12,6 +12,7 @@
  * 
  */
 
+#include <ieeefp.h>
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/mess/messP.h"
@@ -321,6 +322,9 @@ fts_outlet_float(fts_object_t *o, int woutlet, float f)
 {
   fts_connection_t *conn;
   fts_atom_t atom;
+
+  if (isnanf( f))
+    fts_fpe_add_object( o);
 
   fts_set_float(&atom, f);
 

@@ -16,6 +16,8 @@
  * This code include support for fpe exceptions handling and reporting;
  */
 
+#include <stdio.h>
+
 #include "sys.h"
 #include "lang/mess.h"
 #include "lang/ftl.h"
@@ -25,22 +27,28 @@
 
 static fts_object_set_t *fpe_objects = 0;
 
+void fts_fpe_add_object( fts_object_t *object)
+{
+  if (fpe_objects)
+    {
+      fts_object_set_add( fpe_objects, object);
+    }
+}
+
+
 /* Current version ignore exception type and count */
 
-
-static void fpe_handler(int which)
+static void fpe_handler( int which)
 {
-  fts_object_t *obj = dsp_get_current_object();
+  fts_object_t *obj;
+
+  obj = dsp_get_current_object();
+
+  if (!obj)
+    obj = fts_get_current_object();
 
   if (obj)
-    fts_object_set_add(fpe_objects, obj);
-  else
-    {
-      obj = fts_get_current_object();
-
-      if (obj)
-	fts_object_set_add(fpe_objects, obj);
-    }
+    fts_fpe_add_object( obj);
 }
 
 void fts_fpe_empty_collection(void)
@@ -66,7 +74,5 @@ void fts_fpe_stop_collect(void)
   fts_reset_fpe_handler();
   fpe_objects = 0;
 }
-
-
 
 
