@@ -34,6 +34,13 @@
 */
 
 #include <fts/fts.h>
+
+#include <ftsconfig.h>
+
+#if HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #include "naming.h"
 #include "atomlist.h"
 
@@ -531,11 +538,13 @@ static fts_memorystream_t * message_get_memory_stream()
   return message_memory_stream;
 }
 
-static void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
+static void messbox_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
 {
   fts_memorystream_t *stream = message_get_memory_stream();
   int size = fts_atom_list_get_size( atom_list);
-  fts_atom_t a[ size];
+  fts_atom_t *a;
+
+  a = alloca( size * sizeof( fts_atom_t));
   fts_atom_list_get_atoms( atom_list, a);
   
   fts_memorystream_reset( stream);      
@@ -551,7 +560,7 @@ static void messbox_update(fts_object_t *o)
 {
   messbox_t *this = (messbox_t *) o;
 
-  fts_client_send_message_from_atom_list(o, fts_s_set, this->atom_list);
+  messbox_send_message_from_atom_list(o, fts_s_set, this->atom_list);
 }
 
 /************************************************************
