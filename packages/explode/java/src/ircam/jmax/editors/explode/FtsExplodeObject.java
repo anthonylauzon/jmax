@@ -27,7 +27,6 @@ package ircam.jmax.editors.explode;
 
 import ircam.jmax.MaxApplication;
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;

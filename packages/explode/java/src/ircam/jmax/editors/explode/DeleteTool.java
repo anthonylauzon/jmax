@@ -26,7 +26,6 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.utils.*;
 
 import java.util.*;
 import java.awt.Component;

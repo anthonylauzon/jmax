@@ -34,7 +34,6 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
-import ircam.jmax.utils.*;
 
 /** Implement the patcher editor File Menu */
 

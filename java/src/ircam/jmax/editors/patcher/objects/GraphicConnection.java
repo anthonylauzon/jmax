@@ -31,7 +31,6 @@ import java.util.*;
 import java.lang.Math;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;

@@ -30,7 +30,6 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.menus.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.utils.*;
 import java.awt.*;
 import java.beans.*;
 import java.awt.event.*;

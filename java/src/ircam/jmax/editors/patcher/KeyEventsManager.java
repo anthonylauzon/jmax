@@ -27,7 +27,6 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 
 public class KeyEventsManager implements KeyListener
 {

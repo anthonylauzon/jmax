@@ -24,7 +24,7 @@
 // 
 
 
-package ircam.jmax.utils;
+package ircam.jmax;
 
 import java.awt.*;
 import java.awt.event.*;

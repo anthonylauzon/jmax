@@ -30,7 +30,6 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
 import javax.swing.*;
 import javax.swing.filechooser.*; // tmp !!

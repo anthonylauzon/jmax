@@ -29,7 +29,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /** Object set class.
  *  

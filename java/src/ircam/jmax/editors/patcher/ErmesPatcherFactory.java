@@ -28,7 +28,6 @@ package ircam.jmax.editors.patcher;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 
 //
 // The factory of patcher editors...

@@ -30,7 +30,6 @@ import java.util.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 
 /**
  * Proxy of an FTS patcher.

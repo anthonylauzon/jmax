@@ -35,7 +35,6 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.actions.*;
 
 /** Implement the key handling for the sketchpad, using the registerKeyboardAction

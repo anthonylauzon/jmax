@@ -65,8 +65,40 @@ else
   AC_DEFINE_UNQUOTED(DEFAULT_ROOT, "${prefix}")
 fi
 
-dnl Absolute pathname of top-level directory
-ABS_TOP_SRCDIR=`pwd`
-AC_SUBST(ABS_TOP_SRCDIR)
+dnl Check for Java compiler
+dnl AC_PROG_JAVAC
+JAVAC=javac
+AC_SUBST(JAVAC)
 
-AC_OUTPUT(Makefile fts/Makefile fts/version.c java/src/ircam/jmax/MaxVersion.java)
+AC_OUTPUT(
+Makefile
+fts/Makefile
+fts/version.c
+java/src/ircam/jmax/MaxVersion.java
+java/src/Makefile
+java/src/ircam/Makefile
+java/src/ircam/jmax/Makefile
+java/src/ircam/jmax/dialogs/Makefile
+java/src/ircam/jmax/editors/Makefile
+java/src/ircam/jmax/editors/console/Makefile
+java/src/ircam/jmax/editors/console/actions/Makefile
+java/src/ircam/jmax/editors/console/menus/Makefile
+java/src/ircam/jmax/editors/patcher/Makefile
+java/src/ircam/jmax/editors/patcher/actions/Makefile
+java/src/ircam/jmax/editors/patcher/interactions/Makefile
+java/src/ircam/jmax/editors/patcher/menus/Makefile
+java/src/ircam/jmax/editors/patcher/objects/Makefile
+java/src/ircam/jmax/fts/Makefile
+java/src/ircam/jmax/mda/Makefile
+java/src/ircam/jmax/script/Makefile
+java/src/ircam/jmax/script/pkg/Makefile
+java/src/ircam/jmax/script/scm/Makefile
+java/src/ircam/jmax/script/scm/kawa/Makefile
+java/src/ircam/jmax/script/scm/silk/Makefile
+java/src/ircam/jmax/script/tcl/Makefile
+java/src/ircam/jmax/toolkit/Makefile
+java/src/ircam/jmax/toolkit/actions/Makefile
+java/src/ircam/jmax/toolkit/menus/Makefile
+java/src/ircam/jmax/widgets/Makefile
+java/src/silk/Makefile
+)

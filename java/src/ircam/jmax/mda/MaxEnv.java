@@ -29,7 +29,6 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.script.*;
 

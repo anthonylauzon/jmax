@@ -36,7 +36,6 @@ import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.script.*;
 import ircam.jmax.script.pkg.*;
@@ -251,7 +250,7 @@ public class MaxApplication extends Object
 
     itsHookTable = new MaxWhenHookTable(); 
 
-    ircam.jmax.utils.Platform.setValues();
+    ircam.jmax.Platform.setValues();
 
     // Create the package handler
 

@@ -37,7 +37,6 @@ import javax.swing.filechooser.*; // tmp !!
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 /**
  * 
  * A File Dialog that provide the concept

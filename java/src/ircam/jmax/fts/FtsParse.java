@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.text.*;
 
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /** Lexical analyzer/unparser.
  * This class implement a lexical analizer for object and message box

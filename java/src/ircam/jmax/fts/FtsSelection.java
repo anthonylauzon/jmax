@@ -29,7 +29,6 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 
 /**
  * Implement the selection.

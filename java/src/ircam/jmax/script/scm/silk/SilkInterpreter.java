@@ -31,7 +31,6 @@ import ircam.jmax.script.*;
 import ircam.jmax.script.scm.*;
 import ircam.jmax.script.pkg.*;
 import java.awt.event.*;
-import ircam.jmax.utils.Platform;
 import java.io.*;
 import silk.*;
 

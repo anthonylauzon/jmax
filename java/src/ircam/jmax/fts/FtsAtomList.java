@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.io.*;
 import java.util.*;
 
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /** 
  * The Java Implementation for the atom list remote data class.

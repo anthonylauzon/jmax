@@ -29,7 +29,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import ircam.jmax.utils.*;
 
 /* Not static any ore */
 

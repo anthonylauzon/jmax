@@ -29,7 +29,6 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.datatransfer.*;
 import ircam.jmax.toolkit.*;
-import ircam.jmax.utils.*;
 
 /**
  * The Table selection. This class is implemented on the base of the

@@ -59,10 +59,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
-ABS_TOP_SRCDIR = @ABS_TOP_SRCDIR@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+JAVAC = @JAVAC@
 JMAX_VERSION = @JMAX_VERSION@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -73,13 +73,13 @@ PLATFORM = @PLATFORM@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-SUBDIRS = fts
+SUBDIRS = fts java
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ./include/ftsconfig-ac.h
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  README AUTHORS ChangeLog Makefile.am Makefile.in \
-acinclude.m4 aclocal.m4 config.guess config.sub configure configure.in \
+aclocal.m4 config.guess config.sub configure configure.in \
 include/ftsconfig-ac.h.in include/stamp-h.in install-sh ltconfig \
 ltmain.sh missing mkinstalldirs
 
@@ -97,7 +97,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4):  configure.in  acinclude.m4
+$(ACLOCAL_M4):  configure.in 
 	cd $(srcdir) && $(ACLOCAL)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)

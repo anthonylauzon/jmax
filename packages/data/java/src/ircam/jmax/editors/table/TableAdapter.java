@@ -26,7 +26,6 @@
 package ircam.jmax.editors.table;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.utils.*;
 import java.awt.*;
 
 /**

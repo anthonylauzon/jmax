@@ -33,7 +33,6 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 
 /**
  * Represent a running FTS server.

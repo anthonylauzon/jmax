@@ -39,7 +39,6 @@ import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
@@ -371,17 +370,17 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     defaultFontName = MaxApplication.getProperty("jmaxDefaultFont");
 
     if (defaultFontName == null)
-      defaultFontName = ircam.jmax.utils.Platform.FONT_NAME;
+      defaultFontName = ircam.jmax.Platform.FONT_NAME;
 
     s = MaxApplication.getProperty("jmaxDefaultFontSize");
     
     if (s == null)
-	defaultFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
+	defaultFontSize = ircam.jmax.Platform.FONT_SIZE;
     else
       defaultFontSize = Integer.parseInt(s);
 
 
-    defaultFontStyle = ircam.jmax.utils.Platform.FONT_STYLE;
+    defaultFontStyle = ircam.jmax.Platform.FONT_STYLE;
 
 
     // Install the display List object

@@ -30,7 +30,6 @@ import java.awt.event.*;
 import java.util.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.fts.*;
 
 

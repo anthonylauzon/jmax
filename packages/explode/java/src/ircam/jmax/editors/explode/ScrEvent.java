@@ -26,12 +26,11 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.utils.*;
 
 /**
  * The class representing a generic event in the score
  */
-public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject, Cloneable{
+public class ScrEvent extends AbstractUndoableObject implements /* TwoOrderObject,*/ Cloneable{
 
 
   /**
@@ -75,27 +74,27 @@ public class ScrEvent extends AbstractUndoableObject implements TwoOrderObject, 
     itsChannel = theChannel;
   }
 
-  // TwoOrderObject interface. It makes a ScrEvent suitable
-  // for the use in a TDTree (future implementation?) 
-  public boolean firstLessOrEqual(TwoOrderObject obj)
-  {
-    return getFirst()<=obj.getFirst();
-  }
+//    // TwoOrderObject interface. It makes a ScrEvent suitable
+//    // for the use in a TDTree (future implementation?) 
+//    public boolean firstLessOrEqual(TwoOrderObject obj)
+//    {
+//      return getFirst()<=obj.getFirst();
+//    }
 
-  public boolean secondLessOrEqual(TwoOrderObject obj)
-  {
-    return getSecond()<=obj.getSecond();
-  }
+//    public boolean secondLessOrEqual(TwoOrderObject obj)
+//    {
+//      return getSecond()<=obj.getSecond();
+//    }
  
-  public int getFirst()
-  {
-    return getTime();
-  }
+//    public int getFirst()
+//    {
+//      return getTime();
+//    }
   
-  public int getSecond()
-  {
-    return getTime()+getDuration();
-  }
+//    public int getSecond()
+//    {
+//      return getTime()+getDuration();
+//    }
   
 
   /**

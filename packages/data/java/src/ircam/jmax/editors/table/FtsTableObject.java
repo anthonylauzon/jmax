@@ -28,7 +28,6 @@ package ircam.jmax.editors.table;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;

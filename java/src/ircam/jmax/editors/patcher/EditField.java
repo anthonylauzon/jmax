@@ -29,7 +29,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.actions.*;
 
@@ -135,9 +134,9 @@ public class EditField extends JTextArea implements FocusListener
 
     sketch = editor;
 
-    setFont(FontCache.lookupFont(ircam.jmax.utils.Platform.FONT_NAME,
-				 ircam.jmax.utils.Platform.FONT_SIZE,
-				 ircam.jmax.utils.Platform.FONT_STYLE));
+    setFont(FontCache.lookupFont(ircam.jmax.Platform.FONT_NAME,
+				 ircam.jmax.Platform.FONT_SIZE,
+				 ircam.jmax.Platform.FONT_STYLE));
 
     Keymap myMap = JTextComponent.addKeymap(null, getKeymap());
 

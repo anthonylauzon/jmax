@@ -36,7 +36,6 @@ import ircam.jmax.editors.patcher.actions.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.menus.*;
-import ircam.jmax.utils.*;
 
 /** Implement the patcher editor File Menu */
 

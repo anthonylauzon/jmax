@@ -27,7 +27,6 @@ package ircam.jmax;
 
 import java.util.*;
 
-import ircam.jmax.utils.*;
 import ircam.jmax.*;
 import ircam.jmax.script.*;
 

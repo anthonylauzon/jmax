@@ -36,7 +36,6 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
-import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.actions.*;

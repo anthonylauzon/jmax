@@ -35,7 +35,6 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 
 import java.net.URL;
 import java.io.IOException;

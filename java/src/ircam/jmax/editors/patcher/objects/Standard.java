@@ -35,7 +35,6 @@ import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.editors.patcher.*;
-import ircam.jmax.utils.*;
 
 //
 // The generic "extern" object in ermes. (example: adc1~)

@@ -32,7 +32,6 @@ import java.util.*;
 import ircam.jmax.editors.patcher.*;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 
 //
 // The graphic inlet contained in subpatchers

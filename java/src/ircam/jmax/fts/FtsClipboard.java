@@ -30,7 +30,6 @@ import java.util.*;
 
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 
 /**
  * Implement an interface to the FTS clipboard.

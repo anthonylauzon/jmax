@@ -31,7 +31,6 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 
 public class FtsForkObject extends FtsObject
 {

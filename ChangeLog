@@ -1,3 +1,7 @@
+2001-09-07  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* moved java/ compilation to automake/autoconf
+
 2001-07-24  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* changed messtab to a double (int/symbol) hashtable and

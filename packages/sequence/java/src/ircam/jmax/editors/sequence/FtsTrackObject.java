@@ -30,7 +30,6 @@ import ircam.jmax.editors.sequence.track.LockListener;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;

@@ -29,7 +29,7 @@ import java.io.*;
 import java.util.*;
 
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /**
  * Remote data class representing the content of a patcher.

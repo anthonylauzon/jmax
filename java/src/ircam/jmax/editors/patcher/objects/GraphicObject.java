@@ -35,7 +35,6 @@ import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
@@ -126,7 +125,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   private static boolean followingOutletLocations = false;
 
   static final int ERROR_MESSAGE_DISPLAY_PAD = ObjectGeometry.INOUTLET_PAD + ObjectGeometry.INOUTLET_WIDTH + 1;
-  private static Font errorFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.BOLD, ircam.jmax.utils.Platform.FONT_SIZE);
+  private static Font errorFont = new Font(ircam.jmax.Platform.FONT_NAME, Font.BOLD, ircam.jmax.Platform.FONT_SIZE);
 
   final public static void setFollowingInOutletLocations(boolean v)
   {

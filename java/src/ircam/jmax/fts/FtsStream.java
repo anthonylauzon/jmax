@@ -28,7 +28,7 @@ package ircam.jmax.fts;
 import java.util.*;
 import java.io.*;
 
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /**
  * This class provide some basic mechanism to handle 

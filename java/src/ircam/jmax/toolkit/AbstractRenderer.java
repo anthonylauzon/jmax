@@ -25,10 +25,11 @@
 
 package ircam.jmax.toolkit;
 
-import ircam.jmax.utils.*;
 
 import java.util.*;
 import java.awt.*;
+
+import ircam.jmax.*;
 
 /**
  * An handy base class implementing the RenderManager interface. It handles

@@ -30,7 +30,7 @@ import java.lang.*;
 import java.util.*;
 
 import ircam.jmax.mda.*;
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /**
  * Remote data generic class.

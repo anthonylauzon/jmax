@@ -26,7 +26,6 @@
 package ircam.jmax.editors.patcher;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 import javax.swing.*; 
 import java.awt.*; 
 import java.util.*;

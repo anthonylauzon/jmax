@@ -25,7 +25,7 @@
 
 package ircam.jmax.mda;
 
-import ircam.jmax.utils.*;
+import ircam.jmax.*;
 
 /** This class is an empty implementation of a MaxDataEditor that
  *  provide empty methods, apart from getData, but handle the editorReadylistener list.

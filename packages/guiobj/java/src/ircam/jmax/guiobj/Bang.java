@@ -35,7 +35,6 @@ import javax.swing.*;
 import java.beans.*;
 
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;

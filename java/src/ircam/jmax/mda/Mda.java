@@ -31,12 +31,13 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
+import ircam.jmax.*;
+
 // Tmp packages
 
 // import javax.swing.preview.*;
 // import javax.swing.preview.filechooser.*;
 
-import ircam.jmax.utils.*;
 
 /** 
  * Access to MDA wide global public services.

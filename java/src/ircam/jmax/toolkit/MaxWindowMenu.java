@@ -32,7 +32,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 
 public class MaxWindowMenu extends Menu implements WindowListener, ListDataListener 
 {

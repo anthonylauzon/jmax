@@ -30,7 +30,6 @@ import java.io.*;
 import javax.swing.*;
 
 import ircam.jmax.*;
-import ircam.jmax.utils.*;
 
 
 /**
