@@ -45,7 +45,7 @@ extern void fts_object_remove_patcher_data(fts_object_t *obj);
 
 /* object properties */
 extern void fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value);
-extern void fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+FTS_API void fts_object_get_prop(fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
 extern void fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property);
 
 /* support for redefinition */
