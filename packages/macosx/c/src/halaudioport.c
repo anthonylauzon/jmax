@@ -32,13 +32,37 @@ typedef struct {
   fts_audioport_t head;
   AudioDeviceID device;
   int samples_per_tick;
-  float *current_buffer;
+  float *input_buffer;
+  float *output_buffer;
   int xrun;
+  int halted;
 } halaudioport_t;
 
 
 static void halaudioport_input( fts_word_t *argv)
 {
+  halaudioport_t *this;
+  int n, channels, ch, i, j;
+
+  this = (halaudioport_t *)fts_word_get_pointer( argv+0);
+
+  if ( !this->output_buffer)
+    return;
+    
+  n = fts_word_get_int(argv + 1);
+  channels = fts_audioport_get_input_channels( (fts_audioport_t *)this);
+
+  for ( ch = 0; ch < channels; ch++)
+    {
+      float *out = (float *) fts_word_get_pointer( argv + 2 + ch);
+    
+      j = ch;
+      for ( i = 0; i < n; i++)
+	{
+	  out[i] = this->input_buffer[j];
+	  j += channels;
+	}
+    }
 }
 
 static void halaudioport_output( fts_word_t *argv)
@@ -48,7 +72,7 @@ static void halaudioport_output( fts_word_t *argv)
 
   this = (halaudioport_t *)fts_word_get_pointer( argv+0);
 
-  if ( !this->current_buffer)
+  if ( !this->output_buffer)
     return;
     
   n = fts_word_get_int(argv + 1);
@@ -61,7 +85,7 @@ static void halaudioport_output( fts_word_t *argv)
       j = ch;
       for ( i = 0; i < n; i++)
 	{
-	  this->current_buffer[j] = in[i];
+	  this->output_buffer[j] = in[i];
 	  j += channels;
 	}
     }
@@ -82,7 +106,8 @@ OSStatus halaudioport_ioproc( AudioDeviceID inDevice,
 
   for ( n = 0; n < samples_per_buffer; n += this->samples_per_tick)
     {
-      this->current_buffer = (float *)outOutputData->mBuffers[0].mData + n;
+      this->input_buffer = (float *)inInputData->mBuffers[0].mData + n;
+      this->output_buffer = (float *)outOutputData->mBuffers[0].mData + n;
       fts_sched_run_one_tick();
     }
 
@@ -104,6 +129,16 @@ static void halaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fd_set rfds;
   halaudioport_t *this = (halaudioport_t *)o;
   OSStatus err;
+
+  fts_sched_remove( o);
+
+  if (this->halted)
+    {
+      fts_log( "Halted twice !!!\n");
+      return;
+    }
+
+  this->halted = 1;
 
   err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
   if (err != noErr)
@@ -169,6 +204,8 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
     }
 
   channels = format.mChannelsPerFrame;
+  fts_audioport_set_input_channels( (fts_audioport_t *)this, channels);
+  fts_audioport_set_input_function( (fts_audioport_t *)this, halaudioport_input);
   fts_audioport_set_output_channels( (fts_audioport_t *)this, channels);
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
 
