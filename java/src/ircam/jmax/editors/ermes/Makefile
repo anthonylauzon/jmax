@@ -171,10 +171,6 @@ ErmesKeyAdapter:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesKeyAdapter.java)
 .PHONY: ErmesKeyAdapter
 
-ErmesClipboardProvider:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesClipboardProvider.java)
-.PHONY: ErmesClipboardProvider
-
 ErmesDrawable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesDrawable.java)
 .PHONY: ErmesDrawable

@@ -6,7 +6,6 @@ SSOURCES = \
 	  ErmesSwToolbar.java \
 	  ErmesSwToggleButton.java \
 	  ErmesPatcherFactory.java \
-	  ErmesClipboardProvider.java \
           ErmesObjBang.java \
           ErmesObjComment.java \
           ErmesObjEditField.java \

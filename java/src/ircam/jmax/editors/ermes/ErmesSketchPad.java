@@ -103,13 +103,13 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
   public boolean copyPending = false;
 
   
-  public void updateGroupStart() {
-    //System.err.println("+");
+  public void updateGroupStart() 
+  {
     isInGroup = true;
   }
   
-  public void updateGroupEnd() {
-    //System.err.println("-");
+  public void updateGroupEnd() 
+  {
     isInGroup = false;
     if (drawPending) {
       DrawOffScreen(getGraphics());
@@ -123,17 +123,15 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
     theToolkit.sync();
   }
 
-  //end of ErmesDrawable
 
   public void Paint(Graphics g) {
     repaint();
   }
-  //end of ErmesDrawable
 
   ErmesSketchWindow itsSketchWindow;
 
-  private final static int SKETCH_WIDTH = 1200/*800*/;
-  private final static int SKETCH_HEIGHT = 1200/*800*/;
+  private final static int SKETCH_WIDTH = 1200;
+  private final static int SKETCH_HEIGHT = 1200;
   static Dimension preferredSize = new Dimension(SKETCH_WIDTH, SKETCH_HEIGHT);
 
   final static int DOING_NOTHING = 0;		
@@ -984,7 +982,7 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
   public void mousePressed(MouseEvent e)
   {
-    itsSketchWindow.requestFocus();//???
+    itsSketchWindow.requestFocus();
 
     int x = e.getX();
     int y = e.getY();
@@ -1033,6 +1031,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
 
 	deselectObjects( currentSelection.itsObjects, false);
 	deselectConnections( currentSelection.itsConnections, false);
+	ErmesSketchPad.currentSelection.removeAllElements();
+
 	if ( e.isShiftDown())
 	  {
 	    MultiConnect(itsCurrentInOutlet);
@@ -1099,7 +1099,8 @@ class ErmesSketchPad extends Panel implements AdjustmentListener,
       }
   }
        
-  private void prepareForDynamicConnect(ErmesObjInOutlet io) {
+  private void prepareForDynamicConnect(ErmesObjInOutlet io) 
+  {
     startConnectPoint.setLocation(io.GetAnchorPoint());
     currentConnectPoint.setLocation(startConnectPoint);
     previousConnectPoint.setLocation(startConnectPoint);
