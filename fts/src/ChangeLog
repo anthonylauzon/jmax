@@ -1,3 +1,7 @@
+2000-04-05  Norbert Schnell  <schnell@ircam.fr>
+
+	* runtime/files/midifile.[ch] Added midifile library based on the code by Tim Thompson
+
 2000-03-31  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* sys/modules.[ch]: removed the restart function (which has never been tested nor used).

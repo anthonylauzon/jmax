@@ -1,3 +1,7 @@
+2000-04-05  Norbert Schnell  <schnell@ircam.fr>
+
+	* added midifile reading to the sequence package
+
 2000-04-04  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Finished moving of syspackages/* to packages/*
