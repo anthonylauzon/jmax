@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
+#include <string.h> // strcmp
 #include <fts/client/ftsclient.h>
 
 #include "BinaryProtocolEncoder.h"
@@ -55,7 +56,7 @@ namespace client {
   {
     int index = _symbolCache->index( v);
 
-    if (_symbolCache->get(index) == v)
+    if (std::strcmp(_symbolCache->get(index),v) == 0)
       {
 	_outputBuffer->append( BinaryProtocol::SYMBOL_INDEX);
 	write( index);
