@@ -12,11 +12,11 @@
 #  
 
 ifeq ($(VENDOR),sgi)
-  ARCH_SOURCES = sgiaf.c
+  ARCH_SOURCES = af.c
 endif
 
 ifeq ($(VENDOR),gnu)
-  ARCH_SOURCES = sttools.c
+  ARCH_SOURCES = af.c
 endif
 
 ifeq ($(VENDOR),solaris2)

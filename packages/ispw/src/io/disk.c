@@ -38,7 +38,6 @@ static const char *get_readsf_path(fts_symbol_t filename)
 static const char *get_writesf_path(fts_symbol_t filename)
 {
   fts_file_get_write_path(fts_symbol_name(filename), buf);
-  
   return buf;
 }
 

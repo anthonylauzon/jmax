@@ -18,10 +18,6 @@
 #include "fts.h"
 
 
-#ifdef SGI
-#define HAVE_VIRTUAL_SAMPLE_FORMAT
-#endif
-
 /* Implementation of asynchronius io for sound files,
    based on pthreads */
 
@@ -50,7 +46,7 @@
    that can be used to destroy other shared resources used for the communication.
    */
 
-#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+#ifdef HAVE_AF_VIRTUAL_PARAMETERS
 typedef float fifo_sample_t;
 #else
 typedef short fifo_sample_t;
@@ -724,7 +720,7 @@ sgi_readsf_get(fts_word_t *argv)
 
 	  for (i = ch, j = 0; j < n; i = i + nchans, j++)
 	    {
-#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+#ifdef HAVE_AF_VIRTUAL_PARAMETERS
 	      out[j] = in[i];
 #else
 	      out[j] = ((float) in[i] / 32768.0f);
@@ -746,7 +742,7 @@ sgi_readsf_get(fts_word_t *argv)
 	    {
 	      if (i < ret)
 		{
-#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+#ifdef HAVE_AF_VIRTUAL_PARAMETERS
 		  out[j] = in[i];
 #else
 		  out[j] = ((float) in[i] / 32768.0f);
@@ -793,7 +789,7 @@ static void *fts_readsf_worker(void *data)
     {
       /* Note that on Linux the number of channels must match ! */
 
-#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+#ifdef HAVE_AF_VIRTUAL_PARAMETERS
       /* Set the number of virtual channels */
 
       afSetVirtualChannels(file, AF_DEFAULT_TRACK, dev_data->nch);
@@ -966,8 +962,6 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   dev_data->file_name = fts_get_symbol(&args[0]);
   dev_data->active = 0;
 
-  fprintf(stderr, "Want to Opened file %s\n", fts_symbol_name(dev_data->file_name));
-
   /* parse the other file parameters : channels and format.
      Note that while in theory the device should automatically get the number
      of channels of the file, since this device is used by the writesf and family
@@ -997,9 +991,6 @@ sgi_writesf_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
     }
 
   dev_data->format_descr = fts_soundfile_format_get_descriptor(format_name);
-
-  fprintf(stderr, "File format name %s id %d\n", fts_symbol_name(format_name), fts_get_int(dev_data->format_descr));
-
   dev_data->file_block = fts_get_int_by_name(nargs, args, fts_new_symbol("fileblock"), 16 * 1024);
   dev_data->fifo_size  = fts_get_int_by_name(nargs, args, fts_new_symbol("fifosize"),  64 * 1024);
 
@@ -1103,7 +1094,7 @@ sgi_writesf_put(fts_word_t *argv)
 
 		  in = (float *) fts_word_get_ptr(argv + 3 + ch);
 
-#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+#ifdef HAVE_AF_VIRTUAL_PARAMETERS
 		  for (i = ch, j = 0; j < n; i = i + nchans, j++)
 		    out[i] = in[j];
 #else
@@ -1128,9 +1119,6 @@ sgi_writesf_put(fts_word_t *argv)
    used to initialize the sample fifo.
 */
 
-
-static int mcount = 0;
-
 static void *fts_writesf_worker(void *data)
 {
   int i;
@@ -1151,26 +1139,22 @@ static void *fts_writesf_worker(void *data)
   afInitChannels(setup, AF_DEFAULT_TRACK, dev_data->nch);
 
   file = afOpenFile(fts_symbol_name(dev_data->file_name), "w", setup);
-  fprintf(stderr, "Opening file %s\n", fts_symbol_name(dev_data->file_name));
 
   afFreeFileSetup(setup);
 
   if (file == AF_NULL_FILEHANDLE)
     {
-      fprintf(stderr, "Null file handle ?\n");
       eof = 1;
       fts_sample_fifo_reader_eof(fifo);
     }
   else
     {
-#ifdef HAVE_VIRTUAL_SAMPLE_FORMAT
+#ifdef HAVE_AF_VIRTUAL_PARAMETERS
       /* Set the virtual format of the file */
 
       afSetVirtualSampleFormat(file, AF_DEFAULT_TRACK, AF_SAMPFMT_FLOAT, 32);
 #endif
     }
-
-  fprintf(stderr, "Opened file %lx\n", (unsigned int) file);
 
   /*  LOOP: on the out of band status --> read the file -> Write to the sample fifo */
 
@@ -1183,9 +1167,6 @@ static void *fts_writesf_worker(void *data)
 
       afWriteFrames(file, AF_DEFAULT_TRACK, p, ret / dev_data->nch);
 
-      if (mcount++ < 10)
-	fprintf(stderr, "Written a tick on %lx\n", (unsigned int) file);
-
       if (ret != dev_data->file_block)
 	eof = 1;
 
@@ -1197,10 +1178,7 @@ static void *fts_writesf_worker(void *data)
   fts_sample_fifo_reader_eof(fifo);
 
   if (file != AF_NULL_FILEHANDLE)
-    {
-      fprintf(stderr, "Closing file %lx\n", (unsigned int) file);
-      afCloseFile(file);
-    }
+    afCloseFile(file);
 
   return NULL;
 }

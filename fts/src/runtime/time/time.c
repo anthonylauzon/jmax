@@ -67,7 +67,7 @@ fts_time_init(void)
 
 
 
-static void fts_time_do_heaps()
+static void fts_time_do_heaps(void)
 {
   clocks_heap     = fts_heap_new(sizeof(fts_clock_t));
   callbacks_heap  = fts_heap_new(sizeof(struct clock_reset_callback));

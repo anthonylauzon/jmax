@@ -44,6 +44,7 @@
 
 #define FTS_ARCH_NAME "sgi"
 
+#define HAVE_AF_VIRTUAL_PARAMETERS
 #define HAS_DTD /* direct to disk support */
 #define HAS_UNIX
 #define HAS_PTHREADS
