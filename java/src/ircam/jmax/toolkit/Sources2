@@ -1,5 +1,7 @@
 SOURCES = \
-	$(INCLUDE_PATH)/AbstractSelection.java		\
+	$(INCLUDE_PATH)/AbstractSelection.java	\
+	$(INCLUDE_PATH)/AbstractLayer.java	\
+	$(INCLUDE_PATH)/AbstractRenderer.java	\
 	$(INCLUDE_PATH)/AbstractUndoableObject.java	\
 	$(INCLUDE_PATH)/DirectionChooser.java		\
 	$(INCLUDE_PATH)/DirectionListener.java		\

@@ -12,7 +12,7 @@ import java.awt.event.*;
  * from the semantic (selection of the objects in the rect).
  * This base class acts like a multiple adapter for the derived class.
  */
-public abstract class InteractionModule implements MouseListener, MouseMotionListener, KeyListener{
+public class InteractionModule implements MouseListener, MouseMotionListener, KeyListener{
 
 
   /**
@@ -71,7 +71,31 @@ public abstract class InteractionModule implements MouseListener, MouseMotionLis
   /**
    * set the starting point for this interaction module
    */
-  abstract public void interactionBeginAt(int x, int y);
+  public void interactionBeginAt(int x, int y) {}
+
+
+  /** temporarly suspend listening the events from the producer
+   * (does not change the current interaction module)
+   */
+  public static void suspend()
+  {
+    currentActiveModule.unBindFromProducer();
+    suspended = true;
+  }
+
+  /** is there a suspended module? */
+  public static boolean isSuspended()
+  {
+    return suspended;
+  }
+
+  /** resume the activitiy of the current Active module
+   */
+  public static void resume()
+  {
+    currentActiveModule.bindToProducer(currentActiveModule.gc.getGraphicSource());
+    suspended = false;
+  }
 
   //----------- Mouse interface ------------
   public void mouseClicked(MouseEvent e) {}
@@ -99,6 +123,7 @@ public abstract class InteractionModule implements MouseListener, MouseMotionLis
 
   //--------------- Fields
   static InteractionModule currentActiveModule = null;
+  static boolean suspended = false;
 
   protected GraphicContext gc;
 

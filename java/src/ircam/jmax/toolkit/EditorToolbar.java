@@ -18,11 +18,13 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
    * constructor. It inserts the tools provided by the given
    * ToolbarProvider
    */
-  public EditorToolbar(ToolbarProvider theProvider) 
+  public EditorToolbar(ToolbarProvider theProvider, int direction) 
   {
     super();
     setDoubleBuffered(false);
     
+    if (direction == VERTICAL)
+      setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     currentContext = theProvider.getGraphicContext();
 
     /** prepare the popup */
@@ -116,12 +118,14 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
    */ 
   public void addTool(Tool theTool) 
   {
-    JButton aButton = new JButton(theTool.getIcon());
+    JToggleButton aButton = new JToggleButton(theTool.getIcon());
     JMenuItem aMenuItem;
 
     aButton.setToolTipText(theTool.getName());
+    aButton.setMargin(new Insets(0,0,0,0));
 
     add(aButton);
+    itsButtonGroup.add(aButton);
 
     itsPopupMenu.add (aMenuItem = new JMenuItem (theTool.getIcon()));
     
@@ -202,6 +206,9 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
   Hashtable itsClients = new Hashtable();
   Vector listeners = new Vector();
 
+  private ButtonGroup itsButtonGroup = new ButtonGroup();
+  public static final int VERTICAL = 0;
+  public static final int HORIZONTAL = 1;
 }
 
 

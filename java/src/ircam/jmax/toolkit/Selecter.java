@@ -137,10 +137,10 @@ public class Selecter extends InteractionModule implements XORPainter {
   }
 
   //--- Fields
-  GraphicSelectionListener itsListener;
+  protected GraphicSelectionListener itsListener;
 
-  Point startSelection = new Point();
-  Point movingPoint = new Point();
+  protected Point startSelection = new Point();
+  protected Point movingPoint = new Point();
   XORHandler itsXORHandler;
 
   boolean active = false;
