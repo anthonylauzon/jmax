@@ -1,7 +1,7 @@
 EXTRA_DIST= \
 	fts.dsp \
 	fts.dsw \
-	fts/mak \
+	fts.mak \
 	ftsdll.dsp \
 	ftsdll.mak \
 	jmax.dsp \
