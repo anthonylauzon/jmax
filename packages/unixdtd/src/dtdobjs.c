@@ -213,8 +213,9 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   n_channels = fts_get_long_arg(ac, at, 1, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  /* Create enough fifos so that there number_of_fifos is at least X*number_of_objects
-   * where X is something like 1.5
+  /* 
+   * Create enough fifos so that there is at least X*number_of_objects fifos
+   * so that, when you open a file, 
    */
 #define X 2.0
 
