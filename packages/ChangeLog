@@ -2,4 +2,7 @@
 
 	* Added this ChangeLog.
 	
+	* QList: starting to remove MaxFileChooser (which I think is useless).
+	
+
 
