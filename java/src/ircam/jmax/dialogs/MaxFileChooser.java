@@ -24,12 +24,17 @@ public class MaxFileChooser
 {
 
   static private JFileChooser fd;
+  static private boolean configured = false;
 
   static void makeFileChooser()
   {
     fd = new JFileChooser(MaxApplication.getProperty("user.dir"));
 
-    if (MaxApplication.getProperty("jmaxFastFileBox") == null)
+  }
+
+  private static void configure()
+  {
+    if (MaxApplication.getProperty("jmaxFastFileBox").equals("false"))
       {
 	fd.setFileFilter(Mda.getAllDocumentsFileFilter());
 
@@ -41,6 +46,8 @@ public class MaxFileChooser
 
 	fd.setFileView(Mda.getFileView());
       }
+
+    configured = true;
   }
 
   /** New Loading structure (beginning): global "Open" FileDialog that handle current directory */
@@ -53,6 +60,9 @@ public class MaxFileChooser
 
     if (fd == null)
       makeFileChooser();
+
+    if ( !configured)
+      configure();
 
     dir = fd.getCurrentDirectory();
     fd.setDialogTitle("Open"); 
@@ -78,6 +88,9 @@ public class MaxFileChooser
 
     if (fd == null)
       makeFileChooser();
+
+    if ( !configured)
+      configure();
 
     dir = fd.getCurrentDirectory();
     fd.setDialogTitle(title);
