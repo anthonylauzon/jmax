@@ -5,6 +5,8 @@ package_JAVA = \
 Actions.java \
 CoordinateWriter.java \
 FreeHandDrawer.java \
+FtsFvecObject.java \
+FtsIvecObject.java \
 FtsTableObject.java \
 LineDrawer.java \
 LineListener.java \

@@ -30,14 +30,14 @@
 typedef struct _ivec_
 {
   data_object_t o;
+
   int *values;
   int size;
   int alloc;
   int opened; /* non zero if editor open */
-  int vsize; /* visible points */
-  int vindex; /* first visible point */
-  float zoom; /* current zoom */
-  int pixsize; /* visible pixels size */
+  
+  fts_object_t *editor;
+
   struct _ivec_ *copy;
 } ivec_t;
 
@@ -54,6 +54,10 @@ DATA_API void ivec_set_size(ivec_t *vector, int size);
 #define ivec_get_element(v, i) ((v)->values[i])
 #define ivec_set_element(v, i, x) ((v)->values[i] = (x))
 
+#define ivec_set_editor_open(v) ((v)->opened = 1)
+#define ivec_set_editor_close(v) ((v)->opened = 0)
+#define ivec_editor_is_open(v) ((v)->opened)
+
 DATA_API void ivec_set_const(ivec_t *vector, int c);
 DATA_API void ivec_copy(ivec_t *org, ivec_t *copy);
 
@@ -65,3 +69,4 @@ DATA_API int ivec_get_min_value(ivec_t *vector);
 DATA_API int ivec_get_max_value(ivec_t *vector);
 
 #endif
+

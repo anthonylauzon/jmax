@@ -49,15 +49,15 @@ public class Tabler extends JFrame implements EditorContainer {
   private JMenu   itsWindowsMenu;
 
   /** Constructor */
-  public Tabler(FtsTableObject theData) {
+  public Tabler( FtsObjectWithEditor ftsObj, TableDataModel tm) {
     super();
 
     MaxWindowManager.getWindowManager().addWindow(this);
     
     // Make the title
-    makeTitle(theData);
+    makeTitle();
 
-    itsPanel = new TablePanel(this, theData);
+    itsPanel = new TablePanel( this, ftsObj, tm);
     
     // Build The Menus and Menu Bar
     makeMenuBar();
@@ -84,7 +84,7 @@ public class Tabler extends JFrame implements EditorContainer {
 	});    
   }
 
-  private final void makeTitle(FtsTableObject data)
+  private final void makeTitle()
   { 
       setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table"));
     

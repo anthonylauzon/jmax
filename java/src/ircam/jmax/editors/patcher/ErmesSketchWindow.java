@@ -56,7 +56,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   public ErmesSketchPad itsSketchPad;
   JScrollPane  itsScrollerView;
   ToolBar itsToolBar;
-  JLabel       itsMessageLabel;
+  JLabel itsMessageLabel;
   FtsPatcherObject itsPatcher;
 
   private FileMenu itsFileMenu;
@@ -108,7 +108,11 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   {
     return (! gotMessage);
   }
-  
+
+  public JLabel getMessageLabel()
+  {
+    return itsMessageLabel;
+  }
   /****************************************************************************/
   /*                                                                          */
   /*           CONSTRUCTOR                                                    */

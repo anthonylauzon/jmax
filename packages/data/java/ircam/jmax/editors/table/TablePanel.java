@@ -65,11 +65,14 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   TableDataModel tableData;
   TableDisplay itsCenterPanel;
   TableToolManager toolManager;
+  FtsObjectWithEditor ftsObj;
 
   /**
    * Constructor. */
-  public TablePanel(EditorContainer container, TableDataModel tm) {
+  public TablePanel(EditorContainer container, FtsObjectWithEditor ftsObj, TableDataModel tm) {
     super();
+
+    this.ftsObj = ftsObj;
     tableData = tm;
     itsEditorContainer = container;
 
@@ -164,8 +167,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     gc.setGraphicDestination(itsCenterPanel);
     gc.setCoordWriter(new CoordinateWriter(gc));
     gc.setToolManager( toolManager);
-    gc.setSelection(new TableSelection(tableData));
-    TableAdapter ta = new TableAdapter(tableData, gc);
+    gc.setSelection(new TableSelection( tableData));
+    TableAdapter ta = new TableAdapter( tableData, gc);
 
     ta.addXZoomListener(new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
@@ -497,7 +500,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
   public void close(boolean doCancel){
     ((Component)itsEditorContainer).setVisible(false);
-    getData().requestDestroyEditor();
+    ftsObj.requestDestroyEditor();
     MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
   public void save(){}

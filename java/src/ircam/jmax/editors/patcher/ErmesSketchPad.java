@@ -38,6 +38,9 @@ import java.awt.datatransfer.*;
 
 //import javax.swing.*; 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import ircam.jmax.*;
@@ -117,7 +120,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	}
     }    
     else
-      repaint(invalid); 
+      repaint(invalid);
   }
 
   // ------------------------------------------------

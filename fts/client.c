@@ -904,7 +904,7 @@ static void client_predefine_objects( client_t *this)
 #ifdef HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
   client_register_object( this, (fts_object_t *)fts_get_root_patcher(), FTS_CLIENT_ROOT_OBJECT_ID);
 #else
-  this->root_patcher = fts_object_create( patcher_class, fts_get_root_patcher(), 0, 0);
+  this->root_patcher = fts_object_create_in_patcher( patcher_class, fts_get_root_patcher(), 0, 0);
 
   if ( !this->root_patcher)
     {

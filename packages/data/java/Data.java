@@ -42,14 +42,21 @@ public class Data implements JMaxPackage {
 	  return new Standard( new FtsBpfObject( server, parent, objId, className, args, offset, length));
 	}
       }; 
-    JMaxObjectCreator tableCreator = new JMaxObjectCreator() {
+    JMaxObjectCreator ivecCreator = new JMaxObjectCreator() {
 	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
 	{
-	  return new Standard( new FtsTableObject( server, parent, objId, className, args, offset, length));
+	  return new Standard( new FtsIvecObject( server, parent, objId, className, args, offset, length));
+	}
+      }; 
+    JMaxObjectCreator fvecCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new Standard( new FtsFvecObject( server, parent, objId, className, args, offset, length));
 	}
       }; 
 
     JMaxClassMap.put( "bpf", bpfCreator, null, null, "bpf", this);
-    JMaxClassMap.put( "ivec", tableCreator, null, null, "ivec", this);
+    JMaxClassMap.put( "ivec", ivecCreator, null, null, "ivec", this);
+    JMaxClassMap.put( "fvec", fvecCreator, null, null, "fvec", this);
   }
 }

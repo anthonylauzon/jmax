@@ -626,6 +626,18 @@ public class FtsGraphicObject extends FtsObject {
 	  }
       }
   }
+
+  public void sendDoubleClick()
+  {
+    try{
+      send(FtsSymbol.get("double_click"));
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsGraphicObject: I/O Error sending double_click Message!");
+	e.printStackTrace(); 
+      }
+  }
   /********************************************************************************/
     
   protected transient Object listener;

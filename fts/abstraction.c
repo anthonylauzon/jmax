@@ -47,6 +47,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>
+#include <ftsprivate/object.h>
 #include <ftsprivate/patfile.h>
 #include <ftsprivate/package.h>
 
@@ -226,7 +227,7 @@ static fts_object_t *fts_make_abstraction(FILE *file, fts_patcher_t *patcher, in
   fts_object_t *obj;
   fts_patlex_t *in; 
 
-  obj = fts_object_create( patcher_class, patcher, 0, 0);
+  obj = fts_object_create_in_patcher( patcher_class, patcher, 0, 0);
 
   /* flag the patcher as abstraction */
 

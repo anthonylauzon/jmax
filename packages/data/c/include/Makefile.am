@@ -4,4 +4,7 @@ package_HEADERS= bpf.h \
 		 data.h \
 		 fmat.h \
 		 fvec.h \
-		 ivec.h
+		 ivec.h \
+		 tabeditor.h
+
+

@@ -1195,7 +1195,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
   // Assist code
   // Protected against repetitions of assist messages
 
-    //private static FtsAtom assistArgs[] = null;
+  //private static FtsAtom assistArgs[] = null;
 
   static transient FtsObject lastAssistedObject;
   static transient int lastPosition;

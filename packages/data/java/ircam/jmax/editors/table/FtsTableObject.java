@@ -39,86 +39,74 @@ import javax.swing.*;
  * A concrete implementation of the SequenceDataModel,
  * this class represents a model of a set of tracks.
  */
-public class FtsTableObject extends FtsObjectWithEditor implements TableDataModel
+public class FtsTableObject extends FtsUndoableObject implements TableDataModel
 {
   static
   {
-    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setSize"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("size"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
 	  ((FtsTableObject)obj).setSize(args.getInt( 0));
 	}
       });
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setVisibles"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).setVisibles( args.getLength(), args.getAtoms());
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendVisibles"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).appendVisibles(  args.getLength(), args.getAtoms());
-	  }
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setVisibles"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).setVisibles( args.getLength(), args.getAtoms());
+	}
       });
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("startEdit"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).startEdit();
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("endEdit"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).endEdit();
-	  }
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendVisibles"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).appendVisibles(  args.getLength(), args.getAtoms());
+	}
       });
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setPixels"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).setPixels( args.getLength(), args.getAtoms());
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendPixels"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).appendPixels( args.getLength(), args.getAtoms());
-	  }
-	});
-      FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("addPixels"), new FtsMessageHandler(){
-	  public void invoke( FtsObject obj, FtsArgs args)
-	  {
-	    ((FtsTableObject)obj).addPixels( args.getLength(), args.getAtoms());
-	  }
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("startEdit"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).startEdit();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("endEdit"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).endEdit();
+	}
+      });
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("setPixels"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).setPixels( args.getLength(), args.getAtoms());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("appendPixels"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).appendPixels( args.getLength(), args.getAtoms());
+	}
+      });
+    FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("addPixels"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsTableObject)obj).addPixels( args.getLength(), args.getAtoms());
+	}
       });
   }
 
   /**
    * constructor.
    */
-  public FtsTableObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
+  public FtsTableObject(FtsServer server, FtsObject parent, int id)
   {
-    super(server, parent, objId, classname, args, offset, length);
-    
+    super(server, parent, id);
+    vector = parent;
+
     listeners = new MaxVector();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from fts.
   //////////////////////////////////////////////////////////////////////////////////////
-  
-  public void openEditor(int argc, FtsAtom[] argv)
-  {
-    if(getEditorFrame() == null)
-      setEditorFrame( new Tabler(this));
-    
-    showEditor();
-  }
-  
-  public void destroyEditor()
-  {
-    disposeEditor();
-  }
 
   public void setSize(int newSize)
   {
@@ -590,6 +578,7 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
   private int size = 0;
+  private FtsObject vector;
 }
 
 

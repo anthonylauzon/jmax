@@ -14,6 +14,7 @@ ivec.c \
 mat.c \
 dict.c \
 row.c \
+tabeditor.c \
 value.c \
 vec.c \
 dumpfile.c
