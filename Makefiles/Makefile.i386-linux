@@ -20,8 +20,20 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-include $(DISTDIR)/Makefiles/Makefile.linux
+include $(JMAXDISTDIR)/Makefiles/Makefile.linux
 
+ARCH_PACKAGES=audpdev ossdev unixdtd
+
+# Special for ALSA.
+ifeq ($(ENABLE_ALSA),yes)
+ARCH_PACKAGES:= $(ARCH_PACKAGES) alsadev
+endif
+
+ifeq ($(ENABLE_ALSA0.6),yes)
+ARCH_PACKAGES:= $(ARCH_PACKAGES) alsa0.6dev
+endif
+
+# Compiling for a pentium (what about a i486 ? :-)))
+ARCH_OPT_CFLAGS := -O2 -mpentium -funroll-all-loops

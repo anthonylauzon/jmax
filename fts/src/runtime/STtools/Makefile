@@ -23,9 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
 
-ROOTDIR = ../../..
+JMAXDISTDIR = ../../../..
 
-include $(ROOTDIR)/Makefiles/Makefile.common
+include $(JMAXDISTDIR)/Makefiles/Makefile.common
 include Sources
 
 all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/libSTtools.a
@@ -35,7 +35,7 @@ $(LIBDIR)/libSTtools.a: $(OBJECTS)
 
 TOCLEAN = $(LIBDIR)/libSTtools.a
 
-include $(ROOTDIR)/Makefiles/Makefile.misc
+include $(JMAXDISTDIR)/Makefiles/Makefile.misc
 
 
 

@@ -23,20 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts
+JMAXDISTDIR = ../../../../fts
 PACKAGEROOT = ..
-
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
 PACKAGELIB=$(LIBDIR)/libmidishare.so
-
 MODULE_CFLAGS=-I/usr/include
 MORESOLIBS=-lMidiShare
 
-all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
-
-TOCLEAN = $(PACKAGELIB)
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
-
+include $(JMAXDISTDIR)/Makefiles/Makefile.package

@@ -22,8 +22,6 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-ROOTDIR = .
-
 all_c: all
 .PHONY: all_c
 

@@ -20,10 +20,24 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
-#
 
-ARCH_PACKAGES=audpdev sgidev unixdtd
+PLATFORM := sgi
+
+CC := cc
+LD := cc
+CC_ALL_FLAG := -all
+CC_NONE_FLAG := -none
+LDSO=ld
+LDSOFLAGS=-elf -shared -rdata_shared
+SOLIBS=-lc
+
+## This is to help Purify, that currently does not work with pthreads
+ifeq ($(ENABLE_PURIFY),yes)
+ARCH_CFLAGS := $(ARCH_CFLAGS) -DHELP_PURIFY
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe
+else
+FTS_SYS_LIBS = -laudio  -lmd -laudiofile -laudioutil -lmalloc  -lm -lfpe -lpthread
+endif
 
 INSTALL=install
 INSTALL_DATA=$(INSTALL) -m 644
@@ -37,4 +51,6 @@ doc_install_dir=$(prefix)/webdocs/jMax
 lib_install_dir=$(prefix)/lib/jmax
 include_install_dir=$(prefix)/include
 bin_install_dir=$(prefix)/bin
+
+ARCH_PACKAGES=audpdev sgidev unixdtd
 

@@ -22,8 +22,8 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-ROOTDIR = ../..
-include $(ROOTDIR)/Makefiles/Makefile.fts
+JMAXDISTDIR = ../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts
 
 DATE:= $(shell date | sed 's/\"//'g)
 HOST:= $(shell hostname)
@@ -35,12 +35,7 @@ bin:  $(BINDIR) $(FTS_BIN)
 
 TOCLEAN = $(FTS_BIN)
 
-# (fd) Because of automatic rules for .a, this no longer works
-# Maybe the Makefile organization is too complicated ? Why
-# making archives for each subdirectory (even with 1 file) ?...
-# removed include $(ROOTDIR)/Makefiles/Makefile.misc
-
-## Rule to make an fts executable; here to simplify makefiles.
+## Rule to make an fts executable
 ifeq ($(ARCH),macosx)
 $(FTS_BIN) : $(OBJECTS) $(FTS_LIBS) $(ARCH_LIBS) $(FTS_ARCH_LIBS)
 	rm -f $(FTS_BIN)

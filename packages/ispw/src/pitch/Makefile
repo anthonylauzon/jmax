@@ -23,19 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-#
-
-DISTDIR = ../../../../fts/
+JMAXDISTDIR = ../../../..
 PACKAGEROOT = ../..
-
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
 PACKAGELIB=$(LIBDIR)/libpitch.so
 
-all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
-
-TOCLEAN = $(PACKAGELIB)
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
-
+include $(JMAXDISTDIR)/Makefiles/Makefile.package

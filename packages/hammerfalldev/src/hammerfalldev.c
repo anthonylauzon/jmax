@@ -78,9 +78,6 @@ static char rme9652_dsp_adc[] = "/dev/rme9652/C0ad%d";
 static fts_hash_table_t *audio_desc_table;
 
 
-extern void fts_dsp_set_dac_slip_dev(fts_dev_t *dev);
-
-
 /***************************************************************************
  *                                                                         *
  *        The audio_desc_t a description of the devices used               *

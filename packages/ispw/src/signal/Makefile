@@ -23,17 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-DISTDIR = ../../../../fts/
+JMAXDISTDIR = ../../../../fts/
 PACKAGEROOT = ../..
-
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
 PACKAGELIB=$(LIBDIR)/libsignal.so
 
-all: $(LIBDIR) $(OBJDIR) $(PACKAGELIB)
-
-TOCLEAN = $(PACKAGELIB)
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
-
+include $(JMAXDISTDIR)/Makefiles/Makefile.package

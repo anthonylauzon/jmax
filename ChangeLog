@@ -1,3 +1,18 @@
+2000-12-20  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	*  operation "Mani Pulite" on Makefiles is going on:
+	  . all Makefiles for C part are now in jmax/Makefiles
+	  . all platform dependent definitions are in jmax/Makefiles/Makefile.$(ARCH)
+	  . you can do a 'make install' in the packages
+	  . the packages Makefiles are much simpler (4 lines)
+	  . the .so are build from the .o and not from the .a
+	
+
+2000-12-14  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* added packages/io/c/src/pipestream.c (a bytestream using a pipe). ***but*** it does 
+	not work.
+
 2000-12-13  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* changed VERSION to 2.5.0, in order to be able to patch freely version 2.4.16

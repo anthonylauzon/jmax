@@ -22,8 +22,8 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-ROOTDIR = ../..
-include $(ROOTDIR)/Makefiles/Makefile.fts
+JMAXDISTDIR = ../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts
 
 lib-recursive:
 	(cd $(PLATFORM); $(MAKE) lib)

@@ -22,15 +22,5 @@
 #
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 
-ROOTDIR = ../../..
-
-include $(ROOTDIR)/Makefiles/Makefile.common
-include Sources
-
-MODULE_LIB = $(LIBDIR)/libhw.a
-
-all: $(LIBDIR) $(OBJDIR) $(MODULE_LIB)
-
-TOCLEAN = $(MODULE_LIB)
-
-include $(ROOTDIR)/Makefiles/Makefile.misc
+JMAXDISTDIR = ../../..
+include $(JMAXDISTDIR)/Makefiles/Makefile.fts

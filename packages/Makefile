@@ -23,11 +23,10 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXROOTDIR= ..
-DISTDIR=$(JMAXROOTDIR)
+JMAXDISTDIR= ..
 
 ifdef ARCH
-include $(JMAXROOTDIR)/Makefiles/Makefile.$(ARCH)
+include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 # Architecture dependant packages are supposed to be C...

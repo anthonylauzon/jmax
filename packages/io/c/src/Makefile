@@ -23,19 +23,11 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXROOTDIR= ../../../..
-DISTDIR= $(JMAXROOTDIR)/fts
-
-PACKAGEROOT = ..
-
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
+JMAXDISTDIR= ../../../..
+PACKAGEROOT= ..
 PACKAGELIB=$(LIBDIR)/libio.so
 
-all: $(LIBDIR) $(OBJDIR)  $(PACKAGELIB)
+include $(JMAXDISTDIR)/Makefiles/Makefile.package
 
-TOCLEAN = $(PACKAGELIB)
 
-include $(DISTDIR)/Makefiles/Makefile.lib.end
 

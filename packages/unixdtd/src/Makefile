@@ -23,24 +23,29 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-JMAXROOTDIR= ../../..
-DISTDIR= $(JMAXROOTDIR)/fts
-
+JMAXDISTDIR= ../../..
 PACKAGEROOT = ..
+PACKAGELIB=$(LIBDIR)/libunixdtd.so
 
-include $(DISTDIR)/Makefiles/Makefile.lib
-include Sources
-
-#SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
-# This is for debug
-SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o $(OBJDIR)/libtime.o
+##
+## Extra definitions
+##
 
 # Note: some $(SERVER_OBJECTS) are not in the SOURCES because they are not added to the .so library
-
-PACKAGELIB=$(LIBDIR)/libunixdtd.so
+#SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o
+SERVER_OBJECTS=$(OBJDIR)/dtdmain.o $(OBJDIR)/dtdfifo.o $(OBJDIR)/libtime.o # This is for debug
 DTD_BIN = $(BINDIR)/dtd
+FTS_LIB=$(JMAXDISTDIR)/fts/lib/$(ARCH)/$(MODE)/libfts.a
+TOCLEAN=$(SERVER_OBJECTS) $(PACKAGE_LIB) $(DTD_BIN)  
 
-FTS_LIB=$(JMAXROOTDIR)/fts/lib/$(ARCH)/$(MODE)/libfts.a
+##
+## Standard Makefile for packages
+##
+include $(JMAXDISTDIR)/Makefiles/Makefile.package
+
+##
+## Extra rules
+##
 
 all: $(LIBDIR) $(OBJDIR) $(BINDIR) $(PACKAGELIB) $(DTD_BIN)
 
@@ -49,8 +54,4 @@ $(DTD_BIN): $(SERVER_OBJECTS)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
-
-TOCLEAN=$(SERVER_OBJECTS) $(PACKAGE_LIB) $(DTD_BIN)  
-
-include $(DISTDIR)/Makefiles/Makefile.lib.end
 
