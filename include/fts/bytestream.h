@@ -390,19 +390,11 @@ FTS_API void fts_bytestream_flush(fts_bytestream_t *stream);
 
 /* system byte stream implementation */
 FTS_API fts_class_t *fts_socketstream_class;
-FTS_API fts_class_t *fts_tcpstream_class;
 FTS_API fts_class_t *fts_udpstream_class;
 
 FTS_API fts_class_t *fts_pipestream_class;
 FTS_API fts_class_t *fts_memorystream_class;
 
-
-typedef struct _fts_udpstream_t fts_udpstream_t;
-
-FTS_API int fts_udpstream_get_port(fts_udpstream_t* stream);
-FTS_API int fts_udpstream_get_connected_port(fts_udpstream_t* stream);
-FTS_API void fts_udpstream_connect( fts_udpstream_t* stream, int connected_port);
-FTS_API void fts_udpstream_disconnect( fts_udpstream_t* stream);
 
 /** 
  * @name memory stream
