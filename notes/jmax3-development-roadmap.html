@@ -1,86 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<body>
-
-<h2>jMax 3 development roadmap</h2>
-
-<h3>Introduction</h3>
-
-<p>
-Targets:
+<head>
+       
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>jMax 3 development roadmap</title>
+</head>
+ <body style="font-family: sans-serif; ">
+ 
+<h1>jMax 3 development roadmap</h1>
+  jMax 3 should be released as soon as possible. The developments mentioned
+ in this paper are considered as urgent and have to be completed to be included
+ to this release. The exact release date depends on this list.<br>
+ <br>
+  The release of jMax 3 can be split into two steps: First a user release 
+which provides the user with an interface (modules and syntax) introducing 
+the dynamic client/server connection, a user friendly configuration and launcher
+ applications embedded to the different platforms supported by the release:<br>
+ 
 <ul>
-<li>object system
-<li>DSP engine
-<li>plug-in integration
+   
+  <li>Linux</li>
+   
+  <li>Windows</li>
+   
+  <li>MacOs X<br>
+   </li>
+   
+  <li>SGI</li>
+ 
 </ul>
-
-<h3>Multi-thread</h3>
-
-<p>
-Several threads running their own scheduler
-and communicating via message fifo (i.e. via control only)
-
-<p>
-Do an async sound file reader (based on methods callback) and reimplement Direct-to-Disk 
-using async sound file reader.
-
-
-<h3>Portability</h3>
-
-<p>
-Put fts_soundfile_t in a separate package, that can be loaded
-dynamicaly (as audio and MIDI ports)
-
-
-<h3>Configuration</h3>
-
-<p>
-Finish project/packages/config stuff
-
-
-<h3>Object system</h3>
-
-<h4>Methods</h4>
-
-<p>
-Simplify the method signature:
-<pre>
-typedef void (*fts_method_t)( fts_object_t *object, int argc, const fts_atom_t *argv);
-typedef void (*fts_anything_method_t)( fts_object_t *object, fts_symbol_t selector, int argc, const fts_atom_t *argv);
-</pre>
-Alternative:
-<pre>
-typedef void (*fts_method_t)( fts_object_t *object, const fts_atom_t *arg);
-typedef void (*fts_anything_method_t)( fts_object_t *object, fts_symbol_t selector, const fts_atom_t *arg);
-</pre>
-(where single argument can be an array (or a list) for a multiple arguments method)
-
-<p>
-
-
-
-<h4>Inlets</h4>
-
-<h4>Properties</h4>
-
-<p>
-Define properties statically by set/get method, a la JavaBeans
-
-
-<h4>Meta-classes</h4>
-
-<h4>Inheritance</h4>
-
-
-<h3>User interface</h3>
-
-<h4>Parser</h4>
-
-
-
-<h3>File formats and persistence</h3>
-
-
-
-
+  The development of a portable  soundfile<br>
+ 
+<h2>dynamic client/server connection</h2>
+  This is the most important group of new features for jMax 3:<br>
+ 
+<ul>
+   
+  <li>the server can run without the client</li>
+   
+  <li>the client can be connected, deconnected and reconnected to the server
+ at any moment</li>
+   
+  <li>multiple clients can be connected to the server</li>
+ 
+</ul>
+ 
+<h2><font>project, </font>package &amp; configuaration</h2>
+  A graphical editor should be provided for the editting of packages/projects.<br>
+  How to handle the configuration???<br>
+ 
+<h2>platform embedding</h2>
+  At least for MacOsX and Windows version but aswell for Linux a jMax launcher
+ application should be provided, which fully integrates into the given OS
+in a way that opening of jMax documents such as patches and projects can
+be done in the standard way provided by a given OS (double-click, drag and
+drop, etc.).<br>
+ 
+<h2>parsing</h2>
+   The current parser is a source of constant annoyance in the development
+ of jMax. jMax 3 should include a very first version of a new parser providing
+ at least a very simple syntax for messages close to the current jMax (MAX)
+ syntax for messages and simple expressions. <br>
+ 
+<ul>
+   
+  <li>parsing of strings to FTS' internal representations is done by the
+server</li>
+   
+  <li>the client/server protocol permits to send parsed message and atoms 
+ as well as unparsed strings<br>
+   </li>
+ 
+</ul>
+  The parser has to be compatible with the future developments of jMax (implemented
+ with a minimal effort!!). The parser should try to keep a maximum compatibility
+ with MAX style messages and the expression syntax of jMax.<br>
+ <br>
+  The parser should introduce the possiblilty to specify the package of class
+ at the instantiation of an object. This way the transition towards a new
+object set can be simplyfied.<br>
+ <br>
+ 
+<h2>message system</h2>
+  For the first user release the changes of the message system should be
+minimal.  Nevertheless some changes has to be done in order to support the
+new parser  and client server communication. The outlines of the message
+system for FTS  <br>
+  after the jMax 3 user release should be developed in advance.<br>
+ <br>
+ 
+<h2>GUI features</h2>
+  Editors should be provided for fvec, messtab (maybe to be renamed to "dictionary"
+or so?),  and the MIDI track.<br>
+ <br>
+ 
+<h2>portable soundfile i/o</h2>
+  The reading and writing of soundfiles must be handles by a platform depended
+ package and implemented for all  four platforms.<br>
+ <br>
+ 
+<h2>multi-thread</h2>
+ 
+<p> Several threads running their own scheduler and communicating via message
+ fifo (i.e. via control only)  </p>
+ 
+<p> Do an async sound file reader (based on methods callback) and reimplement
+ Direct-to-Disk  using async sound file reader.   </p>
+ 
 </body>
 </html>
