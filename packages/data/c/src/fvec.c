@@ -130,11 +130,166 @@ fvec_create_vector(int size)
   return fvec;
 }
 
+
+
+/********************************************************************
+ *
+ *   upload methods
+ *
+ */
+
+#if 0	/* copied from fmat.c */
+
+#define FVEC_CLIENT_BLOCK_SIZE 128
+
+static void 
+fvec_upload_size(fvec_t *self)
+{
+  fts_atom_t a[2];
+  int m = fvec_get_m(self);
+  int n = fvec_get_n(self);
+  
+  fts_set_int(a, m);
+  fts_set_int(a+1, n);
+  fts_client_send_message((fts_object_t *)self, fts_s_size, 2, a);
+}
+
+static void 
+fvec_upload_from_index(fvec_t *self, int row_id, int col_id, int size)
+{
+  fts_atom_t a[FVEC_CLIENT_BLOCK_SIZE];  
+  int n_cols = fvec_get_n(self);
+  int sent = 0;
+  int data_size = size;
+  int ms = row_id;
+  int ns = col_id;
+  int start_id = (ms*n_cols + ns);
+  
+  fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
+  
+  while( data_size > 0)
+  {
+    int i = 0;
+    int n = (data_size > FVEC_CLIENT_BLOCK_SIZE-2)? FVEC_CLIENT_BLOCK_SIZE-2: data_size;
+    
+    /* starting row and column index */
+    if( sent)
+    {
+      ms = sent/n_cols;
+      ns = sent - ms*n_cols;
+    }
+    fts_set_int(a, ms);
+    fts_set_int(a+1, ns);
+    
+    for(i=0; i < n ; i++)
+      fts_set_float(&a[2+i], self->values[start_id  + sent + i]);      
+    
+    fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
+    
+    sent += n;
+    data_size -= n;
+  }
+  
+  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
+}
+
+static void 
+fvec_upload_data(fvec_t *self)
+{  
+  fvec_upload_from_index(self, 0, 0, fvec_get_m(self) * fvec_get_n(self));
+}
+
+void
+fvec_upload(fvec_t *self)
+{
+  fvec_upload_size(self);
+  fvec_upload_data(self);
+}
+
+#else
+
+void
+fvec_upload (fvec_t *self)
+{
+  fts_post("UPLOAD DUMMY does nothing!\n");
+}
+
+#endif
+
+
+
+
+/*********************************************************
+ *
+ *  editor
+ *
+ */
+
+static void *fvec_editor = NULL;
+
+
+static void
+fvec_editor_callback (fts_object_t *o, void *e)
+{
+  fvec_t *self = (fvec_t *) o;
+  fvec_upload(self); 
+}
+
+static void 
+fvec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, 
+		 int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *) o;
+  
+  fvec_set_editor_open(self);
+  fts_client_send_message(o, fts_s_openEditor, 0, 0);
+  
+  fts_object_add_listener(o, fvec_editor, fvec_editor_callback);
+  
+  fvec_upload(self);
+}
+
+static void
+fvec_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, 
+		    int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *) o;
+  
+  fvec_set_editor_close(self);
+  fts_object_remove_listener(o, fvec_editor);
+}
+
+static void 
+fvec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, 
+		  int ac, const fts_atom_t *at)
+{
+  fvec_t *self = (fvec_t *) o;
+  
+  if (fvec_editor_is_open(self))
+  {
+    fvec_set_editor_close(self);
+    fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
+    fts_object_remove_listener(o, fvec_editor);
+  }
+}
+
+
+
 /********************************************************************
  *
  *  utilities
  *
  */
+
+/* if another object changed our data, do the necessary stuff */
+void fvec_changed(fvec_t *this)
+{
+    if (this->editor)
+	tabeditor_send((tabeditor_t *) this->editor);
+
+    /* ??? no longer in fmat.  data_object_set_dirty((fts_object_t *) this); */
+}
+
 
 void
 fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
@@ -514,27 +669,42 @@ fvec_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_return_object(o);
 }
 
+
+/** set values in fvec
+ *  @fn fvec_object set(int offset, number values...)
+ */
 static void
-fvec_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+fvec_set (fts_object_t *o, int winlet, fts_symbol_t is, 
+	  int ac, const fts_atom_t *at)
 {
-  fvec_t *self = (fvec_t *)o;
-  float *ptr;
-  int size, stride;
-  int i, j;
-
-  fvec_get_vector(self, &ptr, &size, &stride);
-
-  if(ac > size)
-    ac = size;
-  
-  for(i=0, j=0; i<size; i++, j+=stride)
+  if (ac > 1  &&  fts_is_number(at))
   {
-    if(fts_is_number(at))
-      ptr[j] += fts_get_number_float(at + i);
-  }
+    fvec_t *self = (fvec_t *)o;
+    float  *ptr;
+    int     size, stride;
+    int     onset = fts_get_number_int(at);
+    int     i, j;
+    
+    ac -= 1;
+    at += 1;
+
+    fvec_get_vector(self, &ptr, &size, &stride);
+
+    if (onset + ac > size)
+      ac = size - onset;
   
+    for (i = 0, j = onset; i < ac; i++, j += stride) 
+    {
+      if (fts_is_number(at + i))
+	ptr[j] = fts_get_number_float(at + i);
+    }
+  
+    fts_object_changed(o);
+  }
+
   fts_return_object(o);
 }
+
 
 static void
 fvec_set_from_fmat_or_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1294,6 +1464,9 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   }
 }
 
+
+
+
 /****************************************************************************
  *
  *  post and print
@@ -1369,6 +1542,8 @@ fvec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   self->index = 0;
   self->onset = 0;
   self->size = INT_MAX >> 2;
+
+  self->editor = 0;
   
   if(ac > 0)
   {
@@ -1432,6 +1607,11 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
 
+  /* graphical editor */
+  fts_class_message_varargs(cl, fts_s_openEditor,    fvec_open_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor,   fvec_close_editor);
+  fts_class_message_varargs(cl, fts_s_destroyEditor, fvec_destroy_editor);
+
   /* access methods */
   fts_class_message_varargs(cl, fts_s_print, fvec_print);
   fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
@@ -1487,6 +1667,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fvec_apply_expr);
 
   /* let's have standard in/outlets */
+  fts_class_inlet_bang(cl, 0, data_object_output);
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
