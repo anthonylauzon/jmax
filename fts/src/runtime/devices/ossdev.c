@@ -268,8 +268,8 @@ static int audio_desc_update( audio_desc_t *aud, int cmd)
   */
   if ( aud->fd >= 0) 
     {    
-      if ( (aud->dac_open && cmd == CMD_OPEN_ADC) 
-	   || (aud->adc_open && cmd == CMD_OPEN_DAC) )
+      if ( (aud->dac_open && (cmd == CMD_OPEN_ADC)) 
+	   || (aud->adc_open && (cmd == CMD_OPEN_DAC)) )
 	{
 	  if (audio_desc_check_full_duplex_caps( aud) < 0)
 	    return -1;
