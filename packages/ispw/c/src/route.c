@@ -237,7 +237,7 @@ route_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(self->ints != NULL)
     fts_free(self->ints);
   else if(self->symbols != NULL)
-    fts_free(self->symbols);
+    fts_free((void*)self->symbols);
 }
 
 static void
