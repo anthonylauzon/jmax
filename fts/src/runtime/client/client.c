@@ -84,7 +84,10 @@ static void
 client_shutdown(void)
 {
   if (client_dev)
-    fts_dev_close(client_dev);
+    {
+      fts_dev_close(client_dev);
+      client_dev = 0;
+    }
 }
 
 /******************************************************************************/

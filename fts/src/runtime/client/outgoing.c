@@ -44,26 +44,27 @@ static void fts_client_send_string(char *msg)
 {
   int i;
 
-  for (i = 0; msg[i] != '\0' ; i++)
+  if (client_dev)
     {
-      if (i >= 1024)
+      for (i = 0; msg[i] != '\0' ; i++)
 	{
-	  fprintf(stderr, "String too long >%s<\n", msg); 
-	}
+	  if (i >= 1024)
+	    fprintf(stderr, "String too long >%s<\n", msg); 
 
-      fts_char_dev_put(client_dev, msg[i]);      
+	  fts_char_dev_put(client_dev, msg[i]);
+	}
     }
 }
 
 void fts_client_mess_start_msg(int type)
 {
-  fts_char_dev_put(client_dev, (char) type);
+  if (client_dev)
+    fts_char_dev_put(client_dev, (char) type);
 }
 
 void fts_client_mess_add_int(int value)
 {
   sprintf(outbuf, "%c%ld", LONG_POS_CODE, value);
-
   fts_client_send_string(outbuf);
 }
 
@@ -71,7 +72,6 @@ void fts_client_mess_add_int(int value)
 void fts_client_mess_add_data( fts_data_t *data)
 {
   sprintf(outbuf, "%c%ld", DATA_CODE, (data ? fts_data_get_id(data) : 0));
-
   fts_client_send_string(outbuf);
 }
 
@@ -79,7 +79,6 @@ void fts_client_mess_add_data( fts_data_t *data)
 void fts_client_mess_add_object(fts_object_t *obj)
 {
   sprintf(outbuf, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
-
   fts_client_send_string(outbuf);
 }
 
@@ -87,7 +86,6 @@ void fts_client_mess_add_object(fts_object_t *obj)
 void fts_client_mess_add_connection(fts_connection_t *c)
 {
   sprintf(outbuf, "%c%ld", CONNECTION_CODE, (c ? fts_connection_get_id(c) : 0));
-
   fts_client_send_string(outbuf);
 }
 
@@ -95,7 +93,6 @@ void fts_client_mess_add_connection(fts_connection_t *c)
 void fts_client_mess_add_float(float value)
 {
   sprintf(outbuf, "%c%f", FLOAT_CODE, value);
-
   fts_client_send_string(outbuf);
 }
 
@@ -115,7 +112,6 @@ void fts_client_mess_add_void()
 void fts_client_mess_add_string(const char *sp)
 {
   sprintf(outbuf, "%c%s%c", STRING_START_CODE, sp, STRING_END_CODE);
-
   fts_client_send_string(outbuf);
 }
 
@@ -153,7 +149,8 @@ void fts_client_mess_send_msg(void)
 {
   /*  Add the eom code  */
 
-  fts_char_dev_put(client_dev, (char) EOM_CODE);
+  if (client_dev)
+    fts_char_dev_put(client_dev, (char) EOM_CODE);
 }
 
 /* 

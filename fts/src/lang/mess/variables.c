@@ -107,8 +107,6 @@ static void fts_binding_delete(fts_binding_t *var)
       u = u->next;
       obj = tmp->obj;
 
-      fts_heap_free((char *)tmp, objlist_heap);
-
 #ifdef TRACE_DEBUG
       fprintf(stderr, "\t");
       fprintf_object(stderr, obj);
@@ -116,6 +114,12 @@ static void fts_binding_delete(fts_binding_t *var)
 #endif
 
       fts_object_recompute(obj);
+
+      /* Free after the recomputing, because will
+	 be read by the recomputed object */
+
+      fts_heap_free((char *)tmp, objlist_heap);
+
     }
 
 #ifdef TRACE_DEBUG

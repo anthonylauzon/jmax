@@ -62,6 +62,18 @@ proc abstractionDirectory { dir } {
     }
 }
     
+##
+## Same thing for templates
+##
+
+proc templateDirectory { dir } {
+    if {[file exists "$dir/templates.tcl"]} then {
+	sourceFile $dir/templates.tcl
+    } else {
+	abstractionPath $dir
+    }
+}
+    
 
 
 

@@ -203,7 +203,11 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent,
 
 
   if (e)
-    lambda = fts_expression_map_to_assignements(e, fts_object_push_assignement, 0);
+    {
+      fts_expression_assignement_t *p = fts_expression_get_assignements(e);
+      lambda = fts_expression_map_to_assignements(p, fts_object_push_assignement, 0);
+      fts_expression_free_assignements(p);
+    }
   else
     lambda = 0;
 

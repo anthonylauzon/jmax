@@ -861,7 +861,13 @@ fts_patcher_t *fts_patcher_redefine_description(fts_patcher_t *this, int aoc, co
   /* 3- set the new variables */
 
   fts_set_atom_array(&va, this->args);
-  fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) this);
+
+  {
+    fts_expression_assignement_t *p = fts_expression_get_assignements(e);
+    fts_expression_map_to_assignements(p, fts_patcher_assign_variable, (void *) this);
+    fts_expression_free_assignements(p);
+  }
+
   fts_variable_restore(this, fts_s_args, &va, (fts_object_t *)this);
 
   /* 4- register the patcher as user of the used variables */

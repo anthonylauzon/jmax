@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.45 $ IRCAM $Date: 1998/10/14 17:07:37 $
+ *      $Revision: 1.46 $ IRCAM $Date: 1998/10/15 12:36:41 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -469,10 +469,14 @@ fts_object_t *fts_object_new(fts_patcher_t *patcher, int aoc, const fts_atom_t *
 
   if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
     {
+      fts_expression_assignement_t *p = fts_expression_get_assignements(e);
+
       if (fts_object_is_patcher(obj))
-	fts_expression_map_to_assignements(e, fts_patcher_assign_variable, (void *) obj);
+	fts_expression_map_to_assignements(p, fts_patcher_assign_variable, (void *) obj);
       else
-	fts_expression_map_to_assignements(e, fts_object_assign_property, (void *) obj);
+	fts_expression_map_to_assignements(p, fts_object_assign_property, (void *) obj);
+
+      fts_expression_free_assignements(p);
     }
 
   /* then, assign it to the variable if any */
