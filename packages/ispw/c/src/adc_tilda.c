@@ -36,7 +36,7 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     outlets = 2;
   else
     outlets = ac;
-#warning (OLD API) fts_audioport_get_default (OLD API)
+/* #warning (OLD API) fts_audioport_get_default (OLD API) */
 /*   this->port = fts_audioport_get_default(o); */
   if ( !this->port)
     {
@@ -48,13 +48,13 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   if ( ac != 0)
     {
-#warning (OLD API) fts_audioport_add_input_object (OLD API)
+/* #warning (OLD API) fts_audioport_add_input_object (OLD API) */
 /*       for ( i = 0; i < outlets; i++) */
 /* 	fts_audioport_add_input_object( this->port, fts_get_int(at + i) - 1, (fts_object_t *)this); */
     }
   else
     {
-#warning (OLD API) fts_audioport_add_input_object (OLD API)
+/* #warning (OLD API) fts_audioport_add_input_object (OLD API) */
 /*       for ( i = 0; i < 2; i++) */
 /* 	fts_audioport_add_input_object( this->port, i, (fts_object_t *)this); */
     }
@@ -67,7 +67,7 @@ static void adc_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
   if(this->port)
     {
       int i;
-#warning (OLD API) fts_audioport_remove_input_object (OLD API)
+/* #warning (OLD API) fts_audioport_remove_input_object (OLD API) */
 /*       for ( i = 0; i < fts_object_get_outlets_number( o); i++) */
 /* 	fts_audioport_remove_input_object( this->port, i, (fts_object_t *)this); */
     }

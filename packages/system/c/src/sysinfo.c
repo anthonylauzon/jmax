@@ -96,7 +96,7 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static void
 sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-#warning sysinfo_audio use fts_audioport_get_default, need to be changed
+/* #warning sysinfo_audio use fts_audioport_get_default, need to be changed */
 /*   fts_audioport_t *port = fts_audioport_get_default(o); */
 
 /*   fts_send_message_varargs((fts_object_t *)port, fts_s_print, ac, at); */
