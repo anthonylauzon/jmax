@@ -75,6 +75,7 @@ extern void         dsp_chain_print_signals(void);
 extern int          dsp_is_running( void);
 extern void         dsp_chain_poll(void);
 extern void         dsp_make_dsp_off_chain(void);
+extern ftl_program_t *dsp_get_current_dsp_chain( void);
 
 extern fts_symbol_t fts_s_put;
 extern fts_symbol_t fts_s_sig;

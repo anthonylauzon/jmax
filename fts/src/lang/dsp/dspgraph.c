@@ -738,6 +738,10 @@ int dsp_is_running( void)
   return dsp_chain == dsp_chain_on;
 }
 
+ftl_program_t *dsp_get_current_dsp_chain( void)
+{
+  return dsp_chain;
+}
 
 /* --------------------------------------------------------------------------- */
 /*                                                                             */
