@@ -21,7 +21,16 @@ public class ScaleTransform {
 
     public ScaleTransform()
     {
-	recomputeScaleFactors(defaultFontName, defaultBaseSize);
+      //recomputeScaleFactors(defaultFontName, defaultBaseSize);
+      fontName = defaultFontName;
+      baseSize = defaultBaseSize;
+	
+      initFontMetrics();
+	
+      scaleX = (float)1.0;   
+      invScaleX = 1/scaleX;	
+      scaleY = (float)1.0;
+      invScaleY = 1/scaleY;
     }
 
     public static void createScaleTransform(float xfactor, float yfactor)
