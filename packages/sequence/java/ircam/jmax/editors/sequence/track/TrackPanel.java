@@ -290,10 +290,13 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   }
   public void startPaste(){}
   public void endPaste(){}
-  public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
+  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient)
   {
-    resizePanelToEventTime((TrackEvent)whichObject);
+    if(fromClient)
+      resizePanelToEventTime((TrackEvent)whichObject);
+    else
+      resizePanelToEventTimeWithoutScroll((TrackEvent)whichObject);
   }
 	
   //controll if the object is in the actual scrollable area. if not extend the area

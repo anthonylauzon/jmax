@@ -312,10 +312,10 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   }
   public void objectsAdded(int maxTime) {}
 	
-  public void lastObjectMoved(Object o, int oldIndex, int newIndex){}
+  public void lastObjectMoved(Object o, int oldIndex, int newIndex, boolean fromClient){}
   /**
 		* TrackDataListener interface: keep the index-based selection consistent. */
-  public void objectMoved(Object o, int oldIndex, int newIndex)
+  public void objectMoved(Object o, int oldIndex, int newIndex, boolean fromClient)
   {
     // NOTE: oldIndex is the index where the object WAS before moving,
     // newIndex is the index where the object IS (after rearranging the vector).

@@ -110,6 +110,7 @@ extern fts_symbol_t seqsym_addEvent;
 extern fts_symbol_t seqsym_addEvents;
 extern fts_symbol_t seqsym_removeEvents;
 extern fts_symbol_t seqsym_moveEvents;
+extern fts_symbol_t seqsym_moveEventsFromServer;
 extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_highlightEventsAndTime;
 extern fts_symbol_t seqsym_openFileDialog;

@@ -73,8 +73,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 		
     track.getTrackDataModel().addListener( new TrackDataListener() {
 			public void objectChanged(Object spec, String propName, Object propValue){}
-			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
-			public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
+			public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
 			public void objectAdded(Object whichObject, int index){}
 			public void objectsAdded(int maxTime){}
 			public void objectDeleted(Object whichObject, int oldIndex){}
@@ -208,8 +208,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   }    
   public void startPaste(){}    
   public void endPaste(){}    
-  public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
+  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
 
 	public SequenceTablePanel getPanel()
 	{

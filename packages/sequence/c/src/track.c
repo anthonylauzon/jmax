@@ -1180,7 +1180,7 @@ track_move_events_at_client(track_t *self, event_t *first, event_t *after)
       event = event_get_next(event);
     }
     
-    fts_client_send_message((fts_object_t *)self, seqsym_moveEvents, fts_array_get_size(&array), fts_array_get_atoms(&array));
+    fts_client_send_message((fts_object_t *)self, seqsym_moveEventsFromServer, fts_array_get_size(&array), fts_array_get_atoms(&array));
     
     fts_array_destroy(&array);
   }

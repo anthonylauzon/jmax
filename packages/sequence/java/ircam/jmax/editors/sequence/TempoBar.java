@@ -422,8 +422,8 @@ public void mouseExited(MouseEvent e){}
 //=================== TrackDataListener interface ========================
 
 public void objectChanged(Object spec, String propName, Object propValue){repaint();}
-public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
-public void objectMoved(Object whichObject, int oldIndex, int newIndex){repaint();}
+public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
+public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
 public void objectAdded(Object whichObject, int index){repaint();}
 public void objectsAdded(int maxTime){repaint();}
 public void objectDeleted(Object whichObject, int oldIndex){repaint();}

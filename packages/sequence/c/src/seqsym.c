@@ -107,6 +107,7 @@ fts_symbol_t seqsym_addEvent = 0;
 fts_symbol_t seqsym_addEvents = 0;
 fts_symbol_t seqsym_removeEvents = 0;
 fts_symbol_t seqsym_moveEvents = 0;
+fts_symbol_t seqsym_moveEventsFromServer = 0;
 fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_highlightEventsAndTime = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
@@ -200,6 +201,7 @@ seqsym_config(void)
   seqsym_addEvents = fts_new_symbol("addEvents");
   seqsym_removeEvents = fts_new_symbol("removeEvents");
   seqsym_moveEvents = fts_new_symbol("moveEvents");
+  seqsym_moveEventsFromServer = fts_new_symbol("moveEventsFromServer");
   seqsym_highlightEvents = fts_new_symbol("highlightEvents");
   seqsym_highlightEventsAndTime = fts_new_symbol("highlightEventsAndTime");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");

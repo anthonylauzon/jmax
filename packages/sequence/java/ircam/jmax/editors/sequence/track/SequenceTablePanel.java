@@ -96,10 +96,10 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			public void objectChanged(Object spec, String propName, Object propValue){
 				repaint();
 		  }
-			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){
+			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){
 				repaint();
 			}
-			public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+			public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
 			public void objectAdded(Object whichObject, int index)
 		  {
 				if( !uploading)

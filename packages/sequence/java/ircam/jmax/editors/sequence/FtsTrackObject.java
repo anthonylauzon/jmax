@@ -70,9 +70,15 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("moveEvents"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
-      ((FtsTrackObject)obj).moveEvents( args.getLength(), args.getAtoms());
+      ((FtsTrackObject)obj).moveEvents( args.getLength(), args.getAtoms(), true);
   }
   });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("moveEventsFromServer"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+  {
+      ((FtsTrackObject)obj).moveEvents( args.getLength(), args.getAtoms(), false);
+  }
+  });  
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("lock"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
@@ -316,7 +322,7 @@ public void clear()
   endUpdate();
 }
 
-public void moveEvents(int nArgs , FtsAtom args[])
+public void moveEvents(int nArgs , FtsAtom args[], boolean fromClient)
 {
   TrackEvent evt;
   int oldIndex, newIndex;
@@ -353,10 +359,10 @@ public void moveEvents(int nArgs , FtsAtom args[])
       maxOldIndex = oldIndex;
       maxNewIndex = newIndex;
     }
-    notifyObjectMoved(evt, oldIndex, newIndex);
+    notifyObjectMoved(evt, oldIndex, newIndex, fromClient);
   }
   if(nArgs>0)
-    notifyLastObjectMoved(maxEvent, maxOldIndex, maxNewIndex);
+    notifyLastObjectMoved(maxEvent, maxOldIndex, maxNewIndex, fromClient);
 
   endUpdate();
 }
@@ -929,7 +935,7 @@ public void moveEvent(TrackEvent event, double newTime)
   }
 
   events[newIndex] = event;
-  notifyObjectMoved(event, index, newIndex);
+  notifyObjectMoved(event, index, newIndex, true);
 }
 
 
@@ -1045,15 +1051,15 @@ private void notifyEndPaste()
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
     ((TrackDataListener) e.nextElement()).endPaste();
 }
-private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)
+private void notifyObjectMoved(Object spec, int oldIndex, int newIndex, boolean fromClient)
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
-    ((TrackDataListener) e.nextElement()).objectMoved(spec, oldIndex, newIndex);
+    ((TrackDataListener) e.nextElement()).objectMoved(spec, oldIndex, newIndex, fromClient);
 }
-private void notifyLastObjectMoved(Object spec, int oldIndex, int newIndex)
+private void notifyLastObjectMoved(Object spec, int oldIndex, int newIndex, boolean fromClient)
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
-    ((TrackDataListener) e.nextElement()).lastObjectMoved(spec, oldIndex, newIndex);
+    ((TrackDataListener) e.nextElement()).lastObjectMoved(spec, oldIndex, newIndex, fromClient);
 }
 private void notifyHighlighting(MaxVector hhobj, double time)
 {
