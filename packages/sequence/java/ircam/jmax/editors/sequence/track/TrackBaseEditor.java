@@ -454,9 +454,8 @@ public void processKeyEvent(KeyEvent e)
       case KeyEvent.VK_DELETE:
       case KeyEvent.VK_BACK_SPACE:
         ((UndoableData)track.getTrackDataModel()).beginUpdate();
-        getSelection().deleteAll();
-        if(currentSelMarkers != null)
-          /*currentSelMarkers.deleteByType("marker");*/
+        if(getSelection().size() > 0) getSelection().deleteAll();
+        if((currentSelMarkers != null) && (currentSelMarkers.size() > 0))
 					currentSelMarkers.deleteAll();
         break;
       case KeyEvent.VK_LEFT:       
