@@ -1,3 +1,7 @@
+2003-05-28  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/alsa/c/src/alsaaudiomanager.c (alsaaudiomanager_scan_plugins): avoid opening of dsnoop and dmix ALSA plugins (if you open/close these plugins devices are still opened). Thanks to Paul Brossier for bug report.
+
 2003-05-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* fixed C++ compilation when <fts/fts.h> is included.
