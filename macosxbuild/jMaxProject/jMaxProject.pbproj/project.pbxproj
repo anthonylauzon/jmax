@@ -1650,6 +1650,18 @@
 			path = ../../packages/macosx/c/src/macosxmidi.c;
 			refType = 2;
 		};
+		F7A54B3C03E1537F01664058 = {
+			isa = PBXFileReference;
+			name = default_project_macosx.jprj;
+			path = ../../config/default_project_macosx.jprj;
+			refType = 2;
+		};
+		F7A54B3E03E1538C01664058 = {
+			fileRef = F7A54B3C03E1537F01664058;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 //F70
 //F71
 //F72
@@ -11906,18 +11918,6 @@
 			settings = {
 			};
 		};
-		F854950002D2514001664092 = {
-			isa = PBXFileReference;
-			name = config_macosx.jprj;
-			path = ../../config/config_macosx.jprj;
-			refType = 2;
-		};
-		F854950202D2515501664092 = {
-			fileRef = F854950002D2514001664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F854BE7202B7C9BC01664092 = {
 			isa = PBXFileReference;
 			name = FtsProject.java;
@@ -12152,8 +12152,8 @@
 				F8A9635302D36AC001664092,
 				F88000010283043C01664092,
 				F5F80BF203420AB201664092,
-				F854950002D2514001664092,
 				F594D066036557D601664092,
+				F7A54B3C03E1537F01664058,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -12810,7 +12810,7 @@
 			dstPath = share/jmax;
 			dstSubfolderSpec = 7;
 			files = (
-				F854950202D2515501664092,
+				F7A54B3E03E1538C01664058,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -21104,7 +21104,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/config_macosx.jprj build/jMax.app/Contents/Resources/share/jmax/config.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/config.jprj";
+			shellScript = "mv build/jMax.app/Contents/Resources/share/jmax/default_project_macosx.jprj build/jMax.app/Contents/Resources/share/jmax/default-project.jprj\nchmod a+r build/jMax.app/Contents/Resources/share/jmax/default-project.jprj";
 		};
 		F8DC5EF40286A1FA01664092 = {
 			children = (
