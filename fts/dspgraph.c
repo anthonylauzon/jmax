@@ -757,7 +757,10 @@ void
 fts_dsp_graph_remove_object(fts_dsp_graph_t *graph, fts_dsp_object_t *obj)
 {
   fts_dsp_object_t **p;
-  
+
+  if(graph->status == status_compiled)
+    fts_dsp_graph_reset(graph);
+
   for(p=&graph->objects; *p != NULL; p=&((*p)->next_in_dspgraph))
     {
       if(*p == obj)

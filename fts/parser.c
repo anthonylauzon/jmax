@@ -50,9 +50,7 @@
   /* #define this to 1 if you want a lot of debug printout of the parser */
 #define YYDEBUG 0
 
-#ifndef STANDALONE  
-/*#define free fts_free
-#define malloc fts_malloc*/
+#ifndef STANDALONE
 static int yylex();
 #else
 extern int yylex();

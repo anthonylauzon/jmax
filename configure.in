@@ -1,8 +1,12 @@
-dnl $Id: configure.in,v 1.110 2003/02/28 16:22:49 p_tisserand Exp $
+dnl $Id: configure.in,v 1.111 2003/03/19 14:05:28 dechelle Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.111  2003/03/19 14:05:28  dechelle
+dnl - fixed declaration of alloca(): see ChangeLog
+dnl - cleaned code for printing patches
+dnl
 dnl Revision 1.110  2003/02/28 16:22:49  p_tisserand
 dnl Add a check on doxygen
 dnl Add jmax/utils/linux_desktop/Makefile in list of file to generate
@@ -158,10 +162,11 @@ AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h arpa/inet.h netdb.h)
+AC_CHECK_HEADERS( sys/param.h unistd.h alloca.h sys/time.h time.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h netdb.h sys/signal.h sys/types.h pthread.h)
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(socket)
+AC_CHECK_FUNCS(signal)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

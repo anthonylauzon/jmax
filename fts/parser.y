@@ -29,8 +29,6 @@
 #define YYDEBUG 0
 
 #ifndef STANDALONE
-#define free fts_free
-#define malloc fts_malloc
 static int yylex();
 #else
 extern int yylex();
