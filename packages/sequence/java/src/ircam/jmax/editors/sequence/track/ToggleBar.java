@@ -29,13 +29,8 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
 	openButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	openButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 
-	//muteButton = new JButton();
 	muteButton = new JButton(SequenceImages.getImageIcon("unmute"));
 	muteButton.setToolTipText("mute/unmute");
-	//muteButton.setMargin(new Insets(0, 3, 0, 3));
-	//muteButton.setForeground(Color.green);
-	//muteButton.setFont(muteFont);
-	//muteButton.setText("m");
 	muteButton.setPreferredSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	muteButton.setMaximumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));
 	muteButton.setMinimumSize(new Dimension(TrackContainer.BUTTON_WIDTH, TOGGLEBAR_HEIGHT+1));

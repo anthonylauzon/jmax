@@ -36,11 +36,10 @@ public class TrackContainer extends JPanel {
 
     //muteButton = new JButton();
     muteButton = new JButton(SequenceImages.getImageIcon("unmute"));
-    muteButton.setPreferredSize(new Dimension(BUTTON_WIDTH, /*20*/14));
+    muteButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 14));
+    muteButton.setMaximumSize(new Dimension(BUTTON_WIDTH, 14));
+    muteButton.setMinimumSize(new Dimension(BUTTON_WIDTH, 14));
     muteButton.setToolTipText("mute/unmute");
-    //muteButton.setMargin(new Insets(0, 3, 0, 3));
-    //muteButton.setForeground(Color.green);
-    //muteButton.setText("m");
 
     JPanel bp = new JPanel();
     bp.setLayout(new BoxLayout(bp, BoxLayout.Y_AXIS));
