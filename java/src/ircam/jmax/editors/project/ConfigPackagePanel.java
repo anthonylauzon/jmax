@@ -916,10 +916,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
       if( ftsPackage != null)
 	{
 	  if(( data[row][0] != null) && ( data[row][1] != null))
-	    {
-	      String[] tmp = {(String)data[row][0], (String)data[row][1]}; 
-	      ftsPackage.set( "template", tmp);
-	    }
+	    ftsPackage.requestAddTemplate( (String)data[row][0], (String)data[row][1], row);
 	}
     }
 

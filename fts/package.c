@@ -76,7 +76,7 @@ static void fts_package_upload_requires(fts_package_t* pkg);
 static void fts_package_upload_template_paths( fts_package_t* pkg);
 static void fts_package_upload_data_paths( fts_package_t* pkg);
 static void fts_package_upload_help( fts_package_t* pkg);
-static void fts_package_upload_template( fts_package_t* pkg);
+static void fts_package_upload_templates( fts_package_t* pkg);
 static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t path);
 
 static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t file)
@@ -395,7 +395,7 @@ fts_package_get_required_packages(fts_package_t* pkg, fts_iterator_t* iter)
  *   - templates 
  */
 
-static void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
+static void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file, int index)
 {
   fts_template_t *template;
   fts_atom_t n, p;
@@ -427,7 +427,10 @@ static void fts_package_add_template(fts_package_t* pkg, fts_symbol_t name, fts_
 
       fts_template_set_package(template, pkg);
       
-      pkg->template_names = fts_list_append( pkg->template_names, &n);
+      if( index >= 0)
+	pkg->template_names = fts_list_insert( pkg->template_names, &n, index);
+      else    
+	pkg->template_names = fts_list_append( pkg->template_names, &n);
     }
 }
 
@@ -929,12 +932,29 @@ __fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
-
-  fts_package_add_template(pkg, fts_get_symbol(&at[0]), 
-			   fts_package_make_relative_path(pkg, fts_get_symbol(&at[1])));
+  
+  for (i = 0; i < ac; i += 2)
+    fts_package_add_template(pkg, fts_get_symbol(&at[i]), 
+			     fts_package_make_relative_path(pkg, fts_get_symbol(&at[i+1])), 
+			     -1);
   
   if( fts_object_has_id( o) && pkg->declared_templates)
-    fts_package_upload_template( pkg);
+    fts_package_upload_templates( pkg);
+  
+  fts_package_set_dirty( pkg, 1);
+}
+
+static void 
+__fts_package_template_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_package_t* pkg = (fts_package_t *)o;
+
+  fts_package_add_template(pkg, fts_get_symbol(&at[0]), 
+			   fts_package_make_relative_path(pkg, fts_get_symbol(&at[1])), 
+			   fts_get_int( &at[2]));
+  
+  if( fts_object_has_id( o) && pkg->declared_templates)
+    fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
 }
@@ -948,7 +968,7 @@ __fts_package_template_remove(fts_object_t *o, int winlet, fts_symbol_t s, int a
   fts_package_remove_template(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
 
   if( fts_object_has_id( o) && pkg->declared_templates)
-    fts_package_upload_template( pkg);
+    fts_package_upload_templates( pkg);
   
   fts_package_set_dirty( pkg, 1);
 }
@@ -1124,7 +1144,32 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_package_save_list( &f, this->data_paths, fts_s_data_path);
   }
   if ( this->declared_templates) {
-    fts_package_save_hashtable( &f, this->declared_templates, fts_s_template, fun_template);
+    fts_atom_t* a;
+    int i = 0;
+    fts_iterator_t keys, values;
+
+#if HAVE_ALLOCA
+    a = alloca(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
+#else
+    a = malloc(( fts_hashtable_get_size( this->declared_templates)*2 + 1) * sizeof(fts_atom_t));
+#endif
+              
+    fts_list_get_values( this->template_names, &keys);
+      
+    while ( fts_iterator_has_more( &keys))
+      {
+	fts_iterator_next( &keys, a+i);
+	fts_hashtable_get( this->declared_templates, a+i, a+i+1);
+	fts_set_symbol( a+i+1, fts_template_get_original_filename(((fts_template_t *)fts_get_object( a+i+1))));
+	i+=2;
+      }      
+    fts_bmax_code_push_atoms(&f, i, a);
+    fts_bmax_code_obj_mess(&f, fts_s_template, i);
+    fts_bmax_code_pop_args(&f, i);
+  
+#ifndef HAVE_ALLOCA
+    free(a);
+#endif    
   }
   if ( this->declared_abstractions) {
     fts_package_save_hashtable( &f, this->declared_abstractions, fts_s_abstraction, fun_abstraction);
@@ -1256,6 +1301,7 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->classes = NULL;
 
   pkg->declared_templates = NULL;
+  pkg->template_names = NULL;
   pkg->templates_in_path = NULL;
   pkg->template_paths = NULL;
 
@@ -1290,6 +1336,7 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
   if (pkg->declared_templates != NULL) {
     fts_hashtable_destroy(pkg->declared_templates);
+    fts_list_delete(pkg->template_names);
   }
   if (pkg->templates_in_path != NULL) {
     fts_hashtable_destroy(pkg->templates_in_path);
@@ -1396,7 +1443,7 @@ fts_package_upload_help( fts_package_t *this)
 }
 
 static void 
-fts_package_upload_template( fts_package_t *this)
+fts_package_upload_templates( fts_package_t *this)
 {
   fts_package_t *pkg;
   fts_template_t *tmpl;
@@ -1452,7 +1499,7 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     fts_package_upload_help( this);
 
   if ( this->declared_templates)
-    fts_package_upload_template( this);
+    fts_package_upload_templates( this);
 
   if( this->midi_config)
     if( fts_object_has_id( o))
@@ -1517,6 +1564,7 @@ fts_package_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_require, __fts_package_require);
   fts_class_message_varargs(cl, fts_s_template, __fts_package_template);
+  fts_class_message_varargs(cl, fts_new_symbol("insert_template"), __fts_package_template_insert);
   fts_class_message_varargs(cl, fts_new_symbol("remove_template"), __fts_package_template_remove);
   fts_class_message_varargs(cl, fts_s_template_path, __fts_package_template_path);
   fts_class_message_varargs(cl, fts_s_abstraction, __fts_package_abstraction);

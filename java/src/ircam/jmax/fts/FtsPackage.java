@@ -175,6 +175,25 @@ public class FtsPackage extends FtsObjectWithEditor
       }
   }
 
+  public void requestAddTemplate(String name, String fileName, int index)
+  {
+    args.clear();
+    args.addSymbol( FtsSymbol.get(name));
+    args.addSymbol( FtsSymbol.get(fileName));
+    args.addInt( index);
+
+    try
+      {
+	send( FtsSymbol.get("insert_template"), args);
+      }
+    catch(IOException e)
+      {
+	System.err.println("FtsPackage: I/O Error sending template Message!");
+	e.printStackTrace(); 
+      }
+  }
+
+
   public void requestRemoveTemplate(String name, String fileName)
   {
     args.clear();

@@ -86,6 +86,31 @@ fts_list_prepend(fts_list_t *list, const fts_atom_t *data)
 }
 
 fts_list_t* 
+fts_list_insert(fts_list_t *list, const fts_atom_t *data, int index)
+{
+  fts_list_t *tmp;
+  fts_list_t *node;
+
+  tmp = list;
+
+  while ((index-- > 1) && tmp) {
+    tmp = tmp->next;
+  }
+  
+  if (tmp) 
+    {
+      node = (fts_list_t*) fts_heap_alloc(list_heap);
+      node->next = tmp->next;
+      node->data = *data;
+      tmp->next = node;
+    }
+  else
+    list = fts_list_append( list, data);
+
+  return list;
+}
+
+fts_list_t* 
 fts_list_remove(fts_list_t *list, const fts_atom_t *data)
 {
   fts_list_t *tmp;
@@ -139,7 +164,7 @@ fts_list_set(fts_list_t *list, const fts_atom_t *data)
 fts_list_t* 
 fts_list_get_nth(fts_list_t *list, int n)
 {
- while ((n-- > 0) && list) {
+  while ((n-- > 0) && list) {
     list = list->next;
   }
   return list;

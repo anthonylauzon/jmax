@@ -91,6 +91,20 @@ FTS_API fts_list_t *fts_list_append(fts_list_t *list, const fts_atom_t *data);
 FTS_API fts_list_t *fts_list_prepend(fts_list_t *list, const fts_atom_t *data);
 
 /**
+ * Inserts a new node with the given data to the engiven position of the list. The
+ * functions returns the list. If the argument "list" is NULL, a new
+ * list is allocated and returned. If the position > list_size appends the new node 
+ * at the end of the list
+ *
+ * @fn fts_list_t *fts_list_insert(fts_list_t *list, const fts_atom_t *data, int index)
+ * @param list the list 
+ * @param data the data of the new node 
+ * @param index the position in the list of the new node 
+ * @return the new list
+ * @ingroup list */
+FTS_API fts_list_t *fts_list_insert(fts_list_t *list, const fts_atom_t *data, int index);
+
+/**
  * Removes a new node from the list. Returns the list with the data
  * removed.  The functions returns the list or NULL if the list has no
  * more nodes.
