@@ -1,38 +1,39 @@
 SOURCES = \
-	AbstractSelection.java	\
+	AbstractSelection.java		\
 	AbstractUndoableObject.java	\
-	MaxWindowMenu.java	\
-	DirectionChooser.java	\
+	DirectionChooser.java		\
 	DirectionListener.java		\
 	DragListener.java		\
-	ObjectRenderer.java		\
+	EditorToolbar.java		\
 	GraphicContext.java		\
 	GraphicSelectionListener.java	\
+	IconCache.java			\
 	InfoPanel.java			\
 	InteractionModule.java		\
 	Layer.java			\
+	MaxWindowMenu.java		\
 	MouseTracker.java		\
 	NumericPropertyEditor.java	\
 	NumericalWidget.java		\
+	ObjectRenderer.java		\
 	PositionListener.java		\
 	ProportionalLayout.java		\
 	RenderManager.java		\
-	Tool.java			\
-	EditorToolbar.java		\
 	Selecter.java			\
+	SelectionHandler.java		\
+	SelectionListener.java		\
 	SelectionMover.java		\
 	SelectionResizer.java		\
 	StatusBar.java			\
 	StatusBarClient.java		\
+	Tool.java			\
 	ToolChangeEvent.java		\
 	ToolListener.java		\
 	ToolbarProvider.java		\
+	UndoableData.java		\
 	Widget.java			\
 	XORHandler.java			\
 	XORPainter.java			\
-	SelectionHandler.java		\
-	UndoableData.java		\
-	SelectionListener.java	
 
 
 
