@@ -346,11 +346,6 @@ abstract public class FtsObject
 
     if (propertyHandlerTable != null)
       propertyHandlerTable.callHandlers(name, value, author);
-
-    // Call the handlers in the parent
-
-    if (parent != null)
-      parent.callWatchAll(name, value, author);
   }
 
   /** Get a propery value; subclasses may specialize it */
@@ -577,14 +572,26 @@ abstract public class FtsObject
     return objectName;
   }
 
-  /** Get the MaxDocument this objects is part of */
+  /** Get the MaxDocument this objects is part of;
+   * Temporary; actually the patcher document should be
+   * a remote data and be known on the FTS side.
+   */
+
+  FtsPatcherDocument document;
 
   public MaxDocument getDocument()
   {
-    if (parent != null)
+    if (document != null)
+      return (MaxDocument) document;
+    else if (parent != null)
       return parent.getDocument();
     else
       return null;
+  }
+
+  public void setDocument(MaxDocument document)
+  {
+    this.document = (FtsPatcherDocument) document;
   }
 
   /** Tell the document this object is changed, 

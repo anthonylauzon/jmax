@@ -96,7 +96,6 @@ class FtsClientProtocol
 
   static final int fts_open_patcher_cmd = 'O';
   static final int fts_close_patcher_cmd = 'C';
-  static final int fts_patcher_loaded_cmd = 'L';
 
   static final int fts_new_object_cmd = 'n';
   static final int fts_delete_object_cmd = 'f';

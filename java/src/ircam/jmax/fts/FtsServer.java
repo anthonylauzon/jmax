@@ -357,27 +357,6 @@ public class FtsServer
       }
   }
 
-  /** Send a "patcher loaded" messages to FTS.*/
-
-  final void patcherLoaded(FtsObject patcher)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("patcherLoaded(" + patcher + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_patcher_loaded_cmd);
-	port.sendObject(patcher);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
 
   /** Send a "new object" messages to FTS; receive the class Name and a description as a string;
    *  It is actually used only for those objects that don't have the class name in the description,
@@ -845,29 +824,6 @@ public class FtsServer
 
     if (FtsServer.debug)
       System.err.println("askObjectProperty(" + object + ", " + name + ")");
-
-    try
-      {
-	port.sendCmd(FtsClientProtocol.fts_get_property_cmd);
-	port.sendObject(object);
-	port.sendString(name);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
-      }
-  }
-
-
-  /** Send a "get all property" messages to FTS; argument should be a container */
-
-  final void askAllObjectProperty(FtsObject object, String name)
-  {
-    if (! connected)
-      return;
-
-    if (FtsServer.debug)
-      System.err.println("askAllObjectProperty(" + object + ", " + name + ")");
 
     try
       {

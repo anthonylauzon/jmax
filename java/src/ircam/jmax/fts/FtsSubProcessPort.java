@@ -17,9 +17,9 @@ class FtsSubProcessPort extends FtsPort
   InputStream in_stream = null;
   OutputStream out_stream = null;
 
-  FtsSubProcessPort(String name)
+  FtsSubProcessPort()
   {
-    super(name);
+    super("fts");
   }
 
   void open()

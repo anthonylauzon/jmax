@@ -8,9 +8,7 @@ SOURCES = \
 	FtsContainerObject.java		\
 	FtsDatagramClientPort.java	\
 	FtsDatagramPort.java		\
-	FtsDatagramServer.java	\
 	FtsDotPatRemoteDocumentHandler.java		\
-	FtsError.java			\
 	FtsErrorStreamer.java		\
 	FtsException.java		\
 	FtsHelpPatchTable.java		\
@@ -35,19 +33,11 @@ SOURCES = \
 	FtsRemoteDataID.java		\
 	FtsRemoteMetaData.java		\
 	FtsRexecDatagramPort.java	\
-	FtsRexecDatagramServer.java	\
 	FtsSelection.java		\
 	FtsServer.java			\
-	FtsSocketClientServer.java	\
 	FtsSocketPort.java		\
-	FtsSocketServer.java		\
 	FtsSocketServerPort.java	\
 	FtsStandardObject.java		\
 	FtsSubProcessPort.java		\
-	FtsSubProcessServer.java	\
 	FtsUpdateGroupListener.java    \
 	FtsVoid.java
-
-
-
-

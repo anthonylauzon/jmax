@@ -25,8 +25,6 @@ public class FtsAbstractionObject  extends FtsContainerObject
   FtsAbstractionObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);
-
-    this.className = className;
   }
 }
 

@@ -26,17 +26,18 @@ public class Fts
 				  String serverName, String port)
   {
     if (mode.equals("socket")) 
-      server = new FtsSocketServer(serverName, Integer.parseInt(port));
+      server = new FtsServer(serverName, new FtsSocketServerPort(serverName));
     else if (mode.equals("udp")) 
-      server = new FtsDatagramServer(serverName);
+      server = new FtsServer(serverName, new FtsDatagramPort(serverName));
     else if (mode.equals("udprx")) 
-      server = new FtsRexecDatagramServer(serverName);
+      server = new FtsServer(serverName, new FtsRexecDatagramPort(serverName));
     else if (mode.equals("udpclient")) 
-      server = new FtsDatagramClientServer(serverName, Integer.parseInt(port));
+      server = new FtsServer(serverName + ":" + port,
+			     new FtsDatagramClientPort(serverName, Integer.parseInt(port)));
     else if (mode.equals("client"))
-      server = new FtsSocketClientServer(serverName);
+      server = new FtsServer(serverName, new FtsSocketServerPort(serverName));
     else if (mode.equals("local"))
-      server = new FtsSubProcessServer();
+      server = new FtsServer("fts", new FtsSubProcessPort());
     else
       System.out.println("unknown FTS connection type "+mode+": can't connect to FTS");
 
@@ -80,7 +81,7 @@ public class Fts
 	return obj;
       }
     else
-      throw new FtsException( new FtsError(FtsError.INSTANTIATION_ERROR, className + " " + description));
+      throw new FtsException("Instantiation error for " + className + " " + description);
   }
   
   /* 
@@ -108,7 +109,7 @@ public class Fts
 	return obj;
       }
     else
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, description));
+      throw new FtsException("Instantiation error : " + description);
   }
   
 
@@ -139,7 +140,7 @@ public class Fts
 	return conn;
       }
     else
-      throw new FtsException( new FtsError(FtsError.CONNECTION_ERROR, "Connection error"));
+      throw new FtsException("Connection error");
   }
 
 
@@ -206,7 +207,7 @@ public class Fts
     if (newObject != null)
       newObject.setDirty();
     else
-      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, description));
+      throw new FtsException("Instantiation Error: " + description);
 
     return newObject;
   }
