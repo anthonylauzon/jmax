@@ -18,10 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 
@@ -53,8 +49,10 @@
    to, and the others should specify better.
  */
 
-#ifndef _FTS_PROPERTIES_H_
-#define _FTS_PROPERTIES_H_
+#ifndef _FTS_PROPERTY_H_
+#define _FTS_PROPERTY_H_
+
+typedef struct fts_plist fts_plist_t;
 
 /* the non underscored functions will run the daemon (look to the .c file for comments) */
 /* also included are shortcuts to avoid type conversions to atoms */
@@ -86,6 +84,14 @@ FTS_API const fts_atom_t *fts_class_get_prop(fts_class_t *cl, fts_symbol_t prope
 
 /* class daemons */
 
+typedef enum fts_daemon_action {
+  obj_property_put, 
+  obj_property_get, 
+  obj_property_remove
+} fts_daemon_action_t;
+
+typedef void (* fts_property_daemon_t)(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value);
+
 FTS_API void fts_class_add_daemon(fts_class_t *cl,
 				 fts_daemon_action_t  action,
 				 fts_symbol_t        property,
@@ -95,8 +101,5 @@ FTS_API void fts_class_remove_daemon(fts_class_t *cl,
 				    fts_daemon_action_t  action, 
 				    fts_symbol_t        property,
 				    fts_property_daemon_t daemon);
-
-FTS_API void fts_obj_prop_init(void);
-
 
 #endif

@@ -42,6 +42,18 @@ struct fts_class_mess
   fts_method_t mth;
 };
 
+struct fts_inlet_decl
+{
+  int nmess;
+  int nalloc;
+  fts_class_mess_t **messlist;
+};
+
+struct fts_outlet_decl
+{
+  fts_mess_type_t tmess;	
+};
+
 extern fts_metaclass_t *fts_metaclass_get_by_name(fts_symbol_t name);
 
 #endif

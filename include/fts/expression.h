@@ -18,32 +18,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_EXPRESSIONS_H_
-#define _FTS_EXPRESSIONS_H_
+#ifndef _FTS_EXPRESSION_H_
+#define _FTS_EXPRESSION_H_
 
-FTS_API void fts_expressions_init(void);
-
-struct fts_expression_state;
 typedef struct fts_expression_state fts_expression_state_t;
-
-struct fts_expression_assignement;
 typedef struct fts_expression_assignement fts_expression_assignement_t;
+typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
 
 FTS_API fts_expression_state_t *
 fts_expression_eval(fts_patcher_t *scope, int expr_size, const fts_atom_t *expr, int result_size, fts_atom_t *result);
 
 FTS_API void fts_expression_state_free(fts_expression_state_t *e);
-
-FTS_API int fts_expression_get_result_count(fts_expression_state_t *e);
-
-typedef int (* fts_expression_fun_t)(int ac, const fts_atom_t *at, fts_atom_t *result) ;
-void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
 
 /* Error codes must be negative numbers */
 #define FTS_EXPRESSION_OK 0
@@ -55,16 +42,7 @@ void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
 #define FTS_EXPRESSION_ARRAY_ACCESS_ERROR -6
 
 FTS_API int fts_expression_get_status(fts_expression_state_t *e);
-FTS_API const char *fts_expression_get_msg(fts_expression_state_t *e);
-FTS_API const char *fts_expression_get_err_arg(fts_expression_state_t *e);
-FTS_API void fts_expression_add_variables_user(fts_expression_state_t *e, fts_object_t *obj);
 
-FTS_API int fts_expression_map_to_assignements(fts_expression_state_t *e, 
-					      void (* f)(fts_symbol_t name, fts_atom_t *value, void *data), void *data);
+FTS_API void fts_expression_declare_fun(fts_symbol_t name, fts_expression_fun_t f);
 
 #endif
-
-
-
-
-

@@ -18,22 +18,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
+ */
+
+#ifndef _FTS_INOUT_H_
+#define _FTS_INOUT_H_
+
+/**
  *
- * Authors: Francois Dechelle, Norbert Schnell, Riccardo Borghesi.
+ * Channel
+ * A list of targets and origins
  *
  */
-#ifndef _FTS_CHANNEL_H_
-#define _FTS_CHANNEL_H_
-
-#include <fts/sys.h>
-#include <fts/lang/mess/classes.h>
-#include <fts/lang/utils.h>
 
 typedef struct _fts_channel_
 {
-  fts_object_list_t targets; /* list of targets */
-  fts_object_list_t origins; /* list of origins */
+  fts_objectlist_t targets; /* list of targets */
+  fts_objectlist_t origins; /* list of origins */
 } fts_channel_t;
 
 #define fts_channel_has_target(c) (!fts_object_list_is_empty( &(c)->targets))
@@ -46,8 +46,32 @@ FTS_API void fts_channel_remove_target(fts_channel_t *channel, fts_object_t *tar
 FTS_API void fts_channel_add_origin(fts_channel_t *channel, fts_object_t *origin);
 FTS_API void fts_channel_remove_origin(fts_channel_t *channel, fts_object_t *origin);
 
-FTS_API void fts_channel_output_message_from_targets(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_channel_send(fts_channel_t *channel, int outlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
 FTS_API void fts_channel_find_friends(fts_channel_t *channel, int ac, const fts_atom_t *at);
 FTS_API void fts_channel_propagate_input( fts_channel_t *channel, fts_propagate_fun_t propagate_fun, void *propagate_context, int outlet);
+
+
+/**
+ *
+ * Label
+ * A fts_object_t that contains a channel
+ *
+ */
+
+FTS_API fts_class_t *fts_label_class;
+
+typedef struct _fts_label_
+{
+  fts_object_t head;
+  fts_channel_t channel;
+} fts_label_t;
+
+#define fts_label_get_channel(l) (&(l)->channel)
+
+#define fts_label_get(p, s) ((fts_label_t *)fts_variable_get_object_always((p), (s), fts_label_class))
+
+#define fts_label_is_connected(l) (fts_channel_has_target(fts_label_get_channel(l)))
+#define fts_label_send(l, s, n, a) fts_channel_send( fts_label_get_channel(l), 0, (s), (n), (a))
 
 #endif

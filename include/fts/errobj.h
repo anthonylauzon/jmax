@@ -18,21 +18,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_PATPARSER_H_
-#define _FTS_PATPARSER_H_
+#ifndef _FTS_ERROBJ_H_
+#define _FTS_ERROBJ_H_
 
-#include "patlex.h"
+FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
+FTS_API void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
 
-/* Functions for direct .pat loading support */
-FTS_API void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);
-
-FTS_API fts_object_t *fts_load_dotpat_patcher(fts_object_t *parent, fts_symbol_t name);
-FTS_API void fts_patparse_set_font_size_table(int ac, const fts_atom_t *at);
+FTS_API fts_symbol_t fts_object_get_error(fts_object_t *obj);
 
 #endif

@@ -25,6 +25,20 @@
 
 extern fts_metaclass_t *patcher_metaclass;
 
+struct fts_inlet
+{
+  fts_object_t o;
+  int position; /* inlet position */
+  struct fts_inlet *next; /* next inlet in the same position */
+};
+
+struct fts_outlet
+{
+  fts_object_t o;		
+  int position; /* outlet position */
+  struct fts_outlet *next; /* next outlet in the same position */
+};
+
 #define fts_object_is_patcher(o) ((o)->head.cl->mcl == patcher_metaclass)
 
 #define fts_patcher_set_standard(p)      ((p)->type = fts_p_standard)
@@ -66,6 +80,13 @@ extern fts_connection_type_t fts_object_get_thru_type(fts_object_t *obj);
 extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
 extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
 
+extern void fts_create_root_patcher(void);
+extern void fts_patcher_add_object(fts_patcher_t *this, fts_object_t *obj);
+extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
+extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
+extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data);
+
+extern void fts_patcher_reassign_inlets_outlets(fts_patcher_t *obj);
 
 extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
 

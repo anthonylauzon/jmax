@@ -18,15 +18,58 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 
-#ifndef _FTS_CLASSES_H_
-#define _FTS_CLASSES_H_
+#ifndef _FTS_CLASS_H_
+#define _FTS_CLASS_H_
+
+
+typedef fts_status_t (*fts_instantiate_fun_t)(fts_class_t *, int, const fts_atom_t *);
+typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *);
+
+typedef struct fts_inlet_decl fts_inlet_decl_t;
+typedef struct fts_outlet_decl fts_outlet_decl_t;
+
+struct fts_metaclass
+{
+  fts_instantiate_fun_t instantiate_fun;
+
+  /* Instance data base */
+  fts_equiv_fun_t equiv_fun;
+  fts_class_t *inst_list;
+
+  fts_symbol_t name;		/* the name of the metaclass, i.e. the first name used to register it */
+};
+
+struct fts_class
+{
+  /* Object management */
+  fts_metaclass_t *mcl;
+  fts_inlet_decl_t *sysinlet;
+
+  int ninlets;
+  fts_inlet_decl_t *inlets;
+
+  int noutlets;
+  fts_outlet_decl_t *outlets;
+
+  int size;
+
+  /* Class Instance Data Base support */
+  int ac;
+  const fts_atom_t *at;
+  fts_class_t *next;
+
+  /* property list handling */
+  fts_plist_t *properties;		/* class' dynamic properties */
+
+  struct daemon_list *daemons;
+
+  /* User data */
+  void *user_data;
+};
+
 
 /* Status return values */
 

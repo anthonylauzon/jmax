@@ -18,25 +18,39 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_ERROBJ_H_
-#define _FTS_ERROBJ_H_
+#ifndef _FTS_PATCHER_H_
+#define _FTS_PATCHER_H_
 
-FTS_API fts_object_t *fts_error_object_new(fts_patcher_t *parent, int ac, const fts_atom_t *at, const char *format, ...);
+struct fts_patcher
+{
+  fts_object_t o;
 
-FTS_API void fts_error_object_fit_inlet(fts_object_t *obj, int ninlet);
-FTS_API void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet);
-FTS_API void fts_recompute_errors(void);
-FTS_API void fts_do_recompute_errors(void);
+  fts_inlet_t  **inlets;	/* the patcher inlet array */
+  fts_outlet_t **outlets;	/* the patcher outlet array */
+  fts_object_t *objects;	/* the patcher content, organized as a list */
 
-FTS_API void fts_object_set_error(fts_object_t *obj, const char *format, ...);
-FTS_API void fts_object_set_runtime_error(fts_object_t *obj, const char *format, ...);
+  int open;			/* the open flag */
+  int load_init_fired;		/* the multiple load init protection flag*/
+  int deleted;			/* set to one during content deleting */
 
-FTS_API fts_symbol_t fts_object_get_error(fts_object_t *obj);
+  fts_array_t *args;	/* the arguments used for the "args" variable */
+
+  enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
+
+  /* If this patcher is a template, point to the template definition */
+  fts_template_t *template;
+
+  /* The pointer to the patcher data  */
+  fts_patcher_data_t *data;
+
+  /* Variables */
+  fts_env_t env;
+};    
+
+#define fts_patcher_get_args(p)           ((p)->args)
+
+FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
 #endif

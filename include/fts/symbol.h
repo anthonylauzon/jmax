@@ -18,16 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_SYMBOLS_H_
-#define _FTS_SYMBOLS_H_
-
-#include <stdio.h>
+#ifndef _FTS_SYMBOL_H_
+#define _FTS_SYMBOL_H_
 
 /**
  * Symbols are canonical representations of C strings that can be 
@@ -36,6 +30,16 @@
  *
  * @defgroup symbols symbols
  */
+
+
+struct fts_symbol_descr
+{
+  const char *name;		/* name */
+  int cache_index;		/* index in the client cache if any */
+  int operator;			/* index in the operator table, for the expression eval */
+  struct fts_symbol_descr *next_in_table; /* next in hash table for fts_new_symbol */
+};
+
 
 /**
  * Lookup a symbol and create a new definition if symbol
@@ -79,29 +83,6 @@ FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 */
 #define fts_symbol_name(symbol)                 ((symbol)->name)
 
-
-/*
-   Symbol cache index access.
-   These macros are used by the client protocol handling code.
-*/
-/*
-   Get the symbol's cache index.
-*/
-#define fts_symbol_get_cache_index(sym)      ((sym)->cache_index)
-/*
-   Set the symbol's cache index
-*/
-#define fts_symbol_set_cache_index(sym, index) (((struct fts_symbol_descr *) sym)->cache_index = (index))
-
-
-/*
- * non documented 
- */
-#define fts_symbol_get_operator(sym)         ((sym)->operator)
-#define fts_symbol_set_operator(sym, op)     (((struct fts_symbol_descr *) sym)->operator = (op))
-#define fts_symbol_is_operator(sym)          ((sym)->operator != (-1))
-
-
 /*
   Predefined symbols. See predefsymbols.h
 */
@@ -109,9 +90,9 @@ FTS_API fts_symbol_t fts_new_symbol_copy( const char *name);
 #define PREDEF_SYMBOL(V,S) FTS_API fts_symbol_t V;
 #include <fts/lang/mess/predefsymbols.h>
 
-/* (fd)
-   See mess_types.h for comment on fts_type_t
-*/
+/* 
+ * fts_type_t equivalent of symbols
+ */
 #define fts_t_anything fts_s_anything
 #define fts_t_void fts_s_void
 #define fts_t_float fts_s_float

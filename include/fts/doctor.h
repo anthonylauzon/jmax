@@ -18,15 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 #ifndef _FTS_DOCTOR_H_
 #define _FTS_DOCTOR_H_
-
 
 FTS_API void fts_register_object_doctor(fts_symbol_t class_name,
 				       fts_object_t *(* fun)(fts_patcher_t *patcher,

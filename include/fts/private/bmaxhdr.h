@@ -18,42 +18,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_SYS_H_
-#define _FTS_SYS_H_
-
-/* 
-   Stdio is included for every FTS file 
-   */
-
-#include <stdio.h>
+#ifndef _FTS_PRIVATE_BMAXHDR_H_
+#define _FTS_PRIVATE_BMAXHDR_H_
 
 /*
-  Generic include file for the sys layer.
-  */
+  A FTS binary file is made of the following:
+  . a header:
+    . magic number: 'bMax'
+    . code size
+    . number of symbols
+  . code
+  . symbol table
+*/
 
-#include <fts/sys/platform.h>
-#include <fts/sys/hw.h>
-#include <fts/sys/mem.h>
-#include <fts/sys/modules.h>
-#include <fts/sys/status.h>
-#include <fts/sys/version.h>
+typedef struct fts_binary_file_header_t {
+  unsigned long magic_number;
+  unsigned long code_size;
+  unsigned long n_symbols;
+} fts_binary_file_header_t;
+
+/* 'bMax' */
+#define FTS_BINARY_FILE_MAGIC 0x624D6178
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-

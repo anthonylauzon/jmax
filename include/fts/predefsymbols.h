@@ -18,10 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Author: Francois Dechelle.
- *
  */
 
 /**
@@ -50,8 +46,6 @@ PREDEF_SYMBOL( fts_s_symbol, "symbol")
 PREDEF_SYMBOL( fts_s_object, "object")
 PREDEF_SYMBOL( fts_s_list, "list")
 PREDEF_SYMBOL( fts_s_connection, "connection")
-PREDEF_SYMBOL( fts_s_true, "true")
-PREDEF_SYMBOL( fts_s_false, "false")
 PREDEF_SYMBOL( fts_s_yes, "yes")
 PREDEF_SYMBOL( fts_s_no, "no")
 PREDEF_SYMBOL( fts_s_init, "init")

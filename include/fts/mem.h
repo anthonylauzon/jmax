@@ -26,8 +26,6 @@
    This file include all the memory allocation tools provided by FTS.
 */
 
-#include <stdio.h>
-
 /* Standard allocation routines */
 FTS_API void *fts_malloc(unsigned int size);
 FTS_API void *fts_calloc(unsigned int size);
@@ -38,8 +36,7 @@ FTS_API void fts_free(void *p);
 #define fts_zalloc fts_calloc
 
 /* Heap allocator */
-struct fts_heap;
-typedef struct fts_heap fts_heap_t;
+typedef struct _fts_heap_t fts_heap_t;
 
 FTS_API fts_heap_t *fts_heap_new(unsigned int block_size);
 

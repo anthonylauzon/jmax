@@ -18,23 +18,53 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
 
-#ifndef _FTS_OBJECTS_H_
-#define _FTS_OBJECTS_H_
-
-/* init function */
-FTS_API void fts_objects_init(void);
+#ifndef _FTS_OBJECT_H_
+#define _FTS_OBJECT_H_
 
 #define FTS_NO_ID -1
 
+struct fts_simple_object
+{
+  fts_class_t *cl;
+  int id; /* id for the object */
+};
+
+struct fts_object
+{
+  struct fts_simple_object head;
+
+  /* the object description */
+  int argc;
+  fts_atom_t *argv;
+
+  /* patcher housekeeping */
+  fts_patcher_t *patcher;
+  fts_object_t  *next_in_patcher;
+
+  /* Variable: If this object is bound to a variable, this is the variable name */
+  fts_symbol_t varname;
+
+  /* Variables referred by the object */
+  fts_binding_list_t *var_refs; /* handled completely in the variable.c file */
+
+  /* connections */
+  fts_connection_t **in_conn;
+  fts_connection_t **out_conn;
+
+  /* object dynamic properties */
+  fts_plist_t *properties;
+
+  /* reference counter */
+  int refcnt;
+};
+
+
+
+
 FTS_API fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int ac, const fts_atom_t *at);
-FTS_API void fts_object_set_id(fts_object_t *obj, int id);
 
 /* create/destroy object without patcher (attention: hack in fts_object_create()!) */
 FTS_API fts_object_t *fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at);
@@ -48,10 +78,6 @@ FTS_API void fts_object_destroy(fts_object_t *obj);
 /* traditional object in patcher functions */
 FTS_API fts_status_t fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_t **ret);
 FTS_API void fts_object_delete_from_patcher(fts_object_t *obj);
-
-/* support for redefinition */
-FTS_API fts_object_t *fts_object_recompute(fts_object_t *old);
-FTS_API fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const fts_atom_t *at);
 
 /* properties */
 FTS_API void fts_object_send_properties(fts_object_t *obj);
@@ -80,9 +106,6 @@ FTS_API fts_symbol_t fts_object_get_class_name(fts_object_t *obj);
 #define fts_object_get_class(o) ((o)->head.cl)
 #define fts_object_get_metaclass(o) ((o)->head.cl->mcl)
 #define fts_object_get_user_data(o) ((o)->head.cl->user_data)
-
-/* return true if the object is being deleted, i.e. if the patcher (or an ancestor of the patcher) is being deleted */
-FTS_API int fts_object_being_deleted(fts_object_t *obj);
 
 /* test recursively if an object is inside a patcher (or its subpatchers) */
 FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);

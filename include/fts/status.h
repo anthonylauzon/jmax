@@ -18,20 +18,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_LANG_H_
-#define _FTS_LANG_H_
+#ifndef _FTS_STATUS_H_
+#define _FTS_STATUS_H_
 
-#include <fts/lang/datalib.h>
-#include <fts/lang/dsp.h>
-#include <fts/lang/ftl.h>
-#include <fts/lang/mess.h>
-#include <fts/lang/utils.h>
-#include <fts/lang/veclib.h>
+/* General status return values for FTS. */
+struct _fts_status_description_t {
+  const char *description;
+};
+
+#define fts_Success ((fts_status_t) 0)
+
+#define fts_status_get_description(s) ((s)->description)
 
 #endif

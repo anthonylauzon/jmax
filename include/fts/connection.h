@@ -18,22 +18,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _PATCHERDATA_H_
-#define _PATCHERDATA_H_
 
-FTS_API fts_patcher_data_t *fts_patcher_data_new(fts_patcher_t *patcher);
-FTS_API void fts_patcher_data_free( fts_patcher_data_t *data);
-FTS_API void fts_patcher_data_add_object(fts_patcher_data_t *d, fts_object_t *obj);
-FTS_API void fts_patcher_data_add_connection(fts_patcher_data_t *d, fts_connection_t *obj);
-FTS_API void fts_patcher_data_remove_object(fts_patcher_data_t *d, fts_object_t *obj);
-FTS_API void fts_patcher_data_remove_connection(fts_patcher_data_t *d, fts_connection_t *obj);
-FTS_API void fts_patcher_data_redefine(fts_patcher_data_t *d);
-FTS_API void fts_patcher_data_blip(fts_data_t *d, const char *msg);
+#ifndef _FTS_CONNECTION_H_
+#define _FTS_CONNNECTION_H_
+
+typedef enum fts_connection_type
+{
+  fts_c_invalid = 0, /* from error object or type missmatch */
+  fts_c_anything = 1, /* message which is not one of the following */
+  fts_c_atom = 2, /* single atom (value) */
+  fts_c_object = 3, /* objects */
+  fts_c_signal = 4 /* signal connection */
+} fts_connection_type_t;
+
+struct fts_connection
+{
+  fts_object_t *src;
+  int woutlet;
+
+  fts_object_t *dst;
+  int winlet;
+
+  int id; /* the connection ID, when defined */
+ 
+  fts_symbol_t symb; /* the message cache: the symbol: if null, means anything ! */
+  fts_method_t  mth; /* the message  cache: the method */
+
+  fts_connection_type_t type; /* user visible connection cathogeries */
+
+  fts_connection_t *next_same_dst;
+  fts_connection_t *next_same_src;
+};
 
 #endif

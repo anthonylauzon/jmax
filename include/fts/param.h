@@ -18,14 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_PARAMS_H_
-#define _FTS_PARAMS_H_
+#ifndef _FTS_PARAM_H_
+#define _FTS_PARAM_H_
 
 typedef void (* fts_param_listener_fun_t) (void *listener, fts_symbol_t name,
 					   const fts_atom_t *value);

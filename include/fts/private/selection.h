@@ -18,30 +18,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
 
-#ifndef _FTS_LABEL_H_
-#define _FTS_LABEL_H_
 
-typedef struct _fts_label_
+#ifndef _FTS_PRIVATE_SELECTION_H_
+#define _FTS_PRIVATE_SELECTION_H_
+
+/* Selection */
+typedef struct _fts_selection_t
 {
-  fts_object_t head;
-  fts_channel_t channel;
-} fts_label_t;
+  fts_object_t ob;
 
-FTS_API fts_class_t *fts_label_class;
+  fts_object_t **objects;
+  int objects_size;
+  int objects_count;
 
-#define fts_label_get_channel(l) (&(l)->channel)
-
-#define fts_object_is_label(o) (fts_object_get_class(o) == fts_label_class)
-
-#define fts_label_get(p, s) ((fts_label_t *)fts_variable_get_object_always((p), (s), fts_label_class))
-
-#define fts_label_is_connected(l) (fts_channel_has_target(fts_label_get_channel(l)))
-#define fts_label_send(l, s, n, a) fts_channel_output_message_from_targets(fts_label_get_channel(l), 0, (s), (n), (a))
+  fts_connection_t **connections;
+  int connections_size;
+  int connections_count;
+} fts_selection_t;
 
 #endif
