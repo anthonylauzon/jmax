@@ -34,7 +34,13 @@ import tcl.lang.*;
 
 public class MaxApplication extends Object
 {
-  private static Properties jmaxProperties;
+  // (fd) changed because FtsServer uses MaxApplication.getProperty for timeOut
+  // This is not clean because you cannot use the application layer without calling
+  // MaxApplication.main !!! 
+  // i.e. cannot write an application in Java that is not jMax...
+
+  //  private static Properties jmaxProperties;
+  private static Properties jmaxProperties = new Properties(System.getProperties());
 
   /** Method to get system wide properties, stored
     in jmaxProperties */
@@ -59,10 +65,13 @@ public class MaxApplication extends Object
 
   /** Get the unique active TCL interpreter */
 
-  static private Interp itsInterp;
+  static private Interp itsInterp = null;
 
   public static Interp getTclInterp()
   {
+    if (itsInterp == null)
+      makeTclInterp();
+
     return itsInterp;
   }
 
@@ -73,7 +82,7 @@ public class MaxApplication extends Object
 
   private static ErmesSketchWindow itsSketchWindow;
 
-  static MaxWhenHookTable  itsHookTable;
+  static MaxWhenHookTable  itsHookTable = null;
 
   /**
    * @deprecated
@@ -92,6 +101,9 @@ public class MaxApplication extends Object
 
   public static void addHook(String name, String code)
   {
+    if (itsHookTable == null)
+      itsHookTable = new MaxWhenHookTable(); 
+      
     itsHookTable.addHook(name, code);
   }
 
@@ -99,6 +111,9 @@ public class MaxApplication extends Object
 
   public static void runHooks(String name)
   {
+    if (itsHookTable == null)
+      itsHookTable = new MaxWhenHookTable(); 
+      
     itsHookTable.runHooks(name);
   }
 
