@@ -1,5 +1,9 @@
 2003-07-08  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
+	* configure.in, client/configure.in, m4/ac_prog_jar_update.m4, */jav/*/Makefile.am: added test to know if jar support -u flag (jar from gcj-3.2 doesn't support -u).
+	added configure flag to set which jar to use (--with-jar=) 
+	replaced jar by $(JAR) in Makefile.am
+
 	* */java/*/Makefile.am: closed bug "[ 761311 ] make dist RedHat 8.0". 
 	set EXTRA_DIST to package_JAVA.
 
