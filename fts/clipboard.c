@@ -43,6 +43,7 @@
 #endif
 
 #include <ftsprivate/bmaxfile.h>
+#include <ftsprivate/selection.h>
 
 typedef struct {
   fts_object_t ob;
@@ -100,7 +101,6 @@ clipboard_copy_selection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   if (this->file)
     fts_save_selection_as_bmax(this->file, fts_get_object(at));
 }
-
 
 static void
 clipboard_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

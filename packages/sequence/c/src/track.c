@@ -1171,7 +1171,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_upload, track_upload);
   fts_class_message_varargs(cl, fts_s_post, track_post);
   fts_class_message_varargs(cl, fts_s_print, track_print);
-
+  
   fts_class_message_varargs(cl, seqsym_import_midifile_dialog, track_import_midifile_dialog);
   fts_class_message_varargs(cl, seqsym_import_midifile, track_import_midifile);
 

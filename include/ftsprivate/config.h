@@ -19,24 +19,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
+#include <ftsprivate/audio.h> /* audioconfig_t */
+#include <ftsprivate/midi.h> /* midiconfig_t */
 
-
-#ifndef _FTS_PRIVATE_SELECTION_H_
-#define _FTS_PRIVATE_SELECTION_H_
-
-/* Selection */
-typedef struct _fts_selection_t
+typedef struct
 {
-  fts_object_t ob;
+  fts_object_t* o;
+  fts_symbol_t file_name;
+  midiconfig_t* midi_config;
+  audioconfig_t* audio_config;
+} config_t;
 
-  fts_object_t **objects;
-  int objects_size;
-  int objects_count;
+extern fts_class_t* config_type;
 
-} fts_selection_t;
+extern fts_object_t *fts_config_get( void);
+extern void fts_config_set( config_t* config);
 
-FTS_API int fts_selection_contains_object(fts_selection_t *sel, fts_object_t *o);
-FTS_API void fts_selection_add_object(fts_selection_t *sel, fts_object_t *o);
-FTS_API int fts_selection_connection_ends_selected(fts_selection_t *sel, fts_connection_t *c); 
 
-#endif
+
+
+

@@ -94,19 +94,19 @@ public class AdderTool extends Tool implements PositionListener {
   }
   
   void addEvent(int x, int y, EventValue value)
-    {
-      UtilTrackEvent aEvent = new UtilTrackEvent(value);
-      SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+  {
+    UtilTrackEvent aEvent = new UtilTrackEvent(value);
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
       
-      egc.getAdapter().setX(aEvent, x);
+    egc.getAdapter().setX(aEvent, x);
       
-      egc.getAdapter().setY(aEvent, y);
-      
-      egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
-							value.getValueInfo().getName(), 
-							  value.getPropertyCount(), 
-							value.getPropertyValues());
-    }
+    egc.getAdapter().setY(aEvent, y);
+    
+    egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
+						      value.getValueInfo().getName(), 
+						      value.getPropertyCount(),
+						      value.getPropertyValues());
+  }
   
   //-------------- Fields
   MidiMouseTracker itsMidiMouseTracker;

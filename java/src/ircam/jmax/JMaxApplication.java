@@ -28,12 +28,12 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-import javax.swing.*;
-/*import javax.swing.JLabel;
-  import javax.swing.JOptionPane;
-  import javax.swing.JScrollPane;
-  import javax.swing.JTextArea;
-  import javax.swing.ListModel;*/
+/*import javax.swing.*;*/
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ListModel;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -90,14 +90,14 @@ class ProjectMessageHandler implements FtsMessageHandler {
   }
 }
 
-class MidiManagerMessageHandler implements FtsMessageHandler {
+class ConfigMessageHandler implements FtsMessageHandler {
   public void invoke( FtsObject obj, FtsArgs args)
   {
     if ( args.isInt( 0) )
       {
-	JMaxApplication.setMidiManager( new FtsMidiManager( JMaxApplication.getFtsServer(), 
-							    JMaxApplication.getRootPatcher(),
-							    args.getInt( 0)));
+	JMaxApplication.setConfig( new FtsConfig( JMaxApplication.getFtsServer(), 
+						  JMaxApplication.getRootPatcher(),
+						  args.getInt( 0)));
       }
   }
 }
@@ -164,7 +164,7 @@ class JMaxClient extends FtsObject {
   {
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "patcher_loaded"), new LoadPatcherMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "project"), new ProjectMessageHandler());
-    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "midi_config"), new MidiManagerMessageHandler());
+    FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "config"), new ConfigMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "package"), new PackageMessageHandler());
     FtsObject.registerMessageHandler( JMaxClient.class, FtsSymbol.get( "showMessage"), new FtsMessageHandler() {
 	public void invoke( FtsObject obj, FtsArgs args)
@@ -259,17 +259,17 @@ public class JMaxApplication {
       getProject().save( null);	
 
     //Look if current midi configuration needs to be saved
-    if( getMidiManager().isDirty() && ( getMidiManager().getFileName() != null))
+    if( getConfig().isDirty() && ( getConfig().getFileName() != null))
       {
 	Object[] options = { "Save", "Don't save"};
 	int result = JOptionPane.showOptionDialog( getConsoleWindow(), 
-						   "MIDI Configuration File is not saved.\nDo you want to save it now?", 
-						   "MIDI Config Not Saved", 
+						   "Configuration File is not saved.\nDo you want to save it now?", 
+						   "Config Not Saved", 
 						   JOptionPane.YES_NO_CANCEL_OPTION,
 						   JOptionPane.QUESTION_MESSAGE,
 						   null, options, options[0]);
 	if( result == JOptionPane.YES_OPTION)
-	  getMidiManager().save( getMidiManager().getFileName());	
+	  getConfig().save( getConfig().getFileName());	
       }
     /////////////////////////////////////////////////////////////////////////
 
@@ -431,14 +431,14 @@ public class JMaxApplication {
     singleInstance.project = proj;
   }
 
-  public static FtsMidiManager getMidiManager()
+  public static FtsConfig getConfig()
   {
-    return singleInstance.midiManager; 
+    return singleInstance.config; 
   }
 
-  public static void setMidiManager( FtsMidiManager midim)
+  public static void setConfig( FtsConfig c)
   {
-    singleInstance.midiManager = midim;
+    singleInstance.config = c;
   }
 
   public static FtsDspControl getDspControl()
@@ -748,7 +748,7 @@ public class JMaxApplication {
 
     try
       {
-	clientObject.send( FtsSymbol.get( "midi_config"));
+	clientObject.send( FtsSymbol.get( "config"));
       }
     catch(IOException e)
       {
@@ -784,5 +784,5 @@ public class JMaxApplication {
   private FtsPatcherObject rootPatcher;
   private JMaxClient clientObject;
   private FtsProject project;
-  private FtsMidiManager midiManager;
+  private FtsConfig config;
 }

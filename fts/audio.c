@@ -899,6 +899,12 @@ audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
   self->buffer_size = AUDIO_CONFIG_DEFAULT_BUFFER_SIZE;
 }
 
+static void
+audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  audioconfig_t *this = (audioconfig_t *)o;
+}
+
 /* DUMMY DESTRUCTOR */
 static void
 audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -910,7 +916,9 @@ audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const ft
 static void
 audioconfig_instantiate(fts_class_t* cl)
 {
-  fts_class_init(cl, sizeof(audioconfig_t), audioconfig_init, audioconfig_delete);  
+  fts_class_init(cl, sizeof(audioconfig_t), audioconfig_init, audioconfig_delete);
+
+  fts_class_message_varargs(cl, fts_s_upload, audioconfig_upload);
 }
 
 /***********************************************************************

@@ -5,6 +5,7 @@ bmaxfile.h \
 class.h \
 client.h \
 connection.h \
+config.h \
 dspgraph.h \
 errobj.h \
 fpe.h \

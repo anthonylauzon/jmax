@@ -261,7 +261,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
       select(index);    
   }
   /**
-   * TrackDataListener interface: keep the index-based selection consistent. */
+   * BpfDataListener interface: keep the index-based selection consistent. */
   public void pointChanged(int oldIndex, int newIndex, float newTime, float newValue)
   {
     // NOTE: oldIndex is the index where the object WAS before moving,
@@ -305,7 +305,7 @@ public class BpfSelection extends DefaultListSelectionModel implements BpfDataLi
 
     public void pointsChanged(){}
 
-    /** TrackDataListener interface */
+    /** BpfDataListener interface */
     public void pointsDeleted( int index, int size) 
     {
 	for(int i =0; i<size;i++)

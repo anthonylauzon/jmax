@@ -90,25 +90,28 @@ fts_selection_connection_ends_selected(fts_selection_t *sel, fts_connection_t *c
     return 0;
 }
 
+void
+fts_selection_add_object( fts_selection_t *sel, fts_object_t *obj)
+{
+  int i;
+
+  sel->objects_count++;
+
+  if (sel->objects_count > sel->objects_size)
+    selection_object_size_to_fit(sel);
+
+  for (i = 0; i < sel->objects_size; i++)
+    if (sel->objects[i] == 0)
+      {
+	sel->objects[i] = obj;
+	return;
+      }
+}
+
 static void
 selection_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_selection_t *this  = (fts_selection_t *) o;
-  fts_object_t *newobj;
-  int i;
-
-  newobj = fts_get_object(at);
-  this->objects_count++;
-
-  if (this->objects_count > this->objects_size)
-    selection_object_size_to_fit(this);
-
-  for (i = 0; i < this->objects_size; i++)
-    if (this->objects[i] == 0)
-      {
-	this->objects[i] = newobj;
-	return;
-      }
+  fts_selection_add_object( (fts_selection_t *) o, fts_get_object(at));
 }
 
 static void

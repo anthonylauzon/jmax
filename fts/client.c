@@ -23,7 +23,7 @@
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
 /* Define this if you want logs of symbol cache hit */
 #define CACHE_REPORT
-/* #define CLIENT_LOG */
+#define CLIENT_LOG
 /* #define CLIENT_DEBUG */
 
 #include <fts/fts.h>
@@ -35,6 +35,7 @@
 #include <ftsprivate/tokenizer.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/errobj.h>
+#include <ftsprivate/config.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -1080,19 +1081,19 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_send_message( project, fts_s_upload, 0, 0);
 }
 
-static void client_get_midiconfig( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_get_config( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_t *config = fts_midiconfig_get();
+  fts_object_t *config = fts_config_get();
 
   if(config != NULL) 
     {
       fts_atom_t a;
 
-      if (!fts_object_has_id(config))
+      if ( !fts_object_has_id( config))
 	client_register_object((client_t *)o, config, FTS_NO_ID);
       
       fts_set_int(&a, fts_get_object_id(config));
-      fts_client_send_message(o, fts_s_midi_config, 1, &a);
+      fts_client_send_message(o, fts_s_config, 1, &a);
       
       fts_send_message(config, fts_s_upload, 0, 0);
     }
@@ -1127,7 +1128,7 @@ static void client_instantiate(fts_class_t *cl)
   fts_class_init( cl, sizeof( client_t), client_init, client_delete);
 
   fts_class_message_varargs(cl, fts_new_symbol( "get_project"), client_get_project);
-  fts_class_message_varargs(cl, fts_s_midi_config, client_get_midiconfig);
+  fts_class_message_varargs(cl, fts_s_config, client_get_config);
 
   fts_class_message_varargs(cl, fts_new_symbol( "new_object"), client_new_object);
   fts_class_message_varargs(cl, fts_new_symbol( "set_object_property"), client_set_object_property);

@@ -74,15 +74,14 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
     makeMenuBar();    
     
-    midiPanel  = new MidiConfigPanel( this, JMaxApplication.getMidiManager());
-    audioPanel = new AudioConfigPanel( this);
+    midiPanel  = new MidiConfigPanel( this, JMaxApplication.getConfig().getMidiConfig());
+    audioPanel = new AudioConfigPanel( this, JMaxApplication.getConfig().getAudioConfig());
 
     tabbedPane = new JTabbedPane();
     tabbedPane.setBorder( BorderFactory.createEtchedBorder());
     tabbedPane.addTab("MIDI", midiPanel);
     tabbedPane.addTab("Audio", audioPanel);
     tabbedPane.setSelectedIndex(0);
-    tabbedPane.setEnabledAt( 1, false);
     
     /************ Buttons **********************************/
     JButton addButton = new JButton("Add");
@@ -112,9 +111,10 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     validate();
     pack();
 
-    if( JMaxApplication.getMidiManager() == null)
+    if( JMaxApplication.getConfig() == null)
       {
 	tabbedPane.setEnabledAt( 0, false);
+	tabbedPane.setEnabledAt( 1, false);
 	addButton.setEnabled( false);
 	deleteButton.setEnabled( false);
       }
@@ -148,8 +148,8 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
 
   void update()
   {
-    midiPanel.update( JMaxApplication.getMidiManager());
-    audioPanel.update();
+    midiPanel.update( JMaxApplication.getConfig().getMidiConfig());
+    audioPanel.update( JMaxApplication.getConfig().getAudioConfig());
   } 
 
   void Add()
@@ -194,5 +194,6 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
   private AudioConfigPanel audioPanel;
   private static ConfigurationEditor configEditor = null;
   private JTabbedPane tabbedPane;
+  static Font tableFont = (Font)UIManager.get("Table.font");
 }
 

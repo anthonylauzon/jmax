@@ -40,16 +40,16 @@ public class SequenceSelecter extends Selecter {
     public void XORDraw(int dx, int dy) 
     {
 	
-	Rectangle tempr, clip;
-	    
-	tempr = (Rectangle) itsRunningG.getClip();
-	clip = ((SequenceGraphicContext)gc).getTrackClip();
+      Rectangle tempr, clip;
+      
+      tempr = (Rectangle) itsRunningG.getClip();
+      clip = ((SequenceGraphicContext)gc).getTrackClip();
 	
-	itsRunningG.clipRect(clip.x, clip.y, clip.width, clip.height);
-
-	super.XORDraw(dx, dy);
-
-	itsRunningG.setClip(tempr);
+      itsRunningG.clipRect(clip.x, clip.y, clip.width, clip.height);
+      
+      super.XORDraw(dx, dy);
+      
+      itsRunningG.setClip(tempr);
     }
 }
 

@@ -1,6 +1,8 @@
 packagedir=$(pkgdatadir)/java/classes/ircam/jmax/fts
 package_JAVA = \
+FtsAudioConfig.java\
 FtsClipboard.java\
+FtsConfig.java\
 FtsConnection.java\
 FtsConnectionListener.java\
 FtsConsole.java\
@@ -17,7 +19,7 @@ FtsInletsListener.java\
 FtsIntValueListener.java\
 FtsIntValueObject.java\
 FtsMessageListener.java\
-FtsMidiManager.java\
+FtsMidiConfig.java\
 FtsObjectErrorListener.java\
 FtsObjectSet.java\
 FtsObjectWithEditor.java\

@@ -332,118 +332,118 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     return track;
   }
   
-    public void updateNewObject(Object obj){};
+  public void updateNewObject(Object obj){};
 
-    public void setViewMode(int viewType)
+  public void setViewMode(int viewType)
+  {
+    if(viewMode!=viewType)
+      {
+	viewMode=viewType;
+	renderer.setViewMode(viewMode);
+	track.setProperty("viewMode", new Integer(viewType));
+	repaint();
+      }    
+  }
+  public int getViewMode()
+  {
+    return viewMode;
+  }
+
+  public int getDefaultHeight()
+  {
+    return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
+  }
+  public void showListDialog()
+  {
+    if(listDialog==null) 
+      createListDialog();
+    listDialog.setVisible(true);
+  }
+
+  private void createListDialog()
+  {
+    listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
+  }
+  
+  public boolean isDisplayLabels()
+  {
+    return ((PartitionAdapter)gc.getAdapter()).isDisplayLabels();
+  }
+  public void setDisplayLabels(boolean display)
+  {
+    ((PartitionAdapter)gc.getAdapter()).setDisplayLabels(display);
+    itsScore.repaint();
+  }
+
+  class ScorePanel extends ircam.jmax.toolkit.PopupToolbarPanel
+  {
+    MidiTrackEditor editor;
+    ScorePanel(MidiTrackEditor editor)
     {
-	if(viewMode!=viewType)
+      super(editor);
+      this.editor = editor; 
+    }
+
+    protected void processMouseEvent(MouseEvent e)
+    {
+      if(e.isPopupTrigger())
 	{
-	    viewMode=viewType;
-	    renderer.setViewMode(viewMode);
-	    track.setProperty("viewMode", new Integer(viewType));
-	    repaint();
-	}    
-    }
-    public int getViewMode()
-    {
-      return viewMode;
-    }
-
-    public int getDefaultHeight()
-    {
-	return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
-    }
-    public void showListDialog()
-    {
-	if(listDialog==null) 
-	    createListDialog();
-	listDialog.setVisible(true);
-    }
-
-    private void createListDialog()
-    {
-	listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
-    }
-
-    public boolean isDisplayLabels()
-    {
-	return ((PartitionAdapter)gc.getAdapter()).isDisplayLabels();
-    }
-    public void setDisplayLabels(boolean display)
-    {
-	((PartitionAdapter)gc.getAdapter()).setDisplayLabels(display);
-	itsScore.repaint();
-    }
-
-    class ScorePanel extends ircam.jmax.toolkit.PopupToolbarPanel
-    {
-	MidiTrackEditor editor;
-	ScorePanel(MidiTrackEditor editor)
-	{
-	  super(editor);
-	  this.editor = editor; 
-	}
-
-	protected void processMouseEvent(MouseEvent e)
-	{
-	    if(e.isPopupTrigger())
+	  if(editor.renderer.getViewMode()==NMS_VIEW)
 	    {
-		if(editor.renderer.getViewMode()==NMS_VIEW)
+	      TrackEvent event = null;
+	      int x = e.getX();
+	      int y = e.getY();
+	      event = (TrackEvent)editor.renderer.firstObjectContaining(x,y);
+	      if(event!=null)
 		{
-		  TrackEvent event = null;
-		  int x = e.getX();
-		  int y = e.getY();
-		  event = (TrackEvent)editor.renderer.firstObjectContaining(x,y);
-		  if(event!=null)
+		  MidiEventPopupMenu popup = (MidiEventPopupMenu)event.getValue().getPopupMenu();
+		  if(popup!=null)
 		    {
-		      MidiEventPopupMenu popup = (MidiEventPopupMenu)event.getValue().getPopupMenu();
-		      if(popup!=null)
-		      {
-			popup.update(event, editor.gc);
-			popup.show (e.getComponent(), x-10, y-10);
-		      }		      
-		      return;
-		    }
+		      popup.update(event, editor.gc);
+		      popup.show (e.getComponent(), x-10, y-10);
+		    }		      
+		  return;
 		}
 	    }
-	    super.processMouseEvent(e);
 	}
-
-	public void processKeyEvent(KeyEvent e)
-	{
-	    if(SequenceTextArea.isDeleteKey(e))
-		{
-		    if(e.getID()==KeyEvent.KEY_PRESSED)
-			{
-			    ((UndoableData)track.getTrackDataModel()).beginUpdate();
-			    editor.getSelection().deleteAll();
-			}	    
-		}
-	    else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
-		if(e.isControlDown())
-		    editor.getSelection().selectPrevious();
-		else
-		    editor.getSelection().selectNext();
-
-	    super.processKeyEvent(e);
-	    requestFocus();
-	}
-   
-	public void paint(Graphics g) 
-	{
-	  Rectangle r = g.getClipBounds();
-	  renderer.render(g, r); //et c'est tout	
-	}
+      super.processMouseEvent(e);
     }
 
-    class MidiTrackPropertyChangeListener implements PropertyChangeListener 
+    public void processKeyEvent(KeyEvent e)
     {
-	public void propertyChange(PropertyChangeEvent e)
+      if(SequenceTextArea.isDeleteKey(e))
 	{
-	    if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
-		SequenceSelection.setCurrent(selection);
+	  if(e.getID()==KeyEvent.KEY_PRESSED)
+	    {
+	      ((UndoableData)track.getTrackDataModel()).beginUpdate();
+	      editor.getSelection().deleteAll();
+	    }	    
 	}
+      else if((e.getKeyCode() == KeyEvent.VK_TAB)&&(e.getID()==KeyEvent.KEY_PRESSED))
+	if(e.isControlDown())
+	  editor.getSelection().selectPrevious();
+	else
+	  editor.getSelection().selectNext();
+      
+      super.processKeyEvent(e);
+      requestFocus();
     }
+   
+    public void paint(Graphics g) 
+    {
+      Rectangle r = g.getClipBounds();
+      renderer.render(g, r); //et c'est tout	
+    }
+  }
+
+  class MidiTrackPropertyChangeListener implements PropertyChangeListener 
+  {
+    public void propertyChange(PropertyChangeEvent e)
+    {
+      if (e.getPropertyName().equals("selected") && e.getNewValue().equals(Boolean.TRUE))
+	SequenceSelection.setCurrent(selection);
+    }
+  }
 
 
     //--- MidiTrack fields

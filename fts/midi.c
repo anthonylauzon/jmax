@@ -2035,15 +2035,8 @@ midiconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     label = label->next;
   }
 
-  midiconfig_update_labels(this);
-  midiconfig_update_devices(this);
-
-/*   if( this->file_name != NULL) */
-/*   { */
-/*     fts_atom_t a[1]; */
-/*     fts_set_symbol( a, this->file_name); */
-/*     fts_client_send_message((fts_object_t *)this, fts_s_name, 1, a); */
-/*   } */
+  midiconfig_update_labels( this);
+  midiconfig_update_devices( this);
 }
 
 

@@ -28,87 +28,75 @@ import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.editors.project.*;
 
-public class FtsMidiManager extends FtsObject
+public class FtsMidiConfig extends FtsObject
 {
   protected FtsArgs args = new FtsArgs();
 
   static
   {
-    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("inputs"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("inputs"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMidiManager)obj).setSources( args.getLength(), args.getAtoms());
+	  ((FtsMidiConfig)obj).setSources( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("outputs"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("outputs"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMidiManager)obj).setDestinations( args.getLength(), args.getAtoms());
+	  ((FtsMidiConfig)obj).setDestinations( args.getLength(), args.getAtoms());
 	}
       });
-    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("insert"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("insert"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMidiManager)obj).insertLabel( args.getInt( 0), args.getSymbol( 1).toString());
+	  ((FtsMidiConfig)obj).insertLabel( args.getInt( 0), args.getSymbol( 1).toString());
 
           if(args.getLength() > 2)
-            ((FtsMidiManager)obj).setInput( args.getInt( 0), args.getSymbol( 2).toString());
+            ((FtsMidiConfig)obj).setInput( args.getInt( 0), args.getSymbol( 2).toString());
             
           if(args.getLength() > 3)
-            ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 3).toString());            
+            ((FtsMidiConfig)obj).setOutput( args.getInt( 0), args.getSymbol( 3).toString());            
 	}
       });
-    FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("set"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("set"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
-        ((FtsMidiManager)obj).set( args.getInt( 0), args.getSymbol( 1).toString(), args.getSymbol( 2).toString(), args.getSymbol( 3).toString());
+        ((FtsMidiConfig)obj).set( args.getInt( 0), args.getSymbol( 1).toString(), args.getSymbol( 2).toString(), args.getSymbol( 3).toString());
       }
     });    
-     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("remove"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
-	  ((FtsMidiManager)obj).removeLabel( args.getInt( 0));
+	  ((FtsMidiConfig)obj).removeLabel( args.getInt( 0));
 	}
       });
-     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("input"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("input"), new FtsMessageHandler(){
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
-	   ((FtsMidiManager)obj).setInput( args.getInt( 0), args.getSymbol( 1).toString());
+	   ((FtsMidiConfig)obj).setInput( args.getInt( 0), args.getSymbol( 1).toString());
 	 }
        });
-     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("output"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("output"), new FtsMessageHandler(){
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
-	   ((FtsMidiManager)obj).setOutput( args.getInt( 0), args.getSymbol( 1).toString());
+	   ((FtsMidiConfig)obj).setOutput( args.getInt( 0), args.getSymbol( 1).toString());
 	 }
        });
-     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("name"), new FtsMessageHandler(){
+     FtsObject.registerMessageHandler( FtsMidiConfig.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
 	 public void invoke( FtsObject obj, FtsArgs args)
 	 {
-	   ((FtsMidiManager)obj).setFileName( args.getSymbol( 0).toString());
-	 }
-       });
-     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("setDirty"), new FtsMessageHandler(){
-	 public void invoke( FtsObject obj, FtsArgs args)
-	 {
-	   ((FtsMidiManager)obj).setDirty( args.getInt( 0) == 1);
-	 }
-       });
-     FtsObject.registerMessageHandler( FtsMidiManager.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
-	 public void invoke( FtsObject obj, FtsArgs args)
-	 {
-	   ((FtsMidiManager)obj).clear();
+	   ((FtsMidiConfig)obj).clear();
 	 }
        });
   }
     
-  public FtsMidiManager(FtsServer server, FtsObject parent, int id)
+  public FtsMidiConfig(FtsServer server, FtsObject parent, int id)
   {
     super(server, parent, id);
     labels = new Vector();
   }
 
-  public FtsMidiManager() throws IOException
+  public FtsMidiConfig() throws IOException
   { 
     super(JMaxApplication.getFtsServer(), JMaxApplication.getRootPatcher(), FtsSymbol.get("slider"));
   }
@@ -133,7 +121,7 @@ public class FtsMidiManager extends FtsObject
       }
     catch(IOException e)
       {
-	System.err.println("FtsMidiManager: I/O Error sending insert Message!");
+	System.err.println("FtsMidiConfig: I/O Error sending insert Message!");
 	e.printStackTrace(); 
       }
   }
@@ -150,7 +138,7 @@ public class FtsMidiManager extends FtsObject
       }
     catch(IOException e)
       {
-	System.err.println("FtsMidiManager: I/O Error sending remove Message!");
+	System.err.println("FtsMidiConfig: I/O Error sending remove Message!");
 	e.printStackTrace(); 
       }
   }
@@ -168,7 +156,7 @@ public class FtsMidiManager extends FtsObject
       }
     catch(IOException e)
       {
-	System.err.println("FtsMidiManager: I/O Error sending input Message!");
+	System.err.println("FtsMidiConfig: I/O Error sending input Message!");
 	e.printStackTrace(); 
       }
   }
@@ -186,35 +174,7 @@ public class FtsMidiManager extends FtsObject
       }
     catch(IOException e)
       {
-	System.err.println("FtsMidiManager: I/O Error sending output Message!");
-	e.printStackTrace(); 
-      }
-  }
-
-  public void upload()
-  {
-    try
-      {
-	send( FtsSymbol.get("upload"));
-      }
-    catch(IOException e)
-      {
-	System.err.println("FtsMidiManager: I/O Error sending upload Message!");
-	e.printStackTrace(); 
-      }
-  }
-
-  public void save( String fileName)
-  {
-    args.clear();
-    args.addSymbol( FtsSymbol.get( fileName));
-    try
-      {
-	send( FtsSymbol.get("save"), args);
-      }
-    catch(IOException e)
-      {
-	System.err.println("FtsMidiManager: I/O Error sending save Message!");
+	System.err.println("FtsMidiConfig: I/O Error sending output Message!");
 	e.printStackTrace(); 
       }
   }
@@ -227,15 +187,6 @@ public class FtsMidiManager extends FtsObject
   
     if(listener != null)
       listener.sourcesChanged();
-  }
-
-  public void setDirty( boolean d)
-  {
-    isDirty = d;
-  }
-  public boolean isDirty()
-  {
-    return isDirty;
   }
 
   public String[] getSources()
@@ -293,21 +244,9 @@ public class FtsMidiManager extends FtsObject
       listener.labelChanged( index, null, null, output);
   }
 
-  public void setFileName( String fn)
-  {
-    this.fileName = fn;
-    
-  }
-  
-  public String getFileName()
-  {
-    return fileName;
-  }
-
   public void clear()
   {
     labels.removeAllElements();
-    fileName = null;
   }
 
   public class MidiLabel extends Object
@@ -326,10 +265,7 @@ public class FtsMidiManager extends FtsObject
 
   private String[] sources;
   private String[] destinations;
-  private String fileName = null;
-  private String dir = null;
   private Vector labels; 
   private ircam.jmax.editors.configuration.MidiConfigPanel listener;
-  private boolean isDirty = false;
 }
 

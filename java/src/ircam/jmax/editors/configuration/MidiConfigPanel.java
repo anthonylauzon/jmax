@@ -44,8 +44,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 
-// import javax.swing.event.*;
-
 // import javax.swing.table.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
@@ -58,7 +56,7 @@ import ircam.jmax.widgets.*;
 
 public class MidiConfigPanel extends JPanel implements Editor
 {
-  public MidiConfigPanel(Window win, FtsMidiManager mm)  
+  public MidiConfigPanel(Window win, FtsMidiConfig mm)  
   {
     window = win;
     midiMan = mm;
@@ -73,7 +71,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     /*********** Table  ******************************************/
     initCellEditors();
-    defaultLabelFont = tableFont.deriveFont( Font.BOLD);
+    defaultLabelFont = ConfigurationEditor.tableFont.deriveFont( Font.BOLD);
 
     midiTable = new JTable( midiModel){
 	public TableCellEditor getCellEditor(int row, int column)
@@ -107,7 +105,6 @@ public class MidiConfigPanel extends JPanel implements Editor
       }
     });
 
-    
     add( scrollPane);
 
     if( midiMan == null)
@@ -120,10 +117,10 @@ public class MidiConfigPanel extends JPanel implements Editor
     
     if( midiMan == null) return;
 
-    FtsMidiManager.MidiLabel label;
+    FtsMidiConfig.MidiLabel label;
     for( Enumeration e = midiMan.getLabels(); e.hasMoreElements();)
       {
-      label = (FtsMidiManager.MidiLabel) e.nextElement();
+      label = (FtsMidiConfig.MidiLabel) e.nextElement();
       midiModel.addRow( label.label, label.input, label.output);    
       }
   }
@@ -134,16 +131,16 @@ public class MidiConfigPanel extends JPanel implements Editor
 
     JComboBox sourceCombo = new JComboBox( midiMan.getSources());
     sourceCombo.setBackground( Color.white);
-    sourceCombo.setFont( tableFont);
+    sourceCombo.setFont( ConfigurationEditor.tableFont);
     inputCellEditor = new DefaultCellEditor( sourceCombo);
 
     JComboBox destCombo = new JComboBox( midiMan.getDestinations());
     destCombo.setBackground( Color.white);
-    destCombo.setFont( tableFont);
+    destCombo.setFont( ConfigurationEditor.tableFont);
     outputCellEditor = new DefaultCellEditor( destCombo);
   }
 
-  void update(FtsMidiManager mm)
+  void update(FtsMidiConfig mm)
   {    
     midiMan = mm;
     initDataModel();
@@ -188,11 +185,11 @@ public class MidiConfigPanel extends JPanel implements Editor
   }
 
   /*********************************************************
-   ***   Table model for the Requires JTable             ***
+   ***   Table model for the Labels JTable             ***
    *********************************************************/
   class MidiTableModel extends AbstractTableModel 
   {
-    MidiTableModel( FtsMidiManager mm)
+    MidiTableModel( FtsMidiConfig mm)
     {
       super();
       midiMan = mm;
@@ -410,7 +407,7 @@ public class MidiConfigPanel extends JPanel implements Editor
     int size = 0;
     int rows = 0;
     Object data[][];
-    FtsMidiManager midiMan;
+    FtsMidiConfig midiMan;
   }
 
   /************* interface Editor ************************/
@@ -422,10 +419,10 @@ public class MidiConfigPanel extends JPanel implements Editor
   public void close(boolean doCancel)
   {
     boolean toClose = true;
-    if( midiMan.isDirty())
+    if( JMaxApplication.getConfig().isDirty())
       {
-	String message = "MIDI Configuration File is not saved.\nDo you want to save it now?";
-	String title =  "MIDI Config Not Saved";
+	String message = "Configuration File is not saved.\nDo you want to save it now?";
+	String title =  "Config Not Saved";
 	Object[] options = { "Save", "Don't save", "Cancel" };
 	int result = JOptionPane.showOptionDialog( window, message, title, 
 						   JOptionPane.YES_NO_CANCEL_OPTION,
@@ -434,7 +431,7 @@ public class MidiConfigPanel extends JPanel implements Editor
 	
 	if( result == JOptionPane.CANCEL_OPTION)
 	  return;
-
+	
 	if( result == JOptionPane.YES_OPTION)
 	  save();	
       }
@@ -443,8 +440,9 @@ public class MidiConfigPanel extends JPanel implements Editor
 
   public void save()
   {
-    if( midiMan.getFileName() != null)
-      midiMan.save( midiMan.getFileName());
+    String fileName = JMaxApplication.getConfig().getFileName();
+    if( fileName != null)
+      JMaxApplication.getConfig().save( fileName);
     else
       saveAs();
   }
@@ -461,13 +459,12 @@ public class MidiConfigPanel extends JPanel implements Editor
       {
 	String fileName = fileChooser.getSelectedFile().getAbsolutePath();		  		
 	if( fileName != null)
-	  midiMan.save( fileName);
+	  JMaxApplication.getConfig().save( fileName);
       }
   }
   public void print(){}
 
   /********************************/
-  private JTabbedPane tabbedPane;
   private JTable midiTable;
   private DefaultCellEditor inputCellEditor;
   private DefaultCellEditor outputCellEditor;
@@ -475,13 +472,12 @@ public class MidiConfigPanel extends JPanel implements Editor
   private JScrollPane scrollPane;
   private MidiTableModel midiModel;
   private Window window;
-  private FtsMidiManager midiMan;
-  private final int DEFAULT_WIDTH = 450;
-  private final int DEFAULT_HEIGHT = 280;
+  private FtsMidiConfig midiMan;
+  private final int DEFAULT_WIDTH = 500;
+  private final int DEFAULT_HEIGHT = 260;
 
   private JFileChooser fileChooser = new JFileChooser(); 
 
-  private Font tableFont = (Font)UIManager.get("Table.font");
   private Font defaultLabelFont;
 }
 
