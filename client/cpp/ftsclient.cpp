@@ -21,6 +21,7 @@
  */
 
 #ifndef WIN32
+
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -33,18 +34,54 @@
 #include <dlfcn.h>
 #include <signal.h>
 #define LASTERROR errno
+
 #else
+
 #define LASTERROR WSAGetLastError()
 #define snprintf _snprintf
 #define sleep Sleep
+#include <windows.h>
+#include <ctype.h>
+#include <shlobj.h>
+
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <assert.h>
 #include <time.h>
 #include <fts/ftsclient.h>
 
+#include <common/config.h>
+#include <common/configfile.h>
+
+
+// [RS]: TODO: put stuff common to FTS and FTSclient in a
+// common/ subdir, and with one class/module per file!!
+// This whole file is a mess.
+
+/***************************************************
+ * ftsclient init
+ *
+ * Should be called before using anything else.
+ */
+
+// [RS]: TODO: remove the __stdcall and find a better way to make this **** work.
+FTSCLIENT_API void __stdcall ftsclient_init(const char *clientName) 
+{
+  
+  // One may need this debug code again, someday, in a desperate cases...
+  //FILE *f;
+  //f=fopen("c:\\ftsnet_log.txt", "w");
+  //if(f!=NULL) {
+  //  fprintf(f, "I'm alive!!!\n");
+  //  fflush(f);
+  //  fclose(f);
+  //}
+  fts_config_init(clientName, ftsclient_log);
+  fts_config_log_info();
+}
 
 /***************************************************
  * ftsclient log
@@ -84,13 +121,16 @@ unsigned int ftsclient_curtime()
 #endif
 }
 
-void ftsclient_init_log(void)
+void ftsclient_init_log()
 {
   FILE* log;
   char date[64];
+  char logfilename[1024];
 
 #ifdef WIN32
-  log_file = "C:\\ftsclient_log.txt";
+  strcpy(logfilename, fts_config_get_log_dir());
+  strcat(logfilename, "\\ftsclient_log.txt");
+  log_file = strdup(logfilename);
 #else
   char* home = getenv("HOME");
   struct timeval now;
@@ -107,12 +147,14 @@ void ftsclient_init_log(void)
 
   /* truncate the file */
   log = fopen(log_file, "w");
+  assert(log != NULL);
+
   fprintf(log, "[log]: ftsclient compiled on %s at %s\n", __DATE__, __TIME__);
   fprintf(log, "[log]: %s started logging\n", ftsclient_curdate(date, 64));
   fclose(log);
 }
 
-void ftsclient_log(char* fmt, ...)
+FTSCLIENT_API void ftsclient_log(char* fmt, ...)
 {
   FILE* log;
   va_list args; 
@@ -135,6 +177,9 @@ void ftsclient_log(char* fmt, ...)
   fflush(log);
   fclose(log);
 }
+
+
+
 
 /***************************************************
  * FtsHashTable
@@ -1092,7 +1137,7 @@ void FtsObject::install( FtsCallback *callback)
  */
 
 #if WIN32
-void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
+void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) throw( FtsClientException)
 {
   BOOL result;
   char cmdLine[2048];
@@ -1101,7 +1146,8 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   pipe_t new_stdin, new_stdout, tmp_in, tmp_out; 
   SECURITY_ATTRIBUTES attr; 
   int i;
-
+  int bAppNameSpecified = 0;
+    
   _path = (path)? strdup(path) : 0;
   _in = INVALID_PIPE;
   _out = INVALID_PIPE;
@@ -1119,9 +1165,17 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
   for (i = 0; i < args.length(); i++) {
     if ( args.isString(i))
       {
-	strcat( cmdLine, args.getString( i));
-	strcat(cmdLine, " ");
+	    strcat( cmdLine, args.getString( i));
+	    strcat(cmdLine, " ");
       }
+  }
+
+  if(appName) {
+      strcat(cmdLine, " -appname ");
+      strcat(cmdLine, appName);
+  } else {
+      strcat(cmdLine, " -appname ");
+      strcat(cmdLine, fts_config_get_app_name());
   }
 
   /* 
@@ -1204,7 +1258,7 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
 
 }
 #else
-void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientException)
+void FtsProcess::init( const char *path, FtsArgs &args, const char *appName) throw( FtsClientException)
 {
   int from_fts_pipe[2];
   int to_fts_pipe[2];
@@ -1271,50 +1325,172 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
 
 
 
+// [RS]: OK, this file IS a mess, but I didn't start it!!
 #if WIN32
+
+// pHostName may be NULL. pShareName may be NULL, too.
+// If they are not null, they are filled so that the path matches:
+// "\\<pHostName>\<pShareName>..."
+static int isNetworkShare(const char *path, char *pHostName, char *pShareName)
+{
+    if(strlen(path)>=2)
+    {
+        // If the path starts with \\, it must be a network share
+        if (path[0]=='\\' && path[1]=='\\') 
+        {
+            if((pHostName != NULL) || (pShareName != NULL)) {
+                int i, j;
+                i = 0;
+                j = 2; 
+                while( (path[j] != '\\') && (path[j] != 0) ) {
+                    if(pHostName != NULL)
+                        pHostName[i] = path[j];
+                    i++;
+                    j++;                    
+                }
+                if(pHostName != NULL)
+                    pHostName[i] = 0;
+                
+                if ((pShareName != NULL) && (path[j] == '\\')) {
+                    i = 0;
+                    j++;
+                    while( (path[j] != '\\') && (path[j] != 0) ) {
+                        pShareName[i] = path[j];
+                        i++;
+                        j++;
+                    }
+                    pShareName[i] = 0;
+                }
+            }
+
+            return 1;
+        }
+        // If the path starts with a letter followed by a ':'
+        else if(isalpha(path[0]) && path[1]==':')
+        {
+            char rootPath[4];
+			UINT type;
+            rootPath[0] = path[0];
+            rootPath[1] = path[1];
+            rootPath[2] = '\\';
+            rootPath[3] = 0;
+
+            type = GetDriveType(rootPath);
+            if(type == DRIVE_REMOTE) {
+                //if ((pHostName != NULL)) {
+                //}
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+/// Find the path of the FTS executable from ftsclient's 
+/// config file ("ftsclient.cfg").
 void FtsProcess::findDefaultPath() throw( FtsClientException)
 {
-  char fullpath[1024];
-  unsigned char buf[1024];
-  unsigned char version[256];
-  HKEY key, version_key;
-  DWORD type, size;
-  char* jmax_key = "Software\\Ircam\\jMax";
-  char* jmax_version = "FtsVersion";
-  char* jmax_root = "ftsRoot";
+    // [RS]: 1024 is cool, isn't it ?
+    // 64KBytes should be enough for everybody :)
+    // I don't use std::string... it's a shame,
+    // even if other parts of this file use char* too.
+    // But the client is half C++/half C, anyway...
+    // TODO: refactor OR secure all this !!!
 
-  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, jmax_key, 0, KEY_READ, &key) != 0) {
-    throw FtsClientException("Failed to open the jMax registry key\n");
-  }
+    char exeDirPath[1024]; // The current exe's file path
+    char ftspath[1024];    // The FTS path that the function will return
+    char cfgPath[1024];    // The file path to the config file
+    char path[1024];       // The path to FTS as specified in the cfg file.
+    char shareName[1024];  // The share name we may be run from.
+    char hostName[1024];   // The host name we may be run from.
+    int i;
 
-  if ((RegQueryValueEx(key, jmax_version, 0, &type, 0, &size) != 0)
-      || (type != REG_SZ)
-      || (size >= 256)
-      || (RegQueryValueEx(key, jmax_version, 0, 0, &version[0], &size) != 0)) {
-    RegCloseKey(key);
-    throw FtsClientException("Failed to read the jMax version registry key\n");
-  }
+    // Get the current executable file path.
+    GetModuleFileName(NULL, exeDirPath, 1023);
+    i = strlen(exeDirPath);
+    while( (--i >= 0) && (exeDirPath[i]!='\\'));
+    exeDirPath[i] = 0;
 
-  if (RegOpenKeyEx(key, (const char*) &version[0], 0, KEY_READ, &version_key) != 0) {
-    RegCloseKey(key);
-    throw FtsClientException("Error opening registry key\n");
-  }
+    // Open the config file.
+    strcpy(cfgPath, exeDirPath);
+    strcat(cfgPath, "\\ftsclient.cfg");
+    config_file_t *cfgfile;
+    cfgfile = config_file_open(cfgPath);
+    if(cfgfile) {
 
-  if ((RegQueryValueEx(version_key, jmax_root, 0, &type, 0, &size) != 0)
-      || (type != REG_SZ)
-      || (size >= 1024)
-      || (RegQueryValueEx(version_key, jmax_root, 0, 0, &buf[0], &size) != 0)) {
-    RegCloseKey(key);
-    RegCloseKey(version_key);
-    throw FtsClientException("Failed to read the jmaxRoot registry key\n");
-  }
+        // If we are run from a network share...
+        if(isNetworkShare(cfgPath, hostName, shareName)) {
 
-  RegCloseKey(key);
-  RegCloseKey(version_key);
+            int bShareNameSpecified = 0;
+            char shareNameFromConfig[1024];
+            int bLeadingSlash;
 
-  snprintf(fullpath, 1024, "%s\\bin\\%s", buf, "fts.exe");
+            ftsclient_log("[ftsclient] runned on another computer from network share\n");
+            ftsclient_log("[ftsclient] exe file was accessed through host:'%s', share:'%s'\n", hostName, shareName);
 
-  _path = strdup(fullpath);
+            // Read options from config file.
+            config_file_get_string(cfgfile, "FtsRemoteExePath",
+                                   path, sizeof(path)-1
+                                  );
+            if(config_file_get_string(cfgfile, "ShareName",
+                                      shareNameFromConfig, 
+                                      sizeof(shareNameFromConfig)-1
+                                     ) >= 0
+              ) 
+                bShareNameSpecified = 1;
+            
+            bLeadingSlash = (path[0] == '\\');
+
+            snprintf(ftspath, sizeof(ftspath)-1,
+                     "\\\\%s\\%s%s%s",
+                     hostName,
+                     bShareNameSpecified ? shareNameFromConfig : shareName,
+                     bLeadingSlash ? "" : "\\",
+                     path
+                    );
+        }
+        // Else if we are run from the local machine...
+        else {
+            int bRelative = 1;
+
+            ftsclient_log("[ftsclient] run on the local computer directly\n");
+
+            config_file_get_bool(cfgfile, "Relative", &bRelative);
+          
+            if(bRelative) {
+                int bLeadingSlash;
+
+                if( config_file_get_string(cfgfile, "FtsLocalExePath", path, sizeof(path)-1) < 0) {
+                    ftsclient_log("[ftsclient] FATAL: 'FtsLocalExePath' not found in config file\n");
+                    throw new FtsClientException("'FtsLocalExePath' missing in ftsclient.cfg");
+                }
+                bLeadingSlash = (path[0] == '\\');
+
+                ftsclient_log("[ftsclient] FtsLocalExePath (relative) = '%s'\n",path);
+                snprintf(ftspath, sizeof(ftspath)-1, "%s%s%s",
+                         exeDirPath, bLeadingSlash ? "" : "\\", path
+                        );
+                ftsclient_log("[ftsclient] FtsLocalExePath (absolute derived from relative) ='%s'\n",ftspath);
+            }
+            else {
+                if( config_file_get_string(cfgfile, "FtsLocalExePath", ftspath, sizeof(ftspath)-1) < 0) {
+                    ftsclient_log("[ftsclient] FATAL: 'FtsLocalExePath' not found in config file\n");
+                    throw new FtsClientException("'FtsLocalExePath' missing in ftsclient.cfg");
+                }
+                ftsclient_log("[ftsclient] FtsLocalExePath (absolute) = '%s'\n",ftspath);
+            }
+        }
+
+        config_file_close(cfgfile);
+
+        ftsclient_log("[ftsclient] FTS exe path configured as '%s'\n", ftspath);
+        _path = strdup(ftspath);
+    }
+    else {
+        ftsclient_log("[ftsclient] CRITICAL: Config file not found: '%s'\n", cfgPath);
+        _path = "";
+    }
 }
 
 #else
