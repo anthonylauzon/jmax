@@ -158,7 +158,7 @@ fts_random_float(void)
       ++seed;
     }
   
-  return (2.0 * seed / RM) - 1.0;
+  return (float)((2.0 * seed / RM) - 1.0);
 }
 
 #endif
