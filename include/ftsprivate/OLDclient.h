@@ -117,7 +117,7 @@
  */
 
 /* client API */
-extern void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at);
+/*  extern void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int ac, const fts_atom_t *at); */
 
 extern void fts_client_start_msg(int type);
 extern void fts_client_add_int(int value);
