@@ -191,9 +191,14 @@ public class TextRenderer implements ObjectRenderer
   static Container ic = new JPanel();
 
   public void render(Graphics g, int x, int y, int w, int h)
-  {
+  { 
     area.setSize( w, h);
-    SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
+    try{
+        SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
+    }
+    catch( java.lang.NullPointerException e){
+        e.printStackTrace();
+    }
   }
 }
 
