@@ -34,7 +34,6 @@ declareIcon _jmax_patcher_file_ $jmaxRootDir/images/mini_icon_jmax.gif
 declareIcon _jmax_tiny_logo_    $jmaxRootDir/images/jmax_logo_tiny.gif
 declareIcon _patcher_           $jmaxRootDir/images/tool_patcher.gif
 declareIcon _object_            $jmaxRootDir/images/tool_ext.gif
-declareIcon _comment_           $jmaxRootDir/images/tool_text.gif
 declareIcon _error_object_      $jmaxRootDir/images/tool_err.gif
 declareIcon _inlet_             $jmaxRootDir/images/tool_in.gif
 declareIcon _outlet_            $jmaxRootDir/images/tool_out.gif
@@ -64,4 +63,7 @@ declareIcon %arrow_left         $jmaxRootDir/images/arrow_left.gif
 declareIcon %arrow_right        $jmaxRootDir/images/arrow_right.gif
 declareIcon %arrow_up           $jmaxRootDir/images/arrow_up.gif
 declareIcon %arrow_down         $jmaxRootDir/images/arrow_down.gif
+
+
+
 
