@@ -27,12 +27,6 @@
 #ifndef _MESS_MESSTAB_H_
 #define _MESS_MESSTAB_H_
 
-/************************************************************************
- *
- *  messtab object
- *
- */
-
 extern void messtab_get_keys(messtab_t *messtab, fts_list_t *array);
 
 #endif

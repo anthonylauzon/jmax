@@ -467,11 +467,9 @@ static void
 sequence_add_track_from_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_atom_t a[1];
   track_t *track;
   
   /* create new track (for now anyway just event tracks!!! - later to be changed) */
-  fts_set_symbol(a, seqsym_note);  
   track = (track_t *)fts_object_create(eventtrk_class, 1, at);
 
   /* add it to the sequence */

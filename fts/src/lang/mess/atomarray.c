@@ -48,7 +48,7 @@ fts_list_set_size(fts_list_t *list, int size)
       while(alloc < size)
 	alloc += LIST_ALLOC_BLOCK;
 
-      new_atoms = fts_block_alloc(alloc * sizeof(fts_atom_t));
+      new_atoms = fts_malloc(alloc * sizeof(fts_atom_t));
 
       if(list->atoms)
 	{
@@ -56,7 +56,7 @@ fts_list_set_size(fts_list_t *list, int size)
 	  for(i=0; i<list->size; i++)
 	    new_atoms[i] = list->atoms[i];
 	
-	  fts_block_free(list->atoms, list->alloc * sizeof(fts_atom_t));
+	  fts_free(list->atoms);
 	}
 
       /* void newly allocated region */
@@ -114,7 +114,9 @@ void
 fts_list_reset(fts_list_t *list)
 {
   fts_list_set_size(list, 0);
-  fts_block_free(list->atoms, list->alloc * sizeof(fts_atom_t));
+  fts_free(list->atoms);
+  list->atoms = 0;
+  list->alloc = 0;
 }
 
 void 

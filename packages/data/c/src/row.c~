@@ -25,7 +25,7 @@
  */
 
 #include <fts/fts.h>
-#include "row.h"
+#include "col.h"
 
 fts_type_t row_type = 0;
 fts_symbol_t row_symbol = 0;
@@ -205,12 +205,12 @@ row_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 	  int row_index = fts_get_number_int(at + 1);
 
 	  if(row_index >= 0)
-	    this->i = row_index;
+	    this->j = row_index;
 	  else
 	    fts_object_set_error(o, "Index must be positive");
 	}
       else
-	this->i = 0;
+	this->j = 0;
     }
   else
     fts_object_set_error(o, "First argument of mat required");

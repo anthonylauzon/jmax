@@ -32,6 +32,7 @@ fmat.c \
 vec.c \
 mat.c \
 col.c \
+row.c \
 getval.c \
 getinter.c \
 getsize.c \

@@ -76,8 +76,8 @@ set_size(mat_t *mat, int m, int n)
       
       if(size > 0)
 	{
-	  mat->m = size;
-	  mat->n = 1;
+	  mat->m = m;
+	  mat->n = n;
 	}
       else
 	{
@@ -545,7 +545,7 @@ mat_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       n = mat_get_n(this);
       
       if(m >= 0 && n >= 0)
-	set_size(this, m, n);
+	mat_set_size(this, m, n);
     }  
   else if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
     {
