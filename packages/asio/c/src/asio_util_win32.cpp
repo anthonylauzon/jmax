@@ -51,9 +51,9 @@ bool loadAsioDriver(char *name);
 
 
 /*
- * Open the ASIO driver 
+ * Create the ASIO driver object (COM instance)
  */
-LONG asio_open_driver(asio_driver_t* asio_driver)
+static LONG asio_open_driver(asio_driver_t* asio_driver)
 {
   LPVOID* asiodrv = (void**)&asio_driver->driver_interface;
 
@@ -63,10 +63,10 @@ LONG asio_open_driver(asio_driver_t* asio_driver)
   if(!asio_driver->asiodrv)
   {
       ret = CoCreateInstance(asio_driver->clsid, 0, CLSCTX_INPROC_SERVER, asio_driver->clsid, asiodrv);
-      if (S_OK == ret)
+      if(S_OK == ret)
     	{
 	      asio_driver->asiodrv = *asiodrv;
-    	  return 0;
+    	  ret = 0;
 	    }
   }
   else
@@ -77,9 +77,8 @@ LONG asio_open_driver(asio_driver_t* asio_driver)
   return ret;
 }
 
-/*
- * create a driver struct from registry key
- */
+
+
 static LONG find_driver_path(char* clsid_str, char* dllpath, int dllpath_size)
 {
   HKEY regKeyEnum;
@@ -139,7 +138,9 @@ static LONG find_driver_path(char* clsid_str, char* dllpath, int dllpath_size)
 }
 
 
-asio_driver_t* asio_util_create_driver(HKEY regKey, char* regKeyName, int driverID)
+
+/* This method creates an initialized asio_driver_t */
+static asio_driver_t* asio_util_create_driver(HKEY regKey, char* regKeyName, int driverID)
 {
   HKEY regSubKey;
   char databuf[MAX_DRIVER_NAME_LENGTH];
@@ -193,43 +194,48 @@ asio_driver_t* asio_util_create_driver(HKEY regKey, char* regKeyName, int driver
 	  }
     RegCloseKey(regSubKey);
   }  
- // ret = CoCreateInstance(driver->clsid, 0, CLSTX_INPROC_SERVER, driver->clsid, (void**)&driver->);
 
   return driver;
 }
 
 /*
- * scan registry for asio driver and return number of driver found
+ * scan registry for asio drivers, add each found and working driver to the
+ * audiomanager port list, and return the number of drivers found.
  */
 unsigned int asio_util_scan_drivers()
 {
+  /* local vars */
   HKEY regKeyEnum = 0;
   char regKeyName[MAX_DRIVER_NAME_LENGTH];
   LONG err;
   DWORD index = 0;
-  BOOL fin = FALSE;
   asio_driver_t* driver = 0;
   fts_atom_t at;
 
-  /* Initialize COM library */
+  /* initialize the COM library */
   CoInitialize(0);
 
   /* open registry key for ASIO driver */
   err = RegOpenKey(HKEY_LOCAL_MACHINE, ASIO_PATH,&regKeyEnum);
-  while (err == ERROR_SUCCESS)
+  while(err == ERROR_SUCCESS)
   {
     /*loop on ASIO drivers */
     err = RegEnumKey(regKeyEnum, index++, (LPSTR)regKeyName, MAX_DRIVER_NAME_LENGTH);
-    if (err == ERROR_SUCCESS)
-    {	  
+    if(err == ERROR_SUCCESS)
+    {	
+      /* create an initialized asio_driver_t, but don't instantiate the COM object */  
 	    driver = asio_util_create_driver(regKeyEnum, regKeyName, index);
 
+      /* if there was a problem, we skip this driver */
 	    if(NULL == driver)
         continue; /*return -1;*/
-
+ 
+      /* we instantiate the corresponding COM object */
 	    if(asio_open_driver(driver)==0)
-        if(NULL != driver)
+        if(NULL != driver)         
         {
+          /* if we succeeded, we create an asio_audioport_t object, bound to the driver */
+          /* and if the object is correct, we add it into the audiomanager list.        */
           asio_audioport_t* port;
 	        fts_set_pointer(&at, driver);
 	        port = (asio_audioport_t*)fts_object_create(asio_audioport_type, 1, &at);
@@ -239,14 +245,15 @@ unsigned int asio_util_scan_drivers()
 		        fts_audiomanager_put_port(fts_new_symbol(port->driver->name), (fts_audioport_t*)port);
 		        fts_log("[asio_audioport] put port : %s\n", port->driver->name);
   		    }
+          else
+          {
+            /* TODO : free resources, raise error, and continue with next driver */
+          }
         }  
-	  }
-    else
-	  {
-	    fin = TRUE;
 	  }
   }
 
+  /* close the registry key */
   if(regKeyEnum)
   {
     RegCloseKey(regKeyEnum);
