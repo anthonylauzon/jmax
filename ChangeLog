@@ -1,3 +1,8 @@
+2003-10-31  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/guiobj/c/src/toggle.c (toggle_instantiate): fixed bug "[ 832351 ] persistence on toggle does not work".
+	Now toggle_set is called for fts_s_value selector.
+
 2003-10-30  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in, Makefile.am: added macosxbuild directory in make dist tarball
