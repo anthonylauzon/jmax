@@ -59,6 +59,7 @@ struct _fts_midifile_
   int tempo;
 
   fts_midifile_tempo_map_entry_t *tempo_map; /* pointer to first tempo map entry */
+  fts_midifile_tempo_map_entry_t *tempo_map_end; /* pointer to last tempo map entry */
   fts_midifile_tempo_map_entry_t *tempo_map_pointer; /* read pointer to tempo map */
 
   fts_midifile_read_functions_t *read;

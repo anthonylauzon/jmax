@@ -47,6 +47,8 @@ public class MarkerValue extends AbstractEventValue
 private void setDefaultProperties()
 {
 	setProperty("duration", new Double(1.0));
+  tempo = EventValue.UNKNOWN_PROPERTY;
+  meter = EventValue.UNKNOWN_PROPERTY;
 }
 
 Object type, duration, tempo, meter;
@@ -152,12 +154,12 @@ public SeqObjectRenderer getRenderer()
 
 public void setPropertyValues(int nArgs, Object args[])
 {
-	if( nArgs == 2)
+	/*if( nArgs == 2)
 	{
 		setProperty( "type", args[0]);
 		setProperty( "tempo", args[1]);
 	}
-	else
+	else*/
 		super.setPropertyValues( nArgs, args);
 }
 

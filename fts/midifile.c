@@ -144,25 +144,28 @@ read16bit(fts_midifile_t *file)
   return (msb << 8) + lsb;
 }
 
+static fts_heap_t *tempo_map_entry_heap = NULL;
 
 /* format 1 tempo map handling */
 static void
 midifile_tempo_map_add_entry(fts_midifile_t *file, int tick, int tempo)
 {
-  fts_midifile_tempo_map_entry_t *e = file->tempo_map;
+  fts_midifile_tempo_map_entry_t *entry;
   
-  if(e == NULL)
-  {
-    fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
-    
+  if(tempo_map_entry_heap == NULL)
+    tempo_map_entry_heap = fts_heap_new(sizeof(fts_midifile_tempo_map_entry_t));
+      
+  /* create new tempo map entry */
+  entry = (fts_midifile_tempo_map_entry_t *)fts_heap_alloc(tempo_map_entry_heap);
+  
+  if(file->tempo_map == NULL)
+  {    
     if(tick == 0)
     {
       entry->tick = 0;
       entry->time = 0.0;
       entry->conv = 0.001 * tempo / (double)file->division;
-      entry->next = 0;
-      
-      file->tempo_map = entry;
+      entry->next = NULL;
     }
     else
     {
@@ -171,24 +174,21 @@ midifile_tempo_map_add_entry(fts_midifile_t *file, int tick, int tempo)
       entry->tick = tick;
       entry->time = tick * file->tempo_map->conv;
       entry->conv = 0.001 * tempo / (double)file->division;
-      entry->next = 0;
-      
-      file->tempo_map->next = entry;
+      entry->next = NULL;
     }
+    
+    file->tempo_map = entry;
+    file->tempo_map_end = entry;
   }
   else
-  {
-    fts_midifile_tempo_map_entry_t *entry = (fts_midifile_tempo_map_entry_t *)fts_malloc(sizeof(fts_midifile_tempo_map_entry_t));
-    
-    while(e->next != NULL)
-      e = e->next;
-    
+  {    
     entry->tick = tick;
-    entry->time = e->time + (tick - e->tick) * e->conv;
+    entry->time = file->tempo_map_end->time + (tick - file->tempo_map_end->tick) * file->tempo_map_end->conv;
     entry->conv = 0.001 * tempo / (double)file->division;
     entry->next = 0;
     
-    e->next = entry;
+    file->tempo_map_end->next = entry;
+    file->tempo_map_end = entry;
   }
 }
 
@@ -201,12 +201,13 @@ midifile_tempo_map_destroy(fts_midifile_t *file)
   {
     fts_midifile_tempo_map_entry_t *next = e->next;
     
-    fts_free(e);
+    fts_heap_free(e, tempo_map_entry_heap);
     
     e = next;
   }
   
   file->tempo_map = NULL;
+  file->tempo_map_end = NULL;
 }
 
 /* ordinary channel message */
@@ -558,13 +559,11 @@ midifile_read_track(fts_midifile_t *file)
               
               if(file->format == 1)
                 midifile_tempo_map_add_entry(file, file->ticks, tempo);
-              else
-              {
-                if(file->division > 0)
-                  file->time_conv = 0.001 * (double)tempo / (double)file->division;
-                
-                file->tempo = tempo;
-              }
+
+              if(file->division > 0)
+                file->time_conv = 0.001 * (double)tempo / (double)file->division;
+              
+              file->tempo = tempo;
               
               if (file->read->tempo)
                 (*file->read->tempo)(file, tempo);
@@ -984,6 +983,7 @@ fts_midifile_init(fts_midifile_t *file, FILE *fp, fts_symbol_t name)
   file->tempo = FTS_MIDIFILE_DEFAULT_TEMPO;
   
   file->tempo_map = NULL;
+  file->tempo_map_end = NULL;
   file->tempo_map_pointer = NULL;
   
   file->read = 0;

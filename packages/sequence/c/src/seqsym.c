@@ -66,6 +66,7 @@ fts_symbol_t seqsym_make_track = 0;
 fts_symbol_t seqsym_remove_track = 0;
 fts_symbol_t seqsym_move_track = 0;
 fts_symbol_t seqsym_add_event = 0;
+fts_symbol_t seqsym_add_marker = 0;
 fts_symbol_t seqsym_active = 0;
 fts_symbol_t seqsym_dump_mess = 0;
 fts_symbol_t seqsym_properties = 0;
@@ -148,6 +149,7 @@ seqsym_config(void)
   seqsym_remove_track = fts_new_symbol("remove_track");
   seqsym_move_track = fts_new_symbol("move_track");
   seqsym_add_event = fts_new_symbol("add_event");
+  seqsym_add_marker = fts_new_symbol("add_marker");
   seqsym_active = fts_new_symbol("active");
   seqsym_dump_mess = fts_new_symbol("dump_mess");
   seqsym_properties = fts_new_symbol("properties");

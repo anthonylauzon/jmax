@@ -432,13 +432,16 @@ _scomark_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   scomark_t *self = (scomark_t *)o;
   fts_symbol_t type = fts_get_symbol(at);
   
-  if(enumeration_get_index(scomark_type_enumeration, type) >= 0)
-    self->type = type;
-  
-  if(self->type == seqsym_tempo)
-  {
-    self->beat = 0;
-    self->beat_type = 0;
+  if(scomark_get_tempo(self) > 0.0 || type != seqsym_tempo)
+  {  
+    if(enumeration_get_index(scomark_type_enumeration, type) >= 0)
+      self->type = type;
+    
+    if(self->type == seqsym_tempo)
+    {
+      self->meter_num = 0;
+      self->meter_den = 0;
+    }
   }
 }
 
@@ -456,10 +459,13 @@ _scomark_set_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   scomark_t *self = (scomark_t *)o;  
   double tempo = fts_get_number_float(at);
   
-  if(tempo < 0.0)
-    tempo = 0.0;
-  
-  self->tempo = tempo;
+  if(tempo <= 0.0)
+  {
+    if(scomark_get_type(self) != seqsym_tempo)
+      self->tempo = tempo;
+  }
+  else
+    self->tempo = tempo;  
 }
 
 static void
@@ -471,7 +477,7 @@ _scomark_get_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static int
-symbol_get_meter(fts_symbol_t sym, int *beat, int *beat_type)
+symbol_get_meter(fts_symbol_t sym, int *meter_num, int *meter_den)
 {
   const char *str = fts_symbol_name(sym);
   int slash = 0;
@@ -479,6 +485,9 @@ symbol_get_meter(fts_symbol_t sym, int *beat, int *beat_type)
   int bt = 0;
   int i = 0;
   
+  *meter_num = 0;
+  *meter_den = 0;
+
   while(str[i] != '\0' && (str[i] < '0' || str[i] > '9'))
     i++;
   
@@ -510,30 +519,30 @@ symbol_get_meter(fts_symbol_t sym, int *beat, int *beat_type)
   if(bt == 0)
     return 0;
   
-  *beat = b;
-  *beat_type = bt;
+  *meter_num = b;
+  *meter_den = bt;
   
   return 1;
 }
 
 static fts_symbol_t
-meter_get_symbol(int beat, int beat_type)
+meter_get_symbol(int meter_num, int meter_den)
 {
-  if(beat > 0 && beat_type > 0)
+  if(meter_num > 0 && meter_den > 0)
   {
     char str[64];
 
-    if(beat_type == 4)
+    if(meter_den == 4)
     {
-      if(beat == 2)
+      if(meter_num == 2)
         return sym_meter_2_4;
-      else if(beat == 3)
+      else if(meter_num == 3)
         return sym_meter_3_4;
-      else if(beat == 4)
+      else if(meter_num == 4)
         return sym_meter_4_4;
     }
   
-    snprintf(str, 64, "%d/%d", beat, beat_type);
+    snprintf(str, 64, "%d/%d", meter_num, meter_den);
   
     return fts_new_symbol(str);
   }
@@ -548,35 +557,17 @@ _scomark_set_meter(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_symbol_t sym = fts_get_symbol(at);
   
   if(self->type != seqsym_tempo)
-    symbol_get_meter(sym, &self->beat, &self->beat_type);  
+    symbol_get_meter(sym, &self->meter_num, &self->meter_den);  
 }
 
 static void
 _scomark_get_meter(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   scomark_t *self = (scomark_t *)o;
-  fts_symbol_t sym = meter_get_symbol(self->beat, self->beat_type);  
+  fts_symbol_t sym = meter_get_symbol(self->meter_num, self->meter_den);  
   
   if(sym != NULL)
     fts_return_symbol(sym);
-}
-
-static void
-scomark_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  switch(ac)
-  {
-    default:
-      if(fts_is_number(at + 1))
-        _scomark_set_tempo(o, 0, 0, 1, at + 1);
-      
-    case 1:
-      if(fts_is_symbol(at))
-        _scomark_set_type(o, 0, 0, 1, at);
-      
-    case 0:
-      break;
-  }
 }
 
 static void
@@ -584,11 +575,23 @@ scomark_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   scomark_t *self = (scomark_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_symbol_t meter = meter_get_symbol(self->meter_num, self->meter_den);  
+  fts_atom_t a;
   
-  fts_message_append_symbol(mess, self->type);
-  fts_message_append_float(mess, self->tempo);
-  fts_dumper_message_send(dumper, mess);
+  fts_set_symbol(&a, self->type);
+  fts_dumper_send(dumper, seqsym_type, 1, &a);
+  
+  if(meter != NULL)
+  {
+    fts_set_symbol(&a, meter);
+		fts_dumper_send(dumper, seqsym_meter, 1, &a);
+  }
+  
+  if(self->tempo > 0)
+  {
+    fts_set_float(&a, self->tempo);
+		fts_dumper_send(dumper, seqsym_tempo, 1, &a);
+  }
   
   propobj_dump_properties(o, 0, NULL, ac, at);  
 }
@@ -601,8 +604,8 @@ scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   
   if(prop == seqsym_meter)
   {
-    self->beat = 0;
-    self->beat_type = 0;
+    self->meter_num = 0;
+    self->meter_den = 0;
   }
   else
     propobj_remove_property(o, 0, NULL, ac, at);
@@ -622,11 +625,11 @@ scomark_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   for(i=0; i<n_types; i++)
     fts_array_append_symbol(array, enumeration_get_name(scomark_type_enumeration, i));      
   
-  fts_array_append_symbol(array, seqsym_tempo);
-  fts_array_append_symbol(array, fts_s_float);
-  
   fts_array_append_symbol(array, seqsym_meter);
   fts_array_append_symbol(array, fts_s_symbol);
+  
+  fts_array_append_symbol(array, seqsym_tempo);
+  fts_array_append_symbol(array, fts_s_float);
   
   propobj_class_append_properties(scomark_class, array);
 }
@@ -636,21 +639,21 @@ scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 {
   scomark_t *self = (scomark_t *)o;
   fts_array_t *array = fts_get_pointer(at);
-  fts_symbol_t meter = meter_get_symbol(self->beat, self->beat_type);  
+  fts_symbol_t meter = meter_get_symbol(self->meter_num, self->meter_den);  
     
   fts_array_append_symbol(array, seqsym_type);
   fts_array_append_symbol(array, self->type);
-  
-  if(self->tempo > 0.0)
-  {
-    fts_array_append_symbol(array, seqsym_tempo);
-    fts_array_append_float(array, self->tempo);
-  }
   
   if(meter != NULL)
   {
     fts_array_append_symbol(array, seqsym_meter);
     fts_array_append_symbol(array, meter);
+  }
+  
+  if(self->tempo > 0.0)
+  {
+    fts_array_append_symbol(array, seqsym_tempo);
+    fts_array_append_float(array, self->tempo);
   }
   
   propobj_append_properties((propobj_t *)self, array);
@@ -664,8 +667,8 @@ scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   fts_spost(stream, "<scoomark %s", fts_symbol_name(self->type));
 
-  if(self->beat > 0)
-    fts_spost(stream, " %d/%d", self->beat, self->beat_type);
+  if(self->meter_num > 0)
+    fts_spost(stream, " %d/%d", self->meter_num, self->meter_den);
     
   if(self->tempo > 0.0)
     fts_spost(stream, " (MM 1/4 = %g)", self->tempo);
@@ -684,8 +687,8 @@ scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   self->type = seqsym_tempo;
   self->tempo = 0.0;
-  self->beat = 0;
-  self->beat_type = 0;
+  self->meter_num = 0;
+  self->meter_den = 0;
   
   if(ac > 0 && fts_is_symbol(at))
     _scomark_set_type(o, 0, NULL, ac, at);

@@ -227,28 +227,6 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
   }
 }
 
-static scomark_t *
-scoobtrack_append_scomark_event(track_t *track, double time, fts_symbol_t type)
-{
-  track_t *markers = track_get_or_make_markers(track);
-  scomark_t *scomark;
-  event_t *event;
-  fts_atom_t a;
-  
-  /* create a scomark */
-  fts_set_symbol(&a, type);
-  scomark = (scomark_t *)fts_object_create(scomark_class, 1, &a);
-  
-  /* create a new event with the scomark */
-  fts_set_object(&a, (fts_object_t *)scomark);
-  event = (event_t *)fts_object_create(event_class, 1, &a);
-  
-  /* append event to track */
-  track_append_event(markers, time, event);
-  
-  return scomark;
-}
-
 static void
 scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
 {
@@ -258,7 +236,7 @@ scoobtrack_read_tempo(fts_midifile_t *file, int tempo)
   scomark_t *scomark = data->last_marker;
   
   if(scomark == NULL || time > data->last_marker_time)
-    scomark = scoobtrack_append_scomark_event(data->merge, time, seqsym_tempo);
+    scomark = track_insert_marker(data->merge, time, seqsym_tempo);
   
   scomark_set_tempo(scomark, 60000000.0 / (double)tempo);
   
@@ -275,12 +253,12 @@ scoobtrack_read_time_signature(fts_midifile_t *file, int numerator, int denomina
   scomark_t *scomark = data->last_marker;
   
   if(scomark == NULL || time > data->last_marker_time)
-    scomark = scoobtrack_append_scomark_event(data->merge, time, seqsym_bar);
+    scomark = track_insert_marker(data->merge, time, seqsym_bar);
   else
     scomark_set_type(scomark, seqsym_bar);
   
-  scomark_set_beat(scomark, numerator);
-  scomark_set_beat_type(scomark, denominator);
+  scomark_set_meter_num(scomark, numerator);
+  scomark_set_meter_den(scomark, denominator);
   
   data->last_marker = scomark;
   data->last_marker_time = time;

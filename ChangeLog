@@ -1,3 +1,8 @@
+2004-06-15  Norbert Schnell  <Norbert.Schnell@ircam.fr>
+
+	* (package sequence): fixed (hidden) bug in MIDI file import (time of tempo changes was wrong)
+	* (package sequence): advanced implementation of score markers (added method make-bars to track.c)
+
 2004-06-04  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* (package data) data.c: minor fixes for propobj

@@ -69,6 +69,7 @@ extern fts_symbol_t seqsym_make_track;
 extern fts_symbol_t seqsym_remove_track;
 extern fts_symbol_t seqsym_move_track;
 extern fts_symbol_t seqsym_add_event;
+extern fts_symbol_t seqsym_add_marker;
 extern fts_symbol_t seqsym_active;
 extern fts_symbol_t seqsym_dump_mess;
 extern fts_symbol_t seqsym_properties;

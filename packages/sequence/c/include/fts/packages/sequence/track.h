@@ -90,6 +90,7 @@ extern event_t *track_get_next_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time_after(track_t *track, double time, event_t *here);
 
 extern track_t *track_get_or_make_markers(track_t *track);
+extern scomark_t *track_insert_marker(track_t *track, double time, fts_symbol_t type);
 
 /** @name highlighting events in editor
  *  @{ */

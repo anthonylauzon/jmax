@@ -60,10 +60,49 @@ sequence_get_track_by_index(sequence_t *sequence, int index)
   return track;
 }
 
+/*********************************************************
+ *
+ *  sequence context
+ *
+ */
+static fts_heap_t *sequence_context_heap = NULL;
+
+static sequence_context_t *
+sequence_context_get(fts_object_t *obj)
+{
+  sequence_context_t *context = (sequence_context_t *)obj->context;
+
+  if(context == NULL)
+  {
+    if(sequence_context_heap == NULL)
+      sequence_context_heap = fts_heap_new(sizeof(sequence_context_t));
+    
+    context = fts_heap_alloc(sequence_context_heap);
+    context->container = NULL;
+    context->next = NULL;
+    
+    obj->context = context;
+  }
+  
+  return context;
+}
+
+static void
+sequence_context_remove(fts_object_t *obj)
+{
+  sequence_context_t *context = (sequence_context_t *)obj->context;
+  
+  if(context != NULL)
+  {
+    fts_heap_free((void *)context, sequence_context_heap);
+    obj->context = NULL;
+  }
+}
+
 static void
 sequence_insert_track(sequence_t *sequence, track_t *here, track_t *track)
 {
-	sequence_context_t *context = (sequence_context_t *)fts_object_get_context((fts_object_t *)track);
+	sequence_context_t *context = sequence_context_get((fts_object_t *)track);
 		
   if(here == NULL)
   {
@@ -80,9 +119,8 @@ sequence_insert_track(sequence_t *sequence, track_t *here, track_t *track)
     sequence->size++;
   }
 
+  context->container = sequence;
   fts_object_refer((fts_object_t *)track);
-
-  sequence_track_set_container(track, sequence);
 }
 
 void
@@ -105,6 +143,7 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
     sequence->tracks = sequence_track_get_next(track);
     sequence->size--;
 
+    sequence_context_remove((fts_object_t *)track);
     fts_object_release((fts_object_t *)track);
   }
   else
@@ -123,6 +162,7 @@ sequence_remove_track(sequence_t *sequence, track_t *track)
       sequence_track_set_next(prev, sequence_track_get_next(this));
       sequence->size--;
 
+      sequence_context_remove((fts_object_t *)track);
       fts_object_release((fts_object_t *)track);
     }
   }
@@ -133,12 +173,12 @@ sequence_move_track(sequence_t *sequence, track_t *track, int index)
 {
   track_t *here = sequence_get_track_by_index(sequence, index - 1);
 
-  if(track != here && (index == 0 || here))
+  if(track != here && (index == 0 || here != NULL))
   {
     fts_object_refer((fts_object_t *)track);
 
     sequence_remove_track(sequence, track);
-    sequence_insert_track(sequence, 0, track);
+    sequence_insert_track(sequence, here, track);
 
     fts_object_release((fts_object_t *)track);
   }

@@ -96,8 +96,8 @@ typedef struct
   propobj_t propobj;
   fts_symbol_t type;
   double tempo;
-  int beat;
-  int beat_type;
+  int meter_num;
+  int meter_den;
 } scomark_t;
 
 enum scomark_type_enum
@@ -111,17 +111,19 @@ enum scomark_type_enum
 extern fts_class_t *scomark_class;
 extern enumeration_t *scomark_type_enumeration;
 
+#define scomark_is_bar(s) ((s)->type != seqsym_tempo)
+
 #define scomark_set_type(s, t) ((s)->type = (t))
 #define scomark_get_type(s) ((s)->type)
 
 #define scomark_set_tempo(s, t) ((s)->tempo = (t))
 #define scomark_get_tempo(s) ((s)->tempo)
 
-#define scomark_set_beat(s, b) ((s)->beat = (b))
-#define scomark_get_beat(s) ((s)->beat)
+#define scomark_set_meter_num(s, b) ((s)->meter_num = (b))
+#define scomark_get_meter_num(s) ((s)->meter_num)
 
-#define scomark_get_beat_type(s) ((s)->beat_type)
-#define scomark_set_beat_type(s, b) ((s)->beat_type = (b))
+#define scomark_get_meter_den(s) ((s)->meter_den)
+#define scomark_set_meter_den(s, b) ((s)->meter_den = (b))
 
 void scomark_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
