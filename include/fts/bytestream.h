@@ -390,6 +390,9 @@ FTS_API void fts_bytestream_flush(fts_bytestream_t *stream);
 
 /* system byte stream implementation */
 FTS_API fts_class_t *fts_socketstream_class;
+FTS_API fts_class_t *fts_tcpstream_class;
+FTS_API fts_class_t *fts_udpstream_class;
+
 FTS_API fts_class_t *fts_pipestream_class;
 FTS_API fts_class_t *fts_memorystream_class;
 
