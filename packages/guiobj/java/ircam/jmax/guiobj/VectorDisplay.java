@@ -327,6 +327,7 @@ public class VectorDisplay extends GraphicObject implements FtsDisplayListener
   public void popUpReset()
   {
     super.popUpReset();
+    controlPanel.setRange();
     ObjectPopUp.getInstance().remove((JPanel)getControlPanel());
     ObjectPopUp.removeSeparation();
   }

@@ -34,6 +34,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
+import ircam.jmax.widgets.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 
@@ -45,6 +46,7 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
 {
   GraphicObject target = null;
   JTextField maxValueField, minValueField;
+  float min, max;
 
   public VecDispControlPanel()
   {
@@ -74,6 +76,19 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
     maxPanel.add(maxLabel);
     maxPanel.add(Box.createHorizontalGlue());    
     maxPanel.add( maxValueField);
+    maxPanel.add(new IncrementController(new IncrementListener(){
+	public void increment()
+	{
+	  max++;
+	  maxValueField.setText(""+max);    
+	}
+	public void decrement()
+	{
+	  max--;
+	  maxValueField.setText(""+max);    
+	}
+      }));
+    maxPanel.validate(); 
 
     add(maxPanel);
 
@@ -90,6 +105,19 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
     minPanel.add(minLabel);
     minPanel.add(Box.createHorizontalGlue());    
     minPanel.add( minValueField);
+    minPanel.add(new IncrementController(new IncrementListener(){
+	public void increment()
+	{
+	  min++;
+	  minValueField.setText(""+min);    
+	}
+	public void decrement()
+	{
+	  min--;
+	  minValueField.setText(""+min);    
+	}
+      }));    
+    minPanel.validate();
 
     add(minPanel);
 
@@ -99,29 +127,31 @@ public class VecDispControlPanel extends JPanel implements ActionListener, Objec
   public void update(GraphicObject obj)
   {
     target = obj;
-    float min = ((FtsVectorDisplayObject)obj.getFtsObject()).getMinimum();
+    min = ((FtsVectorDisplayObject)obj.getFtsObject()).getMinimum();
     minValueField.setText(""+min);    
-    float max = ((FtsVectorDisplayObject)obj.getFtsObject()).getMaximum();
+    max = ((FtsVectorDisplayObject)obj.getFtsObject()).getMaximum();
     maxValueField.setText(""+max);    
+  }
+
+  public void setRange()
+  {
+    try
+      {
+	max = Float.parseFloat(maxValueField.getText());
+	min = Float.parseFloat(minValueField.getText());
+      }
+    catch (NumberFormatException e1)
+      {
+	setVisible(false);
+	return;
+      }
+    ((FtsVectorDisplayObject)target.getFtsObject()).setBounds(min, max);
   }
 
   public void actionPerformed( ActionEvent e)
   {
-      float max, min;
-      if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
-	  {
-	      try
-		  {
-		      max = Float.parseFloat(maxValueField.getText());
-		      min = Float.parseFloat(minValueField.getText());
-		  }
-	      catch (NumberFormatException e1)
-		  {
-		      setVisible(false);
-		      return;
-		  }
-	      ((FtsVectorDisplayObject)target.getFtsObject()).setBounds(min, max);
-	  }
+    if((e.getSource() == maxValueField)||(e.getSource() == minValueField)) 
+      setRange();
   }
 }
 
