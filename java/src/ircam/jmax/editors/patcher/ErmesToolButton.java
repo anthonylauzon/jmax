@@ -26,6 +26,7 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
+import java.awt.image.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -54,12 +55,7 @@ class ErmesToolButton extends JToggleButton
     public void mousePressed(MouseEvent e){
       ErmesToolButton button = (ErmesToolButton)e.getSource();
       if(!button.isSelected()){
-	  /*****************/
-	  //jdk117-->jdk1.3//
-	  //button.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
 	  button.setCursor(Cursors.get(button.getDescription()));
-	  /*****************/
-
 	  button.state = true;
 	  button.setSelected(true);
 	  button.toolBar.buttonSelected( button);
@@ -79,8 +75,8 @@ class ErmesToolButton extends JToggleButton
     this.message = message;
     this.toolBar = toolBar;
     
-    /*****************/
-    //jdk117-->jdk1.3//
+    //if(Cursors.get(description) == null)
+    //{
     ImageObserver observer =  new ImageObserver(){
 	    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
 	    {
@@ -88,12 +84,13 @@ class ErmesToolButton extends JToggleButton
 	    }
 	};	
     Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
-    Toolkit.getDefaultToolkit().prepareImage(image, 64, 64, observer);
-
-    Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0,1), description+" cursor");
+    Dimension bestSize = Toolkit.getDefaultToolkit().getBestCursorSize(image.getWidth(this), image.getHeight(this));
+    BufferedImage bi = new BufferedImage(bestSize.width, bestSize.height, BufferedImage.TYPE_INT_ARGB);
+    bi.createGraphics().drawImage(image, 0, 0, observer);
+    Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0,1), description+" cursor");    
     Cursors.loadCursor(description, cursor);
-    /*****************/
-
+    //}
+    
     addMouseListener(ErmesToolButton.mListener);
   }
 
