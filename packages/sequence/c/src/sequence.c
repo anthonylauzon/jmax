@@ -506,6 +506,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   if(sequence_editor_is_open(this))
   {
     sequence_add_track_at_client(this, track);
+    fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
     sequence_set_dirty( this);
   }
 }
