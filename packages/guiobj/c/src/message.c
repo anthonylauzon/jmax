@@ -1,5 +1,5 @@
 /* 
-   New implementation of the vmessage.
+   New implementation of the message.
 
    It is based on the atomlist (a clearer, faster, and more (?)
    memory hungry implementation of the old binbuf concept).
@@ -9,27 +9,25 @@
 
 #include "fts.h"
 
-
-
 static void init_eval(void);
 
-/********************* vmessage ************************/
+/********************* message ************************/
 
 typedef struct 
 {
   fts_object_t o;
   fts_atom_list_t atom_list;
-} vmessage_t;
+} message_t;
 
-static void fts_eval_atom_list(vmessage_t *this,
+static void fts_eval_atom_list(message_t *this,
 			       fts_atom_list_t *list,
 			       int env_ac, const fts_atom_t *env_at,
 			       fts_object_t *default_dst, int outlet);
 
 static void
-vmessage_update(fts_object_t *o)
+message_update(fts_object_t *o)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
   fts_atom_list_iterator_t iterator;
 
   fts_atom_list_iterator_init(&iterator, &(this->atom_list));
@@ -48,98 +46,98 @@ vmessage_update(fts_object_t *o)
 }
 
 static void
-vmessage_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_update(o);
+  message_update(o);
 }
 
 
-/* vmessage_eval is installed for bang, int, float and list.
+/* message_eval is installed for bang, int, float and list.
    It is not installed for anything, because the semantic
-   of vmessage do not allow other messages to trigger the
+   of message do not allow other messages to trigger the
    evalution of the box content.
 */
 
 static void
-vmessage_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {  
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_eval_atom_list(this, &(this->atom_list), ac, at, o, 0);
 }
 
 static void
-vmessage_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_set(&(this->atom_list), ac, at);
 
   if (fts_object_patcher_is_open((fts_object_t *) this))
-    vmessage_update(o);
+    message_update(o);
 }
 
 /* Set without update, for the editing */
 
 static void
-vmessage__set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message__set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_set(&(this->atom_list), ac, at);
 }
 
 static void
-vmessage_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_append(&(this->atom_list), ac, at);
 
   if (fts_object_patcher_is_open((fts_object_t *) this))
-    vmessage_update(o);
+    message_update(o);
 }
 
 static void
-vmessage_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_append_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_append(&(this->atom_list), ac, at);
 }
 
 
 static void
-vmessage_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_clear_noupdate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_destroy(&(this->atom_list));
 }
 
 
 static void
-vmessage_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_init(&(this->atom_list));
 }
 
 
 static void
-vmessage_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
 
   fts_atom_list_destroy(&(this->atom_list));
 }
 
 
 static void
-vmessage_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *)o;
+  message_t *this = (message_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *) fts_get_ptr(at);
 
   fts_atom_list_save_bmax(&(this->atom_list), f, (fts_object_t *) this);
@@ -147,9 +145,9 @@ vmessage_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 
 static void
-vmessage_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+message_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  vmessage_t *this = (vmessage_t *) o;
+  message_t *this = (message_t *) o;
   fts_objectset_t *set = (fts_objectset_t *)fts_get_data(at);
 
   if (fts_atom_list_is_subsequence(&(this->atom_list), ac - 1, at + 1))
@@ -159,59 +157,59 @@ vmessage_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static fts_status_t
-vmessage_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+message_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   fts_symbol_t a[1];
 
-  fts_class_init(cl, sizeof(vmessage_t), 1, 1, 0);
+  fts_class_init(cl, sizeof(message_t), 1, 1, 0);
 
   a[0] = fts_s_symbol;
-  fts_method_define(cl, fts_SystemInlet, fts_s_init, vmessage_init, 1, a);
+  fts_method_define(cl, fts_SystemInlet, fts_s_init, message_init, 1, a);
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, vmessage_delete, 0, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, vmessage__set);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, message_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_set, message__set);
 
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, vmessage_find);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_find, message_find);
 
   /* Atom list saving/loading/update support */
 
-  fts_method_define(cl, fts_SystemInlet, fts_s_upload, vmessage_upload, 0, 0);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  vmessage_append_noupdate);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  vmessage_clear_noupdate);
+  fts_method_define(cl, fts_SystemInlet, fts_s_upload, message_upload, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_append,  message_append_noupdate);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_clear,  message_clear_noupdate);
 
   a[0] = fts_s_ptr;
-  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, vmessage_save_bmax, 1, a);
+  fts_method_define(cl, fts_SystemInlet, fts_s_save_bmax, message_save_bmax, 1, a);
 
   /* Application methods */
 
-  fts_method_define(cl, 0, fts_s_bang, vmessage_eval, 0, 0);
+  fts_method_define(cl, 0, fts_s_bang, message_eval, 0, 0);
 
   a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, vmessage_eval, 1, a);
+  fts_method_define(cl, 0, fts_s_int, message_eval, 1, a);
 
   a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, vmessage_eval, 1, a);
+  fts_method_define(cl, 0, fts_s_float, message_eval, 1, a);
 
   a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, vmessage_eval, 1, a);
+  fts_method_define(cl, 0, fts_s_symbol, message_eval, 1, a);
 
 
-  fts_method_define_varargs(cl, 0, fts_s_list, vmessage_eval);
+  fts_method_define_varargs(cl, 0, fts_s_list, message_eval);
 
-  fts_method_define_varargs(cl, 0, fts_s_set, vmessage_set);
+  fts_method_define_varargs(cl, 0, fts_s_set, message_set);
 
-  fts_method_define_varargs(cl, 0, fts_s_append,  vmessage_append);
+  fts_method_define_varargs(cl, 0, fts_s_append,  message_append);
 
   return fts_Success;
 }
 
 
 void
-vmessage_config(void)
+message_config(void)
 {
   init_eval();
 
-  fts_metaclass_create(fts_new_symbol("messbox"),vmessage_instantiate, fts_always_equiv);
+  fts_metaclass_create(fts_new_symbol("messbox"), message_instantiate, fts_always_equiv);
 }
 
 
@@ -308,7 +306,7 @@ static fts_atom_t *atom_stack_pointer = &atom_stack[0];	/* next usable value */
  */
 
 static void
-fts_eval_atom_list(vmessage_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
+fts_eval_atom_list(message_t *this, fts_atom_list_t *list, int env_ac, const fts_atom_t *env_at,
 		   fts_object_t *default_dst, int outlet)
 {
   /* reader command and status */

@@ -1,11 +1,12 @@
-SOURCES = ui.c \
-button.c	\
-comment.c	\
-comment_doctor.c	\
-gfloat.c	\
-gint.c		\
-gobj.c		\
-panel.c		\
-vmessage.c	\
+SOURCES = \
+guiobj.c \
+button.c \
+comment.c \
+comment_doctor.c \
+gfloat.c \
+gint.c \
+gobj.c \
+panel.c \
+message.c \
 message_doctor.c \
-vtoggle.c
+toggle.c \

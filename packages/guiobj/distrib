@@ -1,2 +1,3 @@
 all	all	guiobj.jpk
+all	all	help
 all	all	c/lib/ARCH/opt/libguiobj.so
