@@ -63,3 +63,7 @@ defineDevice midi2 { sgi_midi port SerialPort2 } "MIDI on startmidi port SerialP
 defineDevice midi3 { sgi_midi port SerialPort3 } "MIDI on startmidi port SerialPort3"
 defineDevice midi4 { sgi_midi port SerialPort4 } "MIDI on startmidi port SerialPort4"
 
+when defaultStart {
+    openDefaultAudioIn adatIn
+    openDefaultAudioOut adatOut
+}

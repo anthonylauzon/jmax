@@ -45,3 +45,8 @@ defineDevice stereoOut1 { oss_dac } "OSS audio out"
 
 defineDevice midi { oss_midi } "OSS MIDI"
 
+when defaultStart {
+    openDefaultAudioIn stereoIn
+    openDefaultAudioOut stereoOut
+}
+
