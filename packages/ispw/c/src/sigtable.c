@@ -295,34 +295,44 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     n_onset = 0;
 
   if(file_name)
+  {
+    /* FIXME: sample rate conversion!!! */
+    fts_audiofile_t* af = fts_audiofile_open_read(file_name);
+    int n_samples;
+    
+    if (!fts_audiofile_is_valid(af)) 
     {
-      /* FIXME: sample rate conversion!!! */
-      fts_audiofile_t* af = fts_audiofile_open_read(file_name);
-      int n_samples;
-	
-      if (!fts_audiofile_is_valid(af)) 
-	{
-	  post("table~: %s: can't open soundfile to read \"%s\"\n", this->name, file_name);	
-	  fts_audiofile_close(af);
-	  return;
-	}
-
-      if (onset > 0 && fts_audiofile_seek(af, n_onset) != 0) 
-	{
-	  post("table~: %s: can't seek position in file \"%s\"\n", this->name, file_name);
-	  fts_audiofile_close(af);
-	  return;
-	}
-
-      n_samples = fts_audiofile_read(af, &buf, 1, size);
-      
+      post("table~: %s: can't open soundfile to read \"%s\"\n", this->name, file_name);	
       fts_audiofile_close(af);
-      
-      if(n_samples > 0)
-	fts_outlet_int(o, 0, n_samples);
-      else
-	post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
+      return;
     }
+    
+    if (onset > 0 && fts_audiofile_seek(af, n_onset) != 0) 
+    {
+      post("table~: %s: can't seek position in file \"%s\"\n", this->name, file_name);
+      fts_audiofile_close(af);
+      return;
+    }
+    
+    n_samples = fts_audiofile_read(af, &buf, 1, size);
+    
+    fts_audiofile_close(af);
+    
+    if(n_samples > 0)
+      fts_outlet_int(o, 0, n_samples);
+    else
+      post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
+  }
+  else
+  {
+    fts_atom_t a[4];
+    
+    fts_set_symbol(a, fts_s_load);
+    fts_set_symbol(a + 1, fts_new_symbol("open file"));
+    fts_set_symbol(a + 2, fts_project_get_dir());
+    fts_set_symbol(a + 3, fts_new_symbol(" "));
+    fts_client_send_message(o, fts_s_openFileDialog, 4, a);
+  }
 }
 
 static void
@@ -418,3 +428,10 @@ sigtable_config(void)
 {
   fts_class_install(fts_new_symbol("table~"),sigtable_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
