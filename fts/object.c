@@ -20,10 +20,14 @@
  * 
  */
 
-
 /* Define TRACE_DEBUG to get some debug printing during object creation.  */
 
 /* #define TRACE_DEBUG */
+
+#ifdef TRACE_DEBUG
+unsigned int debugid = 0;
+#endif
+
 
 #include <stdarg.h>
 
@@ -70,6 +74,10 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   /*obj->properties = 0;*/
   /*obj->varname = 0;*/
   /*obj->refcnt = 0;*/
+
+#ifdef TRACE_DEBUG
+  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_symbol_name(fts_object_get_class_name(obj)));
+#endif
   
   if (cl->noutlets)
     obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
@@ -132,6 +140,10 @@ fts_object_new_to_patcher(fts_patcher_t *patcher, int ac, const fts_atom_t *at, 
   obj->properties = 0;
   obj->varname = 0;
   obj->refcnt = 0;
+
+#ifdef TRACE_DEBUG
+  fts_log("[object]: p=0x%p,id=%05d,op=alloc,class=%s\n", obj, debugid++, fts_symbol_name(fts_object_get_class_name(obj)));
+#endif
 
   if (cl->noutlets)
     obj->out_conn = (fts_connection_t **) fts_calloc(cl->noutlets * sizeof(fts_connection_t *));
@@ -513,6 +525,11 @@ fts_object_unclient(fts_object_t *obj)
 static void 
 fts_object_free(fts_object_t *obj)
 {
+
+#ifdef TRACE_DEBUG
+  fts_log("[object]: p=0x%p,id=%05d,op=free,class=%s\n", obj, debugid++, fts_symbol_name(fts_object_get_class_name(obj)));
+#endif
+
   /* free the object properties */
   fts_properties_free(obj);
 

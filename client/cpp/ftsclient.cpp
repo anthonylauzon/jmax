@@ -1159,8 +1159,7 @@ void FtsProcess::init( const char *path, FtsArgs &args) throw( FtsClientExceptio
 
   GetStartupInfo(&startup_info);
 
-  result = CreateProcess(_path, cmdLine, NULL, NULL, TRUE, 
-			 DETACHED_PROCESS | REALTIME_PRIORITY_CLASS, 
+  result = CreateProcess(_path, cmdLine, NULL, NULL, TRUE, REALTIME_PRIORITY_CLASS, 
 			 NULL, NULL, &startup_info, &process_info);
   if (result == 0) {
     throw FtsClientException("Failed to start the fts application\n");    
