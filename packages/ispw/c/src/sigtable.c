@@ -81,7 +81,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   
   if (sampbuf_name_already_registered(name))
     {
-      post("table~: %s: multiply defined (last ignored)\n", fts_symbol_name(name));
+      post("table~: %s: multiply defined (last ignored)\n", name);
       return;
     }
   else
@@ -165,13 +165,13 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   if(!this->name)
     return;
 
-  if ((fd = fts_file_open(fts_symbol_name(file_name), "r")) < 0){
-    post("table~: %s: can't open\n", fts_symbol_name(file_name));
+  if ((fd = fts_file_open(file_name, "r")) < 0){
+    post("table~: %s: can't open\n", file_name);
     return;
   }
 
   if (fseek(fd, onset, 0) < 0){
-    post("table~: %s: can't seek to beginning\n", fts_symbol_name(file_name));
+    post("table~: %s: can't seek to beginning\n", file_name);
     fts_file_close(fd);
     return;
   }
@@ -188,7 +188,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       bytes_read &= ~1;
     }
 
-    if (bytes_read < 0) post("table~: error reading file: %s\n", fts_symbol_name(file_name));
+    if (bytes_read < 0) post("table~: error reading file: %s\n", file_name);
     if (bytes_read <= 0) break;
     
     for(n_bytes = bytes_read / sizeof(filesamp_t), rats = tempbuf; n_bytes--; rats += sizeof(filesamp_t)){
@@ -201,7 +201,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   samps_read = samps_to_read - samps_left;
   if (samps_read > size) samps_read = size;
 
-  post("table~: read %d samples (out of %d in table) from file: %s\n", samps_read, size, fts_symbol_name(file_name));
+  post("table~: read %d samples (out of %d in table) from file: %s\n", samps_read, size, file_name);
   
   while(samps_left-- > 0) *buf_ptr++ = 0.0f;
 
@@ -223,8 +223,8 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   if (!this->name)
     return;
 
-  if ((fd = fts_file_open(fts_symbol_name(file_name), "w")) < 0){
-    post("table~: can't create file: %s\n", fts_symbol_name(file_name));
+  if ((fd = fts_file_open(file_name, "w")) < 0){
+    post("table~: can't create file: %s\n", file_name);
     return;
   }
   header.magic = SND_MAGIC;
@@ -236,7 +236,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
   header.info = 0x0;
 
   if (fwrite((char *)&header, 1, sizeof(header), fd) < (int)sizeof(header)){
-    post("table~: write error in header of file: %s\n", fts_symbol_name(file_name));
+    post("table~: write error in header of file: %s\n", file_name);
     fts_file_close(fd);
     return;
   }
@@ -266,14 +266,14 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
       }
     }
     if (fwrite(tempbuf, 1, writehere*sizeof(filesamp_t), fd) < (int)(writehere * sizeof(filesamp_t))){
-      post("table~: error writing file: %s\n",  fts_symbol_name(file_name));
+      post("table~: error writing file: %s\n",  file_name);
       break;
     }
     samps_to_write -= writehere;
     bufno++;
   }
   fts_file_close(fd);
-  post("table~: wrote file: %s\n",  fts_symbol_name(file_name));
+  post("table~: wrote file: %s\n",  file_name);
 }
 
 static void
@@ -298,23 +298,35 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      /*fts_soundfile_t *sf = fts_soundfile_open_read_float(file_name, format, sr, n_onset);
+      /* FIXME: sample rate conversion!!! */
+      fts_audiofile_t* af = fts_audiofile_open_read(file_name);
 	
-	if(sf)
+      if (!fts_audiofile_valid(af)) 
 	{
-	int n_samples = fts_soundfile_read_float(sf, buf, size);
-	
-	fts_soundfile_close(sf);
-	
-	if(n_samples > 0)
-	fts_outlet_int(o, 0, n_samples);
-	else
-	post("table~: %s: can't load samples from file \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
-      
+	  post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);
+	  return;
 	}
-	else
-	post("table~: %s: can't open soundfile to read \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
-      */	
+
+      if (fts_audiofile_seek(af, n_onset) != 0) 
+	{
+	  post("table~: %s: can't seek position in file \"%s\"\n", this->name, file_name);
+	  fts_audiofile_delete(af);
+	  return;
+	}
+
+      if (fts_audiofile_valid(af))
+	{
+	  int n_samples = fts_audiofile_read(af, &buf, 1, size);
+	
+	  fts_audiofile_delete(af);
+	
+	  if(n_samples > 0)
+	    fts_outlet_int(o, 0, n_samples);
+	  else
+	    post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
+	}
+      else
+	post("table~: %s: can't open soundfile to read \"%s\"\n", this->name, file_name);	
     }
 }
 
@@ -346,20 +358,18 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      /*fts_soundfile_t *sf = fts_soundfile_open_write_float(file_name, format, sr);
+      fts_audiofile_t *af = fts_audiofile_open_write(file_name, sr, 1, format);
       
-	if(sf)
+      if (fts_audiofile_valid(af))
 	{
-	int n_samples = fts_soundfile_write_float(sf, buf, n_save);
-	
-	fts_soundfile_close(sf);
-	
-	if(n_samples <= 0)
-	post("table~: %s: can't save samples to file \"%s\"\n", fts_symbol_name(this->name) , fts_symbol_name(file_name));
+	  int n_samples = fts_audiofile_write(af, &buf, 1, n_save);
+	  fts_audiofile_delete(af);
+	  
+	  if(n_samples <= 0)
+	    post("table~: %s: can't save samples to file \"%s\"\n", this->name , file_name);
 	}
-	else
-	post("table~: %s: can't open soundfile to write \"%s\"\n", fts_symbol_name(this->name), fts_symbol_name(file_name));
-      */
+      else
+	post("table~: %s: can't open soundfile to write \"%s\"\n", this->name, file_name);
     }
 }
 

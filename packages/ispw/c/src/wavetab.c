@@ -40,41 +40,41 @@ wavetable_load(wavetab_t *wavetab)
 
     if(file_name)
     {
-      /*fts_soundfile_t *sf = fts_soundfile_open_read_float(wavetab->sym, 0, 0.0f, 0);
-	int n_samples;
-	int i;
-	
-	if(!sf)
+      fts_audiofile_t *sf = fts_audiofile_open_read(wavetab->sym);
+      int n_samples;
+      int i;
+      float* tmp = &buf[0];
+
+      if(!fts_audiofile_valid(sf))
 	{
-	post("tab1~: %s: can't open wave table file\n", file_name);
-	return;
+	  post("tab1~: %s: can't open wave table file\n", file_name);
+	  return;
 	}
       
-	n_samples = fts_soundfile_read_float(sf, buf, WAVE_TAB_SIZE);
-	fts_soundfile_close(sf);
+      n_samples = fts_audiofile_read(sf, &tmp, 1, WAVE_TAB_SIZE);
+      fts_audiofile_delete(sf);
 
-	if(n_samples < WAVE_TAB_SIZE)
+      if(n_samples < WAVE_TAB_SIZE)
 	{
-	post("tab1~: %s: can't read wave table\n", file_name);
-	return;
-	}*/
+	  post("tab1~: %s: can't read wave table\n", file_name);
+	  return;
+	}
       
-      /* get value of first wavetable point */
-      
-      /*wavetab->table[0].value = buf[0];*/
+      /* get value of first wavetable point */      
+      wavetab->table[0].value = buf[0];
 
       /* next values and slopes */
-      /*for(i=1; i<WAVE_TAB_SIZE; i++)
+      for(i=1; i<WAVE_TAB_SIZE; i++)
 	{
-	wavetab->table[i].value = buf[i];
-	wavetab->table[i-1].slope = (wavetab->table[i].value - wavetab->table[i-1].value);
-	}*/
+	  wavetab->table[i].value = buf[i];
+	  wavetab->table[i-1].slope = (wavetab->table[i].value - wavetab->table[i-1].value);
+	}
 
       /* get slope of last wavetable point in dependency of wrapping mode */
-      /*if(strstr(file_name, "nowrap") || wavetab->nowrap)
+      if(strstr(file_name, "nowrap") || wavetab->nowrap)
 	wavetab->table[WAVE_TAB_SIZE-1].slope = wavetab->table[WAVE_TAB_SIZE-2].slope;
-	else
-	wavetab->table[WAVE_TAB_SIZE-1].slope = (wavetab->table[0].value - wavetab->table[WAVE_TAB_SIZE-1].value);*/
+      else
+	wavetab->table[WAVE_TAB_SIZE-1].slope = (wavetab->table[0].value - wavetab->table[WAVE_TAB_SIZE-1].value);
     }    
 }
 
