@@ -285,6 +285,10 @@ abstract public class FtsStream
       case FtsAtom.STRING:
 	sendString(a.stringValue);
 	break;
+      
+      case FtsAtom.DOUBLE:
+	  sendFloat((float) a.doubleValue);
+	  break;
       }
   }
   
