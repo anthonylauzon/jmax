@@ -85,7 +85,7 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	String type = pa.getType(e);
 	int cue = pa.getCue(e);
   double offset = pa.getOffset(e);
-		
+		  
 	if( type.equals("note"))
 	{
 		if(height > Adapter.NOTE_DEFAULT_HEIGTH)
@@ -406,7 +406,7 @@ public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext th
 	String type = ((PartitionAdapter)gc.getAdapter()).getType(e);
 	
 	tempRect.setBounds(x, y, w, h);
-	
+	  
 	if( type.equals("rest"))
 		eventRect.setBounds(evtx, evty-evtheight/2, evtlength, evtheight);
 	else if( type.equals("note"))

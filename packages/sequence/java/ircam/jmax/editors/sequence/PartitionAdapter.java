@@ -264,7 +264,9 @@ public void setY(Event e, int y)
  */
 public int getLenght(Event e)
 {
-	return (int)(super.getLenght(e)*geometry.getXZoom());
+  int length = (int)(super.getLenght(e)*geometry.getXZoom());
+  if( length <= 0) length = 1;
+  return length;
 }
 /**
 * inherited from Adapter.
