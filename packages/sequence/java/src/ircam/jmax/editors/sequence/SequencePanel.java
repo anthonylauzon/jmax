@@ -60,7 +60,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     
     Box trackPanel;
     JScrollPane scrollTracks;
-    
     Hashtable trackContainers = new Hashtable();
     MutexPropertyHandler mutex = new MutexPropertyHandler("active");
     //---
@@ -251,6 +250,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	//updates events in track
 	for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 	  teditor.updateNewObject((TrackEvent)e.nextElement());
+    
+	itsContainer.getFrame().validate();
     }
 
     public void tracksAdded(int maxTime)
@@ -285,6 +286,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	    if(!scrollTracks.getVerticalScrollBar().isVisible())		
 		itsContainer.getFrame().setSize(dim.width, 
 						Sequence.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
+    
+	itsContainer.getFrame().validate();
     }
 
     /**
@@ -298,6 +301,8 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 
 	Rectangle absBounds = SwingUtilities.convertRectangle(trackContainer, trackContainer.getBounds(), trackPanel);
 	scrollTracks.getViewport().scrollRectToVisible(absBounds);
+    
+	itsContainer.getFrame().validate();
     }
 
     public int getAllTracksHeight()

@@ -147,30 +147,30 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
      */
     private void setUpEditors() {
 	// Set up the editor for the numeric cells.
-	final WholeNumberField integerField = new WholeNumberField(0, 5);
-	integerField.setHorizontalAlignment(WholeNumberField.RIGHT);
-	final JTextField numberField = new JTextField();
-	numberField.setHorizontalAlignment(WholeNumberField.RIGHT);
+	/*final WholeNumberField integerField = new WholeNumberField(0, 5);
+	  integerField.setHorizontalAlignment(WholeNumberField.RIGHT);
+	  final JTextField numberField = new JTextField();
+	  numberField.setHorizontalAlignment(WholeNumberField.RIGHT);
 
-	DefaultCellEditor integerEditor =  new DefaultCellEditor(integerField) {
-		public Object getCellEditorValue() {
-		    return new Integer(integerField.getValue());
-		}
-	    };
-	DefaultCellEditor doubleEditor = new DefaultCellEditor(numberField) {
-		public Object getCellEditorValue() {
-		    try { 
-			return Double.valueOf(numberField.getText()); // parse double
-		    } catch (NumberFormatException exc) {
-			Toolkit.getDefaultToolkit().beep();
-			System.err.println("Error:  invalid number format!");
-			return null;
-		    }
-		}
-	    };
+	  DefaultCellEditor integerEditor =  new DefaultCellEditor(integerField) {
+	  public Object getCellEditorValue() {
+	  return new Integer(integerField.getValue());
+	  }
+	  };
+	  DefaultCellEditor doubleEditor = new DefaultCellEditor(numberField) {
+	  public Object getCellEditorValue() {
+	  try { 
+	  return Double.valueOf(numberField.getText()); // parse double
+	  } catch (NumberFormatException exc) {
+	  Toolkit.getDefaultToolkit().beep();
+	  System.err.println("Error:  invalid number format!");
+	  return null;
+	  }
+	  }
+	  };
 
-	table.setDefaultEditor(Integer.class, integerEditor);
-	table.setDefaultEditor(Double.class,  doubleEditor);
+	  table.setDefaultEditor(Integer.class, integerEditor);
+	  table.setDefaultEditor(Double.class,  doubleEditor);*/
 	table.setDefaultEditor(String.class,  new CellEditorArea(new JTextField()));
     }
   

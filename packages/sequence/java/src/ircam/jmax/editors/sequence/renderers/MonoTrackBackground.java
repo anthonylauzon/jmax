@@ -119,15 +119,6 @@ public class MonoTrackBackground implements Layer, ImageObserver{
     g.setFont(ToggleBar.toggleBarFont);
     g.drawString(gc.getTrack().getName(), 2, h-17);
 
-    //***** removed passing from tracks multitypes to monotype *****//
-    /*Image image;
-      int i=0;
-      for(Enumeration en = ((FtsTrackObject)gc.getTrack().getTrackDataModel()).getTypes(); en.hasMoreElements();)
-      {
-      image = ((ValueInfo)en.nextElement()).getIcon().getImage();
-      g.drawImage(image , 2, h-15+i*10, this);
-      i++;
-      }*/
     Image image = gc.getTrack().getTrackDataModel().getType().getIcon().getImage();    
     g.drawImage(image , 2, h-15, this);
 

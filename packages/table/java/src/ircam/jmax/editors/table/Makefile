@@ -32,6 +32,8 @@ include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 all: local_all
 	(cd actions ; $(MAKE) all)
 	(cd menus ; $(MAKE) all)
+	(cd renderers ; $(MAKE) all)
+	(cd tools ; $(MAKE) all)
 .PHONY: all
 
 local_all: $(CLASSES)
@@ -40,6 +42,8 @@ local_all: $(CLASSES)
 clean: local_clean
 	(cd actions ; $(MAKE) clean)
 	(cd menus ; $(MAKE) clean)
+	(cd renderers ; $(MAKE) clean)
+	(cd tools ; $(MAKE) clean)
 .PHONY: clean
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc

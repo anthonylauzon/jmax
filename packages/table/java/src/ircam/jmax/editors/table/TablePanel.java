@@ -31,6 +31,9 @@ import ircam.jmax.mda.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
+import ircam.jmax.editors.table.tools.*;
+import ircam.jmax.editors.table.renderers.*;
+
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;

@@ -48,7 +48,7 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
    */
     public FtsBpfObject(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
     {
-	super(fts, parent, variableName, "bpf", "bpf " + FtsParse.unparseArguments(nArgs, args));
+	super(fts, parent, variableName, classname, classname + " " + FtsParse.unparseArguments(nArgs, args));
 	
 	listeners = new MaxVector();
     }
@@ -140,12 +140,16 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   public void set(int nArgs , FtsAtom args[])
     {
 	removeAllPoints();
-	int j=0;
-	for(int i = 0; i<nArgs; i+=2)
-	    addPoint(j++, new BpfPoint(args[i].getFloat(), args[i+1].getFloat()));
 	
-	notifyPointAdded(j);
-	setDirty();
+	if(nArgs > 0)
+	    {
+		int j=0;
+		for(int i = 0; i<nArgs; i+=2)
+		    addPoint(j++, new BpfPoint(args[i].getFloat(), args[i+1].getFloat()));
+
+		notifyPointAdded(j-1);
+		setDirty();	
+	    }
     }
 
   public void append(int nArgs , FtsAtom args[])
@@ -347,9 +351,9 @@ public class FtsBpfObject extends FtsObjectWithEditor implements BpfDataModel
   */
     
     private void notifyPointAdded(int index)
-    {
+    {	
 	for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-	    ((BpfDataListener) e.nextElement()).pointAdded(index);
+	    ((BpfDataListener) e.nextElement()).pointAdded(index);		
     }
 
     private void notifyPointsDeleted(int[] oldIndexs)

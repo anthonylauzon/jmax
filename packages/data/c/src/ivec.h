@@ -32,6 +32,7 @@
 typedef struct _ivec_
 {
   fts_object_t o;
+  int opened; /* non zero if editor open */
   int *values;
   int size;
   int alloc;

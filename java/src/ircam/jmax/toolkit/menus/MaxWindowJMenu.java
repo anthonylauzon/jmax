@@ -33,10 +33,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
-/*****************/
-//jdk117-->jdk1.3//
-//public class MaxWindowJMenu extends AntialiasingMenu
-/*****************/
+
 public class MaxWindowJMenu extends JMenu
 {
   class WindowMenuListener implements MenuListener
@@ -88,22 +85,13 @@ public class MaxWindowJMenu extends JMenu
     if (getMenuComponentCount() > 0)
       removeAll();
 
-    /*****************/
-    //jdk117-->jdk1.3//
-    //mi = new AntialiasingMenuItem("Stack");
     mi = new JMenuItem("Stack");
-    /*****************/
-
 
     add(mi);
     mi.addActionListener(new ActionListener()
 				{public  void actionPerformed(ActionEvent e)
 				    { MaxWindowManager.getWindowManager().StackWindows();}});
-    /*****************/
-    //jdk117-->jdk1.3//
     mi = new JMenuItem("Tile");
-    //mi = new AntialiasingMenuItem("Tile");
-    /*****************/
     add(mi);
     mi.addActionListener(new ActionListener()
 				{public  void actionPerformed(ActionEvent e)
@@ -115,11 +103,7 @@ public class MaxWindowJMenu extends JMenu
       {
 	final Frame w = (Frame) windowList.getElementAt(i);
 	
-	/*****************/
-	//jdk117-->jdk1.3//
 	mi = new JMenuItem(w.getTitle());
-	//mi = new AntialiasingMenuItem(w.getTitle());
-	/*****************/
 
 	add(mi);
 	mi.addActionListener(new ActionListener()

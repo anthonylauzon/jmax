@@ -359,10 +359,10 @@ public class ConsoleArea extends JComponent implements Scrollable {
 
   public void paintComponent( Graphics g)
   {
-      /*****************/
-      //jdk117-->jdk1.3//
-      //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-      /*****************/
+    /*****************/
+    //jdk117-->jdk1.3//
+    ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    /*****************/
 
     Rectangle clip = g.getClipBounds();
     int clipWidth = clip.width;

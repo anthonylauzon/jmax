@@ -163,8 +163,8 @@ public class TextMenu extends EditorMenu
     {
 	/*****************/
 	//jdk117-->jdk1.3//
-	String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
-	//String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+	//String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
+	String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 	/*****************/
 
 	JRadioButtonMenuItem item;

@@ -31,10 +31,12 @@ include $(JMAXROOTDIR)/java/Makefiles/Makefile.package
 
 all: 
 	(cd bpf ; $(MAKE) all)
+	(cd table ; $(MAKE) all)
 .PHONY: all
 
 clean: 
 	(cd bpf ; $(MAKE) clean)
+	(cd table ; $(MAKE) clean)
 .PHONY: clean
 
 include $(JMAXROOTDIR)/java/Makefiles/Makefile.package.misc

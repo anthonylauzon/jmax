@@ -33,11 +33,21 @@ fts_symbol_t ivec_symbol = 0;
 fts_type_t ivec_type = 0;
 fts_class_t *ivec_class = 0;
 
+static fts_symbol_t sym_openEditor = 0;
+static fts_symbol_t sym_destroyEditor = 0;
+static fts_symbol_t sym_set = 0;
+static fts_symbol_t sym_append = 0;
+static fts_symbol_t sym_set_size = 0;
+
 /********************************************************
  *
  *  utility functions
  *
  */
+
+#define ivec_set_editor_open(b) ((b)->opened = 1)
+#define ivec_set_editor_close(b) ((b)->opened = 0)
+#define ivec_editor_is_open(b) ((b)->opened)
 
 /* local */
 static void
@@ -86,7 +96,7 @@ ivec_copy(ivec_t *in, ivec_t *out)
   set_size(out, in->size);
 
   for(i=0; i<in->size; i++)
-    out->values[i] = in->values[i];
+      out->values[i] = in->values[i];
 }
 
 void
@@ -95,7 +105,7 @@ ivec_zero(ivec_t *vec)
   int i;
 
   for(i=0; i<vec->size; i++)
-    vec->values[i] = 0;
+      vec->values[i] = 0;
 }
 
 void
@@ -137,7 +147,9 @@ ivec_set_from_atom_list(ivec_t *vec, int offset, int ac, const fts_atom_t *at)
 {
   int size = ivec_get_size(vec);
   int i;
-  
+ 
+  post("size %d ac %d \n", size, ac);
+ 
   if(offset + ac > size)
     ac = size - offset;
   
@@ -293,6 +305,41 @@ ivec_write_atom_file(ivec_t *vec, fts_symbol_t file_name)
  *   user methods
  *
  */
+#define IVEC_CLIENT_BLOCK_SIZE 128
+
+static void
+ivec_set_client(ivec_t *ivec)
+{
+  int i;
+  fts_atom_t a[IVEC_CLIENT_BLOCK_SIZE];
+  int n = ivec_get_size(ivec);
+  int append = 0;
+  int current = 0;
+
+  while(n > 0)
+    {
+      int send = (n > IVEC_CLIENT_BLOCK_SIZE-1)? IVEC_CLIENT_BLOCK_SIZE-1: n;
+
+      if(!append)
+	fts_set_int(&a[0], n);
+      else
+	fts_set_int(&a[0], current);
+
+      for(i = 0; i < send; i++)
+	  fts_set_int(&a[i+1], ivec->values[current+i]);
+      
+      if(!append)
+	{
+	  fts_client_send_message((fts_object_t *)ivec, sym_set, send+1, a);
+	  append = 1;
+	}
+      else
+	fts_client_send_message((fts_object_t *)ivec, sym_append, send+1, a);
+
+      current+=send;
+      n -= send;
+    }
+}
 
 static void
 ivec_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -319,13 +366,15 @@ ivec_fill(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   int constant = fts_get_int_arg(ac, at, 0, 0);
 
   ivec_set_const(this, constant);
+
+  if(ivec_editor_is_open(this))
+    ivec_set_client(this);
 }
 
 static void
 ivec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   ivec_t *this = (ivec_t *)o;
-
   if(ac > 1 && fts_is_number(at))
     {
       int size = ivec_get_size(this);
@@ -333,7 +382,11 @@ ivec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
       if(offset >= 0 && offset < size)
 	ivec_set_from_atom_list(this, offset, ac - 1, at + 1);
+  
+      if(ivec_editor_is_open(this))
+	ivec_set_client(this);
     }
+  
 }
 
 static void
@@ -390,6 +443,23 @@ ivec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     }
   else
     post("ivec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
+}
+
+static void
+ivec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  ivec_set_editor_open(this);
+  fts_client_send_message(o, sym_openEditor, 0, 0);
+  ivec_set_client(this);
+}
+
+static void
+ivec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+
+  ivec_set_editor_close(this);
 }
 
 /********************************************************************
@@ -583,6 +653,7 @@ ivec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ivec_t *this = (ivec_t *)o;
   
   fts_free(this->values);
+  fts_client_send_message(o, sym_destroyEditor, 0, 0);
 }
 
 static int
@@ -619,6 +690,11 @@ ivec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), ivec_import);
       fts_method_define_varargs(cl, 0, fts_new_symbol("export"), ivec_export);
 
+      /* graphical editor */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("open_editor"), ivec_open_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), ivec_close_editor);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_from_client"), ivec_set);
+
       /* type outlet */
       fts_outlet_type_define(cl, 0, ivec_symbol, 1, &ivec_type);      
 
@@ -647,8 +723,19 @@ ivec_config(void)
   ivec_symbol = fts_new_symbol("ivec");
   ivec_type = ivec_symbol;
 
+  sym_openEditor = fts_new_symbol("openEditor");
+  sym_destroyEditor = fts_new_symbol("destroyEditor");
+  sym_set = fts_new_symbol("set");
+  sym_append = fts_new_symbol("append");
+  sym_set_size = fts_new_symbol("setSize");
+
   fts_metaclass_install(ivec_symbol, ivec_instantiate, ivec_equiv);
   ivec_class = fts_class_get_by_name(ivec_symbol);
 
   fts_atom_type_register(ivec_symbol, ivec_class);
 }
+
+
+
+
+

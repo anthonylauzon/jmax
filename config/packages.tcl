@@ -42,7 +42,7 @@ package require signal
 # ISPW classes
 package require ispw
 package require ispwmath
-package require table
+# package require table
 package require qlist
 package require explode
 

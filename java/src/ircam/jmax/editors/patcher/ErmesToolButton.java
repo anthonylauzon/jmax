@@ -56,8 +56,8 @@ class ErmesToolButton extends JToggleButton
       if(!button.isSelected()){
 	  /*****************/
 	  //jdk117-->jdk1.3//
-	  button.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-	  //button.setCursor(Cursors.get(button.getDescription()));
+	  //button.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+	  button.setCursor(Cursors.get(button.getDescription()));
 	  /*****************/
 
 	  button.state = true;
@@ -81,7 +81,7 @@ class ErmesToolButton extends JToggleButton
     
     /*****************/
     //jdk117-->jdk1.3//
-    /*ImageObserver observer =  new ImageObserver(){
+    ImageObserver observer =  new ImageObserver(){
 	    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
 	    {
 		return true;
@@ -90,7 +90,7 @@ class ErmesToolButton extends JToggleButton
     Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
     Toolkit.getDefaultToolkit().prepareImage(image, 64, 64, observer);
     Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0,1), description+" cursor");
-    Cursors.loadCursor(description, cursor);*/
+    Cursors.loadCursor(description, cursor);
     /*****************/
 
     addMouseListener(ErmesToolButton.mListener);

@@ -40,10 +40,6 @@ import ircam.jmax.toolkit.actions.*;
  * So we use standard actionlistener programming.
  */
 
-/*****************/
-//jdk117-->jdk1.3//
-//public abstract class EditorMenu extends AntialiasingMenu
-/*****************/
 public abstract class EditorMenu extends JMenu					 
 {
   public EditorMenu(String name)
@@ -56,11 +52,7 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    /*****************/
-    //jdk117-->jdk1.3//
     item = new JMenuItem(name, mnemonic);
-    //item = new AntialiasingMenuItem(name, mnemonic);
-    /*****************/
 
     item.addActionListener(action);
     item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
@@ -74,12 +66,7 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    /*****************/
-    //jdk117-->jdk1.3//
     item = new JMenuItem(name, mnemonic); 
-    //item = new AntialiasingMenuItem(name, mnemonic);
-    /*****************/
-    
     item.addActionListener(action);
     item.setAccelerator(KeyStroke.getKeyStroke(mnemonic, modifiers));
 
@@ -92,12 +79,7 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    /*****************/
-    //jdk117-->jdk1.3//
     item = new JMenuItem(name); 
-    //item = new AntialiasingMenuItem(name); 
-    /*****************/
-
     item.addActionListener(action);
     add(item);
 
@@ -119,12 +101,7 @@ public abstract class EditorMenu extends JMenu
   {
     JMenuItem item;
 
-    /*****************/
-    //jdk117-->jdk1.3//
     item = new JMenuItem(name);
-    //item = new AntialiasingMenuItem(name);
-    /*****************/
-
     item.addActionListener(action);
     insert(item, position);
 

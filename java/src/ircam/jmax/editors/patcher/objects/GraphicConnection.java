@@ -206,17 +206,31 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
       return null;
   }
 
+    
+  final static float dash1[] = {10.0f, 3.0f, 2.0f, 3.0f};
+  final static BasicStroke dashed = new BasicStroke(1.0f, 
+						    BasicStroke.CAP_BUTT, 
+						    BasicStroke.JOIN_MITER, 
+						    10.0f, dash1, 0.0f);
+  final static BasicStroke normal = new BasicStroke(1.0f, 
+						    BasicStroke.CAP_BUTT, 
+						    BasicStroke.JOIN_MITER, 
+						    10.0f);
   public void paint( Graphics g) 
   {
     Color aubergine = new Color(100, 100, 190);
 
     if(type == FtsConnection.fts_connection_invalid)
       g.setColor( Color.gray);
-    else if(type == FtsConnection.fts_connection_signal)
-      g.setColor( Color.magenta.darker());
     else
-      g.setColor( Color.black);
-
+	if(type == FtsConnection.fts_connection_signal)	
+	    {
+		g.setColor( Color.magenta.darker());
+		((Graphics2D)g).setStroke(dashed);
+	    }
+	else
+	    g.setColor( Color.black);
+	  
     if ( selected) 
       {
 	if ( java.lang.Math.abs(start.x - end.x) > java.lang.Math.abs(start.y - end.y))
@@ -232,6 +246,9 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
       } 
     else
       g.drawLine(start.x, start.y, end.x, end.y);
+  
+    if(type == FtsConnection.fts_connection_signal)	
+	((Graphics2D)g).setStroke(normal);
   }
 
   public void updatePaint(Graphics g){}

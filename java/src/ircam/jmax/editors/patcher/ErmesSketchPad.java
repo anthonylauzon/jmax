@@ -951,8 +951,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     stopTextEditing();
     /*****************/
     //jdk117-->jdk1.3//
-    setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-    //setCursor(Cursors.get(description));     
+    //setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+    setCursor(Cursors.get(description));     
     /*****************/
 
     engine.setTopInteraction(Interactions.addModeInteraction);    

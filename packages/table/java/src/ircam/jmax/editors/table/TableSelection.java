@@ -289,7 +289,7 @@ public class TableSelection extends DefaultListSelectionModel implements Transfe
   private static int base = EMPTY_CLIP;
   private static int lenght = 0;
 
-  static int NO_CARET = -1;
+  static public int NO_CARET = -1;
   int caretPosition = NO_CARET;
 
   protected MaxVector dataFlavors;

@@ -32,6 +32,7 @@ fts_type_t bpf_type = 0;
 fts_class_t *bpf_class = 0;
 
 static fts_symbol_t sym_openEditor = 0;
+static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_set = 0;
 static fts_symbol_t sym_append = 0;
 static fts_symbol_t sym_addPoint = 0;
@@ -439,6 +440,7 @@ bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   bpf_t *this = (bpf_t *)o;
 
   bpf_clear(this);
+  fts_client_send_message(o, sym_destroyEditor, 0, 0);
 }
 
 static int
@@ -503,6 +505,7 @@ bpf_config(void)
   bpf_type = bpf_symbol;
 
   sym_openEditor = fts_new_symbol("openEditor");
+  sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_set = fts_new_symbol("set");
   sym_append = fts_new_symbol("append");
   sym_addPoint = fts_new_symbol("addPoint");

@@ -57,7 +57,7 @@ abstract public class InOutlet extends Editable implements FtsObjectErrorListene
 
   public String getArgs()
   {
-    return ftsObject.getDescription();
+     return ftsObject.getDescription();
   }
 
   // redefined from base class
