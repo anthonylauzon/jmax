@@ -1,15 +1,19 @@
 2003-02-13  Patrice Tisserand <Patrice.Tisserand@ircam.fr>
 
+	* add fts_udpstream_t in bytestream.c
+
+	* udpreceive now use a fts_udpstream_t instead of his own udp socket implementation
+	
 	* start to separate client and binary protocol decoder
 	  files added :
 	    jmax/fts/binaryprotocol.c
 	    jmax/include/fts/binaryprotocol.h
 	  
-	  Actually client still contains binary protocol decoder code, but it will change in a few days.
-	  We need to add "callback" when decoding, there is specific client code in end_message_action and end_object_action functions.
+	   Actually client still contains binary protocol decoder code, but it will change in a few days.
+	   We need to add "callback" when decoding, there is specific client code in end_message_action and end_object_action functions.
 
 	 * udpreceive.c now use fts_binary_protocol for message decoding
-	
+
 2003-02-13  Norbert Schnell  <schnell@mac-schnell2.ircam.fr>
 
 	* transformed note into score object scoob (package sequence)   
