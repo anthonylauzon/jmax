@@ -739,6 +739,7 @@ marker_track_append_bar(track_t *marker_track)
     scomark_t *new_bar = NULL;
     fts_symbol_t last_meter = NULL;
     fts_symbol_t meter = NULL;
+    int last_number = 0;
     int numerator = 0;
     int denominator = 0;
     double last_tempo = 0.0;
@@ -763,6 +764,7 @@ marker_track_append_bar(track_t *marker_track)
         scomark_bar_get_meter(scomark, &meter);
         if( meter != NULL) last_meter = meter;
         last_tempo = tempo;
+        scomark_bar_get_number( scomark, &last_number);
       }  
       
       marker_event = event_get_next(marker_event);
@@ -817,6 +819,7 @@ marker_track_append_bar(track_t *marker_track)
       }
       
       new_bar = marker_track_insert_marker(marker_track, next_bar_time, seqsym_bar, &new_event);     
+      scomark_bar_set_number( new_bar, last_number+1);
     }
   }
   return new_event;

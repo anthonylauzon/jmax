@@ -98,7 +98,7 @@ public ValueInfo getValueInfo()
 
 public boolean isMovable()
 {  
-  return (getProperty("tempo") == EventValue.UNKNOWN_PROPERTY);
+  return (getProperty("type").equals("marker") && getProperty("tempo") == EventValue.UNKNOWN_PROPERTY);
 }
 
 public String getPropertyMessage(String property)

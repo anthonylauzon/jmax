@@ -137,8 +137,7 @@ public void edit(int x, int y, int modifiers)
 	
 	if (aTrackEvent != null) 
 	{ //click on event
-		aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);
-		
+		aTrackEvent.getValue().edit(x, y, modifiers, aTrackEvent, (SequenceGraphicContext)gc);		
 		gc.getGraphicDestination().repaint();
 	}
 }
@@ -242,6 +241,7 @@ void moveSelection(int deltaX, int deltaY)
 		((UndoableData) egc.getDataModel()).beginUpdate();
 		
 		if(a.isHorizontalMovementAllowed())
+    {
 			if(!a.isHorizontalMovementBounded())
 				egc.getTrack().getFtsTrack().requestEventsMove(egc.getSelection().getSelected(), deltaX, a);
 			else
@@ -270,6 +270,8 @@ void moveSelection(int deltaX, int deltaY)
 						a.setX(aEvent, a.getX(aEvent) + deltaX);
 				}
 			}
+    }
+    if(egc.getMarkersSelection() != null)
       egc.getMarkersTrack().requestEventsMove( egc.getMarkersSelection().getSelected(), deltaX, a); 
 	}
   if(deltaY!=0)

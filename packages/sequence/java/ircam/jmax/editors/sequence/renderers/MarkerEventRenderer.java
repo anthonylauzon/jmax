@@ -83,10 +83,10 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 		maxY = d.height;
 	else
 		maxY = pa.getMaxScoreY();
-	
+  
 	int minY = pa.getMinScoreY();
 	String type = (String)(e.getProperty("type"));
-	
+	  
 	int x = pa.getX(e);
 	Color col, lightCol;
   
@@ -124,7 +124,14 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
     g.setColor( col);
     g.drawLine( x, minY, x, maxY);
     g.setColor( lightCol);
-    g.drawLine( x, maxY, x, 0);
+    g.drawLine( x, maxY, x, 0);    
+    
+    Boolean isLastBar = (Boolean)e.getProperty("last_bar");    
+    if( isLastBar != null && (isLastBar == Boolean.TRUE))
+    {      
+      g.setColor( col);
+      g.drawLine( x+2, minY, x+2, maxY);
+    }
   }
 }
 

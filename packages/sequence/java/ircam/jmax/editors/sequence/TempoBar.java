@@ -430,7 +430,27 @@ public void mouseExited(MouseEvent e){}
 public void objectChanged(Object spec, String propName, Object propValue){repaint();}
 public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
 public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
-public void objectAdded(Object whichObject, int index){repaint();}
+
+TrackEvent lastBar = null;
+int lastBarIndex = -1;
+public void objectAdded(Object whichObject, int index)
+{
+  String type = (String)(((TrackEvent)whichObject).getProperty("type"));  
+  if( type.equals("bar"))
+  {
+    if(index > lastBarIndex)
+    {
+      if(lastBar != null) 
+        lastBar.getValue().setProperty("last_bar", Boolean.FALSE);
+      
+      lastBar = (TrackEvent)whichObject;
+      lastBarIndex = index;
+      lastBar.getValue().setProperty("last_bar", Boolean.TRUE);
+    }
+  }
+  /* if is a bar set if is last bar in score as a property "last_bar" */
+  repaint();
+}
 public void objectsAdded(int maxTime){repaint();}
 public void objectDeleted(Object whichObject, int oldIndex){repaint();}
 public void trackCleared(){repaint();}
