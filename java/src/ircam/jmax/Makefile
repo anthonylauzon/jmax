@@ -49,12 +49,7 @@ MaxVersion.java: $(ROOTDIR)/VERSION
 	echo 'public class MaxVersion {' >> MaxVersion.java
 	echo ' public static String getMaxVersion()' >> MaxVersion.java
 	echo ' {' >> MaxVersion.java
-	awk -F= '\
-$$1=="MAJOR" {ma=$$2;} \
-$$1=="MINOR" {mi=$$2;} \
-$$1=="PATCH_LEVEL" {pa=$$2;} \
-END { printf( "  return \"jMax version %d.%d.%d\";\n", ma, mi, pa); } \
-' < $(ROOTDIR)/VERSION >> MaxVersion.java
+	echo '  return "jMax version' `cat $(ROOTDIR)/VERSION` '";' >> MaxVersion.java
 	echo ' }' >> MaxVersion.java
 	echo '}' >> MaxVersion.java
 

@@ -1,0 +1,9 @@
+#!/bin/sh
+ARCH=$1
+
+cp -fv $DISTFILE /usr/src/redhat/SOURCES
+cp -fv jmax.spec /usr/src/redhat/SPECS
+
+cd /usr/src/redhat/SPECS
+rpm -ba --target $ARCH jmax.spec
+

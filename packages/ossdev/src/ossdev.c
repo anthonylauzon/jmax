@@ -769,6 +769,7 @@ static fts_status_t oss_midi_open( fts_dev_t *dev, int ac, const fts_atom_t *av)
   else
     flags = O_RDWR;
 
+  /* flags |= O_NONBLOCK; */
   fd = open( fts_symbol_name( name), flags);
 
   if (fd < 0)

@@ -29,26 +29,17 @@ ifdef ARCH
 include Makefiles/Makefile.$(ARCH)
 endif
 
-include VERSION
-
-version=$(MAJOR).$(MINOR).$(PATCH_LEVEL)
-disttag=V$(MAJOR)_$(MINOR)_$(PATCH_LEVEL)
-distdir=jmax-$(version)
-distfile=jmax-$(version)-src.tar.gz
-
 all:
-	(cd fts; $(MAKE) all)
-	(cd java ; $(MAKE) all)
-	(cd lib; $(MAKE) all)
-	(cd packages; $(MAKE) all)
-	(cd syspackages; $(MAKE) all)
+	(cd fts; $(MAKE) $@)
+	(cd java ; $(MAKE) $@)
+	(cd lib; $(MAKE) $@)
+	(cd packages; $(MAKE) $@)
 .PHONY: all
 
 all_c:
 	(cd fts; $(MAKE) all)
 	(cd lib; $(MAKE) all_c)
 	(cd packages; $(MAKE) all_c)
-	(cd syspackages; $(MAKE) all)
 .PHONY: all_c
 
 all_java:
@@ -58,18 +49,16 @@ all_java:
 .PHONY: all_java
 
 clean:
-	(cd fts; $(MAKE) clean)
-	(cd java ; $(MAKE) clean)
-	(cd lib; $(MAKE) clean)
-	(cd packages; $(MAKE) clean)
-	(cd syspackages; $(MAKE) clean)
+	(cd fts; $(MAKE) $@)
+	(cd java ; $(MAKE) $@)
+	(cd lib; $(MAKE) $@)
+	(cd packages; $(MAKE) $@)
 .PHONY: clean
 
 clean_c:
 	(cd fts; $(MAKE) clean)
 	(cd packages; $(MAKE) clean_c)
 	(cd lib; $(MAKE) clean_c)
-	(cd syspackages; $(MAKE) clean)
 .PHONY: clean_c
 
 clean_java:
@@ -146,11 +135,12 @@ TAGS:
 #
 # cvs-tag
 #
-cvs-tag:
+cvs-tag: spec-files
 	if cvs -n update 2>&1 | egrep '^[UARMC] ' ; then \
-		echo "not sync with cvs (update or commit)" ; exit 1 ; \
+		echo "Not sync with cvs (do an update or commit)" ; \
+		exit 1 ; \
 	fi
-	cvs tag -F $(disttag)
+	cvs tag -F `sed -e 's/\./_/g' -e 's/^/V/' VERSION`
 .PHONY: cvs-tag
 
 #
@@ -158,68 +148,28 @@ cvs-tag:
 # update the spec files for version number
 #
 spec-files:
-	(cd pkg/sgi ; $(MAKE) all)
-	(cd pkg/rpm ; $(MAKE) all)
+	(cd utils ; $(MAKE) $@)
 .PHONY: spec-files
 
 #
 # dist
 # does a cvs export and a .tar.gz of the sources
 #
-src-dist: spec-files
-	rm -rf $(distdir)
-	umask 22
-	mkdir $(distdir)
-	cvs export -r $(disttag) -d $(distdir) jmax
-	tar cvf - $(distdir) | gzip -c --best > $(distfile)
-	chmod 644 $(distfile)
-	rm -rf $(distdir)
-.PHONY: src-dist
-
-
-#
-# rpm targets
-# builds a rpm on various architectures
-#
-rpm-i686: $(distfile)
-	umask 22
-	cp -fv $(distfile) /usr/src/redhat/SOURCES
-	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
-	(cd /usr/src/redhat/SPECS ; rpm -ba --target i686 jmax.spec)
-	cp /usr/src/redhat/RPMS/i686/jmax-$(version)-1.i686.rpm .
-	cp /usr/src/redhat/SRPMS/jmax-$(version)-1.src.rpm .
-
-rpm-ppc: $(distfile)
-	umask 22
-	cp -fv $(distfile) /usr/src/redhat/SOURCES
-	tar xvzf $(distfile) -O jmax-$(version)/pkg/rpm/jmax.spec > /usr/src/redhat/SPECS/jmax.spec
-	(cd /usr/src/redhat/SPECS ; rpm -ba --target ppc jmax.spec)
-	cp /usr/src/redhat/RPMS/ppc/jmax-$(version)-1.ppc.rpm .
-
-#
-# sgi-pkg targets
-# builds a SGI package
-#
-BUILD_DIR=/data/jmax-build
-
-sgi-pkg: $(distfile)
-	/bin/rm -rf $(BUILD_DIR)/src
-	mkdir -p $(BUILD_DIR)/src
-	gzip -cd $(distfile) | (cd $(BUILD_DIR)/src ; tar xvf -)
-	( cd $(BUILD_DIR)/src/$(distdir) ; gmake ARCH=r10k-irix6.5 all)
-	/bin/rm -rf /tmp/jmax.idb /tmp/jmax.idb.sorted /tmp/jmax.spec
-	gzip -cd $(distfile) | tar xvf - -O jmax-$(version)/pkg/sgi/jmax.spec > /tmp/jmax.spec
+dist:
 	( \
-		cd $(BUILD_DIR)/src/$(distdir) ; \
-		RAWIDB=/tmp/jmax.idb ; \
-		export RAWIDB ; \
-		gmake ARCH=r10k-irix6.5 INSTALL="install -idb ALL" install ; \
-		sort +4u -6 < /tmp/jmax.idb | awk '{ printf( "%s %s %s %s %c%s%c %c%s%c %s\n", $$1, $$2, $$3, $$4, 39, $$5, 39, 39, $$6, 39, $$7); }' > /tmp/jmax.idb.sorted ; \
-		/usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax.spec ; \
+		umask 22 ; \
+		mkdir .$$$$ ; \
+		cd .$$$$ ; \
+		TAG=`echo $(VERSION) | sed -e 's/\./_/g' -e 's/^/V/'` ; \
+		cvs export -r $$TAG jmax ; \
+		mv jmax jmax-$(VERSION) ; \
+		tar cvf - jmax-$(VERSION) | gzip -c --best > ../../jmax-$(VERSION)-src.tar.gz ; \
+		chmod 644 ../../jmax-$(VERSION)-src.tar.gz ; \
+		cd .. ; \
+		/bin/rm -rf .$$$$ ; \
 	)
-	( cd $(BUILD_DIR)/src ; tar cvf - jmax jmax.idb jmax.sw ) > jmax-$(version).r10k.tardist 
-#	/bin/rm -rf $(BUILD_DIR)/src
-.PHONY: sgi-pkg
+.PHONY: dist
+
 
 #
 # install
@@ -252,10 +202,6 @@ install-bin:
 	for a in $(INSTALL_ARCHS) ; do \
 		( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
 	done
-	( cd syspackages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	for a in $(INSTALL_ARCHS) ; do \
-		( cd syspackages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
-	done
 .PHONY: install-bin
 
 install-includes:
@@ -268,19 +214,13 @@ install-includes:
 # 'make new-patch' is the most frequent
 #
 new-patch:
-	echo "MAJOR=$(MAJOR)" > VERSION
-	echo "MINOR=$(MINOR)" >> VERSION
-	echo "PATCH_LEVEL="`expr $(PATCH_LEVEL) + 1` >> VERSION
+	awk -F. '{printf( "%d.%d.%d\n", $1, $2, $3+1);}' VERSION
 	$(MAKE) spec-files
 
 new-minor:
-	echo "MAJOR=$(MAJOR)" > VERSION
-	echo "MINOR="`expr $(MINOR) + 1` >> VERSION
-	echo "PATCH_LEVEL=0" >> VERSION
+	awk -F. '{printf( "%d.%d.%d\n", $1, $2+1, 0);}' VERSION
 	$(MAKE) spec-files
 
 new-major:
-	echo "MAJOR="`expr $(MAJOR) + 1` > VERSION
-	echo "MINOR=0" >> VERSION
-	echo "PATCH_LEVEL=0" >> VERSION
+	awk -F. '{printf( "%d.%d.%d\n", $1+1, 0, 0);}' VERSION
 	$(MAKE) spec-files

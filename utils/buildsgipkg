@@ -1,0 +1,25 @@
+#
+# sgi-pkg targets
+# builds a SGI package
+#
+BUILD_DIR=/data/jmax-build
+
+sgi-pkg: $(distfile)
+	/bin/rm -rf $(BUILD_DIR)/src
+	mkdir -p $(BUILD_DIR)/src
+	gzip -cd $(distfile) | (cd $(BUILD_DIR)/src ; tar xvf -)
+	( cd $(BUILD_DIR)/src/$(distdir) ; gmake ARCH=r10k-irix6.5 all)
+	/bin/rm -rf /tmp/jmax.idb /tmp/jmax.idb.sorted /tmp/jmax.spec
+	gzip -cd $(distfile) | tar xvf - -O jmax-$(version)/pkg/sgi/jmax.spec > /tmp/jmax.spec
+	( \
+		cd $(BUILD_DIR)/src/$(distdir) ; \
+		RAWIDB=/tmp/jmax.idb ; \
+		export RAWIDB ; \
+		gmake ARCH=r10k-irix6.5 INSTALL="install -idb ALL" install ; \
+		sort +4u -6 < /tmp/jmax.idb | awk '{ printf( "%s %s %s %s %c%s%c %c%s%c %s\n", $$1, $$2, $$3, $$4, 39, $$5, 39, 39, $$6, 39, $$7); }' > /tmp/jmax.idb.sorted ; \
+		/usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax.spec ; \
+	)
+	( cd $(BUILD_DIR)/src ; tar cvf - jmax jmax.idb jmax.sw ) > jmax-$(version).r10k.tardist 
+#	/bin/rm -rf $(BUILD_DIR)/src
+.PHONY: sgi-pkg
+
