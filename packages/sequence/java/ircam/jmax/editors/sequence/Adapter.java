@@ -38,7 +38,8 @@ abstract public class Adapter implements MappingListener{
      * Builds an adapter with a given geometry object*/
     public Adapter(Geometry g)
     {
-	setGeometry(g);
+      setGeometry(g);
+      LabelMapper = new LabelsMapper();
     }
 
     /**
@@ -215,7 +216,7 @@ abstract public class Adapter implements MappingListener{
   //public Mapper LenghtMapper;
   public DoubleMapper LenghtMapper;//*@*//
   public Mapper HeigthMapper;
-  public StringMapper LabelMapper;
+  public LabelsMapper LabelMapper;
 
   Geometry geometry; //package private
   String itsName;

@@ -47,8 +47,9 @@ public class MidiTrackPopupMenu extends JPopupMenu
   int y;
   MidiTrackEditor target = null;    
   private boolean added = false;
-  JMenuItem displayLabelItem, removeItem, nameItem;
-  JMenu moveMenu;
+  JMenuItem removeItem, nameItem;
+  JMenu moveMenu, labelTypesMenu;
+  private ButtonGroup labelTypesMenuGroup;
   //int trackCount = 1;
   int trackCount = 0;
 
@@ -64,7 +65,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
     addSeparator();
     moveMenu = new JMenu("Move to Position");
     item = new JMenuItem(""+trackCount);
-    item.addActionListener(Actions.moveMidiTrackToAction);
+    item.addActionListener( Actions.moveMidiTrackToAction);
     moveMenu.add(item);
     
     add(moveMenu);
@@ -72,7 +73,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
     addSeparator();
 
     ////////////////////// Range Menu //////////////////////////////
-    JMenu rangeMenu = new JMenu("Change Range");
+    JMenu rangeMenu = new JMenu("Range");
     JMenu maxRangeMenu = new JMenu("Maximum");
     JMenu minRangeMenu = new JMenu("Minimum");
 
@@ -136,7 +137,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
 
     add(rangeMenu);
 
-    nameItem = new JMenuItem("Track Name");
+    nameItem = new JMenuItem("Name");
     nameItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
@@ -151,11 +152,11 @@ public class MidiTrackPopupMenu extends JPopupMenu
     
     add(nameItem);
     ////////////////////// View Menu //////////////////////////////
-    JMenu viewMenu = new JMenu("Change View");
-    item = new JMenuItem("Pianoroll view");
+    JMenu viewMenu = new JMenu("View");
+    item = new JMenuItem("Pianoroll");
     item.addActionListener(new SetViewAction(MidiTrackEditor.PIANOROLL_VIEW));
     viewMenu.add(item);    
-    item = new JMenuItem("NMS view");
+    item = new JMenuItem("Staves");
     item.addActionListener(new SetViewAction(MidiTrackEditor.NMS_VIEW));
     viewMenu.add(item);
 
@@ -173,14 +174,8 @@ public class MidiTrackPopupMenu extends JPopupMenu
     addSeparator();
 
     ////////////////////// others  //////////////////////////////
-    displayLabelItem = new JMenuItem("Hide label");
-    displayLabelItem.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  MidiTrackPopupMenu.getPopupTarget().setDisplayLabels(!MidiTrackPopupMenu.getPopupTarget().isDisplayLabels());
-	}
-    });
-    add(displayLabelItem);
+    labelTypesMenu = new JMenu("Labels");
+    add( labelTypesMenu);
 
     item = new JMenuItem("Select All");
     item.addActionListener(new ActionListener(){
@@ -245,10 +240,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
       }
     popup.updateChangeRangeMenu();
 
-    if(!popup.target.isDisplayLabels())
-      popup.displayLabelItem.setText("Display Labels");
-    else
-      popup.displayLabelItem.setText("Hide Labels");
+    popup.updateLabelTypesMenu();
     
     if( popup.target.getGraphicContext().getFtsObject() instanceof FtsSequenceObject)
       {
@@ -265,38 +257,67 @@ public class MidiTrackPopupMenu extends JPopupMenu
       }
   }
 
-    void updateMoveToMenu()
-    {
-	JMenuItem item;
-	int count =  target.trackCount()-1;
-	if(trackCount==count)
-	    return;
-	else
-	    {
-		int dif = count-trackCount;
-		
-		if(dif>0)
-		    for(int i=1; i<=dif; i++)
-		    {
-			item = new JMenuItem(""+(trackCount+i));
-			item.addActionListener(Actions.moveMidiTrackToAction);
-			moveMenu.add(item);			
-		    }		
-		else
-		    for(int i=0; i<-dif; i++)
-			moveMenu.remove(moveMenu.getItemCount()-1);
-		trackCount = count;
-	    }
-    }
+  void updateLabelTypesMenu()
+  {
+    labelTypesMenu.removeAll();
+    labelTypesMenuGroup = new ButtonGroup();
     
-    void updateChangeRangeMenu()
-    {
-	int max =  ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
-	int min =  ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();
+    String currentType = target.getLabelType();
+    String type;
+
+    JRadioButtonMenuItem selectItem = null;
+    JRadioButtonMenuItem item =  new JRadioButtonMenuItem( "none"); 
+    item.addActionListener( Actions.labelTypesAction);
+    labelTypesMenu.add( item);
+    labelTypesMenuGroup.add(item);
+    if( currentType.equals("none"))
+      selectItem = item;
+
+    for (Enumeration e = target.getTrack().getFtsTrack().getPropertyNames() ; e.hasMoreElements();)
+      {
+	type = (String)e.nextElement();
+	item = new JRadioButtonMenuItem( type);
+	item.addActionListener( Actions.labelTypesAction);
+	labelTypesMenu.add(item);
+	labelTypesMenuGroup.add(item);
+	if( currentType.equals(type)) selectItem = item;
+      }
+
+    if( selectItem != null) selectItem.setSelected( true);
+  }
+
+  void updateMoveToMenu()
+  {
+    JMenuItem item;
+    int count =  target.trackCount()-1;
+    if(trackCount==count)
+      return;
+    else
+      {
+	int dif = count-trackCount;
 	
-	if(maxSlider.getValue()!=max) maxSlider.setValue(max);
-	if(minSlider.getValue()!=min) minSlider.setValue(min);
-    }
+	if(dif>0)
+	  for(int i=1; i<=dif; i++)
+	    {
+	      item = new JMenuItem(""+(trackCount+i));
+	      item.addActionListener(Actions.moveMidiTrackToAction);
+	      moveMenu.add(item);			
+	    }		
+	else
+	  for(int i=0; i<-dif; i++)
+	    moveMenu.remove(moveMenu.getItemCount()-1);
+	trackCount = count;
+      }
+  }
+    
+  void updateChangeRangeMenu()
+  {
+    int max =  ((Integer)target.getTrack().getProperty("maximumPitch")).intValue();
+    int min =  ((Integer)target.getTrack().getProperty("minimumPitch")).intValue();
+    
+    if(maxSlider.getValue()!=max) maxSlider.setValue(max);
+    if(minSlider.getValue()!=min) minSlider.setValue(min);
+  }
 
   class SetViewAction extends AbstractAction {
     SetViewAction(int viewType)

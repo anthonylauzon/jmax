@@ -42,11 +42,6 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	viewMode = MonoTrackEditor.PEAKS_VIEW;
     }
 
-    public void setLabelMapper(StringMapper mapper)
-    {
-	LabelMapper = mapper;
-    }
-
     /**
      * inherited from Adapter.
      * it returns the Y value of the event,

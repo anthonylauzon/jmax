@@ -41,11 +41,6 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
 	viewMode = MonoTrackEditor.PEAKS_VIEW;
     }
 
-    public void setLabelMapper(StringMapper mapper)
-    {
-	LabelMapper = mapper;
-    }
-
     /**
      * inherited from Adapter.
      * it returns the Y value of the event,

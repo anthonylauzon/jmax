@@ -38,7 +38,7 @@ public class MessageAdapter extends MonoDimensionalAdapter{
 	super(geometry, gc, constant);
 	
 	YMapper = IntegerMapper.getMapper();
-	LabelMapper = MessageMapper.getMapper();
+	LabelMapper.setLabelType("message");
     }
 
     /**

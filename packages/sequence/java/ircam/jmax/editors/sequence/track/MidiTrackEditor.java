@@ -345,6 +345,19 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     return viewMode;
   }
 
+  String labelType = "none";
+  public void setLabelType( String type)
+  {
+    labelType = type;
+    gc.getAdapter().LabelMapper.setLabelType( type);
+    repaint();
+  }
+
+  public String getLabelType()
+  {
+    return labelType;
+  }
+
   public int getDefaultHeight()
   {
     return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
@@ -361,16 +374,6 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
     listDialog = new SequenceTableDialog(track, gc.getFrame(), gc);
   }
   
-  public boolean isDisplayLabels()
-  {
-    return ((PartitionAdapter)gc.getAdapter()).isDisplayLabels();
-  }
-  public void setDisplayLabels(boolean display)
-  {
-    ((PartitionAdapter)gc.getAdapter()).setDisplayLabels(display);
-    itsScore.repaint();
-  }
-
   class ScorePanel extends ircam.jmax.toolkit.PopupToolbarPanel
   {
     MidiTrackEditor editor;

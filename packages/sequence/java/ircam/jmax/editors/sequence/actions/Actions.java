@@ -75,7 +75,6 @@ public class Actions
 	((SequenceEditor)container.getEditor()).redo();
       }
     };
-
   public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
   //******** Merge reintroduction *******************//
@@ -84,6 +83,7 @@ public class Actions
   public static EditorAction moveMidiTrackToAction = new MoveMidiTrackToAction();
   public static EditorAction moveMonodimensionalTrackToAction = new MoveMonoTrackToAction();
   public static EditorAction moveClosedTrackToAction = new MoveClosedTrackToAction();
+  public static EditorAction labelTypesAction = new LabelTypesAction();
 }
 
 

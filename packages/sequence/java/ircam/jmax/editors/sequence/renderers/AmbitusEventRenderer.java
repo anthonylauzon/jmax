@@ -172,12 +172,13 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 	      case PartitionAdapter.ALTERATION_BEMOLLE:
 		g.drawString("b", x-8, y+5);
 	      }
-	  }
-	if(pa.isDisplayLabels())
-	  {
-	    g.setFont(SequencePanel.rulerFont);
-	    g.drawString(label, x, y-5);
-	  }
+	  }	
+      }
+
+    if( !label.equals(""))
+      {
+	g.setFont(SequencePanel.rulerFont);
+	g.drawString(label, x, y-5);
       }
   }
 

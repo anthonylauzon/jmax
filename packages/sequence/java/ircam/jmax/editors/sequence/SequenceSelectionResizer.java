@@ -169,7 +169,7 @@ public class SequenceSelectionResizer extends SelectionResizer {
 	a.setType( tempEvent, a.getType( aTrackEvent));
 
 	a.setLenght( tempEvent, a.getLenght( aTrackEvent) + dx);
-	aTrackEvent.getRenderer().render( tempEvent, g, false, egc);
+	aTrackEvent.getRenderer().renderBounds( tempEvent, g, false, egc);
 	
 	if( aTrackEvent == last) 
 	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(),

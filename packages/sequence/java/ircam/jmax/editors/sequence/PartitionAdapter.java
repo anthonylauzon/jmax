@@ -46,7 +46,6 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
     YMapper = PitchMapper.getMapper();
     LenghtMapper = DurationMapper.getMapper();
     HeigthMapper = IntervalMapper.getMapper();
-    LabelMapper = PitchLabelMapper.getMapper();
       
     itsName = "Standard Adapter";
     this.gc = gc;
@@ -354,19 +353,16 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
 	LabelMapper = ChannelLabelMapper.getMapper();
 	}*/
   }
-    public boolean isDisplayLabels()
-    {
-	return displayLabels;
-    }
-    public void setDisplayLabels(boolean display)
-    {
-	displayLabels = display;
-    }
 
-    public void setViewMode(int mode)
-    {
-	viewMode = mode;
-    }
+  public void setLabelType( String type)
+  {
+    LabelMapper.setLabelType( type);
+  }
+
+  public void setViewMode(int mode)
+  {
+    viewMode = mode;
+  }
     public int getViewMode()
     {
 	return viewMode;

@@ -3,6 +3,7 @@ package_JAVA = \
 Actions.java \
 ExportAction.java \
 ImportAction.java \
+LabelTypesAction.java \
 MergeAction.java \
 MoveClosedTrackToAction.java \
 MoveMidiTrackToAction.java \

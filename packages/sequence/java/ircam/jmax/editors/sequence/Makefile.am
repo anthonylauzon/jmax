@@ -19,9 +19,9 @@ FtsTrackObject.java \
 HighlightListener.java \
 IntEnumeration.java \
 IntegerAdapter.java \
-IntegerLabelMapper.java \
 IntegerMapper.java \
 IntegerValueDataFlavor.java \
+LabelsMapper.java \
 LineDrawer.java \
 LineListener.java \
 Mapper.java \
@@ -33,7 +33,6 @@ MidiMouseTracker.java \
 MonoDimensionalAdapter.java \
 MutexPropertyHandler.java \
 PartitionAdapter.java \
-PitchLabelMapper.java \
 PitchMapper.java \
 PositionMapper.java \
 ScrollManager.java \

@@ -238,7 +238,8 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
       return new Double(time);
     else if (value != null && !value.getProperty(name).equals(EventValue.UNKNOWN_PROPERTY))
       return value.getProperty(name); //this is not a know property, ask to the value object
-    else return EventValue.DEFAULT_PROPERTY;
+    //else return EventValue.DEFAULT_PROPERTY;
+    else return null;
   }
 
   /**

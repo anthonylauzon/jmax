@@ -281,7 +281,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    
 	    tempEvent.setDeltaX(dx);//?????
 
-	    //movTrackEvent.getRenderer().render(tempEvent, g, true, gc);
 	    movTrackEvent.getRenderer().renderBounds(tempEvent, g, true, gc);
 
 	    // e_m_ incorrect! instead, make this object communicate the new position to the listeners,

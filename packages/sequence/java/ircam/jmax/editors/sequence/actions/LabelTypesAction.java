@@ -1,4 +1,4 @@
-//
+ //
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -19,44 +19,34 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.actions;
 
-import ircam.jmax.editors.sequence.track.*;
+import java.awt.*;
+import java.awt.event.*;
 
-/**
- * a mapper into the pitch value of the SequenceEvents
- */
-public class PitchLabelMapper extends StringMapper {
-  
-  /**
-   * set the given pitch in the given event
-   */
-    public void set(Event e, String val) {}
+import javax.swing.*;
+import javax.swing.event.*;
 
-  /**
-   * get the pitch from the given event
-   */
-    public String get(Event e) 
-    {
-	return (""+((Integer)e.getProperty("pitch")).intValue());
-    }
+import ircam.jmax.*;
+import ircam.jmax.editors.sequence.*;
+import ircam.jmax.editors.sequence.menus.*;
 
-    public String getName()
-    {
-	return "pitch";
-    }
-  /**
-   * access the static instance of the class */
-  static StringMapper getMapper() 
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.actions.*;
+
+public class LabelTypesAction extends EditorAction
+{
+  String type;
+  public  void actionPerformed(ActionEvent e)
   {
-    return itsPitchMapper;
+    type = ((JMenuItem)e.getSource()).getText();
+    super.actionPerformed(e);
   }
 
-  //-- Fields
-
-  static PitchLabelMapper itsPitchMapper = new PitchLabelMapper();
+  public void doAction(EditorContainer container)
+  {
+    MidiTrackPopupMenu.getPopupTarget().setLabelType( type);
+  }
 }
-
-
 
 

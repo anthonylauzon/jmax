@@ -26,35 +26,51 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * a mapper into the pitch value of the SequenceEvents
  */
-public class IntegerLabelMapper extends StringMapper {
+public class LabelsMapper {
   
   /**
    * set the given pitch in the given event
    */
-    public void set(Event e, String val) {}
+  public void set(Event e, String val){}
 
   /**
    * get the pitch from the given event
    */
-  public String get(Event e) 
+  public String get( Event e) 
   {
-    return (""+((Integer)e.getProperty("value")).intValue());
+    if( display)
+      {
+	Object val = e.getProperty( labelType);
+	if( val != null)
+	  return (""+val);
+	else
+	  return "";
+      }
+    else return "";
   }
 
   public String getName()
   {
-    return "integer";
+    return "labels";
   }
   /**
    * access the static instance of the class */
-  public static StringMapper getMapper() 
+  static LabelsMapper getMapper() 
   {
-    return itsPitchMapper;
+    return itsLabelMapper;
+  }
+
+  public void setLabelType( String type)
+  {
+    this.labelType = type;
+    display = !labelType.equals("none");
   }
 
   //-- Fields
 
-  static IntegerLabelMapper itsPitchMapper = new IntegerLabelMapper();
+  static LabelsMapper itsLabelMapper = new LabelsMapper();
+  String labelType = "none";
+  boolean display = false;
 }
 
 
