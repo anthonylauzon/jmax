@@ -3,6 +3,7 @@
 #include "lang/ftl.h"
 #include "lang/dsp.h"
 
+#include <stdio.h>
 
 #define ASSERT(e) if (!(e)) { post("assertion (%s) failed file %s line %d\n",#e,__FILE__,__LINE__); *(char *)0 = 0;}
 
@@ -312,8 +313,6 @@ static void
 dsp_graph_reinit( dsp_node_t *graph)
 {
   dsp_node_t *g;
-  int i;
-  dsp_signal **sig;
 
   for( g = graph; g; g = g->next)
     g->pred_cnt = 0;
@@ -473,7 +472,28 @@ dsp_chain_create(int vs)
   /* schedule all nodes without predecessors */
   for( node = dsp_graph; node; node = node->next)
     if ( node->pred_cnt == 0)
-      dsp_schedule_depth( 0, 0, node, 0, 0);
+      {
+	/* (FD): must not schedule objects which (are inlets and are not connected to DSP objects) */
+	if ( fts_object_is_inlet( node->o))
+	  {
+	    fts_connection_t **conn = node->o->out_conn;
+	    fts_connection_t *c;
+	    int must_schedule_inlet = 0;
+
+	    for ( c = *conn; c; c = c->next_same_src)
+	      {
+		if ( dsp_list_lookup( c->dst) || fts_object_is_patcher( c->dst) )
+		  must_schedule_inlet = 1;
+	      }
+
+	    if (must_schedule_inlet)
+	      dsp_schedule_depth( 0, 0, node, 0, 0);
+	    else
+	      node->pred_cnt = IS_SCHEDULED;
+	  }
+	else /* object is not inlet */
+	  dsp_schedule_depth( 0, 0, node, 0, 0);
+      }
 
   /* Add a dac syncronization/zero call for each out device not used by an object */
 
@@ -482,7 +502,10 @@ dsp_chain_create(int vs)
   /* looks for loop */
   for( node = dsp_graph; node; node = node->next)
     if ( node->pred_cnt != IS_SCHEDULED)
-      post("Loop in dsp graph!\n");
+      {
+	post( "Loop in dsp graph: object %s not scheduled\n", 
+	      fts_symbol_name( node->o->cl->mcl->name));
+      }
 
   dsp_chain_create_end();
 }
