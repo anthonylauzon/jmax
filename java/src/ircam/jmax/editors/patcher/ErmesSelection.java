@@ -163,7 +163,11 @@ public class ErmesSelection implements Transferable
   {
     return (GraphicObject) objects.elementAt(0);
   }
-  
+
+  public Enumeration getSelectedObjects()
+  {
+    return objects.elements();
+  }
   public void deselectAll() 
   {
     for (Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
@@ -427,21 +431,6 @@ public class ErmesSelection implements Transferable
   {
     if(hasObjects())
       owner.getDisplayList().objectsToBack(objects.getObjectArray(), objects.size());
-  }
-
-  public boolean openHelpPatches()
-  {
-    GraphicObject object;
-      
-    for (Enumeration en = objects.elements(); en.hasMoreElements(); )
-      {
-	object = (GraphicObject) en.nextElement();
-	
-	if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
-	  return false;
-      }
-
-    return true;
   }
 
   // Queries about selection geometry

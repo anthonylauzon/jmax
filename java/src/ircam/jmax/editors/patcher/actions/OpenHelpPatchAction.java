@@ -25,16 +25,14 @@
 
 package ircam.jmax.editors.patcher.actions;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.util.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import ircam.fts.client.*;
 
 import ircam.jmax.*;
+import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
-import ircam.jmax.dialogs.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
@@ -43,11 +41,15 @@ public class OpenHelpPatchAction extends EditorAction
 {
   public void doAction(EditorContainer container)
   {
+    FtsObject object;
     if (ErmesSelection.patcherSelection.ownedBy( (ErmesSketchPad)container.getEditor()))
-      {
-	if (! ErmesSelection.patcherSelection.openHelpPatches())
-	    JOptionPane.showMessageDialog(container.getFrame(), "Sorry, no help for object ", 
-					  "Warning", JOptionPane.INFORMATION_MESSAGE); 
+      {      
+	FtsPatcherObject patcher = ((ErmesSketchPad)container.getEditor()).getFtsPatcher();
+	for (Enumeration en = ErmesSelection.patcherSelection.getSelectedObjects(); en.hasMoreElements(); )
+	  {
+	    object = ((GraphicObject) en.nextElement()).getFtsObject();	
+	    patcher.requestOpenHelpPatch( object);
+	  }
       }
   }
 }

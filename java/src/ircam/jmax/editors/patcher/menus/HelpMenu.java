@@ -48,10 +48,8 @@ public class HelpMenu extends DefaultHelpMenu
 {
   public HelpMenu()
   {
-    super();
-    
+    super();    
     insert(Actions.openHelpPatchAction, "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_H, 0);
-    /*insert(Actions.showHtmlAction, "Editor Help", 1);*/
   }
 }
 
