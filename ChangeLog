@@ -1,3 +1,9 @@
+2002-11-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* Fix a race condition in FtsSocketConnection (cpp client)
+
+	* client can receive message from FTS and correct handler is called (see test1.cpp)
+
 2002-11-07  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* added message handler management and receive thread to the C++ client library
