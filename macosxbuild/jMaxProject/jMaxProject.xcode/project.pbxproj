@@ -5,6 +5,18 @@
 	};
 	objectVersion = 39;
 	objects = {
+		3B02A7DD0619D61100433611 = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C5428AB05AB0B970042B7A2;
+			remoteInfo = jmax.jar;
+		};
+		3B02A7DE0619D61100433611 = {
+			isa = PBXTargetDependency;
+			target = 5C5428AB05AB0B970042B7A2;
+			targetProxy = 3B02A7DD0619D61100433611;
+		};
 		3B5AB8950610995A00412ACC = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -34,6 +46,86 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
+		};
+		3B9E15010621ADD500CDEBB6 = {
+			children = (
+				3B9E150B0621AE1200CDEBB6,
+				3B9E150C0621AE1200CDEBB6,
+			);
+			isa = PBXGroup;
+			name = fonts;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		3B9E150B0621AE1200CDEBB6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = MusiSync.ttf;
+			path = ../../packages/sequence/fonts/MusiSync.ttf;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B9E150C0621AE1200CDEBB6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = MusiTone.ttf;
+			path = ../../packages/sequence/fonts/MusiTone.ttf;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B9E15160621AE3D00CDEBB6 = {
+			buildActionMask = 2147483647;
+			dstPath = lib/jmax/packages/sequence/fonts;
+			dstSubfolderSpec = 7;
+			files = (
+				3B9E15190621AE7F00CDEBB6,
+				3B9E151A0621AE7F00CDEBB6,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3B9E15190621AE7F00CDEBB6 = {
+			fileRef = 3B9E150B0621AE1200CDEBB6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B9E151A0621AE7F00CDEBB6 = {
+			fileRef = 3B9E150C0621AE1200CDEBB6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3BC58B060618831A003FC0D7 = {
+			buildPhases = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = development;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+				3B02A7DE0619D61100433611,
+				3BC58B0E06188330003FC0D7,
+			);
+			isa = PBXAggregateTarget;
+			name = development;
+			productName = development;
+		};
+		3BC58B0D06188330003FC0D7 = {
+			containerPortal = F880FCE90282F7CE01664092;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 5C54253A05AB0B8A0042B7A2;
+			remoteInfo = jMax.app;
+		};
+		3BC58B0E06188330003FC0D7 = {
+			isa = PBXTargetDependency;
+			target = 5C54253A05AB0B8A0042B7A2;
+			targetProxy = 3BC58B0D06188330003FC0D7;
 		};
 //3B0
 //3B1
@@ -566,6 +658,7 @@
 				5C54268C05AB0B8A0042B7A2,
 				5C54268E05AB0B8A0042B7A2,
 				5C54269005AB0B8A0042B7A2,
+				3B9E15160621AE3D00CDEBB6,
 				5C54269205AB0B8A0042B7A2,
 				5C5426AA05AB0B8A0042B7A2,
 				5C5426B205AB0B8A0042B7A2,
@@ -17580,6 +17673,7 @@
 		F8512369028BE77C01664092 = {
 			children = (
 				F85124F1028BEC7D01664092,
+				3B9E15010621ADD500CDEBB6,
 				F851236A028BE77C01664092,
 				F8512380028BE77C01664092,
 				F8512382028BE77C01664092,
@@ -20250,6 +20344,7 @@
 				5C54287805AB0B930042B7A2,
 				5C54288505AB0B950042B7A2,
 				5C542B3105AB0BA00042B7A2,
+				3BC58B060618831A003FC0D7,
 			);
 		};
 		F880FCEA0282F7CE01664092 = {
