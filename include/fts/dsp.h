@@ -166,7 +166,7 @@ FTS_API double fts_dsp_get_sample_rate(void);
  * fts_dsp_get_input_srate() or fts_dsp_get_output_srate() in order 
  * to get the correct local values for a particular object inside the put method.
  *
- * @fn double fts_dsp_set_sample_rate(void)
+ * @fn double fts_dsp_set_sample_rate(double sample_rate)
  * @return the sample rate
  *
  * @see fts_get_sample_rate()
