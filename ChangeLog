@@ -1,3 +1,8 @@
+2004-07-29  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* configure.in: added flag for profiling and handling of FPE.
+	profiling is for cprof (http://cprof.sourceforge.net) since gprof requires the code to be compiled with -static falg (at least on my system: RedHat 9 + PlanetCCRMA kernel 2.4.26)
+
 2004-06-24  Norbert Schnell  <Norbert.Schnell@ircam.fr>
 
 	* (package sequence): created sequence context in order to move sequence dependent stuff outof track
