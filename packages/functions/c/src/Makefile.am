@@ -6,6 +6,6 @@ functions.c
 noinst_HEADERS= \
 mathfuns.h
 
-libfunctions_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module
+libfunctions_la_LDFLAGS= -L$(top_builddir)/fts -lfts  -module -release @JMAX_VERSION@
 
 INCLUDES=-I$(top_srcdir)/include

@@ -10,7 +10,7 @@ alsaseqmidiport.c \
 alsaseqmidi.c  
 
 libalsa_la_CFLAGS=@ALSA_CFLAGS@
-libalsa_la_LIBADD=-L$(top_builddir)/fts -lfts @ALSA_LIBS@
+libalsa_la_LDFLAGS=-L$(top_builddir)/fts -lfts @ALSA_LIBS@ -release @JMAX_VERSION@
 
 INCLUDES=-I$(top_srcdir)/include
 
