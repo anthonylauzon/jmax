@@ -9,7 +9,6 @@ AbstractUndoableObject.java\
 ClipableData.java\
 ComponentContextSwitcher.java\
 ContextSwitcher.java\
-Cursors.java\
 DirectionChooser.java\
 DirectionListener.java\
 DragListener.java\
@@ -20,8 +19,6 @@ EditorToolbar.java\
 Geometry.java\
 GraphicContext.java\
 GraphicSelectionListener.java\
-IconCache.java\
-Icons.java\
 InfoPanel.java\
 InteractionModule.java\
 InteractionSemaphore.java\
@@ -50,7 +47,6 @@ SelectionResizer.java\
 StatusBar.java\
 StatusBarClient.java\
 SwitchListener.java\
-SystemIcons.java\
 Tool.java\
 ToolChangeEvent.java\
 ToolListener.java\
