@@ -32,7 +32,7 @@ LIB=$(LIBDIR)/libProtocol.a
 
 all: $(LIB)
 
-$(LIB): $(OBJECTS)
+$(LIB): $(OBJDIR) $(LIBDIR) $(OBJECTS)
 	$(AR) $(ARFLAGS) $(LIB) $(OBJECTS)
 
 TOCLEAN= $(LIB)

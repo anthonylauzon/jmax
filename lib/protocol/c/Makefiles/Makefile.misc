@@ -33,3 +33,8 @@ clean:
 $(OBJDIR)/%.o : %.c
 	$(CC) -c  $(CFLAGS) $< -o $@
 
+$(LIBDIR):
+	mkdir -p $(LIBDIR)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
