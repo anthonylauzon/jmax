@@ -1,3 +1,7 @@
+2003-07-25  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
+
+	*  class.c: temporarily added condition to method_get to avoid crashes while loading patches
+
 2003-07-24  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* utils/rpm/jmax.spec.in: added macros to set path for java, javac and jar.
@@ -52,6 +56,7 @@
 	* Modified menus to use actions instead of menu items.
 	* Fixed bug "[ 768933 ] Ctrl-c, Ctrl-x and Ctrl-v".
 
+>>>>>>> 1.252
 2003-07-18  Norbert Schnell  <schnell@mac-portable-schnell.ircam.fr>
 
 	* changed post() to fts_post() and post_atoms() to fts_post_atoms()

@@ -373,16 +373,19 @@ static fts_method_t
 method_get(fts_class_t *cl, const void *selector, fts_class_t *type, int *varargs)
 {
   fts_atom_t a;
-  
-  method_key->selector = selector;
-  method_key->type = type;
-  
-  if(fts_hashtable_get(cl->methods, &method_key_atom, &a))
-  {
-    method_handle_t *handle = fts_get_pointer(&a);
 
-    *varargs = handle->varargs;
-    return handle->method;
+  if(cl->methods)
+  {
+    method_key->selector = selector;
+    method_key->type = type;
+
+    if(fts_hashtable_get(cl->methods, &method_key_atom, &a))
+    {
+      method_handle_t *handle = fts_get_pointer(&a);
+
+      *varargs = handle->varargs;
+      return handle->method;
+    }
   }
 
   return NULL;  
@@ -562,6 +565,7 @@ fts_method_t
 fts_class_get_method_varargs(fts_class_t *cl, fts_symbol_t s)
 {
   int varargs = 0;
+
   fts_method_t method = method_get(cl, (const void *)s, NULL, &varargs);
 
   if(varargs != 0)
