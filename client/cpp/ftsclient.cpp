@@ -511,6 +511,21 @@ int FtsPipeConnection::write( const unsigned char *buffer, int n) throw( FtsClie
 #endif
 }
 
+int FtsPipeConnection::poll() throw( FtsClientException)
+{
+#if WIN32
+  DWORD available = 0;
+
+  if (PeekNamedPipe(_in, NULL, 0, NULL, &available, NULL)) {
+    return available > 0;
+  } else {
+    return 0;
+  } 
+ 
+#else
+  return 0;
+#endif
+}
 
 /* ********************************************************************** */
 /* FtsServer                                                              */

@@ -44,6 +44,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   char* s;
   int state = 0;  
 
+  DebugBreak();
+
   argv[argc++] = "fts";
 
   /* Tokenize the command line and append them to the command line arguments */

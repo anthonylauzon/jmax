@@ -49,6 +49,7 @@ int win_close(int socket)
 
 typedef unsigned int socklen_t;
 typedef SOCKET socket_t;
+typedef HANDLE pipe_t;
 
 #else
 
@@ -72,8 +73,10 @@ typedef SOCKET socket_t;
 #define READSOCKET(S,B,L) read(S,B,L)
 #define WRITESOCKET(S,B,L) write(S,B,L)
 #define INVALID_SOCKET -1
+#define INVALID_PIPE -1
 #define SOCKET_ERROR -1
 typedef int socket_t;
+typedef int pipe_t;
 #define client_error(mess)  post("%s (%s)\n", mess, strerror( errno))
 
 #endif
@@ -87,6 +90,10 @@ typedef int socket_t;
 #include "ftsprivate/client.h"
 #include "ftsprivate/protocol.h"
 
+static fts_symbol_t fts_s_client;
+static fts_symbol_t fts_s_socketstream;
+static fts_class_t *fts_socketstream_class = NULL;
+static fts_symbol_t fts_s_pipestream;
 
 /*
  * Client object
@@ -94,7 +101,7 @@ typedef int socket_t;
  */
 typedef struct _client_t {
   fts_object_t head;
-  socket_t socket;
+  fts_bytestream_t* stream;
 
   /* Output buffer */
   fts_stack_t send_sb;
@@ -131,6 +138,54 @@ typedef struct {
 
 static client_t *client_table[MAX_CLIENTS];
 
+/*
+ * socketstream
+ * (the object that implements the bidirectional byte stream over a TCP/IP socket) 
+ */
+
+struct _fts_socketstream_t
+{
+  fts_bytestream_t bytestream;
+  socket_t socket;
+};
+
+typedef struct _fts_socketstream_t fts_socketstream_t;
+
+static fts_status_t fts_socketstream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+static void fts_socketstream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void fts_socketstream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void fts_socketstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void fts_socketstream_output(fts_bytestream_t *stream, int n, const unsigned char *c);
+static void fts_socketstream_output_char(fts_bytestream_t *stream, unsigned char c);
+static void fts_socketstream_flush(fts_bytestream_t *stream);
+
+
+/*
+ * pipestream
+ *
+ * The pipe stream object implements the byte stream over pipes. On
+ * it's creation it takes the stdin and stdout of the FTS process the
+ * input/output. The FTS stdout is redirected to a file.
+ */
+
+struct _fts_pipestream_t
+{
+  fts_bytestream_t bytestream;
+  pipe_t in;
+  pipe_t out;
+  pipe_t _stdout;
+};
+
+typedef struct _fts_pipestream_t fts_pipestream_t;
+
+static fts_status_t fts_pipestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
+static void fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *c);
+static void fts_pipestream_output_char(fts_bytestream_t *stream, unsigned char c);
+static void fts_pipestream_flush(fts_bytestream_t *stream);
+static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 /***********************************************************************
  *
@@ -145,6 +200,7 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
   int new_client_id;
   fts_atom_t argv[3];
   fts_object_t *client_object;
+  fts_object_t *socket_stream; 
 
   for ( new_client_id = 0; new_client_id < MAX_CLIENTS; new_client_id++)
     if (!client_table[new_client_id])
@@ -164,8 +220,11 @@ static void client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, 
       return;
     }
 
-  fts_set_symbol( argv, fts_new_symbol("client"));
-  fts_set_int( argv+1, new_socket);
+  fts_set_int( argv, new_socket);
+  socket_stream = fts_object_create(fts_socketstream_class, 1, argv);
+
+  fts_set_symbol( argv, fts_s_client);
+  fts_set_object( argv+1, socket_stream);
   /* Client id is index in table + 1, so that no client can have id 0 */
   fts_set_int( argv+2, new_client_id+1);
 
@@ -330,15 +389,9 @@ static void client_put_atoms( client_t *this, int ac, const fts_atom_t *at)
 
 static int client_end_message( client_t *this)
 {
-  int r;
-
   fts_stack_push( &this->send_sb, unsigned char, FTS_PROTOCOL_END_OF_MESSAGE);
-
-  if ( ( r = WRITESOCKET( this->socket, fts_stack_get_ptr( &this->send_sb), fts_stack_get_size( &this->send_sb)) == SOCKET_ERROR))
-    {
-      client_error( "[client] error in sending message");
-      return -1;
-    }
+  
+  fts_bytestream_output( this->stream, fts_stack_get_size( &this->send_sb), fts_stack_get_ptr( &this->send_sb));
 
   return 0;
 }
@@ -443,14 +496,10 @@ static void a_protocol_error( client_t *this)
   fprintf( stderr, "Protocol error: state %d incoming %d\n", this->state, this->incoming);
 }
 
-static void client_receive( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_receive( fts_object_t *o, int size, const unsigned char* buffer)
 {
   client_t *this = (client_t *)o;
-  int i, size;
-#define NN 1024
-  unsigned char buffer[NN];
-
-  size = READSOCKET( this->socket, buffer, NN);
+  int i;
 
   if ( size < 0)
     {
@@ -611,6 +660,7 @@ static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_sched_halt();
 }
 
+
 static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -620,15 +670,16 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   ac--;
   at++;
 
-  this->socket = fts_get_int_arg( ac, at, 0, INVALID_SOCKET);
+  this->stream = (fts_bytestream_t*) fts_get_object_arg( ac, at, 0, NULL);
   this->client_id = fts_get_int_arg( ac, at, 1, -1);
 
-  if (this->socket == INVALID_SOCKET || this->client_id < 0)
+  if (this->stream == NULL)
     {
-      fts_object_set_error( (fts_object_t *)this, "Invalid arguments");
-      CLOSESOCKET( this->socket);
+      fts_object_set_error( (fts_object_t *)this, "Invalid stream");
       return;
     }
+
+  fts_bytestream_add_listener(this->stream, (fts_object_t *) this, client_receive);
 
   fts_set_symbol( a, fts_s_patcher);
   fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, &this->root_patcher);
@@ -636,7 +687,6 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   if ( !this->root_patcher)
     {
       fts_object_set_error( (fts_object_t *)this, "Cannot create client root patcher");
-      CLOSESOCKET( this->socket);
       return;
     }
 
@@ -658,9 +708,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_set_object( &v, (fts_object_t *)this);
   fts_hashtable_put( &this->object_table, &k, &v);
 
-  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
-
-  fts_log( "[client]: Accepted client connection on socket %d\n", this->socket);
+  fts_log( "[client]: Accepted client connection on socket\n");
 }
 
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -676,10 +724,9 @@ static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_stack_destroy( &this->receive_sb);
   fts_hashtable_destroy( &this->object_table);
 
-  fts_sched_remove( (fts_object_t *)this);
-  CLOSESOCKET( this->socket);
+  fts_bytestream_remove_listener(this->stream, (fts_object_t *) this);
 
-  fts_log( "[client]: Released client connection on socket %d\n", this->socket);
+  fts_log( "[client]: Released client connection on socket\n");
 }
 
 static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
@@ -688,7 +735,6 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, client_receive);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
@@ -863,6 +909,269 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
   return fts_Success;
 }
 
+
+/***********************************************************************
+ *
+ * Socket bytestream
+ *
+ */
+
+static fts_status_t
+fts_socketstream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_socketstream_t), 0, 0, 0);
+  fts_bytestream_class_init(cl);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_socketstream_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_socketstream_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, fts_socketstream_receive);
+
+  return fts_Success;
+}
+
+static void 
+fts_socketstream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_socketstream_t *this = (fts_socketstream_t *) o;
+
+  ac--;
+  at++;
+
+  fts_bytestream_init((fts_bytestream_t *) this);
+  
+  this->socket = fts_get_int_arg( ac, at, 0, INVALID_SOCKET);
+
+  if (this->socket == INVALID_SOCKET) {
+    fts_object_set_error( (fts_object_t *)this, "Invalid arguments");
+    return;
+  }
+
+  fts_bytestream_set_output((fts_bytestream_t *) this, 
+			    fts_socketstream_output,
+			    fts_socketstream_output_char,
+			    fts_socketstream_flush);
+
+
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
+}
+
+static void 
+fts_socketstream_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_socketstream_t *this = (fts_socketstream_t *) o;
+
+  fts_sched_remove( (fts_object_t *)this);
+
+  if (this->socket != INVALID_SOCKET) {
+    CLOSESOCKET(this->socket);
+    this->socket = INVALID_SOCKET;
+  }  
+
+  fts_bytestream_destroy((fts_bytestream_t *) this);
+}
+
+static void 
+fts_socketstream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
+{
+  int r;
+  fts_socketstream_t *this = (fts_socketstream_t *) stream;
+
+  if (this->socket == INVALID_SOCKET) {
+    return;
+  }
+
+  r = WRITESOCKET(this->socket, c, n);
+
+  if ((r == SOCKET_ERROR) || (r == 0)) {
+    CLOSESOCKET(this->socket);
+    this->socket = INVALID_SOCKET;
+  }
+}
+
+static void fts_socketstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+#define NN 1024
+  fts_socketstream_t *this = (fts_socketstream_t *) o;
+  unsigned char buffer[NN];
+  int size;
+
+  size = READSOCKET( this->socket, buffer, NN);
+
+  fts_bytestream_input((fts_bytestream_t *) this, size, buffer);
+}
+
+static void 
+fts_socketstream_output_char(fts_bytestream_t *stream, unsigned char c)
+{
+  fts_socketstream_output(stream, 1, &c);
+}
+
+static void 
+fts_socketstream_flush(fts_bytestream_t *stream)
+{
+  fts_socketstream_t *this = (fts_socketstream_t *) stream;
+
+#if WIN32
+  FlushFileBuffers((HANDLE) this->socket);
+#else
+#endif
+}
+
+
+/***********************************************************************
+ *
+ * Pipe bytestream
+ *
+ */
+
+static fts_status_t 
+fts_pipestream_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init(cl, sizeof(fts_pipestream_t), 0, 0, 0);
+  fts_bytestream_class_init(cl);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_pipestream_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_pipestream_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_sched_ready, fts_pipestream_receive);
+
+  return fts_Success;
+}
+
+static void 
+fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_pipestream_t *this = (fts_pipestream_t *) o;
+  pipe_t _stdin;
+
+  ac--;
+  at++;
+
+  fts_bytestream_init((fts_bytestream_t *) this);
+  
+  fts_bytestream_set_output((fts_bytestream_t *) this, 
+			    fts_pipestream_output,
+			    fts_pipestream_output_char,
+			    fts_pipestream_flush);
+
+#ifdef WIN32
+
+  /* obtain stdin and stdout */
+  _stdin = GetStdHandle(STD_INPUT_HANDLE); 
+  this->out = GetStdHandle(STD_OUTPUT_HANDLE); 
+
+  if ((this->out == INVALID_HANDLE_VALUE) || (_stdin == INVALID_HANDLE_VALUE)) {
+    fts_log("Invalid pipes.\n");    
+    fts_object_set_error( (fts_object_t *)this, "Invalid pipes");
+    return;
+  }
+
+  /* close the stdin */
+  if (!DuplicateHandle(GetCurrentProcess(), _stdin,
+		       GetCurrentProcess(), &this->in, 0,
+		       FALSE, DUPLICATE_SAME_ACCESS)) {
+    fts_log("Failed to duplicate stdin.\n");    
+    fts_object_set_error( (fts_object_t *)this, "Failed to duplicate stdin");
+  }
+  CloseHandle(_stdin);
+
+  /* redirect stdout to a file */
+  this->_stdout = CreateFile("C:\\fts_stdout.txt", 
+			     GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
+			     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
+  if ((this->_stdout == INVALID_HANDLE_VALUE) 
+      || !SetStdHandle(STD_OUTPUT_HANDLE, this->_stdout)) {
+    fts_log("Failed to redirect the stdout. Stdout will not be available.\n");
+  }
+
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_ALWAYS);  
+#else
+  fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->in);  
+#endif
+
+}
+
+static void 
+fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_pipestream_t *this = (fts_pipestream_t *) o;
+
+  fts_sched_remove( (fts_object_t *)this);
+
+#ifdef WIN32
+  if (this->in != INVALID_HANDLE_VALUE) {
+    CloseHandle(this->in);
+    this->in = INVALID_HANDLE_VALUE;
+  }  
+  if (this->out != INVALID_HANDLE_VALUE) {
+    CloseHandle(this->out);
+    this->out = INVALID_HANDLE_VALUE;
+  }  
+  if (this->_stdout != INVALID_HANDLE_VALUE) {
+    CloseHandle(this->_stdout);
+    this->_stdout = INVALID_HANDLE_VALUE;
+  }  
+#else
+#endif
+
+  fts_bytestream_destroy((fts_bytestream_t *) this);
+}
+
+static void 
+fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_pipestream_t *this = (fts_pipestream_t *) o;
+#define NN 1024
+  unsigned char buffer[NN];
+
+#if WIN32
+  DWORD size = 0, available = 0;
+
+  if (PeekNamedPipe(this->in, (LPVOID) buffer, NN, &size, &available, NULL) && (size > 0)) {
+      fts_bytestream_input((fts_bytestream_t *) this, size, buffer);
+  } 
+
+#else
+#endif
+}
+
+static void 
+fts_pipestream_output(fts_bytestream_t *stream, int n, const unsigned char *c)
+{
+  fts_pipestream_t *this = (fts_pipestream_t *) stream;
+
+#if WIN32
+  DWORD count; 
+
+  if (!WriteFile(this->out, (LPCVOID) c, (DWORD) n, &count, NULL)) {
+
+    /* keep a trace of the error in the log file */
+    LPVOID msg;
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		  NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &msg, 0, NULL);
+    fts_log("[pipe]: failed to write to pipe: (%s)\n", msg);
+    LocalFree(msg);
+  }
+#else
+#endif
+}
+
+static void 
+fts_pipestream_output_char(fts_bytestream_t *stream, unsigned char c)
+{
+  fts_pipestream_output(stream, 1, &c);
+}
+
+static void 
+fts_pipestream_flush(fts_bytestream_t *stream)
+{
+  fts_pipestream_t *this = (fts_pipestream_t *) stream;
+
+#if WIN32
+  FlushFileBuffers(this->out);
+#else
+#endif
+}
+
 /***********************************************************************
  *
  * Initialization
@@ -875,25 +1184,61 @@ void fts_client_config( void)
   fts_symbol_t s;
   fts_symbol_t s_client_manager;
   fts_object_t *obj;
+  int stdio;
+
+  fts_s_socketstream = fts_new_symbol("socketstream");
+  fts_metaclass_install(fts_s_socketstream, fts_socketstream_instantiate, fts_always_equiv);
+  fts_socketstream_class = fts_class_get_by_name(fts_s_socketstream);
+
+  fts_s_pipestream = fts_new_symbol("pipestream");
+  fts_metaclass_install(fts_s_pipestream, fts_pipestream_instantiate, fts_always_equiv);
 
   s_client_manager = fts_new_symbol("client_manager");
-
   fts_class_install( s_client_manager, client_manager_instantiate);
-  fts_class_install( fts_new_symbol("client"), client_instantiate);
+
+  fts_s_client = fts_new_symbol("client");
+  fts_class_install( fts_s_client, client_instantiate);
+
   fts_class_install( fts_new_symbol("client_controller"), client_controller_instantiate);
 
-  fts_set_symbol( at, s_client_manager);
-  ac++;
+  /* check whether we should use a piped connection thru the stdio
+     file handles */
+  stdio = (fts_cmd_args_get( fts_new_symbol( "stdio")) != NULL);
 
-  if ((s = fts_cmd_args_get( fts_new_symbol( "listen-port"))))
-    {
-      fts_set_int( at+1, atoi( fts_symbol_name( s)));
-      ac++;
-    }
+  if (stdio) {
+    
+    fts_atom_t argv[3];
+    fts_object_t *client_object;
+    fts_object_t *pipe_stream; 
 
-  fts_object_new_to_patcher( fts_get_root_patcher(), ac, at, &obj);
+    pipe_stream = fts_object_create(fts_class_get_by_name(fts_s_pipestream), 0, 0);
 
-  if ( !obj)
-    post( "cannot create client manager\n");
+    fts_set_symbol( argv, fts_s_client);
+    fts_set_object( argv+1, pipe_stream);
+    fts_set_int( argv+2, 1);
+
+    fts_object_new_to_patcher( fts_get_root_patcher(), 3, argv, (fts_object_t **)&client_object);
+
+    if (!client_object)
+      {
+	fprintf( stderr, "[client_manager] internal error (cannot create client object)\n");
+	return;
+      }
+
+  } else {
+    fts_set_symbol( at, s_client_manager);
+    ac++;
+    
+    if ((s = fts_cmd_args_get( fts_new_symbol( "listen-port"))))
+      {
+	fts_set_int( at+1, atoi( fts_symbol_name( s)));
+	ac++;
+      }
+    
+    fts_object_new_to_patcher( fts_get_root_patcher(), ac, at, &obj);
+    
+    if ( !obj)
+      post( "cannot create client manager\n");
+  }
 }
 

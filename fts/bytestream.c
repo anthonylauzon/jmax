@@ -37,6 +37,19 @@ fts_bytestream_init(fts_bytestream_t *stream)
 }
 
 void
+fts_bytestream_destroy(fts_bytestream_t *stream)
+{
+  fts_bytestream_listener_t *l = stream->listeners;
+  fts_bytestream_listener_t *n;
+
+  while (l) {
+    n = l->next;
+    fts_free(l);
+    l = n;
+  }
+}
+
+void
 fts_bytestream_set_input(fts_bytestream_t *stream)
 {
   stream->input = 1;
@@ -134,6 +147,7 @@ fts_bytestream_remove_listener(fts_bytestream_t *stream, fts_object_t *listener)
 	fts_free(freeme);
     }
 }
+
 
 
 /***********************************************************************

@@ -173,6 +173,17 @@ struct fts_bytestream
 FTS_API void fts_bytestream_class_init(fts_class_t *cl);
 FTS_API void fts_bytestream_init(fts_bytestream_t *stream);
 
+
+/**
+ * Delete the ressource held by the byte stream
+ *
+ * @fn void fts_bytestream_destroy(fts_bytestream_t *stream)
+ * @param stream the byte stream
+ *
+ * @ingroup bytestream
+ */
+FTS_API void fts_bytestream_destroy(fts_bytestream_t *stream);
+
 /**
  * Declare initialized byte stream as input.
  *
