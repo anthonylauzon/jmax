@@ -94,7 +94,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   public int length()
   {
-    return events.length;
+    return events_fill_p;
   }
 
   private class ExplodeEnumeration implements Enumeration
@@ -197,12 +197,13 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	break;
       case 2:
 	// FTS always send the events in order (???)
-	
+
 	events[events_fill_p++] = new ScrEvent( ((Integer) args[0]).intValue(), 
 						((Integer) args[1]).intValue(), 
 						((Integer) args[2]).intValue(), 
 						((Integer) args[3]).intValue(), 
 						((Integer) args[4]).intValue());
+	
 	break;
       default:
 	break;

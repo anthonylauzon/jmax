@@ -46,13 +46,14 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     itsRenderer = new ScoreRenderer(this, ep, this);
     itsExplodeDataModel.addListener(this);
     
+    
     Scrollbar aScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, itsExplodeDataModel.getEventAt(itsExplodeDataModel.length()-1).getTime());
     
     aScrollbar.setUnitIncrement(1000);
     aScrollbar.addAdjustmentListener(new AdjustmentListener() {
       public void adjustmentValueChanged(AdjustmentEvent e) {
 	logicalTime = e.getValue();
-	System.err.println("moving to ms "+logicalTime);
+	
 	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
 	((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
 	itsRenderer.render(getGraphics(), temp, temp+10);
@@ -166,11 +167,18 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     repaint();
   }
 
+  public void update(Graphics g) {
+    if (((ScoreRenderer)itsRenderer).prepareBackground(g))
+      paint(g);
+    else return;
+  }
+  
   /**
    * The paint method.
    * Delegated to the current Renderer
    */
   public void paint(Graphics g) {
+    
     int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
     itsRenderer.render(g, temp, temp+10);    
   }

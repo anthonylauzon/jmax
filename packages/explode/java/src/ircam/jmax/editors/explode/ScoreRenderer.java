@@ -56,11 +56,13 @@ public class ScoreRenderer implements Renderer, ImageObserver{
     
     if ((infoflags & ALLBITS) != 0) {
       imageReady = true;
+      
       itsContainer.repaint();
       return false;
     } 
     
-    else return true;
+    return true;
+    
   }
   
   /**
@@ -76,8 +78,7 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   public void render(Graphics g, int startEvent, int endEvent) {
     
     if (!prepareBackground(g)) return;
-    g.setColor(Color.black);
-
+    
     for (int i = startEvent; i< endEvent; i++) {
 
       temp = itsExplodeDataModel.getEventAt(i);
@@ -87,7 +88,7 @@ public class ScoreRenderer implements Renderer, ImageObserver{
 
   }
 
-  private boolean prepareBackground(Graphics g) {
+  boolean prepareBackground(Graphics g) {
     if (!imageReady) {
       /* received a paint while loading the image... don't paint yet */
       
@@ -95,9 +96,11 @@ public class ScoreRenderer implements Renderer, ImageObserver{
       return false;
       
     }
-    else    
-      g.drawImage(itsImage, 12, 20,this);
-    
+    else {
+      
+      if (!g.drawImage(itsImage, 0/*12*/, 0/*20*/, this))
+	System.err.println("OH-OH something wrong: incomplete Image  ");
+    }
     return true;
   }
   
