@@ -137,10 +137,7 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     itsPatcherData.setPatcherListener(new ErmesPatcherListener(this));
 
-    if (itsDocument.isRootData(itsPatcherData))
-      setTitle( itsDocument.getName());
-    else
-      setTitle(chooseWindowName( itsPatcher));
+    makeTitle();
 
     itsSketchPad = new ErmesSketchPad( this, itsPatcherData);
     itsToolBar = new ErmesSwToolbar( itsSketchPad);
@@ -199,12 +196,19 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
     itsPatcherData.startUpdates();
   }
 
-  static String chooseWindowName( FtsObject theFtsPatcher)
+  private final void makeTitle()
   {
-    if (theFtsPatcher instanceof FtsPatcherObject)
-      return "patcher " + theFtsPatcher.getObjectName();
+    if (itsDocument.isRootData(itsPatcherData))
+      setTitle(itsDocument.getName());
+    else if (itsPatcher instanceof FtsPatcherObject)
+      {
+	if (itsPatcher.getObjectName() != null)
+	  setTitle("patcher " + itsPatcher.getObjectName());
+	else
+	  setTitle("patcher " + itsPatcher.getDescription());
+      }
     else
-      return theFtsPatcher.getClassName();
+      setTitle("template " + itsPatcher.getClassName());
   }
 
   int horizontalOffset()
@@ -813,14 +817,6 @@ public class ErmesSketchWindow extends MaxEditor implements FtsPropertyHandler, 
 
     itsPatcher.removeWatch( this);
     itsSketchPad.cleanAll();
-
-    itsGraphicsMenu.remove( itsAlignObjectMenu);
-    itsTextMenu.remove( itsSizesMenu);
-    itsTextMenu.remove( itsFontsMenu);
-
-    getMenuBar().remove(itsExecutionMenu);
-    getMenuBar().remove(itsTextMenu);
-    getMenuBar().remove(itsGraphicsMenu);
 
     itsSketchPad = null;
     itsPatcher = null;

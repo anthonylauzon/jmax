@@ -164,12 +164,6 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     removeKeyListener(this);
     removeWindowListener(this);
     doDestroyDispose();
-
-    itsFileMenu.remove(itsNewFileMenu);    
-    getMenuBar().remove(itsFileMenu);
-    getMenuBar().remove(itsEditMenu);
-    getMenuBar().remove(itsWindowsMenu);
-
     setVisible(false);
     dispose();
   }
