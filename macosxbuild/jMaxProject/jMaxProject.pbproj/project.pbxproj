@@ -433,6 +433,27 @@
 				JAVA_ARCHIVE_SUBDIR = "";
 			};
 		};
+		F5A493BB035CAA6601664092 = {
+			buildRules = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "-g";
+			};
+			isa = PBXBuildStyle;
+			name = Debug;
+		};
+		F5A493BC035CBC9201664092 = {
+			isa = PBXFileReference;
+			name = ToggleControlPanel.java;
+			path = ../../packages/guiobj/java/ircam/jmax/guiobj/ToggleControlPanel.java;
+			refType = 2;
+		};
+		F5A493BD035CBC9201664092 = {
+			fileRef = F5A493BC035CBC9201664092;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F5EF54340352D8FC01664092 = {
 			isa = PBXFileReference;
 			name = parser.c;
@@ -12528,6 +12549,7 @@
 			buildStyles = (
 				F880FCEC0282F7CE01664092,
 				F880FCEB0282F7CE01664092,
+				F5A493BB035CAA6601664092,
 			);
 			isa = PBXProject;
 			mainGroup = F880FCEA0282F7CE01664092;
@@ -19620,6 +19642,7 @@
 				F5933FE603363A6501664092,
 				F51A243E03520EDF01664092,
 				F51A243F03520EDF01664092,
+				F5A493BD035CBC9201664092,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -19735,6 +19758,7 @@
 				F5933FE503363A6501664092,
 				F51A243C03520EDF01664092,
 				F51A243D03520EDF01664092,
+				F5A493BC035CBC9201664092,
 			);
 			isa = PBXGroup;
 			name = guiobj;
