@@ -151,8 +151,8 @@ public interface TrackDataModel {
     public abstract void addHighlightListener(HighlightListener listener);
     public abstract void removeHighlightListener(HighlightListener listener);
 
-    public abstract void addLockListener(LockListener listener);
-    public abstract void removeLockListener(LockListener listener);
+    public abstract void addTrackStateListener(TrackStateListener listener);
+    public abstract void removeTrackStateListener(TrackStateListener listener);
     /**
      * Move all the events of the given model in this model, and
      * remove them from the original one. Merge is possible only between tracks

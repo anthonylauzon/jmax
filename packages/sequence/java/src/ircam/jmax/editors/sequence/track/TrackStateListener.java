@@ -28,9 +28,10 @@ package ircam.jmax.editors.sequence.track;
 import java.util.*;
 import ircam.jmax.editors.sequence.*;
 
-public interface LockListener
+public interface TrackStateListener
 {
   public abstract void lock(boolean lock);
+  public abstract void active(boolean active);
 }
 
 

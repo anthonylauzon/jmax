@@ -63,8 +63,6 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
 	    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {}
 	    public void trackNameChanged(String oldName, String newName) {
 		itsTrack.setProperty("trackName", newName);
-
-		System.err.println("AnythingTrackEditor name changed "+newName);
 	    }
 	});
 
@@ -74,6 +72,14 @@ public class AnythingTrackEditor extends JPanel implements TrackEditor
 		    repaint();
 		}
 	});
+
+	itsTrack.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
+		public void lock(boolean lock){}
+		public void active(boolean active)
+		{
+		    itsTrack.setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
+		}
+	    });
 
 	createGraphicContext(geometry, itsTrack.getTrackDataModel());
 

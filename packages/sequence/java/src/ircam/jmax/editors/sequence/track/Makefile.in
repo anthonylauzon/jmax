@@ -79,7 +79,7 @@ SUBDIRS =
 
 EXTRA_DIST = package.html
 noinst_PROGRAMS = package
-package_SOURCES =  AbstractEventValue.java AbstractValueInfo.java AmbitusValue.java AnythingTrackEditor.java AnythingValue.java ArrayEnumeration.java ChangeRangeDialog.java ChangeTrackNameDialog.java Drawable.java Editable.java Event.java EventValue.java FloatTrackEditor.java FloatTrackEditorFactory.java FloatValue.java IntegerTrackEditor.java IntegerTrackEditorFactory.java IntegerValue.java ListContainer.java LockListener.java MessageTrackEditor.java MessageTrackEditorFactory.java MessageValue.java MidiTrackEditor.java MidiTrackEditorFactory.java MidiValue.java MonoTrackEditor.java MonoTrackEditorFactory.java NullEditor.java SequenceTableDialog.java SequenceTablePanel.java SequenceTextArea.java SequenceTextAreaListener.java TextDialog.java ToggleBar.java Track.java TrackBase.java TrackDataListener.java TrackDataModel.java TrackEditor.java TrackEditorFactory.java TrackEditorFactoryTable.java TrackEvent.java TrackListListener.java TrackListener.java TrackTableModel.java UtilTrackEvent.java ValueEditor.java ValueInfo.java ValueInfoTable.java 
+package_SOURCES =  AbstractEventValue.java AbstractValueInfo.java AmbitusValue.java AnythingTrackEditor.java AnythingValue.java ArrayEnumeration.java ChangeRangeDialog.java ChangeTrackNameDialog.java Drawable.java Editable.java Event.java EventValue.java FloatTrackEditor.java FloatTrackEditorFactory.java FloatValue.java IntegerTrackEditor.java IntegerTrackEditorFactory.java IntegerValue.java ListContainer.java TrackStateListener.java MessageTrackEditor.java MessageTrackEditorFactory.java MessageValue.java MidiTrackEditor.java MidiTrackEditorFactory.java MidiValue.java MonoTrackEditor.java MonoTrackEditorFactory.java NullEditor.java SequenceTableDialog.java SequenceTablePanel.java SequenceTextArea.java SequenceTextAreaListener.java TextDialog.java ToggleBar.java Track.java TrackBase.java TrackDataListener.java TrackDataModel.java TrackEditor.java TrackEditorFactory.java TrackEditorFactoryTable.java TrackEvent.java TrackListListener.java TrackListener.java TrackTableModel.java UtilTrackEvent.java ValueEditor.java ValueInfo.java ValueInfoTable.java 
 
 
 JAVACX = @JAVACX@
@@ -105,7 +105,7 @@ ChangeTrackNameDialog.class Drawable.class Editable.class Event.class \
 EventValue.class FloatTrackEditor.class FloatTrackEditorFactory.class \
 FloatValue.class IntegerTrackEditor.class \
 IntegerTrackEditorFactory.class IntegerValue.class ListContainer.class \
-LockListener.class MessageTrackEditor.class \
+TrackStateListener.class MessageTrackEditor.class \
 MessageTrackEditorFactory.class MessageValue.class \
 MidiTrackEditor.class MidiTrackEditorFactory.class MidiValue.class \
 MonoTrackEditor.class MonoTrackEditorFactory.class NullEditor.class \

@@ -111,7 +111,7 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 		}
 	    });
 
-	itsTrack.getTrackDataModel().addLockListener(new LockListener(){
+	itsTrack.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
 		public void lock(boolean lock)
 		{
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
@@ -119,6 +119,10 @@ public class MonoTrackEditor extends ircam.jmax.toolkit.PopupToolbarPanel implem
 
 		    oldElements.removeAllElements();
 		    getTrack().setProperty("locked", new Boolean(lock));
+		}
+		public void active(boolean active)
+		{
+		    getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		}
 	    });
 

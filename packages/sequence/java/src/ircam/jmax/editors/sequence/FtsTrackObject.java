@@ -26,7 +26,6 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.jmax.editors.sequence.track.*;
-import ircam.jmax.editors.sequence.track.LockListener;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
@@ -65,7 +64,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 
       listeners = new MaxVector();
       hhListeners = new MaxVector();
-      lockListeners = new MaxVector();
+      stateListeners = new MaxVector();
 
       /* prepare the flavors for the clipboard */
       if (flavors == null)
@@ -251,6 +250,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       notifyLock(false);
   }
 
+  public void active(int nArgs[], FtsAtom args[])
+  {
+      boolean active = (args[0].getInt() == 1);
+      notifyActive(active);
+  }
+
   public void highlightEvents(int nArgs , FtsAtom args[])
   {
     int selIndex;
@@ -345,6 +350,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public void export()
   {
       sendMessage(FtsObject.systemInlet, "export_midi_dialog", 0, null);
+  }
+
+  public void requestSetActive(boolean active)
+  {
+      sendArgs[0].setInt((active)? 1 : 0); 
+      sendMessage(FtsObject.systemInlet, "active", 1, sendArgs);
   }
 
     /**
@@ -739,8 +750,13 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     }
     private void notifyLock(boolean lock)
     {
-	for (Enumeration e = lockListeners.elements(); e.hasMoreElements();) 
-	    ((LockListener) e.nextElement()).lock(lock);
+	for (Enumeration e = stateListeners.elements(); e.hasMoreElements();) 
+	    ((TrackStateListener) e.nextElement()).lock(lock);
+    }
+    private void notifyActive(boolean active)
+    {
+	for (Enumeration e = stateListeners.elements(); e.hasMoreElements();) 
+	    ((TrackStateListener) e.nextElement()).active(active);
     }
     /**
      * requires to be notified when the database changes
@@ -757,9 +773,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	hhListeners.addElement(listener);
     }
 
-    public void addLockListener(LockListener listener)
+    public void addTrackStateListener(TrackStateListener listener)
     {
-	lockListeners.addElement(listener);
+	stateListeners.addElement(listener);
     }
     
     /**
@@ -777,9 +793,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	hhListeners.removeElement(theListener);
     }
 
-    public void removeLockListener(LockListener theListener)
+    public void removeTrackStateListener(TrackStateListener theListener)
     {
-	lockListeners.removeElement(theListener);
+	stateListeners.removeElement(theListener);
     }
 
     // ClipableData functionalities
@@ -1194,7 +1210,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     TrackEvent events[] = new TrackEvent[256];
     private MaxVector listeners;
     private MaxVector hhListeners;
-    private MaxVector lockListeners;
+    private MaxVector stateListeners;
     private MaxVector tempVector = new MaxVector();
     private String trackName;
     public DataFlavor flavors[];

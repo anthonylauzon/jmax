@@ -94,7 +94,7 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
 	track.getTrackDataModel().addListener(this);
 
-	track.getTrackDataModel().addLockListener(new LockListener(){
+	track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
 		public void lock(boolean lock)
 		{
 		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
@@ -102,6 +102,10 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 
 		    oldElements.removeAllElements();
 		    getTrack().setProperty("locked", new Boolean(lock));
+		}
+		public void active(boolean active)
+		{
+		    getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		}
 	    });
 	
