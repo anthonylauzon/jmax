@@ -126,7 +126,7 @@ generate_file ()
     cat $1 > $2
 
     inform Commiting file $2
-    ( cd `dirname $2` ; cvs commit -l -m "$CVS_MESSAGE" `basename $2`)
+    ( cd `dirname $2` ; cvs commit -l -m "$CVS_MESSAGE" `basename $2` )
 }
 
 # ---------------------------------------------------------------------------
@@ -188,6 +188,10 @@ bug report submission.
 </HTML>
 EOF
 ( cd doc/release_notes ; touch release_notes.${NEW_VERSION}.html; cvs add release_notes.${NEW_VERSION}.html )
+cat <<EOF >> doc/release_notes/distrib
+all	all	release_notes.${NEW_VERSION}.html
+EOF
+( cd doc/release_notes ; cvs commit distrib )
 generate_file /tmp/$$ doc/release_notes/release_notes.${NEW_VERSION}.html
 
 # ---------------------------------------------------------------------------
