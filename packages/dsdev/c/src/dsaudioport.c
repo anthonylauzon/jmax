@@ -449,7 +449,7 @@ dsaudioport_input_init(dsaudioport_t* dev, fts_symbol_t device_name, LPGUID guid
   
   /* Create Sound Capture Object */
   hr = DirectSoundCaptureCreate(dev->guid, &dev->direct_sound_capture, NULL);
-  if (DS_OK != err)
+  if ((DS_OK != err)||(!dev->direct_sound_capture))
     {
       fts_object_error(o, "Cannot create the DirectSoundCapture object");
       fts_log("[dsaudioport] Cannot create the DirectSoundCapture object\n");
