@@ -1,3 +1,8 @@
+2004-01-08  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* utils/rpm/jmax.spec.in: added custom variable for setting the dependency with external packages.
+	I hope that can be used by packagers of other RPM based distro.
+
 2004-01-07  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/signal/c/src/playfvec.c (play_ftl): fixed bug [ 872267 ] play bug with fvec starting by non 0 value. 
