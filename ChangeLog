@@ -1,3 +1,11 @@
+2001-04-25  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed the default audio port mechanism: now the default audio
+	port is defined by a variable (DefaultAudioPort). This way, the
+	default audio port can be set from a patch (we are moving slowly
+	to configuration done by patches). Also changed the nullaudioport
+	mechanism (still a little bit ugly).
+
 2001-04-10  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* finalized scope and vector display

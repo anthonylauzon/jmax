@@ -71,6 +71,8 @@ static void nullaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_audioport_init( &this->head);
 
+  fts_audioport_set_idle_function( (fts_audioport_t *)this, 0);
+
   fts_audioport_set_output_function( (fts_audioport_t *)this, nullaudioport_output);
   fts_audioport_set_output_channels( (fts_audioport_t *)this, 2);
 

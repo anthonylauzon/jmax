@@ -36,6 +36,14 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
+all_c:
+	(cd src ; $(MAKE) all)
+.PHONY: all
+
+clean_c:
+	(cd src ; $(MAKE) clean)
+.PHONY: clean
+
 all_java:
 	(cd java ; $(MAKE) all)
 .PHONY: all

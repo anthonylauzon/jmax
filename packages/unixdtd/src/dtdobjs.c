@@ -232,24 +232,31 @@ static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   int n_channels;
   const char *filename;
 
-  n_channels = fts_get_long_arg(ac, at, 1, 1);
+  ac--;
+  at++;
+
+  n_channels = fts_get_long_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  if ( ac == 3)
+  if ( ac == 2)
     {
-      if (fts_is_symbol( at+2))
+      if (fts_is_symbol( at+1))
 	{
-	  filename = fts_symbol_name( fts_get_symbol( at+2));
+	  filename = fts_symbol_name( fts_get_symbol( at+1));
 	  this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
 	}
-      if (fts_is_ptr( at+2))
-	this->server = (dtdserver_t *)fts_get_ptr( at+2);
+      else if (fts_is_object( at+1))
+	this->server = (dtdserver_t *)fts_get_object( at+1);
     }
-  if ( ac == 4)
+  else if ( ac == 3)
     {
-      filename = fts_symbol_name( fts_get_symbol( at+2));
-      this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
-      this->server = (dtdserver_t *)fts_get_ptr( at+3);
+      if (fts_is_symbol( at+1))
+	{
+	  filename = fts_symbol_name( fts_get_symbol( at+1));
+	  this->filename = strcpy( (char *)fts_malloc( strlen(filename)+1), filename);
+	}
+      if (fts_is_object( at+2))
+	this->server = (dtdserver_t *)fts_get_object( at+2);
     }
 
   if (!this->server)
@@ -630,10 +637,13 @@ static void writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   return;
   /* *************** */
 
-  n_channels = fts_get_long_arg(ac, at, 1, 1);
+  ac--;
+  at++;
+
+  n_channels = fts_get_long_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
 
-  this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 2, dtdserver_get_default_instance());
+  this->server = (dtdserver_t *)fts_get_ptr_arg(ac, at, 1, dtdserver_get_default_instance());
 
   dtdserver_add_object( this->server, this);
 

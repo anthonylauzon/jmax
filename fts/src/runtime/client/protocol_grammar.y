@@ -13,10 +13,10 @@
 
 %%
 stream : message stream
-	| EOM_CODE
+	| 
 	;
 
-message : cmd args;
+message : cmd args EOM_CODE;
 
 cmd : BYTE ;
 

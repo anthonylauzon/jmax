@@ -27,11 +27,10 @@ SOURCES= \
 fakestream.c \
 filestream.c \
 in.c \
-in_tilda.c \
+in_out_tilda.c \
 iomodule.c \
 loopback.c \
 out.c \
-out_tilda.c \
 serial.c \
 udp.c \
 udpreceive.c \
