@@ -362,7 +362,7 @@ define_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(define_t), define_init, define_delete);
 
-  fts_class_message_varargs(cl, fts_s_dump, define_dump_gui);
+  fts_class_message_varargs(cl, fts_s_dump_gui, define_dump_gui);
   fts_class_message_varargs(cl, fts_s_name, define_name);
 
   fts_class_message_varargs(cl, fts_s_type, define_type);
