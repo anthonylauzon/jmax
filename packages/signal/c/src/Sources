@@ -34,3 +34,5 @@ osc_ieeewrap.c \
 wave.c \
 wave_ieeewrap.c \
 cut.c \
+matrix.c \
+playbpf.c \

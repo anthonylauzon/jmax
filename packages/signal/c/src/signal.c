@@ -35,7 +35,10 @@ extern void signal_white_config(void);
 extern void signal_osc_config(void);
 extern void signal_wave_config(void);
 
+extern void signal_matrix_config(void);
+
 extern void signal_cut_config(void);
+extern void signal_env_config(void);
 
 static void
 signal_init(void)
@@ -49,7 +52,10 @@ signal_init(void)
   signal_osc_config();
   signal_wave_config();
 
+  signal_matrix_config();
+
   signal_cut_config();
+  signal_play_bpf_config();
 }
 
 fts_module_t signal_module = {"signal", "basic signal classes", signal_init, 0, 0};

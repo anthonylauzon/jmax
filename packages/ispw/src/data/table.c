@@ -184,9 +184,9 @@ table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-table_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t property, fts_atom_t *value)
+table_get_state(fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
 {
-  table_t *this = (table_t *)obj;
+  table_t *this = (table_t *)o;
 
   ivec_atom_set(value, this->vec);  
 }
@@ -194,10 +194,10 @@ table_get_state(fts_daemon_action_t action, fts_object_t *obj, fts_symbol_t prop
 static void
 table_save_bmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  ivec_t *vec = ((table_t *)o)->vec;
+  table_t *this = (table_t *)o;
   fts_bmax_file_t *f = (fts_bmax_file_t *)fts_get_ptr(at);
   
-  ivec_save_bmax(vec, f);
+  fts_message_send((fts_object_t *)this->vec, fts_SystemInlet, fts_s_save_bmax, ac, at);
 }
 
 static int get_int_property( fts_object_t *object, fts_symbol_t property_name, int def)
@@ -335,6 +335,9 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   this->vec = (ivec_t *)obj;
   this->name = name;
+
+  fts_set_symbol(a, fts_s_yes);
+  fts_object_put_prop((fts_object_t *)this->vec, fts_s_keep, a);
 }
 
 static void
