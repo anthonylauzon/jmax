@@ -43,22 +43,21 @@ class RunCtrlInteraction extends Interaction
     if (Squeack.isDown(squeack) && (Squeack.onObject(squeack) || Squeack.onText(squeack)))
       object = (GraphicObject) area.getTarget();
 
-    // Take away the control modifier (always there)
-
-    squeack &= (~ Squeack.LOCATION_MASK);
-
-
-    switch (squeack)
+    if (object != null)
       {
-      case Squeack.DRAG:
-      case Squeack.DOWN:
-	object.gotSqueack(squeack, mouse, oldMouse);    
-	break;
+	// Take away the control modifier (always there)
 
-      case Squeack.UP:
-	object.gotSqueack(squeack, mouse, oldMouse);
-	editor.endInteraction();
-	break;
+	squeack &= (~ Squeack.LOCATION_MASK);
+
+	if (Squeack.isDrag(squeack))
+	  object.gotSqueack(squeack, mouse, oldMouse);
+	else if (Squeack.isDown(squeack))
+	  object.gotSqueack(squeack, mouse, oldMouse);
+	else if (Squeack.isUp(squeack))
+	  {
+	    object.gotSqueack(squeack, mouse, oldMouse);
+	    editor.endInteraction();
+	  }
       }
   }
 }
