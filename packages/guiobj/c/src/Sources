@@ -36,3 +36,5 @@ message.c \
 message_doctor.c \
 toggle.c \
 fork.c \
+keyserver.c \
+key.c \

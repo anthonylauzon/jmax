@@ -37,6 +37,8 @@ extern void comment_config(void);
 extern void comment_doctor_init(void);
 extern void button_config(void);
 extern void fork_config(void);
+extern void keyserver_config(void);
+extern void key_config(void);
 
 static void
 fts_guiobj_init(void)
@@ -52,6 +54,8 @@ fts_guiobj_init(void)
   comment_doctor_init();
   button_config();
   fork_config();
+  keyserver_config();
+  key_config();
 }
 
 fts_module_t guiobj_module = {"guiobj", "standard GUI objects", fts_guiobj_init, 0, 0};
