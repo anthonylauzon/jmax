@@ -17,10 +17,12 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   
   TablePanel itsTablePanel;
   TextField itsFormula;
-  Label itsCoordinates;
+  Label itsCoordX;
+  Label itsCoordY;
+  Label itsCurrentValue;
   Panel itsFrontHeader;
-  Button itsRefreshButton;
-
+  MenuItem itsRefreshMenuItem;
+  
   public FtsIntegerVectorData itsData;
   static int untitledCounter = 1;
   
@@ -44,15 +46,34 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     
     itsFrontHeader = new Panel();
     itsFrontHeader.setLayout(new BorderLayout());
-    itsCoordinates = new Label();
-    itsCoordinates.resize(100,20);
-    itsCoordinates.setBackground(Color.lightGray);
+    itsFrontHeader.setBackground(Color.lightGray);
+    
+    Panel aPanel = new Panel();
+    aPanel.resize(80,20);
+    aPanel.setBackground(Color.lightGray);
 
-    itsRefreshButton = new Button("Refresh");
-    itsRefreshButton.resize(60,20);
-    itsRefreshButton.addActionListener(itsTablePanel);
-    itsFrontHeader.add("Center", itsCoordinates);
-    itsFrontHeader.add("East", itsRefreshButton);
+    Label aLabel1 = new Label("x: ");
+    aLabel1.setBackground(Color.lightGray);
+    Label aLabel2 = new Label("current value: ");
+    aLabel2.setBackground(Color.lightGray);
+    Label aLabel3 = new Label("y: ");
+    aLabel3.setBackground(Color.lightGray);
+    itsCoordX = new Label("000");
+    itsCoordX.setBackground(Color.lightGray);
+    itsCoordY = new Label("000");
+    itsCoordY.setBackground(Color.lightGray);
+    itsCurrentValue = new Label("000");
+    itsCurrentValue.setBackground(Color.lightGray);
+
+    aPanel.add(aLabel1);
+    aPanel.add(itsCoordX);
+    aPanel.add(aLabel2);
+    aPanel.add(itsCurrentValue);
+    aPanel.add(aLabel3);
+    aPanel.add(itsCoordY);
+    aPanel.validate();
+
+    itsFrontHeader.add("West", aPanel);
 
     itsFrontHeader.resize(512, 20);
 
@@ -93,13 +114,22 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
 
 
   public static String GetNewUntitledName() {
-    return "untitled"+(untitledCounter++);
+    return "tab_untitled"+(untitledCounter++);
   }
 
-  public void SetupMenu(){}
+  public void SetupMenu(){
+    GetEditMenu().add(new MenuItem("-"));
+    itsRefreshMenuItem = new MenuItem("Refresh");
+    GetEditMenu().add(itsRefreshMenuItem);
+    itsRefreshMenuItem.addActionListener(new ActionListener() {
+      public  void actionPerformed(ActionEvent e)
+	{ itsTablePanel.paint(itsTablePanel.getGraphics());}});
+  }
 
   public void setCoordinates(int x, int y){
-    itsCoordinates.setText("x: "+x+"\t\t  current value: "+itsTablePanel.values[x]+"\t\t y: "+y);
+    itsCoordX.setText(""+x);
+    itsCoordY.setText(""+y);
+    itsCurrentValue.setText(""+(itsTablePanel.values[x]));
   }
   
   /////////////////////////////////////////////////////////////////////////////

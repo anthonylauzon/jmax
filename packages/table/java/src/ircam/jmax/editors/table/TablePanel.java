@@ -8,7 +8,7 @@ import java.io.*;
 import tcl.lang.*;
 import com.sun.java.swing.*;
 
-public class TablePanel extends JPanel implements MouseMotionListener, MouseListener, ActionListener{
+public class TablePanel extends JPanel implements MouseMotionListener, MouseListener{
   
   int x_scale_factor = 4;
   int N_POINTS = 128;
@@ -42,12 +42,6 @@ public class TablePanel extends JPanel implements MouseMotionListener, MouseList
   public void fillTable(FtsIntegerVector aIntV) {
     if(aIntV.getSize()!=0) initValues(aIntV.getValues(),aIntV.getSize());
   }
-
-  public void actionPerformed(ActionEvent e) {
-    //the values[] pointer is still there with another content, right?
-    paint(getGraphics());
-  }
-  
 
    //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////mouseMotionListener--inizio
