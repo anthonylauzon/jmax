@@ -74,15 +74,15 @@ public class BpfToolManager extends ToolManager implements ActionListener{
     
     aMenuItem.addActionListener(this);
       
-    itsBpfTools.put(/*aMenuItem,*/theTool.getName(), theTool);
+    itsBpfTools.put( theTool.getName(), theTool);
     
     itsMenu.add(aMenuItem);
   }  
     
   void initBpfToolManager()
   {
-      itsMenu = new JMenu("Tools");
-      itsBpfTools = new Hashtable();    
+    itsMenu = new JMenu("Tools");
+    itsBpfTools = new Hashtable();    
   }
     
   /**
@@ -93,7 +93,7 @@ public class BpfToolManager extends ToolManager implements ActionListener{
   public void actionPerformed(ActionEvent e) 
   {    
     Object aSource =  e.getSource();
-    Tool aTool = (Tool) itsBpfTools.get(/*aSource*/((JMenuItem)aSource).getText());	
+    Tool aTool = (Tool) itsBpfTools.get( ((JMenuItem)aSource).getText());	
     changeTool(aTool);    
   }
   

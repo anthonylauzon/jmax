@@ -69,18 +69,18 @@ public class ToolManager implements SwitchListener, LockListener{
     /**
      * Constructor with a provider. It's an alternative to insert all the tools
      * via direct addTool() calls */
-    public ToolManager(ToolProvider theProvider)
-    {
-	Tool aTool;
-	for (Enumeration e = theProvider.getTools(); e.hasMoreElements();) 
-	    {
-		aTool = (Tool) e.nextElement();
-		if (aTool == null) System.err.println("warning: trying to add a null tool");
-		else {
-		    addTool(aTool);
-		}
-	    }
-    }
+  public ToolManager(ToolProvider theProvider)
+  {
+    Tool aTool;
+    for (Enumeration e = theProvider.getTools(); e.hasMoreElements();) 
+      {
+	aTool = (Tool) e.nextElement();
+	if (aTool == null) System.err.println("warning: trying to add a null tool");
+	else {
+	  addTool(aTool);
+	}
+      }
+  }
 
     /**
      * Adds a switcher to this manager */

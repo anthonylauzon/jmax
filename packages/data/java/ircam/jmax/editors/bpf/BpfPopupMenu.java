@@ -57,7 +57,7 @@ public class BpfPopupMenu extends JPopupMenu
     JMenuItem aMenuItem;
     Tool tool;
     ButtonGroup toolsMenuGroup = new ButtonGroup();
-    for(Enumeration e = BpfTools.instance.getTools(); e.hasMoreElements();)
+    for(Enumeration e = target.getGraphicContext().getToolManager().getTools(); e.hasMoreElements();)
       {
 	tool = (Tool)e.nextElement();
 	aMenuItem = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());

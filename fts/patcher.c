@@ -763,9 +763,9 @@ patcher_set_arguments( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       fts_bytestream_output_char((fts_bytestream_t *)stream,'\0');
       fts_set_string(&a,  fts_memorystream_get_bytes( stream));
       fts_client_send_message((fts_object_t *)this, sym_setDescription, 1, &a);
+      
+      fts_patcher_set_dirty(this, 1);
     }
-
-  fts_patcher_set_dirty(this, 1);
 }
 
 static void

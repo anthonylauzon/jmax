@@ -44,264 +44,267 @@ import java.beans.*;
  * and settings of y are simply ignored. */
 public class BpfEditor extends PopupToolbarPanel implements ListSelectionListener
 {
-    public BpfEditor(Geometry g, FtsBpfObject model, BpfToolManager manager)
-    {
-	super();
+  public BpfEditor(Geometry g, FtsBpfObject model, BpfToolManager manager)
+  {
+    super();
+    
+    this.geometry = g;
+    this.model = model;
+    
+    /******** display labels **********/
+    JPanel labelPanel = new JPanel();
+    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
+    labelPanel.setOpaque(false);
+	
+    displayMouseLabel = new JLabel();
+    displayMouseLabel.setFont(BpfPanel.rulerFont);
+    displayMouseLabel.setPreferredSize(new Dimension(102, 15));
+    displayMouseLabel.setMaximumSize(new Dimension(102, 15));
+    displayMouseLabel.setMinimumSize(new Dimension(102, 15));
+    
+    infoLabel = new JLabel("", JLabel.RIGHT);
+    infoLabel.setFont(BpfPanel.rulerFont);
+    infoLabel.setPreferredSize(new Dimension(190, 15));
+    infoLabel.setMaximumSize(new Dimension(190, 15));
+    infoLabel.setMinimumSize(new Dimension(190, 15));
+    
+    labelPanel.add(displayMouseLabel);
+    labelPanel.add(Box.createHorizontalGlue());
+    labelPanel.add(infoLabel);
+    
+    setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
+    add(labelPanel);
+    add(Box.createVerticalGlue());
+    /*********************************/
+	
+    model.addBpfListener(new BpfDataListener() {
+	public void pointsDeleted(int index, int size){BpfEditor.this.repaint();}
+	public void pointAdded(int index) {
+	  BpfEditor.this.repaint();			
+	}
+	public void pointChanged(int oldndex, int newIndex, float newTime, float newValue) {
+	  BpfEditor.this.repaint();
+	}
+	public void pointsChanged() {
+	  BpfEditor.this.repaint();
+	}
+	public void cleared(){BpfEditor.this.repaint();}
+      });
+    
+    geometry.addTranspositionListener(new TranspositionListener() {
+	public void transpositionChanged(int newTranspose)
+	{
+	  repaint();
+	}
+      });
 
-	this.geometry = g;
-	this.model = model;
+    createGraphicContext(geometry, model, manager);
+    
+    gc.getSelection().addListSelectionListener(this);
+    
+    setBackground(Color.white);
+    
+    setOpaque(false);
+    
+    bpfPopupMenu = new BpfPopupMenu(this);
+    
+    manager.addToolListener(new ToolListener() {
+	public void toolChanged(ToolChangeEvent e) 
+	{		    
+	  if (e.getTool() != null) 
+	    setCursor(e.getTool().getCursor());
+	}
+      });
 
-	/******** display labels **********/
-	JPanel labelPanel = new JPanel();
-	labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
-	labelPanel.setOpaque(false);
-	
-	displayMouseLabel = new JLabel();
-	displayMouseLabel.setFont(BpfPanel.rulerFont);
-	displayMouseLabel.setPreferredSize(new Dimension(102, 15));
-	displayMouseLabel.setMaximumSize(new Dimension(102, 15));
-	displayMouseLabel.setMinimumSize(new Dimension(102, 15));
-	
-	infoLabel = new JLabel("", JLabel.RIGHT);
-	infoLabel.setFont(BpfPanel.rulerFont);
-	infoLabel.setPreferredSize(new Dimension(190, 15));
-	infoLabel.setMaximumSize(new Dimension(190, 15));
-	infoLabel.setMinimumSize(new Dimension(190, 15));
-	
-	labelPanel.add(displayMouseLabel);
-	labelPanel.add(Box.createHorizontalGlue());
-	labelPanel.add(infoLabel);
-	
-	setLayout( new BoxLayout( this, BoxLayout.Y_AXIS));
-	add(labelPanel);
-	add(Box.createVerticalGlue());
-	/*********************************/
-	
-	model.addBpfListener(new BpfDataListener() {
-	    public void pointsDeleted(int index, int size){BpfEditor.this.repaint();}
-	    public void pointAdded(int index) {
-	      BpfEditor.this.repaint();			
-	    }
-	    public void pointChanged(int oldndex, int newIndex, float newTime, float newValue) {
-	      BpfEditor.this.repaint();
-	    }
-	    public void pointsChanged() {
-	      BpfEditor.this.repaint();
-	    }
-	    public void cleared(){BpfEditor.this.repaint();}
-	  });
-
-	geometry.addTranspositionListener(new TranspositionListener() {
-	    public void transpositionChanged(int newTranspose)
+    addMouseListener(new MouseListener(){
+	public void mouseClicked(MouseEvent e){}
+	public void mousePressed(MouseEvent e){}
+	public void mouseReleased(MouseEvent e){}
+	public void mouseEntered(MouseEvent e)
+	{
+	  requestFocus();
+	}
+	public void mouseExited(MouseEvent e){
+	  gc.display("");
+	}
+      });
+    addMouseMotionListener(new MouseMotionListener(){
+	public void mouseMoved(MouseEvent e)
+	{
+	  /* workaround: right-mouse events used when popup is visible */
+	  if(getMenu().isVisible()) return;
+	  
+	  if(gc.getToolManager().getCurrentTool().getName().equals("edit tool"))
 	    {
-	      repaint();
-	    }
-	  });
-
-	createGraphicContext(geometry, model, manager);
-
-	gc.getSelection().addListSelectionListener(this);
-
-	setBackground(Color.white);
-
-	setOpaque(false);
-
-	bpfPopupMenu = new BpfPopupMenu(this);
-
-	manager.addToolListener(new ToolListener() {
-		public void toolChanged(ToolChangeEvent e) 
-		{		    
-		    if (e.getTool() != null) 
-			setCursor(e.getTool().getCursor());
-		}
-	    });
-
-	addMouseListener(new MouseListener(){
-	    public void mouseClicked(MouseEvent e){}
-	    public void mousePressed(MouseEvent e){}
-	    public void mouseReleased(MouseEvent e){}
-	    public void mouseEntered(MouseEvent e){}
-	    public void mouseExited(MouseEvent e){
-	      gc.display("");
-	    }
-	  });
-	addMouseMotionListener(new MouseMotionListener(){
-	    public void mouseMoved(MouseEvent e)
-	    {
-	      /* workaround: right-mouse events used when popup is visible */
-	      if(getMenu().isVisible()) return;
-
-	      if(gc.getToolManager().getCurrentTool().getName().equals("edit tool"))
-		{
-		  float time = gc.getAdapter().getInvX(e.getX());
-		  float maxTime = gc.getMaximumTime();
-		  if(time < 0) time = 0;
-		  else if(time > maxTime) time = maxTime;
-		  
-		  float val =  gc.getAdapter().getInvY(e.getY());
-		  if(val > gc.getFtsObject().getMaximumValue())
-		    val = gc.getFtsObject().getMaximumValue();
-		  else 
-		    if(val < gc.getFtsObject().getMinimumValue())
-		      val = gc.getFtsObject().getMinimumValue();
-		  
-		  gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
-			     PointRenderer.numberFormat.format(val)+" )");	
-		}
-	    }
-	    public void mouseDragged(MouseEvent e)
-	    {
-	      /* workaround: right-mouse events used when popup is visible */
-	      if(getMenu().isVisible()) return;
+	      float time = gc.getAdapter().getInvX(e.getX());
+	      float maxTime = gc.getMaximumTime();
+	      if(time < 0) time = 0;
+	      else if(time > maxTime) time = maxTime;
 	      
-	      String toolName = gc.getToolManager().getCurrentTool().getName();
-	      if(toolName.equals("edit tool"))
-		{
-		  float time = gc.getAdapter().getInvX(e.getX());
-		  float maxTime = gc.getMaximumTime();
-		  if(time < 0) time = 0;
-		  else if(time > maxTime) time = maxTime;
-		  
-		  float val =  gc.getAdapter().getInvY(e.getY());
-		  if(val > gc.getFtsObject().getMaximumValue())
-		    val = gc.getFtsObject().getMaximumValue();
-		  else 
-		    if(val < gc.getFtsObject().getMinimumValue())
-		      val = gc.getFtsObject().getMinimumValue();
-		  
-		  gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
-			     PointRenderer.numberFormat.format(val)+" )");	
-		}
-	      else
-		if(toolName.equals("zoom&scroll tool"))
-		  {
-		    int start = gc.getLogicalTime();
-		    int end = start + gc.getTimeWindow();
-		    gc.display("[ "+start+" -- "+end+" ]");
-		  }
+	      float val =  gc.getAdapter().getInvY(e.getY());
+	      if(val > gc.getFtsObject().getMaximumValue())
+		val = gc.getFtsObject().getMaximumValue();
+	      else 
+		if(val < gc.getFtsObject().getMinimumValue())
+		  val = gc.getFtsObject().getMinimumValue();
+	      
+	      gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
+			 PointRenderer.numberFormat.format(val)+" )");	
 	    }
-	  });
-
-	addKeyListener(new KeyListener(){
-	    public void keyTyped(KeyEvent e){}
-	    public void keyPressed(KeyEvent e)
+	}
+	public void mouseDragged(MouseEvent e)
+	{
+	  /* workaround: right-mouse events used when popup is visible */
+	  if(getMenu().isVisible()) return;
+	  
+	  String toolName = gc.getToolManager().getCurrentTool().getName();
+	  if(toolName.equals("edit tool"))
 	    {
-	      if(isDeleteKey(e))
-		{
-		  BpfEditor.this.model.beginUpdate();
-		  gc.getSelection().deleteAll();
-		}		
-	      else if(isArrowKey(e))
-		{
-		  consumeArrowKeyEvent(e);
-		}
+	      float time = gc.getAdapter().getInvX(e.getX());
+	      float maxTime = gc.getMaximumTime();
+	      if(time < 0) time = 0;
+	      else if(time > maxTime) time = maxTime;
+	      
+	      float val =  gc.getAdapter().getInvY(e.getY());
+	      if(val > gc.getFtsObject().getMaximumValue())
+		val = gc.getFtsObject().getMaximumValue();
+	      else 
+		if(val < gc.getFtsObject().getMinimumValue())
+		  val = gc.getFtsObject().getMinimumValue();
+	      
+	      gc.display("( "+PointRenderer.numberFormat.format(time)+" , "+
+			 PointRenderer.numberFormat.format(val)+" )");	
 	    }
-	    public void keyReleased(KeyEvent e){}
-	  });
-    }
+	  else
+	    if(toolName.equals("zoom&scroll tool"))
+	      {
+		int start = gc.getLogicalTime();
+		int end = start + gc.getTimeWindow();
+		gc.display("[ "+start+" -- "+end+" ]");
+	      }
+	}
+      });
 
-    public void reinit(){}
+    addKeyListener(new KeyListener(){
+	public void keyTyped(KeyEvent e){}
+	public void keyPressed(KeyEvent e)
+	{
+	  if(isDeleteKey(e))
+	    {
+	      BpfEditor.this.model.beginUpdate();
+	      gc.getSelection().deleteAll();
+	    }		
+	  else if(isArrowKey(e))
+	    {
+	      consumeArrowKeyEvent(e);
+	    }
+	}
+	public void keyReleased(KeyEvent e){}
+      });
+  }
+
+  public void reinit(){}
+  
+  public JMenu getToolsMenu()
+  {
+    return gc.getToolManager().getMenu();
+  }
+  
+  public JPopupMenu getMenu()
+  {
+    return bpfPopupMenu;
+  }
+  
+  public void paintComponent(Graphics g) 
+  {
+    Rectangle r = g.getClipBounds();
+    renderer.render(g, r);	
+  }
+  
+  private void createGraphicContext(Geometry geometry, FtsBpfObject model, BpfToolManager manager)
+  {
+    gc = new BpfGraphicContext(model); //loopback?
+    gc.setSelection( new BpfSelection(model, gc));
+    gc.setGraphicSource(this);
+    gc.setGraphicDestination(this);
+    ad = new BpfAdapter(geometry, gc);
+    gc.setAdapter(ad);
     
-    public JMenu getToolsMenu()
-    {
-	return gc.getToolManager().getMenu();
-    }
+    renderer = new BpfRenderer(gc);
+    gc.setRenderManager(renderer);
+    gc.setToolManager(manager);
     
-    public JPopupMenu getMenu()
-    {
-	return bpfPopupMenu;
-    }
+    gc.setDisplay(displayMouseLabel, infoLabel);
+  }
+  
+  public void setAdapter(BpfAdapter adapter)
+  {
+    gc.setAdapter(adapter);	
+    ad = adapter;
+  }
+  
+  public void setRenderer(BpfRenderer renderer)
+  {
+    this.renderer = renderer;
+    gc.setRenderManager(renderer);
+  }
+  
+  /**
+   * ListSelectionListener interface
+   */
+  
+  public void valueChanged(ListSelectionEvent e)
+  {
+    repaint();
+  }
+  
+  public void showListDialog()
+  {
+    if(listDialog==null) 
+      createListDialog();
+    else
+      listDialog.relocate();
+    listDialog.setVisible(true);
+  }
 
-    public void paintComponent(Graphics g) 
-    {
-	Rectangle r = g.getClipBounds();
-	renderer.render(g, r);	
-    }
+  private void createListDialog()
+  {
+    listDialog = new BpfTableDialog(gc.getFrame(), gc);
+  }
 
-    private void createGraphicContext(Geometry geometry, FtsBpfObject model, BpfToolManager manager)
-    {
-	gc = new BpfGraphicContext(model); //loopback?
-	gc.setSelection( new BpfSelection(model, gc));
-	gc.setGraphicSource(this);
-	gc.setGraphicDestination(this);
-	ad = new BpfAdapter(geometry, gc);
-	gc.setAdapter(ad);
-
-	renderer = new BpfRenderer(gc);
-	gc.setRenderManager(renderer);
-	gc.setToolManager(manager);
-	
-	gc.setDisplay(displayMouseLabel, infoLabel);
-    }
-
-    public void setAdapter(BpfAdapter adapter)
-    {
-	gc.setAdapter(adapter);	
-	ad = adapter;
-    }
-
-    public void setRenderer(BpfRenderer renderer)
-    {
-	this.renderer = renderer;
-	gc.setRenderManager(renderer);
-    }
-
-    /**
-     * ListSelectionListener interface
-     */
-    
-    public void valueChanged(ListSelectionEvent e)
-    {
-	repaint();
-    }
-    
-    public void showListDialog()
-    {
-	if(listDialog==null) 
-	    createListDialog();
-	else
-	    listDialog.relocate();
-	listDialog.setVisible(true);
-    }
-
-    private void createListDialog()
-    {
-	listDialog = new BpfTableDialog(gc.getFrame(), gc);
-    }
-
-    public void updateNewObject(Object obj){};
-
-    void updateEventProperties(Object whichObject, String propName, Object propValue){}
-
-    void updateRange(Object whichObject){}    
-    /**
-     * Track editor interface */
-
-    public Component getComponent()
-    {
-	return this;
-    }
-
-    public BpfGraphicContext getGraphicContext()
-    {
-	return gc;
-    }
-
-    public int getDefaultHeight()
-    {
-	return DEFAULT_HEIGHT;
-    }
-
-    public void dispose()
-    {
-	if(listDialog != null)
-	    listDialog.dispose();
-    }
-
-    public Dimension getPreferredSize()
-    {
-	return new Dimension(BpfWindow.DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    }
+  public void updateNewObject(Object obj){};
+  
+  void updateEventProperties(Object whichObject, String propName, Object propValue){}
+  
+  void updateRange(Object whichObject){}    
+  /**
+   * Track editor interface */
+  
+  public Component getComponent()
+  {
+    return this;
+  }
+  
+  public BpfGraphicContext getGraphicContext()
+  {
+    return gc;
+  }
+  
+  public int getDefaultHeight()
+  {
+    return DEFAULT_HEIGHT;
+  }
+  
+  public void dispose()
+  {
+    if(listDialog != null)
+      listDialog.dispose();
+  }
+  
+  public Dimension getPreferredSize()
+  {
+    return new Dimension(BpfWindow.DEFAULT_WIDTH, DEFAULT_HEIGHT);
+  }
 
     /**
      * Displays (x, y) coord in top-left corner

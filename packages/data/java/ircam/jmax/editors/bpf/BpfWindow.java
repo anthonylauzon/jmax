@@ -57,81 +57,85 @@ public class BpfWindow extends JFrame implements EditorContainer{
    */
     public BpfWindow(FtsBpfObject data)
     {
-	super();
-
-	MaxWindowManager.getWindowManager().addWindow(this);
-
-	bpfData = data;
-
-	makeTitle();
-
-	// Build The Menus and Menu Bar
-	makeMenuBar();
-
-	setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-
-	//... then the SequencePanel
-	itsBpfPanel = new BpfPanel(this, data);
-	getContentPane().add(itsBpfPanel);
-
-	addWindowListener(new WindowListener(){
-		public void windowOpened(WindowEvent e){}
-		public void windowClosed(WindowEvent e){}
-		public void windowClosing(WindowEvent e)
-		{
-		    MaxWindowManager.getWindowManager().removeWindow(getFrame());
-		}
-		public void windowDeiconified(WindowEvent e){}
-		public void windowIconified(WindowEvent e){}
-		public void windowActivated(WindowEvent e){}
-		public void windowDeactivated(WindowEvent e){}
-	    });
-	
-	validate();
-	pack();
-	setVisible(true);
+      super();
+      
+      MaxWindowManager.getWindowManager().addWindow(this);
+      
+      bpfData = data;
+      
+      makeTitle();
+      
+      // Build The Menus and Menu Bar
+      makeMenuBar();
+      
+      setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+      
+      //... then the SequencePanel
+      itsBpfPanel = new BpfPanel(this, data);
+      getContentPane().add(itsBpfPanel);
+      
+      addWindowListener(new WindowListener(){
+	  public void windowOpened(WindowEvent e){}
+	  public void windowClosed(WindowEvent e){}
+	  public void windowClosing(WindowEvent e)
+	  {
+	    MaxWindowManager.getWindowManager().removeWindow(getFrame());
+	  }
+	  public void windowDeiconified(WindowEvent e){}
+	  public void windowIconified(WindowEvent e){}
+	  public void windowActivated(WindowEvent e)
+	  {
+	  }
+	  public void windowDeactivated(WindowEvent e)
+	  {
+	  }
+	});
+      
+      validate();
+      pack();
+      setVisible(true);
     }
-
-    private final void makeTitle(){
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf"));
-	MaxWindowManager.getWindowManager().windowChanged(this);
-    } 
-
-    public void setName(String name)
-    {
-	setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf " + name));
-	MaxWindowManager.getWindowManager().windowChanged(this);
-    }
-
-    private final void makeMenuBar(){
-	JMenuBar mb = new JMenuBar();
-	
-	// Build the file menu	
-	EditorMenu fileMenu = new DefaultFileMenu();
-	fileMenu.setEnabled( false, 3);
-	fileMenu.setEnabled( false, 4);
-	fileMenu.setEnabled( false, 7);
-	mb.add( fileMenu);
-	
-	// New Window Manager based Menu
-	mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
-	
-	setJMenuBar(mb);
-    }
+  
+  private final void makeTitle(){
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf"));
+    MaxWindowManager.getWindowManager().windowChanged(this);
+  } 
+  
+  public void setName(String name)
+  {
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Bpf " + name));
+    MaxWindowManager.getWindowManager().windowChanged(this);
+  }
+  
+  private final void makeMenuBar(){
+    JMenuBar mb = new JMenuBar();
     
-    // ------ editorContainer interface ---------------
-    public Editor getEditor(){
-	return itsBpfPanel;
-    }
-    public Frame getFrame(){
-	return this;
-    }
-    public Point getContainerLocation(){
-	return getLocation();
-    }
-    public Rectangle getViewRectangle(){
-	return itsBpfPanel.getViewRectangle();
-    }
+    // Build the file menu	
+    EditorMenu fileMenu = new DefaultFileMenu();
+    fileMenu.setEnabled( false, 3);
+    fileMenu.setEnabled( false, 4);
+    fileMenu.setEnabled( false, 7);
+    mb.add( fileMenu);
+    
+    // New Window Manager based Menu
+    mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
+    
+    setJMenuBar(mb);
+  }
+    
+  // ------ editorContainer interface ---------------
+  public Editor getEditor(){
+    return itsBpfPanel;
+  }
+  public Frame getFrame(){
+    return this;
+  }
+  public Point getContainerLocation(){
+    return getLocation();
+  }
+  public Rectangle getViewRectangle(){
+    return itsBpfPanel.getViewRectangle();
+  }
 }
 
 

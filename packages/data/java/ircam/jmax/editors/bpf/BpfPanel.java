@@ -82,7 +82,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     }
     //-------------------------------------------------
     //- Create the ToolManager with the needed tools
-    manager = new BpfToolManager(BpfTools.instance);    
+    manager = new BpfToolManager( new BpfTools());    
     Tool arrow = manager.getToolByName("edit tool");     
     manager.activate(arrow, null); //we do not have a gc yet...
     
@@ -106,12 +106,12 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
-	    {
-		repaint();
-		if((editor.getSize().width>0)&&(zoom!=oldZoom))
-		  resizePanelToLastPoint();
-	    }
-    });
+	{
+	  repaint();
+	  if((editor.getSize().width>0)&&(zoom!=oldZoom))
+	    resizePanelToLastPoint();
+	}
+      });
 
     addComponentListener( new ComponentAdapter() {
 	public void componentResized(ComponentEvent e)
