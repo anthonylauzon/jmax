@@ -23,28 +23,25 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
-#ifndef _NOTE_H_
-#define _NOTE_H_
+#ifndef _SEQMESS_H_
+#define _SEQMESS_H_
 
 #include <fts/fts.h>
-#include "event.h"
+#include <sequence/c/include/event.h>
 
-extern fts_class_t *note_type;
+extern fts_class_t *seqmess_type;
 
-typedef struct _note_
+typedef struct _seqmess_
 {
   fts_object_t head;
-  int pitch;
-  double duration;
-} note_t;
+  fts_symbol_t s; /* selector (no arguments yet) */
+  int position; /* vertical position */
+} seqmess_t;
 
-#define NOTE_DEF_PITCH 64
-#define NOTE_DEF_DURATION 100
+#define seqmess_set_selector(m, x) ((m)->s = (x))
+#define seqmess_get_selector(m) ((m)->s)
 
-#define note_set_pitch(n, x) ((n)->pitch = (x))
-#define note_get_pitch(n) ((n)->pitch)
-
-#define note_set_duration(n, x) ((n)->duration = (x))
-#define note_get_duration(n) ((n)->duration)
+#define seqmess_set_position(m, x) ((m)->position = (x))
+#define seqmess_get_position(m) ((m)->position)
 
 #endif

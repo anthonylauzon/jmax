@@ -37,7 +37,7 @@
 #endif
 
 #include <fts/fts.h>
-#include "track.h"
+#include <sequence/c/include/track.h>
 
 SEQUENCE_API void
 sequence_config(void);

@@ -20,8 +20,8 @@
  *
  */
 #include <fts/fts.h>
+#include <sequence/c/include/track.h>
 #include "seqsym.h"
-#include "track.h"
 
 /******************************************************
  *

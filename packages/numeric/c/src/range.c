@@ -20,93 +20,20 @@
  * 
  * Based on Max/ISPW by Miller Puckette.
  *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+ * Authors: Norbert Schnell.
  *
  */
 
 #include <math.h>
 #include <fts/fts.h>
 
-/************************************************************
- *
- *  object
- *
- */
-
-typedef struct {
+typedef struct 
+{
   fts_object_t o;
   int *i_points;
   float *f_points;
   int n;
 } range_t;
-
-static void
-range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  range_t *this = (range_t *)o;
-  int i, n;
-
-  if(ac == 0)
-    n = 1;
-  else 
-    n = ac;
-
-  this->i_points = fts_malloc(sizeof(int) * n);
-  this->f_points = fts_malloc(sizeof(float) * n);
-
-  if(ac == 0)
-    {
-      this->i_points[0] = 0;
-      this->f_points[0] = 0.0f;
-    }
-  else
-    {
-      for(i=0; i<n; i++)
-	{
-	  const fts_atom_t *ap = at + i;
-	  
-	  if(fts_is_int(ap))
-	    {
-	      int v = fts_get_int(ap);
-
-	      this->i_points[i] = v;
-	      this->f_points[i] = (float)v;
-	    }
-	  else if(fts_is_float(ap))
-	    {
-	      float v = fts_get_float(ap);
-
-	      this->i_points[i] = (int)ceil(v);
-	      this->f_points[i] = v;
-	    }
-	  else
-	    {
-	      this->i_points[i] = 0;
-	      this->f_points[i] = 0.0;
-	    }
-	}
-    }
-
-  this->n = n;
-
-  fts_object_set_inlets_number(o, n + 1);
-  fts_object_set_outlets_number(o, n + 1);
-}
-
-static void
-range_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  range_t *this = (range_t *)o;
-
-  fts_free(this->i_points);
-  fts_free(this->f_points);
-}
-
-/************************************************************
- *
- *  user methods
- *
- */
 
 static void
 range_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -165,7 +92,7 @@ range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-range_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_set_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   range_t *this = (range_t *)o;
   int i = winlet - 1;
@@ -177,12 +104,39 @@ range_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       this->i_points[i] = v;
       this->f_points[i] = (float)v;
     }
-  else /* if(fts_is_float(at)) */
+  else if(fts_is_float(at))
     {
       float v = fts_get_float(at);
       
       this->i_points[i] = (int)ceil(v);
       this->f_points[i] = v;
+    }
+}
+
+static void
+range_set_points(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  range_t *this = (range_t *)o;
+  int i;
+
+  for(i=0; i<ac; i++)
+    {
+      const fts_atom_t *ap = at + i;
+      
+      if(fts_is_int(ap))
+	{
+	  int v = fts_get_int(ap);
+	  
+	  this->i_points[i] = v;
+	  this->f_points[i] = (float)v;
+	}
+      else if(fts_is_float(ap))
+	{
+	  float v = fts_get_float(ap);
+	  
+	  this->i_points[i] = (int)ceil(v);
+	  this->f_points[i] = v;
+	}
     }
 }
 
@@ -192,12 +146,45 @@ range_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *
  */
 static void
+range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  range_t *this = (range_t *)o;
+  int i, n;
+
+  if(ac == 0)
+    n = 1;
+  else 
+    n = ac;
+
+  this->i_points = fts_zalloc(sizeof(int) * n);
+  this->f_points = fts_zalloc(sizeof(float) * n);
+
+  range_set_points(o, 0, 0, ac, at);
+
+  this->n = n;
+
+  fts_object_set_inlets_number(o, n + 1);
+  fts_object_set_outlets_number(o, n + 1);
+}
+
+static void
+range_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  range_t *this = (range_t *)o;
+
+  fts_free(this->i_points);
+  fts_free(this->f_points);
+}
+
+static void
 range_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(range_t), range_init, range_delete);
 
+  fts_class_message_varargs(cl, fts_s_set, range_set_points);
+
   fts_class_inlet_number(cl, 0, range_int);
-  fts_class_inlet_number(cl, 1, range_point);
+  fts_class_inlet_number(cl, 1, range_set_point);
 
   fts_class_outlet_number(cl, 0);
 }

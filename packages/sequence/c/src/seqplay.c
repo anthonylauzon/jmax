@@ -27,10 +27,10 @@
 #include <float.h>
 
 #include <fts/fts.h>
+#include <sequence/c/include/sequence.h>
+#include <sequence/c/include/track.h>
+#include <sequence/c/include/event.h>
 #include "seqsym.h"
-#include "sequence.h"
-#include "track.h"
-#include "event.h"
 
 typedef struct _seqplay_
 {
@@ -345,7 +345,7 @@ seqplay_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void 
-seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqplay_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   seqplay_t *this = (seqplay_t *)o;
   double time = 0.0;
@@ -357,6 +357,7 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     seqplay_reset(this);  
 
   seqplay_position(this, time);
+  seqplay_go(this);
 }
   
 static void 
@@ -532,11 +533,15 @@ seqplay_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(seqplay_t), seqplay_init, seqplay_delete);
 
-  fts_class_message_varargs(cl, fts_new_symbol("locate"), seqplay_locate);
+  fts_class_message_varargs(cl, fts_new_symbol("locate"), seqplay_jump);
   fts_class_message_varargs(cl, fts_new_symbol("play"), seqplay_play);
   fts_class_message_varargs(cl, fts_new_symbol("stop"), seqplay_stop);
   fts_class_message_varargs(cl, fts_new_symbol("pause"), seqplay_pause);
   fts_class_message_varargs(cl, fts_new_symbol("loop"), seqplay_loop);
+
+  fts_class_message_varargs(cl, fts_new_symbol("begin"), seqplay_set_begin);
+  fts_class_message_varargs(cl, fts_new_symbol("end"), seqplay_set_end);
+  fts_class_message_varargs(cl, fts_new_symbol("speed"), seqplay_set_speed);
 
   fts_class_message_varargs(cl, fts_new_symbol("duration"), seqplay_set_duration);
   fts_class_message_varargs(cl, fts_s_set, seqplay_set);

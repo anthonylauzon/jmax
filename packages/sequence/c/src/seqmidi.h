@@ -24,42 +24,15 @@
  *
  */
 
+#ifndef _SEQMIDI_H_
+#define _SEQMIDI_H_
+
 #include <sequence/c/include/sequence.h>
+#include <sequence/c/include/track.h>
 
-extern void seqsym_config(void);
+extern int track_import_from_midifile(track_t *track, fts_midifile_t *file);
+extern int track_export_to_midifile(track_t *track, fts_midifile_t *file);
 
-extern void sequence_class_config(void);
-extern void track_config(void);
-extern void event_config(void);
+extern int sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file);
 
-extern void note_config(void);
-extern void seqmess_config(void);
-
-extern void seqfind_config(void);
-extern void seqstep_config(void);
-extern void seqplay_config(void);
-extern void seqrec_config(void);
-extern void locate_config(void);
-
-extern void getdur_config(void);
-
-void
-sequence_config(void)
-{
-  seqsym_config();
-
-  sequence_class_config();
-  track_config();
-  event_config();
-
-  note_config();
-  seqmess_config();
-
-  seqfind_config();
-  seqstep_config();
-  seqplay_config();
-  seqrec_config();
-  locate_config();
-
-  getdur_config();
-}
+#endif

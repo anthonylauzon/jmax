@@ -23,43 +23,28 @@
  * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
  *
  */
+#ifndef _NOTE_H_
+#define _NOTE_H_
 
-#include <sequence/c/include/sequence.h>
+#include <fts/fts.h>
+#include <sequence/c/include/event.h>
 
-extern void seqsym_config(void);
+extern fts_class_t *note_type;
 
-extern void sequence_class_config(void);
-extern void track_config(void);
-extern void event_config(void);
-
-extern void note_config(void);
-extern void seqmess_config(void);
-
-extern void seqfind_config(void);
-extern void seqstep_config(void);
-extern void seqplay_config(void);
-extern void seqrec_config(void);
-extern void locate_config(void);
-
-extern void getdur_config(void);
-
-void
-sequence_config(void)
+typedef struct _note_
 {
-  seqsym_config();
+  fts_object_t head;
+  int pitch;
+  double duration;
+} note_t;
 
-  sequence_class_config();
-  track_config();
-  event_config();
+#define NOTE_DEF_PITCH 64
+#define NOTE_DEF_DURATION 100
 
-  note_config();
-  seqmess_config();
+#define note_set_pitch(n, x) ((n)->pitch = (x))
+#define note_get_pitch(n) ((n)->pitch)
 
-  seqfind_config();
-  seqstep_config();
-  seqplay_config();
-  seqrec_config();
-  locate_config();
+#define note_set_duration(n, x) ((n)->duration = (x))
+#define note_get_duration(n) ((n)->duration)
 
-  getdur_config();
-}
+#endif
