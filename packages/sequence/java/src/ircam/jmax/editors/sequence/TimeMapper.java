@@ -48,6 +48,11 @@ public class TimeMapper extends DoubleMapper {
     return e.getTime();
   }
 
+    public String getName()
+    {
+	return "time";
+    }
+
   static public DoubleMapper getMapper()
   {
     return itsTimeMapper;

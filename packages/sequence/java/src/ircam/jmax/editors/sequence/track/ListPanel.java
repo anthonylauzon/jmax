@@ -132,7 +132,9 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     public void paintComponent(Graphics g) 
     {
 	TrackEvent evt;
+	Dimension d = getSize();
 	Rectangle r = g.getClipBounds();
+
 	g.setColor(Color.white);
 	g.fillRect(0, 0, r.width, r.height);
 
@@ -140,8 +142,10 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
 	g.setColor(Color.black);
 	
-	int first = firstIndexVisible();
-	int last = lastIndexVisible();
+	//int first = firstIndexVisible();
+	int first = getEventIndex(r.y);
+	//int last = lastIndexVisible();
+	int last = getEventIndex(r.y+r.height+3*ystep);
 
 	int y = ystep*(first+1);	    
 
@@ -165,7 +169,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	g.setColor(Color.lightGray);
 
 	for(int i = first+1; i <= last;i++)
-	  g.drawLine(5, (ystep)*i, 5+r.width, (ystep)*i);
+	  g.drawLine(5, (ystep)*i, 5+d.width, (ystep)*i);
     }
    
     String getPropertyAsString(Object prop)
@@ -188,12 +192,13 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     {
 	int index;
 	TrackEvent evt;
+	Dimension d = getSize();
 	g.setColor(SequencePanel.violetColor.brighter());
 	for(Enumeration e = SequenceSelection.getCurrent().getSelected(); e.hasMoreElements();)
 	    {
 		evt = (TrackEvent) e.nextElement();
 		index = data.indexOf(evt);
-		g.fillRect(0, (index)*ystep+1, r.width, ystep-1);
+		g.fillRect(0, (index)*ystep+1, d.width, ystep-1);
 	    }
     }
 

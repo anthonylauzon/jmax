@@ -240,6 +240,10 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     {
 	return lastSelectedEvent;
     }
+  public void setLastSelectedEvent(TrackEvent last)
+    {
+	lastSelectedEvent = last;
+    }
 
   /** selects all the objects. 
    */

@@ -48,6 +48,11 @@ public class IntegerMapper extends Mapper {
     return ((Integer)e.getProperty("integer")).intValue();
   }
 
+    public String getName()
+    {
+	return "integer";
+    }
+
   /**
    * access the static instance
    */

@@ -95,6 +95,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
 	      } 
 	    SequenceSelection.getCurrent().select(aTrackEvent);
 	  }
+	else
+	    SequenceSelection.getCurrent().setLastSelectedEvent(aTrackEvent);
 
 	singleObjectSelected(x, y, modifiers);
       }

@@ -50,7 +50,10 @@ public class PositionMapper extends Mapper {
     return ((Integer)e.getProperty("Position")).intValue();
   }
 
-
+    public String getName()
+    {
+	return "position";
+    }
   /**
    * access the static instance of the class */
   static Mapper getMapper() 

@@ -49,7 +49,10 @@ public class PitchMapper extends Mapper {
     return ((Integer)e.getProperty("pitch")).intValue();
   }
 
-
+    public String getName()
+    {
+	return "pitch";
+    }
   /**
    * access the static instance of the class */
   static Mapper getMapper() 

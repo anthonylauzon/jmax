@@ -91,7 +91,7 @@ public class MonoTrackRenderer extends AbstractRenderer{
 		    
       double time = gc.getAdapter().getInvX(x);
 
-      if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() == MonoTrackEditor.PEAKS_VIEW)
+      if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() != MonoTrackEditor.STEPS_VIEW)
 	  for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
 	      {      
 		  aTrackEvent = (TrackEvent) e.nextElement();

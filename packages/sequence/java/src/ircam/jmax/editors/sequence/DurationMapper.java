@@ -47,6 +47,11 @@ public class DurationMapper extends Mapper {
       return ((Integer)e.getProperty("duration")).intValue();
   }
 
+  public String getName()
+    {
+	return "duration";
+    }
+
   /**
    * access the static instance
    */

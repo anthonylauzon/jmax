@@ -48,6 +48,11 @@ public class VelocityMapper extends Mapper {
     return ((Integer)e.getProperty("velocity")).intValue();
   }
 
+    public String getName()
+    {
+	return "velocity";
+    }
+
   static public Mapper getMapper()
   {
     return itsVelocityMapper;

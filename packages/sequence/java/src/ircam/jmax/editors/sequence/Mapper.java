@@ -45,7 +45,7 @@ public abstract class Mapper {
    */
     public abstract int get(Event e);
 
-
+    public abstract String getName();
 }
 
 

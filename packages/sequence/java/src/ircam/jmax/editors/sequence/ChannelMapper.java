@@ -48,6 +48,11 @@ public class ChannelMapper extends Mapper {
     return ((Integer)e.getProperty("channel")).intValue();
   }
 
+    public String getName()
+    {
+	return "channel";
+    }
+
   /**
    * access the static instance
    */

@@ -54,6 +54,11 @@ public class AmbitusMapper extends Mapper {
       return ((Integer)e.getProperty("ambitus")).intValue();
   }
 
+    public String getName()
+    {
+	return "ambitus";
+    }
+
   /**
    * access the static instance
    */

@@ -75,6 +75,12 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    //count += delta;
 	    updateStart(-delta, 0);
 	    getListener().updateStartingPoint(-delta, 0);
+
+	    if ((getMovements() & HORIZONTAL_MOVEMENT) != 0)
+		{
+		    double time = ((PartitionAdapter)getGc().getAdapter()).getInvX(x);
+		    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), " time "+time);
+		}
 	}
 	void setEditor(SequencePanel editor)
 	{
@@ -190,15 +196,6 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
   {
       SequenceGraphicContext egc = (SequenceGraphicContext) gc;
       
-      int deltaX = (int) (egc.getAdapter().getInvX(e.getX()) - egc.getAdapter().getInvX(itsStartingPoint.x));
-      int deltaY = (int) (egc.getAdapter().getInvY(e.getY()) - egc.getAdapter().getInvY(itsStartingPoint.y));
-    
-      if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
-	  egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX));
-      else if ((itsMovements & VERTICAL_MOVEMENT) != 0)
-	  egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dy "+deltaY);
-      else egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), " dx "+(deltaX)+", dy "+(deltaY));
-      
       if(!scrollTimer.isRunning())
 	  super.mouseDragged(e);
       
@@ -232,15 +229,20 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
       if ((itsMovements & VERTICAL_MOVEMENT) != 0) 
 	enclosingRect.y += dy-previousY;
       
-      g.drawRect(enclosingRect.x,enclosingRect.y, enclosingRect.width, enclosingRect.height);
+      g.drawRect(enclosingRect.x, enclosingRect.y, enclosingRect.width, enclosingRect.height);
     }
     else // move every element
       {
 	PartitionAdapter a = (PartitionAdapter)((SequenceGraphicContext) gc).getAdapter();
 	boolean singleObject = ((SequenceGraphicContext)gc).getSelection().size()==1;
+	
+	TrackEvent last = ((SequenceGraphicContext)gc).getSelection().getLastSelectedEvent();
+
 	for (Enumeration e = ((SequenceGraphicContext)gc).getSelection().getSelected(); e.hasMoreElements();)
 	  {
 	    movTrackEvent = (TrackEvent) e.nextElement();
+
+	    tempEvent.setOriginal(movTrackEvent);
 
 	    //a.setX(tempEvent, a.getX(movTrackEvent));
 	    tempEvent.setTime(movTrackEvent.getTime());
@@ -261,6 +263,18 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 	    // (something like using the ircam.jmax.toolkit.DynamicDragListener).
 	    if ((singleObject)&&(a.getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)) 
 	      ScoreBackground.pressKey(((Integer)tempEvent.getProperty("pitch")).intValue(), getGc());
+	  
+	    if(movTrackEvent == last) 
+		{
+		    if ((itsMovements & HORIZONTAL_MOVEMENT) != 0)
+			((SequenceGraphicContext)gc).getStatusBar().
+			    post(((SequenceGraphicContext)gc).
+				 getToolManager().getCurrentTool(), " time "+tempEvent.getTime());
+		    if ((itsMovements & VERTICAL_MOVEMENT) != 0)
+			((SequenceGraphicContext)gc).getStatusBar().
+			    post(((SequenceGraphicContext)gc).
+				 getToolManager().getCurrentTool(), a.YMapper.getName()+" "+a.getInvY(a.getY(tempEvent)));
+		}
 	  }
       }
     
@@ -289,6 +303,12 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
     {
 	return (SequenceGraphicContext)gc;
     }
+
+    int getMovements()
+    {
+	return itsMovements;
+    }
+
   //--- Fields
     Rectangle enclosingRect = new Rectangle();
     UtilTrackEvent tempEvent = new UtilTrackEvent(new AmbitusValue());

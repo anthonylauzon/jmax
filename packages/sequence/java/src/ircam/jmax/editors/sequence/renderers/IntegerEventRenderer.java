@@ -67,6 +67,7 @@ public class IntegerEventRenderer implements ObjectRenderer {
   {
       Event e = (Event) obj;
       MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
+      TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
 
       int x = adapter.getX(e);
       int y = adapter.getY(e);    
@@ -82,14 +83,22 @@ public class IntegerEventRenderer implements ObjectRenderer {
 	      if(selected)
 		  g.drawOval(x-4, y-4, 9, 9);
 	
-	      Event next = ((SequenceGraphicContext) theGc).getDataModel().getNextEvent(e);		
+	      Event next = model.getNextEvent(e);		
 
+	      Event prev;
 	      if(e instanceof UtilTrackEvent)//during the XOR draw
 		  {
-		      Event prev = ((SequenceGraphicContext)theGc).
-			  getDataModel().getPreviousEvent(e.getTime());
+		      TrackEvent original = ((UtilTrackEvent)e).getOriginal();
+		      prev = model.getPreviousEvent(e.getTime());
+		      
+		      if(prev == original)
+			  prev = model.getPreviousEvent(original.getTime());
+	      
 		      if(prev != null)
 			  g.drawLine(adapter.getX(prev), adapter.getY(prev), x, y);
+
+		      if(next == original)
+			  next = model.getNextEvent(original);
 		  }
 	      else //normal paint
 		  if(selected)
@@ -151,7 +160,6 @@ public class IntegerEventRenderer implements ObjectRenderer {
 	    return (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
 	}
   }
-
 
   Rectangle eventRect = new Rectangle();
   Rectangle tempRect = new Rectangle();

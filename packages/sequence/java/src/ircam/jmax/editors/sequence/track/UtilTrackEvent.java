@@ -127,6 +127,15 @@ public class UtilTrackEvent implements Event, Drawable
 	this.value = value;
     }
 
+    public void setOriginal(TrackEvent evt)
+    {
+	trackEvent = evt;
+    }
+    public TrackEvent getOriginal()
+    {
+	return trackEvent;
+    }
+
     /* --------- Drawable interface ----------*/
 
     public ObjectRenderer getRenderer()
@@ -154,6 +163,7 @@ public class UtilTrackEvent implements Event, Drawable
     private double time;
     private EventValue value;
     private boolean inGroup = false;
+    private TrackEvent trackEvent;
 
     public static double DEFAULT_TIME = 0;
 }
