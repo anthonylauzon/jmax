@@ -418,10 +418,10 @@ public class ErmesSketchPad extends JPanel
     return minSize;
   }
 	
-  void makeObject( String description, int x, int y)
+  GraphicObject makeObject( String description, int x, int y)
   {
     FtsObject fo;
-    GraphicObject object;
+    GraphicObject object = null;
 
     try
       {
@@ -437,19 +437,6 @@ public class ErmesSketchPad extends JPanel
 	if (object instanceof Standard)
 	  ((Standard)object).errorChanged(false);
 
-	if (object instanceof Editable)
-	  {
-	    // The EditField is not really ready until the control
-	    // is returned back to the event loop; this is why we invoke textEditObject 
-	    // with an invoke later command.
-	    
-	    final Editable obj  = (Editable)object;
-	    
-	    SwingUtilities.invokeLater(new Runnable() {
-				       public void run()
-					 { textEditObject((Editable)obj);}});
-	  }
-
 	object.redraw();
       }
     catch ( FtsException ftse)
@@ -457,6 +444,8 @@ public class ErmesSketchPad extends JPanel
 	System.err.println( "ErmesSketchPad:mousePressed: INTERNAL ERROR: FTS Instantiation Error: " + ftse);
 	ftse.printStackTrace();
       }
+
+    return object;
   }
 
   /* Handling of the object text editing */
@@ -739,19 +728,35 @@ public class ErmesSketchPad extends JPanel
   }
 
   String newObjectDescription = null;
+  boolean newObjectEdit;
 
-  public void setAddModeInteraction(String description)
+  public void setAddModeInteraction(String description, String message, boolean edit)
   {
     newObjectDescription = description;
+    newObjectEdit = edit;
+    showMessage(message);
 
     stopTextEditing();
     setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
     engine.setTopInteraction(Interactions.addModeInteraction);
   }
 
-  public void makeAddModeObject(int x, int y)
+  public void makeAddModeObject(int x, int y, boolean edit)
   {
-    makeObject(newObjectDescription, x, y);
+    GraphicObject object = makeObject(newObjectDescription, x, y);
+
+    if (edit && newObjectEdit && (object instanceof Editable))
+      {
+	// The EditField is not really ready until the control
+	// is returned back to the event loop; this is why we invoke textEditObject 
+	// with an invoke later command.
+	
+	final Editable obj  = (Editable)object;
+	
+	SwingUtilities.invokeLater(new Runnable() {
+	  public void run()
+	    { textEditObject((Editable)obj);}});
+      }
   }
 
   public  InteractionEngine getEngine()
@@ -889,5 +894,13 @@ public class ErmesSketchPad extends JPanel
   public void resetMessage()
   {
     itsSketchWindow.resetMessage();
+  }
+
+  public void repaint(int x, int y, int h, int w)
+  {
+    //System.err.println("Repaint " + x + " " + y + " " + h + " " + w);
+    //Thread.dumpStack();
+
+    super.repaint(x, y, h, w);
   }
 }

@@ -9,15 +9,17 @@ import ircam.jmax.editors.patcher.*;
 class ErmesToolButton extends JToggleButton 
 {
   String description;
+  String message;
   ErmesToolBar  toolBar;
 
-  ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon)
+  ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String message)
   {
     super( theIcon);
 
     setDoubleBuffered( false);
     setMargin( new Insets(0,0,0,0));
     this.description = description;
+    this.message = message;
     this.toolBar = toolBar;
 
     addChangeListener(new ChangeListener()
@@ -32,6 +34,11 @@ class ErmesToolButton extends JToggleButton
   String getDescription()
   {
     return description;
+  }
+
+  String getMessage()
+  {
+    return message;
   }
 }
 

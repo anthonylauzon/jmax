@@ -22,13 +22,15 @@ public class AddPopUp extends JPopupMenu
 
   static class AddPopUpListener implements ActionListener
   {
+    boolean edit;
     String descr;
-    AddPopUp popup;
+    String message;
 
-    AddPopUpListener(String descr, AddPopUp popup)
+    AddPopUpListener(String descr, String message, boolean edit)
     {
       this.descr = descr;
-      this.popup = popup;
+      this.message = message;
+      this.edit = edit;
     }
 
     public void actionPerformed( ActionEvent e)
@@ -36,20 +38,21 @@ public class AddPopUp extends JPopupMenu
       Component invoker;
       
       invoker = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
-      ((ErmesSketchPad) invoker).makeObject(descr, popup.x, popup.y);
+      ((ErmesSketchPad) invoker).setAddModeInteraction(descr, message, edit);
     }
   };
 
   static class AddPopUpSubMenuListener implements ActionListener
   {
-
+    boolean edit;
     String descr;
-    AddPopUp popup;
+    String message;
 
-    AddPopUpSubMenuListener(String descr, AddPopUp popup)
+    AddPopUpSubMenuListener(String descr, String message, boolean edit)
     {
       this.descr = descr;
-      this.popup = popup;
+      this.message = message;
+      this.edit  = edit;
     }
 
     public void actionPerformed( ActionEvent e)
@@ -61,8 +64,7 @@ public class AddPopUp extends JPopupMenu
       menu    = ((JPopupMenu) ((JMenuItem)e.getSource()).getParent()).getInvoker();
       invoker = ((JPopupMenu) menu.getParent()).getInvoker();
 
-      ((ErmesSketchPad) invoker).setAddModeInteraction(descr);
-      // ((ErmesSketchPad) invoker).makeObject(descr, popup.x, popup.y);
+      ((ErmesSketchPad) invoker).setAddModeInteraction(descr, message, edit);
     }
   };
 
@@ -81,8 +83,7 @@ public class AddPopUp extends JPopupMenu
     popup.show(invoker, x - 2, y - 2);
   }
 
-
-  static public void addAbbreviation(String cmd, String descr)
+  static public void addAbbreviation(String cmd, String descr, String message, boolean edit)
   {
     JMenuItem item;
 
@@ -91,7 +92,7 @@ public class AddPopUp extends JPopupMenu
     else
       item = new JMenuItem(cmd);
 
-    item.addActionListener(new AddPopUpListener(descr, popup));
+    item.addActionListener(new AddPopUpListener(descr, message, edit));
     popup.add(item);
   }
 
@@ -114,7 +115,7 @@ public class AddPopUp extends JPopupMenu
     return menu;
   }
 
-  static public void addAbbreviation(String menuName, String cmd, String descr)
+  static public void addAbbreviation(String menuName, String cmd, String descr, String message, boolean edit)
   {
     JMenuItem item;
     JMenu menu;
@@ -129,7 +130,7 @@ public class AddPopUp extends JPopupMenu
     else
       item = new JMenuItem(cmd);
 
-    item.addActionListener(new AddPopUpSubMenuListener(descr, popup));
+    item.addActionListener(new AddPopUpSubMenuListener(descr, message, edit));
     menu.add(item);
   }
 }

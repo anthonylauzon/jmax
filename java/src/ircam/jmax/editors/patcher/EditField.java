@@ -201,16 +201,18 @@ public class EditField extends JTextArea
 
     getDocument().removeDocumentListener(listener);
 
+    setVisible(false);
+
+    owner.redraw();
+    owner.redrawConnections();
+
     if (! owner.getArgs().equals(aTextString) )
       {
-	owner.redraw();
-	owner.redrawConnections();
 	owner.redefine(aTextString);
-	owner.redraw();
-	owner.redrawConnections();
       } 
 
-    setVisible(false);
+    owner.redraw();
+    owner.redrawConnections();
 
     sketch.requestFocus();
     owner = null;

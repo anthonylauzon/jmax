@@ -51,8 +51,11 @@ class DragSelectInteraction extends Interaction
       }
     else if (Squeack.isUp(squeack))
       {
-	editor.getDisplayList().noDrag();
-	editor.getDisplayList().redrawDragRectangle();
+	if (dragged)
+	  {
+	    editor.getDisplayList().noDrag();
+	    editor.getDisplayList().redrawDragRectangle();
+	  }
 	editor.endInteraction();
       }
   }

@@ -28,6 +28,12 @@ class DragReverseConnectInteraction extends Interaction
 
   private void doConnection(ErmesSketchPad editor, GraphicObject src, int outlet, GraphicObject dst, int inlet)
   {
+    if (src == dst)
+      {
+	editor.showMessage("Cannot connect an object to itself !");
+	return;
+      }
+
     try
       {
 	FtsConnection fc;

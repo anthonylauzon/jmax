@@ -104,7 +104,7 @@ public class ErmesToolBar extends JPanel  {
 	  selectedButton.setSelected(false);
 
 	selectedButton = button;
-	sketch.setAddModeInteraction(selectedButton.getDescription());
+	sketch.setAddModeInteraction(selectedButton.getDescription(), selectedButton.getMessage(), true);
       }
     else
       {
@@ -135,23 +135,23 @@ public class ErmesToolBar extends JPanel  {
     cardLayout.show( cards, locked ? "lock" : "edit");
   }
 
-  private void addButton( String descr, String iconName)
+  private void addButton( String descr, String iconName, String message)
   {
-    toolBar.add( new ErmesToolButton(this, descr, Icons.get(iconName)));
+    toolBar.add( new ErmesToolButton(this, descr, Icons.get(iconName), message));
   }
 
   private void insertButtons()
   {
-    addButton( "", "_object_");
-    addButton( "messbox", "_message_box_");
-    addButton( "jpatcher", "_patcher_");
-    addButton( "inlet -1", "_inlet_");
-    addButton( "outlet -1","_outlet_");
-    addButton( "comment", "_comment_");
-    addButton( "button",  "_button_");
-    addButton( "toggle",  "_toggle_");
-    addButton( "slider",  "_slider_");
-    addButton( "intbox",   "_intbox_");
-    addButton( "floatbox", "_floatbox_");
+    addButton( "", "_object_", "Adding New Object");
+    addButton( "messbox", "_message_box_", "Adding New Message Box");
+    addButton( "jpatcher", "_patcher_", "Adding New Patcher");
+    addButton( "inlet -1", "_inlet_", "Adding New Inlet");
+    addButton( "outlet -1","_outlet_",  "Adding New Outlet");
+    addButton( "comment", "_comment_","Adding New Comment");
+    addButton( "button",  "_button_", "Adding New Button");
+    addButton( "toggle",  "_toggle_", "Adding New Toggle");
+    addButton( "slider",  "_slider_", "Adding New Slider");
+    addButton( "intbox",   "_intbox_", "Adding New Integer Box");
+    addButton( "floatbox", "_floatbox_", "Adding New Float Box");
   }
 }

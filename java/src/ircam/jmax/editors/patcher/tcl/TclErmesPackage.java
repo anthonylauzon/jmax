@@ -35,7 +35,7 @@ public class TclErmesPackage
 
     /* TCL generic */
 
-    interp.createCommand("abbreviation", new AbbreviationCmd());
+    interp.createCommand("patcherMenu", new AbbreviationCmd());
   }
 }
 

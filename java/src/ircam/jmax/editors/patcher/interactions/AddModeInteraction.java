@@ -26,12 +26,13 @@ class AddModeInteraction extends Interaction
     switch (squeack)
       {
       case (Squeack.DOWN | Squeack.SHIFT):
-	editor.makeAddModeObject(mouse.x, mouse.y);
+	editor.makeAddModeObject(mouse.x, mouse.y, false);
 	break;
 
     case Squeack.DOWN:
-	editor.makeAddModeObject(mouse.x, mouse.y);
+	editor.makeAddModeObject(mouse.x, mouse.y, true);
 	editor.setCursor(Cursor.getDefaultCursor());
+	editor.resetMessage();
 	editor.setEditModeInteraction();
 	break;
       }
