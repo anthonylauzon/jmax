@@ -192,11 +192,15 @@ public class ErmesObjEditField extends TextArea implements KeyListener, FocusLis
 	  s = s1+k+s2;
 	}
 	else//inserisce testo in coda
+	  //System.err.println("stringa "+s+" lunga "+GetCurrentLineWidth(fm,s)+" ricevuto "+k+" totale: "+GetCurrentLineWidth(fm, s+k));
 	  s = s+k;
-	
+	if (k==Platform.DELETE_KEY || 
+	    k==Platform.BACKSPACE_KEY ||
+	    ErmesSketchWindow.isAnArrow(e.getKeyCode())) return;
 	aCurrentLineWidth = GetCurrentLineWidth(fm, s);
 	aWidth = itsOwner.itsFontMetrics.getMaxAdvance();
 	if (aCurrentLineWidth >= getSize().width-20) {  
+	  //System.err.println("allargo");
 	  int step;
 	  if(aWidth>20) step = aWidth;
 	  else step = 30;

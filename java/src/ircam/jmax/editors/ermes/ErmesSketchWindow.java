@@ -772,7 +772,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   ////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////// keyListener --fine
 
-  public boolean isAnArrow(int code) {
+  public static boolean isAnArrow(int code) {
     return (code == Platform.LEFT_KEY ||
 	     code == Platform.RIGHT_KEY ||
 	     code == Platform.UP_KEY ||
