@@ -7,7 +7,6 @@ import java.util.*;
 import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
-import ircam.jmax.utils.GlobalProbe;
 
 
 // The base class of all the graphic objects on the sketch.

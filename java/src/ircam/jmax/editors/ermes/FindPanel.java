@@ -32,14 +32,21 @@ class FindPanel extends JFrame {
   {
     super( "Find Panel");
 
-    JPanel p1 = new JPanel();
-    p1.setBorder( new EmptyBorder(5,5,5,5));
-    p1.setLayout( new BoxLayout( p1, BoxLayout.X_AXIS));
+    JPanel labelPanel = new JPanel();
+
+    labelPanel.setBorder( new EmptyBorder( 15, 15, 15, 15));
+    labelPanel.setLayout( new BoxLayout( labelPanel, BoxLayout.X_AXIS));
+    labelPanel.setOpaque( false);
 
     JLabel label = new JLabel("Find: ");
     label.setHorizontalTextPosition(label.RIGHT);
+    label.setDisplayedMnemonic('T');
+    label.setToolTipText("The labelFor and displayedMnemonic properties work!");
 
-    textField = new JTextField("");
+    textField = new JTextField( 30);
+
+    textField.setBackground( Color.white); // ???
+
     label.setLabelFor( textField);
     textField.getAccessibleContext().setAccessibleName( label.getText());
     textField.addActionListener( new ActionListener() {
@@ -49,25 +56,21 @@ class FindPanel extends JFrame {
 	}
     });
 
-    p1.add( label);
-    p1.add( textField);
+    labelPanel.add( label);
+    labelPanel.add( textField);
 
     objectSetViewer = new ObjectSetViewer();
 
-//     JPanel p2 = new JPanel();
-//     p2.setLayout( new BoxLayout( p2, BoxLayout.Y_AXIS));
-
-//     p2.add( objectSetViewer);
-
     JPanel findPanel = new JPanel();
-    findPanel.setBorder( new EmptyBorder( 5, 5, 5, 5) );
     findPanel.setLayout( new BoxLayout( findPanel, BoxLayout.Y_AXIS));
-    findPanel.setAlignmentX(LEFT_ALIGNMENT);
+    findPanel.setBorder( new EmptyBorder( 5, 5, 5, 5) );
+    findPanel.setAlignmentX( LEFT_ALIGNMENT);
+    //findPanel.setOpaque( false);
 
-    findPanel.add( p1);
-    //    findPanel.add( p2);
+    findPanel.add( labelPanel);
     findPanel.add( objectSetViewer);
 
+    //setSize( 300, 300);
     getContentPane().add( findPanel);
 
     pack();

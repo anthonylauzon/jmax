@@ -12,6 +12,7 @@ import ircam.jmax.utils.*;
  * The "bang" graphic object.
  */
 class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
+
   boolean itsFlashing = false;
   Color   itsFlashColor = Color.yellow;
   static Dimension preferredSize = new Dimension(20,20);
@@ -76,28 +77,28 @@ class ErmesObjBang extends ErmesObject implements FtsPropertyHandler {
   }
 
 	
-  public void Paint_specific(Graphics g)
+  public void Paint_specific( Graphics g) 
   {
-    if (! itsFlashing)
+    if( !itsFlashing)
       {
-	if(! itsSelected)
-	  g.setColor(itsUINormalColor);
-      else
-	g.setColor(itsUISelectedColor);
+	if ( !itsSelected) 
+	  g.setColor( itsUINormalColor);
+	else 
+	  g.setColor( itsUISelectedColor);
       }
     else
       {
-	g.setColor(itsFlashColor);
+	g.setColor( Color.yellow);
       }
 
-    g.fillRect(getItsX()+1,getItsY()+1, getItsWidth()-2,  getItsHeight()-2);
-    g.fill3DRect(getItsX()+2,getItsY()+2, getItsWidth()-4,  getItsHeight()-4, true);
+    g.fillRect( getItsX() + 1, getItsY() + 1, getItsWidth() - 2,  getItsHeight() - 2);
+    g.fill3DRect( getItsX() + 2, getItsY() + 2, getItsWidth() - 4,  getItsHeight() - 4, true);
     g.setColor(Color.black);
-    g.drawRect(getItsX(), getItsY(), getItsWidth()-1, getItsHeight()-1);
-    g.drawOval(getItsX()+5, getItsY()+5, getItsWidth()-10, getItsHeight()-10);
- 
-    if(! itsSketchPad.itsRunMode) 
-      g.fillRect(getItsX()+getItsWidth()-DRAG_DIMENSION,getItsY()+getItsHeight()-DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
+    g.drawRect( getItsX(), getItsY(), getItsWidth() - 1, getItsHeight() - 1);
+    g.drawOval( getItsX() + 5, getItsY() + 5, getItsWidth() - 10, getItsHeight() - 10);
+
+    if( !itsSketchPad.itsRunMode) 
+      g.fillRect( getItsX() + getItsWidth() -DRAG_DIMENSION, getItsY() + getItsHeight() - DRAG_DIMENSION, DRAG_DIMENSION, DRAG_DIMENSION);
   }
 
 	
