@@ -6,7 +6,7 @@ package_JAVA= Sequence.java
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@
 JAVAROOT= $(top_builddir)/packages/sequence/java
-CLASSPATH_ENV= CLASSPATH=$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
+CLASSPATH_ENV= CLASSPATH=$(CLASSPATH):$(JAVAROOT):$(top_builddir)/java/src:$(top_builddir)/client/java/ftsclient.jar
 
 jardir=$(pkgdatadir)/packages/sequence/java
 JARFILE= sequence.jar
