@@ -54,11 +54,9 @@
   <li> <a href="#System Methods">System Methods</a>
   <li> <a href="#Outlet Typing">Outlet Typing</a>
   <li> <a href="#Classes">Classes</a>
-  <li> <a href="#Metaclasses and Class Instantiation">Metaclasses and Class Instantiation</a>
-  <li> <a href="#Metaclasses Creation and Installation">Metaclasses Creation and Installation</a>
-  <li> <a href="#Complete Examples">Complete Examples</a>
-  <li> <a href="#Generic Metaclasses">Generic Metaclasses</a>
+  <li> <a href="#Metaclasses">Metaclasses</a>
   <li> <a href="#Object And Class Properties">Object And Class Properties</a>
+  <li> <a href="#Examples">Examples</a>
 </ul>
 
 <p>
@@ -71,11 +69,11 @@
 <a name="disclaimer"> <H2> Disclaimer </H2> </a>
 
 <p>
-The API presented here is subject to small changes.
+The API presented here may be subject to small changes.
 
 <p>
 This first version of the documentation is adapted from the <quote>FTS Message System 
-Programming Guide</quote> and some inconsistancies may subsist.
+Programming Guide</quote> and some inconsistencies may subsist.
 
 
 <!-- ---------------------------------------------------------------------- -->
@@ -104,11 +102,11 @@ of arguments which are <i>atoms</i>
 <li> <i>inlets</i> and <i>outlets</i> :to each object is associated a set of receptors, the 
 inlets and a set of emitters, the outlets. An inlet receives messages and messages can be emitted
 on outlets
-<li> <i>methods</i> : the reception of a message on an inlet trigs the call of a method. A FTS
+<li> <i>methods</i> : the reception of a message on an inlet triggers the call of a method. A FTS
 method is a C function with a particular signature
 <li> <i>classes</i> : a FTS class is a set of objects having a common <i>interface</i>
 regarding the object model
-<li> <i>metaclasses</i> : a FTS metaclass is a set of classes sharing common behaviour
+<li> <i>metaclasses</i> : a FTS metaclass is a set of classes sharing common behavior
 </ul>
 
 
@@ -241,7 +239,7 @@ argument is optional.
 <p>
 <b>Attention !!!</b> It is strongly recommended to use the arguments access
 macros. Accessing directly the members of the <code>fts_atom_t</code> structure
-is garanteed not to work across different releases of FTS, because <code>fts_atom_t</code>
+is guaranteed not to work across different releases of FTS, because <code>fts_atom_t</code>
 implementation may change.
 
 <p>
@@ -373,7 +371,7 @@ array
 <p>
 <b>Attention !!!</b> It is strongly recommended to use the atoms setting
 macros to format the arguments. Accessing directly the members of the <code>fts_atom_t</code> structure
-is garanteed not to work across different releases of FTS, because <code>fts_atom_t</code>
+is guaranteed not to work across different releases of FTS, because <code>fts_atom_t</code>
 implementation may change.
 
 
@@ -422,7 +420,7 @@ is used when the passed string is not a constant.
 
 <p>
 As sending <code>bang</code>, <code>int</code>, <code>float</code> and <code>symbol</code> messages is
-very frequent, a number of shorcuts have been defined:
+very frequent, a number of shortcuts have been defined:
 <ul>
 <li> <code>fts_outlet_bang( fts_object_t *<i>object</i>, int <i>woutlet</i>)</code>
 <li> <code>fts_outlet_int( fts_object_t *<i>object</i>, int <i>woutlet</i>, int <i>value</i>)</code>
@@ -486,7 +484,7 @@ the method : a function having the signature already defined
 <dt> <i> argc</i> <dd> 
 the count of expected arguments
 <dt> <i> argtypes</i> <dd> 
-the types of expected arguments : the type checking mechanism will be detailled 
+the types of expected arguments : the type checking mechanism will be detailed 
 later
 </dl>
 
@@ -593,7 +591,7 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 
 <p>
 Some of the methods of a class can be "system" methods, handling
-system level functions. These functions are now : object initialisation 
+system level functions. These functions are now : object initialization 
 and deletion, objects connection and disconnection.
 
 
@@ -614,10 +612,10 @@ identical to standard methods.
 <a name="The init Method"><h3>The <code>init</code> Method</h3></a>
 
 <p>
-The init method handles the initialisation of an object, but doesn't need to handle
+The init method handles the initialization of an object, but doesn't need to handle
 memory allocation. It is very similar to a C++ <i>constructor</i>. If it is defined,
 it is called
-automaticaly by the system when an object is created. 
+automatically by the system when an object is created. 
 
 
 <p>
@@ -733,7 +731,7 @@ The type of an outlet will be used by the system
 to do a type checking, at connection-time and at run-time (when needed).
 
 <p>
-Outlet typing do not affect the efficency of method calling; the method dispatching
+Outlet typing do not affect the efficiency of method calling; the method dispatching
 use a entry dynamic cache that optimize methods calls for all objects,
 not only statically type ones.
 
@@ -771,6 +769,7 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 <p>
 The definition of a class is the definition of :
 <ul>
+<li> its name
 <li>the size of the objects of the class
 <li>the number of inlets of the objects of the class
 <li>the number of outlets of the objects of the class
@@ -783,25 +782,69 @@ It comes from this definition that all objects of a class have <i>same</i>
 number of inlets and outlets. The mechanism for having variable number of inlets
 and outlets is the <i>metaclass</i> described below.
 
-
 <p>
-The function that defines a class is called the <i>instantiation function</i>. 
+When a new class is installed, it is not fully initialized. The complete initialization
+will be done on demand, at the first instantiation of the class (i.e. when the first 
+object of the class is created). The function that is responsible for this task
+is called the <i>instantiation function</i>. 
 
 
 <ul>
+<li> <a href="#Class Installation">Class Installation</a>
 <li> <a href="#The Class Instantiation Function">The Class Instantiation Function</a>
 <li> <a href="#The fts_class_init Function">The <code>fts_class_init</code> Function</a>
 <li> <a href="#Class Instantiation Function Example">Class Instantiation Function Example</a>
 </ul>
 
 
-<a name="The Class Instantiation Function"><h3>The Class Instantiation Function</h3></a>
+<a name="Class Installation"><h3>Class Installation</h3></a>
 
+<p>
+A class is installed with the <code>fts_class_install</code> function, that declares its
+name and its instantiation function.
+
+<p>
+<code>fts_status_t fts_class_install( fts_symbol_t <i>name</i>, fts_instantiate_fun_t <i>instantiate_fun</i>)</code>
+
+<p>
+The arguments of <code>fts_class_install</code> have the following meaning :
+<dl>
+ <dt> <i> name</i>
+  <dd> the name of the class
+ <dt> <i> instantiate_fun</i>
+  <dd> the instantiation function of the class
+</dl>
+
+<p>
+For simplicity, aliases (usually abbreviations) can be defined for a class name, using the 
+<code>fts_class_alias</code> function: <br>
+<code>void fts_class_alias( fts_symbol_t <i>new_name</i>, fts_symbol_t <i>old_name</i>)</code> <br>
+After a call to <code>fts_class_alias</code>, the name <i>new_name</i>, when used as a class name, 
+will be automatically substituted by <i>old_name</i>.
+
+
+<p>
+Below is an example of use of the <code>fts_class_install</code> and <code>fts_class_alias</code>
+functions:
+<pre>
+void integer_config( void)
+{
+  /* Install the metaclass "integer" */
+  fts_class_install( fts_new_symbol( "integer"), integer_instantiate);
+
+  /* Register "i" to be an alias for "integer" */
+  fts_class_alias( fts_new_symbol( "i"), fts_new_symbol( "integer"));
+}
+</pre>
+
+
+<a name="The Class Instantiation Function"><h3>The Class Instantiation Function</h3></a>
 
 <p>
 The signature of a class instantiation function is the following :
 
-<code>fts_status_t <i>my_class_instantiate</i>( fts_class_t *<i>class</i>, int <i>ac</i>, fts_atom_t *<i>at</i>)</code> <p>
+<p>
+<code>fts_status_t <i>my_class_instantiate</i>( fts_class_t *<i>class</i>, int <i>ac</i>, fts_atom_t *<i>at</i>)</code> 
 
 <p>
 The arguments of the class instantiation function have the following meaning :
@@ -811,8 +854,8 @@ the class that is to be defined
 <dt> <i> ac</i> <dd> 
 the number of arguments
 <dt> <i> at</i> <dd> 
-the arguments array. The contents of these arguments will be discussed in 
-the Class Instantiation Process description.
+the arguments array. These are the creation arguments of the first object of the class, and
+are usually meaningless for a class.
 </dl>
 
 
@@ -848,6 +891,7 @@ the number of outlets of the objects of the class
 this argument will be simply stored in the fts_class_t structure, giving
 a simple way to share datas between all the objects of a class
 </dl>
+
 
 <a name="Class Instantiation Function Example"><h3>Class Instantiation Function Example</h3></a>
 
@@ -897,34 +941,35 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 <!-- ---------------------------------------------------------------------- -->
 <p>
 <hr>
-<a name="Metaclasses and Class Instantiation"><h2>Metaclasses and Class Instantiation</h2></a>
+<a name="Metaclasses"><h2>Metaclasses</h2></a>
 
 
 <p>
-A metaclass is a definition of a set of classes having common behaviour and
+A metaclass is a definition of a set of classes having common behavior and
 sharing the same <i>instantiation function</i>.
 To a metaclass is associated a base of already instantiated classes.
 A class is instantiated when an object is created, following the
-<i>class instantiation</i> process which is described bellow.
+<i>metaclass instantiation</i> process described bellow.
 
 
 <p>
 <ul>
-<li> <a href="#Class Instantiation Process">Class Instantiation Process </a>
+<li> <a href="#Metaclass Instantiation Process">Metaclass Instantiation Process </a>
 <li> <a href="#Equivalence Functions">Equivalence Functions</a>
 <li> <a href="#Existing Equivalence Functions">Existing Equivalence Functions</a>
 <li> <a href="#Example of Equivalence Function">Example of Equivalence Function</a>
+<li> <a href="#Metaclasses Installation">Metaclasses Installation</a>
 </ul>
 
 
-<a name="Class Instantiation Process"><h3>Class Instantiation Process</h3></a>
+<a name="Metaclass Instantiation Process"><h3>Metaclass Instantiation Process</h3></a>
 
 <p>
-The class instantiation process is based on the following assumption : the decision that
+The metaclass instantiation process is based on the following assumption : the decision that
 2 objects are in the same class can be made by comparing the objects creation arguments <i>only</i>.
 
 <p>
-A class is <i>instanciated</i> on demand, when an object is created,
+A metaclass is <i>instantiated</i> on demand, when an object is created,
 through the following steps :
 <ul>
 <li>the base of classes of the metaclass is searched for a candidate class by 
@@ -998,16 +1043,10 @@ functions are described in the table below.
   <dd> 
    return true (i.e. not zero) if the numbers of arguments are the same.
 
-  <dt> <i> fts_always_equiv</i>
-    <dd> 
-      Always return true (i.e. not zero). Using this equivalence function means that there will be
-      only one class instanciated. This is the case for standard objects with fixed numbers of
-      inlets and oulets.
-
   <dt> <i> fts_never_equiv</i> 
    <dd> 
     Always return false  (i.e.zero). Using this equivalence function means that there will be 
-    a new class instanciated for each object instantiated. This is usefull as a first "coarse"
+    a new class instantiated for each object instantiated. This is useful as a first "coarse"
     implementation of a metaclass.
 </dl>
 
@@ -1091,129 +1130,35 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
 
 
 
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Metaclasses Creation and Installation"><h2>Metaclasses Creation and Installation</h2></a>
+<a name="Metaclasses Installation"><h3>Metaclasses Installation</h3></a>
 
 <p>
-A metaclass is created with the following function:
-
-<pre>
-fts_metaclass_t *fts_metaclass_create(fts_symbol_t <i>name</i>,
-		     fts_method_instantiate_t </i>instantiate_function</i>,
-		     fts_method_equiv_t <i>equiv_function</i>);
-</pre>
+A metaclass is installed with the following function:<br>
+<code>fts_metaclass_t *fts_metaclass_create(fts_symbol_t <i>name</i>, fts_instantiate_fun_t <i>instantiate_function</i>, fts_equiv_fun_t <i>equiv_function</i>)</code>
 
 <p>
 The metaclass is named <i>name</i>; </i>instantiate_function</i> will be used
 to instantiate new classes, and <i>equiv_function</i> will be its equivalence
 function.
-Different metaclasses can have the same name; see <a href="#Generic Metaclasses">Generic Metaclasses</a>.
 
 <p>
-For simplicity, it can be convenient to have multiple names (usually
-abbreviation) for the same kind of object; the standard way to do this
-in FTS is to declare an alias to a name, with the following function:
-
-<pre>
-void
-fts_metaclass_alias(fts_symbol_t <i>new_name</i>, fts_symbol_t <i>old_name</i>)
-</pre>
+As for classes, metaclasses can be aliased, using the <code>fts_metaclass_alias</code>
+function: <br>
+<code>void fts_metaclass_alias( fts_symbol_t <i>new_name</i>, fts_symbol_t <i>old_name</i>) </code> <br>
+This function has the same behavior as <code>fts_class_alias</code>.
 
 <p>
-After the call to <code>fts_metaclass_alias</code>, the name
-<i>new_name</i>, when used as a metaclass name, will be always
-automatically substituted by <i>old_name</i>.  Since more metaclasses
-can have the same name, this is not equivalent to say that a
-meta-class can have multiple names; i.e. all the metaclass with the
-same name will share the same set of aliases.
-
+Below is an example of a metaclass installation:
 <pre>
-void
-integer_config(void)
+void bangbang_config(void)
 {
-  /* create the class 'integer' */
+  /* Install the metaclass "bangbang" */
+  fts_metaclass_install( fts_new_symbol("bangbang"), bangbang_instantiate, bangbang_equiv);
 
-  fts_metaclass_create(fts_new_symbol("int"),integer_instantiate, fts_always_equiv);
-
-  /* ... and register 2 aliases for the "int" name: "i" and "integer" */
-
-  fts_metaclass_alias(fts_new_symbol("integer"), fts_new_symbol("int"));
-  fts_metaclass_alias(fts_new_symbol("i"), fts_new_symbol("int"));
+  /* Register "bb" to be an alias for "bangbang" */
+  fts_metaclass_alias( fts_new_symbol("bb"), fts_new_symbol("bangbang"));
 }
 </pre>
-
-<hr> <a name="Complete Examples"><h2>Complete Examples</h2></a>
-
-<a href="integer.c">Source of the <code>integer</code> object</a>
-<p>
-
-<a href="bangbang.c">Source of the <code>bangbang</code> object</a>
-<p>
-
-
-
-
-<!-- ---------------------------------------------------------------------- -->
-<p>
-<hr>
-<a name="Generic Metaclasses"><h2>Generic Metaclasses</h2></a>
-
-
-<p>
-In some cases, objects with the same name correspond to behaviour that are
-so different to sugger a completely distinct implementation; in other case,
-a programmer would like to add a new behaviour to the same object name,
-without modifing the existing implementation.
-
-<p>
-The FTS message system provide a way to view different metaclasses as
-the implementation of a single metaclass, the generic metaclass.
-
-<p>
-The term "generic" derive from the generic programming technique; if
-we see FTS objects as the operator and statements of a program
-represented by the FTS patches, then a generic operator (in the object
-oriented programming sense) can be implemented with a generic
-metaclass; for example, the "+" operator on control message means
-correspond to two actual operations depending on the argument being an
-int or a float; so "+ 1" and "+ 1.0" correspond to two different
-operations, but to the same, generic, operator.
-
-<p>
-Generic operators can be (and are, for object like "+") implemented
-using generic metclasses.
-
-<p>
-The principle is the following: if more than one class with the same
-name exists, the class instatiation algorithm explained in <a
-href="#Metaclasses and Class Instantiation">Metaclasses and Class
-Instantiation</a> is followed with the first class found; in case
-of failure of the class instantiation function, i.e. in the case the 
-class instantiation function do not return <code>fts_Success</code>,
-the next metaclass with the same name is tryed, and so on.
-
-<p>
-If you design a metaclass so to be extensible or modularly integrable
-in a generic metaclass, you should be carefull in testing the argument
-in the instation function and to return an error in case the metaclass
-cannot implement the requested class; FTS do not provide a declarative
-method to discriminate between different metaclasses in order to leave
-the most generic flexibility in generic metaclasses design; for example,
-a metaclass can overide the behaviour of an existing metaclass for
-a specific value of its argument, for example to provide an optimized
-implementation of a specific special case.
-
-<p>
-The <code>fts_metaclass_create</code> function always add the new
-metaclass at the end of the class list; in order to add a new
-behaviour on top of an existing class, the
-<code>fts_metaclass_create_override</code> function should be used;
-this function behave exactly like <code>fts_metaclass_create</code>,
-but add the new metaclass at the beginning of the list, so that it is
-allowed to override the behaviour of existing classes.
-
 
 
 <!-- ---------------------------------------------------------------------- -->
@@ -1230,7 +1175,7 @@ that are valid for all the object instance of the class.
 
 <p>
 Also, the property system is extended with standard AI like constraint
-progagation and daemon techniques: putting a property or getting a property
+propagation and daemon techniques: putting a property or getting a property
 from an object can transparently activate a  number of functions that
 propagate the properties in the object network.
 
@@ -1240,6 +1185,20 @@ optimization and features in the DSP compiler.
 
 <p>
 Its API is not currently documented.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<p>
+<hr>
+<a name="Examples"><h2>Examples</h2></a>
+
+<a href="integer.c">Source of the <code>integer</code> object</a>
+<p>
+
+<a href="bangbang.c">Source of the <code>bangbang</code> object</a>
+<p>
+
+
 
 <!-- ---------------------------------------------------------------------- -->
 
