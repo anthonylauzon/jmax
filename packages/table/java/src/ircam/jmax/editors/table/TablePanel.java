@@ -47,7 +47,7 @@ import javax.swing.undo.*;
  * This class takes care of creating all the components of an editing session
  * (tools, Renderer, ...) and link them togheter.
  */
-public class TablePanel extends JPanel implements ToolbarProvider, ToolListener, StatusBarClient, TableDataListener, Editor{
+public class TablePanel extends JPanel implements ToolProvider, ToolListener, StatusBarClient, TableDataListener, Editor{
 
   //--- Fields  
   static Vector tools;
@@ -66,6 +66,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   TableRenderer itsTableRenderer;
   TableDataModel tm;
   TableDisplay itsCenterPanel;
+  ToolManager toolManager;
 
   static boolean toolbarAnchored = true;
   Box toolbarPanel;
@@ -91,6 +92,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     instance = this;
     itsEditorContainer = container;
 
+
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
     setBackground(Color.white);
@@ -107,7 +109,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     gc = new TableGraphicContext(tm);
     prepareGraphicContext();
 
-    //... the panel that will contain the toolbar
+    //... the panel that contains the toolbar, the tools, and the ToolManager
     prepareToolbarPanel();
 
 
@@ -139,7 +141,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //the repaints due to selection's ownership change are
     //handled in the SelectionLayer level of the RenderManager
  
-    initTools();
   }
 
 
@@ -147,29 +148,43 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
    * Prepare the panel containing the toolbar AND the scale */
   private void prepareToolbarPanel()
   {
-    // toolbarPanel is a Box containing the toolbar 
-    // scalePanel is a Box containing the scale
-
-    toolbarPanel = new Box(BoxLayout.Y_AXIS) {
-      public Dimension getMinimumSize()
-	{
-	  return toolbarDimension;
-	}
+      initTools();
+      toolManager = new ToolManager(this);
       
-      public Dimension getPreferredSize()
-	{
-	  return toolbarDimension;
-	}
-    };
-
-    toolbarPanel.setSize(toolbarDimension.width, toolbarDimension.height);
-    
-    scalePanel = new ScalePanel();
-
-    scalePanelFont = new Font(getFont().getName(), Font.BOLD, 10);
-    scalePanel.setBorder(new EtchedBorder());
+      // toolbarPanel is a Box containing the toolbar 
+      // scalePanel is a Box containing the scale
+      
+      toolbarPanel = new Box(BoxLayout.Y_AXIS) {
+	  public Dimension getMinimumSize()
+	  {
+	      return toolbarDimension;
+	  }
+	  
+	  public Dimension getPreferredSize()
+	  {
+	      return toolbarDimension;
+	  }
+      };
+      
+      toolbarPanel.setSize(toolbarDimension.width, toolbarDimension.height);
+      
+      Component c = prepareToolbar();
+      toolbarPanel.add(c);
+      
+      scalePanel = new ScalePanel();
+      
+      JPanel mess = new JPanel();
+      mess.setLayout(new BorderLayout());
+      mess.add(BorderLayout.WEST, toolbarPanel);
+      mess.add(BorderLayout.EAST, scalePanel);
+      add(mess, BorderLayout.WEST);
+      
+      scalePanelFont = new Font(getFont().getName(), Font.BOLD, 10);
+      scalePanel.setBorder(new EtchedBorder());
   }
   
+
+
   /** The scale panel on the left */
   class ScalePanel extends JPanel {
       
@@ -272,12 +287,10 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
    * The EditorToolbar class uses the Frame information
    * in order to correctly map graphic contexts on windows.
    */
-  public EditorToolbar prepareToolbar() 
+  private Component prepareToolbar() 
   {
 
-    gc.setFrame(GraphicContext.getFrame(this));
-
-    tb = new EditorToolbar(this, EditorToolbar.VERTICAL);
+    tb = new EditorToolbar(toolManager, EditorToolbar.VERTICAL);
     tb.setFloatable(false);
     
     gc.setToolbar(tb);
@@ -315,26 +328,23 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     
     c.setSize(30, 200);
     
-    toolbarPanel.add(c);
-
-    JPanel mess = new JPanel();
-    mess.setLayout(new BorderLayout());
-    mess.add(BorderLayout.WEST, toolbarPanel);
-    mess.add(BorderLayout.EAST, scalePanel);
-    add(mess, BorderLayout.WEST);
-
-    
     if ( toolbarAnchored)
       {
 	tb.setSize(30, 200);
 	c.add(tb, BorderLayout.CENTER);
       }
 
-    tb.addToolListener(this);
-    itsStatusBar.post(tb.getTool(), "");
 
-    return tb;
+    return c;
   }
+
+    void frameAvailable()
+    {
+	gc.setFrame(GraphicContext.getFrame(this));
+	toolManager.addContextSwitcher(new WindowContextSwitcher(gc.getFrame(), gc));
+	toolManager.addToolListener(this);
+	toolManager.activate(itsDefaultTool, gc);
+    }
 
   private void prepareStatusBar()
   {
@@ -402,7 +412,7 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //**-- zoom increment listeners and controllers.
     // The 0.9, 1.9 constants are used to avoid rounding errors
     // when passing from the '1/n' to the 'n' form of the zoom values. 
-    // (i.e. when we reach 100% zoom value coming from 50% or less)
+    // (i.e. when we reach 100% zoom value coming from 50% or less). Other solutions?
     IncrementListener xil = new IncrementListener() {
       public void increment()
 	{
@@ -556,9 +566,10 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   private void initTools() 
   {
 
-    if (tools != null) return; //someone else created it
+    if (tools != null) return; //someone else created the tools
 
     tools = new Vector();
+
     String fs = File.separator;
     String path = null;
     try
@@ -572,7 +583,6 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
     //String path = MaxApplication.getProperty("tablePackageDir")+fs+"images"+fs;
     
     itsDefaultTool = new TableSelecter(new ImageIcon(path+"table_selecter.gif"));
-
     tools.addElement( itsDefaultTool);
     tools.addElement( new PencilTool(new ImageIcon(path+"pencil.gif")));
     tools.addElement( new LinerTool(new ImageIcon(path+"liner.gif")));
@@ -580,28 +590,13 @@ public class TablePanel extends JPanel implements ToolbarProvider, ToolListener,
   }
 
   /**
-   * ToolbarProvider interface
+   * ToolProvider interface
    */
   public Enumeration getTools() 
   {  
     return tools.elements();
   }
 
-  /**
-   * ToolbarProvider interface
-   */
-  public GraphicContext getGraphicContext() 
-  {
-    return gc;
-  }
-
-  /**
-   * ToolbarProvider interface
-   */
-  public Tool getDefaultTool() 
-  {
-    return itsDefaultTool;
-  }
 
   /**
    * Callback from the toolbar when a new tool have been

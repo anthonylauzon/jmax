@@ -82,6 +82,14 @@ public class TableSelecter extends TableTool implements GraphicSelectionListener
     getGc().getSelection().select(a.getInvX(x), a.getInvX(x+w));
   }
 
+
+    /**
+     * GraphicSelectionListener implementation. Selection via doubleClick */
+    public void selectionPointDoubleClicked(int x, int y, int modifiers)
+    {
+    }
+
+
   /**
    * Selects all the objects in a given rectangle
    */

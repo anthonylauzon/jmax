@@ -66,7 +66,7 @@ public class Tabler extends JFrame implements EditorContainer {
 
     getContentPane().add(itsPanel);
 
-    toolbar = itsPanel.prepareToolbar();
+    itsPanel.frameAvailable(); 
     //--
     validate();
     pack();
