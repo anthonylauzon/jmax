@@ -79,7 +79,6 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
 
     /** prepare the popup */
     itsPopupMenu = new JPopupMenu();
-    JMenuItem item;
 
   }
 
@@ -168,7 +167,8 @@ public class EditorToolbar extends JToolBar implements ActionListener, WindowLis
     add(aButton);
     itsButtonGroup.add(aButton);
 
-    itsPopupMenu.add (aMenuItem = new JMenuItem (theTool.getIcon()));
+    aMenuItem = new JMenuItem (theTool.getIcon());
+    itsPopupMenu.add (aMenuItem);
     
     validate();
     
