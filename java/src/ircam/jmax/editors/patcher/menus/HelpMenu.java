@@ -52,7 +52,8 @@ public class HelpMenu extends DefaultHelpMenu
   {
     super();
     
-    insert(Actions.openHelpPatchAction, "Object Help", Event.CTRL_MASK, KeyEvent.VK_H, 0);
+    insert(Actions.openHelpPatchAction, "Object Help", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_H, 0);
     /*insert(Actions.showHtmlAction, "Editor Help", 1);*/
   }
 }
+

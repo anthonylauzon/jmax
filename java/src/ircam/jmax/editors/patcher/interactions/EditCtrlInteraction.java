@@ -55,7 +55,8 @@ class EditCtrlInteraction extends Interaction
   {
     // Take away the control modifier (always there)
 
-    squeack &= (~ Squeack.CTRL);
+      //squeack &= (~ Squeack.CTRL);
+    squeack &= (~ Squeack.SHORTCUT);
     squeack &= (~ Squeack.LOCATION_MASK);
     
     switch (squeack)

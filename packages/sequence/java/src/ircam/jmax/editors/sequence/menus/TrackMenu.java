@@ -60,7 +60,7 @@ public class TrackMenu extends EditorMenu
 
     //******** Merge reintroduction *******************//
     addSeparator();
-    add(Actions.mergeAction, "Merge Tracks...", java.awt.Event.CTRL_MASK, KeyEvent.VK_M);
+    add(Actions.mergeAction, "Merge Tracks...", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_M);
   }
     
   private void FillAddTrackMenu(JMenu menu)

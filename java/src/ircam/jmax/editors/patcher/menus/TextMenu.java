@@ -161,8 +161,8 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
-    biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
-    smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
+    biggerItem  = add(Actions.fontBiggerAction, "Bigger", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_ADD);
+    smallerItem = add(Actions.fontSmallerAction, "Smaller", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_SUBTRACT);
 
     addSeparator();
 
@@ -171,7 +171,7 @@ public class TextMenu extends EditorMenu
     add(automaticFitItem);
     automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
 
-    fitItem = add(Actions.fitToTextAction, "Fit To Text", Event.CTRL_MASK, KeyEvent.VK_T);
+    fitItem = add(Actions.fitToTextAction, "Fit To Text", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_T);
 
     addMenuListener(new TextMenuListener());
   }

@@ -25,6 +25,8 @@
 
 package ircam.jmax.editors.patcher.interactions;
 
+import java.awt.*;
+
 /** A squeack is a mouse action (squeack !); this class
   contains all the constants for coding mouse actions
   in the patcher editor.
@@ -79,7 +81,8 @@ public class Squeack
   // Modifiers, 4 bit reserved, multiple value possible, but not currently generated
 
   static public final int SHIFT    = 0x10;
-  static public final int CTRL     = 0x20;
+  //static public final int CTRL     = 0x20;
+  static public final int SHORTCUT = 0x20;
   static public final int SHIFT_UP = 0x30;
   static public final int ALT      = 0x40;
   static public final int ESCAPE   = 0x50;
@@ -92,9 +95,14 @@ public class Squeack
     return (squeack & SHIFT) != 0;
   }
 
-  static final public boolean isCtrl(int squeack)
+    /*static final public boolean isCtrl(int squeack)
+      {
+      return (squeack & CTRL) != 0;
+      }*/
+  
+  static final public boolean isShortcut(int squeack)
   {
-    return (squeack & CTRL) != 0;
+      return (squeack & SHORTCUT) != 0;
   }
 
   static final public boolean isAlt(int squeack)
@@ -194,8 +202,10 @@ public class Squeack
     else
       mod = "";
 
-    if (isCtrl(squeack))
-      mod = "Ctrl";
+    /*if (isCtrl(squeack))
+      mod = "Ctrl";*/
+    if(isShortcut(squeack))
+	mod = "Shortcut";
     else
       mod = "";
 

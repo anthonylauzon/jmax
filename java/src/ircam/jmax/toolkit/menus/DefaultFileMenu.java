@@ -33,7 +33,7 @@ import javax.swing.event.*;
 
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
-
+import ircam.jmax.utils.*;
 
 /** Implement the patcher editor File Menu */
 
@@ -45,16 +45,16 @@ public class DefaultFileMenu extends EditorMenu
 
     setHorizontalTextPosition(AbstractButton.LEFT);
 
-    add(DefaultActions.newAction, "New", Event.CTRL_MASK, KeyEvent.VK_N);
-    add(DefaultActions.openAction, "Open", Event.CTRL_MASK, KeyEvent.VK_O);
+    add(DefaultActions.newAction, "New", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_N);
+    add(DefaultActions.openAction, "Open", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_O);
 
     addSeparator();
 
-    add(DefaultActions.closeAction, "Close", Event.CTRL_MASK, KeyEvent.VK_W);
+    add(DefaultActions.closeAction, "Close", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_W);
 
     addSeparator();
 
-    add(DefaultActions.quitAction, "Quit", Event.CTRL_MASK, KeyEvent.VK_Q);
+    add(DefaultActions.quitAction, "Quit", Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), KeyEvent.VK_Q);
   }
 }
 

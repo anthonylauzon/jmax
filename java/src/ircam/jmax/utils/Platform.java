@@ -36,19 +36,19 @@ import ircam.jmax.editors.patcher.PatcherFontManager;
 
 public class Platform
 {
-  static public String NEWLINE     = null;
-  static public char   NEWLINECHAR = 0;
-  static public int    DELETE_KEY  = 0;
+  static public String NEWLINE        = null;
+  static public char   NEWLINECHAR    = 0;
+  static public int    DELETE_KEY     = 0;
   static public int    BACKSPACE_KEY  = 0;	//to check in all the platforms
-  static public int    ENTER_KEY   = 0;
-  static public int    RETURN_KEY  = 0;
-  static public int    FONT_SIZE   = 0;
-  static public int    FONT_STYLE  = 0;
-  static public String FONT_NAME   = null;
-  static public int    LEFT_KEY    = KeyEvent.VK_LEFT;
-  static public int    RIGHT_KEY   = KeyEvent.VK_RIGHT;
-  static public int    UP_KEY      = KeyEvent.VK_UP;
-  static public int    DOWN_KEY    = KeyEvent.VK_DOWN;
+  static public int    ENTER_KEY      = 0;
+  static public int    RETURN_KEY     = 0;
+  static public int    FONT_SIZE      = 0;
+  static public int    FONT_STYLE     = 0;
+  static public String FONT_NAME      = null;
+  static public int    LEFT_KEY       = KeyEvent.VK_LEFT;
+  static public int    RIGHT_KEY      = KeyEvent.VK_RIGHT;
+  static public int    UP_KEY         = KeyEvent.VK_UP;
+  static public int    DOWN_KEY       = KeyEvent.VK_DOWN;
 
   static public String  SYSTEM     = null;
   static public boolean INAPPLET   = false;
@@ -70,7 +70,7 @@ public class Platform
 	SYSTEM = "unknown";
       }
 
-    if (SYSTEM.equalsIgnoreCase("macos"))
+    if (SYSTEM.equalsIgnoreCase("Mac OS X"))
       {
 	setMacValues();
       }
@@ -102,15 +102,16 @@ public class Platform
    
   static protected void setMacValues()
   {
-    NEWLINE     = "\n";
-    NEWLINECHAR = '\n';
-    DELETE_KEY  = 8;
+    NEWLINE       = "\n";
+    NEWLINECHAR   = '\n';
+    DELETE_KEY    = 8;
     BACKSPACE_KEY = 127;
-    ENTER_KEY   = 3;
-    RETURN_KEY  = 10;
-    FONT_SIZE   = 9;
-    FONT_STYLE  = Font.PLAIN;
-    FONT_NAME   = new String("monaco");
+    ENTER_KEY     = /*3*/10;
+    RETURN_KEY    = 10;
+    FONT_SIZE     = /*9*/10;
+    FONT_STYLE    = Font.PLAIN;
+    //FONT_NAME     = new String("monaco");
+    FONT_NAME = PatcherFontManager.getInstance().getFontName("Variable Width Font");
   }
 
   //------------------------------------------
