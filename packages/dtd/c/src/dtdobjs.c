@@ -32,8 +32,8 @@
 
 #include <fts/fts.h>
 #include "dtd.h"
-#include "task_manager.h"
 #include "thread.h"
+#include "worker.h"
 
 
 /* ********************************************************************** */
@@ -56,9 +56,9 @@ static fts_symbol_t s_do_open;
 static fts_symbol_t s_do_close;
 static fts_symbol_t s_do_read;
 static fts_symbol_t s_do_write;
+static fts_symbol_t s_do_reset;
 
-fts_task_manager_t* manager = NULL;
-
+#define BACKGROUND_TASK(_this,_m,_ac,_at)  fts_worker_add_task(_this->worker, (fts_object_t *)_this, 0, _m, _ac, _at)
 
 /* ********************************************************************** */
 /* ********************************************************************** */
@@ -70,9 +70,13 @@ fts_task_manager_t* manager = NULL;
 
 typedef enum { 
   readsf_closed, 
+  readsf_waiting_closed, 
   readsf_opened, 
+  readsf_waiting_opened, 
   readsf_playing, 
-  readsf_paused
+  readsf_waiting_playing, 
+  readsf_paused,
+  readsf_waiting_paused 
 } readsf_state_t;
 
 
@@ -89,12 +93,14 @@ typedef struct {
   int offset;             /* the current offset in the buffer */
   unsigned int frames;    /* the number of frames that have been played */
   fts_mutex_t* mutex;
+  fts_worker_t* worker;
 } readsf_t;
 
 static fts_status_t readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
 static void readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void readsf_do_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void readsf_do_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void readsf_do_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void readsf_do_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 static void readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
@@ -112,9 +118,13 @@ static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
 typedef enum { 
   writesf_closed, 
+  writesf_waiting_closed, 
   writesf_opened, 
+  writesf_waiting_opened, 
   writesf_recording, 
-  writesf_paused
+  writesf_waiting_recording, 
+  writesf_paused,
+  writesf_waiting_paused
 } writesf_state_t;
 
 
@@ -132,6 +142,7 @@ typedef struct {
   int offset;             /* the current offset in the buffer */
   unsigned int frames;    /* the number of frames that have been written */
   fts_mutex_t* mutex;
+  fts_worker_t* worker;
 } writesf_t;
 
 static fts_status_t writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at);
@@ -156,8 +167,6 @@ static void writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 void dtdobjs_config( void)
 {
-  manager = fts_task_manager_new(8);
-
   s_readsf = fts_new_symbol( "readsf~");
   s_writesf = fts_new_symbol( "writesf~");
 
@@ -173,6 +182,7 @@ void dtdobjs_config( void)
   s_do_close = fts_new_symbol( "do_close");
   s_do_read = fts_new_symbol( "do_read");
   s_do_write = fts_new_symbol( "do_write");
+  s_do_reset = fts_new_symbol( "do_reset");
 }
 
 
@@ -213,6 +223,7 @@ readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* callbacks for background processing */
   fts_method_define_varargs( cl, 0, s_do_open, readsf_do_open);
+  fts_method_define_varargs( cl, 0, s_do_reset, readsf_do_reset);
   fts_method_define_varargs( cl, 0, s_do_read, readsf_do_read);
   fts_method_define_varargs( cl, 0, s_do_close, readsf_do_close);
 
@@ -254,6 +265,8 @@ readsf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->available[0] = 0;
   this->available[1] = 0;
   this->mutex = fts_mutex_new();
+  this->worker = fts_worker_new(16);
+
 
   n_channels = fts_get_int_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
@@ -292,6 +305,7 @@ readsf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }
 
   fts_mutex_delete(this->mutex);
+  fts_worker_delete(this->worker);
 
   fts_dsp_remove_object(o);
 }
@@ -307,64 +321,89 @@ static void
 readsf_do_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  int i;
-  int next_state;
-
-  fts_mutex_lock(this->mutex);
 
   if (this->audiofile) {
     fts_audiofile_delete(this->audiofile);
     this->audiofile = NULL;
   }
 
-  next_state = (ac > 1)? fts_get_int(at) : readsf_opened;
-
-  if ((ac > 1) && fts_is_symbol(at + 1)) {
-    this->filename = fts_get_symbol(at + 1);
-  }
-
   if (this->filename) {
     
     this->audiofile = fts_audiofile_open_read(this->filename);
-    
-    if (!fts_audiofile_valid(this->audiofile)) {
-      post( "readsf~: error: failed to open the audio file\n");
-      fts_object_set_error(o, "failed to open the audio file");
-      goto error_recovery;
-    }
 
-    this->curbuf = 0; 
-    this->offset = 0;
-    this->frames = 0;
-
-    /* pre-fill both buffer */
-    for (i = 0; i < 2; i++) {
-
-      this->available[i] = fts_audiofile_read(this->audiofile, this->buf[i], this->n_channels, this->bufsize);
-
-      if (this->available[i] < 0) {
-	goto error_recovery;
-      }
-    }
-
-    /* switch to the new state */
-    this->state = next_state;
-
-  } else {
-    this->state = readsf_closed; 
-    post( "readsf~: error: no file name specified\n");
+    readsf_do_reset(o, 0, NULL, 0, NULL);
   }
 
+  return;
+}
+
+static void 
+readsf_do_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  readsf_t *this = (readsf_t *)o;
+  int i;
+
+  if (!fts_audiofile_valid(this->audiofile)) {
+    post( "readsf~: error: failed to open the audio file\n");
+    goto error_recovery;
+  }
+
+  if (fts_audiofile_seek(this->audiofile, 0) != 0) {
+    post( "readsf~: failed to reset the audio file\n");
+    goto error_recovery;    
+  }
+
+  this->curbuf = 0; 
+  this->offset = 0;
+  this->frames = 0;
+  
+  /* pre-fill both buffer */
+  for (i = 0; i < 2; i++) {
+
+    this->available[i] = fts_audiofile_read(this->audiofile, this->buf[i], this->n_channels, this->bufsize);
+    
+    if (this->available[i] < 0) {
+      goto error_recovery;
+    }
+  }
+
+
+  fts_mutex_lock(this->mutex);
+  
+  /* switch to the new state */
+  switch (this->state) {
+  case readsf_waiting_opened: 
+    this->state = readsf_opened;
+    break;
+    
+  case readsf_waiting_playing: 
+    this->state = readsf_playing;
+    break;
+    
+  case readsf_waiting_paused: 
+    this->state = readsf_paused;
+    break;
+    
+    /* anything else is an error. set it to opened in the hope we
+       recover. */
+  default:
+    this->state = readsf_opened;
+    break;
+  }
+  
   fts_mutex_unlock(this->mutex);
+  
   return;
 
  error_recovery:
 
   fts_audiofile_delete(this->audiofile);
   this->audiofile = NULL;
+
+  fts_mutex_lock(this->mutex);
   this->state = readsf_closed;
-  
   fts_mutex_unlock(this->mutex);
+
   return;
 }
 
@@ -373,12 +412,12 @@ readsf_do_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   readsf_t *this = (readsf_t *)o;
 
-  fts_mutex_lock(this->mutex);
-
   if (this->audiofile) {
     fts_audiofile_delete(this->audiofile);
     this->audiofile = NULL;
   }
+
+  fts_mutex_lock(this->mutex);
 
   this->state = readsf_closed;
 
@@ -390,8 +429,6 @@ readsf_do_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 {
   readsf_t *this = (readsf_t *)o;
   int nextbuf;
-
-  fts_mutex_lock(this->mutex);
 
   if (this->state == readsf_closed) {
     return;
@@ -407,8 +444,6 @@ readsf_do_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   } else if (this->available[nextbuf] < this->bufsize) {
     /* FIXME: close, loop, reposition at beginning, do nothing ??? */
   }
-
-  fts_mutex_unlock(this->mutex);
 }
 
 
@@ -422,47 +457,48 @@ static void
 readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, const fts_atom_t *at)
 {
   readsf_t *this = (readsf_t *)o;
-  fts_atom_t a[2];
 
-  switch( this->state) {
+  fts_mutex_lock(this->mutex);
+
+  switch (this->state) {
+
   case readsf_closed:
+
     if (message == s_open)
       {
-	fts_set_int(a, readsf_opened);
 	if ((ac == 1) && fts_is_symbol(at)) {
-	  a[1] = at[0];	  
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
-	} else {
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 1, a);
-	}
-      }
-    else if ((message == s_close) || (message == fts_s_stop))
-      {
+	  this->filename = fts_get_symbol(at);
+	} 
+	this->state = readsf_waiting_opened;
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     else if ((message == s_play) || (message == fts_s_start) || (message == fts_s_bang))
       {
-	fts_set_int(a, readsf_playing);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	this->state = readsf_waiting_playing;
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     else if (message == s_pause)
       {
-	fts_set_int(a, readsf_paused);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	this->state = readsf_waiting_paused;
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     break;
+
 
   case readsf_opened:
+
     if (message == s_open)
       {
-	fts_set_int(a, readsf_opened);
-	if ((ac == 1) && fts_is_symbol(at)) {
-	  a[1] = at[0];	  
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
-	}
+	if ((ac == 1) && fts_is_symbol(at) && (fts_get_symbol(at) != this->filename)) {
+	  this->filename = fts_get_symbol(at);
+	  this->state = readsf_waiting_opened;
+	  BACKGROUND_TASK(this, s_do_open, 0, NULL);
+	} 
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
-	fts_task_manager_add_task(manager, o, 0, s_do_close, 0, NULL);
+	this->state = readsf_waiting_closed;
+	BACKGROUND_TASK(this, s_do_close, 0, NULL);
       }
     else if ((message == s_play) || (message == fts_s_start) || (message == fts_s_bang))
       {
@@ -473,27 +509,33 @@ readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, c
 	this->state = readsf_paused;
       }
     break;
+
 
   case readsf_playing:
+
     if (message == s_open)
       {
-	/* switch to the paused state to avoid that the buffers are
-           read while they are being refilled */
-	this->state = readsf_paused;
-	fts_set_int(a, readsf_playing);
 	if ((ac == 1) && fts_is_symbol(at)) {
-	  a[1] = at[0];	  
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
+
+	  if (fts_get_symbol(at) != this->filename) {
+	    this->filename = fts_get_symbol(at);
+	    this->state = readsf_waiting_opened;
+	    BACKGROUND_TASK(this, s_do_open, 0, NULL);
+
+	  } else {
+	    this->state = readsf_waiting_opened;
+	    BACKGROUND_TASK(this, s_do_reset, 0, NULL);
+	  }
+
 	} else {
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 1, a);
+	  this->state = readsf_waiting_opened;
+	  BACKGROUND_TASK(this, s_do_reset, 0, NULL);
 	}
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
-	fts_task_manager_add_task(manager, o, 0, s_do_close, 0, NULL);
-      }
-    else if ((message == s_play) || (message == fts_s_start) || (message == fts_s_bang))
-      {
+	this->state = readsf_waiting_closed;
+	BACKGROUND_TASK(this, s_do_close, 0, NULL);
       }
     else if (message == s_pause)
       {
@@ -501,20 +543,32 @@ readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, c
       }
     break;
 
+
   case readsf_paused:
+
     if (message == s_open)
       {
-	fts_set_int(a, readsf_opened);
 	if ((ac == 1) && fts_is_symbol(at)) {
-	  a[1] = at[0];	  
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 2, a);
+
+	  if (fts_get_symbol(at) != this->filename) {
+	    this->filename = fts_get_symbol(at);
+	    this->state = readsf_waiting_opened;
+	    BACKGROUND_TASK(this, s_do_open, 0, NULL);
+
+	  } else {
+	    this->state = readsf_waiting_opened;
+	    BACKGROUND_TASK(this, s_do_reset, 0, NULL);
+	  }
+
 	} else {
-	  fts_task_manager_add_task(manager, o, 0, s_do_open, 1, a);
+	  this->state = readsf_waiting_opened;
+	  BACKGROUND_TASK(this, s_do_reset, 0, NULL);
 	}
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
-	fts_task_manager_add_task(manager, o, 0, s_do_close, 0, NULL);
+	this->state = readsf_waiting_closed;
+	BACKGROUND_TASK(this, s_do_close, 0, NULL);
       }
     else if ((message == s_play) || (message == fts_s_start) || (message == fts_s_bang))
       {
@@ -523,11 +577,28 @@ readsf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, c
     else if (message == s_pause)
       {
       }
+    break;
+
+
+  case readsf_waiting_closed: 
+  case readsf_waiting_opened: 
+  case readsf_waiting_playing: 
+  case readsf_waiting_paused:
+
+    /* We can't handle any open, play, pause, or close messages when
+       the object is in one of the wait states. We have to wait until
+       the background thread handled the previous request before we
+       can handle the new one. Send the message to the background
+       thread so it will be handled when possible. */
+
+    BACKGROUND_TASK(this, message, ac, at);
     break;
 
   default:
     break;
   }
+
+  fts_mutex_unlock(this->mutex);
 }
 
 /* ********************************************************************** */
@@ -593,7 +664,7 @@ readsf_dsp( fts_word_t *argv)
     this->curbuf = 1 - this->curbuf;
     curbuf = this->curbuf;
     this->offset = 0;
-    fts_task_manager_add_task(manager, (fts_object_t*) this, 0, s_do_read, 0, NULL);
+    BACKGROUND_TASK(this, s_do_read, 0, NULL);
   }
 
   /* if we swapped buffers, check if we need to read any samples from
@@ -615,11 +686,15 @@ readsf_dsp( fts_word_t *argv)
   this->frames += n;
 
   if (this->frames > fts_audiofile_get_num_frames(this->audiofile)) { 
-    /* we're done. set the state to pause to avoid that the dsp is run
-       once more before the object switches to the closed state. */
-    this->state = readsf_paused;
+
+    /* we're done. */
     fts_outlet_bang((fts_object_t*) this, n_channels);
-    fts_task_manager_add_task(manager, (fts_object_t*) this, 0, s_do_close, 0, NULL);
+
+    /* reset the buffers so they're ready to be played again. */
+    fts_mutex_lock(this->mutex);
+    this->state = readsf_waiting_opened;
+    BACKGROUND_TASK(this, s_do_reset, 0, NULL);
+    fts_mutex_unlock(this->mutex);
   }
 }
 
@@ -720,6 +795,7 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->available[0] = 0;
   this->available[1] = 0;
   this->mutex = fts_mutex_new();
+  this->worker = fts_worker_new(16);
 
   n_channels = fts_get_int_arg(ac, at, 0, 1);
   this->n_channels = (n_channels < 1) ? 1 : n_channels;
@@ -736,13 +812,8 @@ writesf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   for (i = 0; i < 2; i++) {
     this->buf[i] = (float**) fts_malloc(this->n_channels * sizeof(float*));
-    
-    fts_log("buf[%i]=0x%p\n", i, this->buf[i]);
-
     for (n = 0; n < n_channels; n++) {
       this->buf[i][n] = (float*) fts_malloc(this->bufsize * sizeof(float));
-
-      fts_log("buf[%i][%i]=0x%p\n", i, n, this->buf[i][n]);
     }
   }
 
@@ -768,7 +839,13 @@ writesf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     }
   }
 
-  fts_mutex_delete(this->mutex);
+  if (this->mutex) {
+    fts_mutex_delete(this->mutex);
+  }
+
+  if (this->worker) {
+    fts_worker_delete(this->worker);
+  }
 
   fts_dsp_remove_object(o);
 }
@@ -784,8 +861,6 @@ static void
 writesf_do_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-
-  fts_mutex_lock(this->mutex);
 
   if (this->audiofile) {
     fts_audiofile_delete(this->audiofile);
@@ -809,42 +884,48 @@ writesf_do_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     this->offset = 0;
     this->frames = 0;
 
+
+    fts_mutex_lock(this->mutex);
+
     /* switch to the new state */
-    if (ac > 0) {
-      switch (fts_get_int(at)) {
-      case writesf_opened:
-	this->state = writesf_opened;
+    switch (this->state) {
+    case writesf_waiting_opened:
+      this->state = writesf_opened;
+      break;
+      
+    case writesf_waiting_recording:
+      this->state = writesf_recording;
+      break;
+      
+    case writesf_waiting_paused:
+      this->state = writesf_paused;
 	break;
 	
-      case writesf_recording:
-	this->state = writesf_recording;
-	break;
-	
-      case writesf_paused:
-	this->state = writesf_paused;
-	break;
-	
-      case writesf_closed:
-	this->state = writesf_opened;      /* FIXME */
-	break;
-      }
+    default:
+      this->state = writesf_opened;      /* FIXME */
+      break;
     }
 
+    fts_mutex_unlock(this->mutex);
+  
   } else {
+    fts_mutex_lock(this->mutex);
     this->state = writesf_closed; 
+    fts_mutex_unlock(this->mutex);
     post( "writesf~: error: no file name specified\n");
   }
 
-  fts_mutex_unlock(this->mutex);
   return;
 
  error_recovery:
 
   fts_audiofile_delete(this->audiofile);
   this->audiofile = NULL;
+
+  fts_mutex_lock(this->mutex);
   this->state = writesf_closed;
-  
   fts_mutex_unlock(this->mutex);
+
   return;
 }
 
@@ -853,12 +934,12 @@ writesf_do_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   writesf_t *this = (writesf_t *)o;
 
-  fts_mutex_lock(this->mutex);
-
   if (this->audiofile) {
     fts_audiofile_delete(this->audiofile);
     this->audiofile = NULL;
   }
+
+  fts_mutex_lock(this->mutex);
 
   this->state = writesf_closed;
 
@@ -905,37 +986,44 @@ static void
 writesf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, const fts_atom_t *at)
 {
   writesf_t *this = (writesf_t *)o;
-  fts_atom_t a[1];
 
-  switch( this->state) {
+  fts_mutex_lock(this->mutex);
+
+  switch (this->state) {
   case writesf_closed:
     if (message == s_open)
-      {
-	fts_set_int(a, writesf_opened);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
-      }
-    else if ((message == s_close) || (message == fts_s_stop))
-      {
+      {	
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  this->filename = fts_get_symbol(at);
+	} 
+	this->state = writesf_waiting_opened; 
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     else if ((message == s_record) || (message == fts_s_start) || (message == fts_s_bang))
       {
-	fts_set_int(a, writesf_recording);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	this->state = writesf_waiting_recording; 
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     else if (message == s_pause)
       {
-	fts_set_int(a, writesf_paused);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	this->state = writesf_waiting_paused; 
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     break;
 
   case writesf_opened:
     if (message == s_open)
       {
+	if ((ac == 1) && fts_is_symbol(at) && (fts_get_symbol(at) != this->filename)) {
+	  this->filename = fts_get_symbol(at);
+	  this->state = readsf_waiting_opened;
+	  BACKGROUND_TASK(this, s_do_open, 0, NULL);
+	} 
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
-	fts_task_manager_add_task(manager, o, 0, s_do_close, 0, NULL);
+	this->state = writesf_waiting_closed; 
+	BACKGROUND_TASK(this, s_do_close, 0, NULL);
       }
     else if ((message == s_record) || (message == fts_s_start) || (message == fts_s_bang))
       {
@@ -950,18 +1038,16 @@ writesf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, 
   case writesf_recording:
     if (message == s_open)
       {
-	/* switch to the paused state to avoid that the buffers are
-           written do disk while the file is opened */
-	this->state = writesf_paused;
-	fts_set_int(a, writesf_recording);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  this->filename = fts_get_symbol(at);
+	}
+	this->state = readsf_waiting_opened;
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
-	fts_task_manager_add_task(manager, o, 0, s_do_close, 0, NULL);
-      }
-    else if ((message == s_record) || (message == fts_s_start) || (message == fts_s_bang))
-      {
+	this->state = writesf_waiting_closed; 
+	BACKGROUND_TASK(this, s_do_close, 0, NULL);
       }
     else if (message == s_pause)
       {
@@ -972,25 +1058,28 @@ writesf_change_state(fts_object_t *o, int winlet, fts_symbol_t message, int ac, 
   case writesf_paused:
     if (message == s_open)
       {
-	fts_set_int(a, writesf_opened);
-	fts_task_manager_add_task(manager, o, 0, s_do_open, 1, &a[0]);
+	if ((ac == 1) && fts_is_symbol(at)) {
+	  this->filename = fts_get_symbol(at);
+	}
+	this->state = readsf_waiting_opened;
+	BACKGROUND_TASK(this, s_do_open, 0, NULL);
       }
     else if ((message == s_close) || (message == fts_s_stop))
       {
-	fts_task_manager_add_task(manager, o, 0, s_do_close, 0, NULL);
+	this->state = writesf_waiting_closed; 
+	BACKGROUND_TASK(this, s_do_close, 0, NULL);
       }
     else if ((message == s_record) || (message == fts_s_start) || (message == fts_s_bang))
       {
 	this->state = writesf_recording;
-      }
-    else if (message == s_pause)
-      {
       }
     break;
 
   default:
     break;
   }
+
+  fts_mutex_unlock(this->mutex);
 }
 
 /* ********************************************************************** */
@@ -1049,7 +1138,7 @@ writesf_dsp( fts_word_t *argv)
     curbuf = this->curbuf;
     this->offset = 0;
     this->available[curbuf] = 0;
-    fts_task_manager_add_task(manager, (fts_object_t*) this, 0, s_do_write, 0, NULL);
+    BACKGROUND_TASK(this, s_do_write, 0, NULL);
   }
 
   /* if we swapped buffers, check if we need to write any samples to

@@ -122,7 +122,7 @@ fts_task_manager_delete(fts_task_manager_t* manager)
 
 int 
 fts_task_manager_add_task(fts_task_manager_t* manager, fts_object_t* obj, int winlet, 
-			    fts_symbol_t s, int ac, const fts_atom_t *at)
+			  fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   int head, i;
 
@@ -142,10 +142,15 @@ fts_task_manager_add_task(fts_task_manager_t* manager, fts_object_t* obj, int wi
     if (ac == 0) {
       manager->task[head].at = NULL;
     } else {
+
+      /* FIXME!! Should avoid allocating memory here! This is a
+         real-time thread! */
+
       fts_atom_t* new_at = (fts_atom_t*) fts_malloc(ac * sizeof(fts_atom_t));
       for (i = 0; i < ac; i++) {
 	new_at[i] = at[i];
       }
+
       manager->task[head].at = new_at;
     }
 
