@@ -27,7 +27,6 @@
 #include <ftsprivate/object.h>
 #include <ftsprivate/errobj.h>
 #include <ftsprivate/patcher.h>
-#include <ftsprivate/OLDclient.h>
 
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while

@@ -52,9 +52,54 @@ import ircam.jmax.toolkit.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGroupListener, Printable
-{
+class UpdateGroupNotifier {
+  static ArrayList sketchPadList = new ArrayList();
   
+  static void add( ErmesSketchPad sketchPad)
+  {
+    sketchPadList.add( sketchPad);
+  }
+
+  static void remove( ErmesSketchPad sketchPad)
+  {
+    sketchPadList.remove( sketchPad);
+  }
+
+  static
+  {
+    FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "update_group_begin"), new UpdateGroupBeginHandler());
+    FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "update_group_end"), new UpdateGroupEndHandler());
+  }
+}
+
+class UpdateGroupBeginHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+    for( Iterator i = UpdateGroupNotifier.sketchPadList.iterator(); i.hasNext(); )
+      {
+	ErmesSketchPad sketchPad = (ErmesSketchPad)i.next();
+	sketchPad.updateGroupStart();
+      }
+  }  
+}
+
+class UpdateGroupEndHandler implements FtsMessageHandler {
+  public void invoke( FtsObject obj, FtsArgs args)
+  {
+    for( Iterator i = UpdateGroupNotifier.sketchPadList.iterator(); i.hasNext(); )
+      {
+	ErmesSketchPad sketchPad = (ErmesSketchPad)i.next();
+	sketchPad.updateGroupEnd();
+      }
+  }  
+}
+
+
+
+public class ErmesSketchPad extends JComponent implements  Editor, Printable
+{
+
+
   private boolean somethingToUpdate = false;
   private Rectangle invalid = new Rectangle();
   
@@ -76,15 +121,13 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   public Rectangle getUpdateRect(){
     return invalid;
   }
-  // --------------------------------------
-  // FtsUpdateGroupListener interface
-  // --------------------------------------  
-  public void updateGroupStart()
+
+  void updateGroupStart()
   {
       resetUpdate();
   }
 
-  public void updateGroupEnd()
+  void updateGroupEnd()
   {
     Rectangle rect = getEditorContainer().getViewRectangle();
     Graphics gr;
@@ -309,8 +352,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   //--------------------------------------------------------
   ErmesSketchPad(EditorContainer container, FtsPatcherObject thePatcher) 
   {
-    super();
-
     String s;
 
     // Setting the local variables
@@ -372,6 +413,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     KeyEventsManager.addProducer(this);
 
     requestDefaultFocus(); 
+
+    UpdateGroupNotifier.add( this);
   }
   
   private float sx, sy;
@@ -730,9 +773,6 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     itsPatcher.resetPatcherListener();
     
-    /*  WARNING: re-add when updateGroup reimplemented */
-    //fts.removeUpdateGroupListener( this);
-
     engine.dispose();
 
     if (ErmesSelection.patcherSelection.ownedBy(this))
@@ -749,6 +789,8 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     itsEditField = null;
     anOldPastedObject = null;
     //itsDocument = null;
+
+    UpdateGroupNotifier.remove( this);
   }
 
 

@@ -1,6 +1,5 @@
 ftsdir=$(prefix)/include/fts
 fts_HEADERS= \
-OLDclient.h \
 array.h \
 atom.h \
 atomfile.h \

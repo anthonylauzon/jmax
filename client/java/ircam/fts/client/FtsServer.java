@@ -31,6 +31,11 @@ import java.util.*;
 public class FtsServer {
 
   class ReceiveThread extends Thread {
+    ReceiveThread( FtsProtocolDecoder decoder)
+    {
+      this.decoder = decoder;
+    }
+
     public void run()
     {
       byte[] inputBuffer = new byte[0x10000];
@@ -50,42 +55,26 @@ public class FtsServer {
 	  return;
 	}
     }
+
+    private FtsProtocolDecoder decoder;
   }
 
-  class FtsClientObject extends FtsObject {
-    FtsClientObject( FtsServer server, FtsObject root, int id)
-    {
-      super( server, root, id);
-    }
-  }
-
-  static
-  {
-    FtsObject.registerMessageHandler( FtsClientObject.class, FtsSymbol.get( "notify"), new FtsMessageHandler() {
-	public void invoke( FtsObject obj, FtsArgs args)
-	{
-	  ((FtsClientObject)obj).getServer().fireFtsServerEvent( args);
-	}
-      });
-  }
-
-  public FtsServer( FtsServerConnection connection)
+  public FtsServer( FtsServerConnection connection, FtsClient client)
   {
     this.connection = connection;
 
     newObjectID = 16; // Ids 0 to 15 are reserved for pre-defined system objects
-    objectTable = new HashMap();
 
+    objectTable = new HashMap();
     encoder = new FtsBinaryProtocolEncoder( this);
-    decoder = new FtsBinaryProtocolDecoder( this);
 
     root = new FtsObject( this, null, 0);
-    client = new FtsClientObject( this, root, 1);
+    client.setServer( this);
+    client.setID( 1);
+    putObject( 1, client);
+    this.client = client;
 
-    listeners = new ArrayList();
-    event = new FtsServerEvent( this);
-
-    receiveThread = new ReceiveThread();
+    receiveThread = new ReceiveThread( new FtsBinaryProtocolDecoder( this));
     receiveThread.start();
   }
 
@@ -115,32 +104,6 @@ public class FtsServer {
     return root;
   }
 
-  public void addFtsServerListener( FtsServerListener listener)
-  {
-    listeners.add( listener);
-  }
-
-  public void removeFtsServerListener( FtsServerListener listener)
-  {
-    listeners.remove( listener);
-  }
-
-  public void enableNotify() throws IOException
-  {
-    client.send( FtsSymbol.get( "enable_notify"));
-  }
-
-
-  // Non-public methods
-
-  void fireFtsServerEvent( FtsArgs args)
-  {
-    for ( Iterator i = listeners.iterator(); i.hasNext(); )
-      {
-	FtsServerListener listener = (FtsServerListener)i.next();
-	listener.messageReceived( event, args);
-      }
-  }
 
   int getNewObjectID()
   {
@@ -149,11 +112,6 @@ public class FtsServer {
     newObjectID += 2;
 
     return id;
-  }
-
-  FtsObject getClient()
-  {
-    return client;
   }
 
   FtsObject getObject( int id)
@@ -176,11 +134,15 @@ public class FtsServer {
     return connection;
   }
 
+  FtsClient getClient()
+  {
+    return client;
+  }
+
   // Connection to FTS
   private FtsServerConnection connection;
 
   // Input from FTS
-  private FtsProtocolDecoder decoder;
   private Thread receiveThread;
 
   // Output to FTS
@@ -188,14 +150,10 @@ public class FtsServer {
 
   // Proxies of remote root and client
   private FtsObject root;
-  private FtsObject client;
+  private FtsClient client;
 
   // Objects ID handling
   private int newObjectID;
   private HashMap objectTable;
-
-  // FtsServerEvent handling
-  private FtsServerEvent event;
-  private List listeners;
 }
 

@@ -67,7 +67,7 @@ button_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   button_t *this = (button_t *)o;
 
   this->value = 0;
-  fts_object_ui_property_changed((fts_object_t *)this, fts_s_value);
+  fts_object_ui_property_changed( (fts_object_t *)this, fts_s_value);
 }
 
 static void

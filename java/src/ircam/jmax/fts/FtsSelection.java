@@ -59,7 +59,7 @@ public class FtsSelection extends FtsObject
   
   public FtsSelection() throws IOException
   {
-      super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("__selection")); 
+      super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__selection")); 
   }
 
   /** Add an object to this container  */

@@ -82,7 +82,7 @@ public class DefaultFileMenu extends EditorMenu
 
   public void updateMenu()
   {
-    if(JMaxApplication.getServer() != null)
+    if(JMaxApplication.getFtsServer() != null)
       {
 	dspMenuItem.setEnabled(true);
 

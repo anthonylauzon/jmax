@@ -41,7 +41,7 @@ public class FtsFinderObject extends FtsObject
 {
   public FtsFinderObject() throws IOException
   {
-    super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("__finder"));
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__finder"));
   }
   
   /* Client to server queries */

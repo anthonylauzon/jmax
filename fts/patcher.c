@@ -54,7 +54,6 @@
 
 #include <fts/fts.h>
 #include <ftsprivate/client.h>
-#include <ftsprivate/OLDclient.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
 #include <ftsprivate/errobj.h>

@@ -186,11 +186,13 @@ public class Slider extends GraphicObject implements FtsIntValueListener
       newValue = (((mouse.x - (getX()+ UP_OFFSET)) * (rangeMax - rangeMin)) /
 		  (getWidth() - BOTTOM_OFFSET - UP_OFFSET-THROTTLE_HEIGHT)) + rangeMin;
     
-    if(newValue>rangeMax) newValue = rangeMax;
-    else if(newValue<rangeMin) newValue = rangeMin;
+    if (newValue > rangeMax) 
+      newValue = rangeMax;
+    else if (newValue < rangeMin)
+      newValue = rangeMin;
 
-    if(newValue!=value)
-	((FtsSliderObject)ftsObject).setValue(newValue);
+    if ( newValue != value)
+      ((FtsSliderObject)ftsObject).setValue(newValue);
   }
 
   public void paint( Graphics g) 

@@ -2,7 +2,6 @@ lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
 @PLATFORM@.c \
-OLDclient.c \
 abstraction.c \
 array.c \
 atom.c \

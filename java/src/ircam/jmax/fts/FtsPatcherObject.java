@@ -262,7 +262,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
 
   public FtsPatcherObject() throws IOException
   {
-    super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("jpatcher"));
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("jpatcher"));
   }
 
   /** Get all the objects in this patcherdata */
@@ -685,7 +685,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     if(args[offset].isSymbol()) 
       className = args[offset].symbolValue.toString();
 
-    GraphicObject newObj = makeGraphicObjectFromServer(getServer(), this, objId, className, args, offset, nArgs-offset);
+    GraphicObject newObj = makeGraphicObjectFromServer( getServer(), this, objId, className, args, offset, nArgs-offset);
     
     newObj.setX(x);
     newObj.setY(y);
@@ -726,7 +726,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
       for(int i=0; i<numArgs; i++)
       arguments[i] = args[startIndex+i];
       
-      FtsGraphicObject newObj = new FtsTemplateObject(getServer(), this, FtsSymbol.get(className), numArgs, arguments, newObjId);
+      FtsGraphicObject newObj = new FtsTemplateObject( getServer(), this, FtsSymbol.get(className), numArgs, arguments, newObjId);
 
       addObject(newObj);*/
   }
@@ -735,7 +735,7 @@ public class FtsPatcherObject extends FtsObjectWithEditor
   {
     if(nArgs==6)
       {
-	FtsConnection connection = new FtsConnection(getServer(), this, args[0].intValue, 
+	FtsConnection connection = new FtsConnection( getServer(), this, args[0].intValue, 
 						     (FtsGraphicObject)args[1].objectValue, args[2].intValue, 
 						     (FtsGraphicObject)args[3].objectValue, args[4].intValue, 
 						     args[5].intValue);   

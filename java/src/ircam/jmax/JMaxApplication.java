@@ -54,7 +54,7 @@ import ircam.jmax.editors.console.*;
  * - quit of the application
  */
 
-public class JMaxApplication {
+public class JMaxApplication extends FtsClient {
  
   // **********************************************************************
   // Still ugly
@@ -215,7 +215,7 @@ public class JMaxApplication {
     return singleInstance.recentFileHistory;
   }
 
-  public static FtsServer getServer()
+  public static FtsServer getFtsServer()
   {
     return singleInstance.server;
   }
@@ -362,18 +362,14 @@ public class JMaxApplication {
       });
   }
 
-  static FtsSymbol sPackageLoaded = FtsSymbol.get( "package_loaded");
-
-  private class PackageServerListener implements FtsServerListener {
-    public void messageReceived( FtsServerEvent event, FtsArgs args)
+  private class LoadPackageHandler implements FtsMessageHandler {
+    public void invoke( FtsObject obj, FtsArgs args)
     {
-      if ( args.isSymbol( 0) 
-	   && args.getSymbol( 0).equals( sPackageLoaded) 
-	   && args.isSymbol( 1) )
+      if ( args.isSymbol( 0) )
 	{
 	  try
 	    {
-	      JMaxPackageLoader.load( args.getSymbol( 1).toString());
+	      JMaxPackageLoader.load( args.getSymbol( 0).toString());
 	    }
 	  catch( JMaxPackageLoadingException e)
 	    {
@@ -437,13 +433,15 @@ public class JMaxApplication {
 		connection = new FtsSocketConnection(hostName, port.intValue());
 	  }
 
-	server = new FtsServer( connection);
-	server.addFtsServerListener( new PackageServerListener());
-	server.enableNotify();
+	server = new FtsServer( connection, this);
+
+	FtsObject.registerMessageHandler( JMaxApplication.class, FtsSymbol.get( "package_loaded"), new LoadPackageHandler());
+
+	send( FtsSymbol.get( "get_packages"));
       }
     catch( Exception e)
       {
-	e.printStackTrace();
+	JMaxApplication.reportException( e);
       }
   }
 

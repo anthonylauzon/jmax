@@ -41,12 +41,6 @@ toggle_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 
 
 static void 
-toggle_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_object_ui_property_changed(o, fts_s_value);
-}
-
-static void 
 toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   toggle_t *this = (toggle_t *) o;

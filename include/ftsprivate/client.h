@@ -40,4 +40,6 @@
 #define fts_get_client_id(O) OBJECT_ID_CLIENT(fts_object_get_id(O))
 #define fts_get_object_id(O) OBJECT_ID_OBJ(fts_object_get_id(O))
 
+extern void fts_object_reset_changed(fts_object_t *obj);
+
 #endif

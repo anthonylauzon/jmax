@@ -37,15 +37,14 @@ import ircam.fts.client.*;
  *  
  */
 
-public class FtsErrorFinderObject extends FtsObject
-{
+public class FtsErrorFinderObject extends FtsObject {
   protected FtsArgs args = new FtsArgs();
 
   public FtsErrorFinderObject() throws IOException
   {
-      super(JMaxApplication.getServer(), JMaxApplication.getServer().getRoot(), FtsSymbol.get("__errorfinder"));
+    super(JMaxApplication.getFtsServer(), JMaxApplication.getFtsServer().getRoot(), FtsSymbol.get("__errorfinder"));
   }
-
+  
   public void findErrors(FtsObjectSet set)
   {
       findErrors(getRoot(), set);

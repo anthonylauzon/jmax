@@ -21,6 +21,8 @@
  */
 
 #define HACK_FOR_CRASH_ON_EXIT_WITH_PIPE_CONNECTION
+/* Define this if you want logs of symbol cache hit */
+#define CACHE_REPORT
 
 #include <fts/fts.h>
 #include <ftsconfig.h>
@@ -95,8 +97,16 @@ typedef int socket_t;
 
 /* Forward decls */
 typedef struct _client_t client_t;
+
 static fts_symbol_t s_client;
 static fts_symbol_t s_client_manager;
+static fts_symbol_t s_update_group_begin;
+static fts_symbol_t s_update_group_end;
+static fts_symbol_t s_set_value;
+
+static fts_heap_t *update_heap;
+
+
 
 /***********************************************************************
  *
@@ -113,8 +123,6 @@ static int client_table_add( client_t *client)
   return fts_stack_get_top( &client_table) - 1;
 }
 
-#define client_table_get(ID) ((client_t **)fts_stack_get_base( &client_table))[(ID)]
-
 static void client_table_remove( int id)
 {
   ((client_t **)fts_stack_get_base( &client_table))[id] = 0;
@@ -126,6 +134,26 @@ static void client_table_init( void)
 
   client_table_add( 0); /* so that first client will have id 1 */
 }
+
+#define client_table_get(I) ((client_t **)fts_stack_get_base( &client_table))[(I)]
+
+client_t *object_get_client( fts_object_t *obj)
+{
+  int id, index;
+
+  id = fts_object_get_id( obj);
+
+  if (id == FTS_NO_ID)
+    return NULL;
+
+  index = OBJECT_ID_CLIENT( id );
+
+  if (index < 0 || index >= fts_stack_get_top( &client_table))
+    return NULL;
+
+  return client_table_get(index);
+}
+
 
 
 /***********************************************************************
@@ -254,6 +282,9 @@ static fts_status_t client_manager_instantiate(fts_class_t *cl, int ac, const ft
  *
  */
 
+#define DEFAULT_UPDATE_PERIOD 20
+#define DEFAULT_MAX_UPDATES 40
+
 typedef void (*transition_action_t)( unsigned char input, void *data);
 typedef struct _state_t state_t;
 
@@ -302,6 +333,12 @@ typedef struct {
   fts_bytestream_t *stream;
 } protocol_encoder_t;
 
+typedef struct update_entry {
+  fts_object_t *obj;
+  fts_symbol_t property_name;
+  struct update_entry *next;
+} update_entry_t;
+
 struct _client_t {
   fts_object_t head;
   /* Client id */
@@ -318,6 +355,10 @@ struct _client_t {
   protocol_decoder_t decoder;
   /* Output protocol encoder */
   protocol_encoder_t encoder;
+  /* Updates */
+  int update_period;
+  int max_updates;
+  update_entry_t *update_fifo;
 };
 
 /*----------------------------------------------------------------------
@@ -966,6 +1007,38 @@ static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_sched_halt();
 }
 
+static void client_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+
+  if ( this->update_fifo)
+    {
+      int count;
+
+      fts_client_send_message( (fts_object_t *)this, s_update_group_begin, 0, 0);
+
+      for( count = 0; this->update_fifo && count < this->max_updates; count++)
+	{
+	  update_entry_t *p = this->update_fifo;
+	  fts_atom_t a[1];
+
+	  this->update_fifo = p->next;
+
+	  fts_object_get_prop( p->obj, p->property_name, a);
+
+	  if ( !fts_is_void( a))
+	    fts_client_send_message( p->obj, s_set_value, 1, a);
+
+	  fts_object_release( p->obj);
+
+	  fts_heap_free( p, update_heap);
+	}
+
+      fts_client_send_message( (fts_object_t *)this, s_update_group_end, 0, 0);
+    }
+
+  fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, client_update, 0, this->update_period);
+}
 
 static void client_predefine_objects( client_t *this)
 {
@@ -992,6 +1065,20 @@ static void client_predefine_objects( client_t *this)
   client_put_object( this, 1, (fts_object_t *)this);
 }
 
+static void client_update_period( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+
+  this->update_period = fts_get_int_arg( ac, at, 0, DEFAULT_UPDATE_PERIOD);
+}
+
+static void client_max_updates( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  client_t *this = (client_t *)o;
+
+  this->max_updates = fts_get_int_arg( ac, at, 0, DEFAULT_MAX_UPDATES);
+}
+
 static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   client_t *this = (client_t *)o;
@@ -1012,6 +1099,8 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   this->client_id = client_table_add( this);
   this->object_id_count = 17;
+  this->update_period = fts_get_int_arg( ac, at, 1, DEFAULT_UPDATE_PERIOD);
+  this->max_updates = fts_get_int_arg( ac, at, 2, DEFAULT_MAX_UPDATES);
 
   /* Set my client id */
   this->head.head.id = OBJECT_ID( 1, this->client_id);
@@ -1025,36 +1114,25 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
   client_predefine_objects( this);
 
-  fts_log( "[client]: Accepted client connection on socket\n");
+  fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, client_update, 0, this->update_period);
+
+  fts_log( "[client]: Accepted client connection\n");
 }
 
-static void client_send_package_names( client_t *this)
+static void client_get_packages( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_iterator_t i;
-  fts_atom_t a[2];
-  fts_symbol_t s;
-
-  s = fts_new_symbol( "notify");
-  fts_set_symbol( a, fts_new_symbol( "package_loaded"));
 
   fts_get_package_names( &i);
 
   while (fts_iterator_has_more( &i))
     {
-      fts_iterator_next( &i, a+1);
+      fts_atom_t a[1];
 
-      fts_log( "[client] notify package %s\n", fts_get_symbol( a+1));
-      fts_client_send_message( (fts_object_t *)this, s, 2, a);
+      fts_iterator_next( &i, a);
+      fts_client_send_message( o, fts_new_symbol( "package_loaded"), 1, a);
     }
 }
-
-static void client_enable_notify( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  client_t *this = (client_t *)o;
-
-  client_send_package_names( this);
-}
-
 
 static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1084,11 +1162,15 @@ static fts_status_t client_instantiate(fts_class_t *cl, int ac, const fts_atom_t
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, client_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, client_delete);
 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "get_packages"), client_get_packages);
+
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "update_period"), client_update_period);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "max_updates"), client_max_updates);
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "new_object"), client_new_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "set_object_property"), client_set_object_property);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "connect_object"), client_connect_object);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "delete_object"), client_delete_object);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "enable_notify"), client_enable_notify);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "shutdown"), client_shutdown);
 
@@ -1260,9 +1342,10 @@ static fts_status_t client_controller_instantiate(fts_class_t *cl, int ac, const
  * Client message sending
  *
  */
+
 void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1273,7 +1356,7 @@ void fts_client_start_message( fts_object_t *obj, fts_symbol_t selector)
 
 void fts_client_add_int( fts_object_t *obj, int v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1283,7 +1366,7 @@ void fts_client_add_int( fts_object_t *obj, int v)
 
 void fts_client_add_float( fts_object_t *obj, float v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1293,7 +1376,7 @@ void fts_client_add_float( fts_object_t *obj, float v)
 
 void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1303,7 +1386,7 @@ void fts_client_add_symbol( fts_object_t *obj, fts_symbol_t v)
 
 void fts_client_add_string( fts_object_t *obj, const char *v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1313,7 +1396,7 @@ void fts_client_add_string( fts_object_t *obj, const char *v)
 
 void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1323,7 +1406,7 @@ void fts_client_add_object( fts_object_t *obj, fts_object_t *v)
 
 void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1333,7 +1416,7 @@ void fts_client_add_atoms( fts_object_t *obj, int ac, const fts_atom_t *at)
 
 void fts_client_done_message( fts_object_t *obj)
 {
-  client_t *client = client_table_get( OBJECT_ID_CLIENT( fts_object_get_id( obj)) );
+  client_t *client = object_get_client( obj);
 
   if ( !client)
     return;
@@ -1351,7 +1434,6 @@ void fts_client_send_message( fts_object_t *obj, fts_symbol_t selector, int ac, 
   fts_client_add_atoms( obj, ac, at);
   fts_client_done_message( obj);
 }
-
 
 void fts_client_upload_object(fts_object_t *obj, int id)
 {
@@ -1376,6 +1458,74 @@ void fts_client_upload_object(fts_object_t *obj, int id)
 
   fts_set_object( a, obj);
   fts_send_message( (fts_object_t *)fts_object_get_patcher(obj), fts_SystemInlet, fts_s_upload_child, 1, a);
+}
+
+/* compatibility */
+void fts_object_ui_property_changed( fts_object_t *obj, fts_symbol_t property_name)
+{
+  client_t *client;
+  fts_patcher_t *patcher;
+  update_entry_t **pp;
+
+  client = object_get_client( obj);
+
+  if ( !client)
+    return;
+
+  patcher = fts_object_get_patcher( obj);
+
+  if ( !patcher || !fts_patcher_is_open(patcher))
+    return;
+
+  /* check if the object is already in the evsched list */
+  for ( pp = &client->update_fifo; *pp; pp = &(*pp)->next)
+    if ( (*pp)->obj == obj && (*pp)->property_name == property_name )
+      return;
+
+  *pp = (update_entry_t *)fts_heap_alloc( update_heap);
+
+  (*pp)->obj = obj;
+  (*pp)->property_name = property_name;
+  (*pp)->next = 0;
+
+  fts_object_refer(obj);
+}
+
+void fts_object_reset_changed( fts_object_t *obj)
+{
+  client_t *client;
+  update_entry_t **pp;
+
+  client = object_get_client( obj);
+
+  if ( !client)
+    return;
+
+  pp = &client->update_fifo;
+
+  while (*pp)
+    {
+      if ( (*pp)->obj == obj)
+	{
+	  update_entry_t *to_remove = *pp;
+
+	  *pp = (*pp)->next;
+
+	  fts_object_release( to_remove->obj);
+
+	  fts_heap_free( to_remove, update_heap);
+	}
+      else
+	pp = &(*pp)->next;
+    }
+}
+
+void fts_object_property_changed(fts_object_t *obj, fts_symbol_t property)
+{
+}
+
+void fts_client_send_property(fts_object_t *obj, fts_symbol_t property)
+{
 }
 
 
@@ -1429,12 +1579,18 @@ static void client_pipe_install( void)
 
 void fts_client_config( void)
 {
+  s_client_manager = fts_new_symbol("client_manager");
+  s_client = fts_new_symbol("client");
+  s_update_group_begin = fts_new_symbol( "update_group_begin");
+  s_update_group_end = fts_new_symbol( "update_group_end");
+  s_set_value = fts_new_symbol( "setValue");
+
+  update_heap = fts_heap_new( sizeof( update_entry_t));
+
   client_table_init();
 
-  s_client_manager = fts_new_symbol("client_manager");
   fts_class_install( s_client_manager, client_manager_instantiate);
 
-  s_client = fts_new_symbol("client");
   fts_class_install( s_client, client_instantiate);
 
   fts_class_install( fts_new_symbol("client_controller"), client_controller_instantiate);

@@ -6,6 +6,7 @@ FtsArgs.java \
 FtsAtom.java \
 FtsBinaryProtocolDecoder.java \
 FtsBinaryProtocolEncoder.java \
+FtsClient.java \
 FtsClientException.java \
 FtsMessageHandler.java \
 FtsObject.java \
@@ -16,8 +17,6 @@ FtsProtocolDecoder.java \
 FtsProtocolEncoder.java \
 FtsServer.java \
 FtsServerConnection.java \
-FtsServerEvent.java \
-FtsServerListener.java \
 FtsSocketConnection.java \
 FtsSymbol.java 
 

@@ -1,5 +1,4 @@
 noinst_HEADERS= \
-OLDclient.h \
 abstraction.h \
 audio.h \
 bmaxhdr.h \

@@ -32,7 +32,6 @@ unsigned int debugid = 0;
 #include <stdarg.h>
 
 #include <fts/fts.h>
-#include <ftsprivate/OLDclient.h>
 #include <ftsprivate/abstraction.h>
 #include <ftsprivate/client.h>
 #include <ftsprivate/class.h>

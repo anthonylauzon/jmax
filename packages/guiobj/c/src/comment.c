@@ -42,7 +42,7 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   int x, y, w, font_index;
   fts_symbol_t text;
   fts_atom_t a;
-  char *p;
+  const char *p;
 
   file = (FILE *)fts_get_pointer( at);
 
@@ -58,7 +58,7 @@ static void comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_object_get_prop( o, fts_s_comment, &a);
 
-  for ( p = fts_symbol_name( fts_get_symbol( &a)); *p; p++)
+  for ( p = fts_get_symbol( &a); *p; p++)
     {
       if ( *p == ',' || *p == ';')
 	fprintf( file, "\\%c", *p);

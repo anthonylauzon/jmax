@@ -21,7 +21,6 @@
  */
 
 #include <fts/fts.h>
-#include <ftsprivate/OLDclient.h>
 
 fts_symbol_t objectset_symbol = 0;
 fts_symbol_t sym_objectset_append = 0;

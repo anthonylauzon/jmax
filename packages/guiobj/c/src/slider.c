@@ -55,6 +55,19 @@ slider_send_ui_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_object_ui_property_changed(o, fts_s_value);
 }
 
+static void slider_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  slider_t *this = (slider_t *)o;
+  int n;
+
+  n = fts_get_int_arg( ac, at, 0, 0);
+
+  if ( this->n != n)
+    {
+      this->n = n;
+      fts_object_ui_property_changed( (fts_object_t *)this, fts_s_value);
+    }
+}
 
 static void
 slider_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -197,6 +210,7 @@ slider_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_properties, slider_send_properties); 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_send_ui_properties, slider_send_ui_properties); 
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol( "setValue"), slider_set_value); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("assist"), slider_assist); 
 

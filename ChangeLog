@@ -1,3 +1,9 @@
+2002-02-21  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* reimplemented updates with the new client connection. Changed a little
+	bit ircam.fts.client, copied old code to fts/client.c (the API is not changed
+	right now). And removed OLDclient.c...
+
 2002-02-18  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* java: added JMaxClassMap to centralize data bases of object creator,

@@ -96,6 +96,11 @@ public class FtsObject {
     server.putObject( id, this);
   }
 
+  FtsObject()
+  {
+    id = -1;
+  }
+
   public void send( FtsSymbol selector, FtsArgs args) throws IOException
   {
     encoder.writeObject( this);
@@ -198,9 +203,20 @@ public class FtsObject {
     return server;
   }
 
-  int getID()
+  final void setServer( FtsServer server)
+  {
+    this.server = server;
+    encoder = server.getEncoder();
+  }
+
+  final int getID()
   {
     return id;
+  }
+
+  final void setID( int id)
+  {
+    this.id = id;
   }
 
   private int id;
