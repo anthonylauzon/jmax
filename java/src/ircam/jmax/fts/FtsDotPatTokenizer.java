@@ -66,10 +66,6 @@ class FtsDotPatTokenizer
     (actually for now just print it)
     */
 
-  
-  void registerInHistory(char c)
-  {
-  }
 
   void pushBack()
   {
@@ -78,7 +74,7 @@ class FtsDotPatTokenizer
 
   /** Getting an env value. */
 
-  Object getEnvValue(int idx)
+  final private Object getEnvValue(int idx)
   {
     if (idx > env.size())
       return new FtsParse.IntegerString("0");
@@ -88,44 +84,44 @@ class FtsDotPatTokenizer
 
   /* private predicates for character classes */
 
-  boolean isDollar(int c)
+  final private boolean isDollar(int c)
   {
     return c == '$';
   }
 
-  boolean isBlank(int c)
+  final private boolean isBlank(int c)
   {
     return (c == '\t') || (c == ' ') || (c == '\n') || (c == '\r');
   }
 
-  boolean isEof(int c)
+  final private boolean isEof(int c)
   {
     return (c == -1);
   }
 
-  boolean isSemi(int c)
+  final private boolean isSemi(int c)
   {
     return (c == ';');
   }
 
 
-  boolean isDigit(int c)
+  final private boolean isDigit(int c)
   {
     return ((c == '0') || (c == '1') || (c == '2') || (c == '3') || (c == '4') ||
 	    (c == '5') || (c == '6') || (c == '7') || (c == '8') || (c == '9'));
   }
 
-  boolean isDecimalPoint(int c)
+  final private boolean isDecimalPoint(int c)
   {
     return (c == '.');
   }
 
-  boolean isSign(int c)
+  final private boolean isSign(int c)
   {
     return (c == '-');
   }
 
-  boolean isBackSlash(int c)
+  final private boolean isBackSlash(int c)
   {
     return (c == '\\');
   }
@@ -141,7 +137,7 @@ class FtsDotPatTokenizer
   private final static int tt_in_number_or_sign  =  6;
   private final static int tt_in_float   =  7;
 
-  void nextToken() throws java.io.IOException
+  final void nextToken() throws java.io.IOException
   {
     buf.setLength(0);
 
@@ -162,7 +158,6 @@ class FtsDotPatTokenizer
 	else
 	  {
 	    c = in.read();
-	    registerInHistory((char) c);
 	  }
 
 	status = tt_waiting;
@@ -398,7 +393,6 @@ class FtsDotPatTokenizer
 	      }
 
 	    c = in.read();
-	    registerInHistory((char) c);
 	  }
       }
   }

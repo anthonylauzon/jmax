@@ -9,7 +9,7 @@ import java.io.*;
 
 public class FtsIntegerVector
 {
-  FtsObject object; 
+  FtsObject object = null; 
   int[] values = null;
 
   public FtsIntegerVector()
@@ -78,8 +78,11 @@ public class FtsIntegerVector
 
   public void forceUpdate()
   {
-    FtsServer.getServer().sendObjectMessage(object, -1, "update", null);
-    FtsServer.getServer().syncToFts();
+    if (object != null)
+      {
+	FtsServer.getServer().sendObjectMessage(object, -1, "update", null);
+	FtsServer.getServer().syncToFts();
+      }
   }
 
   void updateFromMessage(FtsMessage msg)
@@ -101,7 +104,8 @@ public class FtsIntegerVector
     // Mandare un messaggio _set all'oggetto
     // primo argomento l'offset, e poi i valori.
 
-    FtsServer.getServer().sendSetMessage(object, from, values, from, to);
+    if (object != null)
+      FtsServer.getServer().sendSetMessage(object, from, values, from, to);
   }
 
   /** Declare that a value in the vector has been changed

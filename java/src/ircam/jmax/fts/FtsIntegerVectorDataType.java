@@ -21,9 +21,12 @@ public class FtsIntegerVectorDataType extends MaxDataType
 
   public MaxData newInstance()
   {
-    MaxData data;
+    FtsIntegerVectorData data;
+    
+    data = new FtsIntegerVectorData();
+    ((FtsIntegerVector) data.getContent()).setSize(128);
 
-    return new FtsIntegerVectorData();
+    return data;
   }
 
   public boolean canMakeNewInstance()
