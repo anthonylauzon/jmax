@@ -10,14 +10,6 @@ import java.net.*;
  * so it will work only on unix machines and the like.
  */
 
-/* 
- * Da fare: passare a fts udpsocket come argomento, e l'indirizzo incluso
- * il port locale; poi, aggiungere variabili per tenere l'indirizzo del
- * server fts, e riempirlo al primo pacchetto.
- * Poi, fare il pacchettamento/ripacchettamento lato ricezione/trasmissione
- * dati
- */
-
 class FtsDatagramStream extends FtsStream
 {
   final static private int max_packet_size = 256;

@@ -1,10 +1,13 @@
 package ircam.jmax.fts;
 
 import java.util.*;
+import java.net.*;
+
+import com.sun.java.swing.*;
 
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
-import com.sun.java.swing.*;
+
 
 /**
  * This class export a number of global functionalities
@@ -25,6 +28,18 @@ public class Fts
   public static void connectToFts(String ftsDir, String ftsName, String mode,
 				  String serverName, String port)
   {
+    if (serverName.equals("local"))
+      {
+	try
+	  {
+	    serverName = InetAddress.getLocalHost().getHostName();
+	  } 
+	catch (java.net.UnknownHostException e)
+	  {
+	    return;
+	  }
+      }
+
     if (mode.equals("socket")) 
       server = new FtsServer(serverName, new FtsSocketStream(serverName, Integer.parseInt(port)));
     else if (mode.equals("udp")) 

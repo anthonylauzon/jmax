@@ -1,0 +1,204 @@
+<HTML>
+<HEAD>
+<TITLE> The jMax Language </TITLE>
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+
+<IMG SRC="../images/logo.jpeg" ALT="IRCAM - Centre Georges Pompidou">
+
+<BR>
+<BR>
+
+<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0>
+<TR>
+<TD ALIGN=CENTER VALIGN=MIDDLE>
+<A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_small.gif" ALT="jMax" BORDER=0></A>
+</TD>
+
+<TD>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+</TD>
+
+<TD ALIGN=CENTER VALIGN=MIDDLE>
+<B><FONT SIZE=+2> The <I>j</I>Max Language </FONT></B>
+</TD>
+
+</TR>
+</TABLE>
+
+<HR>
+
+<UL>
+  <LI>
+    <A HREF="#jmaxvsmax"> <I>j</I>Max is not Max</A>
+  <LI>
+    <A HREF="#variables"> Variables </A>
+  <LI>
+    <A HREF="#expressions"> Expressions </A>
+  <LI>
+    <A HREF="#example"> An Example </A>
+  <LI>
+    <A HREF="#patchers">Patchers and Variables</A>
+  <LI>
+    <A HREF="#templates"> Templates </A>
+</UL>
+
+<HR>
+
+<A NAME="jmaxvsmax">
+<H2><I>j</I>Max is not Max</H2>
+
+<P>
+<I>j</I>Max is based on the same programming paradigm as the other
+members of the Max family, but it go a little bit further, and
+introduce a first set of language extensions to augment its expressive
+power, and to finally simplify the life of patch programmers, by
+giving better ways to customize and parametrize patches and patch
+libraries, and to refer data from objects.
+
+<P>
+
+This first release of <I>j</I>Max introduce the set of basic mechanisms;
+these mechanisms will be used as the fundation for a new object library,
+and will be extended in future releases.
+
+<P>
+
+<A NAME="variables">
+<H2>Variables</H2>
+<P>
+A variable is a name associated to a value; the association between a value
+and a name is made by instantiating an object, so the value of a variable
+do not change during the execution, but only as the result of an editing
+operation.
+<P>
+
+In order to be able to define a variable, an object need to export a
+value, of any supported type; in general, not all the objects need or
+should export a value, but only those objects representing some data
+that need to be shared between objects; any objects can export data by
+using a very simple API (not documented in this release); currently,
+only the object "const", an object without inlets and outlets, export
+a value, that correspond to its first argument.
+
+<P>
+
+A variable can be declared by prepending the variable name followed
+by a semicolon to the object description, like in "sr : const 44100".
+
+<P>
+A variable value can be used in the instantiation of an object; an
+argument in the form "$variable-name" is substituted with the
+variable value <STRONG>before</STRONG> the object is instantiated;
+since the variable substitution is handled by the system, the object
+code don't need to know about variables, and all the object can be used
+with variables.
+<P>
+
+<I>j</I>Max use local scoping for variables; this means that a variable
+defined in a patcher will be visible in all its subpatchers, but it
+will not be visible outside the patcher of definition; this avoid
+conflicts and errors in reusing variables names and simplify writing
+reusable patches; variables will be the preferred way to handle reference
+to any kind of data in the future (like table and table~ objects), so that
+locality of scoping will be available to all the form of data referencing.
+In a future version, local variables will be accessible from the outside of
+a patch by using a composite variable name (like "$spat.input.level").
+<P>
+
+The system keep track of all the dependencies between variables, and automatically
+update all the depending objects when a variable change value as an effect of an editing
+operations; since variables can depend on variables, the dependency handling is recursive;
+all the unresolved dependencies handled as instantiation errors
+(<I>red objects</I>); the resolving of pending dependencies cause automatic
+object reinstantiation.
+<P>
+
+A variable can also contains an array of values; an array can for example
+be defined by the object "srs: const { 32000, 44100, 48000 }", and accessed
+with the standard syntax "$srs[1]" (see     <A HREF="#expressions"> Expressions </A>
+below).
+
+<P>
+<A NAME="expressions">
+<H2>Expressions</H2>
+
+As we saw in the previous paragraph, we can use a variable in instantiating
+an object, by putting a "$" followed by the variable name in the object arguments.
+The dollar sign is an evaluation operator, that applied to a name return the value
+of the corresponding variable; the sequence "$"/variable name is a very simple expression.
+<P>
+<I>j</I>Max actually support more complex expression; an object argument can be
+defined as the result of an arbitrary complex expression; the expression syntax
+is derived from the <B>C</B> programming language expressions, and include parentesys,
+all the arithmetic, logic, bit-by-bit operators, the conditional operators, array access
+and function calls, and the variable evalution operator ("$").
+<P>
+Also the object class can be defined by an expression. 
+Functions calls are calls to a set of predefined functions; this release define a single
+function, <code>unique()</code> that return a unique number each time is evaluated;
+future releases will include a complete function library, and the possibility to define
+functions thru a <B>C</B> API.
+
+<P>
+<A NAME="example">
+<H2>An Example</H2>
+
+Here is an example; have fun.
+<P>
+
+<IMG SRC="../images/variable.gif" ALT="variables in patcher" BORDER=0>
+
+
+<P>
+<A NAME="patchers">
+<H2>Patchers and Variables</H2>
+<P>
+<I>j</I>Max support another way to define variables; any patcher implicitly define
+a variable, called "args", whose value is an array with all the patcher argument,
+including its name; this may sound similar to the mechanism used to pass arguments
+in abstraction in other Max.
+<P>
+Actually, this <strong>is</strong> the mechanism that is used
+to pass arguments in <I>j</I>Max; the difference is that an argument can be passed not
+only in abstractions, that in <I>j</I>Max are called <i>templates</i>, but in every
+patcher; also, a patcher can pass named argument, i.e. define new variables explicitly,
+adding at the end of the arguments a list of assignement in the form <code>variable = value</code>.
+
+
+<P>
+
+<A NAME="templates">
+<H2>Templates</H2>
+<P>
+A template is the <I>j</I>Max version of other Max abstraction; we use
+a different name mostly to avoid confusion, since <I>j</I>Max is able
+to load and use also the older Max 0.26 abstractions.
+<P>
+A template is the implementation of a new object in the <I>j</I>Max language
+itself; 
+
+     subpatchers and templates
+
+
+        + unification of subpatcher and abstraction mechanisms
+          (programming by example)
+
+        + arguments define (local) variables
+
+        + positional and named arguments
+            subpatcher: "pho one 2.0 3 coucou = 42" --> local
+          variables: $args[], $coucou
+
+
+<P>
+<HR>
+
+</BODY>
+</HTML>
+
+
+
+
+
