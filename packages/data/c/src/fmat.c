@@ -1757,7 +1757,7 @@ fmat_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     
     for (i = 1; i < size; i++)
       if (fabsf(p[i]) > max)
-        max = p[i];
+        max = fabsf(p[i]);
     
     fts_return_float(max);
   }
