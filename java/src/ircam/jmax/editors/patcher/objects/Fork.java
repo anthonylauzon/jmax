@@ -35,10 +35,10 @@ import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.interactions.*;
 
 //
-// The "Fork" graphic object.
+// The "Display" graphic object.
 //
 
-class Fork extends GraphicObject /*implements FtsOutletsListener*/
+class Fork extends GraphicObject /* implements FtsOutletsListener */
 {
   private static FtsAtom[] sendArgs = new FtsAtom[1];
   static { sendArgs[0]= new FtsAtom(); }
