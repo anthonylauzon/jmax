@@ -39,6 +39,7 @@ import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.editors.console.menus.*;
 import ircam.jmax.widgets.ConsoleArea;
 
@@ -54,6 +55,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
   private boolean noConsole;
   private ConsoleDocument document;
   private ControlPanel controlPanel;
+  private DefaultHelpMenu helpMenu;
 
   static {
     MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
@@ -73,6 +75,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
   public static void init()
   {
     consoleWindowSingleInstance.getControlPanel().init(MaxApplication.getFts());
+    consoleWindowSingleInstance.helpMenu.init();
   }
 
   public ConsoleWindow()
@@ -161,7 +164,13 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor {
 
     // Windows Menu
     mb.add( new ircam.jmax.toolkit.menus.MaxWindowJMenu( "Windows", this));
+    
+    // Add some separation between help and the others.
+    mb.add(Box.createHorizontalGlue());
 
+    // Build up the help Menu 
+    mb.add(helpMenu = new DefaultHelpMenu());
+    
     setJMenuBar( mb);
   }
 

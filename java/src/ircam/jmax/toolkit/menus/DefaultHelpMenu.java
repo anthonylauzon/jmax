@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.menus;
+package ircam.jmax.toolkit.menus;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -37,39 +37,40 @@ import ircam.jmax.mda.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.utils.*;
 
-import ircam.jmax.editors.patcher.*;
-import ircam.jmax.editors.patcher.actions.*;
-
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.menus.*;
 import ircam.jmax.toolkit.actions.*;
 
 /** Implement the patcher editor File Menu */
 
-public class HelpMenu extends /*EditorMenu*/DefaultHelpMenu
+public class DefaultHelpMenu extends EditorMenu
 {
-  public HelpMenu()
+  private boolean initDone = false;
+  public DefaultHelpMenu()
   {
-      super();
-      //super("Help");
-      //setHorizontalTextPosition(AbstractButton.LEFT);
-
-      //add(Actions.openHelpPatchAction, "Help Patch", Event.CTRL_MASK, KeyEvent.VK_H);
-      insert(Actions.openHelpPatchAction, "Help Patch", Event.CTRL_MASK, KeyEvent.VK_H, 0);
-      insertSeparator(1);
+    super("Help");
+    setHorizontalTextPosition(AbstractButton.LEFT);
 
     // Adding the summaries 
+    Enumeration en = FtsHelpPatchTable.getSummaries(); 
 
-      /*Enumeration en = FtsHelpPatchTable.getSummaries(); 
+    while (en.hasMoreElements())
+       {
+	 final String str = (String) en.nextElement();
+	 add( new OpenHelpSummaryAction(str), str + " summary");
+	 initDone = true;
+       }
+  }
 
-	while (en.hasMoreElements())
-	{
+  public void init()
+  {
+    if(initDone) return;
+    Enumeration en = FtsHelpPatchTable.getSummaries(); 
+
+    while (en.hasMoreElements())
+    {
 	final String str = (String) en.nextElement();
 	add( new OpenHelpSummaryAction(str), str + " summary");
-	}*/
-
-      addSeparator();
-      add(Actions.showHtmlAction, "Patch Editor summary");
+    }   
   }
 }
 

@@ -23,7 +23,7 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.patcher.actions;
+package ircam.jmax.toolkit.actions;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -32,12 +32,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import ircam.jmax.*;
-import ircam.jmax.editors.patcher.*;
-import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.fts.*;
 
 import ircam.jmax.toolkit.*;
-import ircam.jmax.toolkit.actions.*;
 
 public class OpenHelpSummaryAction extends EditorAction
 {
@@ -54,3 +51,4 @@ public class OpenHelpSummaryAction extends EditorAction
     FtsHelpPatchTable.openHelpSummary( container.getEditor().getFts(), argument);
   }
 }
+
