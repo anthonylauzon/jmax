@@ -48,25 +48,25 @@ static void
 delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   delwrite_t *this = (delwrite_t *)o;
-  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, fts_s_default);
   fts_symbol_t unit = samples_unit_get_arg(ac, at, 1);
   float size;
 
   if(unit)
     size = fts_get_float_arg(ac, at, 2, 0.0f);
-  else{
+  else
+  {
     size = fts_get_float_arg(ac, at, 1, 0.0f);
-    unit = samples_unit_get_default();
-
+    unit = samples_unit_get_default();   
   }
 
   this->name = 0;
   
   if(delay_table_get_delbuf(name))
-    {
-      fts_object_error(o, "name multiply defined: %s\n", name);
-      return;
-    }
+  {
+    fts_object_error(o, "name multiply defined: %s\n", name);
+    return;
+  }
 
   this->name = name;
   this->unit = unit;
@@ -84,11 +84,11 @@ delwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   delwrite_t *this = (delwrite_t *)o;
 
   if(this->name)
-    {
-      delbuf_delete_delayline(this->buf);
-      delay_table_remove_delwrite(o, this->name);
-      fts_dsp_object_delete((fts_dsp_object_t *)o);
-    }
+  {
+    delbuf_delete_delayline(this->buf);
+    delay_table_remove_delwrite(o, this->name);
+    fts_dsp_object_delete((fts_dsp_object_t *)o);
+  }
 }
 
 
@@ -111,19 +111,20 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_object_error(o, "unnamed delwrite~\n");
 
   if(delbuf_is_init(this->buf))
+  {
+    if(delbuf_get_tick_size(this->buf) != n_tick)
     {
-      if(delbuf_get_tick_size(this->buf) != n_tick)
-	{
-	  fts_object_error(o, "write sample rate does not match with delay line %s\n", this->name);
-	  return;
-	}
+      fts_object_error(o, "write sample rate does not match with delay line %s\n", this->name);
+      return;
     }
+  }
   else
-    {
-      int success;
-      success = delbuf_init(this->buf, sr, n_tick);
-      if(!success) return;
-    }
+  {
+    int success;
+    success = delbuf_init(this->buf, sr, n_tick);
+    if(!success) 
+      return;
+  }
 
   fts_set_symbol(argv, fts_dsp_get_input_name(dsp, 0));
   fts_set_pointer(argv + 1, this->buf);
@@ -188,3 +189,10 @@ delwrite_config(void)
 {
   fts_class_install(fts_new_symbol("delwrite~"),delwrite_instantiate);
 }
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
