@@ -165,3 +165,4 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monitor_cursor.gif", "monitor", this);
   }
 }
+

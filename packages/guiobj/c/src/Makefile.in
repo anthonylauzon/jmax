@@ -101,7 +101,6 @@ package_LTLIBRARIES = libguiobj.la
 libguiobj_la_SOURCES = \
 button.c \
 comment.c \
-comment_doctor.c \
 console.c \
 display.c \
 dspcontrol.c\
@@ -144,10 +143,10 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libguiobj_la_LIBADD = 
-libguiobj_la_OBJECTS =  button.lo comment.lo comment_doctor.lo \
-console.lo display.lo dspcontrol.lo errorfinder.lo finder.lo fork.lo \
-gfloat.lo gint.lo guiobj.lo key.lo keyserver.lo messconst.lo monitor.lo \
-panel.lo runtimeerrors.lo scope.lo slider.lo toggle.lo vecdisplay.lo \
+libguiobj_la_OBJECTS =  button.lo comment.lo console.lo display.lo \
+dspcontrol.lo errorfinder.lo finder.lo fork.lo gfloat.lo gint.lo \
+guiobj.lo key.lo keyserver.lo messconst.lo monitor.lo panel.lo \
+runtimeerrors.lo scope.lo slider.lo toggle.lo vecdisplay.lo \
 matdisplay.lo xypad.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -163,12 +162,12 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/button.P .deps/comment.P .deps/comment_doctor.P \
-.deps/console.P .deps/display.P .deps/dspcontrol.P .deps/errorfinder.P \
-.deps/finder.P .deps/fork.P .deps/gfloat.P .deps/gint.P .deps/guiobj.P \
-.deps/key.P .deps/keyserver.P .deps/matdisplay.P .deps/messconst.P \
-.deps/monitor.P .deps/panel.P .deps/runtimeerrors.P .deps/scope.P \
-.deps/slider.P .deps/toggle.P .deps/vecdisplay.P .deps/xypad.P
+DEP_FILES =  .deps/button.P .deps/comment.P .deps/console.P \
+.deps/display.P .deps/dspcontrol.P .deps/errorfinder.P .deps/finder.P \
+.deps/fork.P .deps/gfloat.P .deps/gint.P .deps/guiobj.P .deps/key.P \
+.deps/keyserver.P .deps/matdisplay.P .deps/messconst.P .deps/monitor.P \
+.deps/panel.P .deps/runtimeerrors.P .deps/scope.P .deps/slider.P \
+.deps/toggle.P .deps/vecdisplay.P .deps/xypad.P
 SOURCES = $(libguiobj_la_SOURCES)
 OBJECTS = $(libguiobj_la_OBJECTS)
 

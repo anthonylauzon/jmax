@@ -100,6 +100,7 @@ lib_LTLIBRARIES = libfts.la
 
 libfts_la_SOURCES = \
 @PLATFORM@.c \
+OLDexpression.c \
 abstraction.c \
 array.c \
 atom.c \
@@ -113,7 +114,6 @@ class.c \
 client.c \
 clipboard.c \
 connection.c \
-doctor.c \
 dsp.c \
 dspgraph.c \
 errobj.c \
@@ -176,11 +176,11 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfts_la_LIBADD = 
-libfts_la_OBJECTS =  @PLATFORM@.lo abstraction.lo array.lo atom.lo \
-atomfile.lo audio.lo audiofile.lo autosave.lo bmaxfile.lo bytestream.lo \
-class.lo client.lo clipboard.lo connection.lo doctor.lo dsp.lo \
-dspgraph.lo errobj.lo expression.lo fifo.lo file.lo fpe.lo ftl.lo \
-ftlmem.lo fts.lo hashtable.lo label.lo list.lo mem.lo message.lo \
+libfts_la_OBJECTS =  @PLATFORM@.lo OLDexpression.lo abstraction.lo \
+array.lo atom.lo atomfile.lo audio.lo audiofile.lo autosave.lo \
+bmaxfile.lo bytestream.lo class.lo client.lo clipboard.lo connection.lo \
+dsp.lo dspgraph.lo errobj.lo expression.lo fifo.lo file.lo fpe.lo \
+ftl.lo ftlmem.lo fts.lo hashtable.lo label.lo list.lo mem.lo message.lo \
 midi.lo midifile.lo object.lo objectlist.lo objectset.lo package.lo \
 param.lo patcher.lo patfile.lo post.lo project.lo property.lo sched.lo \
 selection.lo sigconn.lo stack.lo symbol.lo template.lo time.lo tuple.lo \
@@ -205,14 +205,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/@PLATFORM@.P .deps/abstraction.P .deps/array.P \
-.deps/atom.P .deps/atomfile.P .deps/audio.P .deps/audiofile.P \
-.deps/autosave.P .deps/bmaxfile.P .deps/bytestream.P .deps/class.P \
-.deps/client.P .deps/clipboard.P .deps/connection.P .deps/doctor.P \
-.deps/dsp.P .deps/dspgraph.P .deps/errobj.P .deps/expression.P \
-.deps/fifo.P .deps/file.P .deps/fpe.P .deps/ftl.P .deps/ftlmem.P \
-.deps/fts.P .deps/hashtable.P .deps/label.P .deps/list.P .deps/main.P \
-.deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
+DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDexpression.P \
+.deps/abstraction.P .deps/array.P .deps/atom.P .deps/atomfile.P \
+.deps/audio.P .deps/audiofile.P .deps/autosave.P .deps/bmaxfile.P \
+.deps/bytestream.P .deps/class.P .deps/client.P .deps/clipboard.P \
+.deps/connection.P .deps/dsp.P .deps/dspgraph.P .deps/errobj.P \
+.deps/expression.P .deps/fifo.P .deps/file.P .deps/fpe.P .deps/ftl.P \
+.deps/ftlmem.P .deps/fts.P .deps/hashtable.P .deps/label.P .deps/list.P \
+.deps/main.P .deps/mem.P .deps/message.P .deps/midi.P .deps/midifile.P \
 .deps/object.P .deps/objectlist.P .deps/objectset.P .deps/package.P \
 .deps/param.P .deps/parser.P .deps/patcher.P .deps/patfile.P \
 .deps/post.P .deps/project.P .deps/property.P .deps/sched.P \

@@ -204,7 +204,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     itsSketchPad.getDisplayList().remove(this);
     itsSketchPad.getFtsPatcher().removeObject( ftsObject);
     dispose();
-    //ftsObject.delete();
   }
   
   public final int getX() 
@@ -282,7 +281,6 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 				  isSquare() ? ScaleTransform.getInstance().invScaleX(h) 
 				  : ScaleTransform.getInstance().invScaleY(h ));
     
-    //itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
   public void setDefaults(){}

@@ -83,7 +83,6 @@ public class TextRenderer implements ObjectRenderer
 
     owner = object;
     area = new RenderTextArea();
-
     area.setEditable(false);
     area.setLineWrap(true);
     area.setWrapStyleWord(true);

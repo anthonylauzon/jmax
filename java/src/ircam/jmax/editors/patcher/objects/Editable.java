@@ -101,10 +101,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
 
   public int getMinimumWidth(){
-      if(renderer instanceof TextRenderer)
-	  return ((TextRenderer)renderer).getColWidth() + getTextWidthOffset();
-      else 
-	  return renderer.getWidth();
+    if(renderer instanceof TextRenderer)
+      return ((TextRenderer)renderer).getColWidth() + getTextWidthOffset();
+    else 
+      return renderer.getWidth();
   }
 
   public int getDefaultWidth()
@@ -117,7 +117,7 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
   public void setDefaultWidth(int w)
   {
-      defaultWidth = w;
+    defaultWidth = w;
   }
 
   // redefined from base class
@@ -137,6 +137,11 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
       } 
   }
 
+  public void forceWidth( int w)
+  {
+    super.setWidth( w);
+  }
+
   // redefined from base class, only when not editing
   // This way, changing the height from outside is forbidden
 
@@ -144,6 +149,11 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
   {
     if (editing)
       super.setHeight(v);
+  }
+
+  public void forceHeight( int v)
+  {
+    super.setHeight(v);
   }
 
   // redefined from base class
@@ -154,6 +164,12 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     renderer.update();
     super.setHeight(renderer.getHeight() + getTextHeightOffset());
     redraw();
+  }
+
+  public void forceFont( Font f)
+  {
+    super.setFont( f);
+    renderer.update();
   }
 
   public void setCurrentFont(Font font)
@@ -181,10 +197,10 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
 
   public void setWidthToText(String text)
   {
-      int tLength = SwingUtilities.computeStringWidth(getFontMetrics(), text)+ getTextWidthOffset() + 2; 	
-      if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
-	
-      super.setWidth(tLength);
+    int tLength = SwingUtilities.computeStringWidth(getFontMetrics(), text)+ getTextWidthOffset() + 2; 	
+    if(tLength < getDefaultWidth()) tLength = getDefaultWidth();
+    
+    super.setWidth(tLength);
   }
 
   // ----------------------------------------
@@ -238,7 +254,6 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
-
   public void drawContent(Graphics g) 
   {
     if (editing)
@@ -291,3 +306,4 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     ObjectPopUp.removeSeparation();
   }
 }
+

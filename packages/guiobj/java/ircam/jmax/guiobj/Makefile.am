@@ -3,6 +3,7 @@ package_JAVA = \
 Bang.java \
 BangControlPanel.java \
 Comment.java \
+CommentControlPanel.java \
 Display.java \
 FloatBox.java \
 Fork.java \

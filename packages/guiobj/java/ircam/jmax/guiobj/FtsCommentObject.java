@@ -39,15 +39,16 @@ import ircam.fts.client.*;
 
 public class FtsCommentObject extends FtsGraphicObject
 {
-  /*****************************************************************************/
-  /*                                                                           */
-  /*                               CONSTRUCTORS                                */
-  /*                                                                           */
-  /*****************************************************************************/
+  static
+  {
+    FtsObject.registerMessageHandler( FtsCommentObject.class, FtsSymbol.get("color"), new FtsMessageHandler(){
+	public void invoke(FtsObject obj, FtsArgs args)
+	{
+	  ((FtsCommentObject)obj).setCurrentColor( args.getInt(0));
+	}
+      });
+  }
 
-  /**
-   * Create a FtsObject object;
-   */
   public FtsCommentObject(FtsServer server, FtsObject parent, int id, String className, FtsAtom args[], int offset, int length)
   {
     super(server, parent, id, className, args[offset].stringValue);
@@ -62,6 +63,35 @@ public class FtsCommentObject extends FtsGraphicObject
     ((Comment)getObjectListener()).renderer.update();
     ((Comment)getObjectListener()).redraw();
   }
+
+  public final void setColor(int color)
+  {
+    args.clear();
+    args.addInt(color);
+    
+    try{
+      send( FtsSymbol.get( "color"), args);
+    }
+    catch(IOException e)
+      {
+	System.err.println("FtsCommentObject: I/O Error sending setColor Message!");
+	e.printStackTrace(); 
+      }  
+  }
+  
+  public void setCurrentColor(int color)
+  {
+    this.color = color;
+    (( Comment)getObjectListener()).setCurrentColor( color);
+  }
+
+  public int getColor()
+  {
+    return color;
+  }
+  
+  protected transient FtsArgs args = new FtsArgs();
+  int color;
 }
 
 
