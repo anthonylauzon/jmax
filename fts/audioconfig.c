@@ -437,7 +437,15 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 /*       label->output_device = fts_get_symbol(at + 4); */
 /*       label->output_channel = fts_get_int(at + 5); */
 /*     } */
-  
+
+  if (6 == ac)
+  {
+    fts_send_message((fts_object_t*)label, fts_s_input, 1, at + 2);
+    fts_send_message((fts_object_t*)label, fts_new_symbol("input_channel"), 1, at + 3);
+    fts_send_message((fts_object_t*)label, fts_s_output, 1, at + 4);
+    fts_send_message((fts_object_t*)label, fts_new_symbol("output_channel"), 1, at + 5);
+  }
+
   if (fts_object_has_id(o))
     {
       fts_atom_t args[7];
@@ -447,10 +455,10 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
       fts_set_int(args, index);
       fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label)); 
       fts_set_symbol(args + 2, fts_audiolabel_get_name(label));
-      fts_set_symbol(args + 3, fts_audiolabel_get_port_name( label, FTS_AUDIO_INPUT));
-      fts_set_int(args + 4, fts_audiolabel_get_channel( label, FTS_AUDIO_INPUT));
-      fts_set_symbol(args + 5, fts_audiolabel_get_port_name( label, FTS_AUDIO_OUTPUT));
-      fts_set_int(args + 6, fts_audiolabel_get_channel( label, FTS_AUDIO_OUTPUT));
+      fts_set_symbol(args + 3, fts_audiolabel_get_port_name(label, FTS_AUDIO_INPUT));
+      fts_set_int(args + 4, fts_audiolabel_get_channel(label, FTS_AUDIO_INPUT));
+      fts_set_symbol(args + 5, fts_audiolabel_get_port_name(label, FTS_AUDIO_OUTPUT));
+      fts_set_int(args + 6, fts_audiolabel_get_channel(label, FTS_AUDIO_OUTPUT));
       fts_client_send_message(o, fts_s_insert, 7, args);    
     }
 }
