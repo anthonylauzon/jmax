@@ -40,6 +40,7 @@ struct value_keeper
   int count;
 };
 
+static fts_symbol_t sym_v = 0;
 static fts_hash_table_t value_table;
 
 static struct value_keeper *
@@ -142,43 +143,61 @@ value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 value_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
   /* initialize the class */
-
   fts_class_init(cl, sizeof(value_t), 1, 1, 0); 
 
   /* define the system methods */
-
-  a[0] = fts_s_symbol;
-  a[1] = fts_s_symbol;
-  a[2] = fts_s_anything;
-  fts_method_define_optargs(cl, fts_SystemInlet, fts_s_init, value_init, 3, a, 2);
-
-  fts_method_define(cl, fts_SystemInlet, fts_s_delete, value_delete, 0, 0);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, value_init);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, value_delete);
 
   /* Value args */
-  fts_method_define(cl, 0, fts_s_bang, value_bang, 0, 0);
+  fts_method_define_varargs(cl, 0, fts_s_bang, value_bang);
 
-  a[0] = fts_s_int;
-  fts_method_define(cl, 0, fts_s_int, value_scalar, 1, a);
-
-  a[0] = fts_s_float;
-  fts_method_define(cl, 0, fts_s_float, value_scalar, 1, a);
-
-  a[0] = fts_s_symbol;
-  fts_method_define(cl, 0, fts_s_symbol, value_scalar, 1, a);
+  fts_method_define_varargs(cl, 0, fts_s_int, value_scalar);
+  fts_method_define_varargs(cl, 0, fts_s_float, value_scalar);
+  fts_method_define_varargs(cl, 0, fts_s_symbol, value_scalar);
 
   return fts_Success;
 }
 
+static fts_object_t *
+value_doctor(fts_patcher_t *patcher, int ac, const fts_atom_t *at)
+{
+  fts_object_t *obj;
+  int i;
+
+  /* change object "value <symbol> ..." to "v" <symbol> ..." */
+  if(ac > 1 && fts_is_symbol(at + 1))
+    {
+      fts_atom_t a[3];
+
+      fts_set_symbol(a + 0, sym_v);
+      a[1] = at[1];
+
+      if(ac > 2)
+	{
+	  a[2] = at[2];
+	  ac = 3;
+	}
+      
+      obj = fts_eval_object_description(patcher, ac, a);
+
+      return obj;
+    }
+  else
+    return 0;
+}
 
 void
-value_config(void)
+ispw_value_config(void)
 {
+  sym_v = fts_new_symbol("v");
+
   fts_hash_table_init(&value_table);
 
-  fts_class_install(fts_new_symbol("value"),value_instantiate);
-  fts_class_alias(fts_new_symbol("v"), fts_new_symbol("value"));
+  fts_class_install(sym_v, value_instantiate);
+
+  /* ispw value compatibility */
+  fts_register_object_doctor(fts_new_symbol("value"), value_doctor);
 }
 

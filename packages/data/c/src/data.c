@@ -37,6 +37,7 @@ extern void mat_config(void);
 
 extern void getelem_config(void);
 extern void getsize_config(void);
+extern void getrange_config(void);
 extern void getlist_config(void);
 
 extern void fill_config(void);
@@ -58,6 +59,7 @@ data_init(void)
 
   getelem_config();  
   getsize_config();  
+  getrange_config();  
   getlist_config();  
 
   fill_config();

@@ -34,7 +34,7 @@ extern void funbuff_config(void);
 extern void integer_config(void);
 extern void pbank_config(void);
 extern void table_config(void);
-extern void value_config(void);
+extern void ispw_value_config(void);
 extern void expr_config(void);
 extern void expr_doctor_init(void);
 
@@ -49,7 +49,7 @@ ispw_data_module_init(void)
   funbuff_config();
   pbank_config();
   table_config();
-  value_config();
+  ispw_value_config();
 
   /* Note: expr is here because it needs to be in the same
      .so library than table

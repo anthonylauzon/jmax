@@ -869,7 +869,7 @@ binop_ivec_max_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 /**************************************************************************************
  *
- *  number x fvec
+ *  number x ivec
  *
  */
 

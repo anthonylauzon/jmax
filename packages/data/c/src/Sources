@@ -34,6 +34,7 @@ vec.c \
 mat.c \
 getelem.c \
 getsize.c \
+getrange.c \
 getlist.c \
 fill.c \
 copy.c \

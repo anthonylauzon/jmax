@@ -36,13 +36,7 @@ typedef struct
   fts_object_t o;
   int i;
   int j;
-  union {
-    vec_t *vec;
-    ivec_t *ivec;
-    fvec_t *fvec;
-    mat_t *mat;
-    fts_object_t *obj;
-  } ref;
+  fts_object_t *obj;
 } elem_t;
 
 static void
@@ -53,15 +47,15 @@ elem_vec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac == 2)
     {
       this->i = 0;
-      this->ref.obj = fts_get_object(at + 1);
+      this->obj = fts_get_object(at + 1);
     }
   else
     {
       this->i = fts_get_number_int(at + 1);
-      this->ref.obj = fts_get_object(at + 2);
+      this->obj = fts_get_object(at + 2);
     }
 
-  fts_object_refer(this->ref.obj);
+  fts_object_refer(this->obj);
 }
 
 static void
@@ -73,16 +67,16 @@ elem_mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       this->i = 0;
       this->j = 0;
-      this->ref.obj = fts_get_object(at + 1);
+      this->obj = fts_get_object(at + 1);
     }
   else
     {
       this->i = fts_get_number_int(at + 1);
       this->j = fts_get_number_int(at + 2);
-      this->ref.obj = fts_get_object(at + 3);
+      this->obj = fts_get_object(at + 3);
     }
 
-  fts_object_refer(this->ref.obj);
+  fts_object_refer(this->obj);
 }
 
 static void
@@ -90,7 +84,7 @@ elem_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 {
   elem_t *this = (elem_t *)o;
 
-  fts_object_release(this->ref.obj);
+  fts_object_release(this->obj);
 }
 
 /******************************************************
@@ -105,8 +99,8 @@ elem_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   elem_t *this = (elem_t *)o;
   fts_object_t *obj = fts_get_object(at);
 
-  fts_object_release(this->ref.obj);
-  this->ref.obj = obj;
+  fts_object_release(this->obj);
+  this->obj = obj;
   fts_object_refer(obj);
 }
 
@@ -144,12 +138,12 @@ static void
 getelem_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  int size = vec_get_size(this->ref.vec);
+  int size = vec_get_size((vec_t *)this->obj);
   int i = this->i;
   
   if(i >= 0 && i < size)
     {
-      fts_atom_t *a = &vec_get_element(this->ref.vec, i);
+      fts_atom_t *a = &vec_get_element((vec_t *)this->obj, i);
       
       if(!fts_is_void(a))
 	fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
@@ -185,11 +179,11 @@ static void
 setelem_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  int size = vec_get_size(this->ref.vec);
+  int size = vec_get_size((vec_t *)this->obj);
   int i = this->i;
   
   if(ac > 0 && i >= 0 && i < size)
-    vec_set_element(this->ref.vec, i, at[0]);
+    vec_set_element((vec_t *)this->obj, i, at[0]);
 }
 
 static void
@@ -212,11 +206,11 @@ static void
 getelem_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  int size = ivec_get_size(this->ref.ivec);
+  int size = ivec_get_size((ivec_t *)this->obj);
   int i = this->i;
 
   if(i >= 0 && i < size)
-    fts_outlet_int(o, 0, ivec_get_element(this->ref.ivec, i));
+    fts_outlet_int(o, 0, ivec_get_element((ivec_t *)this->obj, i));
 }
 
 static void
@@ -248,11 +242,11 @@ static void
 setelem_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  int size = ivec_get_size(this->ref.ivec);
+  int size = ivec_get_size((ivec_t *)this->obj);
   int i = this->i;
 
   if(i >= 0 && i < size)
-    ivec_set_element(this->ref.ivec, i, fts_get_number_int(at));
+    ivec_set_element((ivec_t *)this->obj, i, fts_get_number_int(at));
 }
 
 static void
@@ -276,11 +270,11 @@ static void
 getelem_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  int size = fvec_get_size(this->ref.fvec);
+  int size = fvec_get_size((fvec_t *)this->obj);
   int i = this->i;
 
   if(i >= 0 && i < size)
-    fts_outlet_float(o, 0, fvec_get_element(this->ref.fvec, i));
+    fts_outlet_float(o, 0, fvec_get_element((fvec_t *)this->obj, i));
 }
 
 static void
@@ -312,11 +306,11 @@ static void
 setelem_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  int size = fvec_get_size(this->ref.fvec);
+  int size = fvec_get_size((fvec_t *)this->obj);
   int i = this->i;
 
   if(i >= 0 && i < size)
-    fvec_set_element(this->ref.fvec, i, fts_get_number_float(at));
+    fvec_set_element((fvec_t *)this->obj, i, fts_get_number_float(at));
 }
 
 static void
@@ -340,7 +334,7 @@ static void
 getelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  mat_t *mat = this->ref.mat;
+  mat_t *mat = (mat_t *)this->obj;
   int m = mat_get_m(mat);
   int n = mat_get_n(mat);
   int i = this->i;
@@ -348,7 +342,7 @@ getelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(i >= 0 && i < m && j >= 0 && j < n)
     {
-      fts_atom_t *a = &mat_get_element(this->ref.mat, i, j);
+      fts_atom_t *a = &mat_get_element((mat_t *)this->obj, i, j);
       
       if(!fts_is_void(a))
 	fts_outlet_send(o, 0, fts_get_selector(a), 1, a);
@@ -395,14 +389,14 @@ static void
 setelem_mat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   elem_t *this = (elem_t *)o;
-  mat_t *mat = this->ref.mat;
+  mat_t *mat = (mat_t *)this->obj;
   int m = mat_get_m(mat);
   int n = mat_get_n(mat);
   int i = this->i;
   int j = this->j;
   
   if(ac > 0 && i >= 0 && i < m && j >= 0 && j < n)
-    mat_set_element(this->ref.mat, i, j, at[0]);
+    mat_set_element((mat_t *)this->obj, i, j, at[0]);
 }
 
 static void

@@ -27,6 +27,8 @@
 #include <fts/fts.h>
 #include "fvec.h"
 
+#include <stdlib.h>
+
 #define FVEC_NO_ALLOC -1
 
 fts_symbol_t fvec_symbol = 0;
@@ -314,6 +316,145 @@ fvec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
       if(offset >= 0 && offset < size)
 	fvec_set_from_atom_list(this, offset, ac - 1, at + 1);
+    }
+}
+
+static void
+fvec_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  float *ptr = fvec_get_ptr(this);
+  int size = fvec_get_size(this); 
+  int i, j;
+
+  for(i=0, j=size-1; i<size/2; i++, j--)
+    {
+      float f = ptr[i];
+
+      ptr[i] = ptr[j];
+      ptr[j] = f;
+    }
+  
+}
+
+static int 
+fvec_element_compare(const void *left, const void *right)
+{
+  float l = *((const float *)left);
+  float r = *((const float *)right);
+
+  return l - r;
+}
+
+static void
+fvec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  float *ptr = fvec_get_ptr(this);
+
+  qsort((void *)ptr, fvec_get_size(this), sizeof(float), fvec_element_compare);
+}
+
+static void
+fvec_scrumble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  float *ptr = fvec_get_ptr(this);
+  int size = fvec_get_size(this);
+  double range = size;
+  int i;
+
+  for(i=0; i<size-1; i++)
+    {
+      int random = (int)(range * fts_random() / FTS_RANDOM_RANGE);
+      float f = ptr[i];
+
+      ptr[i] = ptr[i + random];
+      ptr[i + random] = f;
+
+      range -= 1.0;
+    }
+}
+
+static void
+fvec_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fvec_t *this = (fvec_t *)o;
+  float *ptr = fvec_get_ptr(this);
+  int size = fvec_get_size(this);
+
+  if(size > 1)
+    {
+      int shift = 1;
+      
+      if(ac && fts_is_number(at))
+	shift = fts_get_number_int(at);
+      
+      if(shift == 1)
+	{
+	  float f = ptr[size - 1];
+	  int i;
+
+	  for(i=size-2; i>=0; i--)
+	    ptr[i + 1] = ptr[i];
+
+	  ptr[0] = f;
+	}
+      else if(shift == -1)
+	{
+	  float f = ptr[0];
+	  int i;
+
+	  for(i=0; i<size-1; i++)
+	    ptr[i] = ptr[i + 1];
+
+	  ptr[size - 1] = f;
+	}
+      else
+	{
+	  float forward;
+	  int i, j, next, end;
+
+	  while(shift < 0)
+	    shift += size;
+	  
+	  while(shift >= size)
+	    shift -= size;
+	  
+	  i = 0;
+	  j = shift;
+	  end = shift; 
+
+	  forward = ptr[shift];
+	  ptr[shift] = ptr[0];
+	  
+	  while(i < end)
+	    {
+	      next = (j + shift) % size;
+	      
+	      if(next != i)
+		{
+		  float swap = ptr[next];
+
+		  if(next < end)
+		    end = next;
+
+		  ptr[next] = forward;
+		  forward = swap;
+
+		  j = next;
+		}
+	      else
+		{
+		  ptr[i] = forward;
+
+		  i++;
+		  j = i;
+
+		  forward = ptr[i];
+		}
+	    }
+	}
     }
 }
 
@@ -765,6 +906,11 @@ fvec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_new_symbol("fill"), fvec_fill);
   fts_method_define_varargs(cl, 0, fts_new_symbol("set"), fvec_set);
   
+  fts_method_define_varargs(cl, 0, fts_new_symbol("reverse"), fvec_reverse);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("sort"), fvec_sort);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("scrumble"), fvec_scrumble);
+  fts_method_define_varargs(cl, 0, fts_new_symbol("rotate"), fvec_rotate);
+
   fts_method_define_varargs(cl, 0, fts_new_symbol("size"), fvec_size);
   
   fts_method_define_varargs(cl, 0, fts_new_symbol("import"), fvec_import);

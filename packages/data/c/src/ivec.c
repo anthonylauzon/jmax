@@ -27,6 +27,8 @@
 #include <fts/fts.h>
 #include "ivec.h"
 
+#include <stdlib.h>
+
 static fts_symbol_t sym_text = 0;
 
 fts_symbol_t ivec_symbol = 0;
@@ -493,6 +495,145 @@ ivec_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 		ivec_insert_pixels(this, offset, ac - 1);
 	      
 	      fts_client_send_message((fts_object_t *)this, sym_append_visibles, ac, at);
+	    }
+	}
+    }
+}
+
+static void
+ivec_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  int *ptr = ivec_get_ptr(this);
+  int size = ivec_get_size(this); 
+  int i, j;
+
+  for(i=0, j=size-1; i<size/2; i++, j--)
+    {
+      int f = ptr[i];
+
+      ptr[i] = ptr[j];
+      ptr[j] = f;
+    }
+  
+}
+
+static int 
+ivec_element_compare(const void *left, const void *right)
+{
+  int l = *((const int *)left);
+  int r = *((const int *)right);
+
+  return l - r;
+}
+
+static void
+ivec_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  int *ptr = ivec_get_ptr(this);
+
+  qsort((void *)ptr, ivec_get_size(this), sizeof(int), ivec_element_compare);
+}
+
+static void
+ivec_scrumble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  int *ptr = ivec_get_ptr(this);
+  int size = ivec_get_size(this);
+  double range = size;
+  int i;
+
+  for(i=0; i<size-1; i++)
+    {
+      int random = (int)(range * fts_random() / FTS_RANDOM_RANGE);
+      int f = ptr[i];
+
+      ptr[i] = ptr[i + random];
+      ptr[i + random] = f;
+
+      range -= 1.0;
+    }
+}
+
+static void
+ivec_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  ivec_t *this = (ivec_t *)o;
+  int *ptr = ivec_get_ptr(this);
+  int size = ivec_get_size(this);
+
+  if(size > 1)
+    {
+      int shift = 1;
+      
+      if(ac && fts_is_number(at))
+	shift = fts_get_number_int(at);
+      
+      if(shift == 1)
+	{
+	  int f = ptr[size - 1];
+	  int i;
+
+	  for(i=size-2; i>=0; i--)
+	    ptr[i + 1] = ptr[i];
+
+	  ptr[0] = f;
+	}
+      else if(shift == -1)
+	{
+	  int f = ptr[0];
+	  int i;
+
+	  for(i=0; i<size-1; i++)
+	    ptr[i] = ptr[i + 1];
+
+	  ptr[size - 1] = f;
+	}
+      else
+	{
+	  int forward;
+	  int i, j, next, end;
+
+	  while(shift < 0)
+	    shift += size;
+	  
+	  while(shift >= size)
+	    shift -= size;
+	  
+	  i = 0;
+	  j = shift;
+	  end = shift; 
+
+	  forward = ptr[shift];
+	  ptr[shift] = ptr[0];
+	  
+	  while(i < end)
+	    {
+	      next = (j + shift) % size;
+	      
+	      if(next != i)
+		{
+		  int swap = ptr[next];
+
+		  if(next < end)
+		    end = next;
+
+		  ptr[next] = forward;
+		  forward = swap;
+
+		  j = next;
+		}
+	      else
+		{
+		  ptr[i] = forward;
+
+		  i++;
+		  j = i;
+
+		  forward = ptr[i];
+		}
 	    }
 	}
     }
