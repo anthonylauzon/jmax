@@ -87,18 +87,12 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
   if(!track)
     {
       sequence_t *sequence = data->sequence;
-      char s[] = "track9999";
-      fts_symbol_t name;
-      fts_atom_t a[3];
+      fts_atom_t a[2];
   
-      sprintf(s, "track%d", sequence_get_size(sequence));
-      name = fts_new_symbol_copy(s);
-
       /* create new track */
       fts_set_symbol(a + 0, seqsym_eventtrk);
-      fts_set_symbol(a + 1, name);
-      fts_set_symbol(a + 2, seqsym_noteevt);
-      fts_object_new(0, 3, a, (fts_object_t **)&track);
+      fts_set_symbol(a + 1, seqsym_noteevt);
+      fts_object_new(0, 2, a, (fts_object_t **)&track);
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -156,22 +150,16 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
   eventtrk_t *track = data->controller_tracks[ctrl_num];
   double time = 1000.0 * fts_midifile_get_current_time_in_seconds(file);
   fts_object_t *intevt;
-  fts_atom_t a[3];
+  fts_atom_t a[2];
   
   if(!track)
     {
       sequence_t *sequence = data->sequence;
-      char s[] = "track9999";
-      fts_symbol_t name;
-  
-      sprintf(s, "track%d", sequence_get_size(sequence));
-      name = fts_new_symbol_copy(s);
 
       /* create new track */
       fts_set_symbol(a + 0, seqsym_eventtrk);
-      fts_set_symbol(a + 1, name);
-      fts_set_symbol(a + 2, seqsym_intevt);
-      fts_object_new(0, 3, a, (fts_object_t **)&track);
+      fts_set_symbol(a + 1, seqsym_intevt);
+      fts_object_new(0, 2, a, (fts_object_t **)&track);
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -339,7 +327,7 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
   if(file)
     {
       seqmidi_write_data_t data;
-      fts_atom_t a[3];
+      fts_atom_t a[2];
       event_t *event;
       notestat_t *stat;
       int i, j;
@@ -352,9 +340,8 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
 	  
       /* make note off track */
       fts_set_symbol(a + 0, seqsym_eventtrk); /* event track */
-      fts_set_symbol(a + 1, seqsym_export_midi); /* track name */
-      fts_set_symbol(a + 2, seqsym_export_midi); /* event type */
-      fts_object_new(0, 3, a, (fts_object_t **)&(data.note_off_track));
+      fts_set_symbol(a + 1, seqsym_export_midi); /* track type */
+      fts_object_new(0, 2, a, (fts_object_t **)&(data.note_off_track));
       
       /* init array of note status events */
       for(i=0; i<=N_MIDI_CHANNELS; i++)
