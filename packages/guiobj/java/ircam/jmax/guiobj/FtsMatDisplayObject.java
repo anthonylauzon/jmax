@@ -140,6 +140,9 @@ public class FtsMatDisplayObject extends FtsGraphicObject
     if(scroll < 0)
       scroll += nSize;
 
+    if(pixels.length < (mSize * mZoom * nSize * nZoom))
+      pixels = new byte[nSize*nZoom*mSize*mZoom];
+
     for(int m=0; m<mSize; m++)
       {
 	int offset = m * mZoom * nSize * nZoom;
@@ -170,7 +173,7 @@ public class FtsMatDisplayObject extends FtsGraphicObject
 	mWindow = m;
 	nWindow = n;
 
-	pixels = new byte[mWindow * nWindow];
+	pixels = new byte[nSize*nZoom*mSize*mZoom];
 	scroll = 0;
       }
   }
@@ -196,8 +199,9 @@ public class FtsMatDisplayObject extends FtsGraphicObject
   {
     mZoom = mZ;
     nZoom = nZ;
-    scroll = 0;    
 
+    pixels = new byte[nSize*nZoom*mSize*mZoom];
+    
     if(listener != null)
       {
 	((FtsDisplayListener) listener).display();
