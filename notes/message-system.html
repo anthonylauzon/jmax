@@ -1,265 +1,271 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-               
+                       
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-  <title>FTS 3+ message system</title>
+  <title>jMax 3 message system</title>
 </head>
  <body style="font-family: sans-serif; ">
-       
-<h1>FTS 3+ message system</h1>
- This paper develops features of a new FTS message system from a critical 
-analysis of the existing one.<br>
-       
+           
+<h1>jMax 3 message system</h1>
+   This paper develops features of a new FTS message system from a critical 
+ analysis of the existing one.<br>
+           
 <h2>introduction of <i>data </i>objects</h2>
-    The current message system doesn't distinguish objects showing up as
-boxes  on screen from others which are manipulated by the FTS message system.<br>
-   <br>
-   Nevertheless more and more classes are created in FTS to represent complex 
- data types such as vectors (e.g. fvec) or MIDI events. Instances of these 
- <i><b>data classes</b></i> can be dynamically created as well as garbage 
-collected and sent in messages between the objects of a patcher.<br>
-   <br>
-   It has been experienced that manipulating objects this way the including 
- use of side effects are significantly simplifying FTS patches. On the other 
- hand the manipulation of garbage objects has simplified the implementation 
- of new FTS functionalities such as the MIDI system and the sequencer.<br>
-    <br>
-   The only way for patch programmer to invoke methods of an object is to 
-instantiate  it as a box in a patcher and send messages to an inlet. Another 
-way is to  send the object into an object instantiated in a patcher. Rather 
-generic <i><b> operator classe</b></i><i><b>s</b></i> such as <code>print 
-</code>and <code> getlist </code>are already implemented as method calls to
-the received object. Other classes such <code>getelem</code> access directly 
-the objects data structure to produce an output but could be implemented in
-a similar way.<br>
-   <br>
-    The  <i><b>data classes</b></i> of FTS include:<br>
-        
+      The current message system doesn't distinguish objects showing up as
+ boxes  on screen from others which are manipulated by the FTS message system.<br>
+     <br>
+     Nevertheless more and more classes are created in FTS to represent complex 
+  data types such as vectors (e.g. fvec) or MIDI events. Instances of these 
+  <i><b>data classes</b></i> can be dynamically created as well as garbage 
+ collected and sent in messages between the objects of a patcher.<br>
+     <br>
+     It has been experienced that manipulating objects this way the including 
+  use of side effects are significantly simplifying FTS patches. On the other 
+  hand the manipulation of garbage objects has simplified the implementation 
+  of new FTS functionalities such as the MIDI system and the sequencer.<br>
+      <br>
+     The only way for patch programmer to invoke methods of an object is
+to  instantiate  it as a box in a patcher and send messages to an inlet.
+Another  way is to  send the object into an object instantiated in a patcher.
+Rather  generic <i><b> operator classe</b></i><i><b>s</b></i> such as <code>
+print  </code>and <code> getlist </code>are already implemented as method
+calls to the received object. Other classes such <code>getelem</code> access
+directly  the objects data structure to produce an output but could be implemented 
+in a similar way.<br>
+     <br>
+      The  <i><b>data classes</b></i> of FTS include:<br>
+            
 <ul>
-               
+                       
   <li>ivec</li>
-               
+                       
   <li>fvec</li>
-               
+                       
   <li>vec</li>
-               
+                       
   <li>mat</li>
-               
+                       
   <li>bpf</li>
-               
+                       
   <li>messtab</li>
-               
+                       
   <li>sequence and track<br>
-        </li>
-       
+          </li>
+           
 </ul>
-    In addition references to objects (using variables) are used to handle
- objects of the following classes:<br>
-        
+      In addition references to objects (using variables) are used to handle
+  objects of the following classes:<br>
+            
+<ul>
+                       
+  <li>preset<br>
+       </li>
+                   
+  <li>bus and label</li>
+                   
+  <li>bytestream<br>
+       </li>
+                          
+  <li>audioport and midiport</li>
+           
+</ul>
+      A new message system should provide a more sophisticated garbage collector.<br>
+     <br>
+     A new implementation of the evaluator of textual expressions should
+give   the possibility to create objects and invoke object's methods. The
+relationship    between textual expressions and such defined by a patcher
+is to be carefully   defined.<br>
+    <br>
+         
+<h2>messages, values and tuples</h2>
+     In the current implementation of the message system doesn't distinguish
+  messages and values send between the object of a patcher and as well on
+the  user level both concept are confused:<br>
+     In a message box "coucou", "coucou 1" "coucou 1 2 3" and represent messages, 
+  while "int 1", "1", "list 1 2 3" and "1 2 3" represent single values and
+  lists of values. Single symbols can be expressed only as "symbol coucou".<br>
+      Internally values and lists of values send between objects are represented 
+  as messages with the primitive data type or class name as a selector. Method 
+  dispatching is applied only to the selector of a method.<br>
+    <br>
+     This creates the following inconveniences:<br>
+       
 <ul>
                
-  <li>preset<br>
-     </li>
-           
-  <li>bus and label</li>
-           
-  <li>bytestream<br>
-     </li>
-                  
-  <li>audioport and midiport</li>
-       
-</ul>
-    A new message system should provide a more sophisticated garbage collector.<br>
-   <br>
-   A new implementation of the evaluator of textual expressions should give
- the possibility to create objects and invoke object's methods. The relationship
-  between textual expressions and such defined by a patcher is to be carefully 
- defined.<br>
-  <br>
-     
-<h2>messages, values and tuples</h2>
-   In the current implementation of the message system doesn't distinguish
- messages and values send between the object of a patcher and as well on
-the  user level both concept are confused:<br>
-   In a message box "coucou", "coucou 1" "coucou 1 2 3" and represent messages, 
- while "int 1", "1", "list 1 2 3" and "1 2 3" represent single values and
- lists of values. Single symbols can be expressed only as "symbol coucou".<br>
-    Internally values and lists of values send between objects are represented 
- as messages with the primitive data type or class name as a selector. Method 
- dispatching is applied only to the selector of a method.<br>
-  <br>
-   This creates the following inconveniences:<br>
-   
-<ul>
-       
   <li>it must be taken care that an arbitrary message can not be created with
  the name of a known data type as selector (for example "int coucou" must
 be forbidden each time a messages is created)</li>
-       
+               
   <li>only a fixed set of data types can be used</li>
-       
+               
   <li>a method can be declared for a single data type only or type checking 
- must be implementation in the method</li>
-   
+  must be implementation in the method</li>
+       
 </ul>
-   The term "list" is used for a data structure which is not implemented
-as  a list (in the sense of dynamically linked lists, used for many other
-languages).  This causes some confusion and will cause additional confusion,
-when "real"  lists will be introduced at the user level of jMax.<br>
-  <br>
-  The term <i><b>tuple </b></i>should be given to the unmutable list of values
- (atoms) used for messages and functions with multiple arguments (currently
- array). The tuple term could - ones forever - replace list of the current
- MAX jargon (thanks to Python).<br>
-  <br>
-   The syntax of messages and tuples of values should be clearly distinguished.<br>
-  <br>
-   
+     The term "list" is used for a data structure which is not implemented
+ as  a list (in the sense of dynamically linked lists, used for many other
+ languages).  This causes some confusion and will cause additional confusion,
+ when "real"  lists will be introduced at the user level of jMax.<br>
+    <br>
+    The term <i><b>tuple </b></i>should be given to the unmutable list of 
+values  (atoms) used for messages and functions with multiple arguments (currently
+  array). The tuple term could - ones forever - replace list of the current
+  MAX jargon (thanks to Python).<br>
+    <br>
+     The syntax of messages and tuples of values should be clearly distinguished.<br>
+    <br>
+       
 <h2>properties</h2>
-   Currently named properties of objects are used in the following situations: 
-  
+     Currently named properties of objects are used in the following situations: 
+     
 <ul>
-       
+               
   <li>client/server communication</li>
-       
+               
   <li>object instantiation and initialization</li>
-       
+               
   <li>object persistency</li>
-   
+       
 </ul>
-    In all of this situations the mechanisms of setting properties and sending
-  messages are very similar. Most of the properties use daemons to access 
-directly  the objects states via a "daemon"-function associated to the properties
- name.<br>
-    The distinction of setting properties and sending messages is obsolete
- especially  when messages are implemented with a single argument (see below).<br>
-  <br>
-   It seems that there is no need for a plist for dynamic properties in each 
- object. If ever a module of FTS has to dynamically associate a property to
- an object, the use of a object hash table inside the module is proposed (no
- persistency!).<br>
-   &nbsp;<br>
-  In order to completely replace object properties by methods a return value
- has to be introduced to FTS methods.<br>
-  <br>
-   
+      In all of this situations the mechanisms of setting properties and
+sending    messages are very similar. Most of the properties use daemons
+to access  directly  the objects states via a "daemon"-function associated
+to the properties   name.<br>
+      The distinction of setting properties and sending messages is obsolete
+  especially  when messages are implemented with a single argument (see below).<br>
+    <br>
+     It seems that there is no need for a plist for dynamic properties in 
+each   object. If ever a module of FTS has to dynamically associate a property 
+to  an object, the use of a object hash table inside the module is proposed 
+(no  persistency!).<br>
+     &nbsp;<br>
+    In order to completely replace object properties by methods a return
+value   has to be introduced to FTS methods.<br>
+    <br>
+       
 <h2>inlets</h2>
- For historical reasons messages with a selector (other than a data type
-such as int, float, etc) are accepted only by the first inlet of an object.
-The other inlets accept single values or MAX lists. The objects set of jMax
-still respects this limitation.<br>
- <br>
- For jMax 3 it is proposed that messages - consisting of a selector and a 
-single value or tuple argument - are implemented for a given class independent 
-of the notion of inlets. FTS object apriori don't have inlets but only methods. 
-Instead of using a "system inlet" as in the current implementation, any (public
+   For historical reasons messages with a selector (other than a data type
+ such as int, float, etc) are accepted only by the first inlet of an object.
+ The other inlets accept single values or MAX lists. The objects set of jMax
+ still respects this limitation.<br>
+   <br>
+   For jMax 3 it is proposed that messages - consisting of a selector and 
+a  single value or tuple argument - are implemented for a given class independent 
+ of the notion of inlets. FTS object apriori don't have inlets but only methods. 
+ Instead of using a "system inlet" as in the current implementation, any (public
 ??) method of an object can be invoked at any time.<br>
- <br>
- Inlets should be associated to messages (by a selector) so that sending
-value to an inlet should have the same effect as invoking the message associated 
-to the inlet with the given value as argument to the object (inlets could 
-be even dynamically given to boxes via the GUI).<br>
- Messages to an object could be either accepted by the first inlet of a box 
-only, or by any of the inlets and redirected to the object. It has to be verified
-how strictly the concept of boxes (current <i>patcher </i>objects) can be
-distinguished from basic FTS objects (current <i>data </i>objects).<br>
- <br>
-Multiple inlets can be associated to the same method. In this case an index
-should be available for the called method. This way meta classes are not
+   <br>
+   Inlets should be associated to messages (by a selector) so that sending
+ value to an inlet should have the same effect as invoking the message associated 
+ to the inlet with the given value as argument to the object (inlets could 
+ be even dynamically given to boxes via the GUI).<br>
+   Messages to an object could be either accepted by the first inlet of a 
+box  only, or by any of the inlets and redirected to the object. It has to 
+be verified how strictly the concept of boxes (current <i>patcher </i>objects) 
+can be distinguished from basic FTS objects (current <i>data </i>objects).<br>
+   <br>
+  Multiple inlets can be associated to the same method. In this case an index
+ should be available for the called method. This way meta classes are not
 needed anymore for the implementation of classes with a variable number of
 inlets.<br>
-<br>
-<h2>outlets</h2>
-yy<br>
- 
-<h2>methods</h2>
-  A new implementation of the message system should provide method dispatching 
- on argument types.<br>
-    This can be significantly simplified by allowing only one argument for
- a message. For functions or methods of multiple arguments the argument would 
- be a tuple (object). In this case eventual type checking on multiple arguments 
-must be implemented inside the method (same for functions).<br>
- <br>
- Methods have to be able to return values. Methods which doesn't return a 
-value have to return a unique <i><b>void </b></i>value.<br>
- 
-<blockquote><code>fts_atom_t (*fts_method_t)(fts_object_t *o, fts_atom_t *arg)</code><br>
-   </blockquote>
- A method is defined for a message (selector) and argument type (or meta
-type ?? such as number, object, sequence, etc).<br>
-   <br>
- Methods defined for different argument types can be used to set or get properties
-of a given class. The concept of properties becomes obsolete this way.<br>
-   <br>
-   
-  <h2>meta classes</h2>
-   Meta classes are currently used in the following cases:<br>
-  <ul>
-    <li>classes with a variable number of inlets and/or outlets</li>
-    <li>classes sharing the same semantic (such as <code>+</code> or <code>
-play</code>) acting on different objects using different methods</li>
-  </ul>
-The first case is <br>
   <br>
    
-  <h2>inheritance and interfaces</h2>
-   <br>
+<h2>outlets</h2>
+  yy<br>
      
-  <h2>expressions and functions</h2>
-   The current main expression evaluator visible for the user is only applied 
- to the creation of objects.<br>
-   Further different evaluators/parsers are used for:<br>
+<h2>methods</h2>
+    A new implementation of the message system should provide method dispatching 
+  on argument types.<br>
+      This can be significantly simplified by allowing only one argument
+for   a message. For functions or methods of multiple arguments the argument
+would   be a tuple (object). In this case eventual type checking on multiple
+arguments  must be implemented inside the method (same for functions).<br>
+   <br>
+   Methods have to be able to return values. Methods which doesn't return 
+a  value have to return a unique <i><b>void </b></i>value.<br>
+     
+<blockquote><code>fts_atom_t (*fts_method_t)(fts_object_t *o, fts_atom_t *arg)</code><br>
+     </blockquote>
+   A method is defined for a message (selector) and argument type (or meta
+ type ?? such as number, object, sequence, etc).<br>
+     <br>
+   Methods defined for different argument types can be used to set or get 
+properties of a given class. The concept of properties becomes obsolete this 
+way.<br>
+     <br>
+           
+  <h2>meta classes</h2>
+     Meta classes are currently used in the following cases:<br>
        
   <ul>
-             
-    <li>reading and writing atomfiles<br>
-     </li>
-             
-    <li>the ISPW message box class</li>
-             
-    <li>the ISPW expr class</li>
+           
+    <li>classes with a variable number of inlets and/or outlets</li>
+           
+    <li>classes sharing the same semantic (such as <code>+</code> or <code>
+  play</code>) acting on different objects using different methods</li>
        
   </ul>
-   In the creation of objects variables can be used ($name), which don't
-change  their name in runtime. Changing the value of a variable causes the
-reinstantiation  of all objects accessing this variable. It is desirable
+  The first case is <br>
+    <br>
+           
+  <h2>inheritance and interfaces</h2>
+     <br>
+             
+  <h2>expressions and functions</h2>
+     The current main expression evaluator visible for the user is only applied 
+  to the creation of objects.<br>
+     Further different evaluators/parsers are used for:<br>
+               
+  <ul>
+                         
+    <li>reading and writing atomfiles<br>
+       </li>
+                         
+    <li>the ISPW message box class</li>
+                         
+    <li>the ISPW expr class</li>
+               
+  </ul>
+     In the creation of objects variables can be used ($name), which don't
+ change  their name in runtime. Changing the value of a variable causes the
+ reinstantiation  of all objects accessing this variable. It is desirable
 to provide <b><i>   variables </i></b>in FTS, which can change their value
 at run-time and which  can be distinguished from <i><b>constants</b></i>
 (the current variables).  Non constant expressions could not be used in the
 instantiation of objects.<br>
-   <br>
-   A new implementation of the FTS expression parser/evaluator should provide 
- a unified expression syntax including the following features:<br>
-       
+     <br>
+     A new implementation of the FTS expression parser/evaluator should provide 
+  a unified expression syntax including the following features:<br>
+               
   <ul>
-             
+                         
     <li>evaluation of mathematical expressions</li>
-             
+                         
     <li>access to distinguished constants and variables</li>
-             
+                         
     <li>&lt;not finished&gt;<br>
-     </li>
-       
+       </li>
+               
   </ul>
-   <br>
-   &lt;yet unordered blabla:&gt;<br>
-   A message box like object should allow to create objects and access to 
-the  state of objects such as in<br>
-   "($0.size + $1[3].freq * $sr) * $2".<br>
-   <br>
-   &lt;yet unordered blabla:&gt;<br>
-   FTS should provide a function abstraction so that functions - ones defined
-  (textually and/or graphically) - can be used by an operator object in a
-patcher  with in and outlets as well as by textual expressions.<br>
-  <br>
-     
+     <br>
+     &lt;yet unordered blabla:&gt;<br>
+     A message box like object should allow to create objects and access
+to  the  state of objects such as in<br>
+     "($0.size + $1[3].freq * $sr) * $2".<br>
+     <br>
+     &lt;yet unordered blabla:&gt;<br>
+     FTS should provide a function abstraction so that functions - ones defined
+   (textually and/or graphically) - can be used by an operator object in
+a  patcher  with in and outlets as well as by textual expressions.<br>
+    <br>
+             
   <h2>abstractions and classes defined as patchers and in textual expressions</h2>
-   <br>
-        
+     <br>
+                
   <h2></h2>
-  <br>
-   <br>
-         
+    <br>
+     <br>
+                 
   </body>
   </html>
