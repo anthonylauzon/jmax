@@ -1438,7 +1438,7 @@ fvec_assign(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-fvec_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fvec_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fvec_t *this = (fvec_t *)o;
   int index = fts_get_int_arg( ac, at, 0, -1);
@@ -1575,7 +1575,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_load, fvec_load);
   fts_class_message_varargs(cl, fts_s_save, fvec_save_soundfile);
 
-  fts_class_message_varargs(cl, fts_s_get_element, fvec_get_element);
+  fts_class_message_varargs(cl, fts_s_get_element, fvec_element);
 
   fts_class_inlet_anything(cl, 0);
 }
