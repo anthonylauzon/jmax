@@ -82,6 +82,9 @@ MdaModule:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MdaModule.ja)
 .PHONY: MdaModule
 
+MaxEnv:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxEnv.java)
+.PHONY: MaxEnv
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

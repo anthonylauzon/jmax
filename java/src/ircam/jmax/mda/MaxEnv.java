@@ -34,7 +34,7 @@ public class MaxEnv
       loadEnvFile(envFile);
     else
       {
-	envFile = new File(dir, "jmax.env");
+	envFile = new File(dir, "project.env");
 
 	if (envFile.exists() && envFile.canRead())
 	  loadEnvFile(envFile);

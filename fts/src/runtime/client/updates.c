@@ -33,7 +33,7 @@
 void fts_client_updates_init(void);
 static void fts_client_updates_sched(void);
 
-static int fts_updates_per_ticks = 200;
+static int fts_updates_per_ticks = 100;
 static int fts_update_period = 80; /* every how many ticks we do an update */
 
 void

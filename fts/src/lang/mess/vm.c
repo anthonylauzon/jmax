@@ -76,7 +76,12 @@
 		     // by the C function
    */
 
-/* #define VM_DEBUG */
+/* #define  VM_DEBUG */
+
+#ifdef DEBUG
+#define  VM_SAFE
+#endif
+
 
 #include <stdio.h> /* DEBUG */
 #include "sys.h"
@@ -98,7 +103,31 @@ static fts_object_t **object_table_stack[OBJECT_TABLE_STACK_DEPTH];
 static fts_object_t ***object_table_tos;
 static fts_object_t **object_table;
 
-/* Macros to do stack operations */
+/* Macros to do checks operations */
+
+#ifdef  VM_SAFE
+#define CHECK_OBJ_STACK   \
+      { \
+	if (object_tos < object_stack) \
+         fprintf(stderr, "Object Stack overflow\n"); \
+      else if (object_tos > object_stack + OBJECT_STACK_DEPTH) \
+         fprintf(stderr, "Object Stack underflow\n"); \
+      }
+
+#define CHECK_EVAL_STACK   \
+      { \
+	if (eval_tos < eval_stack) \
+         fprintf(stderr, "Eval Stack overflow\n"); \
+      else if (eval_tos > eval_stack + OBJECT_STACK_DEPTH) \
+         fprintf(stderr, "Eval Stack underflow\n"); \
+      }
+
+#else
+
+#define CHECK_OBJ_STACK     {}
+#define CHECK_EVAL_STACK    {}
+
+#endif
 
 
 /* The parent argument is pushed to the object stack, so to be used
@@ -869,6 +898,9 @@ fts_object_t *fts_run_mess_vm(fts_object_t *parent, unsigned char *program, fts_
 	      return *object_tos;
 	  }
 	}
+
+      CHECK_OBJ_STACK;
+      CHECK_EVAL_STACK;
     }
 }
 

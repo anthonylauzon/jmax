@@ -10,11 +10,11 @@
 #include "lang/mess/loader.h"
 
 
-/* #define SAVER_DEBUG   */
+/* #define SAVER_DEBUG  */
 
 struct fts_bmax_file
 {
-  int fd;
+  FILE *fd;
   fts_binary_file_header_t header; 
   fts_symbol_t *symbol_table;
   int symbol_table_size;
@@ -44,9 +44,9 @@ fts_open_bmax_file_for_writing(const char *name)
 
   /* Open the file */
 
-  f->fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  f->fd = fopen(name, "w");
 
-  if (f->fd < 0)
+  if (f->fd == 0)
     {
       perror("fts_open_bmax_file_for_writing: open ");
       return 0;
@@ -54,7 +54,7 @@ fts_open_bmax_file_for_writing(const char *name)
 
   /* write the init header to the file */
 
-  if (write(f->fd, &(f->header), sizeof(fts_binary_file_header_t)) < sizeof(fts_binary_file_header_t))
+  if (fwrite(&(f->header), sizeof(fts_binary_file_header_t), 1, f->fd) < 1)
     {
       perror("fts_open_bmax_file_for_writing: write header ");
       return 0;
@@ -82,7 +82,8 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 #ifdef SAVER_DEBUG
       fprintf(stderr, "\t- %s\n", fts_symbol_name(f->symbol_table[i]));
 #endif
-      write(f->fd, fts_symbol_name(f->symbol_table[i]), strlen(fts_symbol_name(f->symbol_table[i]))+1);
+      fwrite(fts_symbol_name(f->symbol_table[i]), sizeof(char),
+	     strlen(fts_symbol_name(f->symbol_table[i]))+1, f->fd);
     }
 
 
@@ -90,7 +91,7 @@ fts_close_bmax_file(fts_bmax_file_t *f)
   /* Write the ending zero */
 
   c = '\0';
-  write(f->fd, &c, 1);
+  fwrite(&c, sizeof(char), 1, f->fd);
 
   /* seek to the beginning and rewrite the header */
 
@@ -98,8 +99,8 @@ fts_close_bmax_file(fts_bmax_file_t *f)
   fprintf(stderr, "Writing header\n");
 #endif
 
-  lseek(f->fd, 0, SEEK_SET);
-  write(f->fd, &(f->header), sizeof(fts_binary_file_header_t));
+  fseek(f->fd, 0, SEEK_SET);
+  fwrite(&(f->header), sizeof(fts_binary_file_header_t), 1, f->fd);
 
   /* close the file */
 
@@ -107,7 +108,7 @@ fts_close_bmax_file(fts_bmax_file_t *f)
   fprintf(stderr, "End of file\n");
 #endif
 
-  close(f->fd);
+  fclose(f->fd);
 
   /* free the bmax file descriptor */
 
@@ -237,8 +238,8 @@ static unsigned char fts_bmax_get_argcode(int value)
 static void fts_bmax_write_opcode_for(fts_bmax_file_t *f, unsigned char opcode, int value)
 {
   unsigned char c = opcode | fts_bmax_get_argcode(value);
-  
-  write(f->fd, &c, 1);
+
+  fwrite(&c, sizeof(char), 1, f->fd);  
   f->header.code_size++;
 }
 
@@ -247,7 +248,7 @@ static void fts_bmax_write_opcode(fts_bmax_file_t *f, unsigned char opcode)
 {
   unsigned char c = opcode;
   
-  write(f->fd, &c, 1);
+  fwrite(&c, sizeof(char), 1, f->fd);  
   f->header.code_size++;
 }
 
@@ -258,7 +259,7 @@ static void fts_bmax_write_b_int(fts_bmax_file_t *f, int value)
   unsigned char c;
 
   c = (char) ((unsigned int) (value & 0x000000ff));
-  write(f->fd, &c, 1);
+  fwrite(&c, sizeof(char), 1, f->fd);  
   f->header.code_size++;
 }
 
@@ -269,8 +270,8 @@ static void fts_bmax_write_s_int(fts_bmax_file_t *f, int value)
       
   c[1] = (unsigned char) ((unsigned int) value & 0x000000ff);
   c[0] = (unsigned char) (((unsigned int) value & 0x0000ff00) >> 8);
-      
-  write(f->fd, c, 2);
+
+  fwrite(c, sizeof(char), 2, f->fd);        
   f->header.code_size += 2;
 }
 
@@ -283,7 +284,7 @@ static void fts_bmax_write_l_int(fts_bmax_file_t *f, int value)
   c[1] = (unsigned char) (((unsigned int) value & 0x00ff0000) >> 16);
   c[0] = (unsigned char) (((unsigned int) value & 0xff000000) >> 24);
 
-  write(f->fd, c, 4);
+  fwrite(c, sizeof(char), 4, f->fd);        
   f->header.code_size += 4;
 }
 
@@ -310,7 +311,7 @@ void fts_bmax_write_float(fts_bmax_file_t *f, float value)
   c[1] = (unsigned char) (((unsigned int) fx & 0x00ff0000) >> 16);
   c[0] = (unsigned char) (((unsigned int) fx & 0xff000000) >> 24);
 
-  write(f->fd, c, 4);
+  fwrite(c, sizeof(char), 4, f->fd);        
   f->header.code_size += 4;
 }
 
