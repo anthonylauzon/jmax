@@ -30,9 +30,25 @@ import java.io.*;
 import java.awt.event.*;
 import java.util.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+// import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+
+// import javax.swing.event.*;
+
+// import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;

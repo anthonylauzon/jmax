@@ -25,7 +25,8 @@
 
 package ircam.jmax.editors.patcher;
 
-import javax.swing.*; 
+// import javax.swing.*; 
+import javax.swing.RepaintManager;
 
 /** The ermes module; the init function is called at init time
  *  by jmax, and install module related things

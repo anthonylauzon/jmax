@@ -30,9 +30,15 @@ import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.plaf.*;
+// import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+
+// import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

@@ -23,7 +23,9 @@ package ircam.jmax;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
+
+// import javax.swing.*;
+import javax.swing.ImageIcon;
 
 public class JMaxUtilities {
   public static ImageIcon loadIconFromResource( String name, JMaxPackage jmaxPackage)

@@ -28,7 +28,12 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ListModel;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

@@ -27,8 +27,6 @@ package ircam.jmax.fts;
 
 import java.util.*;
 import java.io.*;
-import javax.swing.*;
-import javax.swing.event.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;

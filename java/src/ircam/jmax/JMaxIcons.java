@@ -22,7 +22,9 @@
 package ircam.jmax;
 
 import java.io.*;
-import javax.swing.*;
+
+// import javax.swing.*;
+import javax.swing.ImageIcon;
 
 public class JMaxIcons {
   public static final ImageIcon jmax_patcher_file_ = loadIcon( "mini_icon_jmax.gif");

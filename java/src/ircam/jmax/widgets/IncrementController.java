@@ -27,7 +27,11 @@ package ircam.jmax.widgets;
 
 import ircam.jmax.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
 import java.awt.*;
 import java.awt.event.*;
 

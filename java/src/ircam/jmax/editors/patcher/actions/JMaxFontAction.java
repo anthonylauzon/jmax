@@ -29,8 +29,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.lang.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;

@@ -25,7 +25,7 @@
 
 package ircam.jmax.editors.patcher;
 
-import javax.swing.*; 
+import javax.swing.RepaintManager; 
 import java.awt.*; 
 
 public class MaxRepaintManager extends RepaintManager

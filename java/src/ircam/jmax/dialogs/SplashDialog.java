@@ -29,7 +29,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import ircam.jmax.*;
-import javax.swing.*;
+
+// import javax.swing.*;
+import javax.swing.Timer;
 
 /**
  * The initial dialog.

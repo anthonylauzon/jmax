@@ -25,7 +25,7 @@
 
 package ircam.jmax.editors.patcher;
 
-import javax.swing.*;
+import javax.swing.ListSelectionModel;
 
 public interface JMaxToolPanel
 {

@@ -25,7 +25,15 @@
 
 package ircam.jmax.toolkit;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;

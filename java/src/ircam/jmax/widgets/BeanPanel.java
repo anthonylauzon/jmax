@@ -31,8 +31,13 @@ import java.beans.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import javax.swing.*;
-import javax.swing.border.*;
+// import javax.swing.*;
+import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 
 /**
   A Swing component that displays the properties of a Java Bean.

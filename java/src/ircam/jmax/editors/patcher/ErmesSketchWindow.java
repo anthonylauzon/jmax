@@ -28,7 +28,15 @@ package ircam.jmax.editors.patcher;
 import java.awt.*;
 import java.awt.print.*;
 import java.awt.event.*;  
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.WindowConstants;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

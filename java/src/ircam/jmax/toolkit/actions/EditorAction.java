@@ -28,8 +28,11 @@ package ircam.jmax.toolkit.actions;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;

@@ -22,7 +22,8 @@
 package ircam.jmax.editors.patcher;
 
 import java.awt.*;
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.RepaintManager;
 
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;

@@ -26,8 +26,9 @@
 package ircam.jmax.toolkit.menus;
 
 import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
+
+// import javax.swing.*;
+import javax.swing.AbstractButton;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.actions.*;

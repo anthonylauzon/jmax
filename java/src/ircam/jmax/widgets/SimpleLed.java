@@ -28,8 +28,6 @@ package ircam.jmax.widgets;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-
 public class SimpleLed extends Led {
 
   public Dimension getPreferredSize()

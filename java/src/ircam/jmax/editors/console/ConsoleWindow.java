@@ -25,8 +25,20 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
-import javax.swing.*;
-import javax.swing.event.*;
+
+// import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+
+// import javax.swing.event.*;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.AncestorEvent;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

@@ -25,8 +25,13 @@
 
 package ircam.jmax.toolkit;
 
-import javax.swing.*;
-import javax.swing.border.*;
+// import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+// import javax.swing.border.*;
+import javax.swing.border.BevelBorder;
+
 import java.awt.*;
 import java.util.*;
 

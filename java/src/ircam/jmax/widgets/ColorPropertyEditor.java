@@ -29,7 +29,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JPanel;
 
 public class ColorPropertyEditor extends PropertyEditorSupport {
 

@@ -29,9 +29,22 @@ import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+// import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+
+// import javax.swing.event.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionListener;
+
+// import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;

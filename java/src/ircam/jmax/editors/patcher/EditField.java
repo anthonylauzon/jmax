@@ -32,9 +32,21 @@ import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.objects.*;
 import ircam.jmax.editors.patcher.actions.*;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+
+// import javax.swing.text.*;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Keymap;
+import javax.swing.text.TextAction;
+
+// import javax.swing.event.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 //
 // The edit field contained in the editable objects (Message, Editable).

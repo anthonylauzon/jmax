@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

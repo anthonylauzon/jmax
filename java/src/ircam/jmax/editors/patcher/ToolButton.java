@@ -23,8 +23,8 @@ package ircam.jmax.editors.patcher;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.JToggleButton;
 
 import ircam.jmax.*;
 import ircam.jmax.toolkit.*;

@@ -25,8 +25,9 @@
 
 package ircam.jmax;
 
-import javax.swing.event.ListDataListener;
 import javax.swing.DefaultListModel;
+import javax.swing.event.ListDataListener;
+
 import java.io.*;
 
 public class RecentFileHistory extends DefaultListModel

@@ -35,7 +35,9 @@ import java.util.*;
 import java.lang.*;
 import java.io.*;
 
-import javax.swing.*; 
+// import javax.swing.*; 
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
@@ -379,18 +381,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
     keyMap      = new KeyMap(this);
 
     // Next two temporary (mdc)
-
-    if (JMaxApplication.getProperty("dg") != null)
-      {
-	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false); 
-	setDoubleBuffered(false);
-	setDebugGraphicsOptions(DebugGraphics.FLASH_OPTION);
-      }
-    else if (JMaxApplication.getProperty("nodb") != null)
-      {
-	RepaintManager.currentManager(this).setDoubleBufferingEnabled(false);
-	setDoubleBuffered(false);
-      }
 
     setOpaque(true);
     setLayout(null);

@@ -30,8 +30,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.lang.*;
 
-import javax.swing.*;
-
 public class MemoryLed extends Led {
 
   public MemoryLed()

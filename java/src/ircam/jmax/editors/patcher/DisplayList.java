@@ -32,8 +32,6 @@ import java.awt.AWTEvent;
 import java.util.*;
 import java.lang.*;
 
-import javax.swing.*; 
-
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;

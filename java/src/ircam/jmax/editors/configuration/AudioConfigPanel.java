@@ -30,7 +30,10 @@ import java.io.*;
 import java.awt.event.*;
 import java.util.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;

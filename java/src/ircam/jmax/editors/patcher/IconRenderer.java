@@ -30,9 +30,8 @@ import java.awt.event.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.Icon;
 
 //
 // The edit field contained in the editable objects (Message, Standard).

@@ -29,9 +29,6 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
-
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.fts.client.*;

@@ -30,8 +30,9 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.JMenuItem;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.project.*;

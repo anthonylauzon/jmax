@@ -27,9 +27,16 @@ package ircam.jmax.dialogs;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.border.*;
+
+// import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+// import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 
 import ircam.jmax.*;
 

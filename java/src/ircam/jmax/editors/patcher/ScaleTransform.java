@@ -23,7 +23,9 @@ package ircam.jmax.editors.patcher;
 import java.awt.*;
 import java.lang.*;
 import java.util.*;
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.ListModel;
+
 import ircam.jmax.*;
 public class ScaleTransform {
 

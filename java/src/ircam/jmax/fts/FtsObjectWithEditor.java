@@ -28,10 +28,10 @@ package ircam.jmax.fts;
 import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.*;
-import javax.swing.undo.*;
-import javax.swing.event.*;
 import java.awt.*;
-import javax.swing.*;
+
+// import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 import java.lang.*;
 import java.io.*;

@@ -28,7 +28,10 @@ package ircam.jmax;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
+
+// import javax.swing.*;
+import javax.swing.UIManager;
+
 import ircam.jmax.editors.patcher.PatcherFontManager;
 import ircam.jmax.editors.patcher.Settings;
 //=====================================================

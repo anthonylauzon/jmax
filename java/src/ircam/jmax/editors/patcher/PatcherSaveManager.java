@@ -22,7 +22,8 @@
 package ircam.jmax.editors.patcher;
 
 import java.io.*;
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JOptionPane;
 
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;

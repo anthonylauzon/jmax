@@ -31,9 +31,10 @@ import ircam.jmax.toolkit.*;
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
 
-import javax.swing.undo.*;
-import javax.swing.event.*;
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
+
 import java.awt.*;
 import java.util.*;
 import java.io.*;

@@ -27,8 +27,16 @@ package ircam.jmax.widgets;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+
+// import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JViewport;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
+
+// import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import ircam.jmax.*;
 import ircam.jmax.editors.patcher.*;

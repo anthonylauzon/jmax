@@ -28,8 +28,19 @@ package ircam.jmax.toolkit.menus;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.ListModel;
+
+
+// import javax.swing.event.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
 
 import ircam.jmax.*;
 

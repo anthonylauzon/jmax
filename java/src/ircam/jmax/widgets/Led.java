@@ -28,7 +28,8 @@ package ircam.jmax.widgets;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JComponent;
 
 abstract public class Led extends JComponent {
 

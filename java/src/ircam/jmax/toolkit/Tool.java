@@ -25,7 +25,10 @@
 
 package ircam.jmax.toolkit;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
+
 import java.awt.*;
 
 /**

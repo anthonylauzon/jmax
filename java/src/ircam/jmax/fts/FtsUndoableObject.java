@@ -28,8 +28,15 @@ package ircam.jmax.fts;
 import ircam.fts.client.*;
 import ircam.jmax.toolkit.*;
 
-import javax.swing.undo.*;
-import javax.swing.event.*;
+// import javax.swing.event.*;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.event.UndoableEditEvent;
+
+// import javax.swing.undo.*;
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
+import javax.swing.undo.UndoManager;
+
 import java.io.*;
 
 /**

@@ -25,8 +25,11 @@
 
 package ircam.jmax.editors.patcher;
 
-import javax.swing.*;
-import javax.swing.table.*;
+// import javax.swing.*;
+import javax.swing.ListModel;
+
+// import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
 
 import java.util.*;
 

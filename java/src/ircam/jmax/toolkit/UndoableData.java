@@ -25,7 +25,8 @@
 
 package ircam.jmax.toolkit;
 
-import javax.swing.undo.*;
+// import javax.swing.undo.*;
+import javax.swing.undo.UndoableEdit;
 
 /**
  * implemented by data models with support for undo.

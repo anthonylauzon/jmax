@@ -28,8 +28,10 @@ package ircam.jmax.editors.patcher;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;

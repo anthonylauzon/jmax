@@ -26,7 +26,6 @@
 package ircam.jmax.toolkit.actions;
 
 import java.awt.event.*;
-import javax.swing.*;
 import ircam.jmax.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;

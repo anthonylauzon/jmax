@@ -25,7 +25,9 @@
 
 package ircam.jmax.toolkit;
 
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JTextField;
+
 import java.awt.*;
 import java.awt.event.*;
 

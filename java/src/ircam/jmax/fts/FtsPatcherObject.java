@@ -27,7 +27,10 @@ package ircam.jmax.fts;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
+// import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import java.lang.reflect.*;
 
 import ircam.fts.client.*;

@@ -31,9 +31,13 @@ import java.awt.geom.*;
 
 import ircam.jmax.editors.patcher.objects.*;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
+// import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
+// import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
 
 //
 // The edit field contained in the editable objects (Message, Standard).

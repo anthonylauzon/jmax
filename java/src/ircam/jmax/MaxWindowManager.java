@@ -28,7 +28,10 @@ package ircam.jmax;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
+
+// import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
 
 
 /** This class provide a basic service for registering windows.
