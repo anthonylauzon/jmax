@@ -76,7 +76,7 @@ static void udp_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port = htons(port);
 
-  if ( bind( this->socket, &addr, sizeof(struct sockaddr_in)) == -1)
+  if ( bind( this->socket, (const struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == -1)
     {
       post( "Cannot bind socket\n");
       close( this->socket);
@@ -104,7 +104,7 @@ static void udp_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_sched_ready, udp_receive);
 
-  fts_class_outlet( cl, 0, fts_s_int);
+  fts_class_outlet( cl, 0, fts_int_class);
 }
 
 void udp_config( void)
@@ -113,3 +113,9 @@ void udp_config( void)
 }
 
 
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
