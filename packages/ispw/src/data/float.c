@@ -56,9 +56,9 @@ static fts_status_t float_instantiate(fts_class_t *, int, const fts_atom_t *);
 void
 float_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("float"),float_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("float"),float_instantiate);
 
-  fts_metaclass_alias(fts_new_symbol("f"), fts_new_symbol("float"));
+  fts_class_alias(fts_new_symbol("f"), fts_new_symbol("float"));
 
 }
 

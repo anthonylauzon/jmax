@@ -208,6 +208,6 @@ pack_config(void)
   pack_s_f = fts_new_symbol("f");
   pack_s_i = fts_new_symbol("i");
 
-  fts_metaclass_create(fts_new_symbol("pack"),pack_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("pack"),pack_instantiate, fts_narg_equiv);
 }
 

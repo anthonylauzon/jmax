@@ -278,7 +278,7 @@ message_config(void)
 {
   init_eval();
 
-  fts_metaclass_create(fts_new_symbol("messbox"), message_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("messbox"), message_instantiate);
 }
 
 

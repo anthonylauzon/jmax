@@ -193,17 +193,17 @@ tanh_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 vectrigon_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("sin~"), sin_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("cos~"), cos_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("tan~"), tan_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("sin~"), sin_instantiate);
+  fts_class_install(fts_new_symbol("cos~"), cos_instantiate);
+  fts_class_install(fts_new_symbol("tan~"), tan_instantiate);
 
-  fts_metaclass_create(fts_new_symbol("asin~"), asin_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("acos~"), acos_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("atan~"), atan_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("asin~"), asin_instantiate);
+  fts_class_install(fts_new_symbol("acos~"), acos_instantiate);
+  fts_class_install(fts_new_symbol("atan~"), atan_instantiate);
 
-  fts_metaclass_create(fts_new_symbol("sinh~"), sinh_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("cosh~"), cosh_instantiate, fts_always_equiv);
-  fts_metaclass_create(fts_new_symbol("tanh~"), tanh_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("sinh~"), sinh_instantiate);
+  fts_class_install(fts_new_symbol("cosh~"), cosh_instantiate);
+  fts_class_install(fts_new_symbol("tanh~"), tanh_instantiate);
 }
 
 

@@ -57,5 +57,5 @@ static fts_status_t profiler_instantiate(fts_class_t *cl, int ac, const fts_atom
 
 void profiler_config( void)
 {
-  fts_metaclass_create( fts_new_symbol("profiler"),profiler_instantiate, fts_always_equiv);
+  fts_class_install( fts_new_symbol("profiler"),profiler_instantiate);
 }

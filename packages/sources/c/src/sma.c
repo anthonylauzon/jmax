@@ -149,6 +149,6 @@ void sma_config( void)
 {
   post( "Installing class `.*+~' of package `sources'\n");
 
-  fts_metaclass_create( fts_new_symbol( ".*+~"), sma_instantiate, fts_always_equiv);
+  fts_class_install( fts_new_symbol( ".*+~"), sma_instantiate);
 }
 

@@ -172,7 +172,7 @@ value_config(void)
 {
   fts_hash_table_init(&value_table);
 
-  fts_metaclass_create(fts_new_symbol("value"),value_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol("v"), fts_new_symbol("value"));
+  fts_class_install(fts_new_symbol("value"),value_instantiate);
+  fts_class_alias(fts_new_symbol("v"), fts_new_symbol("value"));
 }
 

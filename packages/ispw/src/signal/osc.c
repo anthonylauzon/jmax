@@ -98,7 +98,7 @@ sigtab1_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 sigtab1_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("tab1~"),sigtab1_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("tab1~"),sigtab1_instantiate);
 
   sigtab1_ht = fts_hash_table_new();
   fts_hash_table_init(sigtab1_ht);
@@ -280,5 +280,5 @@ osc_config(void)
   osc_ftl_declare_functions();
 
   /* class declaration */
-  fts_metaclass_create(fts_new_symbol("osc1~"),osc_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("osc1~"),osc_instantiate);
 }

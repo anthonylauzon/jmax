@@ -1437,30 +1437,30 @@ binop_config(void)
 {
   /* integer components of generic multiclasses */
 
-  fts_metaclass_create(fts_new_symbol("+"), add_instantiate, fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("*"), mul_instantiate, fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("/"), div_instantiate, fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("-"), sub_instantiate, fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("inv+"), bus_instantiate, fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("inv*"), vid_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("+"), add_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("*"), mul_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("/"), div_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("-"), sub_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("inv+"), bus_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("inv*"), vid_instantiate, fts_arg_type_equiv);
 
-  fts_metaclass_create(fts_new_symbol(">="), ge_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("<="), le_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol(">"),  gt_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("<"),  lt_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("=="), ee_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("!="), ne_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol(">="), ge_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("<="), le_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol(">"),  gt_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("<"),  lt_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("=="), ee_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("!="), ne_instantiate,  fts_arg_type_equiv);
   
-  fts_metaclass_create(fts_new_symbol("minimum"), min_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("maximum"), max_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("minimum"), min_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("maximum"), max_instantiate,  fts_arg_type_equiv);
 
   /* integer only */
 
-  fts_metaclass_create(fts_new_symbol("&"),  ba_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("|"),  bo_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("&&"), la_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("||"), lo_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("%"),  pc_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("<<"), ls_instantiate,  fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol(">>"), rs_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("&"),  ba_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("|"),  bo_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("&&"), la_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("||"), lo_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("%"),  pc_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("<<"), ls_instantiate,  fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol(">>"), rs_instantiate,  fts_arg_type_equiv);
 }

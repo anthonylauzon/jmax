@@ -65,17 +65,17 @@ integer_config(void)
 {
   /* create the class 'integer' */
 
-  fts_metaclass_create(fts_new_symbol("int"),integer_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("int"),integer_instantiate);
 
   /* ... and register 2 aliases for the "int" name: "i" and "integer" */
 
-  fts_metaclass_alias(fts_new_symbol("integer"), fts_new_symbol("int"));
-  fts_metaclass_alias(fts_new_symbol("i"), fts_new_symbol("int"));
+  fts_class_alias(fts_new_symbol("integer"), fts_new_symbol("int"));
+  fts_class_alias(fts_new_symbol("i"), fts_new_symbol("int"));
 
   /* Support for the max only key and keyup objects */
 
-  fts_metaclass_alias(fts_new_symbol("key"), fts_new_symbol("int"));
-  fts_metaclass_alias(fts_new_symbol("keyup"), fts_new_symbol("int"));
+  fts_class_alias(fts_new_symbol("key"), fts_new_symbol("int"));
+  fts_class_alias(fts_new_symbol("keyup"), fts_new_symbol("int"));
 }
 
 /* ---------------- the metaclass instantiation function ------------------ */

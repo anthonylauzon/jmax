@@ -59,7 +59,7 @@ static void symbol_obj_get_state(fts_daemon_action_t action, fts_object_t *obj,
 void
 symbol_obj_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("symbol"),symbol_obj_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("symbol"),symbol_obj_instantiate);
 }
 
 /* ---------------- the metaclass instantiation function ------------------ */

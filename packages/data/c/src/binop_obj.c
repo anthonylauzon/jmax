@@ -386,7 +386,7 @@ binop_obj_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 binop_obj_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("binop"), binop_obj_instantiate, binop_obj_equiv);
+  fts_metaclass_install(fts_new_symbol("binop"), binop_obj_instantiate, binop_obj_equiv);
   fts_metaclass_alias(fts_new_symbol("bo"), fts_new_symbol("binop"));
 
   sym_const = fts_new_symbol("const");

@@ -275,7 +275,7 @@ siglog10_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void veclog_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("exp~"), sigexp_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("log~"), siglog_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("log10~"), siglog10_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("exp~"), sigexp_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("log~"), siglog_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("log10~"), siglog10_instantiate, fts_narg_equiv);
 }

@@ -64,7 +64,7 @@ static void autosave_signal_handler(int sig)
   exit(99);
 }
 
-void fts_autosave_init()
+void fts_autosave_init( void)
 {
 #ifndef DEBUG 
   /* Standard quit/int signals */

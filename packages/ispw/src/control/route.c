@@ -276,5 +276,5 @@ route_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 route_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("route"), route_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("route"), route_instantiate, fts_arg_type_equiv);
 }

@@ -163,8 +163,8 @@ sbinop_config(void)
 {
   /* integer components of generic multiclasses */
 
-  fts_metaclass_create(fts_new_symbol("=="), see_instantiate, fts_arg_type_equiv);
-  fts_metaclass_create(fts_new_symbol("!="), sne_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("=="), see_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("!="), sne_instantiate, fts_arg_type_equiv);
 }
 
 

@@ -77,5 +77,5 @@ time_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 time_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("time"),time_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("time"),time_instantiate);
 }

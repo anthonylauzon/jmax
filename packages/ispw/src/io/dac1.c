@@ -383,7 +383,7 @@ dac_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 dac_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("dac~"), dac_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("dac~"), dac_instantiate, fts_narg_equiv);
   fts_metaclass_alias(fts_new_symbol("out~"), fts_new_symbol("dac~"));
 }
 
@@ -690,6 +690,6 @@ adc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 adc_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("adc~"),adc_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("adc~"),adc_instantiate, fts_narg_equiv);
   fts_metaclass_alias(fts_new_symbol("in~"), fts_new_symbol("adc~"));
 }

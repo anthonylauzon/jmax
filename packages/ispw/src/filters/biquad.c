@@ -326,5 +326,5 @@ biquad_config(void)
   dsp_declare_function(biquad_df1_inplace_dsp_function, ftl_biquad_df1_inplace);
   dsp_declare_function(biquad_df2_inplace_dsp_function, ftl_biquad_df2_inplace);
 
-  fts_metaclass_create(fts_new_symbol("biquad~"), biquad_instantiate, biquad_class_equiv);
+  fts_metaclass_install(fts_new_symbol("biquad~"), biquad_instantiate, biquad_class_equiv);
 }

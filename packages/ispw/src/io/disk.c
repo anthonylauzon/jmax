@@ -782,8 +782,8 @@ writesf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
 void disk_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
-  fts_metaclass_create(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("writesf~"), writesf_instantiate, fts_first_arg_equiv);
 }
 
 

@@ -261,7 +261,7 @@ var_config(void)
   sym_var = fts_new_symbol("var");
   sym_const = fts_new_symbol("const");
 
-  fts_metaclass_create(sym_var, var_instantiate, var_equiv);
-  fts_metaclass_create(sym_const, var_instantiate, var_equiv);
+  fts_metaclass_install(sym_var, var_instantiate, var_equiv);
+  fts_metaclass_install(sym_const, var_instantiate, var_equiv);
 }
 

@@ -195,7 +195,7 @@ pgmout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 pgmout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("pgmout"),pgmout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("pgmout"),pgmout_instantiate);
 }
 
 /* --- */
@@ -288,7 +288,7 @@ pgmin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 pgmin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("pgmin"),pgmin_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("pgmin"),pgmin_instantiate, midi_ch_equiv);
 }
 
 /* 2. pitch bend */
@@ -383,7 +383,7 @@ bendout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 bendout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("bendout"),bendout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("bendout"),bendout_instantiate);
 }
 
 
@@ -474,7 +474,7 @@ bendin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 bendin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("bendin"),bendin_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("bendin"),bendin_instantiate, midi_ch_equiv);
 }
 
 /* 3. channel aftertouch */
@@ -567,7 +567,7 @@ touchout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 touchout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("touchout"),touchout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("touchout"),touchout_instantiate);
 }
 
 
@@ -659,7 +659,7 @@ touchin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 touchin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("touchin"),touchin_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("touchin"),touchin_instantiate, midi_ch_equiv);
 }
 
 
@@ -776,7 +776,7 @@ ctlout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 ctlout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("ctlout"),ctlout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("ctlout"),ctlout_instantiate);
 }
 
 
@@ -901,7 +901,7 @@ ctlin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 ctlin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("ctlin"),ctlin_instantiate, midi_ch_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("ctlin"),ctlin_instantiate, midi_ch_arg_equiv);
 }
 
 
@@ -1016,7 +1016,7 @@ noteout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 noteout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("noteout"),noteout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("noteout"),noteout_instantiate);
 }
 
 
@@ -1110,7 +1110,7 @@ notein_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 notein_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("notein"),notein_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("notein"),notein_instantiate, midi_ch_equiv);
 }
 
 /* DDZ 7. polyphonic keypressure */
@@ -1226,7 +1226,7 @@ polyout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 polyout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("polyout"),polyout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("polyout"),polyout_instantiate);
 }
 
 
@@ -1353,7 +1353,7 @@ polyin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 polyin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("polyin"),polyin_instantiate, midi_ch_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("polyin"),polyin_instantiate, midi_ch_arg_equiv);
 }
 
 
@@ -1414,7 +1414,7 @@ midiout_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 midiout_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("midiout"),midiout_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("midiout"),midiout_instantiate);
 }
 
 typedef struct 
@@ -1481,7 +1481,7 @@ midiin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 midiin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("midiin"),midiin_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("midiin"),midiin_instantiate, midi_ch_equiv);
 }
 
 
@@ -1550,7 +1550,7 @@ sysexin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 sysexin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("sysexin"),sysexin_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("sysexin"),sysexin_instantiate, midi_ch_equiv);
 }
 
 
@@ -1618,7 +1618,7 @@ rtin_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 rtin_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("rtin"),rtin_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("rtin"),rtin_instantiate, midi_ch_equiv);
 }
 
 /* mtc */
@@ -1690,7 +1690,7 @@ mtc_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 mtc_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("mtc"), mtc_instantiate, midi_ch_equiv);
+  fts_metaclass_install(fts_new_symbol("mtc"), mtc_instantiate, midi_ch_equiv);
 }
 
 

@@ -77,5 +77,5 @@ void bangbang_config(void)
   post( "Installing class `bangbang' of package `sources'\n");
 
   /* Uses a bizarre class name no to overwrite the "bangbang" standard class */
-  fts_metaclass_create( fts_new_symbol( "_bangbang"), bangbang_instantiate, bangbang_equiv);
+  fts_metaclass_install( fts_new_symbol( "_bangbang"), bangbang_instantiate, bangbang_equiv);
 }

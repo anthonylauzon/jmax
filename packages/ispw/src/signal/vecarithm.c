@@ -675,12 +675,12 @@ vecarith_config(void)
   dsp_64_1ops_mul = fts_new_symbol("mul_vec_64_1ops");
   dsp_declare_function(dsp_64_1ops_mul, ftl_mul_64_1ops);
 
-  fts_metaclass_create(fts_new_symbol("+~"),  vecadd_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("-~"),  vecsub_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("*~"),  vecmul_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("/~"),  vecdiv_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("inv+~"), vecbus_instantiate, fts_narg_equiv);
-  fts_metaclass_create(fts_new_symbol("inv*~"), vecvid_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("+~"),  vecadd_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("-~"),  vecsub_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("*~"),  vecmul_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("/~"),  vecdiv_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("inv+~"), vecbus_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("inv*~"), vecvid_instantiate, fts_narg_equiv);
 }
 
 

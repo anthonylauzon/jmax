@@ -390,5 +390,5 @@ pipe_config(void)
   fts_s_clear = fts_new_symbol("clear");
   fts_s_flush = fts_new_symbol("flush");
 
-  fts_metaclass_create(fts_new_symbol("pipe"), pipe_instantiate, fts_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("pipe"), pipe_instantiate, fts_arg_equiv);
 }

@@ -382,7 +382,7 @@ line_class_equiv(int ac0, const fts_atom_t *at0, int ac1, const fts_atom_t *at1)
 void
 line_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("line"), line_instantiate, line_class_equiv);
+  fts_metaclass_install(fts_new_symbol("line"), line_instantiate, line_class_equiv);
 }
 
 

@@ -174,5 +174,5 @@ iir_config(void)
   dsp_declare_function(iir_dsp_function[3], ftl_iir_3);
   dsp_declare_function(iir_dsp_function[4], ftl_iir_4);
 
-  fts_metaclass_create(fts_new_symbol("iir~"), iir_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("iir~"), iir_instantiate, fts_narg_equiv);
 }

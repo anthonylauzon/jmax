@@ -354,6 +354,6 @@ static fts_status_t pt_class_instantiate(fts_class_t *cl, int ac, const fts_atom
 void
 pt_config(void)
 {
-  fts_metaclass_create(fts_new_symbol(CLASS_NAME), pt_class_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol(ALIAS_NAME), fts_new_symbol(CLASS_NAME));
+  fts_class_install(fts_new_symbol(CLASS_NAME), pt_class_instantiate);
+  fts_class_alias(fts_new_symbol(ALIAS_NAME), fts_new_symbol(CLASS_NAME));
 }

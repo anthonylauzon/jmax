@@ -195,7 +195,7 @@ sigcatch_config(void)
 {
   fts_hash_table_init(&catch_table);
 
-  fts_metaclass_create(fts_new_symbol("catch~"),sigcatch_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("catch~"),sigcatch_instantiate);
 }
 
 
@@ -438,7 +438,7 @@ sigthrow_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 sigthrow_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("throw~"),sigthrow_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("throw~"),sigthrow_instantiate);
 }
 
 

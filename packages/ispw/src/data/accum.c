@@ -162,6 +162,6 @@ accum_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 accum_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("accum"), accum_instantiate, fts_arg_equiv);
+  fts_metaclass_install(fts_new_symbol("accum"), accum_instantiate, fts_arg_equiv);
 }
 

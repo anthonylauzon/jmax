@@ -1268,7 +1268,7 @@ explode_config(void)
   explode_skip_heap = fts_heap_new(sizeof(skip_t));
   explode_hang_heap = fts_heap_new(sizeof(hang_t));
 
-  fts_metaclass_create( fts_new_symbol( "explode"),explode_instantiate, fts_always_equiv);
+  fts_class_install( fts_new_symbol( "explode"),explode_instantiate);
 
   explode_data_class = fts_data_class_new( fts_new_symbol( "explode_data"));
   fts_data_class_define_export_function(explode_data_class, explode_data_export_fun);

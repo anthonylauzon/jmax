@@ -822,5 +822,5 @@ pbank_config(void)
 {
   fts_hash_table_init(&pbank_data_table);
 
-  fts_metaclass_create(fts_new_symbol("pbank"),pbank_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("pbank"),pbank_instantiate);
 }

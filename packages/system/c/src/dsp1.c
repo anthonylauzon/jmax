@@ -141,7 +141,7 @@ dsp_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 dsp_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("dsp"),dsp_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol("dsp~"), fts_new_symbol("dsp"));
+  fts_class_install(fts_new_symbol("dsp"),dsp_instantiate);
+  fts_class_alias(fts_new_symbol("dsp~"), fts_new_symbol("dsp"));
 }
 

@@ -111,10 +111,10 @@ void integer_config(void)
   post( "Installing class `integer' of package `sources'\n");
 
   /* Uses a bizarre class name no to overwrite the "int" standard class */
-  fts_metaclass_create( fts_new_symbol("_int"), integer_instantiate, fts_always_equiv);
+  fts_class_install( fts_new_symbol("_int"), integer_instantiate);
 
   /* ... and register 2 aliases: "i" and "integer" */
-  fts_metaclass_alias( fts_new_symbol("_integer"), fts_new_symbol("_int"));
-  fts_metaclass_alias( fts_new_symbol("_i"), fts_new_symbol("_int"));
+  fts_class_alias( fts_new_symbol("_integer"), fts_new_symbol("_int"));
+  fts_class_alias( fts_new_symbol("_i"), fts_new_symbol("_int"));
 }
 

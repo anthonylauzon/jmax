@@ -306,8 +306,8 @@ fts_metaclass_t *fts_send_metaclass;
 static void
 internal_send_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("send"),send_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol("s"),     fts_new_symbol("send"));
+  fts_class_install(fts_new_symbol("send"),send_instantiate);
+  fts_class_alias(fts_new_symbol("s"),     fts_new_symbol("send"));
 
   fts_send_metaclass = fts_metaclass_get_by_name(fts_new_symbol("send"));
 }
@@ -381,8 +381,8 @@ fts_metaclass_t *fts_receive_metaclass;
 static void
 internal_receive_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("receive"),receive_instantiate, fts_always_equiv);
-  fts_metaclass_alias(fts_new_symbol("r"), fts_new_symbol("receive"));
+  fts_class_install(fts_new_symbol("receive"),receive_instantiate);
+  fts_class_alias(fts_new_symbol("r"), fts_new_symbol("receive"));
 
   fts_receive_metaclass = fts_metaclass_get_by_name(fts_new_symbol("receive"));
 }

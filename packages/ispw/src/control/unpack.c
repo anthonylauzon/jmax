@@ -138,7 +138,7 @@ unpack_config(void)
   unpack_s_f = fts_new_symbol("f");
   unpack_s_i = fts_new_symbol("i");
 
-  fts_metaclass_create(fts_new_symbol("unpack"),unpack_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("unpack"),unpack_instantiate, fts_arg_type_equiv);
 }
 
 

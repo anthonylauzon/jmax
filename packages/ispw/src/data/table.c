@@ -664,5 +664,5 @@ void
 table_config(void)
 {
   fts_hash_table_init(&table_integer_vector_table);
-  fts_metaclass_create(fts_new_symbol("table"), table_instantiate, table_class_equiv);
+  fts_metaclass_install(fts_new_symbol("table"), table_instantiate, table_class_equiv);
 }

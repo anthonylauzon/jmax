@@ -190,6 +190,6 @@ select_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void
 select_config(void)
 {
-  fts_metaclass_create(fts_new_symbol("select"), select_instantiate, fts_narg_equiv);
+  fts_metaclass_install(fts_new_symbol("select"), select_instantiate, fts_narg_equiv);
   fts_metaclass_alias(fts_new_symbol("sel"), fts_new_symbol("select"));
 }

@@ -260,7 +260,7 @@ static fts_status_t inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t 
 
 static void internal_inlet_config(void)
 {
-  fts_metaclass_create(fts_s_inlet, inlet_instantiate, fts_always_equiv);
+  fts_class_install(fts_s_inlet, inlet_instantiate);
   inlet_metaclass = fts_metaclass_get_by_name(fts_s_inlet);
 }
 
@@ -478,7 +478,7 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 internal_outlet_config(void)
 {
-  fts_metaclass_create(fts_s_outlet, outlet_instantiate, fts_always_equiv);
+  fts_class_install(fts_s_outlet, outlet_instantiate);
   outlet_metaclass = fts_metaclass_get_by_name(fts_s_outlet);
 }
 
@@ -1614,7 +1614,7 @@ fts_object_t *fts_patcher_get_outlet(fts_object_t *patcher, int outlet)
 
 static void internal_patcher_config(void)
 {
-  fts_metaclass_create(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
+  fts_metaclass_install(fts_s_patcher, patcher_instantiate, fts_arg_equiv);
   patcher_metaclass = fts_metaclass_get_by_name(fts_s_patcher);
 }
 

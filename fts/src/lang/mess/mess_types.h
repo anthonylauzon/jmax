@@ -163,18 +163,18 @@ typedef void (* fts_property_daemon_t)(fts_daemon_action_t action, fts_object_t 
 
 /* generic class/object types */
 
-typedef fts_status_t (*fts_method_instantiate_t)(fts_class_t *, int, const fts_atom_t *);
-typedef int (*fts_method_equiv_t)(int, const fts_atom_t *, int, const fts_atom_t *);
+typedef fts_status_t (*fts_instantiate_fun_t)(fts_class_t *, int, const fts_atom_t *);
+typedef int (*fts_equiv_fun_t)(int, const fts_atom_t *, int, const fts_atom_t *);
 typedef void (*fts_method_t) (fts_object_t *, int, fts_symbol_t , int, const fts_atom_t *);
 
 
 struct fts_metaclass
 {
-  fts_method_instantiate_t mth_instantiate;
+  fts_instantiate_fun_t instantiate_fun;
 
   /* Instance data base */
 
-  fts_method_equiv_t mth_equiv;
+  fts_equiv_fun_t equiv_fun;
   fts_class_t *inst_list;
 
   fts_symbol_t name;		/* the name of the metaclass, i.e. the first name used to register it */

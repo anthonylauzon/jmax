@@ -55,8 +55,7 @@ static int fts_class_mess_exists(fts_inlet_decl_t *in, fts_class_mess_t *msg);
 
 const int fts_SystemInlet = -1;
 
-void
-fts_classes_init(void)
+void fts_classes_init(void)
 {
   /* Initialize the heaps */
 
@@ -71,8 +70,7 @@ fts_classes_init(void)
 /*                                                                            */
 /******************************************************************************/
 
-static void
-fts_array_alloc(void **array, unsigned int size, unsigned int *nalloc, unsigned int wanted)
+static void fts_array_alloc( void **array, unsigned int size, unsigned int *nalloc, unsigned int wanted)
 {
 #define ALLOC_INC 8
   if (*nalloc < wanted)
@@ -90,9 +88,7 @@ fts_array_alloc(void **array, unsigned int size, unsigned int *nalloc, unsigned 
 }
 
 
-
-static void
-fts_atom_type_copy(int ac, fts_symbol_t *at, fts_symbol_t **sat)
+static void fts_atom_type_copy( int ac, fts_symbol_t *at, fts_symbol_t **sat)
 {
   if (ac > 0)
     {
@@ -115,18 +111,17 @@ fts_atom_type_copy(int ac, fts_symbol_t *at, fts_symbol_t **sat)
 /*                                                                            */
 /******************************************************************************/
 
-fts_status_t
-fts_metaclass_create(fts_symbol_t name,
-		     fts_method_instantiate_t mth_instantiate,
-		     fts_method_equiv_t mth_equiv)
+fts_status_t fts_metaclass_install( fts_symbol_t name, 
+				    fts_instantiate_fun_t instantiate_fun, 
+				    fts_equiv_fun_t equiv_fun)
 {
   fts_atom_t data;
   fts_metaclass_t *mcl;
 
   mcl = fts_zalloc(sizeof(fts_metaclass_t));
 
-  mcl->mth_instantiate = mth_instantiate;
-  mcl->mth_equiv = mth_equiv;
+  mcl->instantiate_fun = instantiate_fun;
+  mcl->equiv_fun = equiv_fun;
   mcl->name = name;
 
   if (fts_hash_table_lookup(&fts_metaclass_table, name, &data))
@@ -143,8 +138,13 @@ fts_metaclass_create(fts_symbol_t name,
 }
 
 
-void
-fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name)
+fts_status_t fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
+{
+  return fts_metaclass_install( name, instantiate_fun, fts_always_equiv);
+}
+
+
+static void fts_metaclass_alias_realize( fts_symbol_t new_name, fts_symbol_t old_name)
 {
   fts_atom_t data;
 
@@ -158,9 +158,41 @@ fts_metaclass_alias(fts_symbol_t new_name, fts_symbol_t old_name)
     }
 }
 
+void fts_metaclass_alias( fts_symbol_t new_name, fts_symbol_t old_name)
+{
+  fts_metaclass_t *mcl;
 
-static fts_symbol_t 
-fts_metaclass_get_real_name(fts_symbol_t name)
+  mcl = fts_metaclass_get_by_name( old_name);
+
+  if (mcl && mcl->equiv_fun == fts_always_equiv)
+    {
+      post( "Error: Cannot alias \"%s\" using fts_metaclass_alias(): \"%s\" is a class. Use fts_class_alias() instead.\n", fts_symbol_name( old_name));
+      return;
+    }
+
+  fts_metaclass_alias_realize( new_name, old_name);
+}
+
+void fts_class_alias( fts_symbol_t new_name, fts_symbol_t old_name)
+{
+  fts_metaclass_t *mcl;
+
+  mcl = fts_metaclass_get_by_name( old_name);
+
+  if (mcl && mcl->equiv_fun != fts_always_equiv)
+    {
+      char *s;
+
+      s = fts_symbol_name( old_name);
+      post( "Error: Cannot alias %s using fts_class_alias(): %s is a metaclass. Use fts_metaclass_alias() instead.\n", s, s);
+      return;
+    }
+
+  fts_metaclass_alias_realize( new_name, old_name);
+}
+
+
+static fts_symbol_t fts_metaclass_get_real_name(fts_symbol_t name)
 {
   fts_atom_t data;
 
@@ -171,8 +203,7 @@ fts_metaclass_get_real_name(fts_symbol_t name)
 }
 
 
-fts_metaclass_t *
-fts_metaclass_get_by_name(fts_symbol_t name)
+fts_metaclass_t *fts_metaclass_get_by_name(fts_symbol_t name)
 {
   fts_atom_t data;
 
@@ -191,8 +222,7 @@ fts_metaclass_get_by_name(fts_symbol_t name)
 /******************************************************************************/
 
 
-static void
-fts_class_register(fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
+static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class_t *cl)
 {
   fts_atom_t *store;
   int i;
@@ -214,14 +244,13 @@ fts_class_register(fts_metaclass_t *mcl, int ac, const fts_atom_t *at, fts_class
 }
 
 
-static fts_class_t *
-fts_class_get(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
+static fts_class_t *fts_class_get( fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
 {
   fts_class_t *cl = mcl->inst_list;
 
   while(cl)
     {
-      if ((! mcl->mth_equiv) || mcl->mth_equiv(cl->ac, cl->at, ac, at))
+      if ((! mcl->equiv_fun) || mcl->equiv_fun(cl->ac, cl->at, ac, at))
 	return cl;
 
       cl = cl->next;
@@ -236,7 +265,7 @@ fts_class_get(fts_metaclass_t *mcl, int ac, const fts_atom_t *at)
    *We cannot use init arguments because the classes do not exists yet*.
  */
 
-fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at)
+fts_class_t *fts_class_instantiate( int ac, const fts_atom_t *at)
 {
   fts_metaclass_t *mcl;
   fts_class_t *cl;
@@ -260,7 +289,7 @@ fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at)
       cl->daemons = 0;
 
       cl->mcl = mcl;
-      s = mcl->mth_instantiate(cl, ac, at);
+      s = mcl->instantiate_fun(cl, ac, at);
 
       if (s == fts_Success)
 	{
@@ -286,8 +315,7 @@ fts_class_t *fts_class_instantiate(int ac, const fts_atom_t *at)
 }
 
 
-fts_status_t
-fts_class_init(fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
+fts_status_t fts_class_init( fts_class_t *cl, unsigned int size, int ninlets, int noutlets, void *user_data)
 {
   if (cl->size)
     return &fts_ClassAlreadyInitialized;
@@ -310,11 +338,10 @@ fts_class_init(fts_class_t *cl, unsigned int size, int ninlets, int noutlets, vo
 }
 
 
-fts_status_t
-fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
-			  fts_method_t mth, 
-			  int nargs, fts_symbol_t *arg_types,
-			  int mandatory_args)
+fts_status_t fts_method_define_optargs( fts_class_t *cl, int winlet, fts_symbol_t s,
+					fts_method_t mth, 
+					int nargs, fts_symbol_t *arg_types,
+					int mandatory_args)
 {
   fts_inlet_decl_t *in;
   fts_class_mess_t *msg;
@@ -349,10 +376,9 @@ fts_method_define_optargs(fts_class_t *cl, int winlet, fts_symbol_t s,
 }
 
 
-fts_status_t
-fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
-			       int ac, fts_symbol_t *at,
-			       int mandatory_args)
+fts_status_t fts_outlet_type_define_optargs( fts_class_t *cl, int woutlet, fts_symbol_t s,
+					     int ac, fts_symbol_t *at,
+					     int mandatory_args)
 {
   fts_outlet_decl_t *out;
 
@@ -380,8 +406,7 @@ fts_outlet_type_define_optargs(fts_class_t *cl, int woutlet, fts_symbol_t s,
 }
 
 
-fts_symbol_t 
-fts_get_class_name(fts_class_t *cl)
+fts_symbol_t fts_get_class_name( fts_class_t *cl)
 {
   return cl->mcl->name;
 }

@@ -215,7 +215,7 @@ sampread_config(void)
 {
   fts_s_jump = fts_new_symbol("jump");
   
-  fts_metaclass_create(fts_new_symbol("sampread~"), class_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("sampread~"), class_instantiate);
   
   dsp_symbol = fts_new_symbol("sampread");
   dsp_declare_function(dsp_symbol, ftl_sampread);

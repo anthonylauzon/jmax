@@ -50,7 +50,7 @@ arch_config(void)
 {
   arch_sym = fts_new_symbol(FTS_ARCH_NAME);
 
-  fts_metaclass_create(fts_new_symbol("arch"),arch_instantiate, fts_always_equiv);
+  fts_class_install(fts_new_symbol("arch"),arch_instantiate);
 }
 
 
