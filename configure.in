@@ -1,8 +1,11 @@
-dnl $Id: configure.in,v 1.104 2003/01/24 09:35:22 p_tisserand Exp $
+dnl $Id: configure.in,v 1.105 2003/01/28 12:00:30 borghesi Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl 
 dnl $Log: configure.in,v $
+dnl Revision 1.105  2003/01/28 12:00:30  borghesi
+dnl changes in utils, data, sequence includes
+dnl
 dnl Revision 1.104  2003/01/24 09:35:22  p_tisserand
 dnl Add an automake conditionnnal for jack package.
 dnl Now this package is always in $make dist
@@ -263,9 +266,11 @@ PLATFORM_PACKAGES="oss"
 AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="unixdtd aflib $PLATFORM_PACKAGES"],[echo packages unixdtd and aflib will not be build])
 AM_PATH_ALSA(0.9.0,[
 	DEFAULT_PROJECT_FILE=default_project_linux_alsa.jprj
+	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 ],[
 	DEFAULT_PROJECT_FILE=default_project_linux_oss.jprj
+	DEFAULT_CONFIG_FILE=default_config_linux_oss.jcfg
 ])
 
 FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
@@ -409,6 +414,7 @@ then
 	AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")	
 	dnl Define macro to enable scheduler special function (fts_sched_run_one_tick)
 	DEFAULT_PROJECT_FILE=default_project_linux_jack.jprj
+	DEFAULT_CONFIG_FILE=default_config_linux_jack.jcfg
 fi
 
 
@@ -416,6 +422,7 @@ AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
 
 AC_SUBST(DEFAULT_PROJECT_FILE)
+AC_SUBST(DEFAULT_CONFIG_FILE)
 
 dnl Run configure in subdirectories
 AC_CONFIG_SUBDIRS(client)
