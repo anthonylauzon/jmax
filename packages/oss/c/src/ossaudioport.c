@@ -49,6 +49,8 @@ typedef struct {
 } ossaudioport_t;
 
 static fts_symbol_t s_slash_dev_slash_audio;
+static fts_symbol_t s_slash_dev_slash_dsp;
+
 static fts_symbol_t s_read_only;
 static fts_symbol_t s_write_only;
 
@@ -65,6 +67,11 @@ ossaudiomanager_scan_devices()
   fts_set_symbol(&at, s_slash_dev_slash_audio);
   port = (fts_audioport_t*)fts_object_create(ossaudioport_type, NULL, 1, &at);
   fts_audiomanager_put_port(s_slash_dev_slash_audio, port);
+
+  fts_set_symbol(&at, s_slash_dev_slash_dsp);
+  port = (fts_audioport_t*)fts_object_create(ossaudioport_type, NULL, 1, &at);
+  fts_audiomanager_put_port(s_slash_dev_slash_dsp, port);
+
 }
 
 /**
@@ -84,7 +91,7 @@ static void ossaudioport_output_fun(fts_audioport_t* port)
 {
   ossaudioport_t* oss_port = (ossaudioport_t*)port;
 
-  write(oss_port->fd, oss_port->adc_fmtbuf, oss_port->buff_size);
+  write(oss_port->fd, oss_port->dac_fmtbuf, oss_port->buff_size);
 }
 
 /** 
@@ -177,7 +184,8 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   sample_rate = (int)sr ;
 
 
-  strcpy( device_name, fts_get_symbol_arg( ac, at, 0, s_slash_dev_slash_audio));
+  /* HACK */
+  strcpy( device_name, s_slash_dev_slash_dsp);
 
   channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
 
@@ -188,10 +196,23 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   else
     flags = O_RDWR;
 
+  if (-1 != self->fd)
+  {
+    /* close previously opened device */
+    if (close(self->fd) < 0)
+    {
+      fts_object_error(o, "cannot close device (%s)\n", strerror(errno));
+      post("[ossaudioport:] cannot close device (%s)\n", strerror(errno));
+      return;
+    }
+    self->fd = -1;
+    fts_log("[ossaudioport] oss audioport is closed \n");
+  }
+
   if ( (self->fd = open( device_name, flags, 0)) < 0 )
     {
       fts_object_error( o, "cannot open device \"%s\" (%s)", device_name, strerror( errno));
-      post("ossaudioport: cannot open device \"%s\" (%s)", device_name, strerror( errno));
+      post("[ossaudioport:] cannot open device \"%s\" (%s)", device_name, strerror( errno));
       return;
     }
 
@@ -255,7 +276,11 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
      fts_log("[ossaudioport]: cannot set to wanted sample rate (%d), get (%d)\n",
 	     sample_rate, p_sample_rate);
  }
-  
+ 
+ fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+  fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+
+ fts_log("[ossaudioport] oss audioport is open \n");
 }
 
 static void ossaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -297,6 +322,8 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   self->dac_fmtbuf = (short *)fts_malloc(self->buff_size);
 
   self->no_xrun_message_already_posted = 0;
+
+  self->fd = -1;
 }
 
 static void ossaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -313,6 +340,9 @@ static void ossaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
 static void ossaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( ossaudioport_t), ossaudioport_init, ossaudioport_delete);
+
+  fts_class_message_varargs(cl, fts_s_open_input, ossaudioport_open);
+  fts_class_message_varargs(cl, fts_s_open_output, ossaudioport_open);
 }
 
 void ossaudioport_config( void)
@@ -320,6 +350,7 @@ void ossaudioport_config( void)
   fts_symbol_t s = fts_new_symbol("ossaudioport");
 
   s_slash_dev_slash_audio = fts_new_symbol( "/dev/audio");
+  s_slash_dev_slash_dsp = fts_new_symbol( "/dev/dsp");
   s_read_only = fts_new_symbol( "read_only");
   s_write_only = fts_new_symbol( "write_only");
 
