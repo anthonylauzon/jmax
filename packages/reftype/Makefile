@@ -40,4 +40,7 @@ clean_c:
 .PHONY: clean_c
 
 install-exec:
+	$(INSTALL_DIR) $(lib_install_dir)/packages/reftype
+	for f in *.jpk *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/reftype ; done
+	( cd c ; $(MAKE) $@)
 .PHONY: install-exec
