@@ -131,8 +131,7 @@ the script
 located in <i>jMax root dir</i>/bin,
 has to be launched prior to any compilation.
 
-
-<h3> <code>make</code> targets </h3>
+<h3> Environment variables </h3>
 
 <p>
 The JAVA compilation needs to access the Swing classes, which must be
@@ -140,10 +139,12 @@ in the <code>CLASSPATH</code> environment variable, i.e. <br>
 <code>setenv CLASSPATH <i>Swing's home</i>/swingall.jar</code> for csh <br>
 <code>export CLASSPATH=<i>Swing's home</i>/swingall.jar</code> for bash <br>
 
+<h3> Compiling C parts </h3>
+
 <p>
-To recompile, use the following command line:<br>
-<code>make ARCH=<i>your_architecture</i> MODE=opt all</code> (on Linux), or <br>
-<code>gmake ARCH=<i>your_architecture</i> MODE=opt all</code> (on SGI), <br>
+To recompile C parts, use the following command line (in jMax root directory):<br>
+<code>make ARCH=<i>your_architecture</i> MODE=opt all_c</code> (on Linux), or <br>
+<code>gmake ARCH=<i>your_architecture</i> MODE=opt all_c</code> (on SGI), <br>
 where <i>your_architecture</i> is:
 <ul>
 <li> <code>linuxpc</code> for Linux platform on Intel compatible processors
@@ -153,6 +154,15 @@ where <i>your_architecture</i> is:
 <li> <code>irix63r5k</code> for SGI platform, IRIX 6.3, R5000 processor
 <li> <code>irix63r10k</code> for SGI platform, IRIX 6.3, R10000 processor
 </ul>
+
+
+<h3> Compiling JAVA parts </h3>
+
+<p>
+To recompile JAVA parts, use the following command line (in jMax root directory):<br>
+<code>make MODE=debug all_java</code> (on Linux), or <br>
+<code>gmake MODE=debug all_java</code> (on SGI) <br>
+(JAVA parts are acutally compiled with debug on)
 
 
 <!-- ---------------------------------------------------------------------- -->

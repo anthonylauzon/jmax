@@ -3,7 +3,4 @@ all	all	help
 all	all	ispw.jpk
 all	all	sounds
 all	all	templates
-ircam	all	lib
-free	all	lib
-src	all	Makefile
-src	all	src
+all	all	lib

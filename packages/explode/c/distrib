@@ -1,4 +1,1 @@
-ircam	all	lib
-free	all	lib
-src	all	Makefile
-src	all	src
+all	all	lib
