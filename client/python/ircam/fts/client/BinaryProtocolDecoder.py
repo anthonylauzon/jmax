@@ -1,5 +1,4 @@
 # debug
-from Buffer import Buffer
 from SymbolCache import SymbolCache
 from BinaryProtocol import BinaryProtocol
 from FtsClientException import FtsClientException
