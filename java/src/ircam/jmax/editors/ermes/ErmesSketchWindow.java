@@ -721,7 +721,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 	
 	FtsHelpPatchTable.openHelpPatch(aObject.itsFtsObject);
       }
-    } else {
+    } 
+    else if (aInt == Platform.LEFT_KEY || aInt == Platform.RIGHT_KEY ||
+	     aInt == Platform.UP_KEY || aInt == Platform.DOWN_KEY){
+      itsSketchPad.arrowsPressed(aInt);
+    }
+    else {
       // Finally, if we don't redefine the key, call the superclass method
       // that define the standard things.
       super.keyPressed(e);

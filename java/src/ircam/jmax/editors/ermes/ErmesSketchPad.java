@@ -75,6 +75,10 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   //public static boolean stillLoading = false;
   final static Dimension snapGrid = new Dimension(30, 50);
   final public static Color sketchColor = new Color(230, 230, 230);	//the sketchPad gray...
+
+  public final int PIXEL_LEFT = 0;
+  public final int PIXEL_RIGHT = 1;
+
   public Font sketchFont = new Font(ircam.jmax.utils.Platform.FONT_NAME, Font.PLAIN, ircam.jmax.utils.Platform.FONT_SIZE);
   public int sketchFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
   int SKETCH_WIDTH = 1200/*800*/;
@@ -1264,6 +1268,33 @@ Rectangle previousResizeRect = new Rectangle();
     }
   }
 
+  void arrowsPressed(int whichArrow) {
+    if (editStatus != START_SELECT) return;
+
+    if (whichArrow == Platform.LEFT_KEY) {
+      itsHelper.MoveElements(-1, 0);
+      itsHelper.SaveElementRgn();
+      itsHelper.MoveElemConnections(-1,0);
+    }
+    else if (whichArrow == Platform.RIGHT_KEY) {
+      itsHelper.MoveElements(1, 0);
+      itsHelper.SaveElementRgn();
+      itsHelper.MoveElemConnections(1,0);
+    }
+    else if (whichArrow == Platform.UP_KEY) {
+      itsHelper.MoveElements(0, -1);
+      itsHelper.SaveElementRgn();
+      itsHelper.MoveElemConnections(0,-1);
+    }
+    else if (whichArrow == Platform.DOWN_KEY) {
+      itsHelper.MoveElements(0, 1);
+      itsHelper.SaveElementRgn();
+      itsHelper.MoveElemConnections(0,1);
+    }
+    repaint();
+    
+  }
+  
   //////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////mouseListener--fine
   public void SelectConnections(){

@@ -116,6 +116,10 @@ public class Platform
          	NEWLINECHAR = '\n';
         	DELETE_KEY  = 127;
          	BACKSPACE_KEY = 8;
+		LEFT_KEY    = 37;
+		UP_KEY      = 38;
+		RIGHT_KEY   = 39;
+		DOWN_KEY    = 40;
          	ENTER_KEY   = 10;
          	RETURN_KEY  = 10;
          	FONT_SIZE   = 10;
