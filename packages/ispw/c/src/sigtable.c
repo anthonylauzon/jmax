@@ -91,7 +91,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
       
       if(sampbuf_name_already_registered(name))
 	{
-	  fts_object_set_error(o, "table~: %s: multiply defined\n", name);
+	  fts_object_set_error(o, "table %s multiply defined\n", name);
 	  return;
 	}
       
@@ -110,7 +110,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     }
   else
     {
-      fts_object_set_error(o, "table~: %s: multiply defined\n", name);
+      fts_object_set_error(o, "Name required\n");
       return;
     }
 }
@@ -170,11 +170,12 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     return;
   }
 
-  if (fseek(fd, onset, 0) < 0){
-    post("table~: %s: can't seek to beginning\n", file_name);
-    fts_file_close(fd);
-    return;
-  }
+  if (fseek(fd, onset, 0) < 0)
+    {
+      post("table~: %s: can't seek to beginning\n", file_name);
+      fts_file_close(fd);
+      return;
+    }
 
   samps_left = samps_to_read = size + GUARDPTS;
   while(samps_left > 0){
@@ -303,7 +304,7 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 	  return;
 	}
 
-      if (fts_audiofile_seek(af, n_onset) != 0) 
+      if (onset > 0 && fts_audiofile_seek(af, n_onset) != 0) 
 	{
 	  post("table~: %s: can't seek position in file \"%s\"\n", this->name, file_name);
 	  fts_audiofile_close(af);
