@@ -611,7 +611,7 @@ public class MaxApplication extends Object
 
     public String setSystemProperty(String name, String value)
     {
-	return MaxApplication.setProperty(name, value);
+      return MaxApplication.setProperty(name, value);
     }
 
     /* Application "when" hooks */

@@ -37,7 +37,7 @@ import ircam.jmax.editors.patcher.*;
  * The "number box" graphic object base class
  */
 
-abstract class NumberBox extends GraphicObject implements KeyEventClient {
+abstract public class NumberBox extends GraphicObject implements KeyEventClient {
   boolean valueValid = true;
   private StringBuffer currentText;
   private int nDecimals = 0;
@@ -66,6 +66,10 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
   private int getMinWidth()
   {
     return getFontMetrics().stringWidth("0")*DEFAULT_VISIBLE_DIGIT + getFontMetrics().stringWidth("..") +17;
+  }
+
+  private int getFullTextWidth(){
+    return (getFontMetrics().stringWidth("..")+ getFontMetrics().stringWidth(getValueAsText())+17);
   }
 
   private int getMinHeight()
@@ -98,10 +102,20 @@ abstract class NumberBox extends GraphicObject implements KeyEventClient {
     if (getWidth() < minWidth)
       super.setWidth( minWidth);
 
-    int minHeight = getMinHeight();
-    if ( getHeight() < minHeight)
-      super.setHeight( minHeight);
+    super.setHeight(getMinHeight());
   }
+
+  public void fitToText()
+  {
+    int full = getFullTextWidth();
+    int min = getMinWidth();
+
+    if(full<min) super.setWidth(min);
+    else  super.setWidth(full);
+
+    super.setHeight(getMinHeight());
+  }
+
 
   // ----------------------------------------
   // ValueAsText property

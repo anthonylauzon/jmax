@@ -1672,7 +1672,6 @@ public class FtsServer  implements Runnable
 	    if (waiting)
 	      {
 		// Timeout exit
-
 		connected = false;
 		return false;
 	      }

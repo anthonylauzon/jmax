@@ -626,3 +626,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     return itsRedoMenuItem;
   }
 }
+
+
+
+

@@ -60,6 +60,13 @@ public class FitToTextAction extends EditorAction
 	      object.redraw();
 	      object.redrawConnections();
 	    }
+	    else if(object instanceof NumberBox){
+	      object.redraw();
+	      object.redrawConnections();
+	      ((NumberBox)object).fitToText();
+	      object.redraw();
+	      object.redrawConnections();
+	    }
 	}});
       
     }

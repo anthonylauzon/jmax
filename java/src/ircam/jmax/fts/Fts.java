@@ -194,8 +194,9 @@ public class Fts implements MaxContext
     // Wait for FTS to do his work
 
     sync();
+
     obj = server.getObjectByFtsId(id);
-    
+
     if (obj != null)
       {
 	obj.setDirty();
@@ -298,7 +299,7 @@ public class Fts implements MaxContext
 
     sync();
     newObject = server.getObjectByFtsId(newId);
-    
+
     if (newObject != null)
       {
 	newObject.setDirty();
