@@ -140,7 +140,7 @@ static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, in
 #endif
 
   if(!fts_object_has_id((fts_object_t *)this))
-    fts_client_upload((fts_object_t *)this, atomlist_symbol, 0, 0);
+    fts_client_upload_object((fts_object_t *)this, -1);
 
   if (this->name)
     {

@@ -49,7 +49,7 @@ pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   for(i=this->ac-1; i>=0; i--)
     {
       fts_outlet_send(o, i, fts_get_selector(atoms + i), 1, atoms + i);
-      fts_atom_void(atoms + i);
+      fts_set_void(atoms + i);
     }
 
   fts_heap_free(atoms, this->heap);
@@ -203,7 +203,7 @@ pipe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   pipe_clear(o, 0, 0, 0, 0);
   
   for(i=0; i<this->ac; i++)
-    fts_atom_void(this->at + i);
+    fts_set_void(this->at + i);
   
   fts_heap_free(this->at, this->heap);
 }

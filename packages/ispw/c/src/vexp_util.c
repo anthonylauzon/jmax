@@ -222,7 +222,7 @@ argstostr(int argc, const fts_atom_t *argv, char *buf, int size)
 	{
 	}
       else
-	post("argstostr: wrong type %ld\n", fts_get_type(argv));
+	post("argstostr: wrong type %ld\n", fts_get_selector(argv));
 
       argv++;
     }

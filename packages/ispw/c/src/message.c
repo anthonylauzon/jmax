@@ -526,17 +526,15 @@ static void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol
 {
   fts_atom_list_iterator_t *iterator = fts_atom_list_iterator_new(atom_list);
 
-  fts_client_start_clientmess();
-  fts_client_add_object(obj);
-  fts_client_add_symbol(fts_s_set);
+  fts_client_start_message(obj, fts_s_set);
 
   while (! fts_atom_list_iterator_end(iterator))
     {
-      fts_client_add_atoms( 1, fts_atom_list_iterator_current(iterator));
+      fts_client_add_atoms(obj, 1, fts_atom_list_iterator_current(iterator));
       fts_atom_list_iterator_next(iterator);
     }
 
-  fts_client_done_msg();
+  fts_client_done_message(obj);
   fts_atom_list_iterator_free(iterator);
 }
 

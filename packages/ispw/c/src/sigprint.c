@@ -45,9 +45,9 @@ sigprint_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   int i;
   
   if( x->sym)
-    post("%s:\n", fts_symbol_name(x->sym));
+    post("%s:\n", x->sym);
 
-  for (i = 0; i < x->size; i + =4)
+  for (i = 0; i < x->size; i += 4)
     post("%4d: %f %f %f %f\n", i, x->buf[i], x->buf[i+1], x->buf[i+2], x->buf[i+3]);
 
   post("\n");
