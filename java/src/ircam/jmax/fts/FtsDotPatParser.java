@@ -30,8 +30,8 @@ public class FtsDotPatParser
     {
       int n;
 
-      n = in.getNVal();
       in.nextToken();
+      n = in.getNVal();
 
       range = n;
     }
@@ -40,8 +40,8 @@ public class FtsDotPatParser
     {
       int n;
 
-      n = in.getNVal();
       in.nextToken();
+      n = in.getNVal();
 
       switch (n)
 	{
