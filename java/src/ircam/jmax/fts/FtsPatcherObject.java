@@ -36,7 +36,7 @@ import ircam.jmax.utils.*;
  * Proxy of an FTS patcher.
  */
 
-public class FtsPatcherObject extends FtsObject
+public class FtsPatcherObject extends FtsObjectWithEditor
 {
   /*****************************************************************************/
   /*                                                                           */
@@ -48,9 +48,9 @@ public class FtsPatcherObject extends FtsObject
    * Create a FtsPatcherObject object
    */
 
-    public FtsPatcherObject(Fts fts, FtsObject parent/*, int objId*/, String description)
+  public FtsPatcherObject(Fts fts, FtsObject parent, String description)
   {
-      super(fts, parent/*, objId*/, null, "jpatcher", description);
+      super(fts, parent, null, "jpatcher", description);
   }
 
   /**
@@ -70,3 +70,5 @@ public class FtsPatcherObject extends FtsObject
     this.description = FtsParse.unparseArguments(nArgs, args);
   }
 }
+
+

@@ -32,7 +32,9 @@ import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 import ircam.jmax.mda.*;
-
+import javax.swing.*;
+import javax.swing.filechooser.*; // tmp !!
+import java.awt.*;
 /**
  * Class implementing the proxy of an FTS object.
  * It deals with: Object creation/deletion, connections
@@ -615,6 +617,11 @@ public class FtsObject
     return parent;
   }
 
+  public final void setParent(FtsObject obj)
+  {
+    parent = obj;
+  }
+
   /** Get the object class Name. */
 
   public final String getClassName()
@@ -950,5 +957,72 @@ public class FtsObject
   public boolean isARootPatcher()
   {
     return (getParent() == getFts().getRootObject());
+  }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    //// MESSAGES called from fts.
+    //////////////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Fts callback: open the FileSave dialog and initialize it with default directory and fileName.
+   */
+
+  //final variables used by invokeLater method
+  JFileChooser fd;
+  Frame parentFrame;
+  String dialogText;
+  String callbackMethod;
+  
+  public void dialogFileSave(int nArgs, FtsAtom args[])
+  {
+      parentFrame = null;
+      callbackMethod = args[0].getString();
+      dialogText = args[1].getString();
+      String defaultPath = args[2].getString();
+      String defaultName = args[3].getString();
+      
+      fd = new JFileChooser(defaultPath);
+      fd.setDialogTitle(dialogText);
+      fd.setSelectedFile(new File(defaultPath, defaultName));
+      
+      if(this instanceof FtsObjectWithEditor)
+	  parentFrame = ((FtsObjectWithEditor)this).getEditorFrame();
+      
+      FtsObject current = this;
+      while(((parentFrame==null)||(!parentFrame.isVisible()))&&(!isARootPatcher()))
+      {
+	  current = current.getParent();
+	  if(current instanceof FtsObjectWithEditor)
+	      parentFrame = ((FtsObjectWithEditor)current).getEditorFrame();
+      }
+
+      if(parentFrame!=null)
+	  {
+	      /*
+		NOTE: we used invokeLater because the fileDialog is modal so when we show it via a
+		message object (export ...), we lose a mouseup event on the message object leaving 
+		the interactionEngine in an incorrect state (RunCtrlInteraction instead of RunModeInteraction)
+		So invokeLater allow to consume the mouseUp event before fileDialog is shown
+	      */
+	      SwingUtilities.invokeLater(new Runnable() {
+		    public void run()
+			{ 
+			   if (fd.showDialog(parentFrame, dialogText) == JFileChooser.APPROVE_OPTION)
+			       {
+				   String path = fd.getSelectedFile().getAbsolutePath();
+				   sendArgs[0].setString(path); 
+				   sendMessage(FtsObject.systemInlet, callbackMethod, 1, sendArgs);
+			       } 
+			}
+		});
+	  }
+  }
+
+  //----- Fields
+  static FtsAtom[] sendArgs = new FtsAtom[128];
+  static
+  {
+    for(int i=0; i<128; i++)
+	sendArgs[i]= new FtsAtom();
   }
 }

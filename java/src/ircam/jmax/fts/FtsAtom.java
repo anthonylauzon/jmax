@@ -30,12 +30,13 @@ package ircam.jmax.fts;
  */
 
 public class FtsAtom {
-  public static final int VOID = 0;
-  public static final int INT = 1;
-  public static final int FLOAT = 2;
+  public static final int VOID   = 0;
+  public static final int INT    = 1;
+  public static final int FLOAT  = 2;
   public static final int STRING = 3;
   public static final int SYMBOL = 4;
   public static final int OBJECT = 5;
+  public static final int DOUBLE = 6;
   
   public final boolean isVoid()
   {
@@ -45,6 +46,11 @@ public class FtsAtom {
   public final boolean isInt()
   {
     return type == INT;
+  }
+
+  public final boolean isDouble()
+  {
+    return type == DOUBLE;
   }
 
   public final boolean isFloat()
@@ -93,6 +99,17 @@ public class FtsAtom {
     type = FLOAT;
     floatValue = f;
   }
+    
+  public final double getDouble()
+  {
+    return doubleValue;
+  }
+
+  public final void setDouble(double d)
+  {
+    type = DOUBLE;
+    doubleValue = d;
+  }
 
   public final String getString()
   {
@@ -136,6 +153,8 @@ public class FtsAtom {
       return new Integer( intValue);
     case FLOAT:
       return new Float( floatValue);
+    case DOUBLE:
+      return new Double( doubleValue);
     case STRING:
       return stringValue;
     case SYMBOL:
@@ -154,6 +173,8 @@ public class FtsAtom {
 	else
 	    if(value instanceof Float)
 		setFloat(((Float)value).floatValue());
+	    else if(value instanceof Double)
+		setDouble(((Double)value).doubleValue());
 	    else 
 		if(value instanceof String)
 		    setString((String)value);
@@ -165,6 +186,7 @@ public class FtsAtom {
   public int type;
   public int intValue;
   public float floatValue;
+  public double doubleValue;
   public String stringValue;
   public FtsSymbol symbolValue;
   public FtsObject objectValue;
