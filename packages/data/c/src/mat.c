@@ -56,7 +56,11 @@ mat_set_size(mat_t *mat, int m, int n)
   
   if (newsize > alloc)
   {
-    mat->data  = fts_realloc(mat->data, newsize * sizeof(fts_atom_t));
+    if(mat->data == NULL)
+      mat->data  = fts_malloc(newsize * sizeof(fts_atom_t));
+    else
+      mat->data  = fts_realloc(mat->data, newsize * sizeof(fts_atom_t));
+      
     mat->alloc = newsize;
   }
   else
