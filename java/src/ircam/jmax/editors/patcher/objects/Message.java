@@ -95,7 +95,27 @@ class Message extends Editable implements FtsMessageListener, FtsIntValueListene
 
   public void messageChanged(String message)
   {
-    updateRedraw();
+    // No need to call GraphicObject.redefine(): it will only update the in/outlets
+    // geometry, that has not changed here.
+
+    int oldHeight = getHeight();
+
+    renderer.update();
+
+    updateDimensions();
+
+    if ( oldHeight <= getHeight())
+      {
+	redraw();
+	redrawConnections();
+	itsSketchPad.getDisplayList().updateConnectionsFor(this);
+      }
+    else
+      {
+	// As the box has shrinked, and therefore its connections has moved,
+	// it is easier to repaint everything.
+	itsSketchPad.repaint();
+      }
   }
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
