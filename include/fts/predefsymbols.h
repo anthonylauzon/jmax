@@ -259,4 +259,6 @@ PREDEF_SYMBOL( fts_s_args, "args")
 
 /* Default filename */
 PREDEF_SYMBOL( fts_s_default_project, "default_project.jprj")
-PREDEF_SYMBOL( fts_s_default_config, "default_config.jcfg")
+PREDEF_SYMBOL( fts_s_default_config, "default_config.jcfg")        
+PREDEF_SYMBOL( fts_s_noaudio, "noaudio")    
+PREDEF_SYMBOL( fts_s_none, "none")
