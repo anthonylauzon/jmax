@@ -643,14 +643,16 @@ void fts_audioport_add_input_object( fts_audioport_t *port, int channel, fts_obj
 {
   indispatcher_t *indispatcher = (indispatcher_t *)port->input.dispatcher;
 
-  fts_channel_add_target( &indispatcher->channel_objects[channel], object);
+  if ( indispatcher)
+    fts_channel_add_target( &indispatcher->channel_objects[channel], object);
 }
 
 void fts_audioport_remove_input_object( fts_audioport_t *port, int channel, fts_object_t *object)
 {
   indispatcher_t *indispatcher = (indispatcher_t *)port->input.dispatcher;
 
-  fts_channel_remove_target( &indispatcher->channel_objects[channel], object);
+  if ( indispatcher)
+    fts_channel_remove_target( &indispatcher->channel_objects[channel], object);
 }
 
 

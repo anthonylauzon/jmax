@@ -41,12 +41,46 @@
 #define DEFAULT_CHANNELS 2
 
 typedef struct {
+  pthread_mutex_t mutex;
+  pthread_cond_t awaiting_cond;
+  volatile int awaiting_size;
+
+  volatile int read_index;
+  volatile int write_index;
+
+  int buffer_size;
+  volatile float buffer[1];
+} halaudioport_fifo_t;
+
+#define FIFO_READ_LEVEL(FIFO)						\
+(((FIFO)->write_index - (FIFO)->read_index < 0)				\
+ ? (FIFO)->write_index - (FIFO)->read_index + (FIFO)->buffer_size	\
+ : (FIFO)->write_index - (FIFO)->read_index)
+
+#define FIFO_WRITE_LEVEL(FIFO)						\
+(((FIFO)->read_index - (FIFO)->write_index - 1 < 0)			\
+ ? (FIFO)->read_index - (FIFO)->write_index - 1 + (FIFO)->buffer_size	\
+ : (FIFO)->read_index - (FIFO)->write_index - 1)
+
+#define FIFO_INCR_READ_INDEX(FIFO, INCR) 					\
+(FIFO)->read_index = ((FIFO)->read_index + (INCR)) % (FIFO)->buffer_size
+
+#define FIFO_INCR_READ_INDEX(FIFO, INCR) 					\
+(FIFO)->write_index = ((FIFO)->write_index + (INCR)) % (FIFO)->buffer_size
+
+
+
+
+typedef struct {
   fts_audioport_t head;
   AudioDeviceID device;
   float *buffer;
   int count;
   int buffer_size;
 } halaudioport_t;
+
+
+
 
 static void halaudioport_input( fts_word_t *argv)
 {
@@ -116,21 +150,17 @@ static int halaudioport_xrun( fts_audioport_t *port)
   return 0;
 }
 
-static void hal_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fd_set rfds;
-
-  FD_ZERO( &rfds);
-  FD_SET( 0, &rfds);
-
-  if (select( 1, &rfds, NULL, NULL, NULL) < 0)
-    fprintf( stderr, "select() failed\n");
-}
+/*
+ * Current implementation restrictions:
+ * - only interleaved
+ * - only output
+ * - don't know how to get (and set?) the number of channels
+ */
 
 static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   halaudioport_t *this = (halaudioport_t *)o;
-  int fifo_size, channels;
+  int fifo_size, channels, buffer_size;
   OSStatus err;
   UInt32 count;
   UInt32 bufferSizeProperty;
@@ -142,47 +172,41 @@ static void halaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fifo_size = fts_param_get_int( fts_s_fifo_size, DEFAULT_FIFO_SIZE);
 
   channels = fts_get_int_arg( ac, at, 1, DEFAULT_CHANNELS);
+  buffer_size = fts_get_int_arg( ac, at, 2, fts_get_tick_size());
 
   count = sizeof( this->device);
-  err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device);
-  if (err != noErr)
+  if ((err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice, &count, (void *)&this->device)) != noErr)
     {
       fts_object_set_error( o, "Cannot get default device");
       return;
     }
 
+  bufferSizeProperty = channels * sizeof( float) * buffer_size;
   count = sizeof( bufferSizeProperty);
-  err = AudioDeviceGetProperty( this->device, 0, false, kAudioDevicePropertyBufferSize, &count, &bufferSizeProperty);
-  if (err != noErr)
+  if ((err = AudioDeviceSetProperty( this->device, NULL, 0, false, kAudioDevicePropertyBufferSize, count, &bufferSizeProperty)) != noErr)
     {
-      fts_object_set_error( o, "Cannot get buffer size");
+      fts_object_set_error( o, "Cannot set buffer size");
       return;
     }
 
   fts_audioport_set_output_channels( (fts_audioport_t *)this, channels);
-
   fts_audioport_set_output_function( (fts_audioport_t *)this, halaudioport_output);
 
-  post( "*** Buffer size %d\n", bufferSizeProperty);
+  /* Create the fifo and fill it */
+  /* ... */
 
-  this->buffer = (float *)fts_malloc( bufferSizeProperty);
-  this->buffer_size = bufferSizeProperty / sizeof( float);
 
-  err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this);
-  if (err != noErr)
+  if ((err = AudioDeviceAddIOProc( this->device, halaudioport_ioproc, this)) != noErr)
     {
       fts_object_set_error( o, "Cannot set IO proc");
       return;
     }
   
-  err = AudioDeviceStart( this->device, halaudioport_ioproc);
-  if (err != noErr)
+  if ((err = AudioDeviceStart( this->device, halaudioport_ioproc)) != noErr)
     {
       fts_object_set_error( o, "Cannot start device");
       return;
     }
-
-  hal_halt( 0, 0, 0, 0, 0);
 }
 
 static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -192,15 +216,11 @@ static void halaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int
 
   fts_audioport_delete( &this->head);
 
-  err = AudioDeviceStop( this->device, halaudioport_ioproc);
-  if (err != noErr)
+  if ((err = AudioDeviceStop( this->device, halaudioport_ioproc)) != noErr)
     ;
 
-  err = AudioDeviceRemoveIOProc( this->device, halaudioport_ioproc);
-  if (err != noErr)
+  if ((err = AudioDeviceRemoveIOProc( this->device, halaudioport_ioproc)) != noErr)
     ;
-
-  fts_free( this->buffer);
 }
 
 static void halaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
@@ -214,6 +234,7 @@ static fts_status_t halaudioport_instantiate(fts_class_t *cl, int ac, const fts_
 
   fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, halaudioport_init);
   fts_method_define( cl, fts_SystemInlet, fts_s_delete, halaudioport_delete, 0, 0);
+
   /* define variable */
   fts_class_add_daemon( cl, obj_property_get, fts_s_state, halaudioport_get_state);
 
