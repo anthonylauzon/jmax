@@ -350,8 +350,6 @@ fts_clock_reset(fts_clock_t *clock)
 {
   fts_alarm_t *alarm;
 
-  fts_alarm_describe("Before reset", clock); /* @@@ debug */
-
   /* Move the logical time */
 
   clock->logical_time = *(clock->real_time);
@@ -380,8 +378,6 @@ fts_clock_reset(fts_clock_t *clock)
   clock->future_alarm_list = clock->alarm_list;
   while (clock->future_alarm_list && clock->future_alarm_list->when < *(clock->real_time))
     clock->future_alarm_list = clock->future_alarm_list->next;
-
-  fts_alarm_describe("After reset", clock); /* @@@ debug */
 }
 
 /******************************************************************************/
