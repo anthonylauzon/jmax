@@ -104,6 +104,7 @@ AC_SUBST(DOT_LIBS)
 dnl Set platform specifics
 case "$host" in
 
+dnl GNU/Linux on an Intel or compatible
 i*86-pc-linux-gnu)
 PLATFORM=linux
 CFLAGS="$CFLAGS -Wall -Wno-unused -mpentiumpro"
@@ -126,6 +127,26 @@ PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 else
 CONFIG_FILE=config_linux_oss.jmax
 fi
+FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
+ACX_C_RESTRICT
+;;
+
+dnl GNU/Linux on a PowerPC
+powerpc-*-linux-gnu)
+PLATFORM=linux
+CFLAGS="$CFLAGS -Wall -Wno-unused"
+if test "$with_debug" != "yes"
+then
+  CFLAGS="$CFLAGS -O3 -funroll-loops -fmove-all-movables -fstrict-aliasing"
+fi
+if test "$check_memory" = "yes"
+then
+  CFLAGS="$CFLAGS -fcheck-memory-usage"
+fi
+
+PLATFORM_PACKAGES="oss unixdtd aflib"
+
+CONFIG_FILE=config_linux_oss.jmax
 FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
 ACX_C_RESTRICT
 ;;

@@ -21,7 +21,7 @@
  */
 
 /*
- * This file contains Linux (Intel compatible processors) platform dependent functions:
+ * This file contains Linux (Intel compatible processors and PowerPC) platform dependent functions:
  *  - dynamic loader
  *  - FPU settings
  *  - real-time: scheduling mode and priority, memory locking
@@ -124,9 +124,11 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
 
 /***********************************************************************
  *
- * Floating-point unit
+ * Floating-point unit handling for Intel and compatible
  *
  */
+
+#ifdef i386
 
 /*
  * #define this if you want denormalized f.p. traps to be reported 
@@ -262,6 +264,56 @@ unsigned int fts_check_fpe( void)
 
   return which;
 }
+
+#endif
+
+
+/***********************************************************************
+ *
+ * Floating-point unit handling for PowerPC
+ *
+ */
+
+#ifdef PPC
+
+static void linux_fpe_signal_handler( int sig)
+{
+  fts_fpe_handler( fts_check_fpe());
+}
+
+void fts_enable_fpe_traps( void) __attribute__ ((no_check_memory_usage));
+
+void fts_enable_fpe_traps( void)
+{
+  unsigned  int cw;
+
+  signal( SIGFPE, linux_fpe_signal_handler);
+
+  /* ... PPC specific code ... */
+}
+
+void fts_disable_fpe_traps( void) __attribute__ ((no_check_memory_usage));
+
+void fts_disable_fpe_traps( void)
+{
+  signal( SIGFPE, SIG_IGN);
+
+  /* ... PPC specific code ... */
+}
+
+unsigned int fts_check_fpe( void) __attribute__ ((no_check_memory_usage));
+
+unsigned int fts_check_fpe( void)
+{
+  unsigned int s;
+  int which = 0;
+
+  /* ... PPC specific code ... */
+
+  return which;
+}
+
+#endif
 
 /* *************************************************************************** */
 /*                                                                             */
