@@ -512,56 +512,57 @@ track_event_upload(track_t *this, event_t *event)
     {
       ((fts_object_t *)event)->patcher = fts_object_get_patcher( (fts_object_t *)this);
       fts_client_register_object((fts_object_t *)event, -1);
-    }
+    
 
-  fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
-  fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
+      fts_client_start_message( (fts_object_t *)this, seqsym_addEvents);
+      fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)event));
 
-  if(fts_is_object(&event->value))
-    {
-      if(type == seqsym_note)
+      if(fts_is_object(&event->value))
 	{
-	  note_t *note = (note_t *)fts_get_object(&event->value);
+	  if(type == seqsym_note)
+	    {
+	      note_t *note = (note_t *)fts_get_object(&event->value);
+	      
+	      fts_set_float(a + 0, (float)event_get_time(event));
+	      fts_set_symbol(a + 1, seqsym_note);
+	      fts_set_int(a + 2, note_get_pitch(note));
+	      fts_set_float(a + 3, (float)note_get_duration(note));
+	      fts_client_add_atoms( (fts_object_t *)this, 4, a);
+	      fts_client_done_message( (fts_object_t *)this);
 
+	      return;
+	    }
+	  else if(type == seqsym_seqmess)
+	    {
+	      seqmess_t *seqmess = (seqmess_t *)fts_get_object(&event->value);
+	      
+	      fts_set_float(a + 0, (float)event_get_time(event));
+	      fts_set_symbol(a + 1, seqsym_seqmess);
+	      fts_set_symbol(a + 2, seqmess_get_selector(seqmess));
+	      fts_set_int(a + 3, seqmess_get_position(seqmess));
+	      fts_client_add_atoms( (fts_object_t *)this, 4, a);
+	      fts_client_done_message( (fts_object_t *)this);
+
+	      return;
+	    }
+	}
+      else if(!fts_is_void(&event->value))
+	{ 
 	  fts_set_float(a + 0, (float)event_get_time(event));
-	  fts_set_symbol(a + 1, seqsym_note);
-	  fts_set_int(a + 2, note_get_pitch(note));
-	  fts_set_float(a + 3, (float)note_get_duration(note));
-	  fts_client_add_atoms( (fts_object_t *)this, 4, a);
+	  fts_set_symbol(a + 1, fts_get_selector(&event->value));
+	  a[2] = event->value;
+	  fts_client_add_atoms( (fts_object_t *)this, 3, a);
 	  fts_client_done_message( (fts_object_t *)this);
 
 	  return;
 	}
-      else if(type == seqsym_seqmess)
-	{
-	  seqmess_t *seqmess = (seqmess_t *)fts_get_object(&event->value);
 
-	  fts_set_float(a + 0, (float)event_get_time(event));
-	  fts_set_symbol(a + 1, seqsym_seqmess);
-	  fts_set_symbol(a + 2, seqmess_get_selector(seqmess));
-	  fts_set_int(a + 3, seqmess_get_position(seqmess));
-	  fts_client_add_atoms( (fts_object_t *)this, 4, a);
-	  fts_client_done_message( (fts_object_t *)this);
-
-	  return;
-	}
-    }
-  else if(!fts_is_void(&event->value))
-    { 
+      /* anything else is uploaded as void event */
       fts_set_float(a + 0, (float)event_get_time(event));
-      fts_set_symbol(a + 1, fts_get_selector(&event->value));
-      a[2] = event->value;
-      fts_client_add_atoms( (fts_object_t *)this, 3, a);
+      fts_set_symbol(a + 1, fts_s_void);
+      fts_client_add_atoms( (fts_object_t *)this, 2, a);
       fts_client_done_message( (fts_object_t *)this);
-
-      return;
     }
-
-  /* anything else is uploaded as void event */
-  fts_set_float(a + 0, (float)event_get_time(event));
-  fts_set_symbol(a + 1, fts_s_void);
-  fts_client_add_atoms( (fts_object_t *)this, 2, a);
-  fts_client_done_message( (fts_object_t *)this);
 }
 
 /* create new event and upload by client request */

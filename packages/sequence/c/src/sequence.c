@@ -207,17 +207,18 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
     {
       ((fts_object_t *)track)->patcher = fts_object_get_patcher((fts_object_t *)this);
       fts_client_register_object((fts_object_t *)track, -1);
-    }
+    
 
-  fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);
-  fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)track));
-  fts_client_add_symbol( (fts_object_t *)this, track_type);
+      fts_client_start_message( (fts_object_t *)this, seqsym_addTracks);
+      fts_client_add_int( (fts_object_t *)this, fts_get_object_id((fts_object_t *)track));
+      fts_client_add_symbol( (fts_object_t *)this, track_type);
   
-  track_name = track_get_name(track);
-  if( track_name)
-    fts_client_add_symbol( (fts_object_t *)this, track_name);
+      track_name = track_get_name(track);
+      if( track_name)
+	fts_client_add_symbol( (fts_object_t *)this, track_name);
 
-  fts_client_done_message( (fts_object_t *)this);
+      fts_client_done_message( (fts_object_t *)this);
+    }
 }
 
 static void 
@@ -556,9 +557,10 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
   sequence_tuple_append(this, track);
 
   if(sequence_editor_is_open(this))
-    sequence_add_track_at_client(this, track);
-
-  sequence_set_dirty( this);
+    {
+      sequence_add_track_at_client(this, track);
+      sequence_set_dirty( this);
+    }
 }
 
 /* add new track without upload at client */
