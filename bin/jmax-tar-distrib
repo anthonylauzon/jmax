@@ -4,19 +4,15 @@ help ()
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-tar-distrib -arch <arch> -type <type> [-tar <tar-command>] <root-directory> <tar-file>
+    jmax-tar-distrib -type <type> -arch <arch>
 
 Creates the tar file of jMax distribution for architecture <arch> and type <type>.
 
 Options:
-  -arch <arch>                 (mandatory)
-    defines the architecture of the release (origin, linuxpc, ...)
   -type <type>                 (mandatory)
     defines the type of the release (free, forum, ...)
-  -tar <tar-command>           (optional)
-    defines tar command to use (gnutar, /usr/local/bin/tar, ...)
-    WARNING: this script relies on the -T - option of the used tar command.
-    Default: tar.
+  -arch <arch>                 (mandatory)
+    defines the architecture of the release (origin, linuxpc, ...)
 
 HELP_EOF
 }
@@ -35,17 +31,9 @@ do
 	case $ARG in
 	\-arch | \-tar | \-type )
 	    OPT=$ARG ;;
-	\-help | \-h | \-\? )
+	*)
 	    help ;
 	    exit 2 ;;
-	*)
-	    if [ $ROOTDIR = "none" ]
-	    then
-		ROOTDIR=$ARG
-	    elif [ $TARFILE = "none" ]
-	    then
-		TARFILE=$ARG
-	    fi ;;
 	esac
     else
 	case $OPT in
@@ -73,22 +61,92 @@ then
     exit 2
 fi
 
-if [ $TARFILE = "none" ]
+if [ \! -r VERSION ]
 then
-    help
-    exit 2
+    echo "Cannot find file VERSION (probably you're not in the correct directory ...)"
+    exit 1
 fi
 
-if $TAR --version | grep -s GNU >/dev/null 
+#if $TAR --version | grep -s GNU >/dev/null 
+#then
+#    echo > /dev/null
+#else
+#    echo $TAR is not GNU tar. Cannot use it!
+#    exit 2
+#fi
+
+#
+MAJOR=`awk '$1=="MAJOR" { print $2; }' VERSION`
+MINOR=`awk '$1=="MINOR" { print $2; }' VERSION`
+PATCH_LEVEL=`awk '$1=="PATCH_LEVEL" { print $2; }' VERSION`
+
+VERSION=$MAJOR.$MINOR.$PATCH_LEVEL
+
+# 
+DEST_DIR=/tmp/max-${VERSION}
+if [ -d ${DEST_DIR} ]
 then
-    echo > /dev/null
-else
-    echo $TAR is not GNU tar. Cannot use it!
-    exit 2
+    /bin/rm -rf ${DEST_DIR}
 fi
+mkdir ${DEST_DIR}
+chmod 755 ${DEST_DIR}
+
+# args: ARCH TYPE DIR DEST
+copy_files ()
+{
+    if [ \! -f $3/distrib ] ;  then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
+
+    {
+	read TYPE_F ARCH_F NAME OTHERS
+	#echo read $TYPE_F $ARCH_F $NAME $OTHERS "<" $3/distrib
+
+	while [ $ARCH_F ] 
+	do
+	    if [ \( $ARCH_F = $1 -o $ARCH_F = "all" \) -a \( $TYPE_F = $2 -o $TYPE_F = "all" \) ]
+	    then
+		if [ -f "$3/$NAME" ]
+		then
+		    D=`dirname $4/$NAME`
+		    if [ ! -d $D ] ; then mkdir -p $D ; chmod 755 $D ; echo "Created $D" ; fi
+
+		    cp $3/$NAME $4/$NAME
+
+		    if ls -l $3/$NAME | awk '{ exit ( !(substr($1,4,1)=="x") ); }'
+		    then
+			chmod 755 $4/$NAME
+		    else
+			chmod 644 $4/$NAME
+		    fi
+		    echo Copyied $4/$NAME
+
+		elif [ -d "$3/$NAME" ]
+		then
+		    mkdir -p $4/$NAME
+		    chmod 755 $4/$NAME
+		    echo Created $4/$NAME
+		    copy_files $1 $2 $3/$NAME $4/$NAME
+		else
+		    echo "File or directory $3/$NAME not found" >&2
+		    exit 2
+		fi
+	    fi
+	    read TYPE_F ARCH_F NAME OTHERS
+	    #echo read $TYPE_F $ARCH_F $NAME $OTHERS "<" $3/distrib
+	done
+    } < $3/distrib
+}
+
+echo Copying files
+copy_files $ARCH $TYPE . ${DEST_DIR}
 
 # Create the tar file
+if [ ! -d /u/worksta/jmax/releases/${TYPE}/${ARCH} ]
+then
+    mkdir -p /u/worksta/jmax/releases/${TYPE}/${ARCH}
+fi
+TARFILE=/u/worksta/jmax/releases/${TYPE}/${ARCH}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
 echo "Creating tar file $TARFILE"
-jmax-make-distrib-list -arch $ARCH -type $TYPE -check-permission $ROOTDIR | tar cvf - -T - | gzip -9 > $TARFILE
+(cd /tmp ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
+
 
 
