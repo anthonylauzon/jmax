@@ -45,7 +45,9 @@ TrackEditorFactoryTable.java \
 TrackEvent.java \
 TrackListListener.java \
 TrackListener.java \
+TrackPanel.java \
 TrackTableModel.java \
+TrackWindow.java \
 UtilTrackEvent.java \
 ValueEditor.java \
 ValueInfo.java \

@@ -44,147 +44,150 @@ import javax.swing.event.*;
  * a Midi value) */
 public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSelectionListener, ircam.jmax.toolkit.PopupProvider, TrackEditor
 {
-    public MidiTrackEditor(Geometry geometry, Track track)
-    {
-	if(track.getProperty("maximumPitch")==null)
-	    track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
-	if(track.getProperty("minimumPitch")==null)
-	    track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));
+  public MidiTrackEditor(Geometry geometry, Track track)
+  {
+    if(track.getProperty("maximumPitch")==null)
+      track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
+    if(track.getProperty("minimumPitch")==null)
+      track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));
+    
+    setLayout(new BorderLayout());
+    setBackground(Color.white);
 
-	setLayout(new BorderLayout());
-	setBackground(Color.white);
+    setOpaque(false);
+    
+    this.track = track;
+    this.geometry = geometry;
 
-	setOpaque(false);
+    //-- prepares the CENTER panel (the score)
+    // a simple panel, that just uses a Renderer as its paint method...
+    // it takes care of the popup showing.
+    
+    itsScore = new ScorePanel(this);
 
-	this.track = track;
-	this.geometry = geometry;
+    gc = prepareGraphicContext(geometry, track);
 
-	//-- prepares the CENTER panel (the score)
-	// a simple panel, that just uses a Renderer as its paint method...
-	// it takes care of the popup showing.
+    add(itsScore, BorderLayout.CENTER);
 
-	itsScore = new ScorePanel(this);
+    //---- simple things for simple minds
+    
+    geometry.addTranspositionListener(new TranspositionListener() {
+	public void transpositionChanged(int newTranspose)
+	{
+	  itsScore.repaint();
+	}
+      });
+    // make this panel repaint when the selection status change
+    // either in content or in ownership.
+    selection.addListSelectionListener(this);
 
-	gc = prepareGraphicContext(geometry, track);
+    selection.setOwner(new SelectionOwner() {
+	public void selectionDisactivated()
+	{
+	  itsScore.repaint();
+	}
+	public void selectionActivated()
+	{
+	  itsScore.repaint();
+	}
+      });
 
-	add(itsScore, BorderLayout.CENTER);
-
-	//---- simple things for simple minds
-
-	geometry.addTranspositionListener(new TranspositionListener() {
-	    public void transpositionChanged(int newTranspose)
-		{
-		    itsScore.repaint();
-		}
-	});
-	// make this panel repaint when the selection status change
-	// either in content or in ownership.
-	selection.addListSelectionListener(this);
-
-	selection.setOwner(new SelectionOwner() {
-	    public void selectionDisactivated()
-		{
-		    itsScore.repaint();
-		}
-	    public void selectionActivated()
-		{
-		    itsScore.repaint();
-		}
-	});
-
-	track.getTrackDataModel().addListener(this);
-
-	track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
-		public void lock(boolean lock)
-		{
-		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-			((TrackEvent) e.nextElement()).setHighlighted(false);
-
-		    oldElements.removeAllElements();
-		    getTrack().setProperty("locked", new Boolean(lock));
-		}
-		public void active(boolean active)
-		{
-		    getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
-		}
-	    });
+    track.getTrackDataModel().addListener(this);
+    
+    track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
+	public void lock(boolean lock)
+	{
+	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+	    ((TrackEvent) e.nextElement()).setHighlighted(false);
+	  
+	  oldElements.removeAllElements();
+	  getTrack().setProperty("locked", new Boolean(lock));
+	}
+	public void active(boolean active)
+	{
+	  getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
+	}
+      });
 	
-	track.getTrackDataModel().addHighlightListener(new HighlightListener(){
-		public void highlight(Enumeration elements, double time)
+    track.getTrackDataModel().addHighlightListener(new HighlightListener(){
+	public void highlight(Enumeration elements, double time)
+	{
+	  TrackEvent temp;
+	  boolean first = true;
+	  
+	  Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
+	  Graphics g = itsScore.getGraphics();  
+	  g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+	  
+	  for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+	    {
+	      temp = (TrackEvent) e.nextElement();
+	      temp.setHighlighted(false);
+	      temp.getRenderer().render(temp, g, false, gc);			    
+	    }
+	  oldElements.removeAllElements();
+	  
+	  for (Enumeration e = elements; e.hasMoreElements();) 
+	    {
+	      temp = (TrackEvent) e.nextElement();
+	      if(first)
 		{
-		    TrackEvent temp;
-		    boolean first = true;
-		    
-		    Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
-		    Graphics g = itsScore.getGraphics();  
-		    g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
-		    
-		    for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-			{
-			    temp = (TrackEvent) e.nextElement();
-			    temp.setHighlighted(false);
-			    temp.getRenderer().render(temp, g, false, gc);			    
-			}
-		    oldElements.removeAllElements();
-
-		    for (Enumeration e = elements; e.hasMoreElements();) 
-			{
-			    temp = (TrackEvent) e.nextElement();
-			    if(first)
-				{
-				    gc.getScrollManager().makeVisible(temp);
-				    first = false;
-				}
-			    temp.setHighlighted(true);
-			    temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
-			    oldElements.addElement(temp);			    
-			}
+		  gc.getScrollManager().makeVisible(temp);
+		  first = false;
 		}
-	    });
+	      temp.setHighlighted(true);
+	      temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
+	      oldElements.addElement(temp);			    
+	    }
+	}
+      });
+    
+    component = this;
+  }
 
-	component = this;
-    }
+  public void reinit()
+  {
+    track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
+    track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));	
+    setViewMode(PIANOROLL_VIEW);		
+    ((FtsTrackObject)track.getTrackDataModel()).setUntitled();
+  }
+  
+  public JMenu getToolsMenu()
+  {
+    return gc.getToolbar().itsMenu;
+  }
+  public JPopupMenu getMenu()
+  {
+    MidiTrackPopupMenu.getInstance().update(this);
+    return MidiTrackPopupMenu.getInstance();
+  }
 
-    public void reinit()
-    {
-	track.setProperty("maximumPitch", new Integer(AmbitusValue.DEFAULT_MAX_PITCH));
-	track.setProperty("minimumPitch", new Integer(AmbitusValue.DEFAULT_MIN_PITCH));	
-	setViewMode(PIANOROLL_VIEW);		
-	((FtsTrackObject)track.getTrackDataModel()).setUntitled();
-    }
+  public int trackCount()
+  {
+    if( gc.getFtsObject() instanceof FtsSequenceObject)
+      return ((FtsSequenceObject)gc.getFtsObject()).trackCount();
+    else
+      return 1;
+  }
 
-    public JMenu getToolsMenu()
-    {
-	return gc.getToolbar().itsMenu;
-    }
-    public JPopupMenu getMenu()
-    {
-	MidiTrackPopupMenu.getInstance().update(this);
-	return MidiTrackPopupMenu.getInstance();
-    }
-
-    public int trackCount()
-    {
-	return gc.getFtsSequenceObject().trackCount();
-    }
-
-    private SequenceGraphicContext prepareGraphicContext(Geometry geometry, Track track)
-    {
-	selection = new SequenceSelection(track.getTrackDataModel());
-	
-	//--- make this selection the current one when the track is activated
-	track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
-	gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this); //loopback?
-	gc.setGraphicSource(itsScore);
-	gc.setGraphicDestination(itsScore);
-	PartitionAdapter ad = new PartitionAdapter(geometry, gc);
-	track.getPropertySupport().addPropertyChangeListener(ad);
-	gc.setAdapter(ad);
-
-	renderer = new ScoreRenderer(gc);
-	return gc;
-    }
-
+  private SequenceGraphicContext prepareGraphicContext(Geometry geometry, Track track)
+  {
+    selection = new SequenceSelection(track.getTrackDataModel());
+    
+    //--- make this selection the current one when the track is activated
+    track.getPropertySupport().addPropertyChangeListener(new MidiTrackPropertyChangeListener());
+    gc = new SequenceGraphicContext(track.getTrackDataModel(), selection, this); //loopback?
+    gc.setGraphicSource(itsScore);
+    gc.setGraphicDestination(itsScore);
+    PartitionAdapter ad = new PartitionAdapter(geometry, gc);
+    track.getPropertySupport().addPropertyChangeListener(ad);
+    gc.setAdapter(ad);
+    
+    renderer = new ScoreRenderer(gc);
+    return gc;
+  }
+  
     /**
      * Callback from the toolbar when a new tool have been
      * selected by the user
@@ -198,34 +201,36 @@ public class MidiTrackEditor extends JPanel implements TrackDataListener, ListSe
 	  }*/
     }
     
-    /**
-     * called when the database is changed: DataTrackListener interface
-     */
-    
-    public void objectChanged(Object spec, String propName, Object propValue) 
-    {
-	repaint();
-    }
-    
-    public void objectAdded(Object spec, int index) 
-    {
-	repaint();
-    }
+  /**
+   * called when the database is changed: DataTrackListener interface
+   */
+  
+  public void objectChanged(Object spec, String propName, Object propValue) 
+  {
+    repaint();
+  }
+  
+  public void objectAdded(Object spec, int index) 
+  {
+    repaint();
+  }
+  
+  public void objectsAdded(int maxTime) 
+  {
+    repaint();
+  }
+  
+  public void objectDeleted(Object whichObject, int index) 
+  {
+    repaint();
+  }
+  
+  public void trackCleared() 
+  {
+    repaint();
+  }
 
-    public void objectsAdded(int maxTime) 
-    {
-	repaint();
-    }
-    
-    public void objectDeleted(Object whichObject, int index) 
-    {
-	repaint();
-    }
-
-    public void trackCleared() 
-    {
-	repaint();
-    }
+  public void endTrackUpload(){}
     
     public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) 
     {

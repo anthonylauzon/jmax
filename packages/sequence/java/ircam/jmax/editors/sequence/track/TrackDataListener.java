@@ -46,5 +46,6 @@ public interface TrackDataListener {
   abstract public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex);
   abstract public void trackNameChanged(String oldName, String newName);
   abstract public void trackCleared();
+  abstract public void endTrackUpload();
 }
 

@@ -18,44 +18,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // 
+// Based on Max/ISPW by Miller Puckette.
+//
+// Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+// 
 
-package ircam.jmax.editors.sequence.track;
+package ircam.jmax.editors.sequence;
 
-import ircam.jmax.editors.sequence.*;
-import java.util.*;
+import ircam.jmax.toolkit.*;
+import ircam.jmax.fts.*;
 
-/**
- * A class used to register ValueInfo and acces it by name*/
-
-public class ValueInfoTable {
-
-  public static void registerInfo(ValueInfo info)
-  {
-    infos.put(info.getName(), info);
-  }
-  
-  public static ValueInfo getValueInfo(String type)
-  {
-    ValueInfo info = (ValueInfo)(infos.get(type));
-    if(info == null)
-      info = AnythingValue.info;
-    
-    return info;
-  }
-
-  public static Enumeration getTypeNames()
-  {
-    return infos.keys();
-  }
-
-  public static void init()
-  {
-    ValueInfoTable.registerInfo(AmbitusValue.info);
-    ValueInfoTable.registerInfo(IntegerValue.info);
-    ValueInfoTable.registerInfo(MessageValue.info);
-    ValueInfoTable.registerInfo(FloatValue.info);
-  }
-
-  //---
-  private static Hashtable infos = new Hashtable();
+/** An interface for the editor 
+  */
+public interface SequenceEditor extends Editor
+{
+  public EditorToolbar getToolbar();
+  public StatusBar getStatusBar();
+  public FtsGraphicObject getFtsObject();
 }
+

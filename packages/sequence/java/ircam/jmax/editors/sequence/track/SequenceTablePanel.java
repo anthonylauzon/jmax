@@ -87,32 +87,33 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     // of the content will result in the right repaint()
     trackModel.addListener( new TrackDataListener() {
 
-      public void objectChanged(Object spec, String propName, Object propValue)
-	 {
-	     repaint();
-	 }
-      public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
+	public void objectChanged(Object spec, String propName, Object propValue)
 	{
-	    repaint();
+	  repaint();
 	}
-      public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-      public void objectAdded(Object whichObject, int index)
+	public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
 	{
-	    table.revalidate();
+	  repaint();
 	}
-      public void objectsAdded(int maxTime)
+	public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+	public void objectAdded(Object whichObject, int index)
 	{
-	    table.revalidate();
+	  table.revalidate();
 	}
-      public void objectDeleted(Object whichObject, int oldIndex)
+	public void objectsAdded(int maxTime)
 	{
-	    table.revalidate();
+	  table.revalidate();
 	}
-      public void trackCleared()
+	public void objectDeleted(Object whichObject, int oldIndex)
 	{
-	    table.revalidate();
+	  table.revalidate();
 	}
-      public void trackNameChanged(String oldName, String newName) {}
+	public void trackCleared()
+	{
+	  table.revalidate();
+	}
+	public void endTrackUpload(){}
+	public void trackNameChanged(String oldName, String newName) {}
     });
   }
 

@@ -43,7 +43,7 @@ public class TrackContainer extends JPanel {
     this.track = t;
     this.trackEditor = trackEditor;
     
-    trackIndex = trackEditor.getGraphicContext().getFtsSequenceObject().getTrackIndex(t);
+    trackIndex = ((FtsSequenceObject)trackEditor.getGraphicContext().getFtsObject()).getTrackIndex(t);
     activationButton = new JToggleButton(""+trackIndex);
     activationButton.setMargin(new Insets(0, 0, 0, 0));
     activationButton.setPreferredSize(new Dimension(BUTTON_WIDTH, 70));
@@ -174,7 +174,7 @@ public class TrackContainer extends JPanel {
 	      toggleBar.setVisible(!opened);
 
 	      if(opened)
-		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);
+		((FtsSequenceObject)trackEditor.getGraphicContext().getFtsObject()).changeTrack(track);
 	  }
       else 
 	  if(name.equals("active"))
@@ -191,23 +191,23 @@ public class TrackContainer extends JPanel {
 		  setSize(getSize().width, height);
 		  setPreferredSize(new Dimension(getPreferredSize().width, height));
 		  setMaximumSize(new Dimension(getMaximumSize().width, height));
-		  trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
+		  ((FtsSequenceObject)trackEditor.getGraphicContext().getFtsObject()).changeTrack(track);	  
 	      }
 	  else 
-	      if(name.equals("viewMode"))
-		 {
-		     if(((Integer)evt.getNewValue()).intValue() < 2)//MidiTrack only
-			 {
-			     int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
-			     setSize(getSize().width, height);
-			     setPreferredSize(new Dimension(getPreferredSize().width, height));
-			     setMaximumSize(new Dimension(getMaximumSize().width, height));
-			     trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);	  
-			 }
-		 }
+	    if(name.equals("viewMode"))
+	      {
+		if(((Integer)evt.getNewValue()).intValue() < 2)//MidiTrack only
+		  {
+		    int height = ((PartitionAdapter)trackEditor.getGraphicContext().getAdapter()).getRangeHeight();
+		    setSize(getSize().width, height);
+		    setPreferredSize(new Dimension(getPreferredSize().width, height));
+		    setMaximumSize(new Dimension(getMaximumSize().width, height));
+		    ((FtsSequenceObject)trackEditor.getGraphicContext().getFtsObject()).changeTrack(track);	  
+		  }
+	      }
       /*else 
 	if(name.equals("maximumValue") || name.equals("minimumValue"))
-	trackEditor.getGraphicContext().getFtsSequenceObject().changeTrack(track);*/
+	((FtsSequenceObject)trackEditor.getGraphicContext().getFtsObject()).changeTrack(track);*/
     }
     
     AbstractButton b;

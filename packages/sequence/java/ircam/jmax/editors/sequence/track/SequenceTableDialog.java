@@ -33,7 +33,7 @@ import ircam.jmax.editors.sequence.menus.*;
  * This dialog sets the "integer" property of the client TrackEvent.
  * */
 
-class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackListListener, PopupProvider, ListContainer*/{
+class SequenceTableDialog extends JDialog implements TrackDataListener{
     
     SequenceTableDialog(Track track, Frame frame, SequenceGraphicContext gc)
     {
@@ -96,10 +96,10 @@ class SequenceTableDialog extends JDialog implements TrackDataListener/*, TrackL
 	validate();
 	//pack();
     }
-    
-    public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
-    public void trackNameChanged(String oldName, String newName){};
+  public void endTrackUpload(){}    
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex){}
+  public void trackNameChanged(String oldName, String newName){};
 
     Track track;
     SequenceTablePanel tabPanel;

@@ -55,9 +55,9 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
    * It takes into account the selection state.
    */
   public void render(Object obj, Graphics g, boolean selected)
-    {
-	render(obj, g, selected, gc);
-    } 
+  {
+    render(obj, g, selected, gc);
+  } 
 
   /**
    * draw the given event in the given graphic context.
@@ -65,39 +65,39 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
    */
   public void render(Object obj, Graphics g, boolean selected, GraphicContext theGc) 
   {
-      if(((Event)obj).isHighlighted())
-	  render(obj, g, Event.HIGHLIGHTED, theGc); 
+    if(((Event)obj).isHighlighted())
+      render(obj, g, Event.HIGHLIGHTED, theGc); 
+    else
+      if(selected)
+	render(obj, g, Event.SELECTED, theGc); 
       else
-	  if(selected)
-	      render(obj, g, Event.SELECTED, theGc); 
-	  else
-	      render(obj, g, Event.DESELECTED, theGc); 
+	render(obj, g, Event.DESELECTED, theGc); 
   }
   
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {
-      Event e = (Event) obj;
-      SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
-      PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
+    Event e = (Event) obj;
+    SequenceGraphicContext gc = (SequenceGraphicContext) theGc;
+    PartitionAdapter pa = (PartitionAdapter)gc.getAdapter();
+    
+    int x = pa.getX(e);
+    int y = pa.getY(e);
+    int lenght = pa.getLenght(e);
+    String label = pa.getLabel(e);
+    int heigth = pa.getHeigth(e);
 
-      int x = pa.getX(e);
-      int y = pa.getY(e);
-      int lenght = pa.getLenght(e);
-      String label = pa.getLabel(e);
-      int heigth = pa.getHeigth(e);
+    if (heigth == 0)
+      heigth = Adapter.NOTE_DEFAULT_HEIGTH;
 
-      if (heigth == 0)
-	  heigth = Adapter.NOTE_DEFAULT_HEIGTH;
-
-      y = y-heigth/2;
-
-      switch(state)
+    y = y-heigth/2;
+    
+    switch(state)
       {
       case Event.SELECTED:
-	  g.setColor(Color.red);
-	  if (SequenceSelection.getCurrent().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
+	g.setColor(Color.red);
+	if ( gc.getSelection().getModel() != gc.getDataModel()) g.drawRect(x, y, lenght, heigth);
 	  else g.fillRect(x, y, lenght, heigth);
-	  break;
+	break;
       case Event.DESELECTED:
 	  g.setColor(Color.black);
 	  g.fillRect(x, y, lenght, heigth);
@@ -115,16 +115,16 @@ public class AmbitusEventRenderer implements SeqObjectRenderer {
 	  switch(alt)
 	      {
 	      case PartitionAdapter.ALTERATION_DIESIS:
-		  g.drawString("#", x-8, y+5);
-		  break;
+		g.drawString("#", x-8, y+5);
+		break;
 	      case PartitionAdapter.ALTERATION_BEMOLLE:
-		  g.drawString("b", x-8, y+5);
+		g.drawString("b", x-8, y+5);
 	      }
       }
       if(pa.isDisplayLabels())
       {
-	  g.setFont(SequencePanel.rulerFont);
-	  g.drawString(label, x, y-5);
+	g.setFont(SequencePanel.rulerFont);
+	g.drawString(label, x, y-5);
       }
   }
   /**

@@ -51,7 +51,7 @@ public class MonoTrackPopupMenu extends JPopupMenu
   int y;
   MonoTrackEditor target = null;    
   private boolean added = false;
-  JMenuItem displayLabelItem;
+  JMenuItem displayLabelItem, removeItem, nameItem;
   JMenu moveMenu;
   int trackCount = 0;
 
@@ -69,36 +69,35 @@ public class MonoTrackPopupMenu extends JPopupMenu
     add(moveMenu);
 
     addSeparator();
-    
     ////////////////////// Range Menu //////////////////////////////
     item = new JMenuItem("Change Range");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    ChangeRangeDialog.changeRange(MonoTrackPopupMenu.getPopupTarget().getTrack(), 
-					  MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
-					  SwingUtilities.convertPoint(MonoTrackPopupMenu.getPopupTarget(), 
-								      MonoTrackPopupMenu.getPopupX(),
-								      MonoTrackPopupMenu.getPopupY(),
-								      MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
+	  ChangeRangeDialog.changeRange(MonoTrackPopupMenu.getPopupTarget().getTrack(), 
+					MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
+					SwingUtilities.convertPoint(MonoTrackPopupMenu.getPopupTarget(), 
+								    MonoTrackPopupMenu.getPopupX(),
+								    MonoTrackPopupMenu.getPopupY(),
+								    MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
 	}
-	});
+      });
     add(item);
-
-    item = new JMenuItem("Change Name");
-    item.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent e)
-      {
+    
+    nameItem = new JMenuItem("Track Name");
+    nameItem.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	{
 	  ChangeTrackNameDialog.changeName(MonoTrackPopupMenu.getPopupTarget().getTrack(),  
 					   MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
 					   SwingUtilities.convertPoint(MonoTrackPopupMenu.getPopupTarget(), 
 								       MonoTrackPopupMenu.getPopupX(),
 								       MonoTrackPopupMenu.getPopupY(),
 								       MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
-      }
+	}
       });
     
-    add(item);
+    add( nameItem);
 
     addSeparator();
     
@@ -139,15 +138,15 @@ public class MonoTrackPopupMenu extends JPopupMenu
 
     addSeparator();
      ////////////////////////////////////////////////////////////
-    item = new JMenuItem("Remove Track");
-    item.addActionListener(new ActionListener(){
+    removeItem = new JMenuItem("Remove Track");
+    removeItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsSequenceObject().
-		removeTrack(MonoTrackPopupMenu.getPopupTarget().getTrack());
+	  ((FtsSequenceObject)MonoTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
+	    removeTrack( MonoTrackPopupMenu.getPopupTarget().getTrack());
 	}
     });
-    add(item);
+    add(removeItem);
 
     addSeparator();
     item = new JMenuItem("Export Track");
@@ -173,62 +172,75 @@ public class MonoTrackPopupMenu extends JPopupMenu
 
   static public void update(MonoTrackEditor editor)
   {
-    if(!popup.added) 
+    if( !popup.added) 
       {
-	popup.insert(editor.getToolsMenu(), 0);
+	popup.insert( editor.getToolsMenu(), 0);
         popup.target = editor;
 	popup.added=true;
 	popup.pack();
       }
-    else /*if(popup.target!= editor)*/
-	{
-	  popup.remove(popup.target.getToolsMenu());
-	  MidiTrackPopupMenu.getInstance().remove(popup.target.getToolsMenu());
+    else 
+      {
+	popup.remove( popup.target.getToolsMenu());
+	MidiTrackPopupMenu.getInstance().remove( popup.target.getToolsMenu());
 	  
-	  popup.insert(editor.getToolsMenu(), 0);
-	  popup.target = editor;
-	  popup.pack();
-	}
-    popup.updateMoveToMenu();
+	popup.insert(editor.getToolsMenu(), 0);
+	popup.target = editor;
+	popup.pack();
+      }
+    
+    if( popup.target.getGraphicContext().getFtsObject() instanceof FtsSequenceObject)
+      {
+	popup.moveMenu.setEnabled( true);
+	popup.removeItem.setEnabled( true);
+	popup.nameItem.setEnabled( true);
+	popup.updateMoveToMenu();	
+      }    
+    else
+      {
+	popup.moveMenu.setEnabled( false);
+	popup.removeItem.setEnabled( false);
+	popup.nameItem.setEnabled( false);
+      }
   }
 
-    void updateMoveToMenu()
-    {
-	JMenuItem item;
-	int count =  target.trackCount()-1;
-	if(trackCount==count)
-	    return;
-	else
+  void updateMoveToMenu()
+  {
+    JMenuItem item;
+    int count =  target.trackCount()-1;
+    if(trackCount==count)
+      return;
+    else
+      {
+	int dif = count-trackCount;
+	
+	if(dif>0)
+	  for(int i=1; i<=dif; i++)
 	    {
-		int dif = count-trackCount;
-		
-		if(dif>0)
-		    for(int i=1; i<=dif; i++)
-		    {
-			item = new JMenuItem(""+(trackCount+i));
-			item.addActionListener(Actions.moveMonodimensionalTrackToAction);
-			moveMenu.add(item);			
-		    }		
-		else
-		    for(int i=0; i<-dif; i++)
-			moveMenu.remove(moveMenu.getItemCount()-1);
-		trackCount = count;
-	    }
-    }
+	      item = new JMenuItem(""+(trackCount+i));
+	      item.addActionListener(Actions.moveMonodimensionalTrackToAction);
+	      moveMenu.add(item);			
+	    }		
+	else
+	  for(int i=0; i<-dif; i++)
+	    moveMenu.remove(moveMenu.getItemCount()-1);
+	trackCount = count;
+      }
+  }
 
     class SetViewAction extends AbstractAction {
-	SetViewAction(int viewType)
-	{
-	    super("Set View");
-	    this.viewType = viewType;
-	}
+      SetViewAction(int viewType)
+      {
+	super("Set View");
+	this.viewType = viewType;
+      }
     
-	public void actionPerformed(ActionEvent e)
-	{
-	    MonoTrackPopupMenu.getPopupTarget().setViewMode(viewType);
-	}
+      public void actionPerformed(ActionEvent e)
+      {
+	MonoTrackPopupMenu.getPopupTarget().setViewMode(viewType);
+      }
 	
-	int viewType;    
+      int viewType;    
     }
     
     public void show(Component invoker, int x, int y)

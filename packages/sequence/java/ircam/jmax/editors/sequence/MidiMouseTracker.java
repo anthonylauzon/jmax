@@ -44,24 +44,24 @@ public class MidiMouseTracker extends MouseTracker {
   /**
    * The only redefined method */
   public void mouseMoved(MouseEvent e) 
-  {  
+  {
     SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 
     if(!(egc.getAdapter() instanceof MonoDimensionalAdapter))//only for midi editor
-	{
-	    egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-				    numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
-				    ", "+
-				    (egc.getAdapter().getInvY(e.getY())));
-    
-	    //press keys in the pianoroll representation
-	    
-	    if(((PartitionAdapter)egc.getAdapter()).getViewMode() == MidiTrackEditor.PIANOROLL_VIEW)
-		ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
-	}
-    else
+      {
 	egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
-				    numberFormat.format(egc.getAdapter().getInvX(e.getX())));
+				numberFormat.format(egc.getAdapter().getInvX(e.getX()))+
+				", "+
+				(egc.getAdapter().getInvY(e.getY())));
+	
+	//press keys in the pianoroll representation
+	
+	if(((PartitionAdapter)egc.getAdapter()).getViewMode() == MidiTrackEditor.PIANOROLL_VIEW)
+	  ScoreBackground.pressKey(egc.getAdapter().getInvY(e.getY()), egc);
+      }
+    else
+      egc.getStatusBar().post(egc.getToolManager().getCurrentTool(), ""+
+			      numberFormat.format(egc.getAdapter().getInvX(e.getX())));
   }
 
     static public NumberFormat numberFormat;

@@ -41,6 +41,7 @@ SequenceWindow.java \
 SequenceDataFlavor.java \
 SequenceDataListener.java \
 SequenceDataModel.java \
+SequenceEditor.java \
 SequenceGraphicContext.java \
 SequencePanel.java \
 SequenceRuler.java \

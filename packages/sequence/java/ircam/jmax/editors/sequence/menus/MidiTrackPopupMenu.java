@@ -51,7 +51,7 @@ public class MidiTrackPopupMenu extends JPopupMenu
   int y;
   MidiTrackEditor target = null;    
   private boolean added = false;
-  JMenuItem displayLabelItem;
+  JMenuItem displayLabelItem, removeItem, nameItem;
   JMenu moveMenu;
   //int trackCount = 1;
   int trackCount = 0;
@@ -140,20 +140,20 @@ public class MidiTrackPopupMenu extends JPopupMenu
 
     add(rangeMenu);
 
-    item = new JMenuItem("Change Name");
-    item.addActionListener(new ActionListener(){
+    nameItem = new JMenuItem("Track Name");
+    nameItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    ChangeTrackNameDialog.changeName(MidiTrackPopupMenu.getPopupTarget().getTrack(),  
-					     MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
-					     SwingUtilities.convertPoint(MidiTrackPopupMenu.getPopupTarget(), 
-									 MidiTrackPopupMenu.getPopupX(),
-									 MidiTrackPopupMenu.getPopupY(),
-									 MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
+	  ChangeTrackNameDialog.changeName(MidiTrackPopupMenu.getPopupTarget().getTrack(),  
+					   MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
+					   SwingUtilities.convertPoint(MidiTrackPopupMenu.getPopupTarget(), 
+								       MidiTrackPopupMenu.getPopupX(),
+								       MidiTrackPopupMenu.getPopupY(),
+								       MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
 	}
-    });
-
-    add(item);
+      });
+    
+    add(nameItem);
     ////////////////////// View Menu //////////////////////////////
     JMenu viewMenu = new JMenu("Change View");
     item = new JMenuItem("Pianoroll view");
@@ -197,15 +197,15 @@ public class MidiTrackPopupMenu extends JPopupMenu
     add(item);
 
     addSeparator();
-    item = new JMenuItem("Remove Track");
-    item.addActionListener(new ActionListener(){
+    removeItem = new JMenuItem("Remove Track");
+    removeItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsSequenceObject().
-		removeTrack(MidiTrackPopupMenu.getPopupTarget().getTrack());
+	  ((FtsSequenceObject)MidiTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
+	    removeTrack(MidiTrackPopupMenu.getPopupTarget().getTrack());
 	}
     });
-    add(item);
+    add(removeItem);
 
     addSeparator();
     item = new JMenuItem("Export Track");
@@ -229,31 +229,44 @@ public class MidiTrackPopupMenu extends JPopupMenu
     return popup.target;
   }
 
-  static public void update(MidiTrackEditor editor)
+  static public void update( MidiTrackEditor editor)
   {
-    if(!popup.added) 
+    if( !popup.added) 
       {
-	popup.insert(editor.getToolsMenu(), 0);
+	popup.insert( editor.getToolsMenu(), 0);
         popup.target = editor;
-	popup.added=true;
+	popup.added = true;
 	popup.pack();
       }
     else
-	{
-	  popup.remove(popup.target.getToolsMenu());
-	  MonoTrackPopupMenu.getInstance().remove(popup.target.getToolsMenu());
-
-	  popup.insert(editor.getToolsMenu(), 0);
-	  popup.target = editor;
-	  popup.pack();
-	}
-    popup.updateMoveToMenu();
+      {
+	popup.remove(popup.target.getToolsMenu());
+	MonoTrackPopupMenu.getInstance().remove( popup.target.getToolsMenu());
+	
+	popup.insert( editor.getToolsMenu(), 0);
+	popup.target = editor;
+	popup.pack();
+      }
     popup.updateChangeRangeMenu();
 
     if(!popup.target.isDisplayLabels())
-	popup.displayLabelItem.setText("Display Labels");
+      popup.displayLabelItem.setText("Display Labels");
     else
-	popup.displayLabelItem.setText("Hide Labels");
+      popup.displayLabelItem.setText("Hide Labels");
+    
+    if( popup.target.getGraphicContext().getFtsObject() instanceof FtsSequenceObject)
+      {
+	popup.moveMenu.setEnabled( true);
+	popup.removeItem.setEnabled( true);
+	popup.nameItem.setEnabled( true);
+	popup.updateMoveToMenu();
+      }
+    else
+      {
+	popup.moveMenu.setEnabled( false);
+	popup.removeItem.setEnabled( false);
+	popup.nameItem.setEnabled( false);
+      }
   }
 
     void updateMoveToMenu()

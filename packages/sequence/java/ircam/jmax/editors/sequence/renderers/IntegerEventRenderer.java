@@ -76,91 +76,86 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
   
   public void render(Object obj, Graphics g, int state, GraphicContext theGc) 
   {
-      Event e = (Event) obj;
-      MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
-      TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
+    Event e = (Event) obj;
+    MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
+    TrackDataModel model = ((SequenceGraphicContext) theGc).getDataModel();
 
-      int x = adapter.getX(e);
-      int y = adapter.getY(e);    
+    int x = adapter.getX(e);
+    int y = adapter.getY(e);    
 
-      switch(state)
-	  {
-	  case Event.SELECTED:
-	      g.setColor(Color.red);
-	      break;
-	  case Event.DESELECTED:
-	      g.setColor(Color.black);
-	      break;
-	  case Event.HIGHLIGHTED:
-	      g.setColor(Color.green);
-	      break;
-	  }
+    switch(state)
+      {
+      case Event.SELECTED:
+	g.setColor(Color.red);
+	break;
+      case Event.DESELECTED:
+	g.setColor(Color.black);
+	break;
+      case Event.HIGHLIGHTED:
+	g.setColor(Color.green);
+	break;
+      }
       
-      if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
-	  {
-	      g.fillOval(x-2, y-2, 5, 5);
-	      if(state != Event.DESELECTED)
-		  g.drawOval(x-4, y-4, 9, 9);
+    if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
+      {
+	g.fillOval(x-2, y-2, 5, 5);
+	if(state != Event.DESELECTED)
+	  g.drawOval(x-4, y-4, 9, 9);
 	
-	      Event next = model.getNextEvent(e);		
+	Event next = model.getNextEvent(e);		
 
-	      Event prev;
-	      if(e instanceof UtilTrackEvent)//during the XOR draw
-		  {
-		      TrackEvent original = ((UtilTrackEvent)e).getOriginal();
-		      prev = model.getPreviousEvent(e.getTime());
-		      
-		      if(prev == original)
-			  prev = model.getPreviousEvent(original.getTime());
-	      
-		      if((prev != null)&&(!SequenceSelection.getCurrent().isInSelection(prev)))
-			  g.drawLine(adapter.getX(prev), adapter.getY(prev), x, y);
-
-		      if(next == original)
-			  next = model.getNextEvent(original);
-		  
-		      if(next != null)
-			 if (!SequenceSelection.getCurrent().isInSelection(next))
-			     g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
-			 else
-			     {//qui anche il next e' selezionato
-				 //qui deve vedere se il next e' < della sua posizione originale e clipparlo
-				 //deve fare la stessa cosa con se stesso rispetto al prev
-				 int nextX = adapter.getX(next)+((UtilTrackEvent)e).getDeltaX(adapter);
-				 if(nextX < adapter.getX(original)) nextX = adapter.getX(original)+1;
-				 
-
-
-				 //si fa dare il next del next 
-				 TrackEvent nextnext = model.getNextEvent(next);
-				 if(nextnext!=null)
-				     if(nextX > adapter.getX(nextnext)) nextX = adapter.getX(nextnext)-1;		 
-
-				 g.drawLine(x, y, nextX, adapter.getY(next)+((UtilTrackEvent)e).getDeltaY(adapter));
-			     }
-		  }
-	      else //normal paint
-		  {
-		      if(state != Event.DESELECTED)
-		      g.setColor(Color.black);
-
-		      if(next != null)
-			  g.drawLine(x, y, adapter.getX(next), adapter.getY(next)); 
-		  }
-	  }
-      else
+	Event prev;
+	if(e instanceof UtilTrackEvent)//during the XOR draw
 	  {
-	      int heigth = adapter.getHeigth(e);    
-	      int lenght = adapter.getLenght(e);
+	    TrackEvent original = ((UtilTrackEvent)e).getOriginal();
+	    prev = model.getPreviousEvent(e.getTime());
+	    
+	    if(prev == original)
+	      prev = model.getPreviousEvent(original.getTime());
+	    
+	    if( ( prev != null)&&( !((SequenceGraphicContext)theGc).getSelection().isInSelection(prev)))
+	      g.drawLine( adapter.getX(prev), adapter.getY(prev), x, y);
 
-	      if(heigth<0)
-		  {
-		      y += heigth;
-		      heigth = -heigth;
-		  }
-
-	      g.fillRect(x, y, lenght, heigth);
+	    if(next == original)
+	      next = model.getNextEvent(original);
+		  
+	    if(next != null)
+	      if (!((SequenceGraphicContext)theGc).getSelection().isInSelection(next))
+		g.drawLine(x, y, adapter.getX(next), adapter.getY(next));
+	      else
+		{
+		  int nextX = adapter.getX(next)+((UtilTrackEvent)e).getDeltaX(adapter);
+		  if(nextX < adapter.getX(original)) nextX = adapter.getX(original)+1;
+				 
+		  TrackEvent nextnext = model.getNextEvent(next);
+		  if(nextnext!=null)
+		    if(nextX > adapter.getX(nextnext)) nextX = adapter.getX(nextnext)-1;		 
+		  
+		  g.drawLine(x, y, nextX, adapter.getY(next)+((UtilTrackEvent)e).getDeltaY(adapter));
+		}
 	  }
+	else //normal paint
+	  {
+	    if(state != Event.DESELECTED)
+	      g.setColor(Color.black);
+	    
+	    if(next != null)
+	      g.drawLine(x, y, adapter.getX(next), adapter.getY(next)); 
+	  }
+      }
+    else
+      {
+	int heigth = adapter.getHeigth(e);    
+	int lenght = adapter.getLenght(e);
+	
+	if(heigth<0)
+	  {
+	    y += heigth;
+	    heigth = -heigth;
+	  }
+
+	g.fillRect(x, y, lenght, heigth);
+      }
   }
   
   /**

@@ -39,100 +39,100 @@ import java.awt.datatransfer.*;
  * The EventValue object that represents a Integer event. Is used during score-recognition */
 public class FloatValue extends AbstractEventValue
 {
-    public FloatValue()
-    {
-	super();
+  public FloatValue()
+  {
+    super();
+    
+    setProperty("float", new Float(0.0));
+    setProperty("duration", new Double(64.0));
+  }
 
-	setProperty("float", new Float(0.0));
-	setProperty("duration", new Double(64.0));
+  Object floatValue, duration;
+  public void setProperty(String name, Object value)
+  {
+    if(name.equals("float"))
+      if(value instanceof Double)
+	floatValue = new Float(((Double)value).floatValue());
+      else
+	floatValue = value;
+    else if(name.equals("duration"))
+      duration = value;
+    else super.setProperty(name, value);
+  }
+  public Object getProperty(String name)
+  {
+    if(name.equals("float"))
+      return floatValue;
+    if(name.equals("duration"))
+      return duration;
+    else
+      return super.getProperty(name);
+  }
+
+  public ValueInfo getValueInfo() 
+  {
+    return info;
+  }
+
+  static class FloatValueInfo extends AbstractValueInfo {
+    /**
+     * Returns the name of this value object */
+    public String getName()
+    {
+      return FLOAT_NAME;
     }
 
-    Object floatValue, duration;
-    public void setProperty(String name, Object value)
+    public String getPublicName()
     {
-	if(name.equals("float"))
-	    if(value instanceof Double)
-		floatValue = new Float(((Double)value).floatValue());
-	    else
-		floatValue = value;
-	else if(name.equals("duration"))
-	    duration = value;
-	else super.setProperty(name, value);
-    }
-    public Object getProperty(String name)
-    {
-	if(name.equals("float"))
-	    return floatValue;
-	if(name.equals("duration"))
-	    return duration;
-	else
-	    return super.getProperty(name);
+      return FLOAT_PUBLIC_NAME;
     }
 
-    public ValueInfo getValueInfo() 
+    public ImageIcon getIcon()
     {
-	return info;
+      return FLOAT_ICON;
     }
 
-    static class FloatValueInfo extends AbstractValueInfo {
-	/**
-	 * Returns the name of this value object */
-	public String getName()
-	{
-	    return FLOAT_NAME;
-	}
+    public Object newInstance()
+    {
+      return new FloatValue();
+    }
+    
+    public Enumeration getPropertyNames()
+    {
+      return new ArrayEnumeration(defNamesArray);
+    }
+    public int getPropertyCount()
+    {
+      return defPropertyCount;
+    }
 
-	public String getPublicName()
-	{
-	    return FLOAT_PUBLIC_NAME;
-	}
-
-	public ImageIcon getIcon()
-	{
-	    return FLOAT_ICON;
-	}
-
-	public Object newInstance()
-	{
-	    return new FloatValue();
-	}
-	
-	public Enumeration getPropertyNames()
-	{
-	    return new ArrayEnumeration(defNamesArray);
-	}
-	public int getPropertyCount()
-	{
-	    return defPropertyCount;
-	}
-
-	public DataFlavor getDataFlavor()
-	{
-	    return FloatValueDataFlavor.getInstance();
-	}
+    public DataFlavor getDataFlavor()
+    {
+      return FloatValueDataFlavor.getInstance();
+    }
  
-	public Class getPropertyType(int index)
-	{
-	    /*if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	      else
-	      return Integer.class;*/
-	    if(index==0)
-		return Float.class;
-	    else
-		return Integer.class;
-	}
-
-	String defNamesArray[] = {"float"};
-	//Class propertyTypesArray[] = {Float.class};
-	int defPropertyCount = 1;
+    public Class getPropertyType(int index)
+    {
+      /*if(index < defPropertyCount)
+	return propertyTypesArray[index];
+	else
+	return Integer.class;*/
+      if(index==0)
+	return Float.class;
+      else
+	return Integer.class;
     }
+
+    String defNamesArray[] = {"float"};
+    //Class propertyTypesArray[] = {Float.class};
+    int defPropertyCount = 1;
+  }
 
     /**
      * Returns its specialized renderer (an AmbitusEventRenderer) */
     public SeqObjectRenderer getRenderer()
     {
-	return IntegerEventRenderer.getRenderer();
+      return IntegerEventRenderer.getRenderer();
     }
   
     public Enumeration getPropertyNames()

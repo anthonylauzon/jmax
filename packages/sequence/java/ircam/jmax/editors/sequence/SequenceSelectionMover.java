@@ -52,62 +52,62 @@ public class SequenceSelectionMover extends SelectionMover  implements XORPainte
 
     /******************* autoscrolling *******************/
 
-    javax.swing.Timer scrollTimer;
-    SequenceScrollDragAction scroller;
+  javax.swing.Timer scrollTimer;
+  SequenceScrollDragAction scroller;
+  
+  private void initAutoScroll()
+  {
+    scroller    = new SequenceScrollDragAction();
+    scrollTimer = new javax.swing.Timer(8, scroller);
+    scrollTimer.setCoalesce(true);
+    scrollTimer.setRepeats(true);
+  }
 
-    private void initAutoScroll()
+  class SequenceScrollDragAction implements ActionListener
+  {
+    ScrollManager scrollManager;
+    int x, y, delta;
+    public void actionPerformed(ActionEvent ae)
     {
-	scroller    = new SequenceScrollDragAction();
-	scrollTimer = new javax.swing.Timer(8, scroller);
-	scrollTimer.setCoalesce(true);
-	scrollTimer.setRepeats(true);
+      delta = scrollManager.scrollBy(x, y);
+      updateStart(-delta, 0);
+      getListener().updateStartingPoint(-delta, 0);
+      
+      PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
+      getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), " time "+pa.getInvX(x));
     }
-
-    class SequenceScrollDragAction implements ActionListener
+    void setScrollManager( ScrollManager man)
     {
-	SequencePanel sequencePanel;
-	int x, y, delta;
-	public void actionPerformed(ActionEvent ae)
-	{
-	    delta = sequencePanel.scrollBy(x, y);
-	    updateStart(-delta, 0);
-	    getListener().updateStartingPoint(-delta, 0);
-
-	    PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
-	    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), " time "+pa.getInvX(x));
-	}
-	void setEditor(SequencePanel editor)
-	{
-	    this.sequencePanel = editor;
-	}
-	void setXY(int x, int y)
-	{
-	    this.x = x;
-	    this.y = y;
-	}
+      this.scrollManager = man;
     }
-
-    void autoScrollIfNeeded(int x, int y)
+    void setXY(int x, int y)
     {
-	SequencePanel panel = (SequencePanel)((SequenceWindow)gc.getFrame()).getEditor();
-	if (! panel.pointIsVisible(x , y))
-	{
-	    scroller.setXY(x, y);
-	    if (!scrollTimer.isRunning())
-		{
-		    scroller.setEditor(panel);
-		    scrollTimer.start();
-		}
-	}
-	else 
-	    {
-		if (scrollTimer.isRunning())
-		    {
-			scrollTimer.stop();
-		    }
-	    }
+      this.x = x;
+      this.y = y;
     }
+  }
 
+  void autoScrollIfNeeded(int x, int y)
+  {
+    ScrollManager manager = ((SequenceGraphicContext)gc).getScrollManager();
+    if (! manager.pointIsVisible(x , y))
+      {
+	scroller.setXY(x, y);
+	if (!scrollTimer.isRunning())
+	  {
+	    scroller.setScrollManager( manager);
+	    scrollTimer.start();
+	  }
+      }
+    else 
+      {
+	if (scrollTimer.isRunning())
+	  {
+	    scrollTimer.stop();
+	  }
+      }
+  }
+  
   /**
    * sets the point on which to start the movement
    */

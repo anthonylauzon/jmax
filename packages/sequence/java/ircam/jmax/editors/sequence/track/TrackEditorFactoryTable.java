@@ -29,31 +29,40 @@ import ircam.jmax.toolkit.*;
 
 public class TrackEditorFactoryTable {
 
-    public static void setFactoryFor(ValueInfo info, TrackEditorFactory factory)
-    {
-	if(!infos.contains(info))
-	    {
-		factories.put(info.getName(), factory);
-		infos.addElement(info);
-	    }
-    }
+  public static void setFactoryFor(ValueInfo info, TrackEditorFactory factory)
+  {
+    if(!infos.contains(info))
+      {
+	factories.put(info.getName(), factory);
+	infos.addElement(info);
+      }
+  }
 
-    public static TrackEditor newEditor(Track track, Geometry geometry)
-    {
-	TrackEditorFactory tef = (TrackEditorFactory) factories.get(track.getTrackDataModel().getType().getName());
-	if(tef!=null)
-	    return tef.newEditor(track, geometry);
-	else
-	    return new AnythingTrackEditor(geometry, track);
-    }
+  public static TrackEditor newEditor(Track track, Geometry geometry)
+  {
+    TrackEditorFactory tef = (TrackEditorFactory) factories.get(track.getTrackDataModel().getType().getName());
+    if(tef!=null)
+      return tef.newEditor(track, geometry);
+    else
+      return new AnythingTrackEditor(geometry, track);
+  }
 
-    public static Enumeration getTypes()
-    {
-	return infos.elements();
-    }
-    //---
-    private static Hashtable factories = new Hashtable();
-    private static Vector infos = new Vector();
+  public static Enumeration getTypes()
+  {
+    return infos.elements();
+  }
+  
+  public static void init()
+  {
+    setFactoryFor(AmbitusValue.info, MidiTrackEditorFactory.instance);
+    setFactoryFor(IntegerValue.info, IntegerTrackEditorFactory.instance);
+    setFactoryFor(FloatValue.info, FloatTrackEditorFactory.instance);
+    //setFactoryFor(MessageValue.info, MessageTrackEditorFactory.instance);
+    //setFactoryFor(MidiValue.info, IntegerTrackEditorFactory.instance);
+  }
+  //---
+  private static Hashtable factories = new Hashtable();
+  private static Vector infos = new Vector();
 }
 
 

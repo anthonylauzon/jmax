@@ -55,30 +55,31 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
 
 	itsTrack.getTrackDataModel().addListener(new TrackDataListener() {
 	    public void objectDeleted(Object whichObject, int oldIndex) 
-		{
-		    AnythingTrackEditor.this.repaint();
-		}
+	    {
+	      AnythingTrackEditor.this.repaint();
+	    }
 	    public void trackCleared() 
-		{
-		    AnythingTrackEditor.this.repaint();
-		}
+	    {
+	      AnythingTrackEditor.this.repaint();
+	    }
+	    public void endTrackUpload(){}
 	    public void objectAdded(Object whichObject, int index) 
-		{ 
-		    AnythingTrackEditor.this.repaint();
-		}
+	    { 
+	      AnythingTrackEditor.this.repaint();
+	    }
 	    public void objectsAdded(int maxTime) 
-		{
-		    AnythingTrackEditor.this.repaint();
-		    selection.deselectAll();
-		}
+	    {
+	      AnythingTrackEditor.this.repaint();
+	      selection.deselectAll();
+	    }
 	    public void objectChanged(Object whichObject, String propName, Object propValue) 
-		{
-		    AnythingTrackEditor.this.repaint();
-		}
+	    {
+	      AnythingTrackEditor.this.repaint();
+	    }
 	    public void objectMoved(Object whichObject, int oldIndex, int newIndex) 
-		{
-		    AnythingTrackEditor.this.repaint();
-		}
+	    {
+	      AnythingTrackEditor.this.repaint();
+	    }
 	    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex) {}
 	    public void trackNameChanged(String oldName, String newName) {
 		itsTrack.setProperty("trackName", newName);
@@ -145,7 +146,10 @@ public class AnythingTrackEditor extends JPanel implements ListSelectionListener
 
     public int trackCount()
     {
-	return gc.getFtsSequenceObject().trackCount();
+      if( gc.getFtsObject() instanceof FtsSequenceObject)
+	return ((FtsSequenceObject)gc.getFtsObject()).trackCount();
+      else
+	return 1;
     }
 
     public void paintComponent(Graphics g) 

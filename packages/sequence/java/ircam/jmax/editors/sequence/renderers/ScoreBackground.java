@@ -51,102 +51,105 @@ public class ScoreBackground implements Layer{
 
     gc.getTrack().getPropertySupport().addPropertyChangeListener(new PropertyChangeListener() {
 	public void propertyChange(PropertyChangeEvent e)
-	    {		
-		if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") ||
-		    e.getPropertyName().equals("trackName"))
-		{
-		    toRepaintBack = true;
-		    gc.getGraphicDestination().repaint();
-		}
-		else
-		    if(e.getPropertyName().equals("locked"))
-			{
-			    locked = ((Boolean)e.getNewValue()).booleanValue();
-			    toRepaintBack = true;
-			    gc.getGraphicDestination().repaint();
-			}
+	{		
+	  if (e.getPropertyName().equals("maximumPitch") || e.getPropertyName().equals("minimumPitch") ||
+	      e.getPropertyName().equals("trackName"))
+	    {
+	      toRepaintBack = true;
+	      gc.getGraphicDestination().repaint();
 	    }
-    });
+	  else
+	    if(e.getPropertyName().equals("locked"))
+	      {
+		locked = ((Boolean)e.getNewValue()).booleanValue();
+		toRepaintBack = true;
+		gc.getGraphicDestination().repaint();
+	      }
+	}
+      });
   }
     
   /** builds an horizontal grid in the given graphic port
    * using the destination size*/
   private void drawHorizontalGrid(Graphics g)
   {
-      PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
-      int maxPitch = pa.getY(pa.getMaxPitch());
-      int minPitch = pa.getY(pa.getMinPitch());
-      int delta = pa.getVerticalTransp();
-
-      Dimension d = gc.getGraphicDestination().getSize();
-
-      if(!locked)
-	  g.setColor(Color.white);
-      else
-	  g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-      g.fillRect(0, 0, d.width, d.height);
-
-      g.setColor(OUT_RANGE_COLOR);
-      g.fillRect(0 , 0 -delta, d.width, maxPitch);
-      g.fillRect(0, minPitch+2 -delta, d.width, d.height-minPitch-2+delta);
-
-      int positionY;
-      g.setFont(gridSubdivisionFont);
-      // the minor subdivision
+    PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
+    int maxPitch = pa.getY(pa.getMaxPitch());
+    int minPitch = pa.getY(pa.getMinPitch());
+    int delta = pa.getVerticalTransp();
     
-      g.setColor(horizontalGridLinesColor);
-      for (int i = 0; i < 381; i+=9)
-	  {
-	      positionY = SC_BOTTOM-i;
-	      g.drawLine(KEYEND+1, positionY -delta, d.width, positionY -delta);
-	  }
+    Dimension d = gc.getGraphicDestination().getSize();
+    
+    if(!locked)
+      g.setColor(Color.white);
+    else
+      g.setColor(ScoreBackground.OUT_RANGE_COLOR);
+    g.fillRect(0, 0, d.width, d.height);
 
+    g.setColor(OUT_RANGE_COLOR);
+    g.fillRect(0 , 0 -delta, d.width, maxPitch);
+    g.fillRect(0, minPitch+2 -delta, d.width, d.height-minPitch-2+delta);
+    
+    int positionY;
+    g.setFont(gridSubdivisionFont);
+    // the minor subdivision
+    
+    g.setColor(horizontalGridLinesColor);
+    for (int i = 0; i < 381; i+=9)
+      {
+	positionY = SC_BOTTOM-i;
+	g.drawLine(KEYEND+1, positionY -delta, d.width, positionY -delta);
+      }
+    
       // the major subdivision lines and numbers
-      g.setColor(Color.black);
-      g.drawLine(KEYEND+1, SC_BOTTOM+1 -delta, d.width,SC_BOTTOM+1-delta);
-      for (int j = 36; j < 381; j+=36)
-	  {
-	      positionY = SC_BOTTOM-j;
-	      g.drawLine(KEYEND+1, positionY -delta, d.width, positionY-delta);
-	  }
-      // the last (127) line
-      g.drawLine(KEYEND+1, SC_TOP-3 -delta, d.width, SC_TOP-3 -delta);//?????
+    g.setColor(Color.black);
+    g.drawLine(KEYEND+1, SC_BOTTOM+1 -delta, d.width,SC_BOTTOM+1-delta);
+    for (int j = 36; j < 381; j+=36)
+      {
+	positionY = SC_BOTTOM-j;
+	g.drawLine(KEYEND+1, positionY -delta, d.width, positionY-delta);
+      }
+    // the last (127) line
+    g.drawLine(KEYEND+1, SC_TOP-3 -delta, d.width, SC_TOP-3 -delta);//?????
     
-      g.setColor(Color.gray);
-      for (int j = 0; j < 381; j+=36)
-	  {
-	      positionY = SC_BOTTOM-j;
-	      g.drawString(""+j/3, 10 , positionY+3-delta);
-	  }
-      // the last (127) number
-      g.drawString(""+127, 10, SC_TOP+3-delta);
+    g.setColor(Color.gray);
+    for (int j = 0; j < 381; j+=36)
+      {
+	positionY = SC_BOTTOM-j;
+	g.drawString(""+j/3, 10 , positionY+3-delta);
+      }
+    // the last (127) number
+    g.drawString(""+127, 10, SC_TOP+3-delta);
       
-      // the track name
-      g.setFont(backFont);
-      g.drawString(gc.getTrack().getName(), /*10*/2, 10);
+    // the track name
+    if( gc.getFtsObject() instanceof FtsSequenceObject)
+      {
+	g.setFont(backFont);
+	g.drawString(gc.getTrack().getName(), 2, 10);
+      }
 
-      // the piano keys...
-      for (int i = 0; i <= 127; i++)
+    // the piano keys...
+    for (int i = 0; i <= 127; i++)
+      {
+	positionY = SC_BOTTOM-(i*3)-2;
+	if (isAlteration(i)) 
 	  {
-	      positionY = SC_BOTTOM-(i*3)-2;
-	      if (isAlteration(i)) 
-		  {
-		      g.setColor(Color.darkGray);
-		      g.fillRect(KEYX, positionY-delta, SHORTKEYWIDTH, KEYHEIGHT);
-		  }
-	      else 
-		  {
-		      g.setColor(Color.white);
-		      g.fillRect(KEYX, positionY -delta, KEYWIDTH, KEYHEIGHT);
-		  }
+	    g.setColor(Color.darkGray);
+	    g.fillRect(KEYX, positionY-delta, SHORTKEYWIDTH, KEYHEIGHT);
 	  }
-      g.setColor(Color.black);
-      //lines at top and bottom of the keybord 
-      g.drawLine(KEYX, SC_TOP-3-delta, KEYEND,SC_TOP-3-delta);
-      g.drawLine(KEYX, SC_BOTTOM+1-delta, KEYEND,SC_BOTTOM+1-delta);
-      // the vertical line at the end of keyboard
-      g.drawLine(KEYEND, SC_TOP-3-delta, KEYEND, SC_BOTTOM+1-delta);
-      g.drawLine(KEYX-1, SC_TOP-3-delta, KEYX-1, SC_BOTTOM+1-delta); 
+	else 
+	  {
+	    g.setColor(Color.white);
+	    g.fillRect(KEYX, positionY -delta, KEYWIDTH, KEYHEIGHT);
+	  }
+      }
+    g.setColor(Color.black);
+    //lines at top and bottom of the keybord 
+    g.drawLine(KEYX, SC_TOP-3-delta, KEYEND,SC_TOP-3-delta);
+    g.drawLine(KEYX, SC_BOTTOM+1-delta, KEYEND,SC_BOTTOM+1-delta);
+    // the vertical line at the end of keyboard
+    g.drawLine(KEYEND, SC_TOP-3-delta, KEYEND, SC_BOTTOM+1-delta);
+    g.drawLine(KEYX-1, SC_TOP-3-delta, KEYX-1, SC_BOTTOM+1-delta); 
   }
 
   public static boolean isAlteration(int note)
@@ -226,31 +229,31 @@ public class ScoreBackground implements Layer{
   }
 
       
-    private void drawVerticalGrid(Graphics g)
-    {
-	AmbitusValue value = new AmbitusValue();
-	UtilTrackEvent tempEvent = new UtilTrackEvent(value);
-	Dimension d = gc.getGraphicDestination().getSize();
-	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
-	int timeStep;
+  private void drawVerticalGrid(Graphics g)
+  {
+    AmbitusValue value = new AmbitusValue();
+    UtilTrackEvent tempEvent = new UtilTrackEvent(value);
+    Dimension d = gc.getGraphicDestination().getSize();
+    int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
+    int timeStep;
 	
+    
+    timeStep = findBestTimeStep(windowTime);
+    
+    g.setColor(Color.lightGray);
+    
+    int xPosition;
+    int snappedTime;
+    
+    for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
+      {
+	snappedTime = (i/timeStep)*timeStep;
+	tempEvent.setTime(snappedTime);
+	xPosition = gc.getAdapter().getX(tempEvent);
 	
-	timeStep = findBestTimeStep(windowTime);
-	
-	g.setColor(Color.lightGray);
-	
-	int xPosition;
-	int snappedTime;
-	
-	for (int i=gc.getLogicalTime()+timeStep; i<gc.getLogicalTime()+windowTime; i+=timeStep) 
-	    {
-		snappedTime = (i/timeStep)*timeStep;
-		tempEvent.setTime(snappedTime);
-		xPosition = gc.getAdapter().getX(tempEvent);
-		
-		g.drawLine(xPosition, 0, xPosition, d.height);
-	    }
-    }
+	g.drawLine(xPosition, 0, xPosition, d.height);
+      }
+  }
   
   /**
    * Layer interface. */

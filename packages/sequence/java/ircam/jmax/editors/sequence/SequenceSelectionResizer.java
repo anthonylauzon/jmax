@@ -49,94 +49,94 @@ public class SequenceSelectionResizer extends SelectionResizer {
     initAutoScroll();
   }
   
-   /******************* autoscrolling *******************/
+  /******************* autoscrolling *******************/
 
-    javax.swing.Timer scrollTimer;
-    SequenceScrollDragAction scroller;
+  javax.swing.Timer scrollTimer;
+  SequenceScrollDragAction scroller;
 
-    private void initAutoScroll()
+  private void initAutoScroll()
+  {
+    scroller    = new SequenceScrollDragAction();
+    scrollTimer = new javax.swing.Timer(8, scroller);
+    scrollTimer.setCoalesce(true);
+    scrollTimer.setRepeats(true);
+  }
+
+  class SequenceScrollDragAction implements ActionListener
+  {
+    ScrollManager scrollManager;
+    int x, y, delta;
+    public void actionPerformed(ActionEvent ae)
     {
-	scroller    = new SequenceScrollDragAction();
-	scrollTimer = new javax.swing.Timer(8, scroller);
-	scrollTimer.setCoalesce(true);
-	scrollTimer.setRepeats(true);
-    }
-
-    class SequenceScrollDragAction implements ActionListener
-    {
-	SequencePanel sequencePanel;
-	int x, y, delta;
-	public void actionPerformed(ActionEvent ae)
-	{
-	    delta = sequencePanel.scrollBy(x, y);
-	    updateStart(-delta, 0);
-	    getListener().updateStartingPoint(-delta, 0);
+      delta = scrollManager.scrollBy(x, y);
+      updateStart(-delta, 0);
+      getListener().updateStartingPoint(-delta, 0);
 	    
-	    PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
-	    getGc().getStatusBar().post(getGc().getToolManager().getCurrentTool(), 
-					pa.LenghtMapper.getName()+" "+pa.getInvX(x));
-	}
-	void setEditor(SequencePanel editor)
-	{
-	    this.sequencePanel = editor;
-	}
-	void setXY(int x, int y)
-	{
-	    this.x = x;
-	    this.y = y;
-	}
+      PartitionAdapter pa = ((PartitionAdapter)getGc().getAdapter());
+      getGc().getStatusBar().post( getGc().getToolManager().getCurrentTool(), 
+				   pa.LenghtMapper.getName()+" "+pa.getInvX(x));
     }
-
-    void autoScrollIfNeeded(int x, int y)
+    void setScrollManager( ScrollManager mng)
     {
-	SequencePanel panel = (SequencePanel)((SequenceWindow)gc.getFrame()).getEditor();
-	if (! panel.pointIsVisible(x , y))
-	{
-	    scroller.setXY(x, y);
-	    if (!scrollTimer.isRunning())
-		{
-		    scroller.setEditor(panel);
-		    scrollTimer.start();
-		}
-	}
-	else 
-	    {
-		if (scrollTimer.isRunning())
-		    {
-			scrollTimer.stop();
-		    }
-	    }
+      this.scrollManager = mng;
     }
-
-    public void mouseReleased(MouseEvent e)
+    void setXY(int x, int y)
     {
+      this.x = x;
+      this.y = y;
+    }
+  }
+
+  void autoScrollIfNeeded(int x, int y)
+  {
+    ScrollManager manager = getGc().getScrollManager();
+    if (! manager.pointIsVisible(x , y))
+      {
+	scroller.setXY(x, y);
+	if (!scrollTimer.isRunning())
+	  {
+	    scroller.setScrollManager( manager);
+	    scrollTimer.start();
+	  }
+      }
+    else 
+      {
 	if (scrollTimer.isRunning())
+	  {
 	    scrollTimer.stop();
-	super.mouseReleased(e);
-    }
+	  }
+      }
+  }
 
-    public void mouseDragged(MouseEvent e) 
-    { 
-	autoScrollIfNeeded(e.getX(), e.getY());
-	if(!scrollTimer.isRunning())
-	    super.mouseDragged(e);
-    }
+  public void mouseReleased( MouseEvent e)
+  {
+    if ( scrollTimer.isRunning())
+      scrollTimer.stop();
+    super.mouseReleased( e);
+  }
 
-    void updateStart(int deltaX, int deltaY)
-    {
-	itsStartingPoint.x+=deltaX;
-	itsXORHandler.updateBegin(deltaX, deltaY);
-    }
+  public void mouseDragged( MouseEvent e) 
+  { 
+    autoScrollIfNeeded( e.getX(), e.getY());
+    if( !scrollTimer.isRunning())
+      super.mouseDragged( e);
+  }
+  
+  void updateStart( int deltaX, int deltaY)
+  {
+    itsStartingPoint.x+=deltaX;
+    itsXORHandler.updateBegin(deltaX, deltaY);
+  }
     
-    DragListener getListener()
-    {
-	return itsListener;
-    }
+  DragListener getListener()
+  {
+    return itsListener;
+  }
     
-    SequenceGraphicContext getGc()
-    {
-	return (SequenceGraphicContext)gc;
-    } 
+  SequenceGraphicContext getGc()
+  {
+    return (SequenceGraphicContext)gc;
+  } 
 
   /**
    * from the XORPainter interface. The actual drawing function.

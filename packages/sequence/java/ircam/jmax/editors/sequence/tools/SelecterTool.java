@@ -76,37 +76,37 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
    */
   public void selectionPointChoosen(int x, int y, int modifiers) 
   {
-      SequenceGraphicContext egc = (SequenceGraphicContext)gc;
+    SequenceGraphicContext egc = (SequenceGraphicContext)gc;
 
-      egc.getTrack().setProperty("selected", Boolean.TRUE);	    
-      
-      if(egc.getDataModel().isLocked()) return;
-
-      egc.getGraphicDestination().requestFocus();//???
-
-      TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
-      if (aTrackEvent != null) 
-	  { //click on event
-	      startingPoint.setLocation(x,y);
-
-	      if (!SequenceSelection.getCurrent().isInSelection(aTrackEvent)) 
-		  {
-		      if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
-			  SequenceSelection.getCurrent().deselectAll();
-
-		      SequenceSelection.getCurrent().select(aTrackEvent);
-		  }
-	      else
-		  SequenceSelection.getCurrent().setLastSelectedEvent(aTrackEvent);
-	      
-	      singleObjectSelected(x, y, modifiers);
+    egc.getTrack().setProperty("selected", Boolean.TRUE);	    
+    
+    if(egc.getDataModel().isLocked()) return;
+    
+    egc.getGraphicDestination().requestFocus();//???
+    
+    TrackEvent aTrackEvent = (TrackEvent) gc.getRenderManager().firstObjectContaining(x, y);
+    if (aTrackEvent != null) 
+      { //click on event
+	startingPoint.setLocation(x,y);
+	
+	if ( !egc.getSelection().isInSelection(aTrackEvent)) 
+	  {
+	    if ((modifiers & InputEvent.SHIFT_MASK) == 0) //without shift
+	      egc.getSelection().deselectAll();
+	    
+	    egc.getSelection().select(aTrackEvent);
 	  }
-      else //click on empty
-	  if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-	      if (!SequenceSelection.getCurrent().isSelectionEmpty())
-		  SequenceSelection.getCurrent().deselectAll(); 
+	else
+	  egc.getSelection().setLastSelectedEvent(aTrackEvent);
+	
+	singleObjectSelected(x, y, modifiers);
+      }
+    else //click on empty
+      if ((modifiers & InputEvent.SHIFT_MASK) == 0)
+	if ( !egc.getSelection().isSelectionEmpty())
+	  egc.getSelection().deselectAll(); 
   }
-
+  
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
   {
       edit(x, y, modifiers);

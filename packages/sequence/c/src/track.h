@@ -46,6 +46,8 @@ struct _track_
   fts_symbol_t name;
   int active; /* active flag */
 
+  int open; /* flag: is 1 if track editor is open */
+
   fts_symbol_t type; /* type of events */
   event_t *first; /* pointer to first event */
   event_t *last; /* pointer to last event */
@@ -70,7 +72,9 @@ struct _track_
 #define track_set_active(t) ((t)->active = 1)
 #define track_set_inactive(t) ((t)->active = 0)
 
-#define track_editor_is_open(t) ((t)->sequence && sequence_editor_is_open((t)->sequence))
+#define track_set_editor_open(t) ((t)->open = 1)
+#define track_set_editor_close(t) ((t)->open = 0)
+#define track_editor_is_open(t) (((t)->sequence && sequence_editor_is_open((t)->sequence)) || ((!(t)->sequence) && ((t)->open != 0)))
 
 extern void track_add_event(track_t *track, double time, event_t *event);
 extern void track_add_event_after(track_t *track, double time, event_t *event, event_t *here);
@@ -79,6 +83,8 @@ extern void track_remove_event(track_t *track, event_t *event);
 
 extern void track_merge(track_t *track, track_t *merge);
 extern void track_clear(track_t *track);
+
+extern void track_set_dirty(track_t *track);
 
 extern event_t *track_get_event_by_time(track_t *track, double time);
 extern event_t *track_get_next_by_time(track_t *track, double time);

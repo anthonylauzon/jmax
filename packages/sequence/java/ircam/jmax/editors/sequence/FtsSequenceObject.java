@@ -78,16 +78,8 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
     super(server, parent, objId, classname, args, offset, length);
 
     listeners = new MaxVector();
-    initValueInfoTable();
+    ValueInfoTable.init();
     SequenceImages.init();
-  }
-
-  private final void initValueInfoTable()
-  {
-    ValueInfoTable.registerInfo(AmbitusValue.info);
-    ValueInfoTable.registerInfo(IntegerValue.info);
-    ValueInfoTable.registerInfo(MessageValue.info);
-    ValueInfoTable.registerInfo(FloatValue.info);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////

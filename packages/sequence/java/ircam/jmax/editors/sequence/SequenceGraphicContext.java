@@ -28,6 +28,7 @@ package ircam.jmax.editors.sequence;
 import ircam.jmax.editors.sequence.track.*; 
 import ircam.jmax.editors.sequence.renderers.*; 
 import ircam.jmax.toolkit.*;
+import ircam.jmax.fts.*;
 
 import java.awt.*;
 import javax.swing.event.*;
@@ -42,10 +43,10 @@ public class SequenceGraphicContext extends GraphicContext {
    * Constructor */
   public SequenceGraphicContext(TrackDataModel model, SequenceSelection s, TrackEditor editor)
   {
-      super();
-      setDataModel(model);
-      itsSelection = s;
-      itsEditor = editor;
+    super();
+    setDataModel(model);
+    itsSelection = s;
+    itsEditor = editor;
   }
 
   /**
@@ -108,7 +109,7 @@ public class SequenceGraphicContext extends GraphicContext {
      */
   public Rectangle getTrackClip()
   {
-      return new Rectangle(ScoreBackground.KEYEND, 0, ((SequenceWindow)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
+    return new Rectangle( ScoreBackground.KEYEND, 0, ((EditorContainer)getFrame()).getViewRectangle().width-ScoreBackground.KEYEND - TrackContainer.BUTTON_WIDTH - 2, getGraphicDestination().getSize().height);
   }
 
   public void setToolManager(ToolManager t)
@@ -132,64 +133,63 @@ public class SequenceGraphicContext extends GraphicContext {
   }
 
 
-    public Track getTrack()
-    {
-	return itsEditor.getTrack();
-    }
+  public Track getTrack()
+  {
+    return itsEditor.getTrack();
+  }
+  
+  public TrackEditor getTrackEditor()
+  {
+    return itsEditor;
+  }
 
-    public TrackEditor getTrackEditor()
-    {
-	return itsEditor;
-    }
+  // IMPLEMENTATION NOTES:
+  /*
+   * This is not very elegant.
+   * The idea behind is that the status bar cannot be static (A tool will 
+   * infact write in every window...). Construct a SequenceGraphicContext
+   * With a statusBar argument, on the other side, imposes the knowledge
+   * of that statusBar to the object that builds the SequenceGraphicContext
+   * (in our case, the tracks...*/
+  public StatusBar getStatusBar()
+  {
+    return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getStatusBar();
+  }
+  
+  public FtsGraphicObject getFtsObject()
+  {
+    return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getFtsObject();
+  }
 
-    // IMPLEMENTATION NOTES:
-    /*
-     * This is not very elegant.
-     * The idea behind is that the status bar cannot be static (A tool will 
-     * infact write in every window...). Construct a SequenceGraphicContext
-     * With a statusBar argument, on the other side, imposes the knowledge
-     * of that statusBar to the object that builds the SequenceGraphicContext
-     * (in our case, the tracks...*/
-    public StatusBar getStatusBar()
-    {
-	return ((SequenceWindow) getFrame()).itsSequencePanel.statusBar;
-    }
+  public  EditorToolbar getToolbar()
+  {
+    return ((SequenceEditor)((EditorContainer) getFrame()).getEditor()).getToolbar();
+  }
 
-    public FtsSequenceObject getFtsSequenceObject()
-    {
-	return ((SequenceWindow) getFrame()).sequenceData;
-    }
-
-    public  EditorToolbar getToolbar()
-    {
-	return ((SequenceWindow) getFrame()).itsSequencePanel.toolbar;
-    }
-
-    public void setScrollManager(ScrollManager manager)
-    {
-	scrollManager = manager;
-    }
-    public ScrollManager getScrollManager()
-    {
-	return scrollManager;
-    }
-
+  public void setScrollManager(ScrollManager manager)
+  {
+    scrollManager = manager;
+  }
+  public ScrollManager getScrollManager()
+  {
+    return scrollManager;
+  }
 
   //---- Fields 
-    
-    TrackDataModel itsDataModel;
+  
+  TrackDataModel itsDataModel;
+  
+  SequenceSelection itsSelection;
+  
+  Adapter itsAdapter;
+  
+  int itsLogicalTime;
+  
+  ToolManager toolManager;
+  
+  ScrollManager scrollManager;
 
-    SequenceSelection itsSelection;
-
-    Adapter itsAdapter;
-
-    int itsLogicalTime;
-
-    ToolManager toolManager;
-
-    ScrollManager scrollManager;
-
-    TrackEditor itsEditor;
+  TrackEditor itsEditor;
 }
 
 

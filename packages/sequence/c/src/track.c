@@ -25,6 +25,7 @@
  */
 #include <fts/fts.h>
 #include <ftsprivate/client.h>
+#include <ftsprivate/patcher.h>
 #include <ftsconfig.h>
 #include "seqsym.h"
 #include "note.h"
@@ -484,7 +485,7 @@ track_set_name_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
       fts_client_send_message((fts_object_t *)this, seqsym_setName, 1, at);
     }
   
-  sequence_set_dirty( track_get_sequence(this));
+  track_set_dirty( this);
 }
 
 static void
@@ -584,7 +585,7 @@ track_add_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
       track_add_event_at_client(this, event, ac, at);
     }
   
-  sequence_set_dirty( track_get_sequence(this));
+  track_set_dirty( this);
 }
 
 /* create new event by client request without uploading */
@@ -602,7 +603,7 @@ track_make_event_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
   if(event)
     track_add_event(this, time, event);
 
-  sequence_set_dirty( track_get_sequence(this));
+  track_set_dirty( this);
 }
 
 /* delete event by client request */
@@ -622,7 +623,7 @@ track_remove_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t 
       track_remove_event(this, (event_t *)event);
     }
 
-  sequence_set_dirty( track_get_sequence(this));
+  track_set_dirty( this);
 }
 
 /* move event by client request */
@@ -642,7 +643,7 @@ track_move_events_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   
   fts_client_send_message(o, seqsym_moveEvents, ac, at);
 
-  sequence_set_dirty( track_get_sequence(this));
+  track_set_dirty( this);
 }
 
 /******************************************************
@@ -672,7 +673,7 @@ track_clear_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   track_clear(this);
 
-  sequence_set_dirty( track_get_sequence(this));
+  track_set_dirty( this);
 }
 
 static void 
@@ -807,6 +808,7 @@ track_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	  
       event = event_get_next(event);
     }
+  fts_client_send_message((fts_object_t *)this, fts_s_end_upload, 0, 0);  
 }
 
 static void
@@ -839,9 +841,12 @@ track_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   track_t *this = (track_t *)o;
   fts_atom_t a;
 
+  fts_set_symbol(&a, this->type);
+  fts_client_send_message(o, fts_s_type, 1, &a);
+
   fts_set_int(&a, (this->persistence > 0));
   fts_client_send_message(o, fts_s_persistence, 1, &a);
-
+  
   fts_name_gui_method(o, 0, 0, 0, 0);
 }
 
@@ -989,6 +994,46 @@ track_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_object_signal_runtime_error(o, "export: wrong arguments");  
 }
 
+static void
+track_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  track_set_editor_open( this);
+  fts_client_send_message( o, fts_s_openEditor, 0, 0);
+  track_upload(o, 0, 0, 0, 0);
+}
+
+static void
+track_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  track_set_editor_close( this);
+}
+
+static void
+track_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  track_t *this = (track_t *)o;
+
+  if( track_editor_is_open(this))
+    {
+      track_set_editor_close(this);
+      fts_client_send_message( o, fts_s_closeEditor, 0, 0);
+    }
+}
+
+void
+track_set_dirty(track_t *track)
+{
+  if( track_get_sequence( track))
+    sequence_set_dirty( track_get_sequence( track));
+  else
+    if(track->persistence == 1)
+      fts_patcher_set_dirty(  fts_object_get_patcher( (fts_object_t *)track), 1);
+}
+
 /******************************************************
  *
  *  bmax files
@@ -1072,6 +1117,8 @@ track_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->name = 0;
   this->active = 1;
 
+  this->open = 0;
+
   this->first = 0;
   this->last = 0;
   this->size = 0;
@@ -1129,6 +1176,10 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_remove, track_remove);
   fts_class_message_varargs(cl, fts_s_import, track_import);
   fts_class_message_varargs(cl, fts_s_export, track_export);
+
+  fts_class_message_varargs(cl, fts_s_openEditor, track_open_editor);
+  fts_class_message_varargs(cl, fts_s_destroyEditor, track_destroy_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor, track_close_editor);
 
   fts_class_message_varargs(cl, fts_new_symbol("duration"), track_duration);
 

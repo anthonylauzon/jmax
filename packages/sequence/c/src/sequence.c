@@ -611,11 +611,11 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_get_object(at);
 
-  sequence_remove_track(this, track);
-  
   if(fts_object_has_id((fts_object_t *)track))
     fts_client_send_message(o, seqsym_removeTracks, 1, at);
 
+  sequence_remove_track(this, track);
+  
   fts_object_update_name(o);
   sequence_set_dirty( this);
 }

@@ -51,7 +51,7 @@ public class MessageTrackPopupMenu extends JPopupMenu
   int y;
   MonoTrackEditor target = null;    
   private boolean added = false;
-  JMenuItem displayLabelItem;
+  JMenuItem displayLabelItem, removeItem, nameItem;
   JMenu moveMenu;
   int trackCount = 0;
 
@@ -70,19 +70,19 @@ public class MessageTrackPopupMenu extends JPopupMenu
 
     addSeparator();
 
-    item = new JMenuItem("Change Name");
-    item.addActionListener(new ActionListener(){
+    nameItem = new JMenuItem("Track Name");
+    nameItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    ChangeTrackNameDialog.changeName(MessageTrackPopupMenu.getPopupTarget().getTrack(),  
-					     MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
-					     SwingUtilities.convertPoint(MessageTrackPopupMenu.getPopupTarget(), 
-									 MessageTrackPopupMenu.getPopupX(),
-									 MessageTrackPopupMenu.getPopupY(),
-									 MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
+	  ChangeTrackNameDialog.changeName(MessageTrackPopupMenu.getPopupTarget().getTrack(),  
+					   MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame(),
+					   SwingUtilities.convertPoint(MessageTrackPopupMenu.getPopupTarget(), 
+								       MessageTrackPopupMenu.getPopupX(),
+								       MessageTrackPopupMenu.getPopupY(),
+								       MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFrame()));
 	}
-    });
-    add(item);
+      });
+    add( nameItem);
 
     addSeparator();
 
@@ -111,15 +111,15 @@ public class MessageTrackPopupMenu extends JPopupMenu
 
     addSeparator();
     
-    item = new JMenuItem("Remove Track");
-    item.addActionListener(new ActionListener(){
+    removeItem = new JMenuItem("Remove Track");
+    removeItem.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsSequenceObject().
-		removeTrack(MessageTrackPopupMenu.getPopupTarget().getTrack());
+	  ((FtsSequenceObject)MessageTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
+	    removeTrack(MessageTrackPopupMenu.getPopupTarget().getTrack());
 	}
     });
-    add(item);
+    add(removeItem);
 
     addSeparator();
     item = new JMenuItem("Export Track");
@@ -162,48 +162,61 @@ public class MessageTrackPopupMenu extends JPopupMenu
 	  popup.target = editor;
 	  popup.pack();
 	}
-    popup.updateMoveToMenu();
+    
+    if( popup.target.getGraphicContext().getFtsObject() instanceof FtsSequenceObject)
+      {
+	popup.moveMenu.setEnabled( true);
+	popup.removeItem.setEnabled( true);
+	popup.nameItem.setEnabled( true);
+	popup.updateMoveToMenu();
+      }    
+    else
+      {
+	popup.moveMenu.setEnabled( false);
+	popup.removeItem.setEnabled( false);
+	popup.nameItem.setEnabled( false);
+      }
   }
 
     void updateMoveToMenu()
     {
-	JMenuItem item;
-	int count =  target.trackCount()-1;
-	if(trackCount==count)
-	    return;
-	else
-	    {
-		int dif = count-trackCount;
-		
-		if(dif>0)
-		    for(int i=1; i<=dif; i++)
-		    {
-			item = new JMenuItem(""+(trackCount+i));
-			item.addActionListener(Actions.moveMonodimensionalTrackToAction);
-			moveMenu.add(item);			
-		    }		
+      JMenuItem item;
+      int count =  target.trackCount()-1;
+      if(trackCount==count)
+	return;
+      else
+	{
+	  int dif = count-trackCount;
+	  
+	  if(dif>0)
+	    for(int i=1; i<=dif; i++)
+	      {
+		item = new JMenuItem(""+(trackCount+i));
+		item.addActionListener(Actions.moveMonodimensionalTrackToAction);
+		moveMenu.add(item);			
+	      }		
 		else
-		    for(int i=0; i<-dif; i++)
+		  for(int i=0; i<-dif; i++)
 			moveMenu.remove(moveMenu.getItemCount()-1);
-		trackCount = count;
-	    }
+	  trackCount = count;
+	}
     }
 
-    public void show(Component invoker, int x, int y)
-    {
-	this.x = x;
-	this.y = y;
-      
-	super.show(invoker, x, y);
-    }
-    static public int getPopupX()
-    {
-	return popup.x;
-    }
-    static public int getPopupY()
-    {
-	return popup.y;
-    } 
+  public void show(Component invoker, int x, int y)
+  {
+    this.x = x;
+    this.y = y;
+    
+    super.show(invoker, x, y);
+  }
+  static public int getPopupX()
+  {
+    return popup.x;
+  }
+  static public int getPopupY()
+  {
+    return popup.y;
+  } 
 }
 
 

@@ -48,13 +48,6 @@ public class SequenceTools implements ToolProvider{
       WARNING:
       Waiting for a method to get the packagePath from the package name
     */
-    /*try
-      {
-      path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-      }
-      catch(FileNotFoundException e){
-      path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-      }*/
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
     /*************************************************************/
 
@@ -62,41 +55,42 @@ public class SequenceTools implements ToolProvider{
     tools[1] = new AdderTool(new ImageIcon(path+"edit.gif"));
     tools[2] = new DeleteTool(new ImageIcon(path+"delete.gif"));
     tools[3] = new ResizerTool(new ImageIcon(path+"hresize.gif"));
-    tools[4] = new VResizerTool(new ImageIcon(path+"vresize.gif"));
-    tools[5] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
-    tools[6] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
-    tools[7] = new LinerTool(new ImageIcon(path+"liner.gif"));
-    tools[8] = new CombTool(new ImageIcon(path+"comber.gif"));
+    tools[4] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+    tools[5] = new ScrollerTool(new ImageIcon(path+"scroller.gif"));
+    tools[6] = new LinerTool(new ImageIcon(path+"liner.gif"));
+    tools[7] = new CombTool(new ImageIcon(path+"comber.gif"));
   }
 
   public Enumeration getTools()
   {
-    return new ToolEnumeration();
+    return new ToolEnumeration( this);
   }
 
   class ToolEnumeration implements Enumeration 
   {
-    ToolEnumeration()
+    ToolEnumeration( SequenceTools sq)
     {
       index = 0;
+      sequenceTools = sq;
     }
     
     public boolean hasMoreElements()
     {
-      return index < instance.tools.length;
+      return index < sequenceTools.tools.length;
     }
     
     public Object nextElement()
     {
-      return instance.tools[index++];
+      return sequenceTools.tools[index++];
     }
     
     //---
     int index;
+    SequenceTools sequenceTools;
   }
 
   //---
-  Tool tools[] = new Tool[9];
+  Tool tools[] = new Tool[8];
   public static SequenceTools instance = new SequenceTools();
 }
 

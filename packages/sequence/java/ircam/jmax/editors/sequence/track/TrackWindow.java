@@ -23,9 +23,8 @@
 // Authors: Maurizio De Cecco, Francois Dechelle, Riccardo Borghesi, Enzo Maggi, Norbert Schnell.
 // 
 
-package ircam.jmax.editors.sequence;
+package ircam.jmax.editors.sequence.track;
 
-import ircam.jmax.editors.sequence.track.*;
 import java.io.*;
 import java.lang.*;
 import java.awt.event.*;
@@ -40,16 +39,17 @@ import ircam.jmax.toolkit.menus.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
 
 /**
  * This implementation builds a SequencePanel to represent the data.
  */
-public class SequenceWindow extends JFrame implements EditorContainer{
+public class TrackWindow extends JFrame implements EditorContainer{
 
   //------------------- fields
-  SequencePanel itsSequencePanel;
-  FtsSequenceObject sequenceData;
+  TrackPanel trackPanel;
+  FtsTrackObject trackData;
   
   public final static int DEFAULT_WIDTH  = 800;
   public final static int DEFAULT_HEIGHT = 553;
@@ -58,29 +58,28 @@ public class SequenceWindow extends JFrame implements EditorContainer{
   /**
    * Constructor with FtsSequenceObject
    */
-  public SequenceWindow(FtsSequenceObject data)
+  public TrackWindow(FtsTrackObject data)
   {
     super();
     
     MaxWindowManager.getWindowManager().addWindow(this);
     
-    sequenceData = data;
+    trackData = data;
 
-    //initTrackEditorFactoryTable();
     TrackEditorFactoryTable.init();
 
     makeTitle();
     
-    sequenceData.requestSequenceName();
+    //trackData.requestTrackName();
     
     // Build The Menus and Menu Bar
     makeMenuBar();
 
     //... then the SequencePanel
-    itsSequencePanel = new SequencePanel(this, data);
+    trackPanel = new TrackPanel( this, data);
     
-    getContentPane().add(itsSequencePanel);
-    setSize(new Dimension(DEFAULT_WIDTH, EMPTY_HEIGHT));
+    getContentPane().add( trackPanel);
+    setSize( new Dimension( DEFAULT_WIDTH, EMPTY_HEIGHT));
     
     addWindowListener(new WindowListener(){
 	public void windowOpened(WindowEvent e){}
@@ -93,25 +92,25 @@ public class SequenceWindow extends JFrame implements EditorContainer{
 	public void windowIconified(WindowEvent e){}
 	public void windowActivated(WindowEvent e)
 	{
-	  TrackEditor current = itsSequencePanel.getCurrentTrackEditor();
-	  if(current!=null)
-	    SequenceSelection.setCurrent(current.getSelection());
+	  TrackEditor editor = trackPanel.getTrackEditor();
+	  SequenceSelection.setCurrent( editor.getSelection());
 	}
 	public void windowDeactivated(WindowEvent e){}
       });
 	
     validate();
+    pack();
     setVisible(true);
   }
 
   private final void makeTitle(){
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence"));
+    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track"));
     MaxWindowManager.getWindowManager().windowChanged(this);
   } 
   
   public void setName(String name)
   {
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Sequence " + name));
+    setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Track " + name));
     MaxWindowManager.getWindowManager().windowChanged(this);
   }
 
@@ -124,9 +123,6 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     // Build the edit menu
     mb.add(new EditMenu(this)); 
     
-    // Build the track menu
-    mb.add(new TrackMenu(this, sequenceData)) ; 	
-    
     // New Window Manager based Menu
     mb.add(new ircam.jmax.toolkit.menus.MaxWindowJMenu("Windows", this)); 
     
@@ -135,7 +131,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     
   // ------ editorContainer interface ---------------
   public Editor getEditor(){
-    return itsSequencePanel;
+    return trackPanel;
   }
   public Frame getFrame(){
     return this;
@@ -144,7 +140,7 @@ public class SequenceWindow extends JFrame implements EditorContainer{
     return getLocation();
   }
   public Rectangle getViewRectangle(){
-    return itsSequencePanel.scrollTracks.getViewport().getViewRect();
+    return trackPanel.scrollTracks.getViewport().getViewRect();
   }
 }
 

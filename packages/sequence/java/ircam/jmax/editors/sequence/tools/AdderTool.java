@@ -49,65 +49,65 @@ public class AdderTool extends Tool implements PositionListener {
    */
   public AdderTool(ImageIcon theImageIcon) 
   {
-      super("adder", theImageIcon);
-      
-      itsMidiMouseTracker = new MidiMouseTracker(this);
+    super("adder", theImageIcon);
+    
+    itsMidiMouseTracker = new MidiMouseTracker(this);
   }
 
-    /**
-     * the default interaction module for this tool
-     */
-    public InteractionModule getDefaultIM() 
+  /**
+   * the default interaction module for this tool
+   */
+  public InteractionModule getDefaultIM() 
+  {
+    return itsMidiMouseTracker;
+  }
+  
+  /**
+   * called when this tool is "unmounted"
+   */
+  public void deactivate() 
+  {
+  }
+  
+  int remember_x; 
+  int remember_y;
+  /**
+   *PositionListener interface
+   */
+  public void positionChoosen(int x, int y, int modifiers) 
+  {
+    SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+    
+    egc.getTrack().setProperty("selected", Boolean.TRUE);
+  
+    if(egc.getDataModel().isLocked()) return;
+    
+    // starts an undoable transition	
+    ((UndoableData) egc.getDataModel()).beginUpdate();
+    //endUpdate is called in addEvents in dataModel
+    
+    //with Shift add to selection
+    if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
+    
+    ValueInfo info = egc.getTrack().getTrackDataModel().getType();
+    addEvent(x, y, (EventValue) info.newInstance());
+  }
+  
+  void addEvent(int x, int y, EventValue value)
     {
-	return itsMidiMouseTracker;
-    }
-
-    /**
-     * called when this tool is "unmounted"
-     */
-    public void deactivate() 
-    {
-    }
-
-    int remember_x; 
-    int remember_y;
-    /**
-     *PositionListener interface
-     */
-    public void positionChoosen(int x, int y, int modifiers) 
-    {
-	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-	
-	egc.getTrack().setProperty("selected", Boolean.TRUE);
-
-	if(egc.getDataModel().isLocked()) return;
-
-	// starts an undoable transition	
-	((UndoableData) egc.getDataModel()).beginUpdate();
-	//endUpdate is called in addEvents in dataModel
-
-	//with Shift add to selection
-	if((modifiers & InputEvent.SHIFT_MASK) == 0) egc.getSelection().deselectAll();
-	       
-	ValueInfo info = egc.getTrack().getTrackDataModel().getType();
-	addEvent(x, y, (EventValue) info.newInstance());
-    }
-        
-    void addEvent(int x, int y, EventValue value)
-    {
-	UtilTrackEvent aEvent = new UtilTrackEvent(value);
-	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
-	
-	egc.getAdapter().setX(aEvent, x);
-
-	egc.getAdapter().setY(aEvent, y);
-
-	egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
-							  value.getValueInfo().getName(), 
+      UtilTrackEvent aEvent = new UtilTrackEvent(value);
+      SequenceGraphicContext egc = (SequenceGraphicContext) gc;
+      
+      egc.getAdapter().setX(aEvent, x);
+      
+      egc.getAdapter().setY(aEvent, y);
+      
+      egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
+							value.getValueInfo().getName(), 
 							  value.getPropertyCount(), 
-							  value.getPropertyValues());
+							value.getPropertyValues());
     }
-
+  
   //-------------- Fields
   MidiMouseTracker itsMidiMouseTracker;
 }

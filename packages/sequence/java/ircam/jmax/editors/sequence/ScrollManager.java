@@ -27,9 +27,11 @@ import java.awt.*;
 
 public interface ScrollManager {
 
-    public void scrollIfNeeded(int time);
-    public int scrollBy(int x, int y);
-    public void scrollToValue(int value);
-    public void makeVisible(TrackEvent evt);
-    public Rectangle getViewRectangle();
+  public void scrollIfNeeded(int time);
+  public int scrollBy(int x, int y);
+  public void scrollToValue(int value);
+  public void makeVisible(TrackEvent evt);
+  public Rectangle getViewRectangle();
+  public int getMaximumVisibleTime();
+  public boolean pointIsVisible( int x, int y);
 }

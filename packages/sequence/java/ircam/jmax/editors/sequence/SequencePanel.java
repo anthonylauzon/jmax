@@ -47,33 +47,33 @@ import ircam.jmax.toolkit.Geometry;
   /**
    * The graphic component containing the tracks of a Sequence.
    */
-public class SequencePanel extends JPanel implements Editor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager {
+public class SequencePanel extends JPanel implements SequenceEditor, TrackListener, TrackDataListener, ListSelectionListener, ScrollManager {
     
-    FtsSequenceObject ftsSequenceObject;
+  FtsSequenceObject ftsSequenceObject;
 
-    EditorToolbar toolbar;
-    SequenceDataModel sequenceData;
-    EditorContainer itsContainer;
-    public InfoPanel statusBar;
-    public SequenceRuler ruler;
-    
-    Box trackPanel;
-    JScrollPane scrollTracks;
-    Hashtable trackContainers = new Hashtable();
-    MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
+  EditorToolbar toolbar;
+  SequenceDataModel sequenceData;
+  EditorContainer itsContainer;
+  public InfoPanel statusBar;
+  public SequenceRuler ruler;
+  
+  Box trackPanel;
+  JScrollPane scrollTracks;
+  Hashtable trackContainers = new Hashtable();
+  MutexPropertyHandler mutex = new MutexPropertyHandler("selected");
     //---
-    JLabel itsZoomLabel;
-    JScrollBar itsTimeScrollbar;
-    Geometry geometry;
-    ToolManager manager;
+  JLabel itsZoomLabel;
+  JScrollBar itsTimeScrollbar;
+  Geometry geometry;
+  ToolManager manager;
+  
+  public final int INITIAL_ZOOM = 20;
+  public static final int MINIMUM_TIME = 10000;
+  
+  static public Color violetColor = new Color(102, 102, 153);
+  static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
 
-    public final int INITIAL_ZOOM = 20;
-    public static final int MINIMUM_TIME = 10000;
-
-    static public Color violetColor = new Color(102, 102, 153);
-    static public Font rulerFont = new Font("SansSerif", Font.PLAIN, 10);
-
-    Component verticalGlue = Box.createVerticalGlue();
+  Component verticalGlue = Box.createVerticalGlue();
   /**
    * Constructor based on a SequenceDataModel containing the tracks to edit.
    */
@@ -132,15 +132,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     statusBar = new InfoPanel();
 
     manager.addToolListener(new ToolListener() {
-	    public void toolChanged(ToolChangeEvent e) 
+	public void toolChanged(ToolChangeEvent e) 
+	{
+	  
+	  if (e.getTool() != null) 
 	    {
-		
-		if (e.getTool() != null) 
-		    {
-			statusBar.post(e.getTool(), "");
-		    }
+	      statusBar.post(e.getTool(), "");
 	    }
-	});
+	}
+      });
  
     statusBar.setSize(SequenceWindow.DEFAULT_WIDTH, 30);
     //statusBar.setPreferredSize(new Dimension(SequenceWindow.DEFAULT_WIDTH, 30));
@@ -168,15 +168,15 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     //---------- prepares the time zoom listeners
     geometry.addZoomListener( new ZoomListener() {
 	public void zoomChanged(float zoom, float oldZoom)
-	    {
-		statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
-		repaint();
-		TrackEvent lastEvent = sequenceData.getLastEvent();
-		if(lastEvent!=null)
-		    resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
-							 ((Double)lastEvent.getProperty("duration")).intValue()));
-	    }
-    });
+	{
+	  statusBar.post(manager.getCurrentTool(),"zoom "+((int)(zoom*100))+"%");
+	  repaint();
+	  TrackEvent lastEvent = sequenceData.getLastEvent();
+	  if(lastEvent!=null)
+	    resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
+						 ((Double)lastEvent.getProperty("duration")).intValue()));
+	}
+      });
 
     //-------------- prepares the SOUTH scrollbar (time scrolling) and its listener    
     int totalTime = MINIMUM_TIME;
@@ -269,120 +269,121 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
       resizePanelToTimeWithoutScroll(maxTime);
   }
 
-    /**
-     * Callback from the model. It can be called when two tracks are merged into one */
-    public void trackRemoved(Track track)
-    {
-	TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
-	
-	trackPanel.remove(trackContainer);
-	
-	trackContainer.getTrackEditor().dispose();
-
-	trackPanel.validate();
-	trackPanel.repaint();
-	scrollTracks.validate();
-
-	mutex.remove(track);
-
-	trackContainers.remove(track);
-
-	//resize of the frame
-	Dimension dim = itsContainer.getFrame().getSize();
- 	if(sequenceData.trackCount() == 0)
-	     itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT);	
-	else
-	    if(!scrollTracks.getVerticalScrollBar().isVisible())		
-		itsContainer.getFrame().setSize(dim.width, 
-						SequenceWindow.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
+  /**
+   * Callback from the model. It can be called when two tracks are merged into one */
+  public void trackRemoved(Track track)
+  {
+    TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
     
-	itsContainer.getFrame().validate();
-	
-	resetTrackIndexs();
-    }
-
-    /**
-     * Callback from the model. It can be called when a track changed */
-    public void trackChanged(Track track)
-    {
-	TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
-	trackContainer.validate();
-	trackPanel.validate();
-	scrollTracks.validate();
-    }
-
-    public void trackMoved(Track track, int oldPosition, int newPosition)
-    {
-	resetTrackIndexs();
-    }
+    trackPanel.remove(trackContainer);
     
-    void resetTrackIndexs()
-    {
-	Component[] comp = trackPanel.getComponents();  
-	for(int i = 0; i < comp.length-1; i++)
-	    ((TrackContainer)comp[i]).changeIndex(i);
-    }
-
-    public int getAllTracksHeight()
-    {
-	int height = 0;
-	for(Enumeration e = trackContainers.elements(); e.hasMoreElements();)
-	    height += ((TrackContainer)e.nextElement()).getSize().height;
-	return height;
-    }
-
-    boolean isVisible(int y)
-    {
-	Rectangle r = scrollTracks.getViewport().getViewRect();
-	return ((y >= r.y)&&(y <= r.y +r.height));
-    }
-
-    public void moveTrackTo(Track track, int pos)
-    {
-	TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
-	trackPanel.remove(trackContainer);
-	trackPanel.add(trackContainer, pos);
-	trackPanel.validate();
-	scrollTracks.validate();
-	scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
-	track.setProperty("selected", Boolean.TRUE);
-    }
-
-   /**
-     * called when the database is changed: DataTrackListener interface
-     */
+    trackContainer.getTrackEditor().dispose();
     
-    public void objectChanged(Object spec, String propName, Object propValue) {}
-    public void objectAdded(Object spec, int index) 
-    {
-	resizePanelToEventTime((TrackEvent)spec);	
-    }
-    public void objectsAdded(int maxTime) 
-    {
-	resizePanelToTime(maxTime);	
-    }
-    public void objectDeleted(Object whichObject, int index){}
-    public void trackCleared(){}
-    public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
-    public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
-    {
-	resizePanelToEventTime((TrackEvent)whichObject);
-    }
-    public void trackNameChanged(String oldName, String newName){}
+    trackPanel.validate();
+    trackPanel.repaint();
+    scrollTracks.validate();
+    
+    mutex.remove(track);
+    
+    trackContainers.remove(track);
+    
+    //resize of the frame
+    Dimension dim = itsContainer.getFrame().getSize();
+    if(sequenceData.trackCount() == 0)
+      itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT);	
+    else
+      if(!scrollTracks.getVerticalScrollBar().isVisible())		
+	itsContainer.getFrame().setSize(dim.width, 
+					SequenceWindow.EMPTY_HEIGHT+ruler.getSize().height+21+getAllTracksHeight());	
+    
+    itsContainer.getFrame().validate();
+    
+    resetTrackIndexs();
+  }
 
-    //controll if the object is in the actual scrollable area. if not extend the area
-    private void resizePanelToEventTime(TrackEvent evt)
-    {
-	int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
-	resizePanelToTime(evtTime);
-    }
+  /**
+   * Callback from the model. It can be called when a track changed */
+  public void trackChanged(Track track)
+  {
+    TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
+    trackContainer.validate();
+    trackPanel.validate();
+    scrollTracks.validate();
+  }
+  
+  public void trackMoved(Track track, int oldPosition, int newPosition)
+  {
+    resetTrackIndexs();
+  }
+    
+  void resetTrackIndexs()
+  {
+    Component[] comp = trackPanel.getComponents();  
+    for(int i = 0; i < comp.length-1; i++)
+      ((TrackContainer)comp[i]).changeIndex(i);
+  }
+  
+  public int getAllTracksHeight()
+  {
+    int height = 0;
+    for(Enumeration e = trackContainers.elements(); e.hasMoreElements();)
+      height += ((TrackContainer)e.nextElement()).getSize().height;
+    return height;
+  }
+  
+  boolean isVisible(int y)
+  {
+    Rectangle r = scrollTracks.getViewport().getViewRect();
+    return ((y >= r.y)&&(y <= r.y +r.height));
+  }
+  
+  public void moveTrackTo(Track track, int pos)
+  {
+    TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
+    trackPanel.remove(trackContainer);
+    trackPanel.add(trackContainer, pos);
+    trackPanel.validate();
+    scrollTracks.validate();
+    scrollTracks.getVerticalScrollBar().setValue(trackContainer.getBounds().y);
+    track.setProperty("selected", Boolean.TRUE);
+  }
+  
+  /**
+   * called when the database is changed: DataTrackListener interface
+   */
+  
+  public void objectChanged(Object spec, String propName, Object propValue) {}
+  public void objectAdded(Object spec, int index) 
+  {
+    resizePanelToEventTime((TrackEvent)spec);	
+  }
+  public void objectsAdded(int maxTime) 
+  {
+    resizePanelToTime(maxTime);	
+  }
+  public void objectDeleted(Object whichObject, int index){}
+  public void trackCleared(){}
+  public void endTrackUpload(){}
+  public void objectMoved(Object whichObject, int oldIndex, int newIndex){}
+  public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex)
+  {
+    resizePanelToEventTime((TrackEvent)whichObject);
+  }
+  public void trackNameChanged(String oldName, String newName){}
 
-    private void resizePanelToTime(int time)
-    {
-	int maxVisibleTime = getMaximumVisibleTime();
-	int maximumTime = getMaximumTime();
-
-	if(time > maximumTime)
+  //controll if the object is in the actual scrollable area. if not extend the area
+  private void resizePanelToEventTime(TrackEvent evt)
+  {
+    int evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
+    resizePanelToTime(evtTime);
+  }
+  
+  private void resizePanelToTime(int time)
+  {
+    int maxVisibleTime = getMaximumVisibleTime();
+    int maximumTime = getMaximumTime();
+    
+    if(time > maximumTime)
 	{
 	    int delta = maximumTime-itsTimeScrollbar.getMaximum();
 
@@ -542,6 +543,18 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	return ftsSequenceObject;
     }
   //------------------- Editor interface ---------------
+  public FtsGraphicObject getFtsObject()
+  {
+    return ftsSequenceObject;
+  }
+  public EditorToolbar getToolbar()
+  {
+    return toolbar;
+  }
+  public StatusBar getStatusBar()
+  {
+    return statusBar;
+  }
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
@@ -595,82 +608,83 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
 	return ((time>startTime)&&(time+duration<endTime));
     }
+
+  /**************** ScrollManager Interface ********************************/
+  
+  ///////AUTOMATIC SCROLLING  
+  public boolean pointIsVisible(int x, int y)
+  {
+    Rectangle r = itsContainer.getViewRectangle();
+    return ((x > r.x + ScoreBackground.KEYEND) && (x < r.x + r.width - TrackContainer.BUTTON_WIDTH));
+  } 
+
+  private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
+  private int scrolledDelta = 2;//the corresponding graphic delta
+  public int scrollBy(int x, int y)
+  {
+    Rectangle r = itsContainer.getViewRectangle();
+    if(x < r.x  + ScoreBackground.KEYEND)
+      {
+	if(itsTimeScrollbar.getValue()-scrollingDelta >0)
+	  {
+	    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
+	    return -scrolledDelta;//scroll to left
+	  }
+	else return 0;//is already scrolled to zero
+      }
+    else
+      {		
+	if(x > r.x + r.width - TrackContainer.BUTTON_WIDTH)
+	  {
+	    int value = itsTimeScrollbar.getValue()+scrollingDelta;
+	    if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
+	      itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
+	    
+	    itsTimeScrollbar.setValue(value);
+	    return scrolledDelta;//scroll to rigth
+	  }
+	else return 0;//the mouse is in the window
+      }
+  }
+
+  public void makeVisible(TrackEvent evt)
+  {
+    int time = (int)evt.getTime();
+    int duration = ((Double)evt.getProperty("duration")).intValue();
+    int startTime = -geometry.getXTransposition(); 
+    int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
     
-    ///////AUTOMATIC SCROLLING  
-    public boolean pointIsVisible(int x, int y)
-    {
-	Rectangle r = itsContainer.getViewRectangle();
-	return ((x > r.x + ScoreBackground.KEYEND) && (x < r.x + r.width - TrackContainer.BUTTON_WIDTH));
-    } 
+    if((time<startTime)||(time+duration>endTime))
+      itsTimeScrollbar.setValue(time);
+  }
+  
+  public int getMaximumVisibleTime()
+  {
+    return geometry.sizeToMsec(geometry, getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
+  }
+  public int getMaximumTime()
+  {
+    int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
+    int size = getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND;
+    
+    if (geometry.getXInvertion()) 
+      return (int) (maxTransp -(size)/geometry.getXZoom())-1;
+    
+    else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
+  }
 
-    private int scrollingDelta = 10;//the automatic scrolling delta for the scrollbar  
-    private int scrolledDelta = 2;//the corresponding graphic delta
-    public int scrollBy(int x, int y)
-    {
-	Rectangle r = itsContainer.getViewRectangle();
-	if(x < r.x  + ScoreBackground.KEYEND)
-	    {
-		if(itsTimeScrollbar.getValue()-scrollingDelta >0)
-		{
-		    itsTimeScrollbar.setValue(itsTimeScrollbar.getValue()-scrollingDelta);
-		    return -scrolledDelta;//scroll to left
-		}
-		else return 0;//is already scrolled to zero
-	    }
-	else
-	    {		
-		if(x > r.x + r.width - TrackContainer.BUTTON_WIDTH)
-		{
-		    int value = itsTimeScrollbar.getValue()+scrollingDelta;
-		    if(value>itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount())
-			itsTimeScrollbar.setMaximum(itsTimeScrollbar.getMaximum()+scrollingDelta);
-		    
-		    itsTimeScrollbar.setValue(value);
-		    return scrolledDelta;//scroll to rigth
-		}
-		else return 0;//the mouse is in the window
-	    }
-    }
-
-    public void makeVisible(TrackEvent evt)
-    {
-	int time = (int)evt.getTime();
-	int duration = ((Double)evt.getProperty("duration")).intValue();
-	int startTime = -geometry.getXTransposition(); 
-	int endTime = geometry.sizeToMsec(geometry, getSize().width-TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-	
-	if((time<startTime)||(time+duration>endTime))
-	    itsTimeScrollbar.setValue(time);
-    }
-
-    public int getMaximumVisibleTime()
-    {
-	return geometry.sizeToMsec(geometry, getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND)-1 ;
-    }
-    public int getMaximumTime()
-    {
-	int maxTransp = -(itsTimeScrollbar.getMaximum()-itsTimeScrollbar.getVisibleAmount());
-	int size = getSize().width - TrackContainer.BUTTON_WIDTH - ScoreBackground.KEYEND;
-
-	if (geometry.getXInvertion()) 
-	    return (int) (maxTransp -(size)/geometry.getXZoom())-1;
-	
-	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
-    }
-
-    /////////////////ScrollManager Interface
-    public void scrollIfNeeded(int time)
-    {
-	resizePanelToTime(time);
-    }
-    public void scrollToValue(int value)
-    {
-	itsTimeScrollbar.setValue(value);
-    }
-    public Rectangle getViewRectangle()
-    {
-	return scrollTracks.getViewport().getViewRect();
-    }
+  public void scrollIfNeeded(int time)
+  {
+    resizePanelToTime(time);
+  }
+  public void scrollToValue(int value)
+  {
+    itsTimeScrollbar.setValue(value);
+  }
+  public Rectangle getViewRectangle()
+  {
+    return scrollTracks.getViewport().getViewRect();
+  }
 }
 
 

@@ -370,7 +370,11 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   {
       deselectAll();
   }
-    public void trackNameChanged(String oldName, String newName){}
+  public void endTrackUpload() 
+  {
+    deselectAll();
+  }
+  public void trackNameChanged(String oldName, String newName){}
 
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 

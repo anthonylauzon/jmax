@@ -73,8 +73,8 @@ public class ClosedTrackPopupMenu extends JPopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	    ClosedTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsSequenceObject().
-		removeTrack(ClosedTrackPopupMenu.getPopupTarget().getTrack());
+	  ((FtsSequenceObject)ClosedTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
+	    removeTrack(ClosedTrackPopupMenu.getPopupTarget().getTrack());
 	}
     });
     add(item);
@@ -97,30 +97,29 @@ public class ClosedTrackPopupMenu extends JPopupMenu
       popup.updateMoveToMenu();
   }
 
-    void updateMoveToMenu()
-    {
-	JMenuItem item;
-	//int count = target.trackCount();
-	int count = target.getGraphicContext().getFtsSequenceObject().trackCount()-1;
-	if(trackCount==count)
-	    return;
-	else
+  void updateMoveToMenu()
+  {
+    JMenuItem item;
+    int count = ((FtsSequenceObject)target.getGraphicContext().getFtsObject()).trackCount()-1;
+    if(trackCount==count)
+      return;
+    else
+      {
+	int dif = count-trackCount;
+	
+	if(dif>0)
+	  for(int i=1; i<=dif; i++)
 	    {
-		int dif = count-trackCount;
-		
-		if(dif>0)
-		    for(int i=1; i<=dif; i++)
-		    {
-			item = new JMenuItem(""+(trackCount+i));
-			item.addActionListener(Actions.moveClosedTrackToAction);
-			moveMenu.add(item);			
-		    }		
-		else
-		    for(int i=0; i<-dif; i++)
-			moveMenu.remove(moveMenu.getItemCount()-1);
-		trackCount = count;
-	    }
-    }
+	      item = new JMenuItem(""+(trackCount+i));
+	      item.addActionListener(Actions.moveClosedTrackToAction);
+	      moveMenu.add(item);			
+	    }		
+	else
+	  for(int i=0; i<-dif; i++)
+	    moveMenu.remove(moveMenu.getItemCount()-1);
+	trackCount = count;
+      }
+  }
 }
 
 

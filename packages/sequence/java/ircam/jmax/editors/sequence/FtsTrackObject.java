@@ -26,9 +26,10 @@
 package ircam.jmax.editors.sequence;
 
 import ircam.fts.client.*;
+import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.*;
-import ircam.jmax.fts.FtsUndoableObject;
+import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 
 import java.awt.datatransfer.*;
@@ -43,7 +44,7 @@ import javax.swing.*;
  * array.
  * @see ircam.jmax.editors.sequence.track.TrackDataModel*/
 
-public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel, ClipableData, ClipboardOwner {
+public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataModel, ClipableData, ClipboardOwner {
   static
   {
     FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("addEvent"), new FtsMessageHandler(){
@@ -110,6 +111,18 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
 	((FtsTrackObject)obj).highlightEvents( args.getLength(), args.getAtoms());		  
       }
     });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("type"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).setType( args.getSymbol( 0).toString());		  
+      }
+    });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+	((FtsTrackObject)obj).endUpload();		  
+      }
+    });
   }
 
   /**
@@ -119,6 +132,9 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   public FtsTrackObject(FtsServer server, FtsObject parent, int objId, String className, FtsAtom args[], int offset, int length)
   {
     super(server, parent, objId, className, args, offset, length);
+
+    ValueInfoTable.init();
+    SequenceImages.init();
 
     this.info = ValueInfoTable.getValueInfo(args[offset].symbolValue.toString());
 
@@ -135,6 +151,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     if (flavors == null)
       flavors = new DataFlavor[1];
     flavors[0] = sequenceFlavor;
+  }
+
+  void setType( String type)
+  {
+    this.info = ValueInfoTable.getValueInfo( type);
   }
 
   public void setUntitled()
@@ -316,11 +337,12 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     args.addSymbol( FtsSymbol.get(type));
 
     for(int i=0; i<nArgs; i++)
-      if(arguments[i] instanceof Double)
-	args.addFloat(((Double)arguments[i]).floatValue());
-      else
-	args.add(arguments[i]);
-
+      {
+	if(arguments[i] instanceof Double)
+	  args.addFloat(((Double)arguments[i]).floatValue());
+	else
+	  args.add(arguments[i]);
+      }
     try{
       send( FtsSymbol.get("addEvent"), args);
     }
@@ -391,7 +413,7 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
       }   
   }
     
-  public void requestSetName(String newName)
+  public void requestChangeTrackName(String newName)
   {
     args.clear();
     args.addSymbol( FtsSymbol.get( newName));
@@ -832,6 +854,11 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((TrackDataListener) e.nextElement()).trackCleared();
+  }
+  private void notifyUploadEnd()
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((TrackDataListener) e.nextElement()).endTrackUpload();
   }
   private void notifyObjectMoved(Object spec, int oldIndex, int newIndex)
   {
@@ -1307,6 +1334,32 @@ public class FtsTrackObject extends FtsUndoableObject implements TrackDataModel,
     }
     temp[dim]=flavor;
     flavors = temp;
+  }
+
+
+  /********************************************************
+   *  FtsObjectWithEditor
+   ********************************************************/
+  TrackWindow trackWindow = null;
+  public void openEditor(int argc, FtsAtom[] argv)
+  {
+    if( trackWindow == null)
+      {
+	trackWindow = new TrackWindow(this);
+	setEditorFrame( trackWindow);
+      }
+    showEditor();
+  }
+  public void destroyEditor()
+  {
+    trackWindow = null;
+    disposeEditor();
+  }
+  /********************************************************/
+
+  void endUpload()
+  {
+    notifyUploadEnd();
   }
 
   //---  AbstractSequence fields
