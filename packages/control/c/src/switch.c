@@ -58,7 +58,7 @@ switch_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   switch_t *this = (switch_t *)o;
 
   if(this->on != 0)
-    fts_outlet_send(o, 0, s, 1, at);
+    fts_outlet_send(o, 0, s, ac, at);
 }
 
 static void
