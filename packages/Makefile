@@ -1,4 +1,4 @@
-C_TARGETS=ispw guiobj lists additive manoury eric kimbo
+C_TARGETS=ispw guiobj lists additive manoury eric system
 JAVA_TARGETS=table
 MIXED_TARGETS=qlist explode
 
