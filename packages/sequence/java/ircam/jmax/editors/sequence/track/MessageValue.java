@@ -41,321 +41,320 @@ import java.awt.datatransfer.*;
  * The EventValue object that represents a Integer event. Is used during score-recognition */
 public class MessageValue extends AbstractEventValue
 {
-    Object message = "";
-    Object integer = new Integer(0);
-    Object open = new Boolean(true);
+  Object message = "";
+  Object integer = new Integer(0);
+  Object open = new Boolean(true);
 
-    public MessageValue()
-    {
-	super();
+  public MessageValue()
+  {
+    super();
 
-	setText("", null, null);
-	setProperty("integer", integer);
-	setProperty("open", open);
-    }
+    setText("", null, null);
+    setProperty("integer", integer);
+    setProperty("open", open);
+  }
 
-    public void setProperty(String name, Object value)
-    {
-	if(name.equals("message"))
-	    message = value;
-	else if(name.equals("integer"))
-	    integer = value;
-	else if(name.equals("open"))
-	    open = value;
-	else super.setProperty(name, value);
-    }
+  public void setProperty(String name, Object value)
+  {
+    if(name.equals("message"))
+      message = value;
+    else if(name.equals("integer"))
+      integer = value;
+    else if(name.equals("open"))
+      open = value;
+    else super.setProperty(name, value);
+  }
 
-    public Object getProperty(String name)
-    {
-	if(name.equals("message"))
-	    return message;
-	else if(name.equals("integer"))
-	    return integer;
-	else if(name.equals("open"))
-	    return open;
-	else return super.getProperty(name);
-    }
+  public Object getProperty(String name)
+  {
+    if(name.equals("message"))
+      return message;
+    else if(name.equals("integer"))
+      return integer;
+    else if(name.equals("open"))
+      return open;
+    else return super.getProperty(name);
+  }
 
-    public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc)
-    {
-	if(isOnTheButton(evt, x, gc))
-	    {
-		int width, height;
-		boolean open = ((Boolean)getProperty("open")).booleanValue();
-		setProperty("open", new Boolean(!open));
-		
-		String text = ((MessageAdapter)gc.getAdapter()).getLabel(evt);
-		
-		if(!text.equals(""))
-		    height = TextRenderer.getRenderer().getTextHeight(text, gc);
-		else
-		    height = DEFAULT_HEIGHT;
-		
-		if(open) 
-		    width = ((MessageAdapter)gc.getAdapter()).getInvWidth(MessageEventRenderer.BUTTON_WIDTH);
-		else 
-		    {
-			int evtLenght;
-		
-			if(!text.equals(""))
-			    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
-			else
-			    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
-			
-			width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
-		    }
-		//setProperty("duration", new Integer(width));
-		setProperty("duration", new Double(width));
-		setProperty("height", new Integer(height));
-	    }
-    }
-
-    public boolean isOnTheButton(Event evt, int x, SequenceGraphicContext gc)
-    {
-    	return (x-gc.getAdapter().getX(evt) <= MessageEventRenderer.BUTTON_WIDTH);
-
-    }
-
-    public void setText(String text, TrackEvent evt, SequenceGraphicContext gc)
-    {	
-	int width, evtLenght, height;
-
-	if(gc!=null)
-	    {
-		if(!text.equals(""))
-		    {
-			evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
-			height = TextRenderer.getRenderer().getTextHeight(text, gc);
-		    }		
-		else
-		    {
-			evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
-			height = DEFAULT_HEIGHT;
-		    }
-
-		width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
-	    }
-	else 
-	    {
-		width = DEFAULT_WIDTH;
-		height = DEFAULT_HEIGHT;
-	    }
-
-	if(evt != null)
-	    {
-		//for the undo/redo
-		evt.setProperty("message", text);
-		evt.setProperty("duration", new Double(width));
-		evt.setProperty("height", new Integer(height));
-
-		evt.sendSetMessage(MESSAGE_NAME, getPropertyCount(), getPropertyValues());
-	    }
-	else
-	    {
-		setProperty("message", text);
-		
-		//setProperty("duration", new Integer(width));
-		setProperty("duration", new Double(width));
-		
-		setProperty("height", new Integer(height));
-	    }
-    }
-
-    public void updateHeight(TrackEvent evt, SequenceGraphicContext gc)
-    {
-	int height;
-	String text = (String) message;
-
-	if(!text.equals(""))
-	    height = TextRenderer.getRenderer().getTextHeight(text, gc);
-	else
-	    height = DEFAULT_HEIGHT;
-
-	setProperty("height", new Integer(height));
-    }
-
-    public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
-    {
-	int width, evtLenght;
-
-	String text = (String) message;
+  public void edit(int x, int y, int modifiers, Event evt, SequenceGraphicContext gc)
+  {
+    if(isOnTheButton(evt, x, gc))
+      {
+	int width, height;
 	boolean open = ((Boolean)getProperty("open")).booleanValue();
-	if(open)
-	    {
-		if(!text.equals(""))
-		    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
-		else
-		    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
-	    }
+	setProperty("open", new Boolean(!open));
+	
+	String text = ((MessageAdapter)gc.getAdapter()).getLabel(evt);
+	
+	if(!text.equals(""))
+	  height = TextRenderer.getRenderer().getTextHeight(text, gc);
 	else
-	    evtLenght = MessageEventRenderer.BUTTON_WIDTH;
-
-	 width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
+	  height = DEFAULT_HEIGHT;
 	
-	 //setProperty("duration", new Integer(width));
-	 setProperty("duration", new Double(width));
-    }
-
-    public ValueInfo getValueInfo() 
-    {
-	return info;
-    }
-
-    static class MessageValueInfo extends AbstractValueInfo {
-	/**
-	 * Returns the name of this value object */
-	public String getName()
-	{
-	    return MESSAGE_NAME;
-	}
-
-	public String getPublicName()
-	{
-	    return MESSAGE_PUBLIC_NAME;
-	}
-
-	public ImageIcon getIcon()
-	{
-	    return MESSAGE_ICON;
-	}
-
-	public Object newInstance()
-	{
-	    return new MessageValue();
-	}
-	
-	public Enumeration getPropertyNames()
-	{
-	    return new ArrayEnumeration(defNamesArray);
-	}
-	public int getPropertyCount()
-	{
-	    return defPropertyCount;
-	}
-
-	public DataFlavor getDataFlavor()
-	{
-	    return MessageValueDataFlavor.getInstance();
-	}
-
-	public Class getPropertyType(int index)
-	{
-	    /*if(index < defPropertyCount)
-	      return propertyTypesArray[index];
-	      else
-	      return Integer.class;*/
-	    if(index==0)
-		return String.class;
+	if(open) 
+	  width = ((MessageAdapter)gc.getAdapter()).getInvWidth(MessageEventRenderer.BUTTON_WIDTH);
+	else 
+	  {
+	    int evtLenght;
+	    
+	    if(!text.equals(""))
+	      evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
 	    else
-		return Integer.class;
-	}
-	
-	
-	String defNamesArray[] = {"message", "integer"};
-	//Class propertyTypesArray[] = {String.class, Integer.class};
-	int defPropertyCount = 2;
-    }
+	      evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
+	    
+	    width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
+	  }
+	//setProperty("duration", new Integer(width));
+	setProperty("duration", new Double(width));
+	setProperty("height", new Integer(height));
+      }
+  }
 
+  public boolean isOnTheButton(Event evt, int x, SequenceGraphicContext gc)
+  {
+    return (x-gc.getAdapter().getX(evt) <= MessageEventRenderer.BUTTON_WIDTH);    
+  }
+
+  public void setText(String text, TrackEvent evt, SequenceGraphicContext gc)
+  {	
+    int width, evtLenght, height;
+    
+    if(gc!=null)
+      {
+	if(!text.equals(""))
+	  {
+	    evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
+	    height = TextRenderer.getRenderer().getTextHeight(text, gc);
+	  }		
+	else
+	  {
+	    evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
+	    height = DEFAULT_HEIGHT;
+	  }
+	
+	width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
+      }
+    else 
+      {
+	width = DEFAULT_WIDTH;
+	height = DEFAULT_HEIGHT;
+      }
+    
+    if(evt != null)
+      {
+	//for the undo/redo
+	evt.setProperty("message", text);
+	evt.setProperty("duration", new Double(width));
+	evt.setProperty("height", new Integer(height));
+	
+	evt.sendSetMessage(MESSAGE_NAME, getPropertyCount(), getPropertyValues());
+      }
+    else
+      {
+	setProperty("message", text);
+	
+	//setProperty("duration", new Integer(width));
+	setProperty("duration", new Double(width));
+	
+	setProperty("height", new Integer(height));
+      }
+  }
+
+  public void updateHeight(TrackEvent evt, SequenceGraphicContext gc)
+  {
+    int height;
+    String text = (String) message;
+    
+    if(!text.equals(""))
+      height = TextRenderer.getRenderer().getTextHeight(text, gc);
+    else
+      height = DEFAULT_HEIGHT;
+    
+    setProperty("height", new Integer(height));
+  }
+
+  public void updateLength(TrackEvent evt, SequenceGraphicContext gc)
+  {
+    int width, evtLenght;
+    
+    String text = (String) message;
+    boolean open = ((Boolean)getProperty("open")).booleanValue();
+    if(open)
+      {
+	if(!text.equals(""))
+	  evtLenght = TextRenderer.getRenderer().getTextWidth(text, gc)+4+MessageEventRenderer.BUTTON_WIDTH; 
+	else
+	  evtLenght = MessageEventRenderer.DEFAULT_WIDTH;
+      }
+    else
+      evtLenght = MessageEventRenderer.BUTTON_WIDTH;
+    
+    width = ((MessageAdapter)gc.getAdapter()).getInvWidth(evtLenght);
+    
+    //setProperty("duration", new Integer(width));
+    setProperty("duration", new Double(width));
+  }
+
+  public ValueInfo getValueInfo() 
+  {
+    return info;
+  }
+
+  static class MessageValueInfo extends AbstractValueInfo {
     /**
-     * Returns its specialized renderer (an AmbitusEventRenderer) */
-    public SeqObjectRenderer getRenderer()
+     * Returns the name of this value object */
+    public String getName()
     {
-	return MessageEventRenderer.getRenderer();
+      return MESSAGE_NAME;
     }
-  
+    
+    public String getPublicName()
+    {
+      return MESSAGE_PUBLIC_NAME;
+    }
+    
+    public ImageIcon getIcon()
+    {
+      return MESSAGE_ICON;
+    }
+    
+    public Object newInstance()
+    {
+      return new MessageValue();
+    }
+    
     public Enumeration getPropertyNames()
     {
-	return new ArrayEnumeration(nameArray);
+      return new ArrayEnumeration(defNamesArray);
     }
-    
     public int getPropertyCount()
     {
-	return propertyCount;
-    }
-
-    public int getPropertyType(int index)
-    {
-	if(index < propertyCount)
-	    return propertyTypes[index];
-	else return UNKNOWN_TYPE;
-    }
-
-    public String[] getLocalPropertyNames()
-    {
-	return localNameArray;
+      return defPropertyCount;
     }
     
-    public int getLocalPropertyCount()
+    public DataFlavor getDataFlavor()
     {
-	return localPropertyCount;
+      return MessageValueDataFlavor.getInstance();
     }
-   
-    public Object[] getPropertyValues()
+
+    public Class getPropertyType(int index)
     {
-	for(int i = 0; i<propertyCount; i++)
-	    propertyValuesArray[i] = getProperty(nameArray[i]);
+      /*if(index < defPropertyCount)
+	return propertyTypesArray[index];
+	else
+	return Integer.class;*/
+      if(index==0)
+	return String.class;
+      else
+	return Integer.class;
+    }
 	
-	return propertyValuesArray;
-    }
+    
+    String defNamesArray[] = {"message", "integer"};
+    //Class propertyTypesArray[] = {String.class, Integer.class};
+    int defPropertyCount = 2;
+  }
 
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-	for(int i = 0; i<nArgs; i++)
-	    setProperty(nameArray[i], args[i]);
-    }
+  /**
+   * Returns its specialized renderer (an AmbitusEventRenderer) */
+  public SeqObjectRenderer getRenderer()
+  {
+    return MessageEventRenderer.getRenderer();
+  }
+  
+  public Enumeration getPropertyNames()
+  {
+    return new ArrayEnumeration(nameArray);
+  }
+    
+  public int getPropertyCount()
+  {
+    return propertyCount;
+  }
+  
+  public int getPropertyType(int index)
+  {
+    if(index < propertyCount)
+      return propertyTypes[index];
+    else return UNKNOWN_TYPE;
+  }
+  
+  public String[] getLocalPropertyNames()
+  {
+    return localNameArray;
+  }
+  
+  public int getLocalPropertyCount()
+  {
+    return localPropertyCount;
+  }
+  
+  public Object[] getPropertyValues()
+  {
+    for(int i = 0; i<propertyCount; i++)
+      propertyValuesArray[i] = getProperty(nameArray[i]);
+    
+    return propertyValuesArray;
+  }
 
-    public Object[] getLocalPropertyValues()
-    {
-	for(int i = 0; i<localPropertyCount; i++)
-	    propertyValuesArray[i] = getProperty(localNameArray[i]);
+  public void setPropertyValues(int nArgs, Object args[])
+  {
+    for(int i = 0; i<nArgs; i++)
+      setProperty(nameArray[i], args[i]);
+  }
+
+  public Object[] getLocalPropertyValues()
+  {
+    for(int i = 0; i<localPropertyCount; i++)
+      propertyValuesArray[i] = getProperty(localNameArray[i]);
+    
+    return propertyValuesArray;
+  }
+
+  public void setLocalPropertyValues(int nArgs, Object args[])
+  {
+    for(int i = 0; i<nArgs; i++)
+      setProperty(localNameArray[i], args[i]);
+  }
+  
+  public boolean samePropertyValues(Object args[])
+  {
+    return (((String)getProperty("message")).equals((String)args[0]) &&
+	    (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
+  }
+
+  //--- Fields
+  public static final String fs = File.separator;
+  public static final String MESSAGE_NAME = "seqmess";
+  public static final String MESSAGE_PUBLIC_NAME = "message";
+  public static MessageValueInfo info = new MessageValueInfo();
+  public static final int DEFAULT_WIDTH = 290;
+  public static final int DEFAULT_HEIGHT = 13;
+  static String path;
+  public static ImageIcon MESSAGE_ICON;
+  static String nameArray[] = {"message", "integer"};
+  static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};
+  static String localNameArray[] = {"duration", "open", "height"};
+  static int propertyCount = 2;
+  static int localPropertyCount = 3;
+  
+  static 
+  {
+    /*
+      WARNING:
+      Waiting for a method to get the packagePath from the package name
+    */
+    /*try
+      {
+      path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
+      }
+      catch(FileNotFoundException e){
+      //System.err.println("Can't locate sequence images");
+      path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
+      }*/
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
+    /*************************************************************/
 	
-	return propertyValuesArray;
-    }
-
-    public void setLocalPropertyValues(int nArgs, Object args[])
-    {
-	for(int i = 0; i<nArgs; i++)
-	    setProperty(localNameArray[i], args[i]);
-    }
-
-    public boolean samePropertyValues(Object args[])
-    {
-      return (((String)getProperty("message")).equals((String)args[0]) &&
-	      (((Integer)getProperty("integer")).intValue() == ((Integer)args[1]).intValue()));
-    }
-
-    //--- Fields
-    public static final String fs = File.separator;
-    public static final String MESSAGE_NAME = "seqmess";
-    public static final String MESSAGE_PUBLIC_NAME = "message";
-    public static MessageValueInfo info = new MessageValueInfo();
-    public static final int DEFAULT_WIDTH = 290;
-    public static final int DEFAULT_HEIGHT = 13;
-    static String path;
-    public static ImageIcon MESSAGE_ICON;
-    static String nameArray[] = {"message", "integer"};
-    static int propertyTypes[] = {STRING_TYPE, INTEGER_TYPE};
-    static String localNameArray[] = {"duration", "open", "height"};
-    static int propertyCount = 2;
-    static int localPropertyCount = 3;
-
-    static 
-    {
-	/*
-	  WARNING:
-	  Waiting for a method to get the packagePath from the package name
-	*/
-	/*try
-	  {
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+fs+"images"+fs;
-	  }
-	  catch(FileNotFoundException e){
-	  //System.err.println("Can't locate sequence images");
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
-	
-	MESSAGE_ICON = new ImageIcon(path+"message.gif");
-    }
+    MESSAGE_ICON = new ImageIcon(path+"message.gif");
+  }
 }

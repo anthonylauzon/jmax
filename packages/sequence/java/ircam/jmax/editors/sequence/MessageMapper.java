@@ -37,7 +37,7 @@ public class MessageMapper extends StringMapper {
    */
   public void set(Event e, String mess) 
   {
-      e.setProperty("message", mess);
+    e.setProperty("message", mess);
   }
 
   /**
@@ -45,13 +45,13 @@ public class MessageMapper extends StringMapper {
    */
   public String get(Event e) 
   {
-      return (String)e.getProperty("message");
+    return (String)e.getProperty("message");
   }
 
-    public String getName()
-    {
-	return "message";
-    }
+  public String getName()
+  {
+    return "message";
+  }
 
   /**
    * access the static instance

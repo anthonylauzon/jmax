@@ -202,72 +202,72 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
     /**
      * Callback from the model. This is called when a new track is added, but also
      * as a result of a merge */
-    public void trackAdded(Track track)
-    {
-	TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
-	teditor.getGraphicContext().setToolManager(manager);
-	teditor.getGraphicContext().setFrame(itsContainer.getFrame());
-	teditor.getGraphicContext().setScrollManager(this);
-	manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
+  public void trackAdded(Track track)
+  {
+    TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry);
+    teditor.getGraphicContext().setToolManager(manager);
+    teditor.getGraphicContext().setFrame(itsContainer.getFrame());
+    teditor.getGraphicContext().setScrollManager(this);
+    manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
+    
+    trackPanel.remove(verticalGlue);
+    TrackContainer trackContainer = new TrackContainer(track, teditor);
+    trackContainer.setBorder(new EtchedBorder()); 
+    
+    //trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
 
-	trackPanel.remove(verticalGlue);
-	TrackContainer trackContainer = new TrackContainer(track, teditor);
-	trackContainer.setBorder(new EtchedBorder()); 
+    trackPanel.add(trackContainer);
+    trackPanel.add(verticalGlue);
+    
+    trackPanel.validate();
+    scrollTracks.validate();
+    scrollTracks.getVerticalScrollBar().setValue(scrollTracks.getVerticalScrollBar().getMaximum());
+
+    mutex.add(track);
+    trackContainers.put(track, trackContainer);
+
+    teditor.getSelection().addListSelectionListener(this);//????
+    track.setProperty("selected", Boolean.TRUE);
+
+    //added to update maximum time if needed
+    track.getTrackDataModel().addListener(this);    
+    //add sequenceRuler as highlighting listener 
+    track.getTrackDataModel().addHighlightListener(ruler);    
+
+    //resize the frame //////////////////////////////////////////////////////////////
+    int height;	
+    Dimension dim = itsContainer.getFrame().getSize();
+    if(dim.height < SequenceWindow.MAX_HEIGHT)
+      {
+	int tcHeight = trackContainer.getSize().height;
 	
-	//trackContainer.setMaximumSize(new Dimension(trackContainer.getMaximumSize().width, teditor.getDefaultHeight()));//?????
+	if(sequenceData.trackCount() == 1)
+	  itsContainer.getFrame().
+	    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
+	else
+	  if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
+	    itsContainer.getFrame().
+	      setSize(dim.width, dim.height + tcHeight);
+	  else 
+	    if(dim.height < SequenceWindow.MAX_HEIGHT)
+	      itsContainer.getFrame().
+		setSize(dim.width, SequenceWindow.MAX_HEIGHT);
+      }
 
-	trackPanel.add(trackContainer);
-	trackPanel.add(verticalGlue);
-
-	trackPanel.validate();
-	scrollTracks.validate();
-	scrollTracks.getVerticalScrollBar().setValue(scrollTracks.getVerticalScrollBar().getMaximum());
-
-	mutex.add(track);
-	trackContainers.put(track, trackContainer);
-
-	teditor.getSelection().addListSelectionListener(this);//????
-	track.setProperty("selected", Boolean.TRUE);
-
-	//added to update maximum time if needed
-	track.getTrackDataModel().addListener(this);    
-	//add sequenceRuler as highlighting listener 
-	track.getTrackDataModel().addHighlightListener(ruler);    
-
-	//resize the frame //////////////////////////////////////////////////////////////
-	int height;	
-	Dimension dim = itsContainer.getFrame().getSize();
-	if(dim.height < SequenceWindow.MAX_HEIGHT)
-	{
-	    int tcHeight = trackContainer.getSize().height;
-	    
-	    if(sequenceData.trackCount() == 1)
-		itsContainer.getFrame().
-		    setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + ruler.getSize().height + 21 + tcHeight);
-	    else
-		if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
-		    itsContainer.getFrame().
-			setSize(dim.width, dim.height + tcHeight);
-		else 
-		    if(dim.height < SequenceWindow.MAX_HEIGHT)
-			itsContainer.getFrame().
-			    setSize(dim.width, SequenceWindow.MAX_HEIGHT);
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////
-	//updates events in track
-
-	for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
-	    teditor.updateNewObject((TrackEvent)e.nextElement());
+    ///////////////////////////////////////////////////////////////////////////////////
+    //updates events in track
+    
+    for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
+      teditor.updateNewObject((TrackEvent)e.nextElement());
 	
-	itsContainer.getFrame().validate();
-    }
+    itsContainer.getFrame().validate();
+  }
 
-    public void tracksAdded(int maxTime)
-    {
-	if(maxTime>0)
-	  resizePanelToTimeWithoutScroll(maxTime);
-    }
+  public void tracksAdded(int maxTime)
+  {
+    if(maxTime>0)
+      resizePanelToTimeWithoutScroll(maxTime);
+  }
 
     /**
      * Callback from the model. It can be called when two tracks are merged into one */

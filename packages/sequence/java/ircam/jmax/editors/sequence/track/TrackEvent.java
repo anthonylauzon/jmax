@@ -56,7 +56,9 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
 	
 	if(obj instanceof Float) 
 	  obj = new Double(((Float)obj).doubleValue());
-	
+	else if(obj instanceof FtsSymbol)
+	  obj = ((FtsSymbol)obj).toString();
+
 	evtArgs[i] = obj;	  
       }
     
@@ -123,8 +125,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
   /**
    * Set the named property */
   public void setProperty(String name, Object theValue)
-  {
-    
+  {    
     //int intVal;
     double doubleVal;
     
