@@ -60,38 +60,47 @@ fts_symbol_t fts_get_default_root_directory( void)
   return fts_new_symbol( DEFAULT_ROOT);
 }
 
-fts_symbol_t
-fts_get_user_project( void)
+fts_symbol_t fts_get_default_user_directory(void)
 {
-    char* home;
+  char* home;
   char* jmax_user_dir;
-  char path[MAXPATHLEN];
   int size;
   int cumul = 0;
+  fts_symbol_t s_jmax_user_dir;
+
   jmax_user_dir = getenv("JMAX_PREF_DIR");
   if (NULL == jmax_user_dir)
   {
-      home = getenv("HOME");
-      /* don'"t forget to add '/' and '\0' */
-      size = strlen(home) + strlen(PREF_DIR) + 2;
-      jmax_user_dir = (char*)malloc(size * sizeof(char*)); 
-      strncpy(jmax_user_dir + cumul, home, strlen(home));
-      cumul += strlen(home);
-      strncpy(jmax_user_dir + cumul , "/", 1);
-      cumul += 1;
-      strncpy(jmax_user_dir + cumul, PREF_DIR, strlen(PREF_DIR));
-      cumul += strlen(PREF_DIR);
-      jmax_user_dir[cumul] = '\0';
-      fts_make_absolute_path(jmax_user_dir, fts_s_default_project, path, MAXPATHLEN);      
-      free(jmax_user_dir);
+    home = getenv("HOME");
+    /* don'"t forget to add '/' and '\0' */
+    size = strlen(home) + strlen(PREF_DIR) + 2;
+    jmax_user_dir = (char*)malloc(size * sizeof(char*)); 
+    strncpy(jmax_user_dir + cumul, home, strlen(home));
+    cumul += strlen(home);
+    strncpy(jmax_user_dir + cumul , "/", 1);
+    cumul += 1;
+    strncpy(jmax_user_dir + cumul, PREF_DIR, strlen(PREF_DIR));
+    cumul += strlen(PREF_DIR);
+    jmax_user_dir[cumul] = '\0';
+    s_jmax_user_dir = fts_new_symbol(jmax_user_dir);
+    free(jmax_user_dir);
   }
   else
-  {      
-      fts_make_absolute_path(jmax_user_dir, fts_s_default_project, path, MAXPATHLEN);      
+  {
+    s_jmax_user_dir = fts_new_symbol(jmax_user_dir);
   }
 
+  return s_jmax_user_dir;
+}
+
+fts_symbol_t
+fts_get_user_project( void)
+{
+  char path[MAXPATHLEN];
+
+  fts_make_absolute_path(fts_get_default_user_directory(), fts_s_default_project, path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
-      return fts_new_symbol(path);
+    return fts_new_symbol(path);
   }
   
   return NULL;
@@ -103,6 +112,31 @@ fts_get_system_project( void)
   char path[MAXPATHLEN];
 
   fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_project, path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  return NULL;  
+}
+
+
+fts_symbol_t 
+fts_get_user_configuration(void)
+{
+  char path[MAXPATHLEN];
+  fts_make_absolute_path(fts_get_default_user_directory(), fts_s_default_config, path, MAXPATHLEN);
+  if (fts_file_exists(path) && fts_is_file(path)) {
+    return fts_new_symbol(path);
+  }
+
+  return NULL;  
+}
+
+fts_symbol_t 
+fts_get_system_configuration(void)
+{
+  char path[MAXPATHLEN];
+  fts_make_absolute_path(DEFAULT_ROOT, fts_s_default_config, path, MAXPATHLEN);
   if (fts_file_exists(path) && fts_is_file(path)) {
     return fts_new_symbol(path);
   }
@@ -127,18 +161,18 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
   handle = dlopen( filename, RTLD_NOW | RTLD_GLOBAL);
 
   if (!handle)
-    {
-      strcpy( error_description, dlerror());
-      return &load_library_error;
-    }
+  {
+    strcpy( error_description, dlerror());
+    return &load_library_error;
+  }
 
   fun = (void (*)(void))dlsym( handle, symbol);
 
   if ( fun == NULL)
-    {
-      strcpy( error_description, dlerror());
-      return &load_library_error;
-    }
+  {
+    strcpy( error_description, dlerror());
+    return &load_library_error;
+  }
 
   (*fun)();
 
@@ -366,9 +400,10 @@ static void set_priority( int delta)
   sp.sched_priority = sched_get_priority_max( SCHED_FIFO) + delta;
 
   if ( sched_setscheduler( 0, SCHED_FIFO, &sp) < 0)
-    {
-      /* ??? */
-    }    
+  {
+    fts_log("[sched] cannot set scheduling policy to SCHED_FIFO with priority %d\n",
+	    sp.sched_priority);
+  }    
 }
 
 static void abandon_root( void)
@@ -402,12 +437,12 @@ static void watchdog_low( void)
   signal( SIGCHLD, sigchld_signal_handler);
 
   while (1)
-    {
-      if (write( wdpipe[1], "\n", 1) < 1)
-	exit( 1);
+  {
+    if (write( wdpipe[1], "\n", 1) < 1)
+      exit( 1);
 
-      sleep( 1);
-    }
+    sleep( 1);
+  }
 }
 
 static void my_fd_zero( fd_set *fds) __attribute__ ((no_check_memory_usage));
@@ -434,37 +469,37 @@ static void watchdog_high( int fts_pid)
   signal( SIGCHLD, sigchld_signal_handler);
 
   while (1)
-    {
-      struct timeval timeout;
-      fd_set rfds;
-      int r;
+  {
+    struct timeval timeout;
+    fd_set rfds;
+    int r;
 
-      timeout.tv_sec = (armed) ? 1 : 5;
-      timeout.tv_usec = 0;
+    timeout.tv_sec = (armed) ? 1 : 5;
+    timeout.tv_usec = 0;
 
-      my_fd_zero( &rfds);
-      my_fd_set( wdpipe[0], &rfds);
+    my_fd_zero( &rfds);
+    my_fd_set( wdpipe[0], &rfds);
       
-      r = select( wdpipe[0]+1, &rfds, 0, 0, &timeout);
+    r = select( wdpipe[0]+1, &rfds, 0, 0, &timeout);
 
-      if (r > 0)
-	{
-	  char buffer[100];
+    if (r > 0)
+    {
+      char buffer[100];
 
-	  if ( read( wdpipe[0], &buffer, 100) <= 0)
-	    exit( 1);
-
-	  armed = 0;
-	}
-      else if (r == 0)
-	{
-	  armed = 1;
-	  kill( fts_pid, SIGHUP);
-	  fts_log( "watchdog waking up\n"); 
-	}
-      else
+      if ( read( wdpipe[0], &buffer, 100) <= 0)
 	exit( 1);
+
+      armed = 0;
     }
+    else if (r == 0)
+    {
+      armed = 1;
+      kill( fts_pid, SIGHUP);
+      fts_log( "watchdog waking up\n"); 
+    }
+    else
+      exit( 1);
+  }
 }
 
 static int do_fork( void)
@@ -472,10 +507,10 @@ static int do_fork( void)
   int pid;
 
   if ((pid = fork()) < 0)
-    {
-      fts_log( "cannot fork (%s)\n", strerror( errno));
-      exit( 2);
-    }
+  {
+    fts_log( "cannot fork (%s)\n", strerror( errno));
+    exit( 2);
+  }
 
   return pid;
 }
@@ -485,10 +520,10 @@ static void start_watchdog( void)
   int child_pid;
 
   if (pipe( wdpipe) < 0)
-    {
-      fprintf( stderr, "cannot create pipe (%s)\n", strerror( errno));
-      return;
-    }
+  {
+    fprintf( stderr, "cannot create pipe (%s)\n", strerror( errno));
+    return;
+  }
 
   if ((child_pid = do_fork()))
     watchdog_low();
@@ -532,40 +567,40 @@ double fts_systime()
 /* ************************************************** */
 int thread_manager_start(thread_manager_t* self)
 {
-    int success;
-    /* Time to create the thread */
-    success = pthread_create(&self->thread_manager_ID,
-			     NULL,
-			     thread_manager_main,
-			     (void*)self);
+  int success;
+  /* Time to create the thread */
+  success = pthread_create(&self->thread_manager_ID,
+			   NULL,
+			   thread_manager_main,
+			   (void*)self);
 
-    return success;
+  return success;
 }
 
 void* thread_manager_run_thread(void* arg)
 {
-    fts_thread_function_t* thread_func = (fts_thread_function_t*)arg;
-    fts_object_t* object = thread_func->object;
-    fts_method_t method = thread_func->method;
-    fts_symbol_t symbol = thread_func->symbol;
-    int ac = thread_func->ac;
-    fts_atom_t* at = thread_func->at;
-    int delay_ms = thread_func->delay_ms;
-    struct timespec time_req;
-    struct timespec time_rem;
-    time_req.tv_sec = 0;
-    time_req.tv_nsec = delay_ms * 1000 * 1000;
+  fts_thread_function_t* thread_func = (fts_thread_function_t*)arg;
+  fts_object_t* object = thread_func->object;
+  fts_method_t method = thread_func->method;
+  fts_symbol_t symbol = thread_func->symbol;
+  int ac = thread_func->ac;
+  fts_atom_t* at = thread_func->at;
+  int delay_ms = thread_func->delay_ms;
+  struct timespec time_req;
+  struct timespec time_rem;
+  time_req.tv_sec = 0;
+  time_req.tv_nsec = delay_ms * 1000 * 1000;
 
-    while(1)
+  while(1)
+  {
+    if (0 == thread_func->is_dead)
     {
-	if (0 == thread_func->is_dead)
-	{
-	    method(object, fts_system_inlet, symbol, ac, at);
-	}
-	nanosleep(&time_req, &time_rem);
+      method(object, fts_system_inlet, symbol, ac, at);
     }
+    nanosleep(&time_req, &time_rem);
+  }
 
-    return 0;
+  return 0;
 }
 
 
@@ -578,77 +613,85 @@ void* thread_manager_run_thread(void* arg)
  */
 void* thread_manager_main(void* arg)
 {
-    int work_done;
-    int success;
-    thread_manager_t* manager = (thread_manager_t*)arg;
+  int work_done;
+  int success;
+  thread_manager_t* manager = (thread_manager_t*)arg;
 
-    while(1)
+  while(1)
+  {
+    work_done = 0;
+    /* Is there some data in create FIFO */
+    if (fts_fifo_read_level(&manager->create_fifo) >= sizeof(fts_atom_t))
     {
-	work_done = 0;
-	/* Is there some data in create FIFO */
-	if (fts_fifo_read_level(&manager->create_fifo) >= sizeof(fts_atom_t))
+      fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->create_fifo);	    
+      fts_thread_worker_t* worker;
+
+      fts_fifo_incr_read(&manager->create_fifo, sizeof(fts_atom_t));
+
+      worker = (fts_thread_worker_t*)fts_get_pointer(atom);
+	    
+      success = pthread_create((pthread_t *)&worker->id,
+			       NULL,
+			       thread_manager_run_thread,
+			       (void*)worker->thread_function);
+      if (0 != success)
+      {
+	post("[thread_manager] cannot start a new thread \n");
+      }
+      else
+      {
+	/* try to detach thread */
+	success = pthread_detach(worker->id);
+	if (0 != success)
 	{
-	    fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->create_fifo);	    
-	    fts_thread_worker_t* worker;
-
-	    fts_fifo_incr_read(&manager->create_fifo, sizeof(fts_atom_t));
-
-	    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
-	    
-	    success = pthread_create((pthread_t *)&worker->id,
-				     NULL,
-				     thread_manager_run_thread,
-				     (void*)worker->thread_function);
-	    if (0 != success)
-	    {
-		post("[thread_manager] cannot start a new thread \n");
-	    }
-	    else
-	    {
-		/* try to detach thread */
-		success = pthread_detach(worker->id);
-		if (0 != success)
-		{
-		    post("[thread manager] cannot detach thread %d \n", worker->id);
-		}
-		work_done++;
-
-	    }
-
+	  post("[thread manager] cannot detach thread %d \n", worker->id);
 	}
-	/* Is there some data in cancel FIFO */
-	if (fts_fifo_read_level(&manager->cancel_fifo) >= sizeof(fts_atom_t))
-	{
-	    fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->cancel_fifo);	    
-	    fts_thread_worker_t* worker;
+	work_done++;
 
-	    fts_fifo_incr_read(&manager->cancel_fifo, sizeof(fts_atom_t));
+      }
 
-	    worker = (fts_thread_worker_t*)fts_get_pointer(atom);
-	    
-	    success = pthread_cancel(worker->id);
-	    if (0 != success)
-	    {
-		if (ESRCH == success)
-		{
-		    post("[thread manager] no such thread \n");
-		}
-		post("[thread manager] error while cancelling thread \n");
-	    }
-	    work_done++;
-	}
-	if (0 == work_done)
-	{	
-	    int delay_ms = manager->delay_ms;
-	    struct timespec time_req;
-	    struct timespec time_rem;
-	    time_req.tv_sec = 0;
-	    time_req.tv_nsec = delay_ms * 1000 * 1000;
-	    
-	    /* post("[thread_manager] thread is running \n"); */
-	    nanosleep(&time_req, &time_rem);
-	}
     }
+    /* Is there some data in cancel FIFO */
+    if (fts_fifo_read_level(&manager->cancel_fifo) >= sizeof(fts_atom_t))
+    {
+      fts_atom_t* atom = (fts_atom_t*)fts_fifo_read_pointer(&manager->cancel_fifo);	    
+      fts_thread_worker_t* worker;
+
+      fts_fifo_incr_read(&manager->cancel_fifo, sizeof(fts_atom_t));
+
+      worker = (fts_thread_worker_t*)fts_get_pointer(atom);
+	    
+      success = pthread_cancel(worker->id);
+      if (0 != success)
+      {
+	if (ESRCH == success)
+	{
+	  post("[thread manager] no such thread \n");
+	}
+	post("[thread manager] error while cancelling thread \n");
+      }
+      work_done++;
+    }
+    if (0 == work_done)
+    {	
+      int delay_ms = manager->delay_ms;
+      struct timespec time_req;
+      struct timespec time_rem;
+      time_req.tv_sec = 0;
+      time_req.tv_nsec = delay_ms * 1000 * 1000;
+	    
+      /* post("[thread_manager] thread is running \n"); */
+      nanosleep(&time_req, &time_rem);
+    }
+  }
     
-    return NULL;
+  return NULL;
 }
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
