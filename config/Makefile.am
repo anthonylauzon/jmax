@@ -4,18 +4,12 @@ CONFIGURATION_FILES = \
 	default_config_linux_jack.jcfg \
 	default_config_linux_oss.jcfg 
 
-PROJECT_FILES = \
-	default_project.jprj \
-	default_project_linux_alsa.jprj \
-	default_project_linux_jack.jprj \
-	default_project_linux_oss.jprj \
-	default_project_macosx.jprj \
-	default_project_win32.jprj
+PROJECT_FILE = default_project.jprj 
 
 
-EXTRA_DIST= $(CONFIGURATION_FILES) $(PROJECT_FILES)
+EXTRA_DIST= $(CONFIGURATION_FILES) $(PROJECT_FILE)
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(pkgdatadir)
-	$(INSTALL_DATA) $(top_srcdir)/config/@DEFAULT_PROJECT_FILE@ $(DESTDIR)$(pkgdatadir)/default-project.jprj
+	$(INSTALL_DATA) $(top_srcdir)/config/$(PROJECT_FILE) $(DESTDIR)$(pkgdatadir)/default-project.jprj
 	$(INSTALL_DATA) $(top_srcdir)/config/@DEFAULT_CONFIG_FILE@ $(DESTDIR)$(pkgdatadir)/default-config.jcfg
