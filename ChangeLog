@@ -1,3 +1,8 @@
+2003-03-12  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/atom.c: changed ANSI style 'type_id:...' initialization because
+	of compilation problems on Windows.
+
 2003-03-11  Francois Dechelle  <dechelle@limbe.ircam.fr>
 
 	* java/src/ircam/jmax/JMaxApplication.java: fixed overwriting of jmaxServerDir
