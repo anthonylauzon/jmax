@@ -1651,10 +1651,7 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_wh"), fts_patcher_set_wh);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_object"), fts_patcher_add_object_from_client);
-#if 0
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_object"), 
-			    fts_patcher_delete_object_from_client);
-#endif
+
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("delete_objects"), 
 			    fts_patcher_delete_objects_from_client);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_connection"), 

@@ -16,9 +16,6 @@
 /* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
 #undef HAVE_ALLOCA_H
 
-/* Define if you need to in order for stat and other things to work.  */
-#undef _POSIX_SOURCE
-
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
    automatically deduced at run-time.
@@ -75,6 +72,9 @@
 /* Define if you have the <arpa/inet.h> header file.  */
 #undef HAVE_ARPA_INET_H
 
+/* Define if you have the <dlfcn.h> header file.  */
+#undef HAVE_DLFCN_H
+
 /* Define if you have the <netdb.h> header file.  */
 #undef HAVE_NETDB_H
 
@@ -107,10 +107,4 @@
 
 /* Define to enable debug */
 #undef DEBUG
-
-/* Define to equivalent of C99 restrict keyword, or to nothing if this is not supported.  Do not define if restrict is supported directly. */
-#undef restrict
-
-/* Define to equivalent of C99 restrict keyword, or to nothing if this is not supported.  Do not define if restrict is supported directly. */
-#undef restrict
 

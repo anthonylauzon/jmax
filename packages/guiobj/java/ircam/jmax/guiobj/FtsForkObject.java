@@ -54,5 +54,7 @@ public class FtsForkObject extends FtsGraphicObject
 	System.err.println("FtsForkObject: I/O Error sending set_outlets Message!");
 	e.printStackTrace(); 
       }  
+
+    setNumberOfOutlets( nOuts);
   }
 }

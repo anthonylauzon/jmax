@@ -512,17 +512,8 @@ fts_object_unconnect(fts_object_t *obj)
 static void 
 fts_object_unclient(fts_object_t *obj)
 {
-#if 0
-  /* if no id or object ID belongs to new client, do nothing */
-  if (obj->head.id != FTS_NO_ID && !OBJECT_ID_CLIENT( obj->head.id))
-    {
-	/* tell the client to release the Java part */
-	fts_client_release_object(obj);
-
-	/* remove the object from the object table */
-	fts_object_table_remove(obj->head.id);
-    }
-#endif
+  if (obj->head.id != FTS_NO_ID)
+    fts_client_release_object(obj);
 }
 
 /* delete the unbound, unconnected object already removed from the patcher */
@@ -691,9 +682,8 @@ fts_object_redefine(fts_object_t *old, int new_id, int doclient, int ac, const f
   /* if old id and new id are the same, do the replace without telling the client */
   if ((old->head.id != FTS_NO_ID) && (old->head.id == new_id))
     {
-#if 0
-      fts_object_table_remove(old->head.id);
-#endif
+      fts_client_release_object( old);
+
       old->head.id = FTS_NO_ID;
     }
 

@@ -46,13 +46,11 @@ public class Fork extends GraphicObject
   static final int CONST_HEIGHT = 12;
   static final int DEFAULT_OUTLETS = 2;
 
-  private int nOutlets = 0;
-
   public Fork(FtsGraphicObject theFtsObject) 
   {
     super(theFtsObject);
 
-    nOutlets = theFtsObject.getNumberOfOutlets();
+    int nOutlets = ftsObject.getNumberOfOutlets();
     if(nOutlets==0)
 	{
 	    nOutlets = DEFAULT_OUTLETS;
@@ -79,7 +77,7 @@ public class Fork extends GraphicObject
       theWidth = DEFAULT_WIDTH;
     else
       {
-	int minWidth = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH * nOutlets;
+	int minWidth = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH * ftsObject.getNumberOfOutlets();
       
 	if(theWidth < minWidth)
 	  theWidth = minWidth;
@@ -100,6 +98,7 @@ public class Fork extends GraphicObject
 
   public void setWidthShift( int theWidth) 
   {
+    int nOutlets;
     int minWidth = 2 * getOutletDistance() + 2 * ObjectGeometry.INOUTLET_PAD - 1;
 
     if (theWidth < minWidth)
@@ -158,7 +157,7 @@ public class Fork extends GraphicObject
 
   public void paintOutlets(Graphics g)
   {
-    for ( int i = 0; i < nOutlets; i++)
+    for ( int i = 0; i < ftsObject.getNumberOfOutlets(); i++)
       {
 	int x, y;
 
@@ -183,7 +182,8 @@ public class Fork extends GraphicObject
     int w = getWidth();
     int h = getHeight();
     int x_out = getOutletAnchorX(0);
-    
+    int nOutlets = ftsObject.getNumberOfOutlets();
+
     if (!isSelected())
       {
 	g.setColor( Color.lightGray);
