@@ -79,7 +79,7 @@ static void test_get( fts_symbol_t s)
 
   p = fts_variable_get_value( env_patcher, s);
 
-  if (p)
+  if (!fts_is_void( p))
     fprintf( stderr, "%s -> %d\n", fts_symbol_name( s), fts_get_int( p));
   else
     fprintf( stderr, "%s undef\n", fts_symbol_name( s));
@@ -112,34 +112,35 @@ static void test_variables( void)
 
 
 
-extern void fts_kernel_symbol_init( void);
-extern void fts_kernel_hashtable_init( void);
+extern void fts_kernel_abstraction_init( void);
 extern void fts_kernel_atom_init( void);
-extern void fts_kernel_objtable_init( void);
-extern void fts_kernel_class_init( void);
-extern void fts_kernel_doctor_init( void);
-extern void fts_kernel_patcher_init( void);
 extern void fts_kernel_audio_init( void);
-extern void fts_kernel_bytestream_init( void);
 extern void fts_kernel_autosave_init( void);
+extern void fts_kernel_bytestream_init( void);
+extern void fts_kernel_class_init( void);
 extern void fts_kernel_clipboard_init( void);
+extern void fts_kernel_doctor_init( void);
 extern void fts_kernel_dsp_graph_init( void);
 extern void fts_kernel_dsp_init( void);
 extern void fts_kernel_expression_init( void);
 extern void fts_kernel_ftl_init( void);
+extern void fts_kernel_hashtable_init( void);
 extern void fts_kernel_midi_init( void);
 extern void fts_kernel_objtable_init( void);
+extern void fts_kernel_objtable_init( void);
+extern void fts_kernel_oldclient_init( void);
+extern void fts_kernel_oldftsdata_init( void);
+extern void fts_kernel_oldpatcherdata_init( void);
 extern void fts_kernel_param_init( void);
+extern void fts_kernel_patcher_init( void);
 extern void fts_kernel_patparser_init( void);
 extern void fts_kernel_property_init( void);
 extern void fts_kernel_sched_init( void);
 extern void fts_kernel_selection_init( void);
 extern void fts_kernel_soundfile_init( void);
+extern void fts_kernel_symbol_init( void);
 extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
-extern void fts_kernel_oldclient_init( void);
-extern void fts_kernel_oldftsdata_init( void);
-extern void fts_kernel_oldpatcherdata_init( void);
 
 void fts_init( void)
 {
@@ -155,24 +156,25 @@ void fts_init( void)
   fts_kernel_oldpatcherdata_init();
   fts_kernel_variable_init();
   fts_kernel_patcher_init();
+  fts_kernel_expression_init();
+  fts_kernel_ftl_init();
+  fts_kernel_param_init();
+  fts_kernel_dsp_graph_init();
+  fts_kernel_dsp_init();
+  fts_kernel_abstraction_init();
+  fts_kernel_template_init();
 
   /* For the rest, the order is no longer important */
   fts_kernel_audio_init();
   fts_kernel_bytestream_init();
   fts_kernel_autosave_init();
   fts_kernel_clipboard_init();
-  fts_kernel_dsp_graph_init();
-  fts_kernel_dsp_init();
-  fts_kernel_expression_init();
-  fts_kernel_ftl_init();
   fts_kernel_midi_init();
   fts_kernel_objtable_init();
-  fts_kernel_param_init();
   fts_kernel_patparser_init();
   fts_kernel_sched_init();
   fts_kernel_selection_init();
   fts_kernel_soundfile_init();
-  fts_kernel_template_init();
 
   fts_kernel_oldclient_init();
 
