@@ -71,6 +71,7 @@ binop_number_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       else
 	fts_object_signal_runtime_error(o, "Bad value for left operand");
     case 0:
+      break;
     }
 }
 
@@ -88,6 +89,7 @@ binop_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     case 1:
       this->left = at[0];
     case 0:
+      break;
     }
 }
 
@@ -156,6 +158,7 @@ binop_equal_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  else
 	    fts_object_signal_runtime_error(o, "Bad value for left operand");
 	case 0:
+	  break;
 	}
     }
   else
@@ -175,6 +178,7 @@ binop_equal_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  else
 	    fts_object_signal_runtime_error(o, "Bad value for left operand");
 	case 0:
+	  break;
 	}
     }
 }
@@ -192,6 +196,7 @@ binop_equal_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     case 1:
       this->left = at[0];
     case 0:
+      break;
     }
 }
 
