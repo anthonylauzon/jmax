@@ -53,21 +53,19 @@
 (println "jMax is free software with ABSOLUTELY NO WARRANTY.")
 (println "(see file LICENSE for more details)")
 
-(println jmax-server-dir)
-
 (if (string=? jmax-connection "scheme")
     (println "jMax starting server on " jmax-host " via TCP/IP")
-    (if (string=? jmax-connection "scheme")
-	(println "jMax starting server on " jmax-host " via TCP/IP port " jmax-port)
-	(if (string=? jmax-connection "udp")
-	    (println "jMax starting server on " jmax-host " via UDP/IP"))))
+    (if (string=? jmax-connection "udp")
+	(println "jMax starting server on " jmax-host " via UDP")
+	(if (string=? jmax-connection "socket")
+	    (println "jMax starting server on " jmax-host " via UDP/IP port " jmax-port))))
 
 (println "jMax Host type " jmax-host-type)
 
 (if (string=? jmax-mode "debug")
     (println "jMax in DEBUG mode"))
 
-(fts-connect jmax-server-dir jmax-server-name jmax-connection jmax-host "" jmax-port)
+(fts-connect jmax-server-dir jmax-server-name jmax-connection jmax-host "" (string->number jmax-port))
 
 ;;
 ;; hello server

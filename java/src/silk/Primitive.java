@@ -587,7 +587,8 @@ public class Primitive extends Procedure {
   public static int stringCompare(Object x, Object y, boolean ci) {
     if (x instanceof char[] && y instanceof char[]) {
       char[] xc = (char[])x, yc = (char[])y;
-      for (int i = 0; i < xc.length; i++) {
+      int len = (xc.length < yc.length)? xc.length : yc.length;
+      for (int i = 0; i < len; i++) {
 	int diff = (!ci) ? xc[i] - yc[i]
 	  : Character.toUpperCase(xc[i]) - Character.toUpperCase(yc[i]);
 	if (diff != 0) return diff;
