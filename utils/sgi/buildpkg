@@ -96,7 +96,7 @@ guess_arch ()
 # ---------------------------------------------------------------------------
 build_it ()
 {
-    set -x
+    set -ex
 
     /bin/rm -rf $BUILD_DIR
     mkdir -p $BUILD_DIR

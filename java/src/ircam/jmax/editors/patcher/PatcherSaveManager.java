@@ -171,11 +171,21 @@ public class PatcherSaveManager
 
     if (file == null)
       return false;
-    else
+
+    // Test if file exists already
+    if (file.exists())
       {
-	document.bindToDocumentFile( file);
+	int result = JOptionPane.showConfirmDialog( container.getFrame(),
+						    "File \"" + file.getName() + "\" exists.\nOK to overwrite ?",
+						    "Warning",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.WARNING_MESSAGE);
+
+	if ( result != JOptionPane.OK_OPTION)
+	  return false;
       }
 
+    document.bindToDocumentFile( file);
 
     window.setTitle( file.toString()); 
 
@@ -230,6 +240,19 @@ public class PatcherSaveManager
 
     if (file == null)
       return;
+
+    // Test if file exists already
+    if (file.exists())
+      {
+	int result = JOptionPane.showConfirmDialog( container.getFrame(),
+						    "File \"" + file.getName() + "\" exists.\nOK to overwrite ?",
+						    "Warning",
+						    JOptionPane.YES_NO_OPTION,
+						    JOptionPane.WARNING_MESSAGE);
+
+	if ( result != JOptionPane.OK_OPTION)
+	  return false;
+      }
 
     /////////////////////////????????????????
     /*MaxDocumentHandler documentHandler = null;
