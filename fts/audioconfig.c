@@ -403,27 +403,11 @@ audioconfig_upload_label(fts_object_t *o, fts_audiolabel_t *label, int index)
     fts_set_int(args + 1, fts_get_object_id((fts_object_t*)label));
     fts_set_symbol(args + 2, name);
 
-    if(fts_audioport_get_channels(fts_audiolabel_get_port(label, FTS_AUDIO_INPUT), FTS_AUDIO_INPUT) > 0)
-    {
-      fts_set_symbol(args + 3, fts_audiolabel_get_port_name(label, FTS_AUDIO_INPUT));
-      fts_set_int(args + 4, fts_audiolabel_get_channel(label, FTS_AUDIO_INPUT));
-    }
-    else
-    {
-      fts_set_symbol(args + 3, audioconfig_s_unconnected);
-      fts_set_int(args + 4, 0);
-    }
+    fts_set_symbol(args + 3, fts_audiolabel_get_port_name(label, FTS_AUDIO_INPUT));
+    fts_set_int(args + 4, fts_audiolabel_get_channel(label, FTS_AUDIO_INPUT));
 
-    if(fts_audioport_get_channels(fts_audiolabel_get_port(label, FTS_AUDIO_OUTPUT), FTS_AUDIO_OUTPUT) > 0)
-    {
-      fts_set_symbol(args + 5, fts_audiolabel_get_port_name(label, FTS_AUDIO_OUTPUT));
-      fts_set_int(args + 6, fts_audiolabel_get_channel(label, FTS_AUDIO_OUTPUT));
-    }
-    else
-    {
-      fts_set_symbol(args + 5, audioconfig_s_unconnected);
-      fts_set_int(args + 6, 0);
-    }
+    fts_set_symbol(args + 5, fts_audiolabel_get_port_name(label, FTS_AUDIO_OUTPUT));
+    fts_set_int(args + 6, fts_audiolabel_get_channel(label, FTS_AUDIO_OUTPUT));
 
     fts_client_send_message(o, fts_s_insert, 7, args);
   }

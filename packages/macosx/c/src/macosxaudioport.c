@@ -319,12 +319,18 @@ macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       post( "cannot set buffer size");
     }
 
-  fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_INPUT);
-  fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT);
+  /* if port is not opened either in input or output */
+  if (!fts_audioport_is_open( (fts_audioport_t *)self, FTS_AUDIO_INPUT)
+      && !fts_audioport_is_open( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT))
+    {
+      opened_ports_count++;
+      fts_sched_add( o, FTS_SCHED_ALWAYS);
+    }
 
-  opened_ports_count++;
-
-  fts_sched_add( o, FTS_SCHED_ALWAYS);
+  if (s == fts_s_open_input)
+    fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_INPUT);
+  else
+    fts_audioport_set_open( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT);
 }
 
 static void
@@ -347,8 +353,10 @@ macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
     return;
   }
 
-  fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
-  fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+  if (s == fts_s_close_input)
+    fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+  else
+    fts_audioport_unset_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
 
   if (self->master)
     {
@@ -356,7 +364,12 @@ macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
       find_master_port();
     }
   
-  opened_ports_count--;
+  /* if port is closed in both direction */
+  if (!fts_audioport_is_open( (fts_audioport_t *)self, FTS_AUDIO_INPUT)
+      && !fts_audioport_is_open( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT))
+    {
+      opened_ports_count--;
+    }
 
   /* when closing last port, restart scheduler */
   if (opened_ports_count <= 0)
@@ -418,8 +431,6 @@ get_channels( macosxaudioport_t *self, int direction)
   channels = 0;
   for (i = 0; i < buffer_list->mNumberBuffers; i++) 
     channels += buffer_list->mBuffers[i].mNumberChannels;
-
-  fts_audioport_set_channels( (fts_audioport_t *)self, direction, channels);
 
   info = (struct _buffer_info *)fts_malloc( sizeof( struct _buffer_info) * channels);
 
@@ -495,6 +506,7 @@ static void
 macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
+  int channels;
 
   fts_audioport_init( (fts_audioport_t *)self);
 
@@ -504,14 +516,29 @@ macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_INPUT, macosxaudioport_input);
   fts_audioport_set_io_fun((fts_audioport_t*)self, FTS_AUDIO_OUTPUT, macosxaudioport_output);
 
-  if ((get_channels( self, FTS_AUDIO_INPUT)) < 0)
-    fts_object_error( (fts_object_t *)self, "cannot get device configuration");
+  /* get input channel number */
+  if ((channels = get_channels( self, FTS_AUDIO_INPUT)) < 0)
+    {
+      fts_object_error( (fts_object_t *)self, "cannot get device configuration");
+      return;
+    }
 
-  if ((get_channels( self, FTS_AUDIO_OUTPUT)) < 0)
-    fts_object_error( (fts_object_t *)self, "cannot get device configuration");
+  fts_audioport_set_channels( (fts_audioport_t *)self, FTS_AUDIO_INPUT, channels);
 
-  fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
-  fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+  if (channels)
+    fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+
+  /* get output channel number */
+  if ((channels = get_channels( self, FTS_AUDIO_OUTPUT)) < 0)
+    {
+      fts_object_error( (fts_object_t *)self, "cannot get device configuration");
+      return;
+    }
+
+  fts_audioport_set_channels( (fts_audioport_t *)self, FTS_AUDIO_OUTPUT, channels);
+
+  if (channels)
+    fts_audioport_set_valid((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
 
   fts_sched_running_add_listener(o, macosxaudioport_sched_listener);
 }
@@ -657,31 +684,6 @@ macosxaudiomanager_new_device( AudioDeviceID device, fts_symbol_t name)
   fts_atom_t at[2];
   fts_audioport_t *port;
 
-  if (name == NULL)
-    {
-      char *buff;
-      UInt32 count;
-      OSStatus status;
-
-      if ((status = AudioDeviceGetPropertyInfo( device, 0, false, kAudioDevicePropertyDeviceName, &count, NULL)) != noErr)
-	{
-	  print_error( status, AudioDeviceGetPropertyInfo);
-	  return;
-	}
-
-      buff = (char *)fts_malloc( count);
-
-      if ((status = AudioDeviceGetProperty( device, 0, false, kAudioDevicePropertyDeviceName, &count, buff)) != noErr)
-	{
-	  print_error( status, AudioDeviceGetProperty);
-	  return;
-	}
-
-      name = fts_new_symbol( buff);
-
-      fts_free( buff);
-    }
-
   fts_set_int( at, device);
   fts_set_symbol( at+1, name);
   port = (fts_audioport_t *)fts_object_create( macosxaudioport_class, 2, at);
@@ -692,11 +694,11 @@ macosxaudiomanager_new_device( AudioDeviceID device, fts_symbol_t name)
 static void
 macosxaudiomanager_scan_devices( void)
 {
-  UInt32 size, i, count;
+  UInt32 count;
   char *buff;
-  AudioDeviceID *device_list;
   AudioDeviceID default_output_device;
   OSStatus status;
+  fts_symbol_t name;
 
   /* Get the default output device */
   count = sizeof( default_output_device);
@@ -706,8 +708,28 @@ macosxaudiomanager_scan_devices( void)
       return;
     }
 
+  /* Get its name */
+  if ((status = AudioDeviceGetPropertyInfo( default_output_device, 0, false, kAudioDevicePropertyDeviceName, &count, NULL)) != noErr)
+    {
+      print_error( status, AudioDeviceGetPropertyInfo);
+      return;
+    }
+
+  buff = (char *)fts_malloc( count);
+  if ((status = AudioDeviceGetProperty( default_output_device, 0, false, kAudioDevicePropertyDeviceName, &count, buff)) != noErr)
+    {
+      print_error( status, AudioDeviceGetProperty);
+      return;
+    }
+
+  name = fts_new_symbol( buff);
+
+  fts_free( buff);
+
   macosxaudiomanager_new_device( default_output_device, fts_s_default);
-  macosxaudiomanager_new_device( default_output_device, NULL);
+  macosxaudiomanager_new_device( default_output_device, name);
+
+  post( "Using default audio output: %s\n", name);
 }
 #endif
 

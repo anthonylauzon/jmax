@@ -147,7 +147,7 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
   fts_symbol_t selector = (direction == FTS_AUDIO_INPUT) ? fts_s_open_input : fts_s_open_output;
 
   /* Call "open" method when adding first label */
-  if ( !port->inout[direction].used && !fts_audioport_is_open( port, direction))
+  if ( !port->inout[direction].used && fts_audioport_is_valid( port, direction) && !fts_audioport_is_open( port, direction))
     {
       fts_atom_t a[1];
 
@@ -358,6 +358,9 @@ audiolabel_set_port( fts_audiolabel_t *label, int direction, fts_symbol_t port_n
       fts_object_refer( port);
       fts_audioport_add_label( port, direction, label);
     }
+
+  if (!fts_audioport_is_open( port, direction))
+    label->inout[direction].port = NULL;
 }
 
 static void
@@ -401,7 +404,7 @@ audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
   fts_atom_t a[1];
 
   audiolabel_set_port( self, FTS_AUDIO_OUTPUT, port_name);
-
+  
   fts_client_send_message(o, fts_s_output, 1, at);  
 
   /* set channel to 0 */
