@@ -366,6 +366,68 @@ macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
+macosxmidi_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_midimanager_t *mm = (fts_midimanager_t *)o;
+  macosxmidi_t *this = (macosxmidi_t *)o;
+  fts_midilabel_t *label = fts_midimanager_get_labels(mm);
+  fts_iterator_t keys, values;
+  fts_atom_t k, a;
+
+  fts_hashtable_get_keys(&this->sources, &keys);
+  
+  fts_client_start_message( o, fts_s_sources);
+
+  while(fts_iterator_has_more(&keys))
+    {
+      fts_symbol_t name;
+      
+      fts_iterator_next(&keys, &k);
+      name = fts_get_symbol(&k);
+      fts_client_add_symbol( o, fts_get_symbol( name));  
+    }
+  fts_client_done_message( o);  
+
+  fts_hashtable_get_keys(&this->destinations, &keys);
+  
+  fts_client_start_message( o, fts_s_destinations);
+  
+  while(fts_iterator_has_more(&keys))
+    {
+      fts_symbol_t name;
+      fts_iterator_next(&keys, &k);
+      name = fts_get_symbol(&k);
+      fts_client_add_symbol( o, fts_get_symbol( name)); 
+    }
+  fts_client_done_message( o);  
+
+  /*while(label)
+    {
+    fts_symbol_t name = fts_midilabel_get_name(label);
+    macosxmidiport_t *input = (macosxmidiport_t *)fts_midilabel_get_input(label);
+    macosxmidiport_t *output = (macosxmidiport_t *)fts_midilabel_get_output(label);
+    fts_symbol_t input_name, output_name;
+    
+    if(input == NULL)
+    input_name = fts_s_none;
+    else if(fts_object_get_metaclass((fts_object_t *)input) == fts_midiport_type)
+    input_name = fts_s_internal;
+    else
+    input_name = macosxmidiport_get_name(input);
+    
+    if(output == NULL)
+    output_name = fts_s_none;
+    else if(fts_object_get_metaclass((fts_object_t *)output) == fts_midiport_type)
+    output_name = fts_s_internal;
+    else
+    output_name = macosxmidiport_get_name(output);
+    
+    label = fts_midilabel_get_next(label);
+    }*/
+}
+
+
+static void
 macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
@@ -391,6 +453,7 @@ macosxmidi_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, macosxmidi_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, macosxmidi_delete);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_upload, macosxmidi_upload);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_print, macosxmidi_print);
 
