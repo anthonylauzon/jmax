@@ -33,7 +33,7 @@ public class IntegerMapper extends Mapper {
    */
   public void set(Event e, int value) 
   {
-      e.setProperty("integer", new Integer(value));
+    e.setProperty("value", new Integer(value));
   }
 
   /**
@@ -41,7 +41,7 @@ public class IntegerMapper extends Mapper {
    */
   public int get(Event e) 
   {
-    return ((Integer)e.getProperty("integer")).intValue();
+    return ((Integer)e.getProperty("value")).intValue();
   }
 
     public String getName()

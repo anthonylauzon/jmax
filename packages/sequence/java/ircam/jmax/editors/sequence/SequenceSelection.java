@@ -560,7 +560,10 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	  itsCopy.addElement(s.duplicate());
 	}
 
-    } catch (Exception ex) {System.err.println("error while cloning events");}
+    } catch (Exception ex) {
+      System.err.println("error while cloning events");
+      Thread.dumpStack();
+    }
 
   }
 

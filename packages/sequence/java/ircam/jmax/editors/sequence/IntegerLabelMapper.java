@@ -36,15 +36,15 @@ public class IntegerLabelMapper extends StringMapper {
   /**
    * get the pitch from the given event
    */
-    public String get(Event e) 
-    {
-	return (""+((Integer)e.getProperty("integer")).intValue());
-    }
+  public String get(Event e) 
+  {
+    return (""+((Integer)e.getProperty("value")).intValue());
+  }
 
-    public String getName()
-    {
-	return "integer";
-    }
+  public String getName()
+  {
+    return "integer";
+  }
   /**
    * access the static instance of the class */
   public static StringMapper getMapper() 

@@ -147,7 +147,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     itsTrackDataModel.changeEvent(this, name, theValue);
 
     //send the set message to the fts event object
-    sendSetMessage(value.getValueInfo().getName(), itsTrackDataModel.getPropertyCount(), value.getPropertyValues());
+    sendSetMessage( value.getValueInfo().getName(), itsTrackDataModel.getPropertyCount(), value.getPropertyValues());
   }
 
   void sendSetMessage(String type, int nArgs, Object arguments[])
@@ -265,7 +265,7 @@ public class TrackEvent extends FtsObject implements Event, Drawable, UndoableDa
     UtilTrackEvent evt = new UtilTrackEvent();
     evt.setTime(getTime());
     EventValue evtValue = (EventValue)(getValue().getValueInfo().newInstance());
-    evtValue.setPropertyValues( itsTrackDataModel.getPropertyCount(), getValue().getPropertyValues());
+    evtValue.setPropertyValues( getValue().getDefinedPropertyCount()*2, getValue().getDefinedPropertyNamesAndValues());
     evtValue.setLocalPropertyValues( getValue().getLocalPropertyCount(), getValue().getLocalPropertyValues());
     evt.setValue(evtValue);
     return evt;

@@ -101,8 +101,7 @@ public class AdderTool extends Tool implements PositionListener {
     egc.getTrack().getFtsTrack().requestEventCreation((float)aEvent.getTime(), 
 						      value.getValueInfo().getName(), 
 						      value.getDefinedPropertyCount(),
-						      //egc.getDataModel().getPropertyCount(),
-						      value.getPropertyValues());
+						      value.getDefinedPropertyValues());
   }
   
   //-------------- Fields

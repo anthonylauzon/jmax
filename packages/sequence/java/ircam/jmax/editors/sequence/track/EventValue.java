@@ -84,8 +84,12 @@ public interface EventValue
     /**
      * Returns all the property values known by this
      * EventValue like a FtsAtom array */
-    public abstract Object[] getPropertyValues();
+   public abstract Object[] getPropertyValues();
+
+   public abstract Object[] getDefinedPropertyValues();
     
+  public  abstract Object[] getDefinedPropertyNamesAndValues();
+  
     public abstract Object[] getLocalPropertyValues();
 
     public abstract boolean samePropertyValues(Object args[]);

@@ -59,6 +59,9 @@ public class AmbitusValue extends AbstractEventValue
   {
     if(name.equals("pitch"))
       {
+	if(value instanceof Double)
+	  value = new Integer( ((Double)value).intValue());
+	
 	if(((Integer)value).intValue() > 127)
 	  value = new Integer(127);
 	pitch = value;

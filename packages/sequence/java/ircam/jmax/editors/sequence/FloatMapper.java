@@ -33,7 +33,7 @@ public class FloatMapper {
    */
   public void set(Event e, float value) 
   {
-      e.setProperty("float", new Float(value));
+    e.setProperty("value", new Float(value));
   }
 
   /**
@@ -41,13 +41,13 @@ public class FloatMapper {
    */
   public float get(Event e) 
   {
-    return ((Float)e.getProperty("float")).floatValue();
+    return ((Float)e.getProperty("value")).floatValue();
   }
 
   public String getName()
-    {
-	return "float";
-    }
+  {
+    return "float";
+  }
 
   /**
    * access the static instance

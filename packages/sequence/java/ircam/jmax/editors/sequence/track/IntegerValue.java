@@ -35,145 +35,102 @@ import java.awt.datatransfer.*;
  * The EventValue object that represents a Integer event. Is used during score-recognition */
 public class IntegerValue extends AbstractEventValue
 {
-    public IntegerValue()
-    {
-	super();
+  public IntegerValue()
+  {
+    super();
 
-	setProperty("integer", new Integer(0));
-	setProperty("duration", new Double(64.0));
-    }
+    setProperty("value", new Integer(0));
+    setProperty("duration", new Double(64.0));
+  }
 
-    Object intValue, duration;
-    public void setProperty(String name, Object value)
-    {
-	if(name.equals("integer"))
-	    intValue = value;
-	else if(name.equals("duration"))
-	    duration = value;
-	else
-	    super.setProperty(name, value);
+  Object intValue, duration;
+  public void setProperty(String name, Object value)
+  {
+    if(name.equals("value"))
+      intValue = value;
+    else if(name.equals("duration"))
+      duration = value;
+    else
+      super.setProperty(name, value);
   }
   public Object getProperty(String name)
   {
-      if(name.equals("integer"))
-	  return intValue;
-      else if(name.equals("duration"))
-	  return duration;
-      else
-	  return super.getProperty(name);
+    if(name.equals("value"))
+      return intValue;
+    else if(name.equals("duration"))
+      return duration;
+    else
+      return super.getProperty(name);
   }
 
-    public ValueInfo getValueInfo() 
-    {
-	return info;
-    }
+  public ValueInfo getValueInfo() 
+  {
+    return info;
+  }
 
-    static class IntegerValueInfo extends AbstractValueInfo {
-	/**
-	 * Returns the name of this value object */
-	public String getName()
-	{
-	    return INTEGER_NAME;
-	}
-
-	public String getPublicName()
-	{
-	    return INTEGER_PUBLIC_NAME;
-	}
-
-	public ImageIcon getIcon()
-	{
-	    return INTEGER_ICON;
-	}
-
-	public Object newInstance()
-	{
-	    return new IntegerValue();
-	}
-	
-      /*public Enumeration getPropertyNames()
-	{
-	return new ArrayEnumeration(defNamesArray);
-	}
-	public int getPropertyCount()
-	{
-	return defPropertyCount;
-	}*/
-
-	public DataFlavor getDataFlavor()
-	{
-	    return IntegerValueDataFlavor.getInstance();
-	}
-      /*public Class getPropertyType(int index)
-	{
-	return Integer.class;
-	}
-	String defNamesArray[] = {"integer"};
-	int defPropertyCount = 1;*/
-    }
-
+  static class IntegerValueInfo extends AbstractValueInfo {
     /**
-     * Returns its specialized renderer (an AmbitusEventRenderer) */
-    public SeqObjectRenderer getRenderer()
+     * Returns the name of this value object */
+    public String getName()
     {
-	return IntegerEventRenderer.getRenderer();
-    }
-  
-  /*public Enumeration getPropertyNames()
-    {
-    return new ArrayEnumeration(nameArray);
+      return INTEGER_NAME;
     }
 
-    public int getPropertyType(int index)
+    public String getPublicName()
     {
-    if(index < propertyCount)
-    return propertyTypes[index];
-    else return UNKNOWN_TYPE;
+      return INTEGER_PUBLIC_NAME;
     }
     
-    public int getPropertyCount()
+    public ImageIcon getIcon()
     {
-    return propertyCount;
-    }*/
+      return INTEGER_ICON;
+    }
+    
+    public Object newInstance()
+    {
+      return new IntegerValue();
+    }
+    public DataFlavor getDataFlavor()
+    {
+      return IntegerValueDataFlavor.getInstance();
+    }
+  }
+
+  /**
+   * Returns its specialized renderer (an AmbitusEventRenderer) */
+  public SeqObjectRenderer getRenderer()
+  {
+    return IntegerEventRenderer.getRenderer();
+  }
    
-  /*public Object[] getPropertyValues()
-    {
-    for(int i = 0; i<propertyCount; i++)
-    propertyValuesArray[i] = getProperty(nameArray[i]);
-	
-    return propertyValuesArray;
-    }
+  public void setPropertyValues(int nArgs, Object args[])
+  {
+    if( nArgs == 1)
+      setProperty( "value", args[0]);
+    else
+      super.setPropertyValues(nArgs, args);
+  }
 
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-    for(int i = 0; i<nArgs; i++)
-    setProperty(nameArray[i], args[i]);
-    }*/
+  public boolean samePropertyValues(Object args[])
+  {
+    return (((Integer)propertyValuesArray[0]).intValue() == ((Integer)args[0]).intValue());
+  }
 
-    public boolean samePropertyValues(Object args[])
-    {
-	return (((Integer)propertyValuesArray[0]).intValue() == ((Integer)args[0]).intValue());
-    }
-
-    //--- Fields
-    public static final String fs = File.separator;
-    public static final String INTEGER_NAME = "int";
-    public static ImageIcon INTEGER_ICON; 
-    static String path;
-    public static final String INTEGER_PUBLIC_NAME = "integer";
-    public static IntegerValueInfo info = new IntegerValueInfo();
-    public static final int DEFAULT_MAX_VALUE = 127;
-    public static final int DEFAULT_MIN_VALUE = 0;
-
-  /*static String nameArray[] = {"integer"};
-    static int propertyTypes[] = {INTEGER_TYPE};
-    static int propertyCount = 1;*/
-
-    static 
-    {
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-      INTEGER_ICON = new ImageIcon(path+"integer.gif");
-    }
+  //--- Fields
+  public static final String fs = File.separator;
+  public static final String INTEGER_NAME = "int";
+  public static ImageIcon INTEGER_ICON; 
+  static String path;
+  public static final String INTEGER_PUBLIC_NAME = "integer";
+  public static IntegerValueInfo info = new IntegerValueInfo();
+  public static final int DEFAULT_MAX_VALUE = 127;
+  public static final int DEFAULT_MIN_VALUE = 0;
+  
+  static 
+  {
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+    INTEGER_ICON = new ImageIcon(path+"integer.gif");
+  }
 }
 
 

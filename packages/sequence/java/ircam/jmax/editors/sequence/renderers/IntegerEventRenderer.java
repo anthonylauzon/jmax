@@ -158,9 +158,9 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
    * returns true if the given event contains the given (graphic) point
    */
   public boolean contains(Object obj, int x, int y) 
-    {
-	return contains(obj, x, y, gc);
-    }
+  {
+    return contains(obj, x, y, gc);
+  }
 
   /**
    * returns true if the given event contains the given (graphic) point
@@ -175,22 +175,22 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
 
     /* for now the height can be negative for the negative values (to speed the search)*/
     if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
-	{
-	    return ((evtx-POINT_RADIUS <= x) && (evtx+POINT_RADIUS >= x) &&
-		    (evty-POINT_RADIUS <= y ) && (evty+POINT_RADIUS >= y));
-	}
+      {
+	return ((evtx-POINT_RADIUS <= x) && (evtx+POINT_RADIUS >= x) &&
+		(evty-POINT_RADIUS <= y ) && (evty+POINT_RADIUS >= y));
+      }
     else
-	{
-	    int evtheigth = adapter.getHeigth(e);
-	    int evtlenght = adapter.getLenght(e);
-	    if(evtheigth<0)
-		{
-		    evty += evtheigth;
-		    evtheigth = -evtheigth;
-		}
+      {
+	int evtheigth = adapter.getHeigth(e);
+	int evtlenght = adapter.getLenght(e);
+	if(evtheigth<0)
+	  {
+	    evty += evtheigth;
+	    evtheigth = -evtheigth;
+	  }
 
-	    return (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
-	}
+	return (evtx<=x && (evtx+evtlenght >= x) && evty<=y && (evty+evtheigth) >= y);
+      }
   }
 
   Rectangle eventRect = new Rectangle();
@@ -200,9 +200,9 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
    * returns true if the representation of the given event "touches" the given rectangle
    */
   public boolean touches(Object obj, int x, int y, int w, int h)
-    {
-	return touches(obj, x, y, w, h, gc);
-    } 
+  {
+    return touches(obj, x, y, w, h, gc);
+  } 
 
   /**
    * returns true if the representation of the given event "touches" the given rectangle
@@ -211,48 +211,47 @@ public class IntegerEventRenderer implements SeqObjectRenderer {
   {
     Event e = (Event) obj;
     MonoDimensionalAdapter adapter = (MonoDimensionalAdapter)((SequenceGraphicContext) theGc).getAdapter();
-
+    
     int evtx = adapter.getX(e);
     int evty = adapter.getY(e);    
     
     if(adapter.getViewMode() == MonoTrackEditor.BREAK_POINTS_VIEW)
-	{
-	    eventRect.setBounds(evtx-POINT_RADIUS, evty-POINT_RADIUS, 2*POINT_RADIUS+1, 2*POINT_RADIUS+1);
-	}
+      {
+	eventRect.setBounds(evtx-POINT_RADIUS, evty-POINT_RADIUS, 2*POINT_RADIUS+1, 2*POINT_RADIUS+1);
+      }
     else
-	{
-	    int evtheigth = adapter.getHeigth(e);
-	    int evtlenght = adapter.getLenght(e);
-
-	    if(evtheigth<0)
-		{
-		    evty += evtheigth;
-		    evtheigth = -evtheigth;
-		}
-
-	    eventRect.setBounds(evtx, evty, evtlenght, evtheigth);	    
-	}
-
+      {
+	int evtheigth = adapter.getHeigth(e);
+	int evtlenght = adapter.getLenght(e);
+	
+	if(evtheigth<0)
+	  {
+	    evty += evtheigth;
+	    evtheigth = -evtheigth;
+	  }
+	
+	eventRect.setBounds(evtx, evty, evtlenght, evtheigth);	    
+      }
+    
     tempRect.setBounds(x, y, w, h);
-
+    
     return  eventRect.intersects(tempRect);
-
   }
 
-    public static IntegerEventRenderer getRenderer()
-    {
-	if (staticInstance == null)
-	    staticInstance = new IntegerEventRenderer();
-
-	return staticInstance;
-    }
+  public static IntegerEventRenderer getRenderer()
+  {
+    if (staticInstance == null)
+      staticInstance = new IntegerEventRenderer();
+    
+    return staticInstance;
+  }
 
   //------------Fields
-    final static int Integer_HEIGHT = 12;
-
-    SequenceGraphicContext gc;
-    public static IntegerEventRenderer staticInstance;
-    public final static int INTEGER_WIDTH = 2;
-    public final static int POINT_RADIUS = /*4*/5;
+  final static int Integer_HEIGHT = 12;
+  
+  SequenceGraphicContext gc;
+  public static IntegerEventRenderer staticInstance;
+  public final static int INTEGER_WIDTH = 2;
+  public final static int POINT_RADIUS = /*4*/5;
 }
 

@@ -36,11 +36,14 @@ class UndoableAdd extends AbstractUndoableEdit {
 
   public UndoableAdd(TrackEvent theAddedEvent)
   {
-      try {
-	  itsEvent = theAddedEvent.duplicate();
-      } catch (Exception ex) {System.err.println("error while cloning event");}
+    try {
+      itsEvent = theAddedEvent.duplicate();
+    } catch (Exception ex) {
+      System.err.println("error while cloning event");
+      Thread.dumpStack();
+    }
       
-      trkObj = ((FtsTrackObject)theAddedEvent.getDataModel());
+    trkObj = ((FtsTrackObject)theAddedEvent.getDataModel());
   }
   
   public boolean addEdit(UndoableEdit anEdit)
@@ -55,21 +58,20 @@ class UndoableAdd extends AbstractUndoableEdit {
   
   public void redo()
   {
-      SequenceSelection.getCurrent().deselectAll();
-      trkObj.requestEventCreation((float)itsEvent.getTime(), 
-				  itsEvent.getValue().getValueInfo().getName(), 
-				  trkObj.getPropertyCount(), 
-				  itsEvent.getValue().getPropertyValues());
+    SequenceSelection.getCurrent().deselectAll();
+    trkObj.requestEventCreation((float)itsEvent.getTime(), 
+				itsEvent.getValue().getValueInfo().getName(), 
+				itsEvent.getValue().getDefinedPropertyCount(),
+				itsEvent.getValue().getDefinedPropertyValues());
   }  
   
   public void undo()
   { 
-      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
-      if(evt!=null)
-	  trkObj.deleteEvent(evt);
-      else
-	  die();
+    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+    if(evt!=null)
+      trkObj.deleteEvent(evt);
+    else
+      die();
   }
-
 }
 

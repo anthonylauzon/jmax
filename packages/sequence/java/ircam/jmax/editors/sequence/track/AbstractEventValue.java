@@ -87,7 +87,7 @@ public class AbstractEventValue implements EventValue
   }
 
   public static Object[] propertyValuesArray = new Object[128];
-  public Object[] getPropertyValues()
+  public Object[] getDefinedPropertyValues()
   {
     int i = 0;
     Object prop;
@@ -99,16 +99,36 @@ public class AbstractEventValue implements EventValue
       }      
     return propertyValuesArray;
   }
+  public Object[] getPropertyValues()
+  {
+    int i = 0;
+    Object prop;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+      propertyValuesArray[i++] = getProperty( (String)e.nextElement());
+            
+    return propertyValuesArray;
+  }
+  public Object[] getDefinedPropertyNamesAndValues()
+  {
+    int i = 0;
+    Object value;
+    String name;
+    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+      {
+	name = (String)e.nextElement();
+	value = getProperty( name);
+	if( value != UNKNOWN_PROPERTY)
+	  {
+	    propertyValuesArray[i++] = name;
+	    propertyValuesArray[i++] = value;
+	  }   
+      }
+    return propertyValuesArray;
+  }
   public void setPropertyValues(int nArgs, Object args[])
   {
-
-    System.err.println("setPropertyValues nArgs = "+nArgs);
-    for(int i =0; i<nArgs;i++)
-      System.err.println("args["+i+"] = "+args[i]);
-
-    int i = 0;
-    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-      setProperty( (String)e.nextElement(), args[i++]);
+    for(int i = 0; i< nArgs-1; i+=2)
+      setProperty( (String)args[i], args[i+1]);
   }
   
   public int getDefinedPropertyCount()

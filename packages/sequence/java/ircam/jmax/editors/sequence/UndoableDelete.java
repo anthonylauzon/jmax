@@ -38,7 +38,10 @@ class UndoableDelete extends AbstractUndoableEdit {
   {
       try {
 	  itsEvent = theDeletedEvent.duplicate();
-      } catch (Exception ex) {System.err.println("error while cloning event");}
+      } catch (Exception ex) {
+	System.err.println("error while cloning event");	
+	Thread.dumpStack();
+      }
       
       trkObj = ((FtsTrackObject)theDeletedEvent.getDataModel());
   }

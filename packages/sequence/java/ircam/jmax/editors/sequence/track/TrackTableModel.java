@@ -75,20 +75,20 @@ class TrackTableModel extends AbstractTableModel{
    * @see WholeNumberField*/
   public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
   {
-      if(columnIndex == 0) return;
+    if(columnIndex == 0) return;
       
-      Event event = model.getEventAt(rowIndex);
+    Event event = model.getEventAt(rowIndex);
 
-      if (model instanceof UndoableData) //can't make assumptions...
-	((UndoableData) model).beginUpdate(); 
+    if (model instanceof UndoableData) //can't make assumptions...
+      ((UndoableData) model).beginUpdate(); 
       
-      if(columnIndex == 1)
-	event.move(((Double) aValue).doubleValue());
-      else
-	event.setProperty(getColumnName(columnIndex), aValue);
+    if(columnIndex == 1)
+      event.move(((Double) aValue).doubleValue());
+    else
+      event.setProperty(getColumnName(columnIndex), aValue);
 
-      if (model instanceof UndoableData)
-	((UndoableData) model).endUpdate();
+    if (model instanceof UndoableData)
+      ((UndoableData) model).endUpdate();
   }
 
   /**
@@ -102,26 +102,26 @@ class TrackTableModel extends AbstractTableModel{
    * Returns the Name of the given column */
   public String getColumnName(int col)
   {
-      String name;
-      if(col == 0)
-	return "evt. no";
-      else 
-	{
-	  if(col == 1)
-	    return "time";
-	  else
-	    {
-	      int i = 2;
-	      for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
-		{
-		  name = (String)e.nextElement();
-		  if(i==col)
-		    return name;
-		  i++;
-		}
-	    }
-	}
-      return "";
+    String name;
+    if(col == 0)
+      return "evt. no";
+    else 
+      {
+	if(col == 1)
+	  return "time";
+	else
+	  {
+	    int i = 2;
+	    for(Enumeration e = model.getPropertyNames(); e.hasMoreElements();)
+	      {
+		name = (String)e.nextElement();
+		if(i==col)
+		  return name;
+		i++;
+	      }
+	  }
+      }
+    return "";
   }
 
   /**
@@ -137,14 +137,19 @@ class TrackTableModel extends AbstractTableModel{
     if(col == 0)
       return new Integer(row);
     else 
-	{
-	  Event temp = model.getEventAt(row);    
-	    
-	  if(col == 1)
-	    return new Float(temp.getTime());
-	  else
-	    return temp.getValue().getPropertyValues()[col-2];
-	}
+      {
+	Event temp = model.getEventAt(row);    
+	
+	if(col == 1)
+	  return new Float(temp.getTime());
+	else
+	  {
+	    Object val = temp.getValue().getPropertyValues()[col-2];
+	    if( val != EventValue.UNKNOWN_PROPERTY) 
+	      return val;
+	    else return null;
+	  }
+      }
   }
   
   /**

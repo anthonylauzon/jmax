@@ -145,34 +145,6 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     table.scrollRectToVisible(rect);      
   }
 
-    /*
-     * Setup typed editors in table
-     */
-  /*private void setUpEditors() 
-    {
-    table.setDefaultEditor(String.class,  new CellEditorArea(new JTextField()));
-    }*/
-  
-  //--- Fields
-  /*public class CellEditorArea extends DefaultCellEditor
-    {
-    JTextArea area = new JTextArea();
-    JScrollPane scroll;
-    public CellEditorArea(JTextField field)
-    {
-    super(field);
-    scroll = new JScrollPane(area,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    }
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
-    {
-    area.setText(""+table.getValueAt(row, column));
-    return scroll;
-    }
-    public Object getCellEditorValue() {
-    return area.getText();
-    }
-    }*/
-
   TrackTableModel tmodel;
   SequenceGraphicContext gc;
   JScrollPane scrollPane; 

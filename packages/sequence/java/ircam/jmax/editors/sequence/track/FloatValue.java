@@ -39,14 +39,14 @@ public class FloatValue extends AbstractEventValue
   {
     super();
     
-    setProperty("float", new Float(0.0));
+    setProperty("value", new Float(0.0));
     setProperty("duration", new Double(64.0));
   }
 
   Object floatValue, duration;
   public void setProperty(String name, Object value)
   {
-    if(name.equals("float"))
+    if(name.equals("value"))
       if(value instanceof Double)
 	floatValue = new Float(((Double)value).floatValue());
       else
@@ -57,7 +57,7 @@ public class FloatValue extends AbstractEventValue
   }
   public Object getProperty(String name)
   {
-    if(name.equals("float"))
+    if(name.equals("value"))
       return floatValue;
     if(name.equals("duration"))
       return duration;
@@ -93,94 +93,47 @@ public class FloatValue extends AbstractEventValue
       return new FloatValue();
     }
     
-    /*public Enumeration getPropertyNames()
-      {
-      return new ArrayEnumeration(defNamesArray);
-      }
-      public int getPropertyCount()
-      {
-      return defPropertyCount;
-      }*/
-
     public DataFlavor getDataFlavor()
     {
       return FloatValueDataFlavor.getInstance();
-    }
- 
-    /*public Class getPropertyType(int index)
-      {
-      if(index==0)
-      return Float.class;
-      else
-      return Integer.class;
-      }
-
-      String defNamesArray[] = {"float"};
-      int defPropertyCount = 1;*/
+    } 
   }
 
-    /**
-     * Returns its specialized renderer (an AmbitusEventRenderer) */
-    public SeqObjectRenderer getRenderer()
-    {
-      return IntegerEventRenderer.getRenderer();
-    }
+  /**
+   * Returns its specialized renderer (an AmbitusEventRenderer) */
+  public SeqObjectRenderer getRenderer()
+  {
+    return IntegerEventRenderer.getRenderer();
+  }
   
-  /*public Enumeration getPropertyNames()
-    {
-    return new ArrayEnumeration(nameArray);
-    }
+  public void setPropertyValues(int nArgs, Object args[])
+  {
+    if( nArgs == 1)
+      setProperty( "value", args[0]);
+    else
+      super.setPropertyValues(nArgs, args);
+  }
 
-    public int getPropertyType(int index)
-    {
-    if(index < propertyCount)
-    return propertyTypes[index];
-    else return UNKNOWN_TYPE;
-    }
-    
-    public int getPropertyCount()
-    {
-    return propertyCount;
-    }*/
-   
-  /*public Object[] getPropertyValues()
-    {
-    for(int i = 0; i<propertyCount; i++)
-    propertyValuesArray[i] = getProperty(nameArray[i]);
-      
-    return propertyValuesArray;
-    }
+  public boolean samePropertyValues(Object args[])
+  {
+    return (((Float)propertyValuesArray[0]).floatValue() == ((Float)args[0]).floatValue());
+  }
 
-    public void setPropertyValues(int nArgs, Object args[])
-    {
-    for(int i = 0; i<nArgs; i++)
-    setProperty(nameArray[i], args[i]);
-    }*/
+  //--- Fields
+  public static final String fs = File.separator;
+  public static final String FLOAT_NAME = "float";
+  public static ImageIcon FLOAT_ICON; 
+  static String path;
+  public static final String FLOAT_PUBLIC_NAME = "float";
+  public static FloatValueInfo info = new FloatValueInfo();
+  public static final int DEFAULT_MAX_VALUE = 1;
+  public static final int DEFAULT_MIN_VALUE = 0;
 
-    public boolean samePropertyValues(Object args[])
-    {
-      return (((Float)propertyValuesArray[0]).floatValue() == ((Float)args[0]).floatValue());
-    }
-
-    //--- Fields
-    public static final String fs = File.separator;
-    public static final String FLOAT_NAME = "float";
-    public static ImageIcon FLOAT_ICON; 
-    static String path;
-    public static final String FLOAT_PUBLIC_NAME = "float";
-    public static FloatValueInfo info = new FloatValueInfo();
-    public static final int DEFAULT_MAX_VALUE = 1;
-    public static final int DEFAULT_MIN_VALUE = 0;
-
-  /*static String nameArray[] = {"float"};
-    static int propertyTypes[] = {FLOAT_TYPE};
-    static int propertyCount = 1;*/
-
-    static 
-    {
-      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-      FLOAT_ICON = new ImageIcon(path+"float.gif");
-    }
+  static 
+  {
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+    FLOAT_ICON = new ImageIcon(path+"float.gif");
+  }
 }
 
 

@@ -69,7 +69,7 @@ public class FloatTrackEditor extends MonoTrackEditor
   {
     int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
     int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
-    float value = ((Float)((TrackEvent)obj).getProperty("float")).floatValue();
+    float value = ((Float)((TrackEvent)obj).getProperty("value")).floatValue();
     
     if(value>(float)max) itsTrack.setProperty("maximumValue", new Integer((int)value+1));
     if(value<(float)min) itsTrack.setProperty("minimumValue", new Integer((int)value-1));

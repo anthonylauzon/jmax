@@ -774,7 +774,8 @@ track_upload_event(track_t *this, event_t *event, fts_array_t *temp_array)
       {
         fts_atom_t a;
         fts_set_pointer(&a, temp_array);
-        (*method_append_properties)((fts_object_t *)this, 0, 0, 1, &a);
+        /*(*method_append_properties)((fts_object_t *)this, 0, 0, 1, &a);*/
+	(*method_append_properties)( fts_get_object( event_get_value( event)), 0, 0, 1, &a);
       }
 
       size = fts_array_get_size(temp_array);
