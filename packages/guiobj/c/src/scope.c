@@ -438,8 +438,23 @@ scope_dump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   fts_set_float(&a, this->period_msec);
   fts_dumper_send(dumper, sym_set_period, 1, &a);
 
-  fts_set_float(&a, data->threshold);
-  fts_dumper_send(dumper, sym_set_threshold, 1, &a);
+  switch(data->trigger)
+    {
+    case scope_period:
+      fts_set_symbol(&a, sym_off);
+      fts_dumper_send(dumper, sym_set_threshold, 1, &a);
+      break;
+    case scope_auto:
+      fts_set_symbol(&a, sym_auto);
+      fts_dumper_send(dumper, sym_set_threshold, 1, &a);
+      break;
+    case scope_threshold:
+      fts_set_float(&a, data->threshold);
+      fts_dumper_send(dumper, sym_set_threshold, 1, &a);
+      break;
+    default:
+      break;
+    }
 }
 
 static void 
@@ -538,5 +553,5 @@ scope_config(void)
 
   fts_dsp_declare_function(scope_symbol, scope_ftl);  
   fts_class_install(scope_symbol, scope_instantiate);
-  fts_alias_install(fts_new_symbol("scope"), scope_instantiate);
+  fts_alias_install(fts_new_symbol("scope"), scope_symbol);
 }
