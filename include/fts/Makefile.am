@@ -42,8 +42,11 @@ sched.h \
 stack.h \
 status.h \
 symbol.h \
+thread.h \
 time.h \
 tuple.h \
 types.h \
 update.h \
 variable.h
+
+
