@@ -120,6 +120,12 @@ public class Guiobj implements JMaxPackage {
 	  return new VectorDisplay( new FtsVectorDisplayObject( server, parent, objId,  className, args, offset, length));
 	}
       };
+    JMaxObjectCreator matdisplayCreator = new JMaxObjectCreator() {
+	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
+	{
+	  return new MatDisplay( new FtsMatDisplayObject( server, parent, objId,  className, args, offset, length));
+	}
+      };
     JMaxObjectCreator scopeCreator = new JMaxObjectCreator() {
 	public GraphicObject create( FtsServer server, FtsObject parent, int objId, String className, FtsAtom[] args, int offset, int length) 
 	{
@@ -147,6 +153,7 @@ public class Guiobj implements JMaxPackage {
     JMaxClassMap.put( "floatbox", floatboxCreator, "/icons/floatbox.gif", "/icons/floatbox_cursor.gif", this);
     JMaxClassMap.put( "display", displayCreator, "/icons/display.gif", "/icons/display_cursor.gif", this);
     JMaxClassMap.put( "vecdisplay", vecdisplayCreator, "/icons/vecdisplay.gif", "/icons/vecdisplay_cursor.gif", this);
+    JMaxClassMap.put( "matdisplay", matdisplayCreator, "/icons/matdisplay.gif", "/icons/matdisplay_cursor.gif", this);
     JMaxClassMap.put( "scope~", scopeCreator, "/icons/scope.gif", "/icons/scope_cursor.gif", this);
     JMaxClassMap.put( "monitor~", monitorCreator, "/icons/monitor.gif", "/icons/monitor_cursor.gif", this);
   }

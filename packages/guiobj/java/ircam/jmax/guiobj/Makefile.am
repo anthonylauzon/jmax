@@ -21,6 +21,7 @@ FtsScopeObject.java \
 FtsSliderObject.java \
 FtsToggleObject.java \
 FtsVectorDisplayObject.java \
+FtsMatDisplayObject.java \
 Inlet.java \
 InOutlet.java \
 IntBox.java \
@@ -37,7 +38,11 @@ SliderControlPanel.java \
 Toggle.java \
 VecDispControlPanel.java \
 VecDispRModePopUp.java \
-VectorDisplay.java 
+VectorDisplay.java \
+MatDispControlPanel.java \
+MatDispRModePopUp.java \
+MatDisplay.java
+
 
 JAVAC= @JAVACX@
 JAVACFLAGS= @JAVACFLAGSX@

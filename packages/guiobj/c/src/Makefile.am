@@ -22,7 +22,8 @@ runtimeerrors.c \
 scope.c \
 slider.c \
 toggle.c \
-vecdisplay.c
+vecdisplay.c\
+matdisplay.c
 
 
 INCLUDES=-I$(top_srcdir)/packages/data/c/src
