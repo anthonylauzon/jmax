@@ -2036,6 +2036,35 @@ fts_get_root_patcher(void)
   return fts_root_patcher;
 }
 
+
+
+/***********************************************************************
+*
+*  patcher iterator
+*
+*/
+static int 
+patcher_iterator_has_more(fts_iterator_t* i)
+{
+  return i->data != NULL;
+}
+
+static void
+patcher_iterator_next(fts_iterator_t* i, fts_atom_t* p)
+{
+  fts_object_t* o = (fts_object_t*)i->data;
+  fts_set_object(p, o);
+  i->data = fts_object_get_next_in_patcher(o);
+}
+
+void 
+fts_patcher_get_objects(fts_patcher_t* patcher, fts_iterator_t* i)
+{
+  i->has_more = patcher_iterator_has_more;
+  i->next = patcher_iterator_next;
+  i->data = patcher->objects;
+}
+
 /***********************************************************************
 *
 *  top level & variables

@@ -63,7 +63,14 @@ FTS_API void fts_patcher_set_dirty(fts_patcher_t *this, int is_dirty);
 FTS_API fts_patcher_t *fts_get_root_patcher(void);
 
 
-
+/** 
+ * Return an iterator to enumerate all objects contained by the given patcher
+ * 
+ * @fn void fts_patcher_get_object(fts_patcher_t* patcher, fts_iterator_t* i)
+ * @param patcher the patcher
+ * @param i the iterator
+ */
+FTS_API void fts_patcher_get_objects(fts_patcher_t* patcher, fts_iterator_t* i);
 
 
 
