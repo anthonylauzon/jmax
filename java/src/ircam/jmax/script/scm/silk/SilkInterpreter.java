@@ -195,7 +195,7 @@ public class SilkInterpreter extends SchemeInterpreter
 	return load(new InputPort(new StringReader(expr)));
     }
 
-    public Object load(File file) throws ScriptException 
+    public Object loadFile(File file) throws ScriptException 
     {
 	try  {
 	    return load(new InputPort(new FileReader(file)));	
@@ -203,18 +203,6 @@ public class SilkInterpreter extends SchemeInterpreter
 	    throw sex;
 	} catch (Exception e) {
 	    String m = (e.getMessage() != null) ? e.getMessage() : e.getClass().getName();	    
-	    throw new ScriptException(m);
-	}
-    }
-
-    public Object load(String path) throws ScriptException 
-    {
-	try  {
-	    return load(new InputPort(new FileReader(path)));
-	} catch (ScriptException sex) {
-	    throw sex;
-	} catch (Exception ex) {
-	    String m = (ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getName();	    
 	    throw new ScriptException(m);
 	}
     }

@@ -104,10 +104,30 @@ public abstract class SchemeInterpreter implements Interpreter
     public abstract Object lookup(String name);
 
     /** Loads a file. */
-    public abstract Object load(String path) throws ScriptException;
+    public abstract Object loadFile(File file) throws ScriptException;
 
-    /** Loads a file. */
-    public abstract Object load(File file) throws ScriptException;
+    /** Sets the dir directory and loads the file. */
+    public Object load(String filename) throws ScriptException
+    {
+	File file = new File(filename);
+	String dir = file.getParent();
+	Object old_dir = lookup("dir");
+	define("dir", dir);
+	Object result = loadFile(file);
+	define("dir", old_dir);
+	return result;
+    }
+
+    /** Sets the dir directory and loads the file. */
+    public Object load(File file) throws ScriptException
+    {
+	String dir = file.getParent();
+	Object old_dir = lookup("dir");
+	define("dir", dir);
+	Object result = loadFile(file);
+	define("dir", old_dir);
+	return result;
+    }
 
     /** Loads a file. This method does not throw an exception but
      *  displays an error message on the current output. */

@@ -5,7 +5,7 @@ JAR=$(JAVA_HOME)\jar
 all: dir silk jmax jar
 
 dir:
-	-@if not exist "classes" mkdir "classes"
+	-@if not exist "..\java\classes" mkdir "..\java\classes"
 
 jar:
 	-@cd ..\java\classes

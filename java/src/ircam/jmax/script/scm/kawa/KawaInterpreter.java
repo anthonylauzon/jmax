@@ -149,19 +149,10 @@ public class KawaInterpreter extends SchemeInterpreter
 	return itsInterp.eval(expr, getCurrentEnvironment());
     }
 
-    public Object load(File file) throws ScriptException 
+    public Object loadFile(File file) throws ScriptException 
     {
 	try  {
 	    return load(new InPort(new FileReader(file), file.toString()));
-	} catch (IOException e) {
-	    throw new ScriptException(e.getMessage());
-	}
-    }
-
-    public Object load(String path) throws ScriptException 
-    {
-	try  {
-	    return load(new InPort(new FileReader(path), path));
 	} catch (IOException e) {
 	    throw new ScriptException(e.getMessage());
 	}
