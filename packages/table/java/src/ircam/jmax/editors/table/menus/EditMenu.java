@@ -51,7 +51,7 @@ public class EditMenu extends EditorMenu
   {
     public void menuSelected(MenuEvent e)
     {
-      updateMenu();
+      //updateMenu();
     }
 
     public void menuDeselected(MenuEvent e)
@@ -98,7 +98,6 @@ public class EditMenu extends EditorMenu
   {
     Transferable clipboardContent = MaxApplication.systemClipboard.getContents(this);
     DataFlavor[] flavors = clipboardContent.getTransferDataFlavors();
-    
     if(TableSelection.current.isSelectionEmpty())
       {
 	//Empty selection	
