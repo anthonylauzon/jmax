@@ -119,7 +119,6 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
    * and in rare (and wrong) cases where a service object is created
    * without a father
    */
-
   if (patcher)
     fts_patcher_add_object(patcher, obj);
 
@@ -127,7 +126,6 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
 
   {
     /* force type checking during new */
-
     long save_check_status;
 
     save_check_status = fts_mess_get_run_time_check();
@@ -162,8 +160,6 @@ fts_object_new(fts_patcher_t *patcher, int ac, const fts_atom_t *at, fts_object_
 /* Utility functions to assign a property
    as found by the expression parser
    */
-
-
 static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
 {
   fts_object_t *obj = (fts_object_t *)data;
@@ -176,8 +172,6 @@ static void fts_object_assign(fts_symbol_t name, fts_atom_t *value, void *data)
   This function create an object in a patcher, appling all the 
   expression/object semantic
  */
-
-
 fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const fts_atom_t *aot)
 {
   fts_object_t  *obj = 0;
@@ -201,26 +195,20 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
 
 
   /* First of all, we check if we are in the case of a object variable definition syntax */
-
   if ((aoc >= 3) && fts_is_symbol(&aot[0]) && fts_is_symbol(&aot[1]) && (fts_get_symbol(&aot[1]) == fts_s_column))
     {
       /* foo : <obj> syntax; extract the variable name */
-      
       var = fts_get_symbol(&aot[0]);
 
       /* If the variable already exists in this local context, make a double definition error object  */
-
       if (! fts_variable_can_define(patcher, var))
 	{
 	  /* Error: redefined variable */
-
-	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "Variable %s doubly defined", fts_symbol_name(var));
+	  obj = fts_error_object_new(patcher, aoc, aot, "Variable %s doubly defined", fts_symbol_name(var));
 	}
       else
 	{
 	  /* otherwise, set the ac/at pair to skip the variable */
-	  
 	  ac = aoc - 2;
 	  at = aot + 2;
 	}
@@ -233,7 +221,6 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
     }
 
   /* prepare the variable, if defined */
-
   if ((var != 0) && ( ! fts_variable_is_suspended(patcher, var)))
     {
       /* Define the variable, suspended;
@@ -244,11 +231,9 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
     }
 
   /* Then, check for zero arguments, and produce an error object in this case */
-
   if ((! obj) && (aoc == 0))
     {
       /* error: zero arguments */
-
       obj = fts_error_object_new(patcher, aoc, aot, "Zero arguments in object");
     }
 
@@ -291,37 +276,28 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
    */
 
   /* 1-  try the doctor */
-
   if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
     {
       /* If the doctor return null, it means the doctor don't want
 	 to do this particular object, so we just continue */
-
       obj = fts_call_object_doctor(patcher, ac, at);
     }
 
   /* 2- Expression evaluate */
-
-  if (! obj)
+  if (!obj)
     {
       /* Compute the expressions with the correct offset */
-
       e = fts_expression_eval(patcher, ac, at,  1024, new_args);
 	  
       if (fts_expression_get_status(e) != FTS_EXPRESSION_OK)
 	{
 	  /* Error in expression */
-
-	  obj = fts_error_object_new(patcher, aoc, aot,
-				     fts_expression_get_msg(e),
-				     fts_expression_get_err_arg(e));
+	  obj = fts_error_object_new(patcher, aoc, aot, fts_expression_get_msg(e), fts_expression_get_err_arg(e));
 	}
       else if (! fts_is_symbol(&new_args[0]))
 	{
 	  /* Missing class name, or class name is not a symbol */
-
-	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "The first argument should be a class name, but is not a symbol");
+	  obj = fts_error_object_new(patcher, aoc, aot, "The first argument should be a class name, but is not a symbol");
 	}
       else
 	{
@@ -337,42 +313,34 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
 #endif
 
   /* 3- Retry the object doctor */
-
   if ((! obj) && fts_is_symbol(&at[0]) && fts_object_doctor_exists(fts_get_symbol(&at[0])))
     {
       /* If the doctor return null, it means the doctor don't want
 	 to do this particular object, so we just continue */
-
       obj = fts_call_object_doctor(patcher, ac, at);
     }
 
   /* 4- explicitly declared template  */
-
   if (! obj)
     {
       /* First of all, try an explicitly declared abstraction */
-
       obj =  fts_template_new_declared(patcher, ac, at, e);
     }
 
 
   /* 5- explicitly declared abstraction  */
-
   if (! obj)
     {
       /* First of all, try an explicitly declared abstraction */
-
       obj =  fts_abstraction_new_declared(patcher, ac, at);
     }
 
 
   /* 6- Make the object if the FTS class exists */
-
   if ((! obj) && fts_metaclass_get_by_name(fts_get_symbol(&at[0])))
     {
       /* We have a metaclass: this prevent looking for 
 	 further abstractions */
-
       fts_status_t ret;
 
       ret = fts_object_new(patcher, ac, at, &obj);
@@ -394,24 +362,19 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
     }
 
   /* 7- Try a path template  */
-
   if (! obj)
     obj = fts_template_new_search(patcher, ac, at, e);
 
   /* 8 - Try a path abstraction */
-
   if (! obj)
     obj = fts_abstraction_new_search(patcher, ac, at);
 
 
   /* 9- Make an error object */
-
   if (!obj)
     {
       /* Object not found */
-
-      obj = fts_error_object_new(patcher, aoc, aot,
-				 "Object or template %s not found", fts_symbol_name(fts_get_symbol(at)));
+      obj = fts_error_object_new(patcher, aoc, aot, "Object or template %s not found", fts_symbol_name(fts_get_symbol(at)));
     }
 
   /* Check if we are defining a variable *and* we have a state;
@@ -428,11 +391,8 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
 	{
 	  /* ERROR: the object cannot define a variable,
 	     it does not have a "state" property */
-
 	  fts_object_delete_no_release(obj);
-	  obj = fts_error_object_new(patcher, aoc, aot,
-				     "Object %s cannot define a variable",
-				     fts_symbol_name(fts_get_symbol(aot + 2)));
+	  obj = fts_error_object_new(patcher, aoc, aot, "Object can't define a variable");
 	}
     }
 
@@ -444,14 +404,12 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
      We check if the argv exists already; a doctor may have
      changed the object definition, for persistent fixes !!
      */
-
   if ((fts_object_is_patcher(obj) && (! fts_patcher_is_standard((fts_patcher_t *)obj))) || (! obj->argv))
     fts_object_set_description(obj, aoc, aot);
 
   /* Assign the variable references to the object; do it also if
      it is an error object, because we may try to recompute, and recover,
      the object, if one of this variables have been redefined. */
-
   if (e)
     fts_expression_add_variables_user(e, obj);
 
@@ -460,7 +418,6 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
      Note that in case of the template, this operation has been done during the load vm code
      execution; little weird, but needed to avoid object recomputing during loading.
      */
-
   if (e && (! fts_object_is_error(obj)) && (! fts_object_is_template(obj)))
     {
       if (fts_object_is_patcher(obj))
@@ -470,12 +427,10 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
     }
 
   /* Free the expression state structure if any */
-
   if (e)
     fts_expression_state_free(e);
 
   /* then, assign it to the variable if any */
-
   if (var != 0)
     {
       fts_variable_restore(patcher, var, &state, obj);
@@ -486,7 +441,6 @@ fts_object_t *fts_eval_object_description(fts_patcher_t *patcher, int aoc, const
      Always present, and always explicit for the moment,
      until we don't have global daemons again.
    */
-
   {
     fts_atom_t a;
 
@@ -525,14 +479,12 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
      redefine it using a patcher function, otherwise with 
      the object function.
      */
-
   if (fts_object_is_standard_patcher(old))
     obj = (fts_object_t *) fts_patcher_redefine((fts_patcher_t *) old, old->argc, old->argv);
   else
     {
       /* If we have an object with data, data must be released,
 	 because the object will be deleted */
-
       if (old->id != FTS_NO_ID)
 	fts_client_release_object_data(old);
 
@@ -543,7 +495,6 @@ fts_object_t *fts_object_recompute(fts_object_t *old)
 	 property on a non error redefined object; actually
 	 the error property daemon should be a global daemon !
 	 */
-
       if (obj->id != FTS_NO_ID)
 	fts_object_send_kernel_properties(obj);
     }
@@ -561,11 +512,9 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
 
   /* If the new and the old id are the same, or if old do not have an id,
      don't do any update on the client side */
-
   do_client = ((old->id != FTS_NO_ID) && (old->id != new_id));
 
   /* check for the "var : <obj> syntax" and  extract the variable name if any */
-
   if ((ac >= 3) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1]) && (fts_get_symbol(&at[1]) == fts_s_column))
     var = fts_get_symbol(&at[0]);
   else
@@ -576,12 +525,10 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
      if the new object define the same variable,  just suspend it,
      but unregister the old object as definition
      */
-
   if (old->varname && (old->varname == var))
     fts_variable_suspend(old->patcher, old->varname);
 
   /* if old id and new id are the same, do the replace without telling the client */
-
   if ((old->id != FTS_NO_ID) && (old->id == new_id))
     {
       fts_object_table_remove(old->id);
@@ -591,13 +538,11 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
   /* Reset the old object, and call its delete method, so that
      it will release resources that may be needed by the new object,
      like the name for globally named objects like table */
-
   fts_object_reset(old);
 
   /* If the object define a fts_s_release method, send this now,
      and a real delete after the redefining message; otherwise,
      send a delete now and nothing else */
-
   if (fts_send_message(old, fts_SystemInlet, fts_s_release, 0, 0) == fts_Success)
     {
       do_redefining = 1;
@@ -609,17 +554,14 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
     }
 	    
   /* Make the new object  */
-
   new = fts_eval_object_description(fts_object_get_patcher(old), ac, at);
   fts_object_set_id(new, new_id);
   
   /* Update the loading vm */
-
   fts_vm_substitute_object(old, new);
 
   /* If new is an error object, assure that there are enough inlets
    and outlets for the connections */
-
   if (fts_object_is_error(new))
     {
       fts_error_object_fit_inlet(new, old->cl->ninlets - 1);
@@ -630,7 +572,6 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
      (so the properties will be known to the client), then move
      the connections (because the object need to be uploaded in
      order to move the connections) */
-     
   fts_object_move_properties(old, new);
 
   /* If the object define the release method, we tell the new object
@@ -639,7 +580,6 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
     fts_s_redefining message on the system inlet to the new object, as
     the old one as first argument; errors are of course ignored, so
     the method is not mandatory */
-
   if (do_redefining)
     {
       fts_atom_t a;
@@ -657,12 +597,10 @@ fts_object_t *fts_object_redefine(fts_object_t *old, int new_id, int ac, const f
 
   /* Move the connections from the old to the new object,
      tell the client if needed */
-
   fts_object_move_connections(old, new, do_client);
 
   /* Take the object away from the update queue (if there)
      and free it */
-
   fts_object_reset_changed(old);
   fts_object_free(old, do_client);
 
@@ -683,19 +621,16 @@ void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *a
   if (obj->argc == argc)
     {
       /* Just copy the values, the size is correct */
-      
       for (i = 0; i < argc; i++)
 	obj->argv[i] = argv[i];
     }
   else
     {
       /* Free the old object description, if any */
-
       if (obj->argv)
 	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
 
       /* reallocate the description if argc > -0 and copy the arguments */
-
       obj->argc = argc;
 
       if (argc > 0)
@@ -726,7 +661,6 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
   if (obj->argc == argc + 1)
     {
       /* Just copy the values, the size is correct */
-      
       fts_set_symbol(&(obj->argv[0]), class_name);
 
       for (i = 0; i < argc; i++)
@@ -740,9 +674,7 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
 	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
 
       /* reallocate the description if argc > -0 and copy the arguments */
-
       obj->argc = argc + 1;
-      
       obj->argv = (fts_atom_t *) fts_block_zalloc((argc + 1) * sizeof(fts_atom_t));
 
       fts_set_symbol(&(obj->argv[0]), class_name);
@@ -759,8 +691,6 @@ void fts_object_set_description_and_class(fts_object_t *obj, fts_symbol_t class_
    but want to keep the original description, so after creating the object,
    they reset the description, so that the original one is used.
    */
-   
-
 void fts_object_reset_description(fts_object_t *obj)
 {
   int i;
@@ -779,7 +709,6 @@ void fts_object_reset_description(fts_object_t *obj)
    Add the id to the object.
    Called when we know the id, usually in messtiles.c
    */
-
 void fts_object_set_id(fts_object_t *obj, int id)
 {
   /* set the id and put the object in the object table */
@@ -795,7 +724,6 @@ void fts_object_set_id(fts_object_t *obj, int id)
 }
 
 /* Delete, exported  version */
-
 void fts_object_delete(fts_object_t *obj)
 {
   fts_object_reset(obj);
@@ -805,7 +733,6 @@ void fts_object_delete(fts_object_t *obj)
 }
 
 /* Delete an object without telling the client */
-
 static void fts_object_delete_no_release(fts_object_t *obj)
 {
   fts_object_reset(obj);
@@ -821,16 +748,13 @@ static void fts_object_delete_no_release(fts_object_t *obj)
    reinstantiated, all the object depending on him are already
    been recomputed.
    */
-
 static void fts_object_reset(fts_object_t *obj)
 {
   /* Unbind it from its variable if any */
-
   if (fts_object_get_variable(obj))
     fts_variable_undefine(obj->patcher, fts_object_get_variable(obj), obj);
 
   /* Remove it as user of its var refs */
-
   while (obj->var_refs)
     fts_binding_remove_user(obj->var_refs->var, obj);
 }
@@ -846,20 +770,17 @@ static void fts_object_free(fts_object_t *obj, int release)
   int outlet, inlet;
 
   /* delete all the survived connections starting in the object */
-
   for (outlet = 0; outlet < obj->cl->noutlets; outlet++)
     {
       fts_connection_t *p;
 
       /* must call the real disconnect function, so that all the daemons
 	 and methods  can fire correctly */
-
       while ((p = obj->out_conn[outlet]))
 	fts_connection_delete(p);
     }
 
   /* Delete all the survived connections ending in the object */
-
   for (inlet = 0; inlet < obj->cl->ninlets; inlet++)
     {
       fts_connection_t *p;
@@ -876,31 +797,25 @@ static void fts_object_free(fts_object_t *obj, int release)
 
   /* Some internal object don't necessarly have a patcher,
      (they should be put in the root patcher ??) */
-
   if (obj->patcher)
     fts_patcher_remove_object(obj->patcher, obj);
 
   /* Now Tell the client to release the Java part */
-
   if (release && (obj->id != FTS_NO_ID))
     fts_client_release_object(obj);
 
   /* remove the object from the object table */
-
   if (obj->id != FTS_NO_ID)
     fts_object_table_remove(obj->id);
 
   /* free the object properties */
-
   fts_properties_free(obj);
 
   /* Free the object description */
-
   if (obj->argv)
     fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
 
   /* free the object */
-
   if (obj->out_conn)
     fts_block_free((char *)obj->out_conn, obj->cl->noutlets*sizeof(fts_connection_t *));
 
@@ -912,8 +827,6 @@ static void fts_object_free(fts_object_t *obj, int release)
 
 /* Return true if the object is being deleted, i.e. if 
    the patcher (or an ancestor of the patcher) is being deleted */
-
-
 int fts_object_being_deleted(fts_object_t *obj)
 {
   fts_patcher_t *p;
@@ -954,7 +867,6 @@ int fts_object_handle_message(fts_object_t *o, int winlet, fts_symbol_t s)
 }
 
 /* Test recursively if an object is inside a patcher (or its subpatchers) */
-
 int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher)
 {
   if (! obj)
@@ -985,7 +897,6 @@ fts_object_send_properties(fts_object_t *obj)
      been assigned to it),
      ask the object to send the ninlets and noutlets  properties,
      and name and declaration if any. */
-
   if (obj->id != FTS_NO_ID) 
     { 
       fts_object_property_changed(obj, fts_s_x);
@@ -1016,28 +927,24 @@ fts_object_send_properties(fts_object_t *obj)
       fts_object_property_changed(obj, fts_s_color);
 
       /* Ask the object to send to the client object specific properties */
-
       fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
     }
 }
 
 
 /* Properties used by the ui (value for the moment) at run time; update related */
-
 void
 fts_object_send_ui_properties(fts_object_t *obj)
 {
   if (obj->id != FTS_NO_ID)
     {
       /* Ask the object to send to the client object specific UI properties */
-
       fts_send_message(obj, fts_SystemInlet, fts_s_send_ui_properties, 0, 0);
     }
 }
 
 
 /* Properties to be sent after a recomputing; i.e. all the non geometrical properties */
-
 static void
 fts_object_send_kernel_properties(fts_object_t *obj)
 {
@@ -1054,7 +961,6 @@ fts_object_send_kernel_properties(fts_object_t *obj)
       fts_object_property_changed(obj, fts_s_error_description);
 
       /* Ask the object to send to the client object specific properties */
-
       fts_send_message(obj, fts_SystemInlet, fts_s_send_properties, 0, 0);
     }
 }
@@ -1094,7 +1000,6 @@ static void fts_object_move_properties(fts_object_t *old, fts_object_t *new)
 
 /* Send a blip for an object, i.e. a message that will be shown
    in a context dependent place, tipically the status line */
-
 void fts_object_blip(fts_object_t *obj, const char *format , ...)
 {
   fts_atom_t a;
@@ -1119,8 +1024,6 @@ void fts_object_blip(fts_object_t *obj, const char *format , ...)
 
    < "metaclass-name" #id>
  */
-
-
 void fprintf_object(FILE *f, fts_object_t *obj)
 {
   if (! obj)

@@ -195,7 +195,6 @@ struct fts_metaclass
   fts_instantiate_fun_t instantiate_fun;
 
   /* Instance data base */
-
   fts_equiv_fun_t equiv_fun;
   fts_class_t *inst_list;
 
@@ -205,7 +204,6 @@ struct fts_metaclass
 struct fts_class
 {
   /* Object management */
-
   fts_metaclass_t *mcl;
   fts_inlet_decl_t *sysinlet;
 
@@ -218,19 +216,16 @@ struct fts_class
   unsigned int size;
 
   /* Class Instance Data Base support */
-
   int ac;
   const fts_atom_t *at;
   fts_class_t *next;
 
   /* property list handling */
-
   fts_plist_t *properties;		/* class dynamic properties */
 
   struct daemon_list *daemons;
 
   /* User data */
-
   void *user_data;
 };
 
@@ -287,44 +282,34 @@ struct fts_outlet_decl
 struct fts_object
 {
   /* Class pointer  */
-
   fts_class_t *cl;
 
   /* the object description */
-
   int argc;
   fts_atom_t *argv;
 
   /* patcher housekeeping */
-
   fts_patcher_t *patcher;
   fts_object_t  *next_in_patcher;
 
   /* ID housekeeping */
+  int id; /*  id for the object */
 
-  int id;		/*  id for the object */
-
-  /* Variable: If this object is bound to a variable,
-     this is the variable  name */
-
+  /* Variable: If this object is bound to a variable, this is the variable name */
   fts_symbol_t varname;
 
   /* Variables referred by the object */
-
   fts_binding_list_t *var_refs; /* handled completely in the variable.c file */
 
   /* connections */
-
   fts_connection_t **in_conn;
   fts_connection_t **out_conn;
 
   /* object dynamic properties */
-
   fts_plist_t *properties;	
 };
 
 /* Commodity structure to keep a list of objects */
-
 struct fts_object_list
 {
   fts_object_t *obj;
@@ -334,7 +319,6 @@ struct fts_object_list
 
 
 /* Commodity structure to keep a list of bindings */
-
 struct fts_binding_list
 {
   fts_binding_t *var;
@@ -344,7 +328,6 @@ struct fts_binding_list
 
 
 /* Variable structure */
-
 struct fts_binding
 {
   fts_symbol_t   name;
@@ -358,7 +341,6 @@ struct fts_binding
 
 
 /* Variable environment */
-
 struct fts_env
 {
   fts_binding_t *first;
@@ -366,7 +348,6 @@ struct fts_env
 };
 
 /* Patcher structure */
-
 struct fts_patcher
 {
   fts_object_t o;
@@ -384,15 +365,12 @@ struct fts_patcher
   enum {fts_p_standard, fts_p_abstraction, fts_p_error, fts_p_template} type;
 
   /* If this patcher is a template, point to the template definition */
-
   fts_template_t *template;
 
   /* The pointer to the patcher data  */
-
   fts_patcher_data_t *data;
 
   /* Variables */
-
   fts_env_t env;
 };    
 
@@ -416,7 +394,6 @@ struct fts_outlet
 
 
 /* Selection */
-
 struct fts_selection
 {
   fts_object_t ob;

@@ -60,35 +60,18 @@ extern void fts_data_class_define_function( fts_data_class_t *class, int key, ft
  *
  */
 
-struct fts_data {
+struct fts_data 
+{
   fts_data_class_t *class;
-  fts_symbol_t name;
   int id;
-  int cnst; /* flag: non zero if data is constant */
-  int refcnt; /* reference counter */
 };
 
 extern void fts_data_init( fts_data_t *data, fts_data_class_t *class);
 extern void fts_data_delete( fts_data_t *data);
 
-/* (nos): data can be constant */
-#define fts_data_is_const(data) ((data)->cnst != 0)
-#define fts_data_set_const(data) ((data)->cnst = 1)
-#define fts_data_set_var(data) ((data)->cnst = 0)
-
-/* (nos): reference counting */
-#define fts_data_refer(data) (++(data)->refcnt)
-#define fts_data_derefer(data) (--(data)->refcnt)
-#define fts_data_has_no_reference(data) ((data)->refcnt == 0)
-#define fts_data_has_just_one_reference(data) ((data)->refcnt == 1)
-
 /* class name */
 #define fts_data_get_class_name(data) ((data)->class->data_class_name)
 #define fts_data_is(data, cl_name) ((data)->class->data_class_name == (cl_name))
-
-/* name */
-#define fts_data_set_name(data, x) ((data)->name = (x))
-#define fts_data_get_name(data) ((data)->name)
 
 extern int fts_data_get_id( fts_data_t *data);
 extern void fts_data_id_init(void);

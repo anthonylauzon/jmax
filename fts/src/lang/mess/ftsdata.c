@@ -195,11 +195,8 @@ static int new_id(void)
 
 void fts_data_init(fts_data_t *data, fts_data_class_t *class)
 {
-  data->name = 0;
   data->class = class;
   data->id = NO_ID;
-  data->refcnt = 0; /* no reference (yet) */
-  data->cnst = 0; /* not constant */
 }
 
 void fts_data_delete(fts_data_t *data)
@@ -329,10 +326,10 @@ void fts_data_remote_call( fts_data_t *data, int key, int ac, const fts_atom_t *
   if (! fts_data_is_exported(data))
     fts_data_export(data);
 
-  fts_client_mess_start_msg( REMOTE_CALL_CODE);
+  fts_client_mess_start_msg(REMOTE_CALL_CODE);
   fts_client_mess_add_data(data);
   fts_client_mess_add_int(key);
-  fts_client_mess_add_atoms( ac, at);
+  fts_client_mess_add_atoms(ac, at);
   fts_client_mess_send_msg();
 }
 

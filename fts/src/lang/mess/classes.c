@@ -245,12 +245,7 @@ static void fts_class_register( fts_metaclass_t *mcl, int ac, const fts_atom_t *
   store = (fts_atom_t *)cl->at;
 
   for(i=0; i<ac; i++)
-    {
-      if(fts_is_data(at + i))
-	fts_data_refer(fts_get_data(at + i));
-
-      store[i] = at[i];
-    }
+    store[i] = at[i];
 
   cl->next = mcl->inst_list;
   mcl->inst_list = cl;

@@ -25,6 +25,7 @@
 
 SOURCES = $(ARCH_SOURCES) \
 atoms.c		\
+atomarray.c		\
 classes.c	\
 clipboard.c	\
 doctor.c	\

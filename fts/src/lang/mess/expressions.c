@@ -462,7 +462,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	  else if (fts_is_operator(current_in(e)))
 	    {
 	      /* Unary operator, push it and still wait for an argument */
-
 	      if (fts_op_can_be_unary(fts_get_operator(current_in(e))))
 		op_stack_push(e, fts_get_operator(current_in(e)), FTS_UNARY_OP_TYPE);
 	      else
@@ -472,7 +471,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	  else  if (fts_is_quote(current_in(e)))
 	    {
 	      /* Quoted value, eval to the value itself */
-
 	      next_in(e);
 
 	      if (more_in(e))
@@ -480,12 +478,10 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		  value_stack_push(e, current_in(e));
 
 		  /* next_in(e); */
-
 		  status = waiting_op;
 		}
 	      else
-		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
-					"Syntax error, value missing after quote", 0);
+		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error, value missing after quote", 0);
 	    }
 	  else  if (fts_is_open_cpar(current_in(e)))
 	    {
@@ -493,7 +489,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      /* ARRAY constant: note that we don't handle freeing the array,
 		 so somebody should free it !!!
 	       */
-
 	      fts_atom_t *tos;
 	      int args;
 	      fts_atom_t result;
@@ -507,16 +502,14 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      while (more_in(e) && (! fts_is_closed_cpar(current_in(e))))
 		{
 		  /* Evaluate the expression arguments, and push them in the value stack */
-
 		  TRY(fts_expression_eval_one(e));
 
 		  args++;
 		}
 
 	      /* Make the array */
-	      array = fts_atom_array_new_from_atom_list(args, tos);
-	      fts_data_set_const((fts_data_t *)array);
-	      fts_set_data(&result, (fts_data_t *)array);
+	      array = fts_atom_array_new(args, tos + 1);
+	      fts_set_atom_array(&result, array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -531,7 +524,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		  /* Parentesized sub-expression;
 		     recursively call this function, that push the result
 		     value on the value stack */
-
 		  e->in++;
 		  TRY(fts_expression_eval_one(e));
 
@@ -543,12 +535,10 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	      else
 		{
 		  /* Anything else is a constant argument */
-
 		  value_stack_push(e, current_in(e));
 		}
 
 	      /* Compute all the pending unary operators  */
-
 	      while ((! op_stack_is_empty(e)) && (op_type_stack_top(e) == FTS_UNARY_OP_TYPE))
 		{
 		  TRY(fts_op_eval(e));
@@ -677,7 +667,6 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 	}
 
       /* Move to next token, if any */
-
       if (status != expression_end)
 	next_in(e);
 
@@ -741,13 +730,11 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
       if (status == waiting_arg)
 	{
 	  /* Dollars are the only unary operator accepted in simple expressions */
-
 	  if (fts_is_closed_par(current_in(e)))
 	    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Unbalanced closed parentesis", 0);	
 	  else if (fts_is_dollar(current_in(e)))
 	    {
 	      /* Unary operator, push it and still wait for an argument */
-
 	      op_stack_push(e, fts_get_operator(current_in(e)), FTS_UNARY_OP_TYPE);
 	    }
 	  else  if (fts_is_quote(current_in(e)))
@@ -770,7 +757,6 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      /* ARRAY constant: note that we don't handle freeing the array,
 		 so somebody should free it !!!
 	       */
-
 	      fts_atom_t *tos;
 	      int args;
 	      fts_atom_t result;
@@ -779,10 +765,10 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      tos = value_stack_top(e);
 	      args = 0;
 		  
+	      next_in(e);
+		  
 	      while (more_in(e) && (! fts_is_closed_cpar(current_in(e))))
 		{
-		  next_in(e);
-
 		  if (! more_in(e))
 		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in array constant", 0);
 
@@ -790,11 +776,9 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		    break;	
 
 		  /* Evaluate the expression arguments, and push them in the value stack */
-
 		  TRY(fts_expression_eval_one(e));
 
 		  /* Skip the comma if any (little HACK !! for compatibility) */
-
 		  if (fts_is_comma(current_in(e)))
 		    next_in(e);
 
@@ -802,9 +786,8 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		}
 
 	      /* Make the array */
-	      array = fts_atom_array_new_from_atom_list(args, tos + 1);
-	      fts_data_set_const((fts_data_t *)array);
-	      fts_set_data(&result, (fts_data_t *)array);
+	      array = fts_atom_array_new(args, tos + 1);
+	      fts_set_atom_array(&result, array);
 
 	      /* Pop the stack, and push the result */
 	      value_stack_pop(e, args);
@@ -819,7 +802,6 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		  /* Parentesized sub-expression;
 		     recursively call this function, that push the result
 		     value on the value stack */
-
 		  e->in++;
 		  TRY(fts_expression_eval_one(e));
 
@@ -831,12 +813,10 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      else
 		{
 		  /* Anything else is a constant argument */
-
 		  value_stack_push(e, current_in(e));
 		}
 
 	      /* Compute all the pending unary operators  */
-
 	      while ((! op_stack_is_empty(e)) && (op_type_stack_top(e) == FTS_UNARY_OP_TYPE))
 		{
 		  TRY(fts_op_eval(e));
@@ -851,23 +831,18 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	  /* We are waiting for an operator */
 
 	  /* We accept only the '.' operator and the array access syntax */
-
 	  if (fts_is_open_sqpar(current_in(e)))
 	    {
 	      /* Array access */
-
 	      next_in(e);
 
 	      /* Compute the index, and leave it in the value stack */
-
 	      TRY(fts_expression_eval_one(e));
 
 	      if (! fts_is_closed_sqpar(current_in(e)))
-		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR,
-					"Syntax error in Array access", 0);
+		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in Array access", 0);
 
 	      /* Push the array reference operator in the op stack */
-
 	      op_stack_push(e, FTS_OP_ARRAY_REF, FTS_BINARY_OP_TYPE);
 	    }
 	  else if (fts_is_operator(current_in(e)))
@@ -879,7 +854,6 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		  op = fts_get_operator(current_in(e));
 	      
 		  /* execute the pending binary ops with lower precedence  */
-
 		  while (fts_op_before(op_stack_top(e), op) &&
 			 (op_stack_top_p(e) != op_stack_tos))
 		    {
@@ -888,7 +862,6 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 		    }
 
 		  /* Push the new op */
-
 		  op_stack_push(e, op, FTS_BINARY_OP_TYPE);
 		  status = waiting_arg;
 		}
@@ -900,11 +873,10 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	}
 
       /* Move to next token, if any */
-
-      if (status != expression_end)
+      if(status != expression_end)
 	next_in(e);
 
-      if (! more_in(e))
+      if(!more_in(e))
 	status = expression_end;
 
     }
@@ -1385,21 +1357,15 @@ static int fts_op_eval(fts_expression_state_t *e)
 	  break;
 
 	case FTS_OP_ARRAY_REF:
-	  if (fts_is_int(tos) && fts_is_data(ptos) && fts_data_is(fts_get_data(ptos), fts_s_atom_array))
+	  if (fts_is_int(tos) && fts_is_atom_array(ptos))
 	    {
-	      fts_data_t *data = fts_get_data(ptos);
-	      fts_atom_array_t *aa = (fts_atom_array_t *)data;
+	      fts_atom_array_t *aa = fts_get_atom_array(ptos);
 	      int idx = fts_get_int(tos);
 	      
-	      if(fts_data_is_const(data))
-		{
-		  if (fts_atom_array_check_index(aa, idx))
-		    *value_stack_top(e) = fts_atom_array_get_element(aa, idx);
-		  else
-		    return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array index out of bound", 0);
-		}
+	      if (fts_atom_array_check_index(aa, idx))
+		*value_stack_top(e) = fts_atom_array_get_element(aa, idx);
 	      else
-		return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array not constant in constant expression", 0);
+		return expression_error(e, FTS_EXPRESSION_ARRAY_ACCESS_ERROR, "Array index out of bound", 0);
 	    }
 	  else
 	    return expression_error(e, FTS_EXPRESSION_OP_TYPE_ERROR, "Type error for array access", 0);
@@ -1601,13 +1567,12 @@ static int unique(int ac, const fts_atom_t *at, fts_atom_t *result)
 
 static int get_array_element(int ac, const fts_atom_t *at, fts_atom_t *result)
 {
-  if ((ac == 4) && fts_is_int(&at[2]) && fts_is_data(&at[1]) && fts_data_is(fts_get_data(&at[1]), fts_s_atom_array))
+  if ((ac == 4) && fts_is_int(at + 2) && fts_is_atom_array(at + 1))
     {
-      fts_data_t *data = fts_get_data(&at[1]);
-      fts_atom_array_t *array = (fts_atom_array_t *)data;
+      fts_atom_array_t *array = fts_get_atom_array(at + 1);
       int idx = fts_get_int(&at[2]);
 
-      if (fts_data_is_const(data) && fts_atom_array_check_index(array, idx))
+      if (fts_atom_array_check_index(array, idx))
 	*result = fts_atom_array_get_element(array, idx);
       else
 	*result = at[3];

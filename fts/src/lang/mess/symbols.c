@@ -48,11 +48,11 @@ fts_symbol_t fts_s_fun;
 fts_symbol_t fts_s_string;
 fts_symbol_t fts_s_symbol;
 fts_symbol_t fts_s_object;
-fts_symbol_t fts_s_atom_array;
 fts_symbol_t fts_s_connection;
 fts_symbol_t fts_s_true;
 fts_symbol_t fts_s_false;
 fts_symbol_t fts_s_data;
+fts_symbol_t fts_s_atom_array;
 
 
 /* Predefined symbols for the mess system */
