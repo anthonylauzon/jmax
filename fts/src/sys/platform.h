@@ -21,7 +21,7 @@
  *  linux/gnu (gcc) standard basic platform
  *
  */
-#if defined(LINUX)
+#if defined(LINUXPC)
 
 #define FTS_ARCH_NAME "linux"
 #define restrict
