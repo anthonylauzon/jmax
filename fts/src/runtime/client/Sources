@@ -29,7 +29,6 @@ SOURCES = client.c \
 	  sync.c     \
   	  updates.c	\
 	protocol.c	\
-	protcodec.c	\
 
 
 
