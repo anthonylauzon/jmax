@@ -45,7 +45,7 @@
 
 ;;
 ;; The following functions are just a short cut to their longer-named
-;; equivalents in {kawa,silk}_interface.scm.
+;; equivalents in intrinsics.scm.
 ;;
 (define get-fts                      max-application-get-fts)
 (define help-patch                   fts-help-patch-table-add)
@@ -154,7 +154,7 @@
   (scheme-interpreter-get-key-stroke jmax-interp key alt ctrl meta shift))
 
 ;;
-;; script-menu
+;; add-script-menu
 ;;
 ;; Adds a new entry in the script menu. "type" is the document type
 ;; the script handles. Use "all" for all type of documents. "name" is

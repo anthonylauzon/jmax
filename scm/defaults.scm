@@ -65,7 +65,7 @@
 
 ;; set port number needed for socket connection
 
-(define jmax-port "2000")
+(define jmax-port 2000)
 
 ;; default user package path
 

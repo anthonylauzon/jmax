@@ -8,7 +8,6 @@ interpreter-load-scripted-document
 interpreter-convert
 interpreter-ask
 interpreter-add-script-menu
-interpreter-get-package-handler
 scheme-interpreter-is-null
 scheme-interpreter-to-java-string
 scheme-interpreter-load-silently
@@ -23,6 +22,7 @@ max-application-quit
 max-application-install-editor-factory
 max-application-install-document-handler
 max-application-install-document-type
+max-application-get-package-handler
 new-fts
 fts-make-fts-object
 fts-redefine-fts-object
