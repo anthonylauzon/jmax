@@ -41,7 +41,7 @@
  */
 static fts_symbol_t config_s_name;
 
-static fts_class_t* config_type = NULL;
+fts_class_t* config_type = NULL;
 
 static fts_config_t *config;
 
@@ -239,14 +239,17 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   midi_config = (fts_midiconfig_t*)fts_object_create( fts_midiconfig_class, 0, 0);
   fts_object_refer((fts_object_t*)midi_config);
   self->midi_config = midi_config;
-  fts_midiconfig_set_defaults(self->midi_config);
+  /* @@@@@ default midi is set in fts_load_config @@@@@ 
+     fts_midiconfig_set_defaults(self->midi_config); 
+  */
 
   /* create audio config object */
   audio_config = (fts_audioconfig_t*)fts_object_create( fts_audioconfig_class, 0, 0);
   fts_object_refer((fts_object_t*)audio_config);
   self->audio_config = audio_config;
-  fts_audioconfig_set_defaults(self->audio_config);
-
+  /* @@@@@ defautlt audio is now set in fts_load_config @@@@@ 
+     fts_audioconfig_set_defaults(self->audio_config); 
+  */
   /* modify object description */
   fts_set_symbol(&a, config_s_name);
   fts_object_set_description(o, 1, &a);
