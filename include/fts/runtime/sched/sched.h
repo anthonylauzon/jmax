@@ -74,8 +74,6 @@ typedef struct _fts_sched fts_sched_t;
 */
 extern fts_sched_t *fts_sched_get_current( void);
 
-typedef void (*fts_sched_fd_fun_t)( int fd, void *data);
-
 /*
   Function: fts_sched_add_fd
   Description:
