@@ -6,16 +6,7 @@ public class GlobalProbe {
 
   public static void makeGlobalProbe() {
     itsProbe = new Probe("global");
-  }
-
-  public static void start() {
-    if (itsProbe == null) makeGlobalProbe();
-    itsProbe.start();
-  }
-
-  public static void stop() {
-    if (itsProbe != null)
-      itsProbe.stop();
+    itsProbe.setFile( "global");
   }
 
   public static void report() {
@@ -23,14 +14,20 @@ public class GlobalProbe {
       itsProbe.report();
   }
 
-  public static void silentMark() {
-    if (itsProbe != null)
-      itsProbe.silentMark();
-  }
-
   public static void mark(String theMark) {
     if (itsProbe != null) 
       itsProbe.mark(theMark);
   }
+
+  // @deprecated
+  public static void start()
+  {
+  }
+
+  // @deprecated
+  public static void stop()
+  {
+  }
+
 }
 
