@@ -291,6 +291,59 @@ float_vector_remote_update( fts_data_t *data, int ac, const fts_atom_t *at)
   fts_data_end_remote_call();
 }
 
+/********************************************************
+ *
+ *  files
+ *
+ */
+
+#define FLOAT_VECTOR_BLOCK_SIZE 256
+
+static void
+float_vector_grow(float_vector_t *vec, int size)
+{
+  int alloc = vec->alloc;
+
+  while(size > alloc)
+    alloc += FLOAT_VECTOR_BLOCK_SIZE;
+
+  float_vector_set_size(vec, alloc);
+}
+
+int 
+float_vector_import_ascii(float_vector_t *vec, fts_symbol_t file_name)
+{
+  fts_atom_file_t *file = fts_atom_file_open(fts_symbol_name(file_name), "r");
+  int n = 0;
+  fts_atom_t a;
+  char c;
+
+  if(!file)
+    {
+      post("can't open file to read: %s\n", fts_symbol_name(file_name));
+      return (0);
+    }
+
+  while(fts_atom_file_read(file, &a, &c))
+    {
+      if(n >= vec->alloc)
+	float_vector_grow(vec, n);
+
+      if(fts_is_number(&a))
+	float_vector_set_element(vec, n, fts_get_number_float(&a));
+      else
+	float_vector_set_element(vec, n, 0.0f);
+	
+      n++;
+    }
+
+  float_vector_set_size(vec, n);
+  
+  fts_atom_file_close(file);
+
+  return (n);
+}
+
 /********************************************************************
  *
  *  bmax format

@@ -50,6 +50,8 @@ extern void matrix_set_size(matrix_t *mx, int m, int n);
 #define matrix_get_m(mx) ((mx)->m)
 #define matrix_get_n(mx) ((mx)->n)
 
+#define matrix_get_ptr(vec) ((mx)->data)
+
 extern void matrix_set_element(matrix_t *mx, int i, int j, fts_atom_t atom);
 #define matrix_get_element(mx, i, j) ((mx)->data[(i) * (mx)->n + (j)])
 extern void matrix_void_element(matrix_t *mx, int i, int j);
@@ -73,6 +75,7 @@ extern int matrix_export_ascii_separator(matrix_t *mx, fts_symbol_t file_name, f
 #define matrix_create(ac, at) ((matrix_t *)refdata_create(matrix_reftype, (ac), (at)))
 #define matrix_refer(v) refdata_refer(v)
 #define matrix_release(v) refdata_release(v)
+#define matrix_no_reference(v) refdata_no_reference(v)
 #define matrix_set_creator(v, c) refdata_set_creator((v), (c))
 
 /* atom matrix atoms */

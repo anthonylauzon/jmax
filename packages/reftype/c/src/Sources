@@ -26,10 +26,9 @@
 SOURCES = \
 reftype.c \
 refdata.c \
+vector.c \
 intvec.c \
 floatvec.c \
-vector.c \
 matrix.c \
-getelem.c \
-getsize.c \
+
 

@@ -43,6 +43,8 @@ extern vector_t *vector_new(int size);
 #define vector_set_size(vec, n) (matrix_set_size((vector_t *)(vec), (n), 1))
 #define vector_get_size(vec) (((matrix_t *)(vec))->m)
 
+#define vector_get_ptr(vec) (((matrix_t *)(vec))->data)
+
 #define vector_set_element(vec, i, v) (matrix_set_element(vec, i, 0, v))
 #define vector_get_element(vec, i) (matrix_get_element(vec, i, 0))
 #define vector_void_element(vec, i) (matrix_void_element(vec, i, 0))
@@ -59,6 +61,7 @@ extern int vector_export_ascii(vector_t *vec, fts_symbol_t file_name);
 #define vector_create(ac, at) ((vector_t *)refdata_create(vector_reftype, (ac), (at)))
 #define vector_refer(v) refdata_refer(v)
 #define vector_release(v) refdata_release(v)
+#define vector_no_reference(v) refdata_no_reference(v)
 #define vector_set_creator(v, c) refdata_set_creator((v), (c))
 
 /* atom array atoms */

@@ -72,8 +72,15 @@ extern void float_vector_config(void);
 extern void vector_config(void);
 extern void matrix_config(void);
 
+extern void ivec_config(void);
+extern void fvec_config(void);
+extern void mat_config(void);
+
 extern void getelem_config(void);
 extern void getsize_config(void);
+extern void getlist_config(void);
+
+extern void fill_config(void);
 
 static void
 reftype_init(void)
@@ -85,8 +92,15 @@ reftype_init(void)
   vector_config();
   matrix_config();
 
+  ivec_config();
+  fvec_config();
+  mat_config();
+
   getelem_config();  
   getsize_config();  
+  getlist_config();  
+
+  fill_config();
 }
 
 fts_module_t reftype_module = {"reftype", "reftype classes", reftype_init};

@@ -80,12 +80,11 @@ vector_import_ascii(vector_t *vec, fts_symbol_t file_name)
 
   while(fts_atom_file_read(file, &a, &c))
     {
-      n++;
-
-      if(n > vec->alloc)
+      if(n >= vec->alloc)
 	vector_grow(vec, n);
 
       vec->data[n] = a;
+      n++;
     }
 
   vector_set_size(vec, n);

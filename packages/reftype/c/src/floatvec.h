@@ -70,6 +70,9 @@ extern float float_vector_get_sub_sum(float_vector_t *vector, int from, int to);
 extern float float_vector_get_min_value(float_vector_t *vector);
 extern float float_vector_get_max_value(float_vector_t *vector);
 
+/* files */
+extern int float_vector_import_ascii(float_vector_t *vec, fts_symbol_t file_name);
+
 /* save in bmax format */
 extern void float_vector_save_bmax(float_vector_t *vector, fts_bmax_file_t *f);
 
@@ -78,6 +81,7 @@ extern void float_vector_save_bmax(float_vector_t *vector, fts_bmax_file_t *f);
 #define float_vector_create(ac, at) ((float_vector_t *)refdata_create(float_vector_reftype, (ac), (at)))
 #define float_vector_refer(v) refdata_refer(v)
 #define float_vector_release(v) refdata_release(v)
+#define float_vector_no_reference(v) refdata_no_reference(v)
 #define float_vector_set_creator(v, c) refdata_set_creator((v), (c))
 
 /* float_vector atoms */
