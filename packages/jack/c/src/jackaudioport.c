@@ -1,6 +1,6 @@
 /*
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, Fance.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
  * This file include the jMax JACK audio port.
  */
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/select.h>
 #include <math.h>
@@ -31,111 +32,178 @@
 #include <fts/fts.h>
 
 
-#define MY_DEFAULT_FREQ 8.
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif /* M_PI */
-
-#define DEFAULT_FRAME_SIZE 128
-
 typedef struct
 {
     fts_audioport_t head;
     jack_client_t* client;
+    /* TODO: 
+       Change structure if we want several input and output .
+       But maybe it should be several jackaudioport, in this case we have to choose
+       unique jack_client name */
     jack_port_t* input_port;
     jack_port_t* output_port;
+    /* TODO:
+       If we add several input/output  port, we should want several input/output buffer
+     */
     float* input_buffer;
     float* output_buffer;
+    /* TODO:
+       Frame size could be changed by jack, we need to add a callback for buffer size 
+       change */
     int nframes;
+    /* TODO:
+       sampling rate could be changed by jack, we need to add a callback for sampling 
+       rate change */
     unsigned long samplingRate;
+    /* TODO:
+       Maybe it could be good to add the client name in the structure 
+    */
 } jackaudioport_t;
+/* Do we want connection set by jMax or by an external program ? */
+   
 
+static fts_symbol_t s_default;
+
+#define JACKAUDIOPORT_DEFAULT_CLIENT_NAME s_default
+
+#define JACKAUDIOPORT_DEFAULT_FRAME_SIZE 128
+#define JACKAUDIOPORT_CLIENT_NAME_MAX_LENGTH 256
+
+/* Input function of fts_audioport */
+/* TODO:
+   Change this function to be able to deal with several channels 
+*/
 static void
 jackaudioport_input(fts_word_t* argv)
 {
     jackaudioport_t* this;
-    int n, channels, ch, i, j;
+    int n;
+    int channels;
     float* out;
 
     this = (jackaudioport_t*)fts_word_get_pointer(argv + 0);
+    /* get number of sample in buffer */
     n = fts_word_get_int(argv + 1);
+    /* get number of channels */
     channels = fts_audioport_get_input_channels((fts_audioport_t*)this);
+    /* get object output buffer */
     out = (float*)fts_word_get_pointer(argv + 2);
-
-    for (i = 0; i < n; ++i)
-    {
-	out[i] = this->input_buffer[i];
-    }
+    /* only a copy from jack buffer to object output */
+    /* TODO:
+       - What happen if n is greater than input_buffer allocated space
+       - Check what can happen if jack try to write in buffer, when we are doing 
+       the copy 
+    */
+    memcpy(out, this->input_buffer, n * sizeof(float));
 }
 
+/* Output function of fts_audioport */
+/* TODO:
+   Change this function to be able to deal with several channels 
+*/
 static void
 jackaudioport_output(fts_word_t* argv)
 {
     jackaudioport_t* this;
-    int n, channels, ch, i, j;
+    int n;
+    int channels;
+
     float* in;
     this = (jackaudioport_t*)fts_word_get_pointer(argv + 0);
+
+    /* get number of sample in buffer */  
     n = fts_word_get_int(argv + 1);
+    /* get number of channels */
     channels = fts_audioport_get_output_channels((fts_audioport_t*)this);
+    
+    /* get object input buffer */
     in = (float*)fts_word_get_pointer(argv + 2 );
 
-    for (i = 0; i < n; ++i)
-    {
-	this->output_buffer[i] = in[i];
-    }
-    
+    /* only a copy from object input to jack buffer */
+    /* TODO:
+       - What happen if n is greater than input_buffer allocated space
+       - Check what can happen if jack try to read in buffer, when we are doing 
+       the copy 
+    */
+    memcpy(this->output_buffer, in, n * sizeof(float));    
 }
 
+/* JACK callback */
+/* TODO:
+   Change this function if we want more JACK port 
+*/
 static
 int jackaudioport_process(jack_nframes_t nframes, void* arg)
 {
 
     jackaudioport_t* this = (jackaudioport_t*)arg;
+    /* Get JACK output port buffer pointer */
     jack_default_audio_sample_t* out = (jack_default_audio_sample_t*)jack_port_get_buffer(this->output_port, nframes);
+    /* Get JACK input port buffer pointer */
     jack_default_audio_sample_t* in = (jack_default_audio_sample_t*)jack_port_get_buffer(this->input_port, nframes);
     
     int n = 0;
+    /* get number of samples of a FTS tick */
     int samples_per_tick = fts_dsp_get_tick_size();
 
+    /* TODO: 
+       Check if in/out are valid pointer 
+    */
     this->input_buffer = in;
     this->output_buffer = out;
     
+    /* TODO: 
+       Need to be fix if (nframes % samples_per_tick != 0) 
+
+       Case 1: nframes < samples_per_tick
+       
+       Case 2: nframes > samples_per_tick
+
+    */
     for (n = 0; n < nframes; n += samples_per_tick)
     {
-/*    fts_sched_run_one_tick_without_select(); */
-	fts_sched_run_one_tick();
+/*	fts_sched_run_one_tick_without_select(); */
+	/* Run scheduler */
+	fts_sched_run_one_tick();  
+	/* Step forward in input/output buffer */
 	this->input_buffer += samples_per_tick;
 	this->output_buffer += samples_per_tick;
     }
     return 0;
 }
 
+/* This function is used to remove object from scheduler and to activate JACK client */
 static void
 jackaudioport_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
     fd_set rfds;
     jackaudioport_t* this = (jackaudioport_t*)o;
-    int err;
 
-
-
-    post("[jackaudioport] remove scheduler ready daemon \n");
-
+    /* Remove object of FTS scheduler */
     fts_sched_remove(o);
-    /* Halt scheduler main loop */
-    post("[jackaudioport] halt scheduler \n");
-    fts_sched_suspend();
-    fts_log("[jackaudioport] client activated \n");
+    fts_log("[jackaudioport] jackaudioport removed from scheduler \n");
 
-/*
-  fts_log("[jackaudioport] sched_run_one_tick_without_select \n");
-  fts_sched_run_one_tick_without_select(); 
-*/
-    post("[jackaudioport] scheduler ready daemon removed \n");
+    /* Activate jack client */
+    
+    if (jack_activate(this->client) == -1)
+    {
+	fts_log("[jackaudioport] cannot activate JACK client \n");
+	fts_object_set_error(o, "cannot activate JACK client \n");
+	return;
+    }
 
-    post("[jackaudioport] activate jack client \n");
-    jack_activate(this->client);
+    fts_log("[jackaudioport] jack client activated \n");
+
+    /* Stop FTS scheduler */
+    FD_ZERO(&rfds);
+    FD_SET(0, &rfds);
+    /* check return value of select */
+    if (select(1, &rfds, NULL, NULL, NULL) < 0)
+    {
+	fprintf(stderr, "[jackaudioport] select falied \n");
+    }
+
+    fts_log("[jackaudioport] FTS scheduler stopped \n");
 
 }
 
@@ -143,36 +211,90 @@ static void
 jackaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
     jackaudioport_t* this = (jackaudioport_t*)o;
+    char client_name[JACKAUDIOPORT_CLIENT_NAME_MAX_LENGTH];
 
     fts_audioport_init(&this->head);
+
+    /* JACK structure member initialisation */
+    fts_log("[jackaudioport] init jackaudioport \n");    
+    strncpy(client_name, 
+	    fts_get_symbol_arg(ac, at, 0, JACKAUDIOPORT_DEFAULT_CLIENT_NAME), 
+	    JACKAUDIOPORT_CLIENT_NAME_MAX_LENGTH);
+    
+    /* 
+       strncpy do not force the string to be null-terminated,
+       so we force it ...
+     */
+    client_name[JACKAUDIOPORT_CLIENT_NAME_MAX_LENGTH - 1] = '\0';
+
+    /* TODO:
+       Maybe it could be good to store the JACK client name in object structure 
+    */
+    this->client = jack_client_new(client_name);
+    if (NULL == this->client)
+    {
+	post("[jackaudioport] cannot create jack client (%s) \n"
+	     "[jackaudioport] Are you sure than jackd is running ? \n");
+	fts_log("[jackaudioport] cannot create jack client (%s)\n", client_name);
+	fts_object_set_error(o, "[jackaudioport] cannot create jack client (%s)\n", client_name);
+	return;
+    }
+    fts_log("[jackaudioport] jack client (%s) created \n", client_name);
+    
+    /* JACK input/output port registering */
+    this->input_port = jack_port_register(this->client,             /* client structure */
+					  "input",                  /* port name */
+					  JACK_DEFAULT_AUDIO_TYPE,  /* port type */ 
+					  JackPortIsInput,          /* flags */
+					  0);                       /* we can pass 0 for buffersize,
+								       because we use the 
+								       JACK_DEFAULT_AUDIO_TYPE 
+								       builtin type
+								    */
+    fts_log("[jackaudioport] input port registered \n");
+    
+    /* see above for jack_port_register parameters */
+    this->output_port = jack_port_register(this->client, 
+					   "output", 
+					   JACK_DEFAULT_AUDIO_TYPE, 
+					   JackPortIsOutput, 
+					   0);
+    fts_log("[jackaudioport] output port registered \n");
+
+    /* JACK client process callback setting */
+    jack_set_process_callback(this->client, 
+			      jackaudioport_process, /* callback function */
+			      (void*)this);          /* we need to have our object 
+							in our callback function 
+						     */
+    fts_log("[jackaudioport] set jackaudioport process callback \n");
+
+    /* memory allocation for input/output buffer */
+    this->input_buffer = fts_malloc(JACKAUDIOPORT_DEFAULT_FRAME_SIZE * sizeof(float));
+    if (NULL == this->input_buffer)
+    {
+	fts_log("[jackaudioport] cannot allocate memory for input buffer \n");
+	fts_object_set_error(o, "[jackaudioport] cannot allocate memory for input buffer \n");
+	return;
+    }
+    this->output_buffer = fts_malloc(JACKAUDIOPORT_DEFAULT_FRAME_SIZE * sizeof(float));
+    if (NULL == this->output_buffer)
+    {
+	fts_log("[jackaudioport] cannot allocate memory for output buffer \n");
+	fts_object_set_error(o, "[jackaudioport] cannot allocate memory for output buffer \n");
+	return;
+    }
+
+    this->nframes = JACKAUDIOPORT_DEFAULT_FRAME_SIZE;
+
 
     fts_audioport_set_input_channels((fts_audioport_t*)this, 1);
     fts_audioport_set_input_function((fts_audioport_t*)this, jackaudioport_input);
     fts_audioport_set_output_channels((fts_audioport_t*)this, 1);
     fts_audioport_set_output_function((fts_audioport_t*)this, jackaudioport_output);
 
-    /* JACK structure member initialisation */
-    fts_log("[jackaudioport] init jackaudioport \n");    
-    this->client = jack_client_new("jmax_jackaudioport");
-    fts_log("[jackaudioport] client created \n");
-    this->input_port = jack_port_register(this->client, "input", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-    fts_log("[jackaudioport] input port registered \n");
-    this->output_port = jack_port_register(this->client, "output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-    fts_log("[jackaudioport] output port registered \n");
-    jack_set_process_callback(this->client, jackaudioport_process, (void*)this);
-/*
     fts_sched_add(o, FTS_SCHED_ALWAYS);
-*/
-    /* memory allocation for output_buffer */
-    /* 
-       ARRRGGHHH 
-       MEMORY LEAK HERE
-    */
-    this->input_buffer = fts_malloc(DEFAULT_FRAME_SIZE * sizeof(float));
-    this->output_buffer = fts_malloc(DEFAULT_FRAME_SIZE * sizeof(float));
-    this->nframes = DEFAULT_FRAME_SIZE;
-
-    jackaudioport_halt(o, winlet, s, ac, at);
+    /* jackaudioport_halt(o, winlet, s, ac, at); */
 }
 
 static void
@@ -181,10 +303,12 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     jackaudioport_t* this = (jackaudioport_t*)o;
 
     fts_audioport_delete(&this->head);
-    fts_log("[jackaudioport] deactivate jack client \n");
+
     jack_deactivate(this->client);
-    fts_log("[jackaudioport] close jack client \n");
+    fts_log("[jackaudioport] jack client deactivated \n");
+
     jack_client_close(this->client);
+    fts_log("[jackaudioport] jack client closed \n");
 
     if (0 != this->input_buffer)
     {
@@ -197,7 +321,7 @@ jackaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
 
     /* go back to fts scheduling */
-    fts_sched_unsuspend();
+    /* fts_sched_unsuspend(); */
 }
 
 static void jackaudioport_get_state( fts_daemon_action_t action, fts_object_t *o, fts_symbol_t property, fts_atom_t *value)
@@ -208,13 +332,12 @@ static void jackaudioport_get_state( fts_daemon_action_t action, fts_object_t *o
 static fts_status_t jackaudioport_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
     fts_class_init( cl, sizeof( jackaudioport_t), 0, 0, 0);
-
+    
     fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, jackaudioport_init);
     fts_method_define_varargs( cl, fts_SystemInlet, fts_s_delete, jackaudioport_delete);
-
-/*
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, jackaudioport_halt);
-*/
+    
+    fts_method_define_varargs( cl, fts_SystemInlet, fts_s_sched_ready, jackaudioport_halt);
+    
     fts_class_add_daemon( cl, obj_property_get, fts_s_state, jackaudioport_get_state);
     
     return fts_Success;
@@ -230,10 +353,10 @@ void jackaudioport_config( void)
     fts_symbol_t jackaudioport_symbol = fts_new_symbol("jackaudioport");
 
     fts_class_install(jackaudioport_symbol, jackaudioport_instantiate);
-
     if (!fts_audioport_get_default_class())
     {
 	fts_audioport_set_default_class(jackaudioport_symbol);
     }
 
+    s_default = fts_new_symbol("jMax_jackaudioport");
 }
