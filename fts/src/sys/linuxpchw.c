@@ -289,7 +289,6 @@ static void disable_fpu_trap( void)
 
 unsigned int fts_check_fpe(void)
 {
-  char buff[256];
   unsigned int s, ret;
 
   _FPU_GET_SW( s);
@@ -306,48 +305,52 @@ unsigned int fts_check_fpe(void)
   if (s & _FPU_STATUS_OE)
     ret |= FTS_OVERFLOW_FPE;
 
-  /* (fd) */
-  buff[0] = '\0';
-
-  if (s & _FPU_STATUS_IE)
-    strcat( buff, "'invalid operation' ");
-  if (s & _FPU_STATUS_DE)
-    strcat( buff, "'denormalized operand' ");
-  if (s & _FPU_STATUS_ZE)
-    strcat( buff, "'divide by zero' ");
-  if (s & _FPU_STATUS_OE)
-    strcat( buff, "'overflow' ");
-  if (s & _FPU_STATUS_UE)
-    strcat( buff, "'underflow' ");
-  if (s & _FPU_STATUS_PE)
-    strcat( buff, "'precision' ");
-
-  if ( buff[0] != '\0')
-    post( "FPE: %s\n", buff);
-
+#if 0
   {
-    unsigned int cw;
-
+    char buff[256];
     buff[0] = '\0';
 
-    _FPU_GET_CW( cw);
-
-    if ((cw & _FPU_CONTROL_IM) == 0)
+    if (s & _FPU_STATUS_IE)
       strcat( buff, "'invalid operation' ");
-    if ((cw & _FPU_CONTROL_DM) == 0)
+    if (s & _FPU_STATUS_DE)
       strcat( buff, "'denormalized operand' ");
-    if ((cw & _FPU_CONTROL_ZM) == 0)
+    if (s & _FPU_STATUS_ZE)
       strcat( buff, "'divide by zero' ");
-    if ((cw & _FPU_CONTROL_OM) == 0)
+    if (s & _FPU_STATUS_OE)
       strcat( buff, "'overflow' ");
-    if ((cw & _FPU_CONTROL_UM) == 0)
+    if (s & _FPU_STATUS_UE)
       strcat( buff, "'underflow' ");
-    if ((cw & _FPU_CONTROL_PM) == 0)
+    if (s & _FPU_STATUS_PE)
       strcat( buff, "'precision' ");
 
-    if (buff[0] != '\0')
-      post( "FPU Exception Mask: %s\n", buff);
+    if ( buff[0] != '\0')
+      post( "FPE: %s\n", buff);
+
+    {
+      unsigned int cw;
+
+      buff[0] = '\0';
+
+      _FPU_GET_CW( cw);
+
+      if ((cw & _FPU_CONTROL_IM) == 0)
+	strcat( buff, "'invalid operation' ");
+      if ((cw & _FPU_CONTROL_DM) == 0)
+	strcat( buff, "'denormalized operand' ");
+      if ((cw & _FPU_CONTROL_ZM) == 0)
+	strcat( buff, "'divide by zero' ");
+      if ((cw & _FPU_CONTROL_OM) == 0)
+	strcat( buff, "'overflow' ");
+      if ((cw & _FPU_CONTROL_UM) == 0)
+	strcat( buff, "'underflow' ");
+      if ((cw & _FPU_CONTROL_PM) == 0)
+	strcat( buff, "'precision' ");
+
+      if (buff[0] != '\0')
+	post( "FPU Exception Mask: %s\n", buff);
+    }
   }
+#endif
 
   return ret;
 }
