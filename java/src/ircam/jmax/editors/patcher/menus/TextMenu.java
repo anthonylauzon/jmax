@@ -39,10 +39,14 @@ import ircam.jmax.utils.*;
 
 import ircam.jmax.editors.patcher.*;
 import ircam.jmax.editors.patcher.objects.*;
+import ircam.jmax.editors.patcher.actions.*;
+
+import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
 /** Implement the patcher editor File Menu */
 
-public class TextMenu extends JMenu
+public class TextMenu extends EditorMenu
 {
   JMenuItem biggerItem;
   JMenuItem smallerItem;
@@ -80,70 +84,18 @@ public class TextMenu extends JMenu
     JMenuItem item;
     this.sketch = sketch;
 
-    biggerItem = new JMenuItem("Bigger");
-    biggerItem.addActionListener(new ActionListener()
-				 {
-				   public void actionPerformed(ActionEvent e)
-				     {
-				       ErmesSelection.patcherSelection.fontBigger();
-				     }
-				 });
-    biggerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, Event.CTRL_MASK));
-    add(biggerItem);
+    biggerItem  = add(Actions.fontBiggerAction, "Bigger", Event.CTRL_MASK, KeyEvent.VK_ADD);
+    smallerItem = add(Actions.fontSmallerAction, "Smaller", Event.CTRL_MASK, KeyEvent.VK_SUBTRACT);
 
-    smallerItem = new JMenuItem("Smaller");
-    smallerItem.addActionListener(new ActionListener()
-				 {
-				   public void actionPerformed(ActionEvent e)
-				     {
-				       ErmesSelection.patcherSelection.fontSmaller();
-				     }
-				 });
-
-    smallerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, Event.CTRL_MASK));
-    add(smallerItem);
-
-    itsSizesMenu = new JMenu( "Sizes");
+    itsSizesMenu = new JMenu("Sizes");
     FillSizesMenu( itsSizesMenu);
-    add( itsSizesMenu);
+    add(itsSizesMenu);
 
-    itsFontsMenu =  new JMenu( "Fonts");
-    FillFontMenu( itsFontsMenu);
-    add( itsFontsMenu);
-  }
+    itsFontsMenu = new JMenu("Fonts");
+    FillFontMenu(itsFontsMenu);
+    add(itsFontsMenu);
 
-  class SizesMenuAdapter implements ActionListener
-  {
-    JRadioButtonMenuItem item;
-    int size;
-
-    SizesMenuAdapter( JRadioButtonMenuItem item, int size)
-    {
-      this.item = item;
-      this.size = size;
-    }
-
-    public void actionPerformed(ActionEvent ev) 
-    {
-      //if we are here, a font size have been choosen from the FONT menu
-
-      if (ErmesSelection.patcherSelection.ownedBy(sketch) && 
-	  ErmesSelection.patcherSelection.hasObjects())
-	{
-	  try
-	    {
-	      ErmesSelection.patcherSelection.setFontSize(size);
-	    }
-	  catch (Exception e)
-	    {
-	      ErrorDialog aErr = new ErrorDialog(sketch.getEditorContainer().getFrame(), "This font does not exist on this platform");
-	      aErr.setLocation( 100, 100);
-	      aErr.show();  
-	    }
-	}
-      else
-	sketch.setDefaultFontSize(size);
-    }
+    addMenuListener(new TextMenuListener());
   }
 
   private void FillSizesMenu( JMenu menu)
@@ -157,44 +109,11 @@ public class TextMenu extends JMenu
 
     for (int i = 0; i < sizes.length; i++)
       {
-	item = new JRadioButtonMenuItem( Integer.toString(sizes[i]));
-	menu.add( item);
-	item.addActionListener( new SizesMenuAdapter( item, sizes[i]));
+	item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
+	menu.add(item);
+	item.addActionListener(Actions.fontSizesAction);
 	itsSizesMenuGroup.add(item);
       }
-  }
-
-
-  class FontMenuAdapter implements ActionListener
-  {
-    JRadioButtonMenuItem item;
-    String font;
-
-    FontMenuAdapter( JRadioButtonMenuItem item, String font)
-    {
-      this.item = item;
-      this.font = font;
-    }
-
-    public void actionPerformed(ActionEvent ev) 
-    {
-      if (ErmesSelection.patcherSelection.ownedBy(sketch) && 
-	  ErmesSelection.patcherSelection.hasObjects())
-	{
-	  try
-	    {
-	      ErmesSelection.patcherSelection.setFontName( font);
-	    }
-	  catch (Exception e) 
-	    {
-	      ErrorDialog aErr = new ErrorDialog(sketch.getEditorContainer().getFrame(), "This font does not exist on this platform");
-	      aErr.setLocation( 100, 100);
-	      aErr.show();  
-	    }
-	}
-      else
-	sketch.setDefaultFontName(font);
-    }
   }
 
   private void FillFontMenu( JMenu theFontMenu)
@@ -211,7 +130,7 @@ public class TextMenu extends JMenu
 	item = new JRadioButtonMenuItem(itsFontList[i]);
 	theFontMenu.add(item);
 	itsFontMenuGroup.add(item);
-	item.addActionListener( new FontMenuAdapter( item, itsFontList[i]));
+	item.addActionListener(Actions.fontAction);
       }
   }
 
@@ -267,7 +186,7 @@ public class TextMenu extends JMenu
 	    break;
 	  }
       }
-
+    boolean sizeExist = false;
     for ( int i = 0; i < itsSizesMenu.getItemCount(); i++)
       {
 	item = (JRadioButtonMenuItem)itsSizesMenu.getItem( i);
@@ -275,9 +194,12 @@ public class TextMenu extends JMenu
 	if (Integer.parseInt(item.getText()) == fontSize)
 	  {
 	    item.setSelected(true);
+	    sizeExist = true;
 	    break;
 	  }
       }
+    
+    if(!sizeExist) fakeSizeButton.setSelected(true);
   }
 }
 
