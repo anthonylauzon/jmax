@@ -40,9 +40,9 @@ public class FtsAtomList extends FtsObject
   MaxVector values = new MaxVector();
   MaxVector listeners = new MaxVector();
 
-  public FtsAtomList(Fts fts, FtsObject parent)
-  {
-    super(fts, parent, null, "__atomlist", "");
+  public FtsAtomList(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
+  { 
+    super(fts, parent, variableName, classname, "");
   }
 
   /** Return the size of the atom list */

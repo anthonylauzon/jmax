@@ -55,10 +55,10 @@ public class FtsSelection extends FtsObject
   /**
    * Create a Fts selection;
    */
-
-  protected FtsSelection(Fts fts, FtsObject parent)
+  
+  public FtsSelection(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
   {
-      super(fts, parent, null, "__selection", "");
+      super(fts, parent, null, classname, "");
   }
 
   /** Add an object to this container  */

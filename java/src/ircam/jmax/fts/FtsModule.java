@@ -44,11 +44,11 @@ public class FtsModule
     // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
     Mda.installDocumentType( new FtsPatcherDocumentType());
 
-    // Install the Object set class
-    /*Fts.registerRemoteDataClass("object_set_data", ircam.jmax.fts.FtsObjectSet.class);*/
-
-    // Install the atom list class
-    /*Fts.registerRemoteDataClass("atom_list_data", ircam.jmax.fts.FtsAtomList.class);*/
+    ObjectCreatorManager.registerFtsClass("__selection", ircam.jmax.fts.FtsSelection.class);
+    ObjectCreatorManager.registerFtsClass("__clipboard", ircam.jmax.fts.FtsClipboard.class);
+    ObjectCreatorManager.registerFtsClass("__objectset", ircam.jmax.fts.FtsObjectSet.class);
+    ObjectCreatorManager.registerFtsClass("__atomlist", ircam.jmax.fts.FtsAtomList.class);
+    ObjectCreatorManager.registerFtsClass("__dspcontrol", ircam.jmax.fts.FtsDspControl.class);
 
     // Install the patcher data class
     Fts.registerRemoteDataClass("patcher_data", ircam.jmax.fts.FtsPatcherData.class);

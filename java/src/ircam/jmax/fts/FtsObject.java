@@ -97,9 +97,7 @@ public class FtsObject implements Serializable
 					    int objId, String variableName, String className, int nArgs, FtsAtom args[])
     throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException, FtsException
   {
-    Object creator;
     FtsObject obj = null;
-    StringBuffer description;
 
     /* Note that we do the unparsing relative to ':' and variables
        here; in the future, a dedicated API should be used ! */
@@ -140,16 +138,6 @@ public class FtsObject implements Serializable
 	      obj =  new FtsInletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
 	  else if (className == "outlet")
 	      obj =  new FtsOutletObject(fts, parent, FtsParse.unparseArguments(nArgs, args));
-	  else if (className == "__selection")
-	      obj =  new FtsSelection(fts, parent);
-	  else if (className == "__clipboard")
-	      obj =  new FtsClipboard(fts, parent);
-	  else if (className == "__dspcontrol")
-	      obj =  new FtsDspControl(fts, parent);
-	  else if (className == "__objectset")
-	      obj =  new FtsObjectSet(fts, parent);
-	  else if (className == "__atomlist")
-	    obj =  new FtsAtomList(fts, parent);
 	  else
 	    {
 		String descrpt;

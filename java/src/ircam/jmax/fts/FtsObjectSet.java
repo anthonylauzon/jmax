@@ -61,10 +61,10 @@ public class FtsObjectSet extends FtsObject implements ListModel
     }
   }
 
-  public FtsObjectSet(Fts fts, FtsObject parent)
+  public FtsObjectSet(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
   {
-      super(fts, parent, null, "__objectset", "");
-      
+      super(fts, parent, variableName, classname, "");
+
       list = new MaxVector();
       dataListeners = new MaxVector();
       

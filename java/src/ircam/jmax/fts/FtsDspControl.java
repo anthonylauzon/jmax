@@ -49,9 +49,9 @@ public class FtsDspControl extends FtsObject
 
   protected PropertyChangeSupport listeners;
 
-  public FtsDspControl(Fts fts, FtsObject parent)
+  public FtsDspControl(Fts fts, FtsObject parent, String variableName, String classname, int nArgs, FtsAtom args[])
   {
-    super(fts, parent, null, "__dspcontrol", "");
+    super(fts, parent, variableName, classname, "");
 
     dacSlip         = new Integer(0);
     invalidFpe      = new Integer(0);
