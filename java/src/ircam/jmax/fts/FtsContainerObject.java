@@ -37,7 +37,13 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   public MaxDocument getDocument()
   {
     if (document == null)
-      return parent.getDocument();
+      {
+	if (parent != null)
+	  return parent.getDocument();
+	else
+	  return null;
+      }
+	    
     else
       return (MaxDocument) document;
   }
@@ -85,6 +91,14 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   protected  FtsContainerObject(FtsContainerObject parent, String className, String description, int objId)
   {
     super(parent, className, description, objId);
+  }
+
+  /** Tell MDA to dispose the editor on this data */
+
+  public void delete()
+  {
+    Mda.dispose(this);
+    super.delete();
   }
 
   /*
@@ -136,20 +150,14 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
   }
 
   /** Replace an object with an other one in all the connections
+   * We assume that the container is open !!
    */
 
   void replaceInConnections(FtsObject oldObject, FtsObject newObject)
-  {    
-    // First, redo the connections
+  {
+    // First, collect the connections that will not be consistent 
+    // with newObject in a new Vectro
 
-    for (int i = 0; i < connections.size(); i++)
-      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
-
-    // then, delete the connections that no more consistent
-    // First collect them in a aux vector, then remove them
-    // It is slow, but safer because removing elements in vector
-    // shift the content, so that calling "delete" in a loop on
-    // "connections" would change the connections content ...
 
     Vector toDelete = new Vector();
 
@@ -157,9 +165,16 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
       {
 	FtsConnection conn = (FtsConnection)connections.elementAt(i);
 
-	if (! (conn.checkConsistency()))
+	if ((conn.from == oldObject) && (conn.outlet >= newObject.getNumberOfOutlets()))
+	  toDelete.addElement(conn);
+	else if ((conn.to == oldObject) && (conn.inlet >= newObject.getNumberOfInlets()))
 	  toDelete.addElement(conn);
       }
+
+    // Then delete them 
+    // It is slow, but safer because removing elements in vector
+    // shift the content, so that calling "delete" in a loop on
+    // "connections" would change the connections content ...
 
     for (int i = 0; i < toDelete.size(); i++)
       {
@@ -167,7 +182,13 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
 	conn.delete();
       }
+
+    // Then, redo the connections
+
+    for (int i = 0; i < connections.size(); i++)
+      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
   }
+
 
   /** Overwrite the getObjects methods so to download the patcher
     by need */

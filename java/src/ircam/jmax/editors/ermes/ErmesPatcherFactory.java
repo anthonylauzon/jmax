@@ -21,13 +21,23 @@ public class ErmesPatcherFactory implements MaxDataEditorFactory {
   public MaxDataEditor newEditor(MaxData theData) {
     ErmesSketchWindow aSketchWindow = new ErmesSketchWindow((FtsContainerObject) theData);
     String mode;
+    FtsContainerObject p;
 
     /* To set the initial state: set to edit mode only if the
        initialMode property of a patcher is set and it is set
        to something different than "run" (usually, "edit" :)
        */
 
-    mode = (String) ((FtsContainerObject)theData).get("initialMode");
+    p = (FtsContainerObject) theData;
+
+    mode = (String) p.get("initialMode");
+
+    p = p.getParent();
+    while ((mode == null) && (p != null))
+      {
+	mode = (String) p.get("editMode");
+	p = p.getParent();
+      }
 
     if ((mode == null) || mode.equals("run"))
       aSketchWindow.setRunMode(true);

@@ -119,6 +119,10 @@ abstract class FtsPort implements Runnable
 	    if (msg != null)
 	      server.dispatchMessage(msg);
 	  }
+	catch (java.io.InterruptedIOException e)
+	  {
+	    /* Ignore, just retry */
+	  }
 	catch (FtsQuittedException e)
 	  {
 	    running = false;
@@ -430,7 +434,7 @@ abstract class FtsPort implements Runnable
    * @exception ircam.jmax.fts.FtsQuittedExcepetion For some reason the FTS server quitted.
    */
 
-  FtsMessage receiveMessage() throws java.io.IOException, FtsQuittedException
+  FtsMessage receiveMessage() throws java.io.IOException, FtsQuittedException, java.io.InterruptedIOException
   {
     StringBuffer s = new StringBuffer();
     int c;

@@ -180,13 +180,6 @@ class ErmesSketchHelper extends Object{
     itsSketchPad.RemoveInOutlets(theObject);
     itsSketchPad.markSketchAsDirty();
     
-    if(theObject instanceof ErmesObjExternal)
-      if (((ErmesObjExternal)theObject).itsSubWindow!= null) 
-	((ErmesObjExternal)theObject).itsSubWindow.dispose();
-    if(theObject instanceof ErmesObjPatcher) {
-      ErmesObjPatcher aPatcher = (ErmesObjPatcher)theObject;
-      if (aPatcher.itsSubWindow!= null) aPatcher.itsSubWindow.Close(true);
-    }
     if (paintNow) itsSketchPad.paintDirtyList();
   }
   
@@ -214,7 +207,6 @@ class ErmesSketchHelper extends Object{
     }
     
     itsSketchPad.GetSketchWindow().DeselectionUpdateMenu();
-    itsSketchPad.ToSave();
     itsSketchPad.paintDirtyList();
   }
     
@@ -558,7 +550,6 @@ class ErmesSketchHelper extends Object{
     theSourceOutlet.AddConnection(aConnection);
     theDestInlet.AddConnection(aConnection); 
     itsSketchPad.itsConnections.addElement(aConnection);
-    itsSketchPad.ToSave();
     if (paintNow) aConnection.DoublePaint();
     else itsSketchPad.addToDirtyConnections(aConnection);
     return aConnection;

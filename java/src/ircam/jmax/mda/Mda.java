@@ -91,7 +91,7 @@ public class Mda
   {
     MaxDataEditor editor;
 
-    /* First, check if there is already an editor for the data */
+    /* First, check if there is  an editor for the data */
 
     editor = (MaxDataEditor) dataEditorTable.get(data);
 
@@ -140,6 +140,7 @@ public class Mda
 	    // to properly set the source and handler in the document
 
 	    newDocument = documentHandler.loadDocument(source);
+	    newDocument.setSaved(true);
 
 	    return newDocument;
 	  }
@@ -212,3 +213,4 @@ public class Mda
     throw new MaxDocumentException("Cannot create document for " + data);
   }
 }
+

@@ -233,6 +233,17 @@ public class MaxApplication extends Object
    * to do the work.
    */
 
+  /* @@@@@@@@@@@
+   * Should be rewritten using the new MDA.
+   * 1- the test if there is anything to save
+   * can be done on all the MaxDocument (isSaved()).
+   * 2- the saving can be done here directly with the
+   * mda primitives (no save as, just panels).
+   * 3- the closing can be done here aswell, with the
+   * dispose call on the document
+   * no need to use MaxEditor !!!
+   */
+
   public static void Quit()
   {
     ListModel windows;

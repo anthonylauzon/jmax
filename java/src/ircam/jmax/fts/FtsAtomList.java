@@ -127,7 +127,10 @@ public class FtsAtomList implements FtsDataObject
     // Senza offset
 
     if (object != null)
-      FtsServer.getServer().sendSetMessage(object, values);
+      {
+	FtsServer.getServer().sendSetMessage(object, values);
+	object.setDirty();
+      }
   }
 
   /** Saving as tcl, both embedded in a .tpa or in a table file*/

@@ -15,7 +15,7 @@ import ircam.jmax.mda.*;
 public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public boolean iAmPatcher = false;
-  public ErmesSketchWindow itsSubWindow = null;
+  // public ErmesSketchWindow itsSubWindow = null;
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
@@ -93,11 +93,8 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 
   public void redefineFtsObject()
   {
-    if((iAmPatcher)&&(itsSubWindow != null)){
-      // brutal force, close the window now, destroy from FTS
-      itsSubWindow.Close(true);
-      GetSketchWindow().itsPatcher.watch("deleteConnection", GetSketchWindow());
-    }
+    GetSketchWindow().itsPatcher.watch("deleteConnection", GetSketchWindow());
+
     try
       {
 	itsFtsObject = FtsObject.redefineFtsObject(itsFtsObject, itsArgs);
@@ -106,11 +103,10 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       {
 	// Here pop up error box or something ..
       }
-    if (itsFtsObject instanceof FtsContainerObject) {
-      this.YouArePatcher(true);
-    }
-    else this.YouArePatcher(false);
-    GetSketchWindow().itsPatcher.removeWatch(GetSketchWindow());
+
+    this.YouArePatcher(itsFtsObject instanceof FtsContainerObject);
+
+    GetSketchWindow().itsPatcher.removeWatch("deleteConnection", GetSketchWindow());
   }
   
   //--------------------------------------------------------
@@ -119,18 +115,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
   
    public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
      if(evt.getClickCount()>1) {
-       if (iAmPatcher) {	
-	 if (itsSubWindow != null) {
-	   itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
-	   itsSubWindow.setVisible(true);
-	   ErmesSketchPad.RequestOffScreen(itsSketchPad);
-	 }
-	 else{	//this 'else' shouldn't be reached...
-	   itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsDocument, (FtsContainerObject) itsFtsObject, GetSketchWindow());
-	   itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
-	 }
-       }
-       else if(itsFtsObject instanceof FtsObjectWithData){
+       if(itsFtsObject instanceof FtsObjectWithData){
 	 try{
 	   // New !!! Actually the same thing can be done for 
 	   // patchers now !!!
@@ -153,11 +138,11 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
    }
 
   public void RestartEditing() {
-    if((iAmPatcher)&&(itsSubWindow != null)){
-      GetSketchWindow().CreateFtsGraphics(itsSubWindow);
-      //itsSubWindow.dispose();
-      //itsSubWindow = null;
-    }
+    // if((iAmPatcher)&&(itsSubWindow != null)){
+    // GetSketchWindow().CreateFtsGraphics(itsSubWindow);
+    // //itsSubWindow.dispose();
+    // //itsSubWindow = null;
+    // }
     super.RestartEditing();
   }
   

@@ -95,7 +95,12 @@ abstract public class FtsObject implements MaxTclInterpreter
     obj = server.getObjectByFtsId(id);
     
     if (obj != null)
-      return obj;
+      {
+	if (parent != null)
+	  parent.setDirty();
+
+	return obj;
+      }
     else
       throw new FtsException( new FtsError(FtsError.INSTANTIATION_ERROR, className + " " + description));
   }
@@ -123,7 +128,10 @@ abstract public class FtsObject implements MaxTclInterpreter
     obj = server.getObjectByFtsId(id);
     
     if (obj != null)
-      return obj;
+      {
+	obj.setDirty();
+	return obj;
+      }
     else
       throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, description));
   }
@@ -167,8 +175,9 @@ abstract public class FtsObject implements MaxTclInterpreter
   }
 
 
-  static public FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
+  static FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
   {
+    FtsObject obj;
     String className;
     StringBuffer description;
     FtsContainerObject parent;
@@ -179,38 +188,41 @@ abstract public class FtsObject implements MaxTclInterpreter
     className = (String) msg.getArgument(2);
 
     if (className.equals("table"))
-      return new FtsTableObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsTableObject(parent, className, makeDescription(2, msg), objId);
     if (className.equals("qlist"))
-      return new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("patcher"))
-      return new FtsPatcherObject(parent, (String) msg.getArgument(3),
+      obj = new FtsPatcherObject(parent, (String) msg.getArgument(3),
 				  ((Integer) msg.getArgument(4)).intValue(),
 				  ((Integer) msg.getArgument(5)).intValue(), objId);
     else if (className.equals("inlet"))
-      return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+      obj = new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
     else if (className.equals("outlet"))
-      return new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+      obj = new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
     else if (className.equals("messbox"))
-      return new FtsMessageObject(parent, makeDescription(3, msg), objId);
+      obj = new FtsMessageObject(parent, makeDescription(3, msg), objId);
     else if (className.equals("comment"))
-      return new FtsCommentObject(parent, makeDescription(3, msg), objId);
+      obj = new FtsCommentObject(parent, makeDescription(3, msg), objId);
     else if (className.equals("slider"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("intbox"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("floatbox"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("toggle"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("param"))
-      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else
-      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+      obj = new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
+
+    return obj;
   }
 
 
-  static public FtsObject makeFtsAbstractionFromMessage(FtsMessage msg) throws FtsException
+  static FtsObject makeFtsAbstractionFromMessage(FtsMessage msg) throws FtsException
   {
+    FtsObject obj;
     String className;
     StringBuffer description;
     FtsContainerObject parent;
@@ -220,7 +232,11 @@ abstract public class FtsObject implements MaxTclInterpreter
     objId = ((Integer) msg.getArgument(1)).intValue();
     className = (String) msg.getArgument(2);
 
-    return new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
+    /* if the object has been succesfully created, set the parent dirty */
+
+    obj = new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
+
+    return obj;
   }
 
   /**
@@ -232,8 +248,8 @@ abstract public class FtsObject implements MaxTclInterpreter
    * It just produce a new object (calling makeFtsObject), and replace the old with it in the 
    * container of the old, and in FTS.
    *
-   * You cannot redefine a message, comment, inlet and outlet object, only object that makeFtsObject
-   * can actually create.
+   *  In case of errors, i.e. if the new object do not exists, we just throw an exception
+   *  and do nothing.
    *
    * @@@@: can we just throw away the FTS part of it and do everything here ?
    * @@@@: including moving the connections ? It would be more consistent,
@@ -252,7 +268,10 @@ abstract public class FtsObject implements MaxTclInterpreter
     FtsContainerObject parent;
 
     parent = oldObject.getParent();
-    
+
+    // makeFtsObject can throw a connection if the
+    // object do not exists.
+
     newObject = makeFtsObject(parent, description);
 
     // replaceInConnections should delete the connections
@@ -350,7 +369,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 	table.removeElement((PropertyHandlerEntry)toRemove.elementAt(i));
     }
 
-    public void removeWatch(Object owner, String name)
+    public void removeWatch(String name, Object owner)
     {
       // Shitty code; actually, the handler table should 
       // not be a vector ... may be a linked list
@@ -534,6 +553,11 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   void localPut(String name, Object value)
   {
+    /* if the object has been succesfully created, set the parent dirty */
+
+    if (FtsPropertyDescriptor.isPersistent(name))
+      setDirty();
+
     // local and hardcoded properties
 
     if (! builtinPut(name, value))
@@ -621,10 +645,10 @@ abstract public class FtsObject implements MaxTclInterpreter
       propertyHandlerTable.removeWatch(owner);
   }
 
-  public void removeWatch(Object owner, String name)
+  public void removeWatch(String name, Object owner)
   {
     if (propertyHandlerTable != null)
-      propertyHandlerTable.removeWatch(owner, name);
+      propertyHandlerTable.removeWatch(name, owner);
   }
 
   public void getPropertyNames(Vector names)
@@ -712,7 +736,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     return x;
   }
 
-  public final void setX(int p)
+  final void setX(int p)
   {
     x = p;
   }
@@ -722,7 +746,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     return y;
   }
 
-  public final void setY(int p)
+  final void setY(int p)
   {
     y = p;
   }
@@ -732,7 +756,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     return width;
   }
 
-  public final void setWidth(int p)
+  final void setWidth(int p)
   {
     width = p;
   }
@@ -742,7 +766,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     return height;
   }
 
-  public final void setHeight(int p)
+  final void setHeight(int p)
   {
     height = p;
   }
@@ -828,6 +852,31 @@ abstract public class FtsObject implements MaxTclInterpreter
     return objectName;
   }
 
+  /** Get the MaxDocument this objects is part of */
+
+  public MaxDocument getDocument()
+  {
+    if (parent != null)
+      return parent.getDocument();
+    else
+      return null;
+  }
+
+  /** Tell the document this object is changed, 
+   *  and do not represent the state of the original file (if any)
+   *  anymore
+   */
+
+  public void setDirty()
+  {
+    MaxDocument document;
+
+    document = getDocument();
+
+    if (document != null)
+      document.setSaved(false);
+  }
+
   /** Set the number of inlets */
 
   public void setNumberOfInlets(int ninlets)
@@ -870,6 +919,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void delete()
   {
+    parent.setDirty();
     parent.removeObjectFromContainer(this); 
     FtsServer.getServer().freeObject(this);
   }

@@ -21,6 +21,7 @@ abstract public class MaxDocument
   private   DefaultListModel editors = new DefaultListModel();
   protected String name = null; // name of the document, for UI purposes
   protected String info = null; // comment field; store and get back, but don't use for semantic purpose
+  protected boolean saved = false;   // saved flag
 
   /** A constructor that get only the type */
 
@@ -94,6 +95,7 @@ abstract public class MaxDocument
   {
     setDocumentSource(source);
     setDocumentHandler(Mda.findDocumentHandlerFor(source, this));
+    setSaved(false);
   }
 
   /** To set both the handler and the source at the same time;
@@ -208,6 +210,7 @@ abstract public class MaxDocument
       throw new MaxDocumentException("No document handler for " + source);
 
     handler.saveDocument(this, source);
+    setSaved(true);
   }
 
 
@@ -232,6 +235,24 @@ abstract public class MaxDocument
       }
 
     handler.saveDocument(this, source);
+  }
+
+  /** Saved flag query: true if the document have been saved to its current
+      source.
+      */
+
+  public boolean isSaved()
+  {
+    return saved;
+  }
+
+  /** Saved flag setting; it is the responsability of the MaxData 
+   * composing the document to update this flags correctly.
+   */
+
+  public void setSaved(boolean saved)
+  {
+    this.saved = saved;
   }
 
   /** Disposing this document */

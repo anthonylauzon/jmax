@@ -76,7 +76,6 @@ class FtsSocketServerPort extends FtsPort
       {
 	System.out.println("I/O error during accept on server socket");
 	return;
-
       }    
 
     try

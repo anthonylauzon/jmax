@@ -127,8 +127,12 @@ public class FtsIntegerVector implements FtsDataObject
     // Mandare un messaggio _set all'oggetto
     // primo argomento l'offset, e poi i valori.
 
+    
     if (object != null)
-      FtsServer.getServer().sendSetMessage(object, from, values, from, to);
+      {
+	FtsServer.getServer().sendSetMessage(object, from, values, from, to);
+	object.setDirty();
+      }
   }
 
   /** Declare that a value in the vector has been changed

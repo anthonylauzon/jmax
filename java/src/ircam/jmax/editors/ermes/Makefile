@@ -200,4 +200,8 @@ ErmesDrawable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesDrawable.java)
 .PHONY: ErmesDrawable
 
+ErmesPatcherFactory:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesPatcherFactory.java)
+.PHONY: ErmesPatcherFactory
+
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

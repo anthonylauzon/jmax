@@ -53,8 +53,6 @@ abstract public class MaxDocumentHandler
   abstract protected MaxDocument loadDocument(MaxDocumentSource source) throws MaxDocumentException;
 
   abstract public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException;
-
-
 }
 
 

@@ -44,6 +44,7 @@ public class FtsInletObject  extends FtsObject
     description = "inlet " + position;
 
     FtsServer.getServer().repositionInletObject(this, position);
+    setDirty();
   }
 
   public int getPosition()

@@ -11,7 +11,11 @@ import java.util.*;
 
 public class FtsConnection 
 {
-  boolean active = true;
+  /** to protect against double deletion.
+    temporary, waiting for a more event/based editor
+    */
+
+  boolean deleted = false; 
   FtsObject from;
   int outlet;
 
@@ -32,6 +36,9 @@ public class FtsConnection
     FtsServer.getServer().connectObjects(from, outlet, to, inlet);
 
     from.getParent().addConnectionToContainer(this);
+
+    from.setDirty();
+    to.setDirty();
   }
 
 
@@ -48,6 +55,7 @@ public class FtsConnection
       FtsServer.getServer().connectObjects(from, outlet, to, inlet);
 
     from.getParent().addConnectionToContainer(this);
+    from.setDirty();// only one needed, they *must* reside on the same document
   }
 
 
@@ -77,19 +85,16 @@ public class FtsConnection
 
   public void delete()
   {
-    if (active)
-      {
-	FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
+    if (deleted)
+      return;
 
-	from.getParent().removeConnectionFromContainer(this);
+    deleted = true;
+    from.setDirty();
+    to.setDirty();
+	
+    FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
 
-	active = false;
-      }
-    else
-      {
-	System.err.println("Deleting delete connection" + this);
-	Thread.dumpStack();
-      }
+    from.getParent().removeConnectionFromContainer(this);
   }
 
   /** Access the From. The From is the FtsObject origin of the connection. */

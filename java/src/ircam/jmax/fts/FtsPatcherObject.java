@@ -52,21 +52,23 @@ public class FtsPatcherObject extends FtsContainerObject
     FtsParse.parseAtoms(description, args);
 
     if (args.size() >= 1)
-      setObjectName((String) args.elementAt(0));
+      put("name", args.elementAt(0));
     else
-      setObjectName("unnamed");
+      put("name", "unnamed");
 
     if (args.size() >= 2)
-      setNumberOfInlets(Integer.parseInt(args.elementAt(1).toString()));
+      put("ins", args.elementAt(1));
     else
-      setNumberOfInlets(0);
+      put("ins", new Integer(0));
 
     if (args.size() >= 3)
-      setNumberOfOutlets(Integer.parseInt(args.elementAt(2).toString()));
+      put("outs", args.elementAt(2));
     else
-      setNumberOfOutlets(0);
+      put("outs", new Integer(0));
 
     updateFtsObject();
+
+    setDirty();
   }
 
 

@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.util.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
+import ircam.jmax.mda.*;
 import ircam.jmax.editors.ermes.*;
 
 /**
@@ -86,12 +87,12 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   }
 
   public void RestartEditing() { //extends ErmesObjEditableObject.RestartEditing()
-    if(itsSubWindow != null){
-      GetSketchWindow().CreateFtsGraphics(itsSubWindow);
+    //    if(itsSubWindow != null){
+    // GetSketchWindow().CreateFtsGraphics(itsSubWindow);
       //itsSubWindow.dispose();
       //itsSubWindow = null;
       //itsSubWindow.setVisible(false);
-    }
+    // }
 
     super.RestartEditing();
   }
@@ -100,14 +101,13 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   {
     //the parent patcher could destroy connections...
     GetSketchWindow().itsPatcher.watch("deletedConnection",GetSketchWindow());
-    //the children could destroy connections AND objects
-    if (itsSubWindow != null) {
-      itsFtsObject.watch("deletedObject", itsSubWindow);
-      itsFtsObject.watch("deletedConnection", itsSubWindow);
-    }
+
+    //the children could destroy connections AND objects: NO MORE<
+    // changed: FTS do not destroy the patcher content, and never will
+    // again
+
     ((FtsPatcherObject)itsFtsObject).redefinePatcher(itsArgs);
     if (itsSubWindow != null)  {
-      itsFtsObject.removeWatch(itsSubWindow);
       itsSubWindow.itsSketchPad.RedefineInChoice();
       itsSubWindow.itsSketchPad.RedefineOutChoice();
     }
@@ -165,25 +165,26 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
 	  
 
   public boolean MouseDown_specific(MouseEvent evt,int x, int y) {
-    if(evt.getClickCount()>1) {
-      if (itsSubWindow != null) {
-	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
-	itsSubWindow.setVisible(true);
-	itsSubWindow.itsPatcher.open();
-	ErmesSketchPad.RequestOffScreen(itsSketchPad);
+    if (evt.getClickCount()>1)
+      {
+	try
+	  {
+	    MaxData data;
+
+	    data = ((FtsObjectWithData) itsFtsObject).getData();
+
+	    Mda.edit(data);
+	  }
+	catch (MaxDocumentException e)
+	  {
+	    // Really a system error here
+	    System.err.println(e);
+	  }
       }
-      else{	//this 'else' shouldn't be reached...
-	if(itsArgs.equals("")) return false;
-	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsDocument, (FtsContainerObject) itsFtsObject, GetSketchWindow());
-	itsSubWindow.itsSketchPad.PrepareInChoice();//???????
-	itsSubWindow.itsSketchPad.PrepareOutChoice();///?????????
-	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
-      }
-      return true;
-    }
-    itsSketchPad.ClickOnObject(this, evt, x, y);
+    else
+      itsSketchPad.ClickOnObject(this, evt, x, y);
+
     return true;
-    /*else return true;*/	//run mode, no editing, no subpatcher opening (?)
   }
 	
   //--------------------------------------------------------

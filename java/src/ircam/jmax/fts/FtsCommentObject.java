@@ -38,6 +38,7 @@ public class FtsCommentObject extends FtsObject
   public void setComment(String comment)
   {
     description = comment;
+    setDirty();
   }
 
   /*****************************************************************************/

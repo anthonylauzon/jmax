@@ -44,6 +44,7 @@ public class FtsMessageObject extends FtsObject
     description = message;
 
     FtsServer.getServer().sendSetMessage(this, description);
+    setDirty();
   }
 
 

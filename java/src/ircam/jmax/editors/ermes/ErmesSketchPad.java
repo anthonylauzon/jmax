@@ -304,7 +304,6 @@ Rectangle previousResizeRect = new Rectangle();
 	itsPatcherElements.addElement(aObject);
       if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
 
-      ToSave();
       return aObject;
   }
   
@@ -324,7 +323,7 @@ Rectangle previousResizeRect = new Rectangle();
 
     in.ChangeState(false, true, false); //warning: how many repaint() this function costs?
     out.ChangeState(false, true, false);//warning: how many repaint() this function costs?
-    ToSave();
+
     ErmesConnection aConnection = itsHelper.TraceConnection(out, in, true);
     return aConnection;
   }
@@ -373,7 +372,6 @@ Rectangle previousResizeRect = new Rectangle();
 	aObject.ChangeFont(aFont);
       }
     }
-    ToSave();
   }
 
   public void ChangeSizeFont(int fontSize){
@@ -399,7 +397,6 @@ Rectangle previousResizeRect = new Rectangle();
 	aObject.ChangeFont(aFont);
       }
     }
-    ToSave();
     repaint();
   }
 
@@ -417,7 +414,6 @@ Rectangle previousResizeRect = new Rectangle();
       if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment))
 	aObject.ChangeJustification(aJustificationMode);
     }
-    ToSave();
     repaint();
   }
 
@@ -442,15 +438,12 @@ Rectangle previousResizeRect = new Rectangle();
       paintDirtyList();
       editStatus = START_SELECT;///////
       
-      ToSave();
       break;
     case START_SELECT:
       if (!evt.isShiftDown()) {//lo shift non e' premuto
 	itsHelper.deselectAll(false);
 	itsSelectedConnections.addElement(itsCurrentConnection); 
 
-	ToSave();
-	  
 	itsCurrentConnection.Select(false);
 	paintDirtyList();
       }
@@ -490,7 +483,6 @@ Rectangle previousResizeRect = new Rectangle();
 	theObject.Select(false);
 	CheckCurrentFont();
 	MoveSelected(theX,theY);
-	ToSave();
 	paintDirtyList();
 	break;
       case START_SELECT:
@@ -509,7 +501,6 @@ Rectangle previousResizeRect = new Rectangle();
 	}
 	else if(theObject.itsSelected) {
 	  MoveSelected(theX, theY);
-	  ToSave();
 	}
 	else { 
 	  itsHelper.deselectAll(true);
@@ -517,7 +508,6 @@ Rectangle previousResizeRect = new Rectangle();
 	  theObject.Select(true);
 	  CheckCurrentFont();
 	  MoveSelected(theX,theY);
-	  ToSave();
 	}
 	break;
       }
@@ -879,6 +869,7 @@ Rectangle previousResizeRect = new Rectangle();
     addMouseListener(this);
     addKeyListener(itsSketchWindow);
 
+    
     // Initialization of the "fts class"  to "graphic object" table
   }
 	
@@ -945,16 +936,11 @@ Rectangle previousResizeRect = new Rectangle();
       x = aPoint.x;
       y = aPoint.y;
     }
-      
-    boolean isTopPatcher = (!((ErmesSketchWindow)itsSketchWindow).isSubPatcher);
-    if (isTopPatcher && (itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjIn") || itsAddObjectName.equals("ircam.jmax.editors.ermes.ErmesObjOut"))) {
-      //forbidden to add such objects in a top level patch
-      ErrorDialog aErr = new ErrorDialog(itsSketchWindow, "Can't instantiate inlets/outlets in a Top level patcher");
-      aErr.setLocation(100, 100);
-      aErr.show();
-      editStatus = DOING_NOTHING;
-      return;
-    }
+
+    // Code to prevent inlets/outlets in a top level patcher deleted,
+    // as discussed a while ago (we actually may want to edit a subpatcher
+    // as a single file).
+
     try
       {
 	aObject = (ErmesObject) Class.forName(itsAddObjectName).newInstance();
@@ -982,7 +968,6 @@ Rectangle previousResizeRect = new Rectangle();
     if(itsAddObjectName == "ircam.jmax.editors.ermes.ErmesObjPatcher")
       itsPatcherElements.addElement(aObject);
     if (!itsToolBar.locked && editStatus != EDITING_OBJECT) editStatus = DOING_NOTHING;	
-    ToSave();
   }
 
 
@@ -1655,7 +1640,6 @@ Rectangle previousResizeRect = new Rectangle();
 	aDeltaV = aPoint.y - aObject.itsY ;
 	aObject.MoveBy(aDeltaH, aDeltaV);
       }
-      ToSave();
     }
     repaint();
   }
@@ -1686,14 +1670,6 @@ Rectangle previousResizeRect = new Rectangle();
     itsHelper.deselectAll(true);
     editStatus = START_ADD;
     itsAddObjectName = theObject;
-  }
-
-  public void ToSave(){
-    if(itsSketchWindow.isSubPatcher){
-      if(itsSketchWindow.itsTopWindow!=null) 
-	itsSketchWindow.itsTopWindow.itsSketchPad.ToSave();
-    }
-    else itsSketchWindow.ToSave();
   }
 
   public void AddInlet(ErmesObjInlet theInlet){
