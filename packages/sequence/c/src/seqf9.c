@@ -13,18 +13,6 @@
  * for DISCLAIMER OF WARRANTY.
  * 
  */
-/* The "f9" object, by Miller Puckette */
-/* copyright 1994 IRCAM */
-
-/*
-  This is a score follower that runs on two timescales.  Provisional
-  pitches, on the right, can trigger outputs only if the follower
-  is already up to the previous note.  "real", confirmed pitches, go in
-  the left. They go to a Dannenburg-style score follower.
-  
-  Both provisional and confirmed pitches are floating-point.
-*/
-
 #include "fts.h"
 #include "seqsym.h"
 #include "sequence.h"
@@ -44,7 +32,7 @@ typedef struct _seqf9
 {
   fts_object_t ob; /* object header */  
   sequence_t *sequence;
-  fts_symbol_t track_name;
+  int index;
   eventtrk_t *track;
 
   char running; /* true if we're turned on */
@@ -124,6 +112,7 @@ seqf9_advanceto(seqf9_t *this, note_t *newnote)
     {
       /* scoop up more notes for score follower */
       wanttail = newnote + (NNOTES/2);
+
       if (wanttail > this->tail + NNOTES) 
 	wanttail -= NNOTES;
 
@@ -162,7 +151,7 @@ seqf9_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   if(this->running)
     {
-      fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_unlock, 0, 0);
+      track_unlock((track_t *)this->track);
       
       this->track = 0;
       this->firstev = 0;
@@ -249,14 +238,12 @@ static void
 seqf9_continuous_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   seqf9_t *this = (seqf9_t *)o;
-  float f = fts_get_number_float(at);
-  note_t *note;
-  double deviation;
 
   if(this->running && !this->spoofed && this->lastoutput != this->head) 
     {
-      note = (this->lastoutput ? this->lastoutput->n_next : this->tail);
-      deviation = noteevt_get_pitch(note->n_evt) - f;
+      float f = fts_get_number_float(at);
+      note_t *note = (this->lastoutput ? this->lastoutput->n_next : this->tail);
+      double deviation = noteevt_get_pitch(note->n_evt) - f;
       
       if (deviation < 0.) 
 	deviation = -deviation;
@@ -283,15 +270,15 @@ seqf9_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(this->sequence)
     {
-      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_name(this->sequence, this->track_name);
-      
-      if(track)
+      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
+
+      if(track && eventtrk_get_type(track) == seqsym_noteevt)
 	{
 	  noteevt_t *event = (noteevt_t *)eventtrk_get_event_by_time(track, locate);
 	  
 	  if(event)
 	    {
-	      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_lock, 0, 0);
+	      track_lock((track_t *)track);
 
 	      if(sequence_editor_is_open(this->sequence))
 		{
@@ -334,7 +321,7 @@ seqf9_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 {
   seqf9_t *this = (seqf9_t *)o;
   fts_object_t *seqobj = fts_get_object(at + 1);
-  fts_symbol_t track_name = fts_get_symbol(at + 2);
+  int index = fts_get_int(at + 2);
   note_t *n;
   int i;
 
@@ -343,7 +330,7 @@ seqf9_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   else
     this->sequence = 0;
 
-  this->track_name = track_name;
+  this->index = index;
   this->track = 0;
 
   /* initialize match notes */
@@ -367,28 +354,33 @@ seqf9_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static fts_status_t
 seqf9_instantiate( fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[3];
-
-  fts_class_init( cl, sizeof(seqf9_t), 2, 1, 0);
-
-  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, seqf9_init);
-
-  fts_method_define_varargs( cl, 0, fts_s_list, seqf9_stable_note);
-  fts_method_define_varargs( cl, 1, fts_s_int, seqf9_continuous_pitch);
-  fts_method_define_varargs( cl, 1, fts_s_float, seqf9_continuous_pitch);
-
-  /* sequence reference interface methods */
-  fts_method_define_varargs( cl, 0, fts_new_symbol("locate"), seqf9_locate);
-  fts_method_define_varargs( cl, 0, fts_new_symbol("stop"), seqf9_stop);
-
-  fts_method_define_varargs( cl, 0, fts_new_symbol("hit-score-in-tune"), seqf9_hit_score_in_tune);
-  fts_method_define_varargs( cl, 0, fts_new_symbol("pitch-accuracy"), seqf9_pitch_accuracy);
-
-  return fts_Success;
+  if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
+    {
+      fts_symbol_t a[3];
+      
+      fts_class_init( cl, sizeof(seqf9_t), 2, 1, 0);
+      
+      fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, seqf9_init);
+      
+      fts_method_define_varargs( cl, 0, fts_s_list, seqf9_stable_note);
+      fts_method_define_varargs( cl, 1, fts_s_int, seqf9_continuous_pitch);
+      fts_method_define_varargs( cl, 1, fts_s_float, seqf9_continuous_pitch);
+      
+      /* sequence reference interface methods */
+      fts_method_define_varargs( cl, 0, fts_new_symbol("locate"), seqf9_locate);
+      fts_method_define_varargs( cl, 0, fts_new_symbol("stop"), seqf9_stop);
+      
+      fts_method_define_varargs( cl, 0, fts_new_symbol("hit-score-in-tune"), seqf9_hit_score_in_tune);
+      fts_method_define_varargs( cl, 0, fts_new_symbol("pitch-accuracy"), seqf9_pitch_accuracy);
+      
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;
 }
 
 void
 seqf9_config(void)
 {
-  fts_class_install(fts_new_symbol("seqf9"), seqf9_instantiate);
+  fts_metaclass_install(fts_new_symbol("seqf9"), seqf9_instantiate, fts_arg_type_equiv);
 }

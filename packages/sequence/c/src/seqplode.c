@@ -46,7 +46,7 @@ typedef struct
 {
   fts_object_t obj;
   sequence_t *sequence;
-  fts_symbol_t track_name;
+  int index;
   eventtrk_t *track;
   noteevt_t *event; /* current event */
 
@@ -216,7 +216,7 @@ seqplode_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     {
       skip_t *skip = this->skip;
 
-      fts_send_message((fts_object_t *)this->track, fts_SystemInlet, seqsym_unlock, 0, 0);
+      track_unlock((track_t *)this->track);
 
       this->track = 0;
       this->event = 0;
@@ -248,15 +248,15 @@ seqplode_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if(this->sequence)
     {
-      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_name(this->sequence, this->track_name);
+      eventtrk_t *track = (eventtrk_t *)sequence_get_track_by_index(this->sequence, this->index);
       
-      if(track)
+      if(track && eventtrk_get_type(track) == seqsym_noteevt)
 	{
 	  noteevt_t *event = (noteevt_t *)eventtrk_get_event_by_time(track, locate);
 	  
 	  if(event)
 	    {
-	      fts_send_message((fts_object_t *)track, fts_SystemInlet, seqsym_lock, 0, 0);
+	      track_lock((track_t *)this->track);
 	      fts_outlet_float((fts_object_t *)this, 0, event_get_time((event_t *)event));
 	  
 	      this->track = track;
@@ -277,14 +277,14 @@ seqplode_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 {
   seqplode_t *this = (seqplode_t *)o;
   fts_object_t *seqobj = fts_get_object(at + 1);
-  fts_symbol_t track_name = fts_get_symbol(at + 2);
+  int index = fts_get_int(at + 2);
 
   if(fts_object_get_class_name(seqobj) == seqsym_sequence)
     this->sequence = (sequence_t *)seqobj;
   else
     this->sequence = 0;
 
-  this->track_name = track_name;
+  this->index = index;
   this->track = 0;
 
   this->oct = 0;
@@ -304,30 +304,35 @@ seqplode_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static fts_status_t
 seqplode_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_symbol_t a[1];
-
-  /* initialize the class */
-  fts_class_init(cl, sizeof(seqplode_t), 1, 1, 0); 
-
-  /* define the system methods */
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqplode_init);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqplode_delete);
-
-  /* Seqplode number methods */
-  fts_method_define_varargs(cl, 0, fts_s_int, seqplode_number);
-  fts_method_define_varargs(cl, 0, fts_s_float, seqplode_number);
-
-  /* lists */
-  fts_method_define_varargs(cl, 0, fts_new_symbol("params"), seqplode_params);
-
-  /* sequence reference interface methods */
-  /*fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplode_start);*/
-  fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplode_stop);
-  /*fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), seqplode_continue);*/
-  fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplode_locate);
-  /*fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplode_sync);*/
-  
-  return fts_Success;
+  if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
+    {
+      fts_symbol_t a[1];
+      
+      /* initialize the class */
+      fts_class_init(cl, sizeof(seqplode_t), 1, 1, 0); 
+      
+      /* define the system methods */
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqplode_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqplode_delete);
+      
+      /* Seqplode number methods */
+      fts_method_define_varargs(cl, 0, fts_s_int, seqplode_number);
+      fts_method_define_varargs(cl, 0, fts_s_float, seqplode_number);
+      
+      /* lists */
+      fts_method_define_varargs(cl, 0, fts_new_symbol("params"), seqplode_params);
+      
+      /* sequence reference interface methods */
+      /*fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplode_start);*/
+      fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplode_stop);
+      /*fts_method_define_varargs(cl, 0, fts_new_symbol("continue"), seqplode_continue);*/
+      fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplode_locate);
+      /*fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplode_sync);*/
+      
+      return fts_Success;
+    }
+  else
+    return &fts_CannotInstantiate;    
 }
 
 void
@@ -335,5 +340,5 @@ seqplode_config(void)
 {
   seqplode_skip_heap = fts_heap_new(sizeof(skip_t));
 
-  fts_class_install(fts_new_symbol("seqplode"), seqplode_instantiate);
+  fts_metaclass_install(fts_new_symbol("seqplode"), seqplode_instantiate, fts_arg_type_equiv);
 }

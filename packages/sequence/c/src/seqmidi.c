@@ -315,7 +315,7 @@ seqmidi_write_note(fts_midifile_t *file, double time, int channel, int pitch, in
       fts_midifile_write_note_off(file, time_in_ticks, channel, pitch, 0); 
 
       /* remove note off event from sequence */
-      eventtrk_remove_event((event_t *)stat);
+      eventtrk_remove_event(data->note_off_track, (event_t *)stat);
       
       fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
     }
@@ -394,7 +394,7 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
 	      notestat_set_off(stat);
 
 	      /* remove note off event from note off track */
-	      eventtrk_remove_event((event_t *)stat);
+	      eventtrk_remove_event(data.note_off_track, (event_t *)stat);
 
 	      /* get next note off in sequence */
 	      stat = (notestat_t *)eventtrk_get_first(data.note_off_track);
@@ -422,7 +422,7 @@ seqmidi_write_midifile_from_event_track(eventtrk_t *track, fts_symbol_t file_nam
 	  notestat_set_off(stat);
 	  
 	  /* remove note off event from note off track */
-	  eventtrk_remove_event((event_t *)stat);
+	  eventtrk_remove_event(data.note_off_track, (event_t *)stat);
 
 	  stat = (notestat_t *)eventtrk_get_first(data.note_off_track);
 	}

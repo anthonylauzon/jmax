@@ -59,8 +59,7 @@ struct _eventtrk_
 
 extern void eventtrk_add_event(eventtrk_t *track, double time, event_t *event);
 extern void eventtrk_add_event_after(eventtrk_t *track, double time, event_t *event, event_t *here);
-extern void eventtrk_move_event(event_t *event, double time);
-extern void eventtrk_remove_event(event_t *event);
+extern void eventtrk_remove_event(eventtrk_t *track, event_t *event);
 
 extern event_t *eventtrk_get_event_by_time(eventtrk_t *track, double time);
 extern event_t *eventtrk_get_event_by_time_after(eventtrk_t *track, double time, event_t *here);

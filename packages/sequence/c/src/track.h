@@ -40,18 +40,23 @@ struct _track_
   struct _sequence_ *sequence; /* sequence of track */
 
   fts_symbol_t name;
+
   int active; /* active flag */
   int lock; /* lock counter (non-zero: no delete of track or events) */
 };
 
-extern void track_init(track_t *track, fts_symbol_t name);
+extern void track_init(track_t *track);
 
 #define track_get_sequence(t) ((t)->sequence)
+#define track_get_index(t) ((t)->name)
 #define track_get_name(t) ((t)->name)
 #define track_get_next(t) ((t)->next)
 
-#define track_lock(t) ((t)->lock++)
-#define track_unlock(t) ((t)->lock--)
 #define track_is_locked(t) ((t)->lock != 0)
+
+extern void track_lock(track_t *track);
+extern void track_unlock(track_t *track);
+
+#define track_set_name(t, n) ((t)->name = (n))
 
 #endif

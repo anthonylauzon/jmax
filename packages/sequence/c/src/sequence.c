@@ -33,9 +33,31 @@
 
 /*********************************************************
  *
- *  add/remove tracks
+ *  get, add, remove and move tracks
  *
  */
+
+track_t *
+sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name)
+{
+  track_t *track = sequence->tracks;
+
+  while(track && track_get_name(track) != name)
+    track = track_get_next(track);
+
+  return track;
+}
+
+track_t *
+sequence_get_track_by_index(sequence_t *sequence, int index)
+{
+  track_t *track = sequence->tracks;
+
+  while(track && index--)
+    track = track_get_next(track);
+
+  return track;
+}
 
 void
 sequence_add_track(sequence_t *sequence, track_t *track)
@@ -63,10 +85,8 @@ sequence_add_track(sequence_t *sequence, track_t *track)
 }
 
 void
-sequence_remove_track(track_t *track)
+sequence_remove_track(sequence_t *sequence, track_t *track)
 {
-  sequence_t *sequence = track_get_sequence(track);
-
   if(track == sequence->tracks)
     {
       /* first track */
@@ -92,15 +112,26 @@ sequence_remove_track(track_t *track)
     }
 }
 
-track_t *
-sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name)
+static void
+sequence_move_track(sequence_t *sequence, track_t *track, int index)
 {
-  track_t *track = sequence->tracks;
+  sequence_remove_track(sequence, track);
 
-  while(track && track_get_name(track) != name)
-    track = track_get_next(track);
+  if(index == 0)
+    {
+      track->next = sequence->tracks;
+      sequence->tracks = track;
+    }
+  else
+    {
+      track_t *before = sequence_get_track_by_index(sequence, index - 1);
 
-  return track;
+      if(before)
+	{
+	  track->next = before->next;
+	  before->next = track;
+	}
+    }
 }
 
 /******************************************************
@@ -127,7 +158,7 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   while(track)
     {
-      sequence_remove_track(track);
+      sequence_remove_track(this, track);
       fts_object_delete((fts_object_t *)track);
 
       track = sequence_get_first_track(this);
@@ -147,26 +178,19 @@ void
 sequence_add_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  fts_symbol_t type = fts_get_symbol(at + 0);
-
+  fts_symbol_t type = fts_get_symbol(at);
   fts_object_t *track;
-  fts_atom_t a[3];
-  char str[] = "track9999";
-  fts_symbol_t track_name;
-
-  sprintf(str, "track%d", sequence_get_size(this));
-  track_name = fts_new_symbol_copy(str);
+  fts_atom_t a[2];
   
   fts_set_symbol(a + 0, seqsym_eventtrk);
-  fts_set_symbol(a + 1, track_name);
-  fts_set_symbol(a + 2, type);
-  fts_object_new(0, 3, a, &track);  
+  fts_set_symbol(a + 1, type);
+  fts_object_new(0, 2, a, &track);  
       
   /* add it to the sequence */
   sequence_add_track(this, (track_t *)track);
       
   /* create track at client */
-  fts_client_upload(track, seqsym_track, 2, a + 1);
+  fts_client_upload(track, seqsym_track, 1, at);
       
   /* add track to sequence at client */
   fts_set_object(a + 0, (fts_object_t *)track);	    
@@ -178,19 +202,57 @@ void
 sequence_remove_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   sequence_t *this = (sequence_t *)o;
-  track_t *track = (track_t *)fts_get_object(at + 0);
-  fts_atom_t a[1];
+  track_t *track = (track_t *)fts_get_object(at);
 
-  /* remove track from sequence */
   if(!track_is_locked(track))
-    sequence_remove_track(track);
-  
-  /* add track to sequence at client */
-  fts_set_object(a + 0, (fts_object_t *)track);	    
-  fts_client_send_message(o, seqsym_deleteTracks, 1, a);
-  
-  /* delete track object */
-  fts_object_delete((fts_object_t *)track);
+    {
+      sequence_remove_track(this, track);
+      fts_client_send_message(o, seqsym_deleteTracks, 1, at);
+      fts_object_delete((fts_object_t *)track);
+    }
+}
+
+/* move track by client request */
+void
+sequence_move_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  track_t *track = (track_t *)fts_get_object(at + 0);
+  int index = fts_get_int(at + 1);
+
+  if(!track_is_locked(track))
+    {
+      sequence_move_track(this, track, index);
+      fts_client_send_message(o, seqsym_moveTrack, 2, at);
+    }
+}
+
+/* rename track by client request */
+void
+sequence_rename_track_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  track_t *track = (track_t *)fts_get_object(at + 0);
+  fts_symbol_t name = fts_get_symbol(at + 1);
+
+  if(!track_is_locked(track))
+    {
+      if(sequence_get_track_by_name(this, name))
+	{
+	  fts_atom_t a[2];
+	  
+	  fts_set_object(a + 0, (fts_object_t *)track);
+	  fts_set_symbol(a + 1, track_get_name(track));
+
+	  fts_client_send_message(o, seqsym_renameTrack, 2, a);
+	  
+	}
+      else
+	{
+	  track_set_name(track, name);
+	  fts_client_send_message(o, seqsym_renameTrack, 2, at);
+	}
+    }
 }
 
 void
@@ -422,6 +484,8 @@ sequence_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("close_editor"), sequence_close_editor);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("add_track"), sequence_add_track_by_client_request);
       fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("remove_track"), sequence_remove_track_by_client_request);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move_track"), sequence_move_track_by_client_request);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("rename_track"), sequence_rename_track_by_client_request);
 
       fts_method_define_varargs(cl, 0, fts_s_print, sequence_print);
       fts_method_define_varargs(cl, 0, fts_new_symbol("import"), sequence_import);

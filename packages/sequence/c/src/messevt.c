@@ -75,16 +75,6 @@ messevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-messevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  /* generic event "super class" */
-  event_t *this = (event_t *)o;
-  float time = fts_get_float(at + 0);
-
-  eventtrk_move_event(this, time);
-}
-
-static void
 messevt_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   messevt_t *this = (messevt_t *)o;
@@ -194,7 +184,6 @@ messevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, messevt_save_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), messevt_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), messevt_move);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), messevt_set);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("print"), messevt_print);

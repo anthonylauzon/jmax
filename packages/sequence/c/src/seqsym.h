@@ -50,8 +50,6 @@ extern fts_symbol_t seqsym_export_midi;
 extern fts_symbol_t seqsym_export_midi_dialog;
 extern fts_symbol_t seqsym_import_midi;
 extern fts_symbol_t seqsym_import_midi_dialog;
-extern fts_symbol_t seqsym_lock;
-extern fts_symbol_t seqsym_unlock;
 extern fts_symbol_t seqsym_bmax_add_track;
 extern fts_symbol_t seqsym_bmax_add_event;
 
@@ -60,10 +58,15 @@ extern fts_symbol_t seqsym_createEditor;
 extern fts_symbol_t seqsym_destroyEditor;
 extern fts_symbol_t seqsym_addTracks;
 extern fts_symbol_t seqsym_deleteTracks;
+extern fts_symbol_t seqsym_moveTrack;
+extern fts_symbol_t seqsym_renameTrack;
 extern fts_symbol_t seqsym_addEvents;
 extern fts_symbol_t seqsym_deleteEvents;
+extern fts_symbol_t seqsym_moveEvent;
 extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_openFileDialog;
+extern fts_symbol_t seqsym_lock;
+extern fts_symbol_t seqsym_unlock;
 
 #endif
 

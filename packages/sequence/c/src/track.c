@@ -24,15 +24,30 @@
  *
  */
 #include "fts.h"
+#include "seqsym.h"
 #include "track.h"
 
 void
-track_init(track_t *track, fts_symbol_t name)
+track_init(track_t *track)
 {
   track->next = 0;
   track->sequence = 0;
 
-  track->name = name;
+  track->name = 0;
   track->lock = 0;
   track->active = 1;
+}
+
+void
+track_lock(track_t *track)
+{
+  track->lock++;
+  fts_client_send_message((fts_object_t *)track, seqsym_lock, 0, 0);
+}
+
+void
+track_unlock(track_t *track)
+{
+  track->lock--;
+  fts_client_send_message((fts_object_t *)track, seqsym_unlock, 0, 0);
 }

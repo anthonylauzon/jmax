@@ -53,36 +53,40 @@ static void
 noteevt_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteevt_t *this = (noteevt_t *)o;
-  fts_atom_t a[4];
+  fts_atom_t a[6];
 
   fts_set_float(a + 0, event_get_time(&this->head));
   fts_set_symbol(a + 1, seqsym_noteevt);
   fts_set_int(a + 2, this->pitch);
   fts_set_float(a + 3, this->duration);
 
-  fts_client_upload(o, seqsym_event, 4, a);
-}
-
-static void
-noteevt_move(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  /* generic event "super class" */
-  event_t *this = (event_t *)o;
-  float time = fts_get_float(at + 0);
-
-  eventtrk_move_event(this, time);
+  if(this->midi_channel < 0)
+    fts_client_upload(o, seqsym_event, 4, a);
+  else
+    {
+      fts_set_int(a + 4, this->midi_channel);
+      fts_set_int(a + 5, this->midi_velocity);
+      fts_client_upload(o, seqsym_event, 6, a);
+    }
 }
 
 static void
 noteevt_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   noteevt_t *this = (noteevt_t *)o;
-
-  if(ac > 0 && fts_is_number(at + 0))
-    this->pitch = fts_get_number_int(at + 0);
-
-  if(ac > 1 && fts_is_number(at + 1))
-    this->duration = fts_get_number_float(at + 1);
+  
+  switch(ac)
+    {
+    case 4:
+      this->midi_velocity = fts_get_number_int(at + 3);
+    case 3:
+      this->midi_channel = fts_get_number_int(at + 2);
+    case 2:
+      this->duration = fts_get_number_float(at + 1);
+    case 1:
+      this->pitch = fts_get_number_int(at + 0);
+    default:
+    }
 }
 
 void 
@@ -114,7 +118,6 @@ noteevt_get_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     {
       fts_set_int(a + 2, this->midi_channel);
       fts_set_int(a + 3, this->midi_velocity);
-
       *n = 4;
     }
 }
@@ -255,7 +258,6 @@ noteevt_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save_bmax, noteevt_save_bmax);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("upload"), noteevt_upload);
-  fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("move"), noteevt_move);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set"), noteevt_set);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("pitch"), noteevt_pitch);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("duration"), noteevt_duration);
