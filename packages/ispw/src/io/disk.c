@@ -14,7 +14,6 @@
 
 /*
  * New device based dtd; currently, only readsf~ implemented.
- * Temporarly called newdisk.c, and the object "newreadsf".
  * This file is platform independent; actual platform dependencies
  * are in the DtD devices.
  *
@@ -110,7 +109,7 @@ static void readsf_file_open(readsf_t *this)
 
       /* Build the open arg list: current version, use the default device fifosize and fileblock size */
 
-      fts_set_symbol(&a[0], this->filename);
+      fts_set_symbol(&a[0], fts_new_symbol( get_readsf_path( this->filename)));
       fts_set_symbol(&a[1], fts_new_symbol("channels"));
       fts_set_int(&a[2],    this->nchans);
 
@@ -345,8 +344,7 @@ readsf_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   return fts_Success;
 }
 
-void
-newdisk_config(void)
+void disk_config(void)
 {
   fts_metaclass_create(fts_new_symbol("readsf~"), readsf_instantiate, fts_first_arg_equiv);
 }

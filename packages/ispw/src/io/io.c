@@ -18,7 +18,6 @@ extern void adc_config(void);
 
 #ifdef HAS_DTD
 extern void disk_config(void);
-extern void newdisk_config(void);
 #endif
 
 static void
@@ -29,7 +28,6 @@ io_module_init(void)
 
 #ifdef HAS_DTD
   disk_config();
-  newdisk_config();
 #endif
 }
 
