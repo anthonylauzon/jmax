@@ -121,8 +121,6 @@ public class MaxApplication extends Object
 
   public static void main(String args[])
   {
-    GlobalProbe.setOutputToFile(); // (fd)
-
 
     Vector toOpen = new Vector();
 

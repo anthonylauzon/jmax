@@ -286,6 +286,14 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   protected void Copy(){};
   protected void Paste(){};
   protected void Clear(){};
+
+  protected void Find()
+  {
+  }
+
+  protected void FindAgain()
+  {
+  }
   
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio
@@ -408,6 +416,8 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	else if (aInt == 86) Paste();//v
 	else if (aInt == 87) Close();//w
 	else if (aInt == 88) Cut();//x
+	else if (aInt == 70) Find(); //F
+	else if (aInt == 71) FindAgain(); //G
       }
   }
   ////////////////////////////////////////////////////////////////////////////
@@ -515,13 +525,3 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     return itsEditMenu.getItem(3);
   }
 }
-
-
-
-
-
-
-
-
-
-
