@@ -31,4 +31,4 @@ package provide pdtddev
 global jmaxArch jmaxMode
 ucs load module pdtddev $dir/c/lib/$jmaxArch/$jmaxMode/libpdtddev.so
 
-post "package: Posix Direct-To-Disk devices"
+post "package: pdtddev (POSIX direct-To-disk devices)"
