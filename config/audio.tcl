@@ -6,8 +6,6 @@
 
 global jmaxArch 
 global jmaxHost
-global jmaxSampleRate 
-global jmaxAudioBuffer 
 
 #  ... aswell as any additional system property specified in the command line
 # for example: jmax -myProperty "myValue"
@@ -15,11 +13,6 @@ global jmaxAudioBuffer
 if {[systemProperty "myProperty"] == "myValue"} { 
   # property dependent code here
 }
-
-#set jMax sample rate
-
-ucs set param sampling_rate $jmaxSampleRate
-ucs set param fifo_size     $jmaxAudioBuffer
 
 ######################################################################################
 #
@@ -36,7 +29,7 @@ ucs set param fifo_size     $jmaxAudioBuffer
 
 if {$jmaxArch == "irix6.2"} {
 
-#    puts "Irix 6.2 audio configuration: analog 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    puts "Irix 6.2 default audio configuration: Analog 2/2 @ [jmaxGetSampleRate] ([jmaxGetAudioBuffer])"
 #    ucs open device out~ default as SgiALOut channels 2
 #    ucs open device in~ default as SgiALIn channels 2 
 #    
@@ -45,7 +38,7 @@ if {$jmaxArch == "irix6.2"} {
 
 } elseif {$jmaxArch == "o2r5k" || $jmaxArch == "o2r10k"} {
 
-#    puts "O2 audio configuration: analog 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    puts "O2 default audio configuration: Analog 2/2 @ [jmaxGetSampleRate] ([jmaxGetAudioBuffer])"
 #    ucs open device in~ default as SgiALIn ALdevice AnalogIn channels 2 
 #    ucs open device out~ default as SgiALOut ALdevice AnalogOut channels 2 
 
@@ -54,44 +47,27 @@ if {$jmaxArch == "irix6.2"} {
 
 } elseif {$jmaxArch == "origin"} {
 
-# one ADAT card
+# analog
+#    puts "origin default audio configuration: Analog 2/2 @ [jmaxGetSampleRate] ([jmaxGetAudioBuffer])"
+#    ucs open device in~ default as SgiALIn ALdevice AnalogIn channels 2 
+#    ucs open device out~ default as SgiALOut ALdevice AnalogOut channels 2 
 
-#    puts "    default: 8/8 (default)"
+# ADAT
+#    puts "origin default audio configuration: ADAT 8/8 @ [jmaxGetSampleRate] ([jmaxGetAudioBuffer])"
 #    ucs open device in~ default as SgiALIn ALdevice ADATIn channels 8 
 #    ucs open device out~ default as SgiALOut ALdevice ADATOut channels 8
 
-#    puts "    default: 2/2"
+# AES
+#    puts "origin default audio configuration: AES 2/2 @ [jmaxGetSampleRate] ([jmaxGetAudioBuffer])"
 #    ucs open device in~ default as SgiALIn ALdevice AESIn channels 2 
 #    ucs open device out~ default as SgiALOut ALdevice AESOut channels 2
-
-#    ucs default in~ default
-#    ucs default out~ default
-#     two ADAT cards
-
-# two ADAT cards
-
-#    puts "    default: 8/8 (default)"
-#    ucs open device in~ default as SgiALIn ALdevice RAD1.ADATIn channels 8 
-#    ucs open device out~ default as SgiALOut ALdevice RAD1.ADATOut channels 8
-
-#    puts "    default: 2/2"
-#    ucs open device in~ default as SgiALIn ALdevice RAD1.AESIn channels 2 
-#    ucs open device out~ default as SgiALOut ALdevice RAD1.AESOut channels 2 
-
-#    puts "    default: 8/8"
-#    ucs open device in~ default as SgiALIn ALdevice RAD2.ADATIn channels 8 
-#    ucs open device out~ default as SgiALOut ALdevice RAD2.ADATOut channels 8 
-
-#    puts "    default: 2/2"
-#    ucs open device in~ default as SgiALIn ALdevice RAD2.AESIn channels 2
-#    ucs open device out~ default as SgiALOut ALdevice RAD2.AESOut channels 2 
 
 #    ucs default in~ default
 #    ucs default out~ default
 
 } elseif {$jmaxArch == "linuxpc"} {
 
-#    puts "OSS audio configuration: 2/2 @ $jmaxSampleRate Hz ($jmaxAudioBuffer)"
+#    puts "OSS audio configuration: 2/2
 #    ucs open device out~ default as oss_dac
 #    ucs open device in~ default as oss_adc
    

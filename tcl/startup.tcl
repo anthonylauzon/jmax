@@ -10,7 +10,7 @@ global jmaxSysPkgPath
 global jmaxHostArch
 global jmaxHost jmaxConnection jmaxPort
 global jmaxArch jmaxMode jmaxServerName
-global jmaxAudioBuffer jmaxSampleRate jmaxMidiPort jmaxPkgPath
+global jmaxMidiPort jmaxPkgPath
 global jmaxSplashScreen
 
 # set the system root directory; 
@@ -37,9 +37,7 @@ if {[systemProperty "jmaxArch"] != ""} then { set jmaxArch [systemProperty "jmax
 if {[systemProperty "jmaxMode"] != ""} then { set jmaxMode [systemProperty "jmaxMode"]}
 if {[systemProperty "jmaxServerName"] != ""} then { set jmaxServerName [systemProperty "jmaxServerName"]}
 
-# set audio and MIDI configuration to commandline argument
-if {[systemProperty "jmaxAudioBuffer"] != ""} then { set jmaxAudioBuffer [systemProperty "jmaxAudioBuffer"]}
-if {[systemProperty "jmaxSampleRate"] != ""} then { set jmaxSampleRate [systemProperty "jmaxSampleRate"]}
+# set MIDI configuration to commandline argument
 if {[systemProperty "jmaxMidiPort"] != ""} then { set jmaxMidiPort [systemProperty "jmaxMidiPort"]}
 
 # misc settings
@@ -69,9 +67,7 @@ if [catch {set foo $jmaxArch}] then {
 if [catch {set foo $jmaxMode}] then { set jmaxMode $jmaxDefaultMode}
 if [catch {set foo $jmaxServerName}] then {set jmaxServerName $jmaxDefaultServerName}
 
-# set audio and MIDI configuration defaults
-if [catch {set foo $jmaxAudioBuffer}] then { set jmaxAudioBuffer $jmaxDefaultAudioBuffer}
-if [catch {set foo $jmaxSampleRate}] then { set jmaxSampleRate $jmaxDefaultSampleRate}
+# set MIDI configuration defaults
 if [catch {set foo $jmaxMidiPort}] then { set jmaxMidiPort $jmaxDefaultMidiPort}
 
 # misc defaults
@@ -80,19 +76,8 @@ if [catch {set foo $jmaxPkgPath}] then { set jmaxPkgPath $jmaxDefaultPkgPath}
 # hard coded defaults
 if [catch {set foo $jmaxSplashScreen}] then { set jmaxSplashScreen "show"}
 
-
-##########################################################################
-#
-#  temporary fake of a possible future dataDirectory declaration command
-#
-
-proc dataDirectory {dir} {
-  global DataDirectory
-
-  lappend DataDirectory $dir
-  set path [join $DataDirectory ":"]
-  ucs set defaultpath $path
-}
+# load UCS command wrappers
+sourceFile $jmaxRootDir/tcl/ucs.tcl
 
 ##########################################################################
 #
@@ -135,6 +120,9 @@ package require system
 
 # load installation default packages
 sourceFile $jmaxRootDir/config/packages.tcl
+
+ucs set param sampling_rate $jmaxDefaultSampleRate
+ucs set param fifo_size $jmaxDefaultAudioBuffer
 
 # load installation default audio configuration
 # if profiling is off
