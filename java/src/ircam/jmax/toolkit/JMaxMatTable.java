@@ -132,7 +132,7 @@ public class JMaxMatTable extends JTable
         String name = ((FtsGraphicObject)value).getVariableName();
       
         if( name != null && !name.equals(""))
-          setText(((FtsGraphicObject)value).getDescription()+" "+name);
+          setText(((FtsGraphicObject)value).getDescription()+" #"+name);
         else
           setText(((FtsGraphicObject)value).getDescription()+" #"+((FtsGraphicObject)value).getObjectID());
       }
