@@ -58,13 +58,14 @@ typedef struct _midishare_reference_
 
 static void midishareport_input_event(fts_midiport_t *port, MidiEvPtr evt);
 
+
 static void
 midishare_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   midishare_reference_t *ref = (midishare_reference_t *)o;
   int n_events = MidiCountEvs(ref->number);
   int i;
-
+  
   for(i=0; i<n_events; i++) 
   {
     MidiEvPtr evt = MidiGetEv(ref->number);
@@ -92,7 +93,7 @@ static void
 midishare_reference_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
 {
   int number;
-  midishare_reference_t *ref;
+  midishare_reference_t *ref = (midishare_reference_t*)o;
   fts_atom_t atom, k;
   int i;
   fts_symbol_t name = fts_get_symbol(at);
@@ -107,10 +108,11 @@ midishare_reference_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   ref->name = name;
   ref->number = number;
 
-/*  
   for(i=0; i<256; i++)
+  {
     ref->ports[i] = 0;
-*/
+  }
+
   ref->count = 0;
   
   /* insert reference to hashtable */
@@ -119,7 +121,6 @@ midishare_reference_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   fts_set_object(&atom, (fts_object_t*)ref);
   fts_hashtable_put(&midishare_reference_table, &k, &atom);
 
-  return ref;
 
 }
 
@@ -198,7 +199,8 @@ static void
 midishareport_input_event(fts_midiport_t *port, MidiEvPtr evt)
 {
   int type = EvType(evt);
-  fts_midievent_t* event;
+  fts_midievent_t* event = NULL;
+  fts_atom_t a;
 
   switch(type)
   {
@@ -240,9 +242,9 @@ midishareport_input_event(fts_midiport_t *port, MidiEvPtr evt)
   
   if (event != NULL)
   {
-    fts_atom_t a;
-    fts_set_object(&a, (fts_object_t*) event);
+
     fts_object_refer((fts_object_t*)event);
+    fts_set_object(&a, (fts_object_t*) event);
     fts_midiport_input((fts_object_t*)port, 0, 0, 1, &a);
     fts_object_release((fts_object_t*)event);
 
@@ -672,7 +674,6 @@ midishare_manager_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
   fts_symbol_t label_name = fts_get_symbol(at + 2);
   fts_atom_t* a;
  
-   post("Get %s input port \n", port_name);
   a = fts_array_get_element(&self->inputs, 0);
   if (fts_is_object(a))
   {
@@ -690,7 +691,6 @@ midishare_manager_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac
   fts_symbol_t label_name = fts_get_symbol(at + 2);
   fts_atom_t* a;
   
-  post("Get %s output port \n", port_name);
   a = fts_array_get_element(&self->outputs, 0);
   if (fts_is_object(a))
   {
