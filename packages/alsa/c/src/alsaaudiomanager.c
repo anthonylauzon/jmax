@@ -126,13 +126,13 @@ alsaaudiomanager_scan_devices()
 	default_port = fts_audiomanager_get_port(fts_s_default);
 	if (NULL != default_port)
 	{
-	  if (!fts_audioport_is_input(default_port)
-	      || !fts_audioport_is_output(default_port))
+	  if (!fts_audioport_is_valid(default_port, FTS_AUDIO_INPUT)
+	      || !fts_audioport_is_valid(default_port, FTS_AUDIO_OUTPUT))
 	  {
 	    fts_audiomanager_remove_port(fts_s_default);
 	    fts_object_release(default_port);	    
-	    if (fts_audioport_is_input(port)
-		&&  fts_audioport_is_output(port))
+	    if (fts_audioport_is_valid(port, FTS_AUDIO_INPUT)
+		&&  fts_audioport_is_valid(port, FTS_AUDIO_OUTPUT))
 	    {
 	      fts_object_refer((fts_object_t*) port);
 	      fts_audiomanager_put_port(fts_s_default, port);
@@ -143,8 +143,8 @@ alsaaudiomanager_scan_devices()
 	}
 	else
 	{	  
-	  if (fts_audioport_is_input(port)
-	      &&  fts_audioport_is_output(port))
+	  if (fts_audioport_is_valid(port, FTS_AUDIO_INPUT)
+	      &&  fts_audioport_is_valid(port, FTS_AUDIO_OUTPUT))
 	  {
 	    fts_object_refer((fts_object_t*) port);
 	    fts_audiomanager_put_port(fts_s_default, port);
