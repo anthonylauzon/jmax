@@ -22,4 +22,5 @@ extern void fts_error_object_fit_outlet(fts_object_t *obj, int noutlet);
 extern void fts_recompute_errors(void);
 extern void fts_do_recompute_errors(void);
 
+extern void fts_object_set_error(fts_object_t *obj, const char *format, ...);
 #endif

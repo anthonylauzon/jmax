@@ -42,7 +42,6 @@ SOURCES = \
 	FtsRemoteUndoableData.java		\
 	FtsRemoteDataID.java		\
 	FtsRemoteMetaData.java		\
-	FtsRexecDatagramPort.java	\
 	FtsSelection.java		\
 	FtsServer.java			\
 	FtsSocketPort.java		\

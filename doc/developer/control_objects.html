@@ -596,7 +596,7 @@ identical to standard methods.
 <ul>
 <li> <a href="#The init Method">The <code>init</code> Method</a>
 <li> <a href="#The delete Method">The <code>delete</code> Method</a>
-<li> <a href="#System Messages Selectors">System Messages Selectors</a>
+<li> <a href="#The assist Method">The <code>assist</code> Method</a>
 </ul>
 
 
@@ -650,6 +650,21 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 </pre>
 
 
+<p>
+The init method can detect an error in its argument; in order to signal
+the error, the following function should be called:
+
+<pre>
+extern void fts_object_set_error(fts_object_t *obj, const char *format, ...);
+</pre>
+
+<p>
+The obj argument should be the object being initialized; the format
+argument is a string in the "printf" format, followed by a variable
+number of arguments; the user interface will then show the object
+as an error object (red) and the string passed by format and the
+following arguments will be used as error message for the object.
+<p>
 
 <a name="The delete Method"><h3>The <code>delete</code> Method</h3></a>
 
@@ -672,7 +687,26 @@ fts_status_t integer_instantiate( fts_class_t *class, int ac, fts_atom_t *at)
 }
 </pre>
 
+<a name="The assist Method"><h3>The <code>assist</code> Method</h3></a>
 
+<p>
+The assist method allow an object to define a short help describing
+itself, and its inlet and outlet roles; this help will be shown
+in the status line when the mouse pass over the object or the object
+inlets and outlets.
+<p>
+The assist method receive either one or two arguments describing the
+help requested; the first is always a symbol between "object", "inlet"
+and "outlet"; in the case of a inlet or outlet, the following argument
+is the position of the inlet/outlet.
+<p>
+The message should be sent with the following function:
+<pre>
+extern void fts_object_blip(fts_object_t *obj, const char *format, ...)
+</pre>
+Where obj should be the current object, the format argument is in 
+<code>printf</code> syntax, and the following arguments are used with
+format to produce the message.
 
 
 <!-- ---------------------------------------------------------------------- -->
@@ -860,6 +894,11 @@ of outlets. This is done by the <code>fts_class_init</code> function.
  described
 </ul>
 
+<p>
+The instantiation function can should return <code>fts_Success</code> if
+the class has been instantiate correctly, or
+<code>fts_CannotInstantiate</code> in case of errors.
+
 
 <a name="The fts_class_init Function"><h3>The <code>fts_class_init</code> Function</h3></a>
 
@@ -882,7 +921,6 @@ the number of outlets of the objects of the class
 this argument will be simply stored in the fts_class_t structure, giving
 a simple way to share datas between all the objects of a class
 </dl>
-
 
 <a name="Class Instantiation Function Example"><h3>Class Instantiation Function Example</h3></a>
 
@@ -1118,7 +1156,6 @@ static fts_status_t bangbang_instantiate(fts_class_t *class, int ac, const fts_a
   return fts_Success;
 }
 </pre>
-
 
 
 <a name="Metaclasses Installation"><h3>Metaclasses Installation</h3></a>

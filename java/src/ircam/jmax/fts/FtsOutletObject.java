@@ -43,6 +43,12 @@ public class FtsOutletObject  extends FtsInOutletObject
     noutlets = 0;
   }
 
+  public void setPosition(int i)
+  {
+    super.setPosition(i);
+
+    Fts.getServer().repositionOutletObject(this, i);
+  }
 
   /** Get the number of outlets of the object 
     Overwrite the FtsObject method because inlets

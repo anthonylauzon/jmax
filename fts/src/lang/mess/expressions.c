@@ -765,8 +765,10 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 
 		  TRY(fts_expression_eval_one(e));
 
-		  if ((! fts_is_comma(current_in(e))) && (! fts_is_closed_cpar(current_in(e))))
-		    return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, "Syntax error in array constant", 0);
+		  /* Skip the comma if any (little HACK !! for compatibility) */
+
+		  if (fts_is_comma(current_in(e)))
+		    next_in(e);
 
 		  args++;
 		}

@@ -734,8 +734,9 @@ fts_mess_client_mess(int ac, const fts_atom_t *av)
 	  return;
 	}
 
-      /* Ignore failure; it is normal that the UI interface try to send */
-      /* messages that have no methods defined */
+      /* Ignore failure; it is normal that the UI interface try to send
+	 messages that have no methods defined
+	 */
 
       fts_message_send(obj, inlet, selector, ac - 3, av + 3);
     }

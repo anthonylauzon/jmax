@@ -51,7 +51,6 @@ public class FtsInOutletObject  extends FtsObject
     position = i;
     description = className + " " + position;
 
-    Fts.getServer().repositionInletObject(this, position);
     setDirty();
   }
 

@@ -353,7 +353,7 @@ static void fts_binding_add_definition(fts_binding_t *var, fts_object_t *object)
 
   for (d = var->definitions; d; d = d->next)
     {
-      if (owner == d->obj)
+      if (object == d->obj)
 	return;
     }
 

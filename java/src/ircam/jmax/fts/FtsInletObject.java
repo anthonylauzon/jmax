@@ -45,6 +45,14 @@ public class FtsInletObject  extends FtsInOutletObject
     noutlets = 1;
   }
 
+
+  public void setPosition(int i)
+  {
+    super.setPosition(i);
+
+    Fts.getServer().repositionInletObject(this, i);
+  }
+
   /** Get the number of inlets of the object 
     Overwrite the FtsObject method because inlets
     do not believe to FTS, when it say inlets have

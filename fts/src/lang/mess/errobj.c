@@ -128,3 +128,41 @@ void fts_do_recompute_errors(void)
       fts_object_set_delete(errors);
     }
 }
+
+
+/* Set the error state of an object; can be enterly done with properties */
+
+void fts_object_set_error(fts_object_t *obj, const char *format, ...)
+{
+  va_list ap;
+  char buf[1024];
+  fts_atom_t a;
+
+  fts_atom_t description[1];
+
+  /* Make up the error  property  */
+
+  fts_set_int(&a, 1);
+  fts_object_put_prop(obj, fts_s_error, &a);
+
+  /* Make up the errdesc property  */
+
+  va_start(ap, format);
+  vsprintf(buf, format, ap);
+  va_end(ap);
+
+  fts_set_symbol(&a, fts_new_symbol_copy(buf));
+  fts_object_put_prop(obj, fts_s_error_description, &a);
+}
+
+
+
+
+
+
+
+
+
+
+
+
