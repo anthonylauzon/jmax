@@ -660,17 +660,14 @@ typedef struct _fts_midiparser_
 
 } fts_midiparser_t;
 
-#define fts_midiparser_set_event(p, e) fts_object_refer((p)->event = (e))
-#define fts_midiparser_set_time(p, t) ((p)->time = (t))
-
 FTS_API void fts_midiparser_init(fts_midiparser_t *parser);
 FTS_API void fts_midiparser_reset(fts_midiparser_t *parser);
+FTS_API void fts_midiparser_set_event(fts_midiparser_t *parser, fts_midievent_t *event);
 FTS_API fts_midievent_t *fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte);
-FTS_API void fts_midiparser_reset_event(fts_midiparser_t *parser);
 
 /*****************************************************
  *
- *  MIDI Manager
+ *  MIDI manager
  *
  */
 
@@ -695,6 +692,37 @@ FTS_API fts_midiport_t *fts_midimanager_get_input(fts_symbol_t name);
 FTS_API fts_midiport_t *fts_midimanager_get_output(fts_symbol_t name);
 
 /* MIDI manager API */
+FTS_API void fts_midimanager_update(fts_midimanager_t *mm);
 FTS_API void fts_midimanager_class_init(fts_class_t *class);
 FTS_API void fts_midimanager_set(fts_midimanager_t *mm);
 FTS_API fts_midimanager_t *fts_midimanager_get(void);
+
+/*****************************************************
+ *
+ *  MIDI fifo
+ *
+ */
+
+typedef struct fts_midififo_entry
+{
+  double time;
+  fts_midievent_t *event;
+  fts_object_t *port;
+} fts_midififo_entry_t;
+
+typedef struct fts_midififo
+{
+  fts_fifo_t data;
+  int size;
+  double delta;
+} fts_midififo_t;
+
+#define fts_midififo_get_events(f) ((fts_midififo_entry_t **)((f)->data.buffer))
+
+FTS_API void fts_midififo_init(fts_midififo_t *fifo, int size);
+FTS_API void fts_midififo_destroy(fts_midififo_t *fifo);
+FTS_API void fts_midififo_poll(fts_midififo_t *fifo);
+FTS_API fts_midievent_t *fts_midififo_get_event(fts_midififo_t *fifo);
+FTS_API void fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time);
+
+

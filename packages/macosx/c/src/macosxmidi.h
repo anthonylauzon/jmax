@@ -34,11 +34,14 @@ typedef struct _macosxmidi_
 {
   fts_midimanager_t manager;
   MIDIClientRef client;
+  UInt64 delta;
   fts_hashtable_t inputs;
   fts_hashtable_t outputs;
   fts_hashtable_t sources;
   fts_hashtable_t destinations;
-  fts_timebase_fifo_t fifo;
+  fts_midififo_t fifo;
+  int notify;
+  int acknowledge;
 } macosxmidi_t;
 
 typedef struct _macosxmidiport_

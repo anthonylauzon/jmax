@@ -48,37 +48,34 @@ static void
 sysexin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   sysex_t *this = (sysex_t *)o;
+  fts_symbol_t name;
 
   ac--;
   at++;
 
-  this->port = 0;
+  this->port = NULL;
 
-  if(ac > 0)
-    {
-      if(fts_is_object(at))
-	{
-	  fts_object_t *obj = fts_get_object(at);
-	  
-	  if(fts_object_is_midiport(obj) && fts_midiport_is_input((fts_midiport_t *)obj))
-	    this->port = (fts_midiport_t *)fts_get_object(at);
-	  
-	}
-      
-      if(!this->port)
-	fts_object_set_error(o, "Argument of class midi port required");
+  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
+
+  name = fts_get_symbol(at);
+
+  if(ac > 0 && fts_is_symbol(at)) {
+    this->port = fts_midimanager_get_input(name);
+
+    if(this->port == NULL) {
+      fts_object_set_error(o, "Cannot find MIDI input %s", name);
+      return;
     }
-  else
-    {
-      this->port = 0;
-      
-      if(!this->port)
-	fts_object_set_error(o, "Default MIDI port is not defined");
-    }
+  }
+
+  if(this->port == NULL)
+    this->port = fts_midimanager_get_input(fts_s_default);
   
-  /* add call back to midi port */
-  if(this->port)
+  /* add call back to midi port or set error */
+  if(this->port != NULL)
     fts_midiport_add_listener(this->port, midi_system_exclusive, midi_channel_any, midi_controller_any, o, sysexin_callback);
+  else
+    fts_object_set_error(o, "Cannot find default MIDI output");
 }
 
 static void 
@@ -123,33 +120,33 @@ sysexout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 static void
 sysexout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
+{
   sysex_t *this = (sysex_t *)o;
+  fts_symbol_t name;
 
   ac--;
   at++;
 
-  this->port = 0;
-   if(ac > 0)
-    {
-      if(fts_is_object(at))
-	{
-	  fts_object_t *obj = fts_get_object(at);
-	  
-	  if(fts_object_is_midiport(obj) && fts_midiport_is_output((fts_midiport_t *)obj))
-	    this->port = (fts_midiport_t *)fts_get_object(at);
-	}
-      
-      if(!this->port)
-	fts_object_set_error(o, "Argument of class midi port required");
+  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
+
+  this->port = NULL;
+
+  name = fts_get_symbol(at);
+
+  if(ac > 0 && fts_is_symbol(at)) {
+    this->port = fts_midimanager_get_output(name);
+
+    if(this->port == NULL) {
+      fts_object_set_error(o, "Cannot find MIDI output %s", name);
+      return;
     }
-  else
-    {
-      this->port = 0;
-      
-      if(!this->port)
-	fts_object_set_error(o, "Default MIDI port is not defined");
-    }
+  }
+
+  if(this->port == NULL)
+    this->port = fts_midimanager_get_output(fts_s_default);
+
+  if(this->port == NULL)
+    fts_object_set_error(o, "Cannot find default MIDI output");
 }
 
 static void 

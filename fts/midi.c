@@ -53,8 +53,7 @@ fts_midievent_channel_message_init(fts_midievent_t *event, enum midi_type type, 
   event->data.channel_message.second = byte2;
 }
 
-fts_midievent_t *
-fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2)
+fts_midievent_t *   fts_midievent_channel_message_new(enum midi_type type, int channel, int byte1, int byte2)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
   fts_midievent_channel_message_init(event, type, channel, byte1, byte2);
@@ -498,19 +497,28 @@ midiparser_get_event(fts_midiparser_t *parser)
 }
 
 void
-fts_midiparser_reset_event(fts_midiparser_t *parser)
+fts_midiparser_set_event(fts_midiparser_t *parser, fts_midievent_t *event)
 {
-  if(parser->event != NULL)
-    fts_object_release(parser->event);
+  if(event != parser->event) {
+    if(parser->event != NULL)
+      fts_object_release(parser->event);
 
-  parser->event = NULL;
+    parser->event = event;
+
+    if(event != NULL)
+      fts_object_refer(event);
+  }
 }
 
 void
 fts_midiparser_reset(fts_midiparser_t *parser)
 {
   fts_array_destroy(&parser->system_exclusive);
-  fts_midiparser_reset_event(parser);
+
+  if(parser->event != NULL)
+    fts_object_release(parser->event);
+
+  parser->event = NULL;
 }
 
 fts_midievent_t *
@@ -1654,6 +1662,13 @@ fts_midimanager_get_output(fts_symbol_t name)
 
 /* midi manager API */
 void
+fts_midimanager_update(fts_midimanager_t *mm)
+{
+  midimanager_update_labels(mm);
+  midimanager_update_devices(mm);
+}
+
+void
 fts_midimanager_class_init(fts_class_t *class)
 {
   fts_method_define_varargs(class, fts_SystemInlet, fts_s_insert, midimanager_insert_label);
@@ -1686,6 +1701,112 @@ fts_midimanager_t *
 fts_midimanager_get(void)
 {
   return midimanager;
+}
+
+/***************************************************
+*
+*  midi fifo
+*
+*/
+void
+fts_midififo_init(fts_midififo_t *fifo, int size)
+{
+  int bytes = sizeof(fts_midififo_entry_t) * size;
+  fts_midififo_entry_t *entries;
+  int i;
+
+  fts_fifo_init(&fifo->data, fts_malloc(bytes), bytes);
+  entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
+
+  for(i=0; i<size; i++) {
+    fts_object_t *obj = fts_object_create(fts_midievent_type, 0, 0);
+    fts_object_refer(obj);
+    entries[i].event = (fts_midievent_t *)obj;
+  }
+
+  fifo->delta = 0.0;
+  fifo->size = size;
+}
+
+void
+fts_midififo_destroy(fts_midififo_t *fifo)
+{
+  fts_midififo_entry_t *entries = (fts_midififo_entry_t *)fts_fifo_get_buffer(&fifo->data);
+  int i;
+
+  for(i=0; i<fifo->size; i++)
+    fts_object_release((fts_object_t *)entries[i].event);
+
+  fts_free((void *)fifo->data.buffer);
+}
+
+/* read next fifo entry into time base (returns pointer to atom of newly allocated entry) */
+void
+fts_midififo_poll(fts_midififo_t *fifo)
+{
+  if(fts_fifo_read_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) {
+    fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_read_pointer(&fifo->data);
+    double now = fts_get_time();
+    double delay;
+    fts_atom_t a;
+
+    /* set midievent argument */
+    fts_set_object(&a, entry->event);
+
+    /* time == 0.0 means: send now */
+    if(entry->time != 0.0) {
+      /* adjust delta time on very first fifo entry */
+      if(fifo->delta == 0.0)
+        fifo->delta = entry->time;
+
+      /* translate event time to delay */
+      delay = entry->time - fifo->delta;
+
+      /* adjust delta time */
+      if(delay < 0.0) {
+        delay = 0.0;
+        fifo->delta = entry->time;
+      }
+
+      /* schedule midiport input call */
+      fts_timebase_add_call(fts_get_timebase(), entry->port, fts_midiport_input, &a, delay);
+    } else
+      fts_midiport_input(entry->port, 0, 0, 1, &a);
+
+    fts_object_release(entry->event);
+
+    /* insert a new midievent into fifo and claim it */
+    entry->event = (fts_midievent_t *)fts_object_create(fts_midievent_type, 0, 0);
+    fts_object_refer(entry->event);
+
+    fts_fifo_incr_read(&fifo->data, sizeof(fts_midififo_entry_t));
+  }
+}
+
+fts_midievent_t *
+fts_midififo_get_event(fts_midififo_t *fifo)
+{
+  if(fts_fifo_write_level(&fifo->data) >= sizeof(fts_midififo_entry_t)) {
+    fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
+    return entry->event;
+  } else
+    return NULL;
+}
+
+void
+fts_midififo_write(fts_midififo_t *fifo, fts_object_t *port, double time)
+{
+  fts_midififo_entry_t *entry = (fts_midififo_entry_t *)fts_fifo_write_pointer(&fifo->data);
+  
+  /* set midport */
+  entry->port = port;
+  fts_object_refer(port);
+
+  /* set time */
+  entry->time = time;
+
+  /* send entry */
+  fts_fifo_incr_write(&fifo->data, sizeof(fts_midififo_entry_t));
 }
 
 /************************************************************

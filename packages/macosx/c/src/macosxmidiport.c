@@ -48,42 +48,41 @@ macosxmidiport_parse_input(const MIDIPacketList *pktlist, void *o, void *src)
   macosxmidiport_t *this = (macosxmidiport_t *)o;
   macosxmidi_t *manager = this->manager;
   fts_midiparser_t *parser = &this->parser;
-  fts_timebase_fifo_t *fifo = &manager->fifo;
+  fts_midififo_t *fifo = &manager->fifo;
   const MIDIPacket *packet = &pktlist->packet[0];
-  fts_timebase_entry_t *entry;
   fts_midievent_t *event;
   int i, j;
 
-  /* set MIDI parser event to next fifo event */
-  entry = fts_timebase_fifo_get_entry(fifo);
-  event = (fts_midievent_t *)fts_get_object(fts_timebase_entry_get_atom(entry));
+  /* get event of next entry and set parser */
+  event = fts_midififo_get_event(fifo);
   fts_midiparser_set_event(parser, event);
 
   for(i=0; i<pktlist->numPackets; i++) {
     double time = 0.000001 * (double)AudioConvertHostTimeToNanos(packet->timeStamp);
 
-    for(j=0; j<packet->length; j++) {
-      fts_midievent_t *parsed = fts_midiparser_byte(parser, packet->data[j]);
+    if(event != NULL) {
+      for(j=0; j<packet->length; j++) {
+        fts_midievent_t *parsed = fts_midiparser_byte(parser, packet->data[j]);
 
-      if(parsed != NULL) {
-        /* set timebase fifo entry (NULL since atom is already set) */
-        fts_timebase_entry_set(entry, o, fts_midiport_input, NULL, time);
+        if(parsed != NULL) {
+          /* write fifo entry */
+          fts_midififo_write(fifo, o, time);
 
-        /* finally write fifo */
-        fts_timebase_fifo_incr(fifo);
+          /* get event of next entry and set parser */
+          event = fts_midififo_get_event(fifo);
+          fts_midiparser_set_event(parser, event);
 
-        /* get next entry from fifo and event from entry to set parser */
-        entry = fts_timebase_fifo_get_entry(fifo);
-        event = (fts_midievent_t *)fts_get_object(fts_timebase_entry_get_atom(entry));
-        fts_midiparser_set_event(parser, event);
+          if(event == NULL)
+            break;
+        }
       }
-
-      packet = MIDIPacketNext(packet);
-    }
+    } else
+      fts_object_signal_runtime_error((fts_object_t *)o, "MIDI buffer overflow");
+    
+    packet = MIDIPacketNext(packet);
   }
   
-  /* reset event of parser (entry might be used by another port) */
-  fts_midiparser_reset_event(parser);
+  fts_midiparser_set_event(parser, NULL);
 }
 
 static void
@@ -92,31 +91,36 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
   macosxmidiport_t *this = (macosxmidiport_t *)o;
   MIDIPacketList pktlist;
   MIDIPacket *pkt = MIDIPacketListInit(&pktlist);
+  UInt64 hosttime = AudioGetCurrentHostTime();
+  UInt64 ftstime = Audioconvertnanostohosttime((UInt64)(1000000.0 * fts_get_time()));
 
-  if(fts_midievent_is_channel_message(event))
-    {
+  if(this->manager->delta == 0)
+    this->manager->delta = hosttime - ftstime;
+  
+  pkt->timeStamp = ftstime + this->manager->delta;
+
+  if(pkt->timeStamp < hosttime) {
+    this->manager->delta = hosttime - ftstime;
+    pkt->timeStamp = hosttime;
+  }
+    
+  if(fts_midievent_is_channel_message(event)) {
     Byte buffer[3];
 
-    if(fts_midievent_channel_message_has_second_byte(event))
-      {
+    if(fts_midievent_channel_message_has_second_byte(event)) {
       buffer[0] = (unsigned char)fts_midievent_channel_message_get_status_byte(event);
       buffer[1] = (unsigned char)(fts_midievent_channel_message_get_first(event) & 0x7f);
       buffer[2] = (unsigned char)(fts_midievent_channel_message_get_second(event) & 0x7f);
 
       MIDIPacketListAdd(&pktlist, sizeof(MIDIPacketList), pkt, 0, 3, buffer);
-      }
-    else
-      {
+    } else {
       buffer[0] = (unsigned char)fts_midievent_channel_message_get_status_byte(event);
       buffer[1] = (unsigned char)(fts_midievent_channel_message_get_first(event) & 0x7f);
 
       MIDIPacketListAdd(&pktlist, sizeof(MIDIPacketList), pkt, 0, 2, buffer);
-      }
     }
-  else
-    {
-    switch(fts_midievent_get_type(event))
-      {
+  } else {
+    switch(fts_midievent_get_type(event)) {
       case midi_system_exclusive:
         {
           Byte buffer[BUFFER_LENGTH];
@@ -151,8 +155,8 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 
       default:
         break;
-      }
     }
+  }
 
   if(this->port != NULL)
     MIDISend(this->port, this->ref, &pktlist);

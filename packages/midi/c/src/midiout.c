@@ -310,53 +310,47 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   this->channel = 0;
   this->number = 0;
 
-  if(ac > 0)
-    {
-      if(fts_is_symbol(at))
-	{
-	  fts_symbol_t name = fts_get_symbol(at);
-	  fts_midiport_t *port = fts_midimanager_get_output(name);
+  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
 
-	  /* skip port argument */
-	  ac--;
-	  at++;
+  if(ac > 0) {
+    if(fts_is_symbol(at)) {
+      fts_symbol_t name = fts_get_symbol(at);
 
-	  if(port != NULL)
-	    this->port = port;
-	  else
-	    {
-	      fts_object_set_error(o, "Cannot find MIDI output %s", name);
-	      return;
-	    }
-	}
-  
-      if(ac == 2 && fts_is_number(at))
-	{
-	  int n = fts_get_number_int(at);;
-	  
-	  this->number = (n < 0)? 0: ((n > 127)? 127: n);      
-	  
-	  /* skip number argument */
-	  ac--;
-	  at++;
-	}
+      this->port = fts_midimanager_get_output(name);
 
-      if(ac == 1 && fts_is_number(at))
-	{
-	  int n = fts_get_number_int(at) - 1;
-	  
-	  this->channel = (n < 0)? 0: ((n > 15)? 15: n);
-	}
+      /* skip port argument */
+      ac--;
+      at++;
+
+      if(this->port == NULL) {
+        fts_object_set_error(o, "Cannot find MIDI output %s", name);
+        return;
+      }
     }
-  
-  /* if there is still no port just get default */
-  if(!this->port)
+
+    if(ac == 2 && fts_is_number(at)) {
+      int n = fts_get_number_int(at);;
+
+      this->number = (n < 0)? 0: ((n > 127)? 127: n);
+
+      /* skip number argument */
+      ac--;
+      at++;
+    }
+
+    if(ac == 1 && fts_is_number(at)) {
+      int n = fts_get_number_int(at) - 1;
+
+      this->channel = (n < 0)? 0: ((n > 15)? 15: n);
+    }
+  }
+
+  /* if there is still no port try default */
+  if(this->port == NULL)
     this->port = fts_midimanager_get_output(fts_s_default);
 
-  if(!this->port)
+  if(this->port == NULL)
     fts_object_set_error(o, "Cannot find default MIDI output");
-
-  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
 }
 
 static fts_status_t

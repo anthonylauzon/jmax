@@ -455,26 +455,20 @@ static void
 macosxmidi_notify(const MIDINotification *message, void *o)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  SInt32 id = message->messageID;
-  ByteCount size = message->messageSize;
-
-  /* use fifo to notify change */
+  
+  this->notify++;
 }
 
 static void
 macosxmidi_poll_fifo( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  fts_timebase_entry_t *call = fts_timebase_fifo_next(&this->fifo);
 
-  while(call != NULL) {
-    fts_atom_t *atom = fts_timebase_entry_get_atom(call);
-    fts_object_t *event = fts_object_create(fts_midievent_type, 0, 0);
+  fts_midififo_poll(&this->fifo);
 
-    /* fill new fifo entry with new MIDI event */
-    fts_set_object(atom, event);
-
-    call = fts_timebase_fifo_next(&this->fifo);
+  if(this->acknowledge < this->notify) {
+    fts_midimanager_update((fts_midimanager_t *)this);
+    this->acknowledge = this->notify;
   }
 }
 
@@ -483,25 +477,19 @@ macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_timebase_entry_t **entries;
-  int i;
 
   fts_hashtable_init(&this->inputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->outputs, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->sources, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   fts_hashtable_init(&this->destinations, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
 
-  fts_timebase_fifo_init(&this->fifo, fts_get_timebase(), MACOSXMIDI_FIFO_SIZE);
-  entries = fts_timebase_fifo_get_entries(&this->fifo);
-
-  /* init timebase fifo with empty MIDI events */
-  for(i=0; i<MACOSXMIDI_FIFO_SIZE; i++) {
-    fts_atom_t *atom = fts_timebase_entry_get_atom(entries[i]);
-    fts_object_t *event = fts_object_create(fts_midievent_type, 0, 0);
-    fts_set_object(atom, event);
-  }
-
-  fts_sched_add(o, FTS_SCHED_ALWAYS);  
-
+  this->delta = 0;
+  this->notify = 0;
+  this->acknowledge = 0;
+  
+  fts_midififo_init(&this->fifo, MACOSXMIDI_FIFO_SIZE);
+  fts_sched_add(o, FTS_SCHED_ALWAYS);
+  
   MIDIClientCreate(CFSTR("jMax"), macosxmidi_notify, (void *)o, &this->client);
 }
 
@@ -509,12 +497,8 @@ static void
 macosxmidi_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
-  fts_timebase_entry_t **entries = fts_timebase_fifo_get_entries(&this->fifo);
-  int i;
 
-  /* reset MIDI events in timebase fifo */
-  for(i=0; i<MACOSXMIDI_FIFO_SIZE; i++)
-    fts_timebase_entry_reset(entries[i]);
+  fts_midififo_destroy(&this->fifo);
   
   MIDIClientDispose(this->client);
 }
@@ -563,13 +547,13 @@ mm_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 void 
 macosxmidi_config( void)
 {
+  fts_metaclass_t *mc = fts_class_install(fts_new_symbol("macosxmidi"), macosxmidi_instantiate);
+  fts_midimanager_t *mm = (fts_midimanager_t *)fts_object_create(mc, 0, 0);
+
   macosxmidi_symbol_jmax_prefix = fts_new_symbol("jMax: ");
   macosxmidi_symbol_iac_midi_source = fts_new_symbol("IAC Source");
   macosxmidi_symbol_iac_midi_destination = fts_new_symbol("IAC Destination");
   
-  fts_metaclass_t *mc = fts_class_install(fts_new_symbol("macosxmidi"), macosxmidi_instantiate);
-  fts_midimanager_t *mm = (fts_midimanager_t *)fts_object_create(mc, 0, 0);
-
   fts_class_install(fts_new_symbol("mm"), mm_instantiate);
   
   fts_midimanager_set(mm);

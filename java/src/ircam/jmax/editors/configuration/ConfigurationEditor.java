@@ -79,7 +79,7 @@ public class ConfigurationEditor extends JFrame implements EditorContainer
     tabbedPane = new JTabbedPane();
     tabbedPane.setBorder( BorderFactory.createEtchedBorder());
     tabbedPane.setPreferredSize( new Dimension( 500, 350));
-    tabbedPane.addTab("Midi", midiPanel);
+    tabbedPane.addTab("MIDI", midiPanel);
     tabbedPane.addTab("Audio", audioPanel);
     tabbedPane.setSelectedIndex(0);
     tabbedPane.setEnabledAt( 1, false);

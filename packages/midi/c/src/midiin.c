@@ -162,34 +162,32 @@ xbend_channel_callback(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
  *
  */
 
-int
-midiin_get_port(fts_object_t *o, int ac, const fts_atom_t *at, fts_midiport_t **port)
+static fts_midiport_t *
+midiin_get_port(fts_object_t *o, int ac, const fts_atom_t *at)
 {
-  *port = 0;
+  fts_midiport_t *port = NULL;
 
-  if(ac > 0 && fts_is_object(at))
-    {
-      fts_object_t *obj = fts_get_object(at);
-      
-      if(fts_object_is_midiport(obj) && fts_midiport_is_input((fts_midiport_t *)obj))
-	*port = (fts_midiport_t *)obj;	  
-      else if(o)
-	{
-	  fts_object_set_error(o, "Wrong argument for midiport");
-	  return 0;
-	}
+  fts_variable_add_user(fts_get_root_patcher(), fts_s_midimanager, o);
+
+  if(ac > 0 && fts_is_symbol(at)) {
+    fts_symbol_t name = fts_get_symbol(at);
+
+    port = fts_midimanager_get_input(name);
+
+    if(port == NULL) {
+      fts_object_set_error(o, "Cannot find MIDI input %s", name);
+      return NULL;
     }
-  
-  if(!*port)
-    *port = 0;  
+  }
 
-  if(!*port)
-    {
-      fts_object_set_error(o, "Default MIDI port is not defined");
-      return 0;
-    }
+  /* if there is still no port try default */
+  if(port == NULL)
+    port = fts_midimanager_get_input(fts_s_default);
 
-  return 1;
+  if(port == NULL)
+    fts_object_set_error(o, "Cannot find default MIDI output");
+
+  return port;
 }
 
 static int 
@@ -200,7 +198,7 @@ midiin_get_filters(fts_object_t *o, int ac, const fts_atom_t *at, int *channel, 
 
   if(ac > 0)
     {
-      if(fts_is_object(at))
+      if(fts_is_symbol(at))
 	{
 	  /* skip port argument */
 	  ac--;
@@ -232,7 +230,6 @@ midiin_get_filters(fts_object_t *o, int ac, const fts_atom_t *at, int *channel, 
 
       if(ac == 1)
 	{
-      
 	  if(fts_is_number(at))
 	    {
 	      int n = fts_get_number_int(at) - 1;
@@ -278,7 +275,9 @@ midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   ac--;
   at++;
 
-  if(midiin_get_port(o, ac, at, &this->port))
+  this->port = midiin_get_port(o, ac, at);
+  
+  if(this->port)
     {
       this->type = midi_type_any;
       this->channel = midi_channel_any;
@@ -298,8 +297,9 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   at++;
 
   this->type = midi_note;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_controller_any && this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, note_callback);
@@ -320,8 +320,9 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   at++;
 
   this->type = midi_poly_pressure;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_controller_any && this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_callback);
@@ -341,8 +342,9 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   at++;
 
   this->type = midi_control_change;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_controller_any && this->channel == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, poly_callback);
@@ -362,8 +364,9 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   at++;
 
   this->type = midi_program_change;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_callback);
@@ -381,8 +384,9 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   at++;
 
   this->type = midi_channel_pressure;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, value_callback);
@@ -400,8 +404,9 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   at++;
 
   this->type = midi_pitch_bend;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, bend_callback);
@@ -419,8 +424,9 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   at++;
 
   this->type = midi_pitch_bend;
+  this->port = midiin_get_port(o, ac, at);
 
-  if(midiin_get_port(o, ac, at, &this->port) && midiin_get_filters(o, ac, at, &this->channel, &this->number))
+  if(this->port && midiin_get_filters(o, ac, at, &this->channel, &this->number))
     {
       if(this->number == midi_channel_any)
 	fts_midiport_add_listener(this->port, this->type, this->channel, this->number, o, xbend_callback);
