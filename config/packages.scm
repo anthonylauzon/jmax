@@ -32,12 +32,6 @@
     (require-package "math" "0.0.0")
 )
 
-; ISPW classes
-(require-package "ispw" "0.0.0")
-(require-package "table" "0.0.0")
-(require-package "qlist" "0.0.0")
-(require-package "explode" "0.0.0")
-
 ; new classes
 (require-package "data" "0.0.0")
 (require-package "control" "0.0.0")
@@ -45,6 +39,11 @@
 (require-package "numeric" "0.0.0")
 (require-package "lists" "0.0.0")
 
+; ISPW classes
+(require-package "ispw" "0.0.0")
+(require-package "table" "0.0.0")
+(require-package "qlist" "0.0.0")
+(require-package "explode" "0.0.0")
 
 ; I/O package
 (require-package "io" "0.0.0")
