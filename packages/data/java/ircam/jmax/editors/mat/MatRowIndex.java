@@ -86,11 +86,17 @@ public void paintComponent(Graphics g)
   int rows = data.getRows();
   g.setColor( MatPanel.rowsIdColor);
   g.fillRect(0, 0, d.width, d.height);
-
-  int rectY = MatPanel.ROW_HEIGHT - yTransp;
+  
   String idxString;
   int strW = 0;
-  for(int i = 0; i<rows; i++)
+  int first = yTransp/MatPanel.ROW_HEIGHT;
+  if(first<0) first = 0;
+  int last = first + d.height/MatPanel.ROW_HEIGHT + 1;
+  if(last > rows) last = rows;  
+  
+  int rectY = (first+1)*MatPanel.ROW_HEIGHT - yTransp;
+  //for(int i = 0; i<rows; i++)
+  for(int i = first; i < last; i++)
   {
     g.setColor( MatPanel.matGridColor);
     g.drawLine(0, rectY, d.width, rectY);

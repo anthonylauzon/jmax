@@ -1643,6 +1643,9 @@ fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] += r[i];
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1660,6 +1663,9 @@ fmat_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] += r;
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1681,7 +1687,10 @@ fmat_sub_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] -= r[i];
-  
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1699,6 +1708,9 @@ fmat_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] -= r;
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1721,6 +1733,9 @@ fmat_mul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] *= r[i];
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1738,6 +1753,9 @@ fmat_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] *= r;
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1760,6 +1778,9 @@ fmat_div_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] /= r[i];
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1777,6 +1798,9 @@ fmat_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] /= r;
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1798,7 +1822,10 @@ fmat_bus_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     
     for(i=0; i<size; i++)
       l[i] = r[i] - l[i];
-  
+
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1816,6 +1843,9 @@ fmat_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   for(i=0; i<size; i++)
     p[i] = r - p[i];
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1838,6 +1868,9 @@ fmat_vid_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for(i=0; i<size; i++)
       l[i] = r[i] / l[i];
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1856,11 +1889,11 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<size; i++)
     p[i] = r / p[i];
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
-
-
-
 
 /******************************************************************************
  *
@@ -1885,7 +1918,10 @@ fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] == r[i]);
-  
+ 
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1903,6 +1939,9 @@ fmat_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] == r);
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1924,7 +1963,10 @@ fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] != r[i]);
-  
+    
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1942,6 +1984,9 @@ fmat_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] != r);
+
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -1964,6 +2009,9 @@ fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] > r[i]);
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -1981,6 +2029,9 @@ fmat_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] > r);
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2002,7 +2053,10 @@ fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] >= r[i]);
-  
+
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -2020,6 +2074,9 @@ fmat_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] >= r);
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2042,6 +2099,9 @@ fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] < r[i]);
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -2059,6 +2119,9 @@ fmat_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] < r);
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2081,6 +2144,9 @@ fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<size; i++)
       l[i] = (float)(l[i] <= r[i]);
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -2099,10 +2165,11 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<size; i++)
     p[i] = (float)(p[i] <= r);
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
-
-
 
 
 /******************************************************************************
@@ -2153,7 +2220,10 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     
     for(i=0; i<in_m*n; i++)
       ptr[i] = res[i]; 
-      
+ 
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -2311,6 +2381,9 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
         break;
     }
     
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
@@ -2357,13 +2430,14 @@ fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
         break;
     }
   
+    if(fmat_editor_is_open(self))
+      fmat_upload_data(self);
+    
     fts_return_object(o);
   }
   else
     fts_object_error((fts_object_t *)self, "cmul: can't multiply %s matrix %d x %d with number", fts_symbol_name(fmat_format_get_name(format)), m, n);
 }
-
-
 
 
 /******************************************************************************
@@ -2447,6 +2521,9 @@ fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -2491,6 +2568,9 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] = logf(fabsf(ptr[i]));
       break;
   }
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2540,6 +2620,9 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -2588,6 +2671,9 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -2632,6 +2718,9 @@ fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
         ptr[i] *= ptr[i];
       break;
   }
+
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2685,6 +2774,9 @@ fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
         ptr[i] = sqrtf(ptr[i]);
       break;
   }
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2745,6 +2837,9 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       break;
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -2787,6 +2882,9 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       /* fmat format error */
       break;
   }
+ 
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2822,6 +2920,9 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
         ptr[i] *= scale;
     }
   }
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2861,6 +2962,9 @@ fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     
     ptr += n;
   }
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -2948,6 +3052,9 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     }
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -3006,6 +3113,9 @@ fmat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }    
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -3045,6 +3155,9 @@ fmat_tros(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       ptr[i + col] = f;
     }    
   }
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -3087,7 +3200,10 @@ fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       }
     }
   }  
-  
+    
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+
   fts_return_object(o);
 }
 
@@ -3158,6 +3274,9 @@ fmat_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -3199,6 +3318,9 @@ fmat_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     }
   }
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -3214,7 +3336,10 @@ fmat_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   for(i=0; i<m*n; i++)
     ptr[i] = bpf_get_interpolated(bpf, ptr[i]);
-  
+
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+
   fts_return_object(o);
 }
     
@@ -3268,7 +3393,10 @@ fmat_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       f_index += incr;
     }
   }
-  
+
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+
   fts_return_object(o);
 }
 
@@ -3294,6 +3422,9 @@ fmat_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       
     time += incr;  
   }
+
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
   
   fts_return_object(o);
 }
@@ -3338,7 +3469,10 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_hashtable_destroy(&locals);
 
   fts_set_void(fts_get_return_value());
-  
+    
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+
   fts_return_object(o);
 }
 
@@ -3366,6 +3500,9 @@ fmat_convert_vec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       ptr[i] = ptr[j];
       
     fmat_reshape(self, m, 1);
+  
+    if(fmat_editor_is_open(self))
+      fmat_upload(self);
   }
   
   fts_return_object(o);
@@ -3421,6 +3558,9 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   
   fmat_set_format(self, fmat_format_rect);
   
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
   fts_return_object(o);
 }
 
@@ -3475,6 +3615,9 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   fmat_set_format(self, fmat_format_rect);
   
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+  
   fts_return_object(o);
 }
 
@@ -3507,7 +3650,10 @@ fmat_convert_real(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     default:
       break;
   }
-  
+    
+  if(fmat_editor_is_open(self))
+    fmat_upload_data(self);
+
   fts_return_object(o);
 }
 
@@ -3557,7 +3703,12 @@ fmat_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
       size = fmat_read_atom_file(self, file_name);
     
     if(size > 0)
+    {
+      if(fmat_editor_is_open(self))
+        fmat_upload(self);
+      
       fts_return_object(o);
+    }
     else
       fts_object_error(o, "can't import from file \"%s\"", fts_symbol_name(file_name));
   }
