@@ -2,6 +2,7 @@ lib_LTLIBRARIES= libfts.la
 
 libfts_la_SOURCES= \
 @PLATFORM@.c \
+OLDclient.c \
 OLDftsdata.c \
 OLDpatcherdata.c \
 abstraction.c \

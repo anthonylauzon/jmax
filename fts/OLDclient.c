@@ -24,7 +24,112 @@
 #include <stdio.h>
 
 #include <fts/fts.h>
-#include "fts_interns.h"
+#include <fts/private/OLDclient.h>
+#include <fts/private/OLDftsdata.h>
+#include <fts/private/objtable.h>
+#include <fts/private/abstraction.h>
+#include <fts/private/connection.h>
+#include <fts/private/errobj.h>
+#include <fts/private/object.h>
+#include <fts/private/patcher.h>
+#include <fts/private/loader.h>
+#include <fts/private/patparser.h>
+#include <fts/private/saver.h>
+#include <fts/private/symbol.h>
+#include <fts/private/template.h>
+
+
+/***********************************************************************
+ *
+ * Forward declarations
+ *
+ */
+static void fts_client_updates_sync(void);
+static void fts_client_parse_char( char c);
+
+static int client_dev = 0;
+#define fts_char_dev_get(D, P) (0)
+#define fts_char_dev_put(D,C) (C)
+#define fts_char_dev_flush(D) (0)
+
+static fts_status_description_t fts_dev_eof =
+{
+  "eof for device"
+};
+
+
+/***********************************************************************
+ * 
+ * client.c
+ *
+ */
+
+/*
+ *  Communication with the client: this file define the client logical
+ *  device, the client module including the client poll function
+ * 
+ *
+ */
+
+/******************************************************************************/
+/*                                                                            */
+/*             Client SubSystem Declaration                                   */
+/*                                                                            */
+/******************************************************************************/
+
+/******************************************************************************/
+/*                                                                            */
+/*             CLIENT  polling function                                       */
+/*                                                                            */
+/******************************************************************************/
+
+/* experimentally, we do the real polling every 3 ticks */
+
+void 
+fts_client_poll(void)
+{
+  static int poll_count = 0;
+
+  poll_count++;
+
+  if (poll_count >= 3)
+    {
+      poll_count = 0;
+      return;
+    }
+
+  if (client_dev)
+    {
+      /* then, loop until there are data */
+
+      while (1)
+	{
+	  unsigned char c;
+	  fts_status_t ret;
+
+	  ret = fts_char_dev_get(client_dev, &c);
+
+	  if (ret == &fts_dev_eof)
+	    {
+	      /* End of file for client device (do a shutdown) */
+
+	      fts_sched_halt();
+
+	      return;
+	    }
+	  else if (ret != fts_Success)
+	    {
+	      /* flush the output and return */
+
+	      fts_char_dev_flush(client_dev);
+	      return;
+	    }
+
+	  fts_client_parse_char((char) c);
+	}
+    }
+}
+
 
 
 /***********************************************************************
@@ -111,7 +216,7 @@ static void protocol_error( char c, int state)
   fprintf( stderr, "Error in protocol : got %d ('%c') in state %d\n", c, (c < 32) ? '?' : c, state);
 }
 
-void fts_client_parse_char( char c)
+static void fts_client_parse_char( char c)
 {
   fts_atom_t a;
 
@@ -168,7 +273,7 @@ void fts_client_parse_char( char c)
     ivalue += ((int)c & 0xff) << shift_table[ count++ ];
     if ( count == 4)
       {
-	fts_set_long( &a, ivalue);
+	fts_set_int( &a, ivalue);
 	add_arg( &a);
 	state = S_ARG;
       }
@@ -289,6 +394,7 @@ void fts_client_install(char type, void (* fun) (int, const fts_atom_t *))
    We send the values as we get them; the device implement buffering
    if it need it.
 */
+
 
 
 static void fts_client_send_string(const char *msg)
@@ -455,7 +561,7 @@ static void
 fts_client_add_atom(const fts_atom_t *atom)
 {
   if (fts_is_int( atom))
-    fts_client_add_int( fts_get_long(atom));
+    fts_client_add_int( fts_get_int(atom));
   else  if (fts_is_float( atom))
     fts_client_add_float( fts_get_float(atom));
   else  if (fts_is_symbol( atom))
@@ -509,24 +615,6 @@ void fts_client_send_message(fts_object_t *obj, fts_symbol_t selector, int argc,
   fts_client_add_symbol(selector);
   fts_client_add_atoms(argc, args);
   fts_client_done_msg();
-}
-
-void fts_client_send_message_from_atom_list(fts_object_t *obj, fts_symbol_t selector, fts_atom_list_t *atom_list)
-{
-  fts_atom_list_iterator_t *iterator = fts_atom_list_iterator_new(atom_list);
-
-  fts_client_start_msg(CLIENTMESS_CODE);
-  fts_client_add_object(obj);
-  fts_client_add_symbol(fts_s_set);
-
-  while (! fts_atom_list_iterator_end(iterator))
-    {
-      fts_client_add_atom(fts_atom_list_iterator_current(iterator));
-      fts_atom_list_iterator_next(iterator);
-    }
-
-  fts_client_done_msg();
-  fts_atom_list_iterator_free(iterator);
 }
 
 /* (nos:) This is a new upload function, which is part of a generic object creation client/server API.
@@ -729,10 +817,6 @@ static void fts_client_sync_init(void)
 
 /* #define UPDATE_TRACE  */
 
-#include <fts/sys.h>
-#include <fts/lang.h>
-#include <fts/runtime.h>
-
 /* Default values are for 400 updates per seconds,
  */
 
@@ -866,7 +950,7 @@ static void fts_client_updates_sched(fts_alarm_t *alarm, void *arg)
    under request from the server; it do not touch the alarm.
    */
 
-void fts_client_updates_sync(void)
+static void fts_client_updates_sync(void)
 {
   fts_object_t *obj;
   fts_symbol_t property;
@@ -1826,11 +1910,21 @@ static void fts_messtile_init(void)
 
 /***********************************************************************
  *
- * Initialization
+ * Initialization and shutdown
  *
  */
-void fts_oldclient_init( void)
+
+void fts_kernel_oldclient_init( void)
 {
   fts_client_sync_init();
   fts_client_updates_init();
+}
+
+void fts_kernel_oldclient_shutdown(void)
+{
+/*    if (client_dev) */
+/*      { */
+/*        fts_dev_close(client_dev); */
+/*        client_dev = 0; */
+/*      } */
 }

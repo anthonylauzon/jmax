@@ -74,7 +74,7 @@ VERSION = @VERSION@
 
 lib_LTLIBRARIES = libfts.la
 
-libfts_la_SOURCES =  @PLATFORM@.c OLDftsdata.c OLDpatcherdata.c abstraction.c array.c atom.c autosave.c class.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c fpe.c ftl.c ftlmem.c hashtable.c inout.c loader.c mem.c message.c objectlist.c objectset.c object.c objtable.c param.c patcher.c patparser.c property.c saver.c selection.c sigconn.c symbol.c template.c variable.c version.c vm.c 
+libfts_la_SOURCES =  @PLATFORM@.c OLDclient.c OLDftsdata.c OLDpatcherdata.c abstraction.c array.c atom.c autosave.c class.c clipboard.c connection.c doctor.c dsp.c dspgraph.c errobj.c expression.c fpe.c ftl.c ftlmem.c hashtable.c inout.c loader.c mem.c message.c objectlist.c objectset.c object.c objtable.c param.c patcher.c patparser.c property.c saver.c selection.c sigconn.c symbol.c template.c variable.c version.c vm.c 
 
 
 INCLUDES = -I$(top_srcdir)/include
@@ -90,13 +90,13 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libfts_la_LDFLAGS = 
 libfts_la_LIBADD = 
-libfts_la_OBJECTS =  @PLATFORM@.lo OLDftsdata.lo OLDpatcherdata.lo \
-abstraction.lo array.lo atom.lo autosave.lo class.lo clipboard.lo \
-connection.lo doctor.lo dsp.lo dspgraph.lo errobj.lo expression.lo \
-fpe.lo ftl.lo ftlmem.lo hashtable.lo inout.lo loader.lo mem.lo \
-message.lo objectlist.lo objectset.lo object.lo objtable.lo param.lo \
-patcher.lo patparser.lo property.lo saver.lo selection.lo sigconn.lo \
-symbol.lo template.lo variable.lo version.lo vm.lo
+libfts_la_OBJECTS =  @PLATFORM@.lo OLDclient.lo OLDftsdata.lo \
+OLDpatcherdata.lo abstraction.lo array.lo atom.lo autosave.lo class.lo \
+clipboard.lo connection.lo doctor.lo dsp.lo dspgraph.lo errobj.lo \
+expression.lo fpe.lo ftl.lo ftlmem.lo hashtable.lo inout.lo loader.lo \
+mem.lo message.lo objectlist.lo objectset.lo object.lo objtable.lo \
+param.lo patcher.lo patparser.lo property.lo saver.lo selection.lo \
+sigconn.lo symbol.lo template.lo variable.lo version.lo vm.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -110,7 +110,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDftsdata.P \
+DEP_FILES =  .deps/@PLATFORM@.P .deps/OLDclient.P .deps/OLDftsdata.P \
 .deps/OLDpatcherdata.P .deps/abstraction.P .deps/array.P .deps/atom.P \
 .deps/autosave.P .deps/class.P .deps/clipboard.P .deps/connection.P \
 .deps/doctor.P .deps/dsp.P .deps/dspgraph.P .deps/errobj.P \
