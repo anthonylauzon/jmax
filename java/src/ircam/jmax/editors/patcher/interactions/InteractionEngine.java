@@ -212,13 +212,16 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     
     squeack |= getModifiersBits(e);
 
-    if (followingLocations || followingInOutletLocations)
-      {
+    if (followingLocations || followingInOutletLocations){
+
+      if(Squeack.isDown(squeack))//only in this case we are looking for the connections also
 	area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
+      else
+	area = displayList.getObjectSensibilityAreaAt(mouse.x, mouse.y);
 
-	squeack |= getLocationBits(area);
-      }
-
+      squeack |= getLocationBits(area);
+    }
+    
     autoScrollIfNeeded(editor, squeack, mouse, oldMouse);
 
     if (! scrollTimer.isRunning())

@@ -455,6 +455,44 @@ public class DisplayList
     return candidateArea;
   }
 
+  public SensibilityArea getObjectSensibilityAreaAt(int x, int y)
+  {
+    Object values[] = displayObjects.getObjectArray();
+    int size = displayObjects.size();
+    SensibilityArea candidateArea = null;
+    /* Look in the reverse order from outside to inside,
+       to be consistent with the graphic look */
+
+    for ( int i = (size - 1); i >= 0; i--)
+      {
+	DisplayObject object = (DisplayObject) values[i];
+	
+	if(object instanceof GraphicObject){ 
+	  SensibilityArea area = object.getSensibilityAreaAt( x, y);
+
+	  if (area != null)
+	    {
+	      if (area.isTransparent())
+		{
+		  if (candidateArea == null)
+		    candidateArea = area;
+		  else
+		    {
+		      if (candidateArea.getCost() > area.getCost())
+			{
+			  candidateArea.dispose();
+			  candidateArea = area;
+			}
+		    }
+		}
+	      else return area;
+	    }
+	}
+      }
+    // If nothing returned until now, return the candidate area if any
+    return candidateArea;
+  }
+
   ////////////////////////////////////////////////////////////
   //
   //                  UPDATING 

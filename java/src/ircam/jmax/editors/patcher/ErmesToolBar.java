@@ -112,7 +112,7 @@ public class ErmesToolBar extends JPanel  {
     JPanel empty = new JPanel();
     cards.add( "lock", empty);
     cards.setBorder( new EmptyBorder( 0, 0, 0, 0));
-
+ 
     toolBar = new JPanel();
     toolBar.setBorder( new EmptyBorder( 0, 0, 0, 0));
     toolBar.setLayout( new BoxLayout( toolBar, BoxLayout.X_AXIS));
@@ -127,7 +127,7 @@ public class ErmesToolBar extends JPanel  {
       {
 	if ((selectedButton != null) && (button != selectedButton))
 	  selectedButton.setSelected(false);
-
+	  
 	selectedButton = button;
 	sketch.setAddModeInteraction(selectedButton.getDescription(), selectedButton.getMessage(), true);
       }
@@ -141,7 +141,7 @@ public class ErmesToolBar extends JPanel  {
   public void reset()
   {
     if (selectedButton != null)
-      selectedButton.setSelected(false);
+      selectedButton.setSelected(false); 
   }
 
   protected void setLocked( boolean locked)

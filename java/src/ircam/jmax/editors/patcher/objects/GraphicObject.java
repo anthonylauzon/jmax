@@ -109,9 +109,8 @@ abstract public class GraphicObject implements DisplayObject
 
     static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
  
-    static final int INOUTLET_CONNECTED_SENSIBLE_AREA = 40;
+    static final int INOUTLET_CONNECTED_SENSIBLE_AREA = 30;
   }
-
 
   // This two flags say if the object parts are sensible, and if the in/outlets are sensibles
   // global for all the objects.

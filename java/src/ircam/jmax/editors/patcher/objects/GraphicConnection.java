@@ -203,7 +203,7 @@ public class GraphicConnection implements DisplayObject
 	  } 
 	else 
 	  {
-	    g.drawLine(start.x, start.y, end.x, end.y);
+	    g.drawLine(start.x, start.y, end.x, end.y); 
 	    g.drawLine(start.x+1, start.y, end.x+1, end.y);
 	  }
       } 
