@@ -34,5 +34,6 @@ eventtrk.c \
 note.c \
 message.c \
 seqplay.c \
+seqrec.c \
 seqplode.c \
 seqf9.c \

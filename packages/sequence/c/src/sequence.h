@@ -55,6 +55,7 @@ typedef struct _sequence_
 
 extern void sequence_add_track(sequence_t *sequence, track_t *track);
 extern void sequence_remove_track(sequence_t *sequence, track_t *track);
+
 extern track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
 extern track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 

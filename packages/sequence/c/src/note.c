@@ -29,6 +29,8 @@
 #include "eventtrk.h"
 #include "note.h"
 
+fts_class_t *note_class = 0;
+
 /**************************************************************
  *
  *  mandatory event methods
@@ -158,4 +160,5 @@ void
 note_config(void)
 {
   fts_class_install(seqsym_note, note_instantiate);
+  note_class = fts_class_get_by_name(seqsym_note);
 }

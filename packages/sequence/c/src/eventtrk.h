@@ -36,6 +36,8 @@
  *
  */
 
+extern fts_class_t *eventtrk_class;
+
 typedef struct _eventtrk_ eventtrk_t;
 
 struct _eventtrk_
@@ -63,7 +65,5 @@ extern void eventtrk_remove_event(eventtrk_t *track, event_t *event);
 
 extern event_t *eventtrk_get_event_by_time(eventtrk_t *track, double time);
 extern event_t *eventtrk_get_event_by_time_after(eventtrk_t *track, double time, event_t *here);
-
-extern eventtrk_t *eventtrk_new(fts_symbol_t type);
 
 #endif

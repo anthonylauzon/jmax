@@ -31,56 +31,17 @@
 #include "event.h"
 #include "eventtrk.h"
 
-#define NO_FILTER -1
-
-/************************************************************
- *
- *  object
- *
- */
-
-typedef struct _seqplay_
+typedef struct _seqrec_
 {
   fts_object_t o;
   sequence_t *sequence;
   int index;
+  fts_class_t *class;
   eventtrk_t *track;
-  
   event_t *event;
   double start_location;
   double start_time;
-  fts_alarm_t alarm;
-} seqplay_t;
-
-static void seqplay_alarm_tick(fts_alarm_t *alarm, void *o);
-
-static void
-seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqplay_t *this = (seqplay_t *)o;
-  fts_object_t *seqobj = fts_get_object(at + 1);
-  int index = fts_get_int(at + 2);
-
-  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-    this->sequence = (sequence_t *)seqobj;
-  else
-    this->sequence = 0;
-
-  this->index = index;
-  this->track = 0;
-  this->event = 0;
-  this->start_time = 0.0;
-
-  fts_alarm_init(&this->alarm, 0, seqplay_alarm_tick, this);
-}
-
-static void 
-seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqplay_t *this = (seqplay_t *)o;
-
-  fts_alarm_unarm(&this->alarm);
-}
+} seqrec_t;
 
 /************************************************************
  *
@@ -89,27 +50,29 @@ seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void 
-seqplay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  seqplay_t *this = (seqplay_t *)o;
+  seqrec_t *this = (seqrec_t *)o;
 
-  if(this->event)
+  if(this->track)
     {
-      fts_alarm_unarm(&this->alarm);
+      /* upload and unlock track after recording */
+      /*fts_send_message((fts_object_t *)this->track, fts_SystemInlet, fts_s_upload, 0, 0);*/
       track_unlock((track_t *)this->track);
 
       this->track = 0;
       this->event = 0;
+      this->start_time = 0.0;
     }
 }
 
 static void 
-seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  seqplay_t *this = (seqplay_t *)o;
+  seqrec_t *this = (seqrec_t *)o;
   double locate;
 
-  seqplay_stop(o, 0, 0, 0, 0);
+  seqrec_stop(o, 0, 0, 0, 0);
   
   if(ac && fts_is_number(at))
     locate = fts_get_number_float(at);
@@ -123,94 +86,54 @@ seqplay_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       if(track)
 	{
 	  event_t *event = eventtrk_get_event_by_time(track, locate);
+	  fts_symbol_t type = eventtrk_get_type(track);
 	  
-	  if(event)
-	    {
-	      track_lock((track_t *)track);
-	  
-	      this->track = track;
-	      this->event = event;
+	  if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
+	    this->class = 0;
+	  else
+	    this->class = fts_class_get_by_name(type);
 
-	      this->start_location = locate;      
-	    }
+	  this->track = track;
+	  this->event = event;
+	  
+	  this->start_location = locate;
+	  this->start_time = 0.0;
+
+	  track_lock((track_t *)track);
 	}
     }
 }
 
 static void 
-seqplay_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  seqplay_t *this = (seqplay_t *)o;
+  seqrec_t *this = (seqrec_t *)o;
 
-  if(!fts_alarm_is_armed(&this->alarm))
+  if(this->start_time == 0.0)
     {
       double now = fts_get_time_in_msecs();    
       
-      if(!this->event)
-	seqplay_locate(o, 0, 0, 0, 0);
+      if(!this->track)
+	seqrec_locate(o, 0, 0, 0, 0);
       
-      if(this->event)
-	{
-	  this->start_time = now;
-	  
-	  fts_alarm_set_time(&this->alarm, now + event_get_time(this->event) - this->start_location);
-	  fts_alarm_arm(&this->alarm);
-	}
+      if(this->track)
+	this->start_time = now;
     }
 }
 
 static void 
-seqplay_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  seqplay_t *this = (seqplay_t *)o;
+  seqrec_t *this = (seqrec_t *)o;
   double now = fts_get_time_in_msecs();
       
   this->start_location += now - this->start_time;
-  fts_alarm_unarm(&this->alarm);
 }
 
 static void 
-seqplay_sync(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_set_sequence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  seqplay_t *this = (seqplay_t *)o;
-  event_t *event = this->event;
-
-  if(event && ac && fts_is_number(at))
-    {
-      double time = fts_get_number_float(at);
-      int n_atoms;
-      fts_atom_t atoms[64];
-      fts_atom_t a[2];
-
-      fts_set_ptr(a, &n_atoms);
-      fts_set_ptr(a + 1, atoms);
-
-      while(event && time >= event_get_time(event))
-	{
-	  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
-	  fts_outlet_send(o, 0, fts_s_list, n_atoms, atoms);
-	  
-	  event = event_get_next(event);
-	}
-
-      if(event)
-	{
-	  this->event = event;
-	  this->start_time = fts_get_time_in_msecs();
-	  this->start_location = time;
-
-	  if(fts_alarm_is_armed(&this->alarm))
-	    fts_alarm_set_time(&this->alarm, fts_get_time_in_msecs() + event_get_time(this->event) - time);
-	}
-      else
-	seqplay_stop(o, 0, 0, 0, 0);
-    }
-}
-
-static void 
-seqplay_set_sequence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqplay_t *this = (seqplay_t *)o;
+  seqrec_t *this = (seqrec_t *)o;
 
   if(ac && fts_is_object(at))
     {
@@ -224,63 +147,49 @@ seqplay_set_sequence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void 
-seqplay_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
-  seqplay_t *this = (seqplay_t *)o;
+  seqrec_t *this = (seqrec_t *)o;
 
   this->index = fts_get_int(at);
 }
 
-/************************************************************
- *
- *  alarm
- *
- */
-
-static void
-seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
+static void 
+seqrec_record(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  seqplay_t *this = (seqplay_t *)o;
-  double current_location = fts_get_time_in_msecs() - this->start_time + this->start_location;
-  event_t *event = this->event;
-  eventtrk_t *track = this->track;
-  event_t *next = event_get_next(event);
-  int ac;
-  fts_atom_t at[64];
-  fts_atom_t a[2];
+  seqrec_t *this = (seqrec_t *)o;
 
-  fts_set_object(at, (fts_object_t *)event);
-  ac = 1;
-
-  while(next && event_get_time(next) <= current_location)
+  if(this->start_time != 0.0)
     {
-      fts_set_object(at + ac, (fts_object_t *)next);
-      ac++;
-      next = event_get_next(next);
+      double time = fts_get_time_in_msecs() - this->start_time + this->start_location;
+      event_t *event = 0;
+
+      if(this->class)
+	{
+	  fts_object_t *obj = fts_object_create(this->class, ac, at);
+	  fts_atom_t a[1];
+
+	  fts_set_object(a, obj);
+	  event = (event_t *)fts_object_create(event_class, 1, a);
+	}
+      else
+	event = (event_t *)fts_object_create(event_class, 1, at);
+      
+      /* add event to track (look for right position starting from last event) */
+      eventtrk_add_event_after(this->track, time, event, this->event);
+
+      if(sequence_editor_is_open(this->sequence))
+	{
+	  fts_atom_t a[1];
+
+	  event_upload(event);
+
+	  fts_set_object(a, (fts_object_t *)event);    
+	  fts_client_send_message((fts_object_t *)this->track, seqsym_addEvents, 1, a);
+	}
+
+      this->event = event;
     }
-
-  if(next)
-    {
-      this->event = next;
-      fts_alarm_set_time(alarm, this->start_time + event_get_time(next) - this->start_location);
-      fts_alarm_arm(alarm);
-    }
-  else
-    seqplay_stop(o, 0, 0, 0, 0);
-
-  if(sequence_editor_is_open(this->sequence))
-    fts_client_send_message((fts_object_t *)track, seqsym_highlightEvents, ac, at);
-
-  fts_set_ptr(a, &ac);
-  fts_set_ptr(a + 1, at);
-
-  do{
-    fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
-    fts_outlet_send((fts_object_t *)o, 0, fts_s_list, ac, at);
-    
-    event = event_get_next(event);
-  }
-  while(event != next);
 }
 
 /************************************************************
@@ -289,24 +198,53 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
  *
  */
 
+static void
+seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  seqrec_t *this = (seqrec_t *)o;
+  fts_object_t *seqobj = fts_get_object(at + 1);
+  int index = fts_get_int(at + 2);
+
+  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
+    this->sequence = (sequence_t *)seqobj;
+  else
+    this->sequence = 0;
+
+  this->index = index;
+  this->track = 0;
+  this->event = 0;
+  this->start_location = 0.0;
+  this->start_time = 0.0;
+}
+
+static void 
+seqrec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  seqrec_t *this = (seqrec_t *)o;
+}
+
 static fts_status_t
-seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+seqrec_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   if(ac > 2 && fts_is_symbol(at) && fts_is_object(at + 1) && fts_is_int(at + 2))
     {
-      fts_class_init(cl, sizeof(seqplay_t), 3, 1, 0);
+      fts_class_init(cl, sizeof(seqrec_t), 3, 1, 0);
   
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqplay_init);
-      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqplay_delete);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, seqrec_init);
+      fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, seqrec_delete);
 
-      fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqplay_locate);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqplay_start);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqplay_pause);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqplay_stop);
-      fts_method_define_varargs(cl, 0, fts_new_symbol("sync"), seqplay_sync);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("locate"), seqrec_locate);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("start"), seqrec_start);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("pause"), seqrec_pause);
+      fts_method_define_varargs(cl, 0, fts_new_symbol("stop"), seqrec_stop);
 
-      fts_method_define_varargs(cl, 1, fts_s_object, seqplay_set_sequence);
-      fts_method_define_varargs(cl, 2, fts_s_symbol, seqplay_set_index);
+      fts_method_define_varargs(cl, 0, fts_s_int, seqrec_record);
+      fts_method_define_varargs(cl, 0, fts_s_float, seqrec_record);
+      fts_method_define_varargs(cl, 0, fts_s_symbol, seqrec_record);
+      fts_method_define_varargs(cl, 0, fts_s_list, seqrec_record);
+
+      fts_method_define_varargs(cl, 1, fts_s_object, seqrec_set_sequence);
+      fts_method_define_varargs(cl, 2, fts_s_symbol, seqrec_set_index);
 
       return fts_Success;
     }
@@ -315,7 +253,7 @@ seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 }
 
 void
-seqplay_config(void)
+seqrec_config(void)
 {
-  fts_metaclass_install(fts_new_symbol("seqplay"), seqplay_instantiate, fts_arg_type_equiv);
+  fts_metaclass_install(fts_new_symbol("seqrec"), seqrec_instantiate, fts_arg_type_equiv);
 }

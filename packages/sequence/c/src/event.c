@@ -27,6 +27,8 @@
 #include "seqsym.h"
 #include "event.h"
 
+fts_class_t *event_class = 0;
+
 /**************************************************************
  *
  *  generic event functions
@@ -210,42 +212,7 @@ void
 event_config(void)
 {
   fts_class_install(seqsym_event, event_instantiate);
+  event_class = fts_class_get_by_name(seqsym_event);
 }
 
-event_t *
-event_new(const fts_atom_t *value)
-{
-  event_t *event;
-  fts_atom_t a[2];
 
-  fts_set_symbol(a + 0, seqsym_event);
-  a[1] = *value;
-  fts_object_new(0, 2, a, (fts_object_t **)&event);
-
-  return event;
-}
-
-event_t *
-event_create(int ac, const fts_atom_t *at)
-{
-  fts_symbol_t type = fts_get_symbol(at);
-  fts_atom_t a[2];
-
-  if(type == seqsym_int || type == seqsym_float || type == seqsym_symbol)
-    return event_new(at + 1);
-  else
-    {
-      fts_object_t *obj;
-      fts_atom_t a[1];
-
-      /* create value object */
-      fts_object_new(0, ac, at, &obj);
-
-      if(obj)
-	fts_set_object(a, obj);
-      else
-	fts_set_void(a);
-
-      return event_new(a);
-    }
-}

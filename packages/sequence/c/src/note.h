@@ -29,6 +29,8 @@
 #include "fts.h"
 #include "event.h"
 
+extern fts_class_t *note_class;
+
 typedef struct _note_
 {
   fts_object_t head;
@@ -39,7 +41,7 @@ typedef struct _note_
 } note_t;
 
 #define NOTE_DEF_PITCH 64
-#define NOTE_DEF_DURATION 400
+#define NOTE_DEF_DURATION 100
 #define NOTE_DEF_MIDI_CHANNEL 1
 #define NOTE_DEF_MIDI_VELOCITY 64
 

@@ -31,14 +31,6 @@
 #include "event.h"
 #include "eventtrk.h"
 
-#define NO_FILTER -1
-
-/************************************************************
- *
- *  object
- *
- */
-
 typedef struct _seqplay_
 {
   fts_object_t o;
@@ -50,36 +42,6 @@ typedef struct _seqplay_
   double start_time;
   fts_alarm_t alarm;
 } seqplay_t;
-
-static void seqplay_alarm_tick(fts_alarm_t *alarm, void *o);
-
-static void
-seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqplay_t *this = (seqplay_t *)o;
-  fts_object_t *seqobj = fts_get_object(at + 1);
-  int index = fts_get_int(at + 2);
-
-  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
-    this->sequence = (sequence_t *)seqobj;
-  else
-    this->sequence = 0;
-
-  this->index = index;
-  this->track = 0;
-  this->event = 0;
-  this->start_time = 0.0;
-
-  fts_alarm_init(&this->alarm, 0, seqplay_alarm_tick, this);
-}
-
-static void 
-seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{ 
-  seqplay_t *this = (seqplay_t *)o;
-
-  fts_alarm_unarm(&this->alarm);
-}
 
 /************************************************************
  *
@@ -287,6 +249,35 @@ seqplay_alarm_tick(fts_alarm_t *alarm, void *o)
  *  class
  *
  */
+
+static void
+seqplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  seqplay_t *this = (seqplay_t *)o;
+  fts_object_t *seqobj = fts_get_object(at + 1);
+  int index = fts_get_int(at + 2);
+
+  if(fts_object_get_class_name(seqobj) == seqsym_sequence)
+    this->sequence = (sequence_t *)seqobj;
+  else
+    this->sequence = 0;
+
+  this->index = index;
+  this->track = 0;
+  this->event = 0;
+  this->start_location = 0.0;
+  this->start_time = 0.0;
+
+  fts_alarm_init(&this->alarm, 0, seqplay_alarm_tick, this);
+}
+
+static void 
+seqplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{ 
+  seqplay_t *this = (seqplay_t *)o;
+
+  fts_alarm_unarm(&this->alarm);
+}
 
 static fts_status_t
 seqplay_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)

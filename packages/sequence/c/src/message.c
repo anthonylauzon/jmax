@@ -45,35 +45,39 @@ message_set_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
   if(ac)
     {
+      /* implement conventions of conversion from atom list to message */
       if(fts_is_symbol(at))
-	this->s = fts_get_symbol(at);
+	{
+	  this->s = fts_get_symbol(at);
+
+	  /* skip selector */
+	  ac--;
+	  at++;
+	}
       else if(ac == 1)
 	this->s = fts_get_selector(at);
       else
 	this->s = fts_s_list;
 
-      ac--; /* skip selector */
-      at++;
-      
       if(ac != this->ac)
 	{
 	  if(this->at)
-	    fts_block_free(this->at, (this->ac + 4) * sizeof(fts_atom_t)); /* first two atoms reserved for uploading */
+	    fts_block_free(this->at, this->ac * sizeof(fts_atom_t));
 	  
-	  this->at = (fts_atom_t *)fts_block_alloc((ac + 4) * sizeof(fts_atom_t)); /* first two atoms reserved for uploading */
+	  this->at = (fts_atom_t *)fts_block_alloc(ac * sizeof(fts_atom_t));
 	}
       
       this->ac = ac;
       
       for(i=0; i<ac; i++)
-	this->at[i + 4] = at[i]; /* first two atoms reserved for uploading */
+	this->at[i] = at[i];
     }
   else
     {
       this->s = 0;
 
       if(this->at)
-	fts_block_free(this->at, (this->ac + 4) * sizeof(fts_atom_t));
+	fts_block_free(this->at, this->ac * sizeof(fts_atom_t));
 	  
       this->ac = 0;
     }
@@ -119,11 +123,15 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   message_t *this = (message_t *)o;
   
   this->s = 0;
-  this->ac = -4;
+  this->ac = 0;
   this->at = 0;
-  this->pos = fts_get_int(at + 1);
 
-  message_set_message(o, 0, 0, 1, at + 2);
+  if(fts_is_int(at + 1))
+    this->pos = fts_get_number_int(at + 1);
+  else
+    this->pos = 0;
+
+  message_set_message(o, 0, 0, ac - 2, at + 2);
 }
 
 static fts_status_t

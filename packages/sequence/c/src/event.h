@@ -34,6 +34,8 @@
  *
  */
 
+extern fts_class_t *event_class;
+
 typedef struct _event_ event_t;
 
 struct _event_
@@ -71,9 +73,5 @@ struct _event_
 extern void event_print(event_t *event);
 extern void event_upload(event_t *event);
 extern void event_save_bmax(fts_bmax_file_t *file, event_t *event);
-extern event_t *event_new(const fts_atom_t *value);
-
-/* create event value and make a new event */
-extern event_t *event_create(int ac, const fts_atom_t *at);
 
 #endif

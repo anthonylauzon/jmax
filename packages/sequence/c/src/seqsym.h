@@ -46,8 +46,11 @@ extern fts_symbol_t seqsym_midi_channel;
 extern fts_symbol_t seqsym_midi_velocity;
 
 /* messages */
+extern fts_symbol_t seqsym_add;
 extern fts_symbol_t seqsym_set;
 extern fts_symbol_t seqsym_get_atoms;
+extern fts_symbol_t seqsym_print;
+extern fts_symbol_t seqsym_clear;
 extern fts_symbol_t seqsym_export_midi;
 extern fts_symbol_t seqsym_export_midi_dialog;
 extern fts_symbol_t seqsym_import_midi;
@@ -64,7 +67,7 @@ extern fts_symbol_t seqsym_moveTrack;
 extern fts_symbol_t seqsym_setName;
 extern fts_symbol_t seqsym_addEvents;
 extern fts_symbol_t seqsym_deleteEvents;
-extern fts_symbol_t seqsym_moveEvent;
+extern fts_symbol_t seqsym_moveEvents;
 extern fts_symbol_t seqsym_highlightEvents;
 extern fts_symbol_t seqsym_openFileDialog;
 extern fts_symbol_t seqsym_lock;

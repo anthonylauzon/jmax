@@ -52,6 +52,7 @@ typedef struct _seqmidi_read_data_
 
   /* for reading midi controllers */
   eventtrk_t *controller_tracks[N_MIDI_CONTROLLERS];
+
 } seqmidi_read_data_t;
 
 static int
@@ -79,9 +80,11 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
   if(!track)
     {
       sequence_t *sequence = data->sequence;
-  
+      fts_atom_t a[1];
+
       /* create new track */
-      track = eventtrk_new(seqsym_note);
+      fts_set_symbol(a, seqsym_note);  
+      track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -104,21 +107,20 @@ seqmidi_read_note_on(fts_midifile_t *file, int chan, int pitch, int vel)
       event_t *event;
       fts_atom_t a[3];
 
-      /* create note */
-      fts_set_symbol(a + 0, seqsym_note);
-      fts_set_int(a + 1, pitch);
-      fts_set_float(a + 2, 0.0);
-      fts_object_new(0, 3, a, (fts_object_t **)&note);
+      /* create a note */
+      fts_set_int(a + 0, pitch);
+      fts_set_float(a + 1, 0.0);
+      note = (note_t *)fts_object_create(note_class, 2, a);
 
       /* set midi properties */
       note_set_midi_channel(note, chan);
       note_set_midi_velocity(note, vel);
 
-      /* create new event with note */
+      /* create a new event with the note */
       fts_set_object(a, (fts_object_t *)note);
-      event = event_new(a);
+      event = (event_t *)fts_object_create(event_class, 1, a);
 
-      /* add event to track */
+      /* add the event to track */
       eventtrk_add_event(track, time, event);
 
       /* register note as on */
@@ -158,9 +160,11 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
   if(!track)
     {
       sequence_t *sequence = data->sequence;
+      fts_atom_t a[1];
 
       /* create new track */
-      track = eventtrk_new(seqsym_int);
+      fts_set_symbol(a, seqsym_int);  
+      track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
 
       /* add track to sequence */
       sequence_add_track(sequence, (track_t *)track);
@@ -170,7 +174,7 @@ seqmidi_read_controller(fts_midifile_t *file, int chan, int ctrl_num, int value)
     }
   
   fts_set_int(a, value);
-  event = event_new(a);
+  event = (event_t *)fts_object_create(event_class, 1, a);
   
   /* add event to track */
   eventtrk_add_event(track, time, event);
@@ -351,7 +355,7 @@ seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name
     {
       seqmidi_write_data_t data;
       event_t *event;
-      fts_atom_t a[2];
+      fts_atom_t a[1];
       int i, j;
 
       /* set midi file user data to write data structure */
@@ -361,8 +365,9 @@ seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name
       data.track = track;
 	  
       /* make note off track */
-      data.note_off_track = eventtrk_new(seqsym_export_midi);
-      
+      fts_set_symbol(a, seqsym_export_midi);  
+      data.note_off_track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
+
       /* init array of note status events */
       for(i=0; i<=N_MIDI_CHANNELS; i++)
 	for(j=0; j<N_MIDI_PITCHES; j++)
