@@ -113,12 +113,16 @@ void fts_hashtable_init( fts_hashtable_t *h, int initial_capacity)
   switch (initial_capacity) {
   case FTS_HASHTABLE_SMALL:
     h->length = 7;
+    break;
   case FTS_HASHTABLE_MEDIUM:
     h->length = 101;
+    break;
   case FTS_HASHTABLE_BIG:
     h->length = 1031;
+    break;
   default:
     h->length = 101;
+    break;
   }
   
   h->count = 0;

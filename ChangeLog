@@ -1,3 +1,7 @@
+2003-09-24  Francois Dechelle  <dechelle@limbe.ircam.fr>
+
+	* fts/hashtable.c: added missing break in fts_hashtable_init
+
 2003-09-23  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* configure.in: fixed check for Jack Audio Connection Kit.
