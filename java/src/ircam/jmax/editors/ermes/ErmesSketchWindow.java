@@ -155,13 +155,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     if (theData.getName()==null) setTitle(GetNewUntitledName());
     else {
       setTitle(theData.getDataSource().toString()); 
-   }
-    //else setTitle(theData.getName());
+    }
     itsData = theData;
     itsPatcher = (FtsContainerObject)(theData.getContent());
     CommonInitializations();
     isSubPatcher = false;
-    //setTitle(theData.getName());
+    alreadySaved = true;
   }
   /**
    * constructor from a MaxData AND a ftsContainer AND a father window (subpatchers editors)
@@ -185,6 +184,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     CommonInitializations();
     isSubPatcher = true;
     itsTopWindow = theTopWindow;
+    alreadySaved = true;
   }
    
   /**
@@ -243,8 +243,7 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
     itsDocument = new ErmesPatcherDoc(this);
     InitSketchWin();
     validate();
-    
-    //SetupMenu();
+    alreadySaved = true;
   }
 
   int horizontalOffset() {
@@ -746,7 +745,6 @@ public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow
 
   public boolean Close(boolean deleteOnFts){
     itsClosing = true;
-
     /*if (deleteOnFts)*/ itsPatcher.close();
     if(!(alreadySaved || isSubPatcher)){
       FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsData);
