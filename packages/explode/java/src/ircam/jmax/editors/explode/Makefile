@@ -25,6 +25,10 @@ ExplodeExtension:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ExplodeExtension.java )
 .PHONY: ExplodeExtension
 
+ScrPanel:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ScrPanel.java )
+.PHONY: ScrPanel
+
 include $(ROOTDIR)/packages/explode/java/Makefiles/Makefile.misc
 
 

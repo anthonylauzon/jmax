@@ -4,12 +4,14 @@ import java.io.*;
 import java.lang.*;
 import java.awt.event.*;
 import java.awt.*;
+
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.toolkit.*;
+
 import com.sun.java.swing.*;
 import com.sun.java.swing.table.*;
-import com.sun.java.swing.event.*;
 
 
 /**
@@ -31,19 +33,22 @@ public class Explode extends MaxEditor implements AAAReadme {
 
     setTitle("Explode");
 
-    ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
-
-    itsPanel = new ScrPanel(explodeRemoteData);
+    // get the data
+    ExplodeRemoteData explodeData = (ExplodeRemoteData) maxData;
+    
+    itsPanel = new ScrPanel(explodeData);
     getContentPane().add(itsPanel);
     
-    itsPanel.prepareToolbar();
+    if (toolbar == null)
+      toolbar = itsPanel.prepareToolbar();
+    else itsPanel.linkToToolbar();
     
-
     //----
 
     validate();
     pack();
     setVisible(true);
+
   }
 
 
@@ -70,8 +75,20 @@ public class Explode extends MaxEditor implements AAAReadme {
   
   }
 
+  protected void Undo()
+  {
+    itsPanel.undo();
+  }
+
+  protected void Redo()
+  {
+    itsPanel.redo();
+  }
+
+
   //------------------- fields
 
   ScrPanel itsPanel;
-}  
+  static EditorToolbar toolbar;
+}
 

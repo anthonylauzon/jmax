@@ -1,11 +1,26 @@
 
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 /**
  * The class representing a generic event in the score
  */
-public class ScrEvent {
+public class ScrEvent extends AbstractUndoableObject {
 
+
+  /**
+   * constructor for bean inspector (temporary)
+   */
+  public ScrEvent()
+  {
+    itsTime = DEFAULT_TIME;
+    itsPitch = DEFAULT_PITCH;
+    itsVelocity = DEFAULT_VELOCITY;
+    itsDuration = DEFAULT_DURATION;
+    itsChannel = DEFAULT_CHANNEL;
+  }
+ 
   /**
    * default constructor.
    * It provides an event with a default set of parameters
@@ -34,6 +49,7 @@ public class ScrEvent {
     itsDuration = theDuration;
     itsChannel = theChannel;
   }
+
 
   /**
    * get the starting time of this event
@@ -75,47 +91,109 @@ public class ScrEvent {
     return itsDuration;
   }
 
-  
+  public final ExplodeDataModel getDataModel()
+  {
+    return itsExplodeDataModel;
+  }  
+
   /* the corresponding set functions.. */
 
   public final void setTime(int time) 
   {
-    itsTime = time;
 
     if (itsExplodeDataModel != null)
-      itsExplodeDataModel.moveEvent(this);
+      {
+	if (itsExplodeDataModel.isInGroup())
+	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+      }
+
+    itsTime = time;
+    
+    if (itsExplodeDataModel != null)
+      {
+	itsExplodeDataModel.moveEvent(this);
+      }
   }
+
 
   public final void setPitch(int pitch) 
   {
+
+    if (itsExplodeDataModel != null)
+      {
+	if (itsExplodeDataModel.isInGroup())
+	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+      }
+
     itsPitch = pitch;
 
     if (itsExplodeDataModel != null)
-      itsExplodeDataModel.changeEvent(this);
+      {
+	itsExplodeDataModel.changeEvent(this);	
+      }
   }
 
   public final void setDuration(int duration) 
   {
+
+    if (itsExplodeDataModel != null)
+      {
+	if (itsExplodeDataModel.isInGroup())
+	itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+      }
+
     itsDuration = duration;
 
     if (itsExplodeDataModel != null)
-      itsExplodeDataModel.changeEvent(this);
+      {
+	itsExplodeDataModel.changeEvent(this);
+      }
   }
-
+  
   public final void setVelocity(int theVelocity) 
   {
+
+    if (itsExplodeDataModel != null)
+      {
+	if (itsExplodeDataModel.isInGroup())
+	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+      }
+
     itsVelocity = theVelocity;
 
     if (itsExplodeDataModel != null)
-      itsExplodeDataModel.changeEvent(this);
+      {
+	itsExplodeDataModel.changeEvent(this);
+      }
   }
 
   public final void setChannel(int theChannel) 
   {
+
+    if (itsExplodeDataModel != null)
+      {
+	if (itsExplodeDataModel.isInGroup())
+	  itsExplodeDataModel.postEdit(new UndoableEventTransformation(this));
+      }
+
     itsChannel = theChannel;
 
     if (itsExplodeDataModel != null)
-      itsExplodeDataModel.changeEvent(this);
+      {
+	itsExplodeDataModel.changeEvent(this);
+      }
+
+  }
+
+  /** Undoable data interface */
+  public void beginUpdate()
+  {
+    itsExplodeDataModel.beginUpdate();
+  }
+
+  public void endUpdate()
+  {
+    itsExplodeDataModel.endUpdate();
   }
 
   //------------ Fields
@@ -139,6 +217,7 @@ public class ScrEvent {
   public static int DEFAULT_DURATION = 100;
   public static int DEFAULT_CHANNEL = 0;
 }
+
 
 
 

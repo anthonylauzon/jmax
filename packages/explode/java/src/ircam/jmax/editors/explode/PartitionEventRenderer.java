@@ -1,17 +1,19 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.awt.*;
 
 /**
  * The piano-roll event renderer in a Score: the line-based event, 
  * with a lenght , a fixed width, black color, a label.
  */
-public class PartitionEventRenderer implements EventRenderer {
+public class PartitionEventRenderer implements ObjectRenderer {
 
   /**
    * constructor.
    */
-  public PartitionEventRenderer(GraphicContext theGc) 
+  public PartitionEventRenderer(ExplodeGraphicContext theGc) 
   {
     gc = theGc;
   }
@@ -21,8 +23,10 @@ public class PartitionEventRenderer implements EventRenderer {
    * draw the given event in the given graphic context.
    * It takes into account the selection state.
    */
-  public void render(ScrEvent e, Graphics g, boolean selected) 
+  public void render(Object obj, Graphics g, boolean selected) 
   {
+    ScrEvent e = (ScrEvent) obj;
+
     int x = gc.getAdapter().getX(e);
     int y = gc.getAdapter().getY(e);
     int lenght = gc.getAdapter().getLenght(e);
@@ -33,13 +37,16 @@ public class PartitionEventRenderer implements EventRenderer {
 
     g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
     g.drawString(""+label, x, y-5);
+  
   }
   
   /**
    * returns true if the given event contains the given (graphic) point
    */
-  public boolean contains(ScrEvent e, int x, int y) 
+  public boolean contains(Object obj, int x, int y) 
   {
+    ScrEvent e = (ScrEvent) obj;
+
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);
     int evtlenght = gc.getAdapter().getLenght(e);
@@ -53,8 +60,10 @@ public class PartitionEventRenderer implements EventRenderer {
   /**
    * returns true if the representation of the given event "touches" the given rectangle
    */
-  public boolean touches(ScrEvent e, int x, int y, int w, int h) 
+  public boolean touches(Object obj, int x, int y, int w, int h) 
   {
+    ScrEvent e = (ScrEvent) obj;
+
     int evtx = gc.getAdapter().getX(e);
     int evty = gc.getAdapter().getY(e);
     int evtlenght = gc.getAdapter().getLenght(e);
@@ -68,7 +77,7 @@ public class PartitionEventRenderer implements EventRenderer {
   //------------Fields
   final static int NOTE_DEFAULT_WIDTH = 5;
   final static int NOTE_DEFAULT_HEIGHT = 3;
-  GraphicContext gc;
+  ExplodeGraphicContext gc;
 
   int oldX, oldY;
 

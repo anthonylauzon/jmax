@@ -4,51 +4,43 @@ SOURCES = \
 	ArrowTool.java		\
 	ChannelMapper.java		\
 	DeleteTool.java	\
-	DragListener.java	\
 	DurationMapper.java	\
-	EventRenderer.java	\
 	Explode.java		\
+	ExplodeDataEditor.java  \
 	ExplodeDataListener.java	\
 	ExplodeDataModel.java	\
 	ExplodeExtension.java	\
 	ExplodeFactory.java	\
-	ExplodeDataEditor.java  \
+	ExplodeGraphicContext.java	\
 	ExplodeRemoteData.java	\
 	ExplodeSelection.java	\
-	GraphicContext.java	\
-	GraphicSelectionListener.java	\
-	InfoPanel.java	\
-	InteractionModule.java	\
+	ExplodeSelectionMover.java	\
+	ExplodeSelectionResizer.java	\
 	Mapper.java		\
 	MappingListener.java	\
-	MouseTracker.java	\
 	MoverTool.java		\
 	PartitionAdapter.java	\
 	PartitionEventRenderer.java	\
 	PitchMapper.java	\
-	PositionListener.java	\
-	ProportionalLayout.java	\
-	Renderer.java		\
 	ResizerTool.java		\
+	ScoreBackground.java	\
+	ScoreForeground.java	\
 	ScoreRenderer.java	\
 	ScrAddingTool.java	\
 	ScrEvent.java		\
+	ScrEventWidget.java		\
 	ScrPanel.java		\
-	ScrTool.java		\
-	ScrToolbar.java		\
-	Selecter.java		\
-	SelectionMover.java	\
-	SelectionResizer.java	\
 	SettingsDialog.java	\
-	StatusBar.java		\
-	StatusBarClient.java	\
+	SelecterTool.java	\
 	TimeMapper.java		\
-	ToolChangeEvent.java	\
-	ToolListener.java	\
-	ToolbarProvider.java	\
-	VelocityMapper.java	\
-	XORHandler.java		\
-	XORPainter.java
+	TranspositionListener.java	\
+	VerboseMouseTracker.java		\
+	UndoableAdd.java		\
+	UndoableDelete.java		\
+	UndoableEventTransformation.java		\
+	ZoomListener.java		\
+	ZoomTool.java		\
+	VelocityMapper.java	
 
 	
 	

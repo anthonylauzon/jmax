@@ -1,5 +1,7 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 /**
  * the standard, partition-like adapter for a ScrEvent
  * in the Explode database.

@@ -2,13 +2,15 @@
 package ircam.jmax.editors.explode;
 
 import ircam.jmax.fts.*;
+import ircam.jmax.toolkit.UndoableData;
+
 import java.util.Enumeration;
 
 /**
  * the functionalities of the model for the explode data. 
  * ExplodeRemoteData implements it.
  */
-public interface ExplodeDataModel {
+public interface ExplodeDataModel extends UndoableData{
 
   /**
    * how many events in the database?
@@ -88,7 +90,7 @@ public interface ExplodeDataModel {
   /**
    * requires to be notified when the database changes
    */
-  public void addListener(ExplodeDataListener theListener);
+  public abstract void addListener(ExplodeDataListener theListener);
 
   /**
    * removes the listener

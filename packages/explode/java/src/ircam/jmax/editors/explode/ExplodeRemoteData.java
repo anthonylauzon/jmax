@@ -11,7 +11,7 @@ import java.util.*;
  * A concrete implementation of the ExplodeDataModel.
  * It handles the datas coming from a remote explode in FTS
  */
-public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
+public class ExplodeRemoteData extends FtsRemoteUndoableData implements ExplodeDataModel
 {
   /* Events are stored in an array; the array is larger than
      needed to allow insertions, and reallocated by need.
@@ -63,7 +63,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
   /**
    * utility function to make the event vector bigger
    */
-  private final void reallocateEvents()
+  protected final void reallocateEvents()
   {
     int new_size;
     ScrEvent new_events[];
@@ -172,6 +172,9 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     remoteCall(REMOTE_ADD, args);
 
     notifyObjectAdded(event);
+    
+    if (isInGroup())     
+      postEdit(new UndoableAdd(event));
   }
 
 
@@ -201,6 +204,8 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
 	    notifyObjectDeleted(event);
 
+	    if (isInGroup())
+	      postEdit(new UndoableDelete(event));
 	    return;
 	  }
       }
@@ -467,7 +472,7 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 
   /* a method inherited from FtsRemoteData */
 
-  public final void call( int key, FtsMessage msg)
+  public void call( int key, FtsMessage msg)
     {
       switch( key) {
       case REMOTE_CLEAN:
@@ -494,6 +499,9 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	break;
       }
     }
+
+    
+
 
 
   /* The MaxData interface */

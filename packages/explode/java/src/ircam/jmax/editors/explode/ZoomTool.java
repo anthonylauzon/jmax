@@ -1,5 +1,7 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.awt.event.*;
 import java.awt.*;
 import com.sun.java.swing.ImageIcon;
@@ -9,7 +11,7 @@ import com.sun.java.swing.ImageIcon;
  * It uses just one user-interaction module:
  * a mouse tracker to choose the position.
  */ 
-public class ZoomTool extends ScrTool implements PositionListener {
+public class ZoomTool extends Tool implements PositionListener {
 
   /** constructor */
   public ZoomTool(GraphicContext theGc, ImageIcon theImageIcon) 
@@ -44,15 +46,17 @@ public class ZoomTool extends ScrTool implements PositionListener {
   public void positionChoosen(int x, int y, int modifiers) 
   {
  
+    ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
+
     if ((modifiers & InputEvent.ALT_MASK) == 0) //zoom out
       {
-	gc.getAdapter().setXZoom((int) (gc.getAdapter().getXZoom() * 100 * 2));
+	egc.getAdapter().setXZoom((int) (egc.getAdapter().getXZoom() * 100 * 2));
 
       }
     else 
       {                                       //zoom in
-	if (gc.getAdapter().getXZoom() <= 0.01) return;
-	gc.getAdapter().setXZoom((int) (gc.getAdapter().getXZoom() * 100 / 2));
+	if (egc.getAdapter().getXZoom() <= 0.01) return;
+	egc.getAdapter().setXZoom((int) (egc.getAdapter().getXZoom() * 100 / 2));
 
       }
 

@@ -1,15 +1,18 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.awt.event.*;
 import java.awt.*;
 import com.sun.java.swing.ImageIcon;
+import com.sun.java.swing.undo.*;
 
 /**
  * The tool used to add an event in the score.
  * It uses just one user-interaction module:
  * a mouse tracker to choose the position.
  */ 
-public class ScrAddingTool extends ScrTool implements PositionListener {
+public class ScrAddingTool extends Tool implements PositionListener {
 
   /**
    * Constructor. It needs to know the graphic source of events,
@@ -21,7 +24,7 @@ public class ScrAddingTool extends ScrTool implements PositionListener {
     super("adder", theImageIcon);
 
     gc = theGc;
-    itsMouseTracker = new MouseTracker(this);
+    itsMouseTracker = new VerboseMouseTracker(this);
   }
 
 
@@ -47,15 +50,22 @@ public class ScrAddingTool extends ScrTool implements PositionListener {
    */
   public void positionChoosen(int x, int y, int modifiers) 
   {
-    ScrEvent aEvent = new ScrEvent(gc.getDataModel());
+    ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
+    ScrEvent aEvent = new ScrEvent(egc.getDataModel());
 
-    gc.getAdapter().setX(aEvent, x);
-    gc.getAdapter().setY(aEvent, y);
+    // starts an undoable transition
 
-    gc.getDataModel().addEvent(aEvent);
+    egc.getAdapter().setX(aEvent, x);
+    egc.getAdapter().setY(aEvent, y);
+
+    egc.getDataModel().beginUpdate();
+
+    egc.getDataModel().addEvent(aEvent);
+
+    
+    egc.getDataModel().endUpdate();
   } 
   
-
   //-------------- Fields
 
   MouseTracker itsMouseTracker;

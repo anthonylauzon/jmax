@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import com.sun.java.swing.ImageIcon;
+import com.sun.java.swing.undo.*;
 
 
 /**
@@ -15,7 +16,7 @@ import com.sun.java.swing.ImageIcon;
  * with the "arrow" tool, that is:
  * selection, area_selection, deselection, moving.
  */ 
-public class ArrowTool extends ScrTool implements PositionListener, DirectionListener, DragListener, GraphicSelectionListener{
+public class ArrowTool extends SelecterTool implements DirectionListener, DragListener{
 
   /**
    * Constructor. 
@@ -26,22 +27,11 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
     
     gc = theGc;
     
-    itsMouseTracker = new MouseTracker(this);
-    itsSelecter = new Selecter(this);
     itsDirectionChooser = new DirectionChooser(this);
-    itsSelectionMover = new SelectionMover(this, MoverTool.HORIZONTAL_MOVEMENT);
+    itsSelectionMover = new ExplodeSelectionMover(this, SelectionMover.HORIZONTAL_MOVEMENT);
   }
 
   
-  /**
-   * the default InteractionModule
-   */
-  public InteractionModule getDefaultIM() 
-  {
-    return itsMouseTracker;
-  }
-
-
   /**
    * called when this tool is unmounted
    */
@@ -49,33 +39,23 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
 
   
   /**
-   * called by the MouseTracker UI module
-   */
-  public void positionChoosen(int x, int y, int modifiers) 
+   * a single object has been selected, in coordinates x, y.
+   * Starts a move or a clone operation (if ALT is pressed).
+   * overrides the abstract SelecterTool.singleObjectSelected */
+  void singleObjectSelected(int x, int y, int modifiers)
   {
-    ScrEvent aScrEvent = gc.getRenderer().eventContaining(x, y);
+    if ((modifiers & InputEvent.ALT_MASK) == 0)
+      itsMoveMode = SIMPLE;
+    else itsMoveMode = CLONE;
     
-    if (aScrEvent != null) //click on event
-      if (ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
-	{ 
-	  startingPoint.setLocation(x,y);
-	  mountIModule(itsDirectionChooser, x, y);
-	} 
-      else
-	{
-	  selectionChoosen(x, y, 1, 1);
-	}
+    mountIModule(itsDirectionChooser, x, y);
+  }
 
-    else //click on empty
-      {
-      if ((modifiers & InputEvent.SHIFT_MASK) == 0)
-	{
-	  ExplodeSelection.getSelection().deselectAll(); 
-	  gc.getGraphicDestination().repaint();
-	}
-      
-      mountIModule(itsSelecter, x, y);
-    }
+  /** 
+   * a group of objects was selected 
+   *overrides the abstract SelecterTool.multipleObjectSelected */
+  void multipleObjectSelected()
+  {
   }
 
 
@@ -89,79 +69,81 @@ public class ArrowTool extends ScrTool implements PositionListener, DirectionLis
 
   }
   
-
   /**
-   * called by the selecter UI module
+   * called by the DirectionChooser UI module
    */
-  public void selectionChoosen(int x, int y, int w, int h) 
+  public void directionAbort()
   {
-    if (w ==0) w=1;// at least 1 pixel wide
-    if (h==0) h=1;
-    
-    selectArea(x, y, w, h);
-    
-    gc.getGraphicDestination().repaint();
-    
-    mountIModule(itsMouseTracker);
+    mountIModule(itsSelecter);
   }
 
   /**
-   * called by the SelectionMover UI module
+   * drag listener called by the SelectionMover UI module,
+   * at the end of its interaction.
+   * Moves all the selected elements
    */
   public void dragEnd(int x, int y)
   {
     ScrEvent aEvent;
+    ScrEvent newEvent;
+
+    ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
 
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
 
-    for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+    if (itsMoveMode == CLONE) 
       {
-	aEvent = (ScrEvent) e.nextElement();
-	
-	gc.getAdapter().setX(aEvent, gc.getAdapter().getX(aEvent)+deltaX);
-	gc.getAdapter().setY(aEvent, gc.getAdapter().getY(aEvent)+deltaY);
+	// starts a serie of undoable add transition
+	egc.getDataModel().beginUpdate();
+	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    aEvent = (ScrEvent) e.nextElement();
+	    newEvent = new ScrEvent(aEvent.getDataModel(),
+				    aEvent.getTime(),
+				    aEvent.getPitch(),
+				    aEvent.getVelocity(),
+				    aEvent.getDuration(),
+				    aEvent.getChannel());
+
+	    egc.getAdapter().setX(newEvent, egc.getAdapter().getX(aEvent)+deltaX);
+	    egc.getDataModel().addEvent(newEvent);
+
+	  }
+	egc.getDataModel().endUpdate();
       }
 
-    mountIModule(itsMouseTracker);
+    else
+      {
+	// starts a serie of undoable moves
+	
+	egc.getDataModel().beginUpdate();
+	
+	for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
+	  {
+	    aEvent = (ScrEvent) e.nextElement();
+	    
+	    egc.getAdapter().setX(aEvent, egc.getAdapter().getX(aEvent)+deltaX);
+	    egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
+	  }
+	
+	egc.getDataModel().endUpdate();
+	
+      }
+    
+    mountIModule(itsSelecter);
     gc.getGraphicDestination().repaint();    
   }
 
 
-  /**
-   * Selects all the objects in a given rectangle
-   */
-  void selectArea(int x, int y, int w, int h) 
-  { 
-    selectArea(gc.getRenderer(), ExplodeSelection.getSelection(), x, y,  w,  h);
-  }
-
-  
-  /**
-   * Selects all the objects in a given rectangle, given a Render
-   * and a Selection
-   */
-  public static void selectArea(Renderer r, SelectionHandler s, int x, int y, int w, int h) 
-  {
-    ScrEvent aScrEvent;
-
-    for (Enumeration e = r.eventsIntersecting(x, y, w, h); e.hasMoreElements();) 
-      {
-	aScrEvent = (ScrEvent)e.nextElement() ;
-	s.select(aScrEvent);
-      }
-  }
-
-
-
   //---Fields
 
-  MouseTracker itsMouseTracker;
-  Selecter itsSelecter;
   DirectionChooser itsDirectionChooser;
   SelectionMover itsSelectionMover;
 
-  Point startingPoint = new Point();
+  final static int SIMPLE = 0;
+  final static int CLONE = 1;
+  int itsMoveMode;
 }
 
 

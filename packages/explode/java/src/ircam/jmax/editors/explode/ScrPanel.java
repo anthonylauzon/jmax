@@ -1,6 +1,7 @@
 package ircam.jmax.editors.explode;
 
 import com.sun.java.swing.*;
+import com.sun.java.swing.undo.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -12,7 +13,7 @@ import ircam.jmax.toolkit.*;
   /**
    * The actual panel of a score editor. It contains the "sensible" part.
    * The graphic representation is handled by 
-   * a Renderer that has the responsability to actually draw the score.
+   * a RendererManager that has the responsability to actually draw the score.
    * The simplest renderer is "ScoreRenderer", a piano-roll component.
    * The user interaction is handled by the tools.
    * The panel builds also the Graphic context to be used during edit, 
@@ -28,10 +29,11 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
     setBackground(Color.white);
+    setDoubleBuffered(false);
 
     tools = new Vector();
 
-    //-- prepares the NORTH infoPanel
+    //-- prepares the NORTH Status bar
     
     JPanel northSection = new JPanel();
     northSection.setLayout(new BoxLayout(northSection, BoxLayout.Y_AXIS));
@@ -54,19 +56,16 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
       public void paint(Graphics g) 
 	{
-	  
-	  int currentTime = gc.getLogicalTime();
-	  int temp1 = gc.getDataModel().indexOfFirstEventEndingAfter(currentTime);
-	  int temp2 = gc.getDataModel().indexOfLastEventStartingBefore(currentTime+windowTimeWidth());
-
-	  gc.getRenderer().render(g, temp1, temp2);	
+	  Rectangle r = g.getClipBounds();
+	  gc.getRenderManager().render(g, r); //et c'est tout	
 	}
 
-      protected void processMouseEvent(MouseEvent e)
+       protected void processMouseEvent(MouseEvent e)
 	{
 	  if (e.isPopupTrigger()) 
-	    ScrToolbar.getToolbar().itsPopupMenu.show (e.getComponent(), e.getX(), e.getY());
-	  
+	    {
+	      Explode.toolbar.itsPopupMenu.show (e.getComponent(), e.getX()-10, e.getY()-10);
+	    }
 	  else 
 	    super.processMouseEvent(e);
 	  
@@ -77,21 +76,23 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     add(itsScore, BorderLayout.CENTER);
 
     { //-- prepares the graphic context
-      gc = new GraphicContext();
+      gc = new ExplodeGraphicContext();
       gc.setGraphicSource(itsScore);
       gc.setGraphicDestination(itsScore);
-      //gc.setFrame(GraphicContext.getFrame(this));
+
       gc.setDataModel(ep);
       ExplodeSelection.createSelection(ep);
-      gc.setRenderer(new ScoreRenderer(gc));
+      gc.setRenderManager(new ScoreRenderer(gc));
       gc.setLogicalTime(0);
       gc.setStatusBar(itsStatusBar);
+
     }
 
     ExplodeSelection.getSelection().addSelectionListener(this);
     gc.getDataModel().addListener(this);
 
-    
+    itsStatusBar.addWidget(new ScrEventWidget(gc));
+
     //-- prepares the zoom scrollbar (time stretching) and its listeners
     itsTimeZoom = new Scrollbar(Scrollbar.HORIZONTAL, INITIAL_ZOOM, 5, 1, 1000);
 
@@ -140,7 +141,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 	gc.getAdapter().setXTransposition(-currentTime);
 	itsScore.repaint();
 
-	gc.getStatusBar().post(ScrPanel.this, "starting time: "+currentTime+"msec"+"                 zoomfactor"+itsTimeZoom.getValue()+"%");
+	itsStatusBar.post(ScrPanel.this, "starting time: "+currentTime+"msec"+" zoomfactor"+itsTimeZoom.getValue()+"%");
 	
       }
     });
@@ -164,23 +165,40 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   /**
    * note: can't create the toolbar in the constructor,
    * because the Frame is not available yet.
-   * The ScrToolbar class uses the Frame information
-   * in order to correctly map tools on windows
+   * The EditorToolbar class uses the Frame information
+   * in order to correctly map graphic contexts on windows
    */
-  public void prepareToolbar() 
+  public EditorToolbar prepareToolbar() 
   {
 
     gc.setFrame(GraphicContext.getFrame(this));
 
-    ScrToolbar.createToolbar(this, gc);
-    ScrToolbar.getToolbar().addToolListener(this);
+    EditorToolbar tb = new EditorToolbar(this);
+
+    tb.addToolListener(this);
+    itsStatusBar.post(tb.getTool(), "");
+    return tb;
+    /*JPanel c = new JPanel();
+    c.setLayout(new BorderLayout());
+    Component tb = EditorToolbar.getToolbar();
+    tb.setSize(200, 30);
+    c.add(tb, BorderLayout.CENTER);
+    c.setSize(200, 30);
+    itsStatusBar.addWidgetAt(c, 2);*/
   }
 
-
+  /**
+   * link this panel to a pre-existing toolbar */
+  void linkToToolbar()
+  {
+    Explode.toolbar.addClient(gc);
+    Explode.toolbar.addToolListener(this);
+    itsStatusBar.post(Explode.toolbar.getTool(), "");
+  } 
 
   /**
-   * prepares the tools that will be used with this editor,
-   * and activate the default tool (the selecter)
+   * prepares the tools that will be used with this editor.
+   * 
    */
   private void initTools() 
   {
@@ -204,6 +222,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   }
 
 
+
   /**
    * ToolbarProvider interface
    */
@@ -223,7 +242,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   /**
    * ToolbarProvider interface
    */
-  public ScrTool getDefaultTool() 
+  public Tool getDefaultTool() 
   {
     return itsDefaultTool;
   }
@@ -234,9 +253,9 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */ 
   public void toolChanged(ToolChangeEvent e) 
   {
-    if (ScrToolbar.getTool() != null) 
+    if (e.getTool() != null) 
       {
-	gc.getStatusBar().post(ScrToolbar.getTool(), "");
+	itsStatusBar.post(e.getTool(), "");
       }
     
   }
@@ -265,7 +284,8 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
 
   public void selectionChanged()
-  {
+  {  
+
     repaint();
   }
 
@@ -299,7 +319,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public String getName() 
   {
-    return "Main Editor";
+    return "";
   }
 
 
@@ -319,6 +339,28 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
     gc.getAdapter().edit(gc.getFrame());
   }
 
+
+  /** Undo support */
+  public void undo()
+  {
+    try 
+      {
+	gc.getDataModel().undo();
+      } catch (CannotUndoException e1) {
+	System.out.println("can't undo");
+      }
+  }
+
+  /** undo support */
+  protected void redo()
+  {
+    try 
+      {
+	gc.getDataModel().redo();
+      } catch (CannotRedoException e1) {
+	System.out.println("can't redo");
+      }
+  }
 
 
   /**
@@ -340,14 +382,14 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
   //------------- Fields
   public final int PANEL_WIDTH = 800;
-  public final int PANEL_HEIGHT = 400;
+  public final int PANEL_HEIGHT = 450;
   
-  GraphicContext gc;
+  ExplodeGraphicContext gc;
 
   Vector tools;
-  ScrToolbar itsToolbar;
+  EditorToolbar itsToolbar;
 
-  ScrTool itsDefaultTool;
+  Tool itsDefaultTool;
 
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
   
@@ -358,6 +400,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
 
   InfoPanel itsStatusBar;
   JPanel itsScore;
+
 }
 
 

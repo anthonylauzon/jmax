@@ -1,17 +1,19 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.awt.*;
-import java.util.Enumeration;
+import java.util.*;
 import com.sun.java.swing.ImageIcon;
+import com.sun.java.swing.undo.*;
 
 
 /**
  * the tool used to resize a selection of events.
- * It uses two UI modules: a MouseTracker to establish the starting point
- * of the moving operation, and a SelectionResizer to actually resize the
+ * It uses a SelectionResizer to actually resize the
  * objects.
  */
-public class ResizerTool extends ScrTool implements PositionListener, DragListener {
+public class ResizerTool extends SelecterTool implements DragListener {
 
   /**
    * constructor.
@@ -21,18 +23,10 @@ public class ResizerTool extends ScrTool implements PositionListener, DragListen
     super("Resizer", theIcon);
     
     gc = theGc;
-    itsMouseTracker = new MouseTracker(this);
-    itsSelectionResizer = new SelectionResizer(this);
+    itsSelectionResizer = new ExplodeSelectionResizer(this);
 
-    startingPoint = new Point();
   }
 
-
-  /** the default interface module is a MouseTracker */
-  public InteractionModule getDefaultIM() 
-  {
-    return itsMouseTracker;
-  }
 
   /**
    * called when this module is "unmounted"
@@ -41,23 +35,21 @@ public class ResizerTool extends ScrTool implements PositionListener, DragListen
   {
   }
 
-
   /**
-   * position listening. It mounts the SelectionMover if the 
-   * point choosen is on a selected event. 
-   */
-  public void positionChoosen(int x, int y, int modifiers) 
+   * a single object has been selected, in coordinates x, y:
+   * Mount the resizer interaction module.
+   * Overrides the abstract SelecterTool.singleObjectSelected */
+  public void singleObjectSelected(int x, int y, int modifiers) 
   {
-    ScrEvent aScrEvent = gc.getRenderer().eventContaining(x, y);
-    
-    if (aScrEvent != null && ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
-      {
-	startingPoint.setLocation(x, y);
-
-	mountIModule(itsSelectionResizer, x, y);
-      }
+    mountIModule(itsSelectionResizer, x, y);
   }
 
+  /** 
+   * a group of objects was selected 
+   *overrides the abstract SelecterTool.multipleObjectSelected */
+  void multipleObjectSelected()
+  {
+  }
 
   /**
    * drag listening, called by the SelectionResizer UI Module.
@@ -69,24 +61,29 @@ public class ResizerTool extends ScrTool implements PositionListener, DragListen
     ScrEvent aEvent;
 
     int deltaX = x-startingPoint.x;
+    ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
 
+    // starts a serie of undoable transitions
+    egc.getDataModel().beginUpdate();
+    
     for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aEvent = (ScrEvent) e.nextElement();
 
-	if (gc.getAdapter().getLenght(aEvent)+deltaX > 0)
-	  gc.getAdapter().setLenght(aEvent, gc.getAdapter().getLenght(aEvent)+deltaX);
+	if (egc.getAdapter().getLenght(aEvent)+deltaX > 0)
+	  egc.getAdapter().setLenght(aEvent, egc.getAdapter().getLenght(aEvent)+deltaX);
       }
 
-    mountIModule(itsMouseTracker);
-    gc.getGraphicDestination().repaint();    
+    egc.getDataModel().endUpdate();
+    
+    mountIModule(itsSelecter);
+    egc.getGraphicDestination().repaint();    
   }
 
+
   //------------ Fields
-  MouseTracker itsMouseTracker;
   SelectionResizer itsSelectionResizer;
 
-  Point startingPoint;
 }
 
 

@@ -1,13 +1,16 @@
 package ircam.jmax.editors.explode;
 
-import java.awt.Component;
-import com.sun.java.swing.ImageIcon;
+import ircam.jmax.toolkit.*;
 
+import java.awt.Component;
+
+import com.sun.java.swing.ImageIcon;
+import com.sun.java.swing.undo.*;
 
 /**
  * the tool used to perform an erase operation.
  */
-public class DeleteTool extends ScrTool implements PositionListener {
+public class DeleteTool extends Tool implements PositionListener {
   
   /**
    * Constructor. 
@@ -17,7 +20,7 @@ public class DeleteTool extends ScrTool implements PositionListener {
     super("eraser", theImageIcon);
     
     gc = theGc;    
-    itsMouseTracker = new MouseTracker(this);
+    itsMouseTracker = new VerboseMouseTracker(this);
   }
 
   
@@ -41,12 +44,22 @@ public class DeleteTool extends ScrTool implements PositionListener {
    */
   public void positionChoosen(int x, int y, int modifiers) 
   {
-    ScrEvent aEvent = gc.getRenderer().eventContaining(x, y);
+    ScrEvent aEvent = (ScrEvent) gc.getRenderManager().firstObjectContaining(x, y);
     
-    if (aEvent != null)
-      gc.getDataModel().removeEvent(aEvent);
+    if (aEvent != null) 
+      {
+	ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
+	// starts an undoable transition
+	egc.getDataModel().beginUpdate();
+
+	egc.getDataModel().removeEvent(aEvent);
+
+	egc.getDataModel().endUpdate();
+      }
   } 
   
+
+
   //---- Fields
 
   MouseTracker itsMouseTracker;

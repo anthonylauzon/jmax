@@ -241,7 +241,7 @@ abstract public class Adapter implements MappingListener{
    */
   public void removeTranspositionListener(TranspositionListener listener)
   {
-    zoomListeners.removeElement(listener);
+    transpositionListeners.removeElement(listener);
   }
 
   private void notifyTransposition(int newTransposition)

@@ -1,5 +1,7 @@
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.awt.*;
 import java.util.Enumeration;
 import com.sun.java.swing.ImageIcon;
@@ -11,7 +13,7 @@ import com.sun.java.swing.ImageIcon;
  * of the moving operation, and a SelectionMover to actually move the
  * objects.
  */
-public class MoverTool extends ScrTool implements PositionListener, DragListener {
+public class MoverTool extends Tool implements PositionListener, DragListener {
 
   /**
    * constructor.
@@ -22,7 +24,7 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
     
     gc = theGc;
     itsMouseTracker = new MouseTracker(this);
-    itsSelectionMover = new SelectionMover(this, theDirection);
+    itsSelectionMover = new ExplodeSelectionMover(this, theDirection);
 
     startingPoint = new Point();
   }
@@ -48,7 +50,7 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
    */
   public void positionChoosen(int x, int y, int modifiers) 
   {
-    ScrEvent aScrEvent = gc.getRenderer().eventContaining(x, y);
+    ScrEvent aScrEvent = (ScrEvent) gc.getRenderManager().firstObjectContaining(x, y);
     
     if (aScrEvent != null && ExplodeSelection.getSelection().isInSelection(aScrEvent)) 
       {
@@ -73,13 +75,20 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
     int deltaY = y-startingPoint.y;
     int deltaX = x-startingPoint.x;
 
+    ExplodeGraphicContext egc = (ExplodeGraphicContext) gc;
+
+    // starts a serie of undoable transitions
+    egc.getDataModel().beginUpdate();
+
     for (Enumeration e = ExplodeSelection.getSelection().getSelected(); e.hasMoreElements();)
       {
 	aEvent = (ScrEvent) e.nextElement();
 	
-	gc.getAdapter().setX(aEvent, gc.getAdapter().getX(aEvent)+deltaX);
-	gc.getAdapter().setY(aEvent, gc.getAdapter().getY(aEvent)+deltaY);
+	egc.getAdapter().setX(aEvent, egc.getAdapter().getX(aEvent)+deltaX);
+	egc.getAdapter().setY(aEvent, egc.getAdapter().getY(aEvent)+deltaY);
       }
+
+    egc.getDataModel().endUpdate();
 
     mountIModule(itsMouseTracker);
     gc.getGraphicDestination().repaint();    
@@ -89,8 +98,8 @@ public class MoverTool extends ScrTool implements PositionListener, DragListener
   MouseTracker itsMouseTracker;
   SelectionMover itsSelectionMover;
 
-  public static int VERTICAL_MOVEMENT = 1;
-  public static int HORIZONTAL_MOVEMENT = 2;
+  public static int HORIZONTAL_MOVEMENT = 1;
+  public static int VERTICAL_MOVEMENT = 2;
 
   Point startingPoint;
 }
