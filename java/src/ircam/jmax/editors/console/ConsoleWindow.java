@@ -93,6 +93,7 @@ public class ConsoleWindow extends JFrame implements EditorContainer, Editor, Pr
     JMenuBar mb = new JMenuBar();
 
     mb.add( new FileMenu()); 
+    mb.add( new DefaultProjectMenu()); 
     mb.add( new MaxWindowJMenu( "Windows", this));
     mb.add(Box.createHorizontalGlue());
     mb.add( new DefaultHelpMenu());

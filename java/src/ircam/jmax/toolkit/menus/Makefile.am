@@ -1,8 +1,9 @@
 packagedir=$(pkgdatadir)/java/classes/ircam/jmax/toolkit/menus
 package_JAVA = \
-DefaultFileMenu.java\
-DefaultHelpMenu.java\
-EditorMenu.java\
+DefaultFileMenu.java    \
+DefaultHelpMenu.java    \
+DefaultProjectMenu.java \
+EditorMenu.java         \
 MaxWindowJMenu.java
 
 JAVAC= @JAVACX@

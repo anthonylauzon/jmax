@@ -28,13 +28,15 @@ package ircam.jmax.editors.project;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.util.*;
+import java.awt.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.toolkit.menus.*;
 
-public class ProjectEditor extends JFrame 
+public class ProjectEditor extends JFrame implements EditorContainer
 {    
   public static void registerProjectEditor()
   {
@@ -45,7 +47,7 @@ public class ProjectEditor extends JFrame
   }
 
   public static ProjectEditor open()
-  {
+  {    
     if (projectEditor == null)
       projectEditor = new ProjectEditor();
     else
@@ -55,23 +57,70 @@ public class ProjectEditor extends JFrame
     
     return projectEditor;
   }
-  
+
+  public static ProjectEditor getInstance()
+  {
+    return projectEditor;
+  }
+
   protected ProjectEditor()
   {
     super( "Project Editor");
-    
+
+    makeMenuBar();    
+
     packagePanel = new ConfigPackagePanel( this, JMaxApplication.getProject());
     getContentPane().add( packagePanel);
+    
     validate();
     pack();
   }
 
+  private void makeMenuBar()
+  {
+    JMenuBar mb = new JMenuBar();
+
+    mb.add( new DefaultFileMenu()); 
+    mb.add( new DefaultProjectMenu()); 
+    mb.add( new MaxWindowJMenu( "Windows", this));
+    mb.add(Box.createHorizontalGlue());
+    mb.add( new DefaultHelpMenu());
+    
+    setJMenuBar( mb);
+  }
+
   void update()
   {
-    JMaxApplication.getProject().update();
-    //packagePanel.update();
+    packagePanel.update();
   } 
- 
+
+  public void save()
+  {
+    packagePanel.Save();
+  } 
+  public void saveAs()
+  {
+    packagePanel.SaveAs();
+  } 
+  /************* interface EditorContainer ************************/
+  public Editor getEditor()
+  {
+    return packagePanel;
+  }
+  public Frame getFrame()
+  {
+    return this;
+  }
+  public Point getContainerLocation()
+  {
+    return getLocation();
+  }
+  public Rectangle getViewRectangle()
+  {
+    return getContentPane().getBounds();
+  }
+  /**************************************************************/
+
   private ConfigPackagePanel packagePanel;
   private static ProjectEditor projectEditor = null;
 }

@@ -194,6 +194,8 @@ public class FtsPackage extends FtsObject
 
   void addRequires(int nArgs, FtsAtom[] args)
   {
+    requires.removeAllElements();
+
     for(int i = 0; i < nArgs; i += 2)
       addPackage(args[i].symbolValue.toString(), args[i+1].intValue);
   }
@@ -205,18 +207,24 @@ public class FtsPackage extends FtsObject
 
   void addTemplatePath(int nArgs, FtsAtom[] args)
   {
+    templatePaths.removeAllElements();
+
     for(int i = 0; i<nArgs; i++)
       templatePaths.addElement( args[i].symbolValue.toString());
   }
 
   void addAbstractionPath(int nArgs, FtsAtom[] args)
   {
+    absPaths.removeAllElements();
+
     for(int i = 0; i<nArgs; i++)
       absPaths.addElement( args[i].symbolValue.toString());
   }
 
   void addDataPath(int nArgs, FtsAtom[] args)
   {
+    dataPaths.removeAllElements();
+
     for(int i = 0; i<nArgs; i++)
       dataPaths.addElement( args[i].symbolValue.toString());
   }

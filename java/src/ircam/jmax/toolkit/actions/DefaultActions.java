@@ -28,6 +28,7 @@ package ircam.jmax.toolkit.actions;
 import java.awt.event.*;
 import javax.swing.*;
 import ircam.jmax.toolkit.*;
+import ircam.jmax.editors.project.*;
 
 /** This class define a set of static variables 
  *  containing all the standard actions used for the
@@ -43,6 +44,32 @@ public class DefaultActions
   public static EditorAction statisticsAction = new StatisticsAction();
   public static EditorAction dspAction     = new DSPAction();
   public static EditorAction quitAction     = new QuitAction();
+
+  /*********** project ***********************************/
+  public static EditorAction newProjectAction     = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	//ProjectEditor.new();
+      }
+    };
+  public static EditorAction editProjectAction    = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ProjectEditor.open();
+      }
+    };
+  public static EditorAction saveProjectAction    = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ProjectEditor.getInstance().save();
+      }
+    };
+  public static EditorAction saveAsProjectAction  = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	ProjectEditor.getInstance().saveAs();
+      }
+    };
 }
 
 

@@ -40,7 +40,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
-public class ConfigPackagePanel extends JPanel 
+public class ConfigPackagePanel extends JPanel implements Editor
 {
   public ConfigPackagePanel(Window win, FtsPackage pkg)  
   {
@@ -65,7 +65,8 @@ public class ConfigPackagePanel extends JPanel
     requiresTable.setPreferredScrollableViewportSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     requiresTable.setRowHeight(17);
     requiresTable.getColumnModel().getColumn(1).setPreferredWidth( 50);
-    requiresTable.getColumnModel().getColumn(1).setMaxWidth( 50);    
+    requiresTable.getColumnModel().getColumn(1).setMaxWidth( 50);  
+    requiresTable.getColumnModel().getColumn(1).setResizable( false);  
     requiresTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
 
     requiresScrollPane = new JScrollPane(requiresTable);
@@ -113,28 +114,12 @@ public class ConfigPackagePanel extends JPanel
 	  Delete();
 	}
       });
-    JButton saveButton = new JButton("Save");
-    saveButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  Save();
-	}
-      });
-    JButton closeButton = new JButton("Close");
-    closeButton.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  window.setVisible(false);
-	}
-      });
     
     JPanel buttons = new JPanel();
     buttons.setLayout(new BoxLayout( buttons, BoxLayout.X_AXIS));    
     buttons.add( addButton);
     buttons.add( deleteButton);
     buttons.add( Box.createHorizontalGlue());
-    buttons.add( saveButton);
-    buttons.add( closeButton);
     
     add( tabbedPane);
     add( buttons);
@@ -164,12 +149,19 @@ public class ConfigPackagePanel extends JPanel
   {    
     initDataModels( ftsPkg);
     requiresTable.setModel( requiresModel);
+    requiresTable.getColumnModel().getColumn(1).setPreferredWidth( 50);
+    requiresTable.getColumnModel().getColumn(1).setMaxWidth( 50);  
+    requiresTable.getColumnModel().getColumn(1).setResizable( false);
     requiresTable.revalidate();
+
     templPathList.setModel( templPathModel);
     templPathList.revalidate();
+
     dataPathList.setModel( dataPathModel);
     dataPathList.revalidate();
-    revalidate();
+    revalidate();    
+
+    window.pack();
   }
 
   void chooseAndAddPath( DefaultListModel model, String message, int index)
@@ -238,6 +230,11 @@ public class ConfigPackagePanel extends JPanel
   }
 
   void Save()
+  {
+    ftsPkg.save();
+  }
+
+  void SaveAs()
   {
     ftsPkg.save();
   }
@@ -383,7 +380,16 @@ public class ConfigPackagePanel extends JPanel
     FtsPackage ftsPackage;
   }
 
+  /************* interface Editor ************************/
+  public EditorContainer getEditorContainer()
+  {
+    return (EditorContainer)window;
+  }
 
+  public void Close(boolean doCancel)
+  {
+    window.setVisible(false);
+  }
   /********************************/
   private JTabbedPane tabbedPane;
   private JTable requiresTable;

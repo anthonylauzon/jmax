@@ -73,6 +73,9 @@ static fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass
 #endif
 
 static void fts_package_load_default_files(fts_package_t* pkg);
+static void fts_package_upload_requires(fts_package_t* pkg);
+static void fts_package_upload_template_paths(fts_package_t* pkg);
+static void fts_package_upload_data_paths(fts_package_t* pkg);
 
 /***********************************************
  *
@@ -878,6 +881,9 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       fts_package_require(pkg, fts_get_symbol(&at[i]));
     }
   }
+  
+  if( fts_object_has_id( o) && pkg->packages)
+    fts_package_upload_requires( pkg);
 }
 
 static void 
@@ -903,6 +909,9 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
       fts_package_add_template_path(pkg, fts_get_symbol(&at[i]));
     }
   }
+
+  if( fts_object_has_id( o) && pkg->template_paths)
+    fts_package_upload_template_paths( pkg);
 }
 
 static void 
@@ -941,6 +950,9 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
       fts_package_add_data_path(pkg, fts_get_symbol(&at[i]));
     }
   }
+
+  if( fts_object_has_id( o) && pkg->data_paths)
+    fts_package_upload_data_paths( pkg);
 }
 
 static void 
@@ -1126,6 +1138,42 @@ fts_package_send_list( fts_object_t *o, fts_iterator_t i, fts_symbol_t selector)
 }
 
 static void 
+fts_package_upload_requires( fts_package_t *this)
+{
+  fts_package_t *pkg;
+  fts_atom_t a[1]; 
+  fts_iterator_t i;
+  fts_list_get_values( this->packages, &i);
+  fts_client_start_message( (fts_object_t *)this, fts_s_require);
+  while (fts_iterator_has_more( &i))
+    {
+      fts_iterator_next( &i, a);
+      fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));      
+      pkg = fts_package_get( fts_get_symbol( a));
+      if (!fts_object_has_id( (fts_object_t *)pkg))
+	fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( (fts_object_t *)this));
+      fts_client_add_int( (fts_object_t *)this, fts_get_object_id( (fts_object_t *)pkg));      
+    } 
+  fts_client_done_message( (fts_object_t *)this);    
+}
+
+static void 
+fts_package_upload_template_paths( fts_package_t *this)
+{
+  fts_iterator_t i;
+  fts_list_get_values( this->template_paths, &i);
+  fts_package_send_list( (fts_object_t *)this, i, fts_s_template_path);
+}
+
+static void 
+fts_package_upload_data_paths( fts_package_t *this)
+{
+  fts_iterator_t i;
+  fts_list_get_values( this->data_paths, &i);
+  fts_package_send_list( (fts_object_t *)this, i, fts_s_data_path);
+}
+
+static void 
 __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;
@@ -1134,36 +1182,22 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   fts_package_t *pkg;
   char summary[256];
 
+  if( this->state == fts_package_corrupt)
+    return;
+
   if ( this->packages)
-    {
-      fts_list_get_values( this->packages, &i);
-      fts_client_start_message( o, fts_s_require);
-      while (fts_iterator_has_more( &i))
-	{
-	  fts_iterator_next( &i, a);
-	  fts_client_add_symbol( o, fts_get_symbol( a));      
-	  pkg = fts_package_get( fts_get_symbol( a));
-	  if (!fts_object_has_id( (fts_object_t *)pkg))
-	    fts_client_register_object( (fts_object_t *)pkg, fts_get_client_id( o));
-	  fts_client_add_int( o, fts_get_object_id( (fts_object_t *)pkg));      
-	} 
-      fts_client_done_message( o);            
-    }
+    fts_package_upload_requires( this);
+
   if ( this->template_paths)
-    {
-      fts_list_get_values( this->template_paths, &j);
-      fts_package_send_list( o, j, fts_s_template_path);
-    }
+    fts_package_upload_template_paths( this);
+
   if ( this->abstraction_paths)
     {
       fts_list_get_values( this->abstraction_paths, &h);
       fts_package_send_list( o, h, fts_s_abstraction_path);
     }
   if ( this->data_paths)
-    {
-      fts_list_get_values( this->data_paths, &k);
-      fts_package_send_list( o, k, fts_s_data_path);      
-    }
+    fts_package_upload_data_paths( this);
 
   fts_set_symbol(a, this->name);
   fts_set_symbol(a+1, this->dir);
