@@ -30,6 +30,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import ircam.jmax.*;
+import ircam.jmax.editors.patcher.*;
 /**
  * A <code>ConsoleArea</code> Swing component is a component for
  * fast display of text lines.
@@ -113,7 +115,8 @@ public class ConsoleArea extends JComponent implements Scrollable {
     jump = 0;
 
     setOpaque( true);
-    setBackground( Color.white);
+    setBackground(Settings.sharedInstance().getConsoleBackgroundColor());
+    setForeground(Settings.sharedInstance().getConsoleForegroundColor());
 
     addComponentListener( new ComponentAdapter() {
       public void componentShown( ComponentEvent e)
@@ -123,7 +126,7 @@ public class ConsoleArea extends JComponent implements Scrollable {
 	}
     });
 
-    setFont( new Font( "SansSerif", Font.PLAIN, 12));
+    setFont( new Font( Platform.FONT_NAME, Font.PLAIN, 12));
   }
 
   /*
