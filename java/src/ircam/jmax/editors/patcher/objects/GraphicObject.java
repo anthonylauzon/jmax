@@ -206,6 +206,12 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     itsSketchPad.getDisplayList().releaseConnectionsForObject(this);
     itsSketchPad.getDisplayList().remove(this);
     itsSketchPad.getFtsPatcher().removeObject( ftsObject);
+    if( inspector != null) 
+      {
+	inspector.setVisible( false);
+	inspector.dispose();
+	inspector = null;
+      }
     dispose();
   }
   
@@ -1052,10 +1058,23 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     return false;
   }
 
+  ObjectInspector inspector = null;
   public void inspect()
   {
     if( isInspectable())
-      new ObjectInspector( this);
+      {      
+	if(inspector == null)
+	  inspector = new ObjectInspector( this);
+	else
+	  inspector.relocateToObject();
+      }
+  }
+
+  public void inspectionDone()
+  {
+    inspector.setVisible(false);
+    inspector.dispose();
+    inspector = null;    
   }
 
   public String getName()

@@ -51,7 +51,7 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     target = obj;
-    name = obj.getFtsObject().getVariableName();
+    name = target.getFtsObject().getVariableName();
 
     /* persistence handling */
     if( target.getFtsObject().isPersistent() != -1)
@@ -64,7 +64,7 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
 	      target.getFtsObject().requestSetPersistent( persist);
 	    }
 	  });
-	persistentCB.setSelected( obj.getFtsObject().isPersistent() == 1);
+	persistentCB.setSelected( target.getFtsObject().isPersistent() == 1);
 
 	add( persistentCB);
 	
@@ -98,7 +98,13 @@ public class StandardControlPanel extends JPanel implements ActionListener, Obje
     validate();
   }
 
-  public void update( GraphicObject obj){}
+  public void update( GraphicObject obj)
+  {
+    target = obj;
+    name = target.getFtsObject().getVariableName();
+    nameField.setText( name);    
+    persistentCB.setSelected( target.getFtsObject().isPersistent() == 1);
+  }
 
   public void done()
   {

@@ -71,8 +71,14 @@ public class ObjectInspector extends JDialog
 	public void windowClosing(WindowEvent e)
 	{
 	  controlPanel.done();
+	  ObjectInspector.this.obj.inspectionDone();
 	}
       });
+  }
+
+  public void relocateToObject()
+  {
+    setLocation( parent.getX() + obj.getX() + 10, parent.getY() + obj.getY() + 50);
   }
 }
 
