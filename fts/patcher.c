@@ -20,12 +20,15 @@
  *
  */
 
+#include <ftsconfig.h>
+
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <limits.h>
 
 #include <fts/fts.h>
+
 #include <ftsprivate/client.h>
 #include <ftsprivate/class.h>
 #include <ftsprivate/connection.h>
