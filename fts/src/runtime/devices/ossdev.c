@@ -16,7 +16,6 @@
 
    All the post should generate an error.
 */
-#undef FMT_CHAR
 
 /* Include files */
 
@@ -64,17 +63,12 @@ static struct oss_audio_data_struct
   /* device */
 
   int fd;
-  int fifo_size;		/* the fifo size is stored in samples frames*/
 
   int sampling_rate;	   
 
   /* buffers  */
 
-#ifdef FMT_CHAR
-  char *dac_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device open */
-#else
   short *dac_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device open */
-#endif
   short *adc_fmtbuf;		/* buffer to format stereo sample frames, allocated in the device_open */
 
 } oss_audio_data;
@@ -82,7 +76,23 @@ static struct oss_audio_data_struct
 
 static void oss_audio_set_parameters()
 {
-  int format, stereo, sr;
+  int format, stereo, sr, fragsize;
+
+  /* Set fragment size */
+  fragsize = 0x00800008; /* 128 fragments of 256 bytes, latency: 0.18s */
+  if (ioctl( oss_audio_data.fd, SNDCTL_DSP_SETFRAGMENT, &fragsize))
+    post( "Error setting SNDCTL_DSP_SETFRAGMENT\n");
+
+  {
+    audio_buf_info info;
+
+    if ( ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOSPACE, &info) == -1)
+      post( "SNDCTL_DSP_GETOSPACE\n");
+    post( "fragments: %d\n", info.fragments);
+    post( "total number of fragments: %d\n", info.fragstotal);
+    post( "fragment size: %d bytes\n", info.fragsize);
+    post( "bytes: %d\n", info.bytes);
+  }
 
   /* Set 16 bit format */
 
@@ -110,17 +120,6 @@ static void oss_audio_set_parameters()
 
   if (sr != oss_audio_data.sampling_rate)
     post("Audio device doesn't support requested sampling rate\n");
-
-  {
-    audio_buf_info info;
-
-    if ( ioctl( oss_audio_data.fd, SNDCTL_DSP_GETOSPACE, &info) == -1)
-      post( "SNDCTL_DSP_GETOSPACE\n");
-    post( "fragments %d\n", info.fragments);
-    post( "fragstotal %d\n", info.fragstotal);
-    post( "fragsize %d\n", info.fragsize);
-    post( "bytes %d\n", info.bytes);
-  }
 }
 
 /* to put the audio device in the right configuration,
@@ -251,11 +250,7 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Allocate the DAC  formatting buffer */
 
-#ifdef FMT_CHAR
-  oss_audio_data.dac_fmtbuf = (char *) fts_malloc(MAXVS * 2 * 2);
-#else
   oss_audio_data.dac_fmtbuf = (short *) fts_malloc(MAXVS * 2 * sizeof(short));
-#endif
 
   return fts_Success;
 }
@@ -291,68 +286,27 @@ static void
 oss_dac_put(fts_word_t *argv)
 {
   long n = fts_word_get_long(argv + 1);
-  int i,j;
-  int ch;
+  int i,j, ch;
+  float *in;
 
   /* do the data transfer: unrolled pipelined loop */
 
   for (ch = 0; ch < 2; ch++)
     {
-      float *in;
-      
       in = (float *) fts_word_get_ptr(argv + 2 + ch);
 
-#ifdef FMT_CHAR
-      for (i = ch, j = 0; j < n; i = i + 8, j += 4)
+      j = ch;
+      for ( i = 0; i < n; i += 4)
 	{
-	  float f1, f2, f3, f4;
-	  short s1, s2, s3, s4;
-
-	  f1 = in[j];
-	  f2 = in[j + 1];
-	  f3 = in[j + 2];
-	  f4 = in[j + 3];
-
-	  s1 = (short) ( 32767.0f * f1);
-	  oss_audio_data.dac_fmtbuf[i + 0] = s1&0xff;
-	  oss_audio_data.dac_fmtbuf[i + 1] = (s1>>8)&0xff;
-
-	  s2 = (short) ( 32767.0f * f2);
-	  oss_audio_data.dac_fmtbuf[i + 4] = s2&0xff;
-	  oss_audio_data.dac_fmtbuf[i + 5] = (s2>>8)&0xff;
-
-	  s3 = (short) ( 32767.0f * f3);
-	  oss_audio_data.dac_fmtbuf[i + 8] = s3&0xff;
-	  oss_audio_data.dac_fmtbuf[i + 9] = (s3>>8)&0xff;
-
-	  s4 = (short) ( 32767.0f * f4);
-	  oss_audio_data.dac_fmtbuf[i + 12] = s4&0xff;
-	  oss_audio_data.dac_fmtbuf[i + 13] = (s4>>8)&0xff;
+	  oss_audio_data.dac_fmtbuf[j + 0] = (short) ( 32767.0f * in[i+0]);
+	  oss_audio_data.dac_fmtbuf[j + 2] = (short) ( 32767.0f * in[i+1]);
+	  oss_audio_data.dac_fmtbuf[j + 4] = (short) ( 32767.0f * in[i+2]);
+	  oss_audio_data.dac_fmtbuf[j + 6] = (short) ( 32767.0f * in[i+3]);
+	  j += 8;
 	}
-#else
-      for (i = ch, j = 0; j < n; i = i + 8, j += 4)
-	{
-	  float f0, f1, f2, f3;
-	  short s0, s1, s2, s3;
-
-	  f0 = in[j + 0];
-	  f1 = in[j + 1];
-	  f2 = in[j + 2];
-	  f3 = in[j + 3];
-
-	  s0 = (short) ( 32767.0f * f0);
-	  oss_audio_data.dac_fmtbuf[i + 0] = s0;
-	  s1 = (short) ( 32767.0f * f1);
-	  oss_audio_data.dac_fmtbuf[i + 2] = s1;
-	  s2 = (short) ( 32767.0f * f2);
-	  oss_audio_data.dac_fmtbuf[i + 4] = s2;
-	  s3 = (short) ( 32767.0f * f3);
-	  oss_audio_data.dac_fmtbuf[i + 6] = s3;
-	}
-#endif
     }
 
-  write(oss_audio_data.fd, oss_audio_data.dac_fmtbuf, n * 2 * sizeof(short));
+  write(oss_audio_data.fd, oss_audio_data.dac_fmtbuf, 2 * n * sizeof(short));
 }
 
 
