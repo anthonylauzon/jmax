@@ -496,16 +496,16 @@ public class FtsTableObject extends FtsObjectWithEditor implements TableDataMode
   private Vector points = new Vector();
   MaxVector listeners = new MaxVector();
   
-  public final static int NUM_ARGS = /*128*/256;
-  public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];
+  /*public final static int NUM_ARGS = 256;
+    public static FtsAtom[] sendArgs = new FtsAtom[NUM_ARGS];*/
   
   private int size = 0;
 
-  static
-  {
+  /*static
+    {
     for(int i=0; i<NUM_ARGS; i++)
-      sendArgs[i]= new FtsAtom();
-  }
+    sendArgs[i]= new FtsAtom();
+    }*/
 }
 
 

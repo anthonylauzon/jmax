@@ -70,7 +70,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
   /**
    * DynamicDragListener interface
    */
-    public void dragStart(int x, int y)
+    public void dragStart(int x, int y, MouseEvent e)
     {
 	((SequenceGraphicContext)gc).getTrack().setProperty("active", Boolean.TRUE);
 	mountIModule(itsDirectionChooser, x, y);
@@ -78,7 +78,7 @@ public class ScrollerTool extends Tool implements  DirectionListener, DynamicDra
 	tempY = y;
     }
     private boolean rep = false;
-    public void dynamicDrag(int deltaX, int deltaY)
+    public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	Geometry geometry = egc.getAdapter().getGeometry();

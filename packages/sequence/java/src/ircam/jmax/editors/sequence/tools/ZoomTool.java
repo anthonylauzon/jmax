@@ -70,14 +70,14 @@ public class ZoomTool extends Tool implements  DirectionListener, DynamicDragLis
   /**
    * DynamicDragListener interface
    */
-    public void dragStart(int x, int y)
+    public void dragStart(int x, int y, MouseEvent e)
     {
 	((SequenceGraphicContext)gc).getTrack().setProperty("active", Boolean.TRUE);
 	mountIModule(itsDirectionChooser, x, y);
 	tempX = x;
 	tempY = y;
     }
-    public void dynamicDrag(int deltaX, int deltaY)
+    public void dynamicDrag(int deltaX, int deltaY, MouseEvent e)
     {
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	Geometry geometry = egc.getAdapter().getGeometry();

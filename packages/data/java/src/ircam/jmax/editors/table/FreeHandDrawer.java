@@ -54,7 +54,7 @@ public class FreeHandDrawer extends TableInteractionModule {
    */
   public void mousePressed(MouseEvent e) 
   {
-    itsListener.dragStart(e.getX(), e.getY());
+    itsListener.dragStart(e.getX(), e.getY(), e);
     active = true;
   }
 
@@ -80,7 +80,7 @@ public class FreeHandDrawer extends TableInteractionModule {
   {
     if (! active) return;
 
-    itsListener.dynamicDrag(e.getX(), e.getY());
+    itsListener.dynamicDrag(e.getX(), e.getY(), e);
   } 
 
   /**

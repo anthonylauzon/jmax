@@ -25,6 +25,8 @@
 
 package ircam.jmax.toolkit;
 
+import java.awt.event.*;
+
 /**
  * The interface of the objects that wants to 
  * dynamically follow drag operations. Unlike the DragListener interface,
@@ -35,10 +37,10 @@ public interface DynamicDragListener extends DragListener {
   
   /**
    * Begin the drag */
-  public abstract void dragStart(int x, int y);
+  public abstract void dragStart(int x, int y, MouseEvent e);
 
   /**
    * Continue the drag...*/
-  public abstract void dynamicDrag(int x, int y);
+  public abstract void dynamicDrag(int x, int y, MouseEvent e);
 
 }
