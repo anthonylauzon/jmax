@@ -126,7 +126,6 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   static FtsObject makeFtsObjectFromMessage(FtsMessage msg) throws FtsException
   {
-    FtsObject obj;
     String className;
     StringBuffer description;
     FtsContainerObject parent;
@@ -134,48 +133,51 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     parent = (FtsContainerObject) msg.getArgument(0);
     objId = ((Integer) msg.getArgument(1)).intValue();
+
+    /* Check for null description object */
+
+    if (msg.getNumberOfArguments() < 3)
+      return new FtsStandardObject(parent, "", "", objId);
+
     className = (String) msg.getArgument(2);
 
     if (className.equals("table"))
-      obj = new FtsTableObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsTableObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("qlist"))
-      obj = new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsQlistObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("patcher"))
-      obj = new FtsPatcherObject(parent, (String) msg.getArgument(3),
+      return new FtsPatcherObject(parent, (String) msg.getArgument(3),
 				  ((Integer) msg.getArgument(4)).intValue(),
 				  ((Integer) msg.getArgument(5)).intValue(), objId);
     else if (className.equals("inlet"))
-      obj = new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+      return new FtsInletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
     else if (className.equals("outlet"))
-      obj = new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
+      return new FtsOutletObject(parent, ((Integer) msg.getArgument(3)).intValue(), objId);
     else if (className.equals("messbox"))
-      obj = new FtsMessageObject(parent, makeDescription(3, msg), objId);
+      return new FtsMessageObject(parent, makeDescription(3, msg), objId);
     else if (className.equals("comment"))
-      obj = new FtsCommentObject(parent, makeDescription(3, msg), objId);
+      return new FtsCommentObject(parent, makeDescription(3, msg), objId);
     else if (className.equals("slider"))
-      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("intbox"))
-      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("floatbox"))
-      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("toggle"))
-      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("param"))
-      obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
+      return new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("__selection"))
-      obj = new FtsSelection(parent, className, "__selection", objId);
+      return new FtsSelection(parent, className, "__selection", objId);
     else if (className.equals("__clipboard"))
-      obj = new FtsClipboard(parent, className, "__clipboard", objId);
+      return new FtsClipboard(parent, className, "__clipboard", objId);
     else
-      obj = new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
-
-    return obj;
+      return new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
   }
 
 
   static FtsObject makeFtsAbstractionFromMessage(FtsMessage msg) throws FtsException
   {
-    FtsObject obj;
     String className;
     StringBuffer description;
     FtsContainerObject parent;
@@ -187,9 +189,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
     /* if the object has been succesfully created, set the parent dirty */
 
-    obj = new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
-
-    return obj;
+    return new FtsAbstractionObject(parent, className, makeDescription(2, msg), objId);
   }
 
   /******************************************************************************/

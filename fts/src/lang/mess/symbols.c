@@ -241,8 +241,10 @@ fts_new_symbol(const char *name)
   sp = (struct fts_symbol_descr *) symbol_table.symbol_hash_table[hash];
 
   for (; sp; sp = sp->next_in_table)
-    if (! strcmp(name, sp->name))
-      return sp;
+    {
+      if (! strcmp(name, sp->name))
+	return sp;
+    }
 
   /* Second, the symbol do not exist already: 
      and make a new one */

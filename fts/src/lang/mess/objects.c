@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.22 $ IRCAM $Date: 1998/05/19 15:31:56 $
+ *      $Revision: 1.23 $ IRCAM $Date: 1998/05/22 11:55:27 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -170,6 +170,14 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
   fts_object_t  *obj;
   fts_metaclass_t *mcl;
 
+  /* Explicit check for zero arguments; in this case, we
+     just make an error object 
+     */
+
+
+  if (ac == 0)
+    return fts_error_object_new(patcher, id, ac, at);
+
   if (! fts_is_symbol(&at[0]))
     {
       fprintf(stderr,"Non symbol class name in object creation\n"); /* @@@@ ERROR !!! */
@@ -239,13 +247,19 @@ void fts_object_set_description(fts_object_t *obj, int argc, const fts_atom_t *a
       if (obj->argv)
 	fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
 
-      /* reallocate the description and copy the arguments */
+      /* reallocate the description if argc > -0 and copy the arguments */
 
       obj->argc = argc;
-      obj->argv = (fts_atom_t *) fts_block_zalloc(argc * sizeof(fts_atom_t));
 
-      for (i = 0; i < argc; i++)
-	obj->argv[i] = argv[i];
+      if (argc > 0)
+	{
+	  obj->argv = (fts_atom_t *) fts_block_zalloc(argc * sizeof(fts_atom_t));
+
+	  for (i = 0; i < argc; i++)
+	    obj->argv[i] = argv[i];
+	}
+      else
+	obj->argv = 0;
     }
 }
 
@@ -358,7 +372,8 @@ fts_object_delete(fts_object_t *obj)
 
   /* Free the object description */
 
-  fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
+  if (obj->argv)
+    fts_block_free((char *)obj->argv, obj->argc * sizeof(fts_atom_t));
 
   /* free the object */
 
