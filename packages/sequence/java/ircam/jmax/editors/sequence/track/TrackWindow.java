@@ -160,6 +160,11 @@ public class TrackWindow extends JMaxEditor {
     return editMenu;
   }
 	
+  public EditorMenu getSimpleMenu()
+  {
+    return new TrackSimpleMenu(this);
+  }  
+  
   // ------ JMaxEditor ---------------
   public Editor getEditor(){
     return trackPanel;

@@ -9,7 +9,8 @@ MonoTrackPopupMenu.java \
 RulerPopupMenu.java \
 TempoBarPopupMenu.java \
 TrackBasePopupMenu.java \
-TrackMenu.java 
+TrackMenu.java \
+TrackSimpleMenu.java 
 
 JAVAC = @JAVACX@
 JAVACFLAGS=@JAVACFLAGSX@

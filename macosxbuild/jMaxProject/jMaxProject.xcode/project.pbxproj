@@ -281,6 +281,21 @@
 			settings = {
 			};
 		};
+		3B8173DA06D2092900FA1F28 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			name = TrackSimpleMenu.java;
+			path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/TrackSimpleMenu.java;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		3B8173DB06D2092900FA1F28 = {
+			fileRef = 3B8173DA06D2092900FA1F28;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B84FF2606AEAF6300862F13 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -10453,6 +10468,7 @@
 				3B5C4AFB06B7E40100CC2ECC,
 				3B5C4B1306B80DEF00CC2ECC,
 				3B02488006B94BDA002BEB0D,
+				3B8173DB06D2092900FA1F28,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -18688,6 +18704,7 @@
 				3BA5DEB606789BC90010BF0D,
 				F7DA5E67052DDDED01664058,
 				F85123BF028BEAB301664092,
+				3B8173DA06D2092900FA1F28,
 			);
 			isa = PBXGroup;
 			name = menus;
