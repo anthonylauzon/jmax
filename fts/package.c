@@ -77,6 +77,7 @@ static void fts_package_load_default_files(fts_package_t* pkg);
 static void fts_package_upload_requires(fts_package_t* pkg);
 static void fts_package_upload_template_paths( fts_package_t* pkg);
 static void fts_package_upload_data_paths( fts_package_t* pkg);
+static void fts_package_upload_help( fts_package_t* pkg);
 static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t path);
 
 static fts_symbol_t fts_package_make_relative_path( fts_package_t* pkg, fts_symbol_t file)
@@ -765,10 +766,26 @@ fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t file)
     pkg->help = fts_malloc(sizeof(fts_hashtable_t));
     fts_hashtable_init(pkg->help, FTS_HASHTABLE_SYMBOL, FTS_HASHTABLE_SMALL);
   }
-
+  
   fts_set_symbol(&n, name);
   fts_set_symbol(&p, file);
   fts_hashtable_put(pkg->help, &n, &p);
+
+  pkg->help_classes = fts_list_append(pkg->help_classes, &n);
+}
+
+fts_symbol_t
+fts_package_get_help(fts_package_t* pkg, fts_symbol_t name)
+{
+  fts_atom_t data, k;
+  
+  fts_set_symbol( &k, name);
+  
+  if ((pkg->help != NULL) && fts_hashtable_get(pkg->help, &k, &data)) {
+    return fts_get_symbol(&data);
+  } else {
+    return NULL;
+  }
 }
 
 /***********************************************
@@ -992,10 +1009,18 @@ static void
 __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t* pkg = (fts_package_t *)o;
+  int i;
 
-  if ((ac >= 2) && fts_is_symbol(&at[0]) && fts_is_symbol(&at[1])) {
-    fts_package_add_help(pkg, fts_get_symbol(&at[0]), fts_get_symbol(&at[1]));
-  }
+  pkg->help = NULL;  
+  pkg->help_classes = NULL;  
+
+  for (i = 0; i < ac; i += 2)
+    fts_package_add_help(pkg, fts_get_symbol(&at[i]), fts_get_symbol(&at[i+1]));
+
+  if( fts_object_has_id( o) && pkg->help)
+    fts_package_upload_help( pkg);
+  
+  fts_package_set_dirty( pkg, 1);
 }
 
 static void 
@@ -1032,7 +1057,6 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if ( this->data_paths) {
     fts_package_save_list( &f, this->data_paths, fts_s_data_path);
   }
-
   if ( this->declared_templates) {
     fts_package_save_hashtable( &f, this->declared_templates, fts_s_template, fun_template);
   }
@@ -1040,7 +1064,31 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fts_package_save_hashtable( &f, this->declared_abstractions, fts_s_abstraction, fun_abstraction);
   }
   if ( this->help) {
-    fts_package_save_hashtable( &f, this->help, fts_s_help, NULL);
+    fts_atom_t* a;
+    int i = 0;
+    fts_iterator_t keys, values;
+
+#if HAVE_ALLOCA
+    a = alloca(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
+#else
+    a = malloc(( fts_hashtable_get_size( this->help)*2 + 1) * sizeof(fts_atom_t));
+#endif
+              
+    fts_list_get_values( this->help_classes, &keys);
+      
+    while ( fts_iterator_has_more( &keys))
+      {
+	fts_iterator_next( &keys, a+i);
+	fts_hashtable_get( this->help, a+i, a+i+1);
+	i+=2;
+      }      
+    fts_bmax_code_push_atoms(&f, i, a);
+    fts_bmax_code_obj_mess(&f, fts_SystemInlet, fts_s_help, i);
+    fts_bmax_code_pop_args(&f, i);
+  
+#ifndef HAVE_ALLOCA
+    free(a);
+#endif    
   }
 
   fts_bmax_code_return( &f);
@@ -1137,6 +1185,8 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   pkg->abstraction_paths = NULL;
 
   pkg->help = NULL;
+  pkg->help_classes = NULL;
+
   pkg->data_paths = NULL;
 }
 
@@ -1173,6 +1223,7 @@ __fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
   if (pkg->help != NULL) {
     fts_hashtable_destroy(pkg->help);
+    fts_list_delete(pkg->help_classes);
   }
   if (pkg->patcher != NULL) {
     fts_object_destroy(pkg->patcher);
@@ -1235,6 +1286,31 @@ fts_package_upload_data_paths( fts_package_t *this)
 }
 
 static void 
+fts_package_upload_help( fts_package_t *this)
+{
+  fts_package_t *pkg;
+  fts_atom_t a[2]; 
+  int ok = 0;
+  fts_iterator_t i;
+  fts_list_get_values( this->help_classes, &i);
+  
+  fts_client_start_message( (fts_object_t *)this, fts_s_help);
+  
+  while ( fts_iterator_has_more( &i))
+    {
+      fts_iterator_next( &i, a);
+      ok = fts_hashtable_get( this->help, a, a+1);
+      if( ok)
+	{
+	  fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a));   
+	  fts_client_add_symbol( (fts_object_t *)this, fts_get_symbol( a+1));   
+	}
+    } 
+  
+  fts_client_done_message( (fts_object_t *)this);    
+}
+
+static void 
 __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;
@@ -1259,6 +1335,9 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     }
   if ( this->data_paths)
     fts_package_upload_data_paths( this);
+
+  if ( this->help)
+    fts_package_upload_help( this);
 
   fts_set_symbol(a, this->name);
   fts_set_symbol(a+1, this->dir);
@@ -1327,6 +1406,7 @@ fts_package_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction, __fts_package_abstraction);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_abstraction_path, __fts_package_abstraction_path);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_data_path, __fts_package_data_path);
+  fts_method_define_varargs(cl, fts_SystemInlet, fts_s_help, __fts_package_help);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_save, __fts_package_save);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_openEditor, __fts_package_open_editor);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_new_symbol("set_as_current_project"), __fts_package_set_as_current_project);

@@ -83,6 +83,16 @@ public class ConfigPackagePanel extends JPanel implements Editor
     dataPathScrollPane = new JScrollPane( dataPathList);
     dataPathScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
+    /******** Help Panel ******************************************/
+
+    helpTable = new JTable(helpModel);
+    helpTable.setPreferredScrollableViewportSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    helpTable.setRowHeight(17);
+    helpTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
+
+    helpScrollPane = new JScrollPane(helpTable);
+    helpScrollPane.setPreferredSize(new Dimension( DEFAULT_WIDTH, DEFAULT_HEIGHT));
+
     /******** TabbedPane ***********************************************/
 
     tabbedPane = new JTabbedPane();
@@ -90,6 +100,7 @@ public class ConfigPackagePanel extends JPanel implements Editor
     tabbedPane.addTab("Packages", requiresScrollPane);
     tabbedPane.addTab("Template Path", templPathScrollPane);
     tabbedPane.addTab("Data Path", dataPathScrollPane);    
+    tabbedPane.addTab("Help Patches", helpScrollPane);    
     tabbedPane.setSelectedIndex(0);
 
     add( tabbedPane);
@@ -138,6 +149,15 @@ public class ConfigPackagePanel extends JPanel implements Editor
 
     for(Enumeration e = pkg.getDataPaths(); e.hasMoreElements();)
       dataPathModel.addElement(e.nextElement());    
+  
+    helpModel = new HelpTableModel( pkg);
+    
+    FtsPackage.HelpPatch hp;
+    for(Enumeration e = pkg.getHelps(); e.hasMoreElements();)
+      {
+	hp = ( FtsPackage.HelpPatch)e.nextElement();
+	helpModel.addRow(hp.className, hp.fileName);    
+      }
   }
 
   void setPackage( FtsPackage pkg)
@@ -165,6 +185,9 @@ public class ConfigPackagePanel extends JPanel implements Editor
     dataPathList.revalidate();
     revalidate();    
 
+    helpTable.setModel( helpModel);
+    helpTable.revalidate();
+
     window.pack();
   }
 
@@ -190,6 +213,22 @@ public class ConfigPackagePanel extends JPanel implements Editor
     templPathList.setModel( templPathModel);
     templPathList.revalidate();
     revalidate();    
+  }
+
+  public void helpChanged()
+  {
+    helpModel = new HelpTableModel( ftsPkg);
+    
+    FtsPackage.HelpPatch hp;
+    for(Enumeration e = ftsPkg.getHelps(); e.hasMoreElements();)
+      {
+	hp = (FtsPackage.HelpPatch)e.nextElement();
+	helpModel.addRow(hp.className, hp.fileName);    
+      }
+
+    helpTable.setModel( helpModel);
+    helpTable.revalidate();
+    revalidate();
   }
 
   void chooseAndAddPath( DefaultListModel model, String message, int index)
@@ -222,7 +261,10 @@ public class ConfigPackagePanel extends JPanel implements Editor
       if( selected == templPathScrollPane)
 	  chooseAndAddPath( templPathModel, "template_path", templPathList.getSelectedIndex());
       else
-	chooseAndAddPath( dataPathModel, "data_path", dataPathList.getSelectedIndex());
+	if( selected == dataPathScrollPane)
+	  chooseAndAddPath( dataPathModel, "data_path", dataPathList.getSelectedIndex());
+	else
+	  helpModel.addRow( helpTable.getSelectedRow());
   }
 
   void Delete()
@@ -242,14 +284,17 @@ public class ConfigPackagePanel extends JPanel implements Editor
 	    }      
 	}
       else
-	{
-	  index = dataPathList.getSelectedIndex();
-	  if(index != -1)
-	    {
-	      dataPathModel.removeElementAt( index);
-	      ftsPkg.set( "data_path", dataPathModel.elements());
-	    }
-	}
+	if( selected == dataPathScrollPane)
+	  {
+	    index = dataPathList.getSelectedIndex();
+	    if(index != -1)
+	      {
+		dataPathModel.removeElementAt( index);
+		ftsPkg.set( "data_path", dataPathModel.elements());
+	      }
+	  }
+	else
+	  helpModel.removeRow( helpTable.getSelectedRow());
   }
 
   /*********************************************************
@@ -393,6 +438,148 @@ public class ConfigPackagePanel extends JPanel implements Editor
     FtsPackage ftsPackage;
   }
 
+  /*********************************************************
+   ***   Table model for the Help JTable             ***
+   *********************************************************/
+  class HelpTableModel extends AbstractTableModel 
+  {
+    HelpTableModel( FtsPackage pkg)
+    {
+      super();
+      ftsPackage = pkg;
+    }
+
+    public int getColumnCount() 
+    { 
+      return 2;
+    }
+  
+    public Class getColumnClass(int col)
+    {
+      return String.class;
+    }
+
+    public boolean isCellEditable(int row, int col)
+    {
+      return true;
+    }
+
+    public String getColumnName(int col)
+    {
+      if(col == 0)
+	return "class name";
+      else 
+	return "file name";
+    }
+
+    public int getRowCount() { 
+      return size; 
+    }
+
+    public void addRow(int index)
+    {
+      size++;    
+      if((size > rows) || (index != -1))
+	{
+	  Object[][] temp = new Object[size+5][2];
+	  if(index == -1)
+	    for(int i = 0; i < size-1; i++)
+	      {
+		temp[i][0] = data[i][0];
+		temp[i][1] = data[i][1];
+	      }
+	  else
+	    {
+	      for(int i = 0; i < index+1; i++)
+	      {
+		temp[i][0] = data[i][0];
+		temp[i][1] = data[i][1];
+	      }
+
+	      temp[index+1][0] = null;
+	      temp[index+1][1] = null;
+
+	      for(int j = index+2; j < size; j++)
+	      {
+		temp[j][0] = data[j-1][0];
+		temp[j][1] = data[j-1][1];
+	      }
+	    }
+	  data = temp;
+	  rows = size+5;
+	}
+      fireTableDataChanged();
+    }
+
+    public void addRow(Object v1, Object v2)
+    {
+      addRow(-1);
+      data[size-1][0] = v1;
+      data[size-1][1] = v2;
+    }
+
+    public void removeRow(int rowId)
+    {
+      if(size > 0)
+	{
+	  size--;    
+	  if(rowId >= 0)
+	    {
+	      for(int i = rowId; i < size; i++)
+		{
+		  data[i][0] = data[i+1][0];
+		  data[i][1] = data[i+1][1];
+		}
+	    }
+	  data[size][0] = null;
+	  data[size][1] = null;
+
+	  fireTableDataChanged();
+	  ftsPackage.set( "help", getHelps());
+	}
+    }
+
+    public Object getValueAt(int row, int col) 
+    { 
+      if(row > size) return null;
+      else
+	return data[row][col];
+    }
+
+    public void setValueAt(Object value, int row, int col) 
+    {
+      if(row > size) return;
+
+      data[row][col] = value;
+
+      fireTableCellUpdated(row, col);
+    
+      if( ftsPackage != null)
+	{
+	  if(( data[row][0] != null) && ( data[row][1] != null))
+	    ftsPackage.set( "help", getHelps());
+	}
+    }
+
+    public String[] getHelps() 
+    { 
+      String values[] = new String[ size*2]; 
+      int j = 0;
+      for(int i = 0; i < size; i++)
+	{
+	  values[j] = (String)data[i][0];
+	  values[j+1] = (String)data[i][1];
+	  j+=2;
+	}
+      return values;
+    }
+
+    int size = 0;
+    int rows = 0;
+    Object data[][];
+    FtsPackage ftsPackage;
+  }
+
   public void updateDone()
   {
     update();
@@ -454,10 +641,11 @@ public class ConfigPackagePanel extends JPanel implements Editor
   } 
   /********************************/
   private JTabbedPane tabbedPane;
-  private JTable requiresTable;
+  private JTable requiresTable, helpTable;
   private JList templPathList, dataPathList;
-  private JScrollPane requiresScrollPane, templPathScrollPane, dataPathScrollPane;
+  private JScrollPane requiresScrollPane, templPathScrollPane, dataPathScrollPane, helpScrollPane;
   private RequiresTableModel requiresModel;
+  private HelpTableModel helpModel;
   private DefaultListModel templPathModel, dataPathModel;
   private Window window;
   private FtsPackage ftsPkg;

@@ -61,6 +61,7 @@
 #include <ftsprivate/loader.h>
 #include <ftsprivate/object.h>
 #include <ftsprivate/patcher.h>
+#include <ftsprivate/package.h>
 #include <ftsprivate/bmaxhdr.h>
 #include <ftsprivate/saver.h>
 #include <ftsprivate/template.h>
@@ -1302,9 +1303,15 @@ fts_patcher_open_help_patch( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_symbol_t class_name = fts_object_get_class_name(obj);
   fts_symbol_t file_name;
   fts_patcher_t *help_patch;
+  char *help_name;
   char path[256];
 
-  snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
+  help_name = fts_package_get_help( pkg, class_name);
+  if( help_name)
+    snprintf(path, 256, "%s%c%s%c%s", dir, fts_file_separator, "help", fts_file_separator, help_name);
+  else
+    snprintf(path, 256, "%s%c%s%c%s%s", dir, fts_file_separator, "help", fts_file_separator, class_name, ".help.jmax");
+  
   file_name = fts_new_symbol_copy(path);
 
   fts_log("[patcher] help %s\n", file_name);

@@ -58,6 +58,12 @@ public class FtsPackage extends FtsObjectWithEditor
 	  ((FtsPackage)obj).addDataPath( args.getLength(), args.getAtoms());
 	}
       });
+    FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("help"), new FtsMessageHandler(){
+	public void invoke( FtsObject obj, FtsArgs args)
+	{
+	  ((FtsPackage)obj).addHelps( args.getLength(), args.getAtoms());
+	}
+      });
     FtsObject.registerMessageHandler( FtsPackage.class, FtsSymbol.get("setNames"), new FtsMessageHandler(){
 	public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -101,6 +107,7 @@ public class FtsPackage extends FtsObjectWithEditor
     templatePaths = new Vector();
     absPaths = new Vector();
     dataPaths = new Vector();
+    helpPatches = new Vector();
   }
 
   public FtsPackage(FtsServer server, FtsObject parent, int id)
@@ -111,6 +118,7 @@ public class FtsPackage extends FtsObjectWithEditor
     templatePaths = new Vector();
     absPaths = new Vector();
     dataPaths = new Vector();
+    helpPatches = new Vector();
   }
 
   public void setPackageListener(ircam.jmax.editors.project.ConfigPackagePanel listener)
@@ -143,7 +151,6 @@ public class FtsPackage extends FtsObjectWithEditor
   public void set(String message, String[] values)
   {
     args.clear();
-
     for(int i = 0; i< values.length; i++)
       {
 	if( values[i] != null)
@@ -181,6 +188,7 @@ public class FtsPackage extends FtsObjectWithEditor
     requires.removeAllElements();
     templatePaths.removeAllElements();
     dataPaths.removeAllElements();
+    helpPatches.removeAllElements();
 
     try
       {
@@ -247,6 +255,18 @@ public class FtsPackage extends FtsObjectWithEditor
 
     if( listener != null)
       listener.dataPathChanged();
+  }
+
+  void addHelps(int nArgs, FtsAtom[] args)
+  {
+    helpPatches.removeAllElements();
+
+    for(int i = 0; i < nArgs; i+=2)
+      helpPatches.addElement( new HelpPatch( args[i].symbolValue.toString(),  
+					     args[i+1].symbolValue.toString()));
+
+    /*if( listener != null)
+      listener.helpChanged();*/
   }
 
   public void setName( String name)
@@ -322,16 +342,33 @@ public class FtsPackage extends FtsObjectWithEditor
     return dataPaths.elements();
   }
 
+  public Enumeration getHelps()
+  {
+    return helpPatches.elements();
+  }
+
+  public class HelpPatch extends Object
+  {
+    public HelpPatch( String className, String fileName)
+    {
+      this.className = className;
+      this.fileName = fileName;
+    }
+    public void set( String cn, String fn){className = cn; fileName = fn;}
+    public String className, fileName;
+  }
+
   private Vector requires;
   private Vector templatePaths;
   private Vector absPaths;
   private Vector dataPaths;
+  private Vector helpPatches;
   private String name;
   private String fileName;
   private String dir;
-  //private FtsActionListener listener;
   private ircam.jmax.editors.project.ConfigPackagePanel listener;
   private boolean hasSummaryHelp = true;
   private boolean isDirty = false;
 }
+
 

@@ -97,6 +97,8 @@ struct fts_package {
   fts_list_t* abstraction_paths;
 
   fts_hashtable_t* help;
+  fts_list_t* help_classes;
+
   fts_list_t* data_paths;
 
   int dirty; /* set to one if package's content is not saved */
@@ -298,7 +300,7 @@ void fts_package_add_help(fts_package_t* pkg, fts_symbol_t name, fts_symbol_t fi
  * @param pkg the package
  * @param name the name of the class
  * @ingroup package */
-char* fts_package_get_help(fts_package_t* pkg, fts_symbol_t name);
+fts_symbol_t fts_package_get_help(fts_package_t* pkg, fts_symbol_t name);
 
 /**
  * Defines a new data path.
