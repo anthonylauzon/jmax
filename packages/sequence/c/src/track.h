@@ -65,7 +65,6 @@ struct _track_
 #define track_get_duration(t) ((t)->last->time - (t)->first->time)
 
 #define track_is_active(t) ((t)->active != 0)
-#define track_is_inactive(t) ((t)->active == 0)
 
 #define track_set_active(t) ((t)->active = 1)
 #define track_set_inactive(t) ((t)->active = 0)
