@@ -51,7 +51,7 @@ public class EditMenu extends EditorMenu
   {
     public void menuSelected(MenuEvent e)
     {
-      //updateMenu();
+      updateMenu();
     }
 
     public void menuDeselected(MenuEvent e)
