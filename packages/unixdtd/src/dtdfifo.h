@@ -29,9 +29,11 @@
 #ifndef _FTS_DTDFIFO_H_
 #define _FTS_DTDFIFO_H_
 
+typedef enum { FIFO_LEFT, FIFO_RIGHT} dtdfifo_side_t;
+#define OTHER_SIDE(S) (((S)==FIFO_LEFT) ? FIFO_RIGHT : FIFO_LEFT)
+
 typedef struct {
-  volatile int read_serial;
-  volatile int write_serial;
+  volatile int used[2];
   volatile int eof;
   volatile int read_index;
   volatile int write_index;
@@ -45,7 +47,6 @@ typedef struct {
  * Macros 
  */
 #define dtdfifo_get_buffer_size(F) ((F)->buffer_size)
-
 #define dtdfifo_get_buffer(F) ((F)->buffer)
 
 #define dtdfifo_get_read_index(F) ((F)->read_index)
@@ -60,20 +61,23 @@ typedef struct {
 #define dtdfifo_is_eof(F) ((F)->eof)
 #define dtdfifo_set_eof(F,E) ((F)->eof = (E))
 
-#define dtdfifo_get_read_serial(F) ((F)->read_serial)
-
-#define dtdfifo_get_write_serial(F) ((F)->write_serial)
+#define dtdfifo_is_used(F,W) ((F)->used[W])
+#define dtdfifo_set_used(F,W,U) ((F)->used[W] = (U))
 
 
 /*
  * Functions
  */
 
+extern int dtdfifo_get_number_of_fifos( void);
+
+extern int dtdfifo_allocate( dtdfifo_side_t side);
+extern void dtdfifo_deallocate( dtdfifo_side_t side, int id);
+
 extern int dtdfifo_new( int id, const char *dirname, int buffer_size);
 extern void dtdfifo_delete( int id);
 
 extern dtdfifo_t *dtdfifo_get( int id);
-extern void dtdfifo_put( int id, dtdfifo_t *fifo);
 
 extern void *dtdfifo_get_user_data( int id);
 extern void dtdfifo_put_user_data( int id, void *user_data);
@@ -84,13 +88,10 @@ extern int dtdfifo_get_write_level( const dtdfifo_t *fifo);
 extern void dtdfifo_incr_read_index( dtdfifo_t *fifo, int incr);
 extern void dtdfifo_incr_write_index( dtdfifo_t *fifo, int incr);
 
-extern void dtdfifo_incr_read_serial( dtdfifo_t *fifo);
-extern void dtdfifo_incr_write_serial( dtdfifo_t *fifo);
+extern void dtdfifo_apply( void (*fun)( int id, dtdfifo_t *, void *));
 
 #ifdef DEBUG
 extern void dtdfifo_debug( dtdfifo_t *fifo, const char *msg);
 #endif
-
-extern void dtdfifo_apply( void (*fun)( int id, dtdfifo_t *, void *));
 
 #endif

@@ -148,6 +148,9 @@ void dtdserver_exit( void)
 {
   fprintf( stderr, "Killing DTD server (pid = %d)\n", server_pid);
   kill( server_pid, SIGKILL);
+
+  /* Delete all fifos */
+  /* To Be Written */
 }
 
 #ifdef USE_UDP
@@ -191,29 +194,31 @@ int dtdserver_new( const char *dirname, int buffer_size)
   return id;
 }
 
-void dtdserver_open( int id, const char *filename, const char *path, int n_channels)
+int dtdserver_open( const char *filename, const char *path, int n_channels)
 {
   char buffer[1024];
+  int id;
+
+  id = dtdfifo_allocate( FIFO_RIGHT);
+
+  fprintf( stderr, "%d\n", id);
+
+  if (id < 0)
+    return -1;
 
   sprintf( buffer, "open %d %s %s %d", id, filename, path, n_channels);
   dtdserver_send_command( buffer);
+
+  return id;
 }
 
 void dtdserver_close( int id)
 {
   char buffer[128];
 
+  dtdfifo_deallocate( FIFO_RIGHT, id);
+
   sprintf( buffer, "close %d", id);
-  dtdserver_send_command( buffer);
-}
-
-void dtdserver_delete( int id)
-{
-  char buffer[128];
-
-  dtdfifo_delete( id);
-
-  sprintf( buffer, "delete %d", id);
   dtdserver_send_command( buffer);
 }
 

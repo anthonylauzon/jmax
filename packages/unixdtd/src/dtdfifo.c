@@ -51,6 +51,113 @@ static dtdfifo_entry_t *table = 0;
 static int table_size = 0;
 
 /* ********************************************************************** */
+/* Table handling for mapping ids to pointers                             */
+/* ********************************************************************** */
+
+static void grow_table( int id)
+{
+  int i, old_size;
+
+  old_size = table_size;
+
+  if (table_size == 0)
+    table_size = 32;
+
+  while ( table_size <= id )
+    table_size *= 2;
+
+  table = realloc( table, table_size * sizeof( dtdfifo_entry_t ));
+
+  for ( i = old_size; i < table_size; i ++)
+    {
+      table[i].fifo = 0;
+      table[i].user_data = 0;
+    }
+}
+
+dtdfifo_t *dtdfifo_get( int id)
+{
+  if ( id < 0 || id >= table_size)
+    return 0;
+
+  return table[id].fifo;
+}
+
+static void dtdfifo_put( int id, dtdfifo_t *fifo)
+{
+  if (id < 0)
+    return;
+
+  if (id >= table_size)
+    grow_table( id);
+    
+  table[id].fifo = fifo;
+}
+
+void *dtdfifo_get_user_data( int id)
+{
+  if ( id < 0 || id >= table_size)
+    return 0;
+
+  return table[id].user_data;
+}
+
+void dtdfifo_put_user_data( int id, void *user_data)
+{
+  if (id < 0)
+    return;
+
+  if (id >= table_size)
+    grow_table( id);
+    
+  table[id].user_data = user_data;
+}
+
+
+/* ********************************************************************** */
+/* Allocation/Deallocation                                                */
+/* ********************************************************************** */
+
+int dtdfifo_get_number_of_fifos( void)
+{
+  int id, n;
+
+  n = 0;
+
+  for ( id = 0; id < table_size; id++)
+    {
+      if ( table[id].fifo)
+	n++;
+    }
+
+  return n;
+}
+
+int dtdfifo_allocate( dtdfifo_side_t side)
+{
+  int id;
+
+  for ( id = 0; id < table_size; id++)
+    {
+      if ( table[id].fifo 
+	   && ! dtdfifo_is_used( table[id].fifo, side)
+	   && ! dtdfifo_is_used( table[id].fifo, OTHER_SIDE( side)))
+	{
+	  dtdfifo_set_used( table[id].fifo, side, 1);
+
+	  return id;
+	}
+    }
+
+  return -1;
+}
+
+void dtdfifo_deallocate( dtdfifo_side_t side, int id)
+{
+  dtdfifo_set_used( table[id].fifo, side, 0);
+}
+
+/* ********************************************************************** */
 /* Creation                                                               */
 /* ********************************************************************** */
 
@@ -121,8 +228,8 @@ int dtdfifo_new( int id, const char *dirname, int buffer_size)
   close(fd);
 
   fifo->buffer_size = buffer_size;
-  fifo->read_serial = 0;
-  fifo->write_serial = 0;
+  fifo->used[ FIFO_LEFT] = 0;
+  fifo->used[ FIFO_RIGHT] = 0;
   fifo->eof = 0;
   fifo->read_index = 0;
   fifo->write_index = 0;
@@ -157,71 +264,7 @@ void dtdfifo_delete( int id)
 }
 
 /* ********************************************************************** */
-/* Table handling for mapping ids to pointers                             */
-/* ********************************************************************** */
-
-static void grow_table( int id)
-{
-  int i, old_size;
-
-  old_size = table_size;
-
-  if (table_size == 0)
-    table_size = 32;
-
-  while ( table_size <= id )
-    table_size *= 2;
-
-  table = realloc( table, table_size * sizeof( dtdfifo_entry_t ));
-
-  for ( i = old_size; i < table_size; i ++)
-    {
-      table[i].fifo = 0;
-      table[i].user_data = 0;
-    }
-}
-
-dtdfifo_t *dtdfifo_get( int id)
-{
-  if ( id < 0 || id >= table_size)
-    return 0;
-
-  return table[id].fifo;
-}
-
-void dtdfifo_put( int id, dtdfifo_t *fifo)
-{
-  if (id < 0)
-    return;
-
-  if (id >= table_size)
-    grow_table( id);
-    
-  table[id].fifo = fifo;
-}
-
-void *dtdfifo_get_user_data( int id)
-{
-  if ( id < 0 || id >= table_size)
-    return 0;
-
-  return table[id].user_data;
-}
-
-void dtdfifo_put_user_data( int id, void *user_data)
-{
-  if (id < 0)
-    return;
-
-  if (id >= table_size)
-    grow_table( id);
-    
-  table[id].user_data = user_data;
-}
-
-
-/* ********************************************************************** */
-/* Read/write index/serial                                                */
+/* Read/write index                                                       */
 /* ********************************************************************** */
 
 int dtdfifo_get_read_level( const dtdfifo_t *fifo)
@@ -278,16 +321,6 @@ void dtdfifo_incr_write_index( dtdfifo_t *fifo, int incr)
     write_index -= fifo->buffer_size;
 
   fifo->write_index = write_index;
-}
-
-void dtdfifo_incr_read_serial( dtdfifo_t *fifo)
-{
-  fifo->read_serial += 1;
-}
-
-void dtdfifo_incr_write_serial( dtdfifo_t *fifo)
-{
-  fifo->write_serial += 1;
 }
 
 

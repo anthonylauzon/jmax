@@ -160,6 +160,55 @@ static int dtd_read_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, in
   return n_read;
 }
 
+static int dtd_write_block( AFfilehandle file, dtdfifo_t *fifo, short *buffer, int n_frames, int n_channels)
+{
+  int n_write, index, buffer_size, size, n;
+  volatile float *src;
+  short *p;
+
+  /* This should never happen because it is tested before the call to dtd_read_block() */
+  if ( (unsigned int)dtdfifo_get_read_level( fifo) < n_frames * n_channels * sizeof( float))
+    return -1;
+
+  src = (volatile float *)dtdfifo_get_read_pointer( fifo);
+
+  index = dtdfifo_get_read_index( fifo)/sizeof( float);
+  buffer_size = dtdfifo_get_buffer_size( fifo)/sizeof( float);
+  size = n_frames * n_channels;
+
+  p = buffer;
+  if ( index + size < buffer_size )
+    {
+      for ( n = 0; n < size; n++)
+	{
+	  *p++ = (short) (*src++ * 32767.0f);
+	}
+    }
+  else
+    {
+      for ( n = 0; n < buffer_size - index; n++)
+	{
+	  *p++ = (short) (*src++ * 32767.0f);
+	}
+
+      src = (volatile float *)dtdfifo_get_buffer( fifo);
+
+      for ( ; n < size; n++)
+	{
+	  *p++ = (short) (*src++ * 32767.0f);
+	}
+    }
+
+  n_write = afWriteFrames( file, AF_DEFAULT_TRACK, buffer, n_frames);
+
+  if (n_write < 0)
+    return -1;
+
+  dtdfifo_incr_read_index( fifo, size * sizeof( float));
+
+  return n_write;
+}
+
 static const char *splitpath( const char *path, char *result, char sep)
 {
   if ( *path == '\0')
@@ -209,7 +258,7 @@ static int search_file_in_path( const char *filename, const char *path, char *fu
   return 0;
 }
 
-static AFfilehandle dtd_open_and_check_file( const char *filename, const char *path, int n_channels)
+static AFfilehandle dtd_open_file_read( const char *filename, const char *path, int n_channels)
 {
   char full_path[N+N];
   AFfilehandle file;
@@ -221,7 +270,7 @@ static AFfilehandle dtd_open_and_check_file( const char *filename, const char *p
       return AF_NULL_FILEHANDLE;
     }
 
-  if ( (file = afOpenFile( full_path, "r", 0)) == AF_NULL_FILEHANDLE)
+  if ( (file = afOpenFile( full_path, "r", NULL)) == AF_NULL_FILEHANDLE)
     {
       fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
       return AF_NULL_FILEHANDLE;
@@ -242,6 +291,32 @@ static AFfilehandle dtd_open_and_check_file( const char *filename, const char *p
       fprintf( stderr, "[dtdserver] invalid format\n");
       return AF_NULL_FILEHANDLE;
     }
+
+  return file;
+}
+
+static AFfilehandle dtd_open_file_write( const char *filename, const char *path, int format, double sr, int n_channels)
+{
+  char full_path[N+N];
+  AFfilehandle file;
+  AFfilesetup setup;
+  int file_channels, sampfmt, sampwidth;
+
+  // which path ??
+
+  setup = afNewFileSetup();
+
+  afInitFileFormat( setup, format);
+  afInitRate( setup, AF_DEFAULT_TRACK, sr);
+  afInitChannels( setup, AF_DEFAULT_TRACK, n_channels);
+
+  if ( (file = afOpenFile( full_path, "w", setup)) == AF_NULL_FILEHANDLE)
+    {
+      fprintf( stderr, "[dtdserver] cannot open sound file %s\n", filename);
+      return AF_NULL_FILEHANDLE;
+    }
+
+  afFreeFileSetup(setup);
 
   return file;
 }
@@ -269,6 +344,8 @@ static void dtd_open( const char *line)
   file = handle->file;
   handle->n_channels = n_channels;
 
+  dtdfifo_set_used( fifo, FIFO_LEFT, 1);
+
   /* This should not happen */
   if ( file != AF_NULL_FILEHANDLE)
     {
@@ -276,13 +353,11 @@ static void dtd_open( const char *line)
       handle->file = AF_NULL_FILEHANDLE;
     }
 
-  if ((file = dtd_open_and_check_file( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
+  if ((file = dtd_open_file_read( filename, path, n_channels)) == AF_NULL_FILEHANDLE)
     return;
 
   handle->file = file;
 
-  dtdfifo_incr_write_serial( fifo);
-  
   for ( i = 0; i < BLOCK_FRAMES/PRELOAD_BLOCK_FRAMES; i++)
     {
       int ret;
@@ -305,14 +380,14 @@ static void dtd_close( const char *line)
   handle = (dtdhandle_t *)dtdfifo_get_user_data( id);
 
   /*
-   * A "close" command is send by FTS when it closes the fifo.
-   * As it will not start reading the fifo till the write serial
-   * number has incremented, which results from the next "open"
-   * command, we can safely reinitialize the fifo here.
+   * A "close" command is send by FTS when it releases the fifo.
+   * It will not reallocate the fifo till it is marked
+   * as write_used, so we can safely reinitialize it here.
    */
   dtdfifo_set_eof( fifo, 0);
   dtdfifo_set_read_index( fifo, 0);
   dtdfifo_set_write_index( fifo, 0);
+  dtdfifo_set_used( fifo, FIFO_LEFT, 0);
 
   if ( handle->file != AF_NULL_FILEHANDLE)
     {
@@ -381,7 +456,10 @@ static void dtd_process_fifo( int id, dtdfifo_t *fifo, void *user_data)
 
   handle = (dtdhandle_t *)user_data;
 
-  if ( handle->file != AF_NULL_FILEHANDLE && !dtdfifo_is_eof( fifo))
+  if ( handle->file != AF_NULL_FILEHANDLE 
+       && dtdfifo_is_used( fifo, FIFO_LEFT) 
+       && dtdfifo_is_used( fifo, FIFO_RIGHT)
+       && !dtdfifo_is_eof( fifo))
     {
       int n_channels, block_size;
 
