@@ -128,7 +128,7 @@ ftl_reset_handle_table(void)
 /* User level functions */
 
 ftl_data_t
-_ftl_data_new(unsigned int size, const char *name)
+ftl_data_alloc(unsigned int size)
 {
   ftl_data_t h;
 
@@ -137,7 +137,6 @@ _ftl_data_new(unsigned int size, const char *name)
   h = ftl_get_new_handle();
 
   h->size = size;		/* store the original, unaligned memory size here !!*/
-  h->obj_name = name;
 
   /* Second, allocate memory, from the correct heap
      
@@ -485,35 +484,3 @@ ftl_mem_allocate(int size, struct ftl_mem_block **hp)
 
   return ftl_mem_allocate_aligned(new_size, p);
 }
-      
-
-
-/* returns the type name of a handle.
-   This is a helping function for C code generation.
-*/
-
-const char *
-ftl_data_get_type_name( void *ptr)
-{
-  struct ftl_data_handle_page *p;
-  int i;
-
-  p = ftl_data_handle_page_list;
-
-  while (p)
-    {
-      /* look in the current page */
-
-      for (i = 0; i < FTL_HANDLE_PER_PAGE; i++)
-	if (p->handles[i].state != ftl_handle_free)
-	  if (p->handles[i].ptr == ptr)
-	    return p->handles[i].obj_name;
-
-      /* not found, look in the next one */
-
-      p = p->next_handle_page;
-    }
-  
-  return 0;
-}
-
