@@ -33,6 +33,7 @@ public class MaxWindowManager implements WindowListener
   private static MaxWindowManager theWindowManager = new MaxWindowManager();
 
   private DefaultListModel windows = new DefaultListModel();
+  private DefaultListModel tools = new DefaultListModel();
 
   private static Frame topFrame = new Frame();
 
@@ -101,6 +102,11 @@ public class MaxWindowManager implements WindowListener
     return windows;
   }
 
+  public ListModel getToolFinderList()
+  {
+    return tools;
+  }
+
   public int getWindowOperationCount()
   {
     return windowOperationCount;
@@ -151,6 +157,18 @@ public class MaxWindowManager implements WindowListener
       return theName;
   }
   
+
+  /** Call this method to add a ToolFinder to 
+   * the window manager tool finder list.
+   * A tool finder can't be removed; tools window
+   * are not never moved by the window manager.
+   */
+
+  public void addToolFinder(MaxToolFinder finder)
+  {
+    windowOperationCount++;
+    tools.addElement(finder);
+  }
 
   // Event handler for WindowListener
 

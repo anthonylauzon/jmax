@@ -1,6 +1,5 @@
 SOURCES = \
-	ControlPanelFrame.java		\
-	DacSlipPanel.java		\
+	IndicatorWithMemory.java	\
 	Led.java			\
 	ObjectSelectedListener.java	\
 	ObjectSetViewer.java		\

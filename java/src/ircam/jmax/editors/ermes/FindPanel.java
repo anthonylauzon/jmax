@@ -91,10 +91,14 @@ class FindPanel extends JFrame {
     
     //setBounds( 100, 100, getPreferredSize().width, getPreferredSize().height);
 
-    // Finally, add the panel to the window manager, so it will appear
-    // in the Window menu (Should it ?????) MDC.
+    // Finally, add the a tool finder to the window manager.
+    // As an alternative, the find panel can be added as a window.
+    // With   MaxWindowManager.getWindowManager().addWindow(this);
 
-    MaxWindowManager.getWindowManager().addWindow(this);
+    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
+      public String getToolName() { return "Find Panel";}
+      public void open() { FindPanel.open();}
+    });
   }
 
   public void find()

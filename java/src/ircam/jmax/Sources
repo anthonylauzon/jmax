@@ -2,4 +2,5 @@ SOURCES = MaxApplication.java \
           MaxEditor.java      \
           MaxWhenHookTable.java \
 	  MaxVersion.java \
-	  MaxWindowManager.java
+	  MaxWindowManager.java \
+	  MaxToolFinder.java

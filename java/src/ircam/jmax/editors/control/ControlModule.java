@@ -1,5 +1,6 @@
 package ircam.jmax.editors.control;
 
+import ircam.jmax.*;
 import ircam.jmax.fts.*;
 
 /** The console module; the initModule function is called at init time
@@ -13,6 +14,13 @@ public class ControlModule
     // Install the DspModule remote data
 
     Fts.registerRemoteDataClass("dspcontrol_data", ircam.jmax.editors.control.DspControl.class);
+
+    // Register the Control Panel as a tool
+
+    MaxWindowManager.getWindowManager().addToolFinder( new MaxToolFinder() {
+      public String getToolName() { return "Control Panel";}
+      public void open() { ControlPanelFrame.open();}
+    });
   }
 }
 

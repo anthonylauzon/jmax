@@ -9,32 +9,32 @@ import java.awt.event.*;
 import java.lang.*;
 import java.util.*;
 
-public class DacSlipPanel extends JPanel {
+public class IndicatorWithMemory extends JPanel {
 
-  public DacSlipPanel()
+  public IndicatorWithMemory(String name)
   {
-    Border border = new TitledBorder(null, "Dac slip", TitledBorder.LEFT, TitledBorder.TOP);
+    Border border = new TitledBorder(null, name, TitledBorder.LEFT, TitledBorder.TOP);
 
     setBorder( border);
     setLayout( new BoxLayout( this, BoxLayout.X_AXIS));
 
     JLabel label;
 
-    label = new JLabel( "Dac slip: ");
-    dacSlipLed = new Led();
-    label.setLabelFor( dacSlipLed);
-    dacSlipLed.setAlignmentX( CENTER_ALIGNMENT);
+    label = new JLabel( name + ": ");
+    indicatorLed = new Led();
+    label.setLabelFor( indicatorLed);
+    indicatorLed.setAlignmentX( CENTER_ALIGNMENT);
     add( label);
-    add( dacSlipLed);
+    add( indicatorLed);
 
     add( Box.createVerticalStrut( 2));
 
-    label = new JLabel( "Indicator: ");
-    indicatorLed = new Led();
-    indicatorLed.setAlignmentX( CENTER_ALIGNMENT);
-    label.setLabelFor( indicatorLed);
+    label = new JLabel( "Memory : ");
+    memoryLed = new Led();
+    memoryLed.setAlignmentX( CENTER_ALIGNMENT);
+    label.setLabelFor( memoryLed);
     add( label);
-    add( indicatorLed);
+    add( memoryLed);
 
     add( Box.createVerticalStrut( 2));
 
@@ -59,23 +59,21 @@ public class DacSlipPanel extends JPanel {
     return getMinimumSize();
   }
 
-  public void setDacSlip( boolean dacSlip)
+  public void setValue( boolean value)
   {
-    dacSlipLed.setState( dacSlip ? Led.ON : Led.OFF);
+    indicatorLed.setState( value ? Led.ON : Led.OFF);
 
-    if (dacSlip)
-      {
-	indicatorLed.setState( dacSlip ? Led.ON : Led.OFF);
-      }
+    if (value)
+      memoryLed.setState(Led.ON);
   }
 
   public void reset()
   {
-    dacSlipLed.setState( Led.OFF);
-    dacSlipLed.setState( Led.OFF);
+    indicatorLed.setState( Led.OFF);
+    indicatorLed.setState( Led.OFF);
   }
 
-  protected Led dacSlipLed;
   protected Led indicatorLed;
+  protected Led memoryLed;
 }
 

@@ -26,6 +26,10 @@ ControlModule:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ControlModule.java)
 .PHONY: ControlModule.java
 
+ControlPanelFrame:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ControlPanelFrame.java)
+.PHONY: ControlPanelFrame.java
+
 DspControl:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) DspControl.java)
 .PHONY: DspControl
