@@ -92,7 +92,7 @@ dtdfifo_t *dtdfifo_new( int fifo_number, int buffer_size)
 
   fifo = (dtdfifo_t *)mmap( 0, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 
-  if ( fifo == MAP_FAILED)
+  if ( (void *)fifo == MAP_FAILED)
     {
       fprintf( stderr, "Cannot map file (%s)\n", strerror( errno));
       return NULL;
