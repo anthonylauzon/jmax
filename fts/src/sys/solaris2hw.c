@@ -37,12 +37,14 @@
 
 #include "sys.h"
 
-static fts_welcome_t  solaris_welcome = {"SOLARIS version"};
+static fts_welcome_t solaris_welcome = {"SOLARIS platform"};
 
 
 void fts_platform_init(void)
 {
+#ifdef DEBUG
   fts_add_welcome(&solaris_welcome);
+#endif
 }
 
 void fts_set_no_real_time()

@@ -59,7 +59,7 @@
 
 extern void post( const char *format, ...);
 
-static fts_welcome_t  sgi_welcome = {"SGI platform\n"};
+static fts_welcome_t sgi_welcome = {"SGI platform \n"};
 static int running_real_time = 1;
 static int memory_is_locked = 0;
 struct timespec pause_time;
@@ -118,7 +118,9 @@ enable_fpes(void)
 void
 fts_platform_init(void)
 {
+#ifdef DEBUG
   fts_add_welcome(&sgi_welcome);
+#endif
 
   init_fpe();
 

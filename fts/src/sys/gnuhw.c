@@ -46,7 +46,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-static fts_welcome_t gnu_welcome = {"GNU generic version\n"};
+static fts_welcome_t gnu_welcome = {"generic GNU platform\n"};
 static int running_real_time = 1;
 struct timespec pause_time = { 0, 10000};
 
@@ -55,7 +55,9 @@ void fts_platform_init(void)
 {
   struct sched_param sp;
 
+#ifdef DEBUG
   fts_add_welcome(&gnu_welcome);
+#endif
 
   sp.sched_priority = 80;
 

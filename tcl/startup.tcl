@@ -23,8 +23,6 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-
-
 #
 #  jMax startup file
 #
@@ -48,20 +46,16 @@ if {[systemProperty "jmaxServerDir"] != ""} then {
     set jmaxServerDir "$jmaxRootDir/fts/bin/$jmaxArch/$jmaxMode"
 }
 
-puts $jmaxServerDir
+puts "jMax copyright (C) 1994, 1995, 1998, 1999 IRCAM - Centre Georges Pompidou"
+puts "jMax is free software with ABSOLUTELY NO WARRANTY."
+puts "(see file LICENSE for more details)"
 
 if {$jmaxConnection == "tcl"} {
-  puts "jMax starting server on $jmaxHost via TCP/IP"
+  puts "jMax starting server on $jmaxHost ($jmaxHostType) via TCP/IP"
 } elseif {$jmaxConnection == "udp"} {
-  puts "jMax starting server on $jmaxHost via UDP"
+  puts "jMax starting server on $jmaxHost ($jmaxHostType) via UDP"
 } elseif {$jmaxConnection == "socket"} {
-  puts "jMax connecting to server on $jmaxHost via TCP/IP port $jmaxPort"
-}
-
-puts "jMax Host type $jmaxHostType"
-
-if {$jmaxMode == "debug"} {
-  puts "jMax in DEBUG mode"
+  puts "jMax connecting to server on $jmaxHost ($jmaxHostType) via TCP/IP port $jmaxPort"
 }
 
 ftsconnect $jmaxServerDir $jmaxServerName $jmaxConnection $jmaxHost $jmaxPort

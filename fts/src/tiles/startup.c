@@ -55,7 +55,7 @@ static fts_welcome_t version_welcome = {FTS_VERSION_STRING};
 static fts_welcome_t compilation_info_welcome = {COMPILATION_INFO_STRING};
 
 #ifdef DEBUG
-static fts_welcome_t debug_welcome = {"Compiled for DEBUG\n"};
+static fts_welcome_t debug_welcome = {"compiled for DEBUG\n"};
 #endif
 
 
@@ -86,7 +86,6 @@ main(int argc, char **argv)
     }
 
   /* Install the basic welcome messages */
-
   fts_add_welcome(&version_welcome);
   fts_add_welcome(&compilation_info_welcome);
 
@@ -95,33 +94,26 @@ main(int argc, char **argv)
 #endif
 
   /* sys level initialization */
-
   fts_sys_init();
 
   /* kernel modules configure */
-
   fts_kernel_config();
 
   /* Initialize all the fts and application modules */
-
   fts_modules_init();
 
   /* Install the boot device, deciding on the base of the command
      line arguments.
    */
-
   fts_assign_boot_devices(argc, argv);
 
   /* After module initialization, compile the scheduler list */
-
   fts_sched_compile(); /* compile the scheduler function list  */
 
   /* Run the scheduler */
-
   fts_sched_run();
 
   /* When and if the scheduler exit, run the shutdown functions and return */
-
   fts_modules_shutdown();
 
   return 0;
