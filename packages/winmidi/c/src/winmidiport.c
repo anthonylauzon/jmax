@@ -22,7 +22,20 @@
 #include <windows.h>
 #include <fts/fts.h>
 
-#define WINMIDI_DEBUG 1
+/* 
+   The code to handle sysex in is still being debugged. The current
+   code seems to work alright. When the midiport is closed no
+   errors are returned and the driver sends the the MIM_CLOSE message
+   to the calback function. However, when FTS restarts, the MIDI in
+   port cannot be opened (Device busy). This happens even when the
+   application did not receive any sysex messages at all. It's still a
+   mystery to me (blame it on MicroSoft). [PH,20020311]
+
+   The following macro defines whether sysex in will be compiled in or
+   not.
+*/
+
+#define WINMIDI_SYSEXIN   0
 
 #define BUFFER_SIZE 1024
 #define SYSEX_BUFFER_SIZE 1024
@@ -66,11 +79,16 @@ typedef struct _winmidiport_t
   MIDIHDR outhdr[2];
   CRITICAL_SECTION critical_section;
   int cur_outhdr;
+#if WINMIDI_SYSEXIN
   MIDIHDR inhdr[2];
+#endif
   DWORD incoming[BUFFER_SIZE];
   int head;
   int tail;
   unsigned int flags;
+
+  int midiin_state;
+
 } winmidiport_t;
 
 
@@ -89,16 +107,18 @@ void CALLBACK
 winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
 {
   winmidiport_t *this = (winmidiport_t *) dwInstance;
-  MIDIHDR* hdr;
   
   switch (wMsg) {
   case MIM_OPEN: 
+    this->midiin_state = MIM_OPEN;
     break;
     
   case MIM_CLOSE:
+    this->midiin_state = MIM_CLOSE;
     break;
     
   case MIM_DATA:
+    this->midiin_state = MIM_DATA;
 
     EnterCriticalSection(&this->critical_section);
 
@@ -114,16 +134,22 @@ winmidiport_callback_in(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1
     break;
     
   case MIM_LONGDATA:
-    hdr = (MIDIHDR*) dwParam1;
+    /* I don't handle the sysex message here. Instead, the
+       winmidiport_dispatch() function checks if the buffer is done
+       and then handles the sysex data. */
+    this->midiin_state = MIM_LONGDATA;
     break;
     
   case MIM_ERROR:
+    this->midiin_state = MIM_ERROR;
     break;
     
   case MIM_LONGERROR:
+    this->midiin_state = MIM_LONGERROR;
     break;
     
   case MIM_MOREDATA:
+    this->midiin_state = MIM_MOREDATA;
     break;
   }
 }
@@ -182,13 +208,15 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       }
     }
 
+#if WINMIDI_SYSEXIN
     /* check for incoming sysex messages */
     for (i = 0; i < 2; i++) {
 
-      /* check for incoming messages */
       if (this->inhdr[i].dwFlags & MHDR_DONE) {
 	int size = this->inhdr[i].dwBytesRecorded;
 	int j; 
+
+	fts_log("[winmidiport]: Received sysex message\n");
 
 	/* create a new midi event and send the sysex message to the
 	   midiport. start at position 1 to skip the start-of-sysex
@@ -205,16 +233,21 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	}
 
 	/* unprepare the buffer and flag it as available */
+	fts_log("[winmidiport]: Unprepare sysex buffer\n");
 	midiInUnprepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
 	this->inhdr[i].dwFlags = 0;
 
 	/* prepare and add the buffer to the driver */
+	fts_log("[winmidiport]: Prepare sysex buffer\n");
 	err = midiInPrepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
 
 	if (err == MMSYSERR_NOERROR ) {
 	
+	  fts_log("[winmidiport]: Add sysex buffer\n");
 	  err = midiInAddBuffer(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
+
 	  if (err != MMSYSERR_NOERROR ) {
+	    midiInUnprepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
 	    midiInGetErrorText(err, &msg[0], 256);
 	    post("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
 	    fts_log("Warning: winmidiport: Couldn't add sysex buffer: %s\n", msg);
@@ -227,6 +260,8 @@ winmidiport_dispatch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	}
       }
     }
+#endif 
+
   }
 
   if (this->hmidiout != NULL) {
@@ -423,6 +458,7 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->hmidiout = NULL;
   this->hmidiin = NULL;
   this->cur_outhdr = 0;
+  this->midiin_state = 0;
 
   /* check for the device name */
   devname = fts_get_symbol_arg(ac, at, 0, fts_s_default);
@@ -514,7 +550,7 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 			 "might cause FTS to crash. If you have any problems, please \n"
 			 "select an other MIDI device in the Windows Configuration Panels \n"
 			 "and restart FTS. Do you want to continue?", 
-			 "FTS Initialization", 
+			 "jMax - Warning", 
 			 MB_YESNO | MB_ICONSTOP | MB_APPLMODAL) == IDNO) {
 	    
 	    fts_object_set_error(o, "Failed to open the MIDI port");
@@ -604,7 +640,11 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       }
     }
 
+#if WINMIDI_SYSEXIN
     /* setup the buffers for incoming sysex messages */
+
+    fts_log("[winmidiport]: Setting up buffers for sysex message\n");
+
     for (i = 0; i < 2; i++) {
       this->inhdr[i].lpData = fts_malloc(SYSEX_BUFFER_SIZE);
       this->inhdr[i].dwBufferLength = SYSEX_BUFFER_SIZE;
@@ -613,10 +653,12 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       this->inhdr[i].dwFlags = 0;
       
       /* prepare and add the buffer for incoming sysex messages */
+      fts_log("[winmidiport]: Prepare sysex buffer\n");
       err = midiInPrepareHeader(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
       
       if (err == MMSYSERR_NOERROR ) {
 	
+	fts_log("[winmidiport]: Add sysex buffer\n");
 	err = midiInAddBuffer(this->hmidiin, &this->inhdr[i], sizeof(MIDIHDR));
 	if (err != MMSYSERR_NOERROR ) {
 	  midiInGetErrorText(err, &msg[0], 256);
@@ -630,6 +672,7 @@ winmidiport_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	fts_log("Error: winmidiport: Couldn't prepare sysex buffer: %s\n", msg);
       }
     }
+#endif 
     
     /* start the midi input */
     err = midiInStart(this->hmidiin);
@@ -656,33 +699,50 @@ static void
 winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 { 
   winmidiport_t *this = (winmidiport_t *)o;
-  int i, cur_send;
+  int i;
   HMIDIOUT hmidiout;
   HMIDIIN hmidiin;
+  MMRESULT err;
 
   fts_log("[winmidiport]: Closing MIDI port\n");
 
   EnterCriticalSection(&this->critical_section);
 
-  /* Set the handle to NULL to avoid that trailing callbacks access
-     this midiport */
+  /* Get a local copy of the MIDI handles and set the handles of the
+     port to NULL to avoid that midi callbacks access them */
+
   hmidiout = this->hmidiout;
   hmidiin = this->hmidiin;
   this->hmidiout = NULL;
   this->hmidiin = NULL;
 
+  LeaveCriticalSection(&this->critical_section);
+
+
   if (hmidiout != NULL) {
 
     /* mark the output buffers as done */
-    midiOutReset(hmidiout);
+    if (midiOutReset(hmidiout) != MMSYSERR_NOERROR) {
+      fts_log("[winmidiport]: midiOutReset returned an error\n");      
+    }
 
     /* make sure everything is flushed */
-    i = 0;
-    cur_send = 1 - this->cur_outhdr;
-    while (this->outhdr[cur_send].dwFlags & MHDR_DONE == 0) {
-      Sleep(100);
-      if (i++ == 10) {
-	break;
+    for (i = 0; i < 2; i++) {
+      if ((this->outhdr[i].dwFlags != 0) && 
+	  (err = midiOutUnprepareHeader(hmidiout, &this->outhdr[i], sizeof(MIDIHDR))) != MMSYSERR_NOERROR) {
+	if (err == MIDIERR_STILLPLAYING) {
+	  fts_log("[winmidiport]: midiOutUnprepareHeader returned MIDIERR_STILLPLAYING\n");      
+	} else {
+	  fts_log("[winmidiport]: midiOutUnprepareHeader returned an error\n");      
+	}
+      }
+    }
+    
+    if ((err = midiOutClose(hmidiout)) != MMSYSERR_NOERROR) {
+      if (err == MIDIERR_STILLPLAYING) {
+	fts_log("[winmidiport]: midiOutClose returned MIDIERR_STILLPLAYING\n");      
+      } else {
+	fts_log("[winmidiport]: midiOutClose returned an error\n");      
       }
     }
 
@@ -692,31 +752,56 @@ winmidiport_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	this->outhdr[i].lpData = NULL;
       }
     }
-
-    midiOutClose(hmidiout);
   }
 
   if (hmidiin != NULL) {
 
-    midiInReset(hmidiin);
-    
+#if WINMIDI_SYSEXIN
+    fts_log("[winmidiport]: Reset midi in\n");      
+
+    if (midiInReset(hmidiin) != MMSYSERR_NOERROR) {
+      fts_log("[winmidiport]: midiInReset returned an error\n");      
+    }
+
+    fts_log("[winmidiport]: Unpreparing midi in headers\n");      
+
     for (i = 0; i < 2; i++) {
-      if (this->inhdr[i].dwFlags & MHDR_DONE) {
-	if (this->inhdr[i].lpData != NULL) {
-	  fts_free(this->inhdr[i].lpData);
-	  this->inhdr[i].lpData = NULL;
+      if ((err = midiInUnprepareHeader(hmidiin, &this->inhdr[i], sizeof(MIDIHDR))) != MMSYSERR_NOERROR) {
+	if (err == MIDIERR_STILLPLAYING) {
+	  fts_log("[winmidiport]: midiInUnprepareHeader returned MIDIERR_STILLPLAYING\n");      
+	} else {
+	  fts_log("[winmidiport]: midiInUnprepareHeader returned an error\n");      
 	}
+      }
+    }
+#endif
+
+    fts_log("[winmidiport]: Closing midi in\n");      
+    
+    if ((err = midiInClose(hmidiin)) != MMSYSERR_NOERROR) {
+      if (err == MIDIERR_STILLPLAYING) {
+	fts_log("[winmidiport]: midiInClose returned MIDIERR_STILLPLAYING\n");      
       } else {
-	fts_log("[winmidiport]: Input buffers not done\n");	
+	fts_log("[winmidiport]: midiInClose returned an error\n");      
       }
     }
 
-    midiInClose(hmidiin);
+#if WINMIDI_SYSEXIN
+
+    fts_log("[winmidiport]: Deleting midi headers\n");      
+
+    for (i = 0; i < 2; i++) {
+      if (this->inhdr[i].lpData != NULL) {
+	fts_free(this->inhdr[i].lpData);
+	this->inhdr[i].lpData = NULL;
+      }
+    }
+#endif
+
   }
 
   fts_log("[winmidiport]: Done\n");
 
-  LeaveCriticalSection(&this->critical_section);
   DeleteCriticalSection(&this->critical_section);
 
   fts_sched_remove(o);
