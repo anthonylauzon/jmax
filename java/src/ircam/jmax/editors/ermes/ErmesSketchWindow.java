@@ -87,6 +87,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   private Menu itsAlignMenu;
   private Menu itsSizesMenu;
   private Menu itsFontsMenu;
+  private Menu itsHelpMenu;
 
   CheckboxMenuItem itsSelectedSizeMenu;   //the Selected objects size MenuItem
   CheckboxMenuItem itsSketchSizeMenu;     //the SketchPad size MenuItem
@@ -308,6 +309,12 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 
     CheckDefaultSizeFontMenuItem(); 
     CheckDefaultFontItem(); 
+
+    /* Build up the edit Menu */
+
+    itsHelpMenu = new Menu( "Help");
+    menuBar.setHelpMenu( itsHelpMenu);
+    FillHelpMenu(itsHelpMenu);
   }
 
   public void inspectAction()
@@ -362,7 +369,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   protected void Paste()
   {
     if (isLocked())
-      return;
+      setLocked(false);
 
     Cursor temp = getCursor();
 
@@ -422,6 +429,37 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   void addPastedConnection(FtsConnection c)
   {
     ftsConnectionsPasted.addElement( c);
+  }
+
+  // Help support
+
+  void FillHelpMenu(Menu menu)
+  {
+    MenuItem aMenuItem;
+
+    aMenuItem = new MenuItem( ".. on object", new MenuShortcut(KeyEvent.VK_H));
+    menu.add( aMenuItem);
+    aMenuItem.addActionListener( new MaxActionListener(aMenuItem) {
+      public  void actionPerformed( ActionEvent e)
+	{
+	  Help();
+	}
+    });
+  }
+
+
+  void Help()
+  {
+    //ask help for the selected element...
+    ErmesObject aObject;
+      
+    for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements(); )
+      {
+	aObject = (ErmesObject) en.nextElement();
+	
+	if (! FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject))
+	  new ErrorDialog( this, "Sorry, no help for object " + aObject.itsFtsObject.getClassName());
+      }
   }
 
   // 
@@ -683,19 +721,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
 	else
 	  super.keyPressed( e);
       }
-    else if (aInt == 47)
-      {
-	//ask help for the selected element...
-	ErmesObject aObject = null;
-      
-	for (Enumeration en = ErmesSketchPad.currentSelection.itsObjects.elements(); en.hasMoreElements(); )
-	  {
-	    aObject = (ErmesObject) en.nextElement();
-	
-	    if (! FtsHelpPatchTable.openHelpPatch( aObject.itsFtsObject))
-	      new ErrorDialog( this, "Sorry, no help for object " + aObject.itsFtsObject.getClassName());
-	  }
-      } 
     else if ( keyEventClient != null)
       {
 	keyEventClient.keyPressed( e);
@@ -1061,7 +1086,6 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
     getSelectAllMenuItem().setEnabled( !locked);
     getCutMenu().setEnabled( !locked);
     getCopyMenu().setEnabled( !locked);
-    getPasteMenu().setEnabled( !locked);
     getDuplicateMenu().setEnabled( !locked);
 
     getLockMenuItem().setLabel(locked ? "Unlock" : "Lock");

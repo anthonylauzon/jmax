@@ -63,6 +63,9 @@ public class ErmesDataEditor extends AbstractMaxDataEditor
 
   public void showObject(Object object)
   {
+    if (window.isLocked())
+      window.setLocked(false);
+
     if (window != null)
       window.showObject(object);
   }

@@ -129,9 +129,9 @@ public class FtsParse
     pos--;
   }
 
-  final private void storeChar()
+  final private void storeChar(char c)
   {
-    token.append(str.charAt(pos));
+    token.append(c);
   }
 
   final private void storeString(String s)
@@ -139,18 +139,18 @@ public class FtsParse
     token.append(s);
   }
 
-  final private int charValue()
+  static final private int charValue(char c)
   {
-    return (int) str.charAt(pos) - (int) '0';
+    return (int) c - (int) '0';
   }
 
   /* predicates that identify char properties */
 
   /** identify token separators that can be ignored*/
 
-  final private boolean isSeparator()
+  static final private boolean isSeparator(char c)
   {
-    return (str.charAt(pos) == ' ') || (str.charAt(pos) == '\n') || (str.charAt(pos) == '\t');
+    return (c == ' ') || (c == '\n') || (c == '\t');
   }
 
   /**
@@ -159,10 +159,8 @@ public class FtsParse
    * binops  suppressed !!!
    */
 
-  final private boolean isStartToken()
+  static final private boolean isStartToken(char c)
   {
-    int c = str.charAt(pos);
-
     return ((c == '$') || (c == ',') ||
 	    (c == '(') || (c == ')') ||
 	    (c == '[') || (c == ']') ||
@@ -173,50 +171,48 @@ public class FtsParse
 
   /** Identify the lexical char quote character */
 
-  final private boolean isQuoteChar()
+  static final private boolean isQuoteChar(char c)
   {
-    return (str.charAt(pos) == '\\');
+    return (c == '\\');
   }
 
   /** Identify the lexical start quote and end quote character */
 
-  final private boolean isQuoteStart()
+  static final private boolean isQuoteStart(char c)
   {
-    return (str.charAt(pos) == '"');
+    return (c == '"');
   }
 
-  final private boolean isQuoteEnd()
+  static final private boolean isQuoteEnd(char c)
   {
-    return (str.charAt(pos) == '"');
+    return (c == '"');
   }
 
   /** Identify digits */
 
-  final private boolean isDigit()
+  static final private boolean isDigit(char c)
   {
-    int c = str.charAt(pos);
-
     return ((c == '0') || (c == '1') || (c == '2') || (c == '3') || (c == '4') ||
 	    (c == '5') || (c == '6') || (c == '7') || (c == '8') || (c == '9'));
   }
 
   /** identify  the sign char */
 
-  final private boolean isSign()
+  static final private boolean isSign(char c)
   {
-    return (str.charAt(pos) == '-');
+    return ((c == '-') || (c == '+'));
   }
 
   /** Identify decimal point, and so a float representation */
 
-  final private boolean isDecimalPoint()
+  static final private boolean isDecimalPoint(char c)
   {
-    return (str.charAt(pos) == '.');
+    return (c == '.');
   }
 
   /* Identify the end of the parsed string */
 
-  final private boolean isEndOfString()
+  final private boolean atEndOfString()
   {
     return (pos >= str.length());
   }
@@ -267,7 +263,7 @@ public class FtsParse
 
     tryParse();
 
-    if (isEndOfString())
+    if (atEndOfString())
       {
 	backtrack();
 	return false;
@@ -303,32 +299,32 @@ public class FtsParse
 	switch (status)
 	  {
 	  case lex_long_start:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_long_in_value;}
-	    else if (isSign())
-	      {storeChar(); status = lex_long_in_sign;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_long_in_value;}
+	    else if (isSign(currentChar()))
+	      {storeChar(currentChar()); status = lex_long_in_sign;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
 	  case lex_long_in_sign:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_long_in_value;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_long_in_value;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
 	  case lex_long_in_value:
-	    if (isEndOfString() ||
-		isSeparator()     ||
-		isStartToken())
+	    if (atEndOfString() ||
+		isSeparator(currentChar())     ||
+		isStartToken(currentChar()))
 	      {ungetChar(); ParseLong(); status = lex_long_end;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_long_in_value;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_long_in_value;}
 	    else
 	      {backtrack(); return false;}
 	    break;
@@ -356,14 +352,14 @@ public class FtsParse
 	switch (status)
 	  {
 	  case lex_float_start:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_float_in_value;}
-	    else if (isSign())
-	      {storeChar(); status = lex_float_in_sign;}
-	    else if (isDecimalPoint())
-	      {storeChar(); status = lex_float_after_point;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_in_value;}
+	    else if (isSign(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_in_sign;}
+	    else if (isDecimalPoint(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
 	    
@@ -371,36 +367,36 @@ public class FtsParse
 
 	  case lex_float_in_sign:
 
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_float_in_value;}
-	    else if (isDecimalPoint())
-	      {storeChar(); status = lex_float_after_point;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_in_value;}
+	    else if (isDecimalPoint(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
 	  case lex_float_in_value:
 
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_float_in_value;}
-	    else if (isDecimalPoint())
-	      {storeChar(); status = lex_float_after_point;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_in_value;}
+	    else if (isDecimalPoint(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
 	    break;
 
 	  case lex_float_after_point:
 
-	    if (isEndOfString() ||
-		isSeparator()     ||
-		isStartToken())
+	    if (atEndOfString() ||
+		isSeparator(currentChar())     ||
+		isStartToken(currentChar()))
 	      {ungetChar(); ParseFloat(); status = lex_float_end;}
-	    else if (isDigit())
-	      {storeChar(); status = lex_float_after_point;}
+	    else if (isDigit(currentChar()))
+	      {storeChar(currentChar()); status = lex_float_after_point;}
 	    else
 	      {backtrack(); return false;}
 	    break;
@@ -434,30 +430,30 @@ public class FtsParse
 	switch (status)
 	  {
 	  case lex_qstring_start:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isQuoteStart())
+	    else if (isQuoteStart(currentChar()))
 	      status = lex_qstring_in_value;
 	    else
 	      {backtrack(); return false;}
 	    break;
 
 	  case lex_qstring_in_value:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isQuoteChar())
+	    else if (isQuoteChar(currentChar()))
 	      status = lex_qstring_qchar;
-	    else if (isQuoteEnd())
+	    else if (isQuoteEnd(currentChar()))
 	      {ParseString(); status = lex_qstring_end;}
 	    else
-	      storeChar();
+	      storeChar(currentChar());
 	    break;
 
 	  case lex_qstring_qchar:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
 	    else
-	      {storeChar(); status = lex_qstring_in_value;}
+	      {storeChar(currentChar()); status = lex_qstring_in_value;}
 	    break;
 
 	  case lex_qstring_end:
@@ -483,30 +479,30 @@ public class FtsParse
 	switch (status)
 	  {
 	  case lex_string_start:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
-	    else if (isQuoteChar())
+	    else if (isQuoteChar(currentChar()))
 	      status = lex_string_qchar;
 	    else
-	      {storeChar(); status = lex_string_in_value;}
+	      {storeChar(currentChar()); status = lex_string_in_value;}
 	    break;
 
 	  case lex_string_in_value:
-	    if (isEndOfString() || 
-		     isSeparator()     ||
-		     isStartToken())
+	    if (atEndOfString() || 
+		     isSeparator(currentChar())     ||
+		     isStartToken(currentChar()))
 	      {ungetChar(); ParseString(); status = lex_string_end;}
-	    else if (isQuoteChar())
+	    else if (isQuoteChar(currentChar()))
 	      status = lex_string_qchar;
 	    else
-	      {storeChar(); status = lex_string_in_value;}
+	      {storeChar(currentChar()); status = lex_string_in_value;}
 	    break;
 
 	  case lex_string_qchar:
-	    if (isEndOfString())
+	    if (atEndOfString())
 	      {backtrack(); return false;}
 	    else
-	      {storeChar(); status = lex_string_in_value;}
+	      {storeChar(currentChar()); status = lex_string_in_value;}
 	      
 	    break;
 	  case lex_string_end:
@@ -528,7 +524,7 @@ public class FtsParse
   {
     FtsParse parser = new FtsParse(str, stream);
 
-    while (! parser.isEndOfString())
+    while (! parser.atEndOfString())
       {
 	/* First, a multiple separator skip loop,
 	   just to allow ignoring separators in the
@@ -537,10 +533,10 @@ public class FtsParse
 	   Should be cleaner and nicer :-< ...
 	   */
 
-	while ((! parser.isEndOfString()) && parser.isSeparator())
+	while ((! parser.atEndOfString()) && parser.isSeparator(parser.currentChar()))
 	  parser.nextChar();
 
-	if (parser.isEndOfString())
+	if (parser.atEndOfString())
 	  break;
 
 	/* The order is important, beacause the 
@@ -574,7 +570,7 @@ public class FtsParse
 
     try
       {
-	while (! parser.isEndOfString())
+	while (! parser.atEndOfString())
 	  {
 	    /* First, a multiple separator skip loop,
 	       just to allow ignoring separators in the
@@ -583,10 +579,10 @@ public class FtsParse
 	       Should be cleaner and nicer :-< ...
 	       */
 
-	    while ((! parser.isEndOfString()) && parser.isSeparator())
+	    while ((! parser.atEndOfString()) && isSeparator(parser.currentChar()))
 	      parser.nextChar();
 
-	    if (parser.isEndOfString())
+	    if (parser.atEndOfString())
 	      break;
 
 	    /* The order is important, beacause the 
@@ -706,7 +702,85 @@ public class FtsParse
     return false;
   }
       
+  static private final boolean isAnInt(String value)
+  {
+    int i = 0;
 
+    if (isSign(value.charAt(i)))
+      i++;
+
+    while (i < value.length())
+      if (! isDigit(value.charAt(i++)))
+	return false;
+
+    return true;
+  }
+
+  static private final boolean isAFloat(String value)
+  {
+    int status;
+    int i = 0;
+
+    status = lex_float_start;
+
+    while (status != lex_float_end)
+      {
+	switch (status)
+	  {
+	  case lex_float_start:
+	    if (i >= value.length())
+	      return false;
+	    else if (isDigit(value.charAt(i)))
+	      status = lex_float_in_value;
+	    else if (isSign(value.charAt(i)))
+	      status = lex_float_in_sign;
+	    else if (isDecimalPoint(value.charAt(i)))
+	      status = lex_float_after_point;
+	    else
+	      return false;
+	    break;
+
+	  case lex_float_in_sign:
+
+	    if (i >= value.length())
+	      return false;
+	    else if (isDigit(value.charAt(i)))
+	      status = lex_float_in_value;
+	    else if (isDecimalPoint(value.charAt(i)))
+	      status = lex_float_after_point;
+	    else
+	      return false;
+	    break;
+
+	  case lex_float_in_value:
+
+	    if (i >= value.length())
+	      return false;
+	    else if (isDigit(value.charAt(i)))
+	      status = lex_float_in_value;
+	    else if (isDecimalPoint(value.charAt(i)))
+	      status = lex_float_after_point;
+	    else
+	      return false;
+	    break;
+
+	  case lex_float_after_point:
+
+	    if (i >= value.length())
+	      return true;
+	    else if (isDigit(value.charAt(i)))
+	      status = lex_float_after_point;
+	    else
+	      return false;
+	    break;
+	  }
+
+	i++;
+      }
+
+
+    return true;
+  }
 
   static final private boolean includeStartToken(String s)
   {
@@ -765,8 +839,10 @@ public class FtsParse
 	  {
 	    /* Lexical quoting check */
 
-	    if ((! isAKeyword((String) value1)) &&
-		includeStartToken((String) value1))
+	    if (isAnInt((String) value1) || 
+		isAFloat((String) value1) ||
+		((! isAKeyword((String) value1)) &&
+		includeStartToken((String) value1)))
 	      {
 		descr.append("\"");
 		descr.append(value1);
