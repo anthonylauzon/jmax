@@ -22,7 +22,7 @@ HELP_EOF
 
 confirm ()
 {
-echo $*
+echo "$*"
 read R
 if [ $R != "yes" -a $R != "y" ]
 then
@@ -72,7 +72,7 @@ fi
 
 
 # Remove everything starting from installation directory
-confirm "Remove ${INSTALL_DIR}/max/* ? "
+confirm "Remove ${INSTALL_DIR}/max/* ?"
 
 echo Removing ${INSTALL_DIR}/max/*
 /bin/rm -rf ${INSTALL_DIR}/max/*

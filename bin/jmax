@@ -104,7 +104,21 @@ development | user)
     fi ;;
 esac
 
-CLASSPATH=.:/usr/java/lib/rt.jar:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing-1.0.1/swingall.jar
+JAVA=`which java`
+JAVA_BIN_DIR=`dirname $JAVA`
+JAVA_DIR=`dirname $JAVA_BIN_DIR`
+if [ -f ${JAVA_DIR}/lib/rt.jar ]
+then
+    JAVA_CLASSES=${JAVA_DIR}/lib/rt.jar
+elif [ -f ${JAVA_DIR}/lib/classes.zip ]
+then
+    JAVA_CLASSES=${JAVA_DIR}/lib/classes.zip
+elif [ -f ${JAVA_DIR}/lib/classes.jar ]
+then
+    JAVA_CLASSES=${JAVA_DIR}/lib/classes.jar
+fi
+
+CLASSPATH=.:${JAVA_CLASSES}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing-1.0.1/swingall.jar
 
 if [ _${HIGHPRIORITY}_ = "_true_" ]
 then
