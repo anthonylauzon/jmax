@@ -31,6 +31,7 @@
 static fts_symbol_t sym_openEditor = 0;
 static fts_symbol_t sym_destroyEditor = 0;
 static fts_symbol_t sym_addEvent = 0;
+static fts_symbol_t sym_addTrack = 0;
 
 static fts_symbol_t sym_seqevent = 0;
 static fts_symbol_t sym_upload = 0;
@@ -71,6 +72,9 @@ seqobj_track_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t name = fts_get_symbol(at + 0);
   fts_symbol_t type = fts_get_symbol(at + 1);
+  fts_object_t *track;
+  
+  
 
   sequence_add_track(this, name, fts_type_get_by_name(type));
 }
@@ -98,7 +102,10 @@ seqobj_track_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
       event = next;
     }
 
-  /* ... and delete it */
+  /* delete track object */
+  fts_object_delete((fts_object_t *)track);
+
+  /* remove track from sequence */
   sequence_remove_track(this, track_name);
 }
 
@@ -109,26 +116,40 @@ seqobj_event_new(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   sequence_t *this = (sequence_t *)o;
   fts_symbol_t track_name = fts_get_symbol(at + 0);
   double time = fts_get_float(at + 1);
-  fts_object_t *evtobj;
+  fts_object_t *event;
 
   /* make new event object */
-  fts_object_new(0, ac - 2, at + 2, &evtobj);
+  fts_object_new(0, ac - 2, at + 2, &event);
 
   /* add event to sequence */
-  sequence_add_event(this, sequence_get_track_by_name(this, track_name), time, (sequence_event_t *)evtobj);
+  sequence_add_event(this, sequence_get_track_by_name(this, track_name), time, (sequence_event_t *)event);
 
   /* create event at client */
-  fts_client_upload(evtobj, sym_seqevent, ac - 1, at + 1);
+  fts_client_upload(event, sym_seqevent, ac - 1, at + 1);
 
   /* add event to sequence at client */
   {
     fts_atom_t a[2];
 
     fts_set_symbol(a + 0, track_name);
-    fts_set_object(a + 1, evtobj);
+    fts_set_object(a + 1, event);
     
     fts_client_send_message(o, sym_addEvent, 2, a);
   }
+}
+
+/* delete event by client request */
+void
+seqobj_event_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  fts_object_t *event = fts_get_object(at);
+
+  /* remove event from sequence */
+  sequence_remove_event((sequence_event_t *)event);
+
+  /* delete event object and remove from client */
+  fts_object_delete(event);
 }
 
 void
@@ -168,20 +189,6 @@ seqobj_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
   seqobj_update(o, 0, 0, 0, 0);
   fts_client_send_message(o, sym_openEditor, 0, 0);
-}
-
-/* delete event by client request */
-void
-seqobj_event_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  fts_object_t *event = fts_get_object(at);
-
-  /* remove event from sequence */
-  sequence_remove_event((sequence_event_t *)event);
-
-  /* delete event object and remove from client */
-  fts_object_delete(event);
 }
 
 void
@@ -272,6 +279,7 @@ seqobj_config(void)
   sym_openEditor = fts_new_symbol("openEditor");
   sym_destroyEditor = fts_new_symbol("destroyEditor");
   sym_addEvent = fts_new_symbol("addEvent");
+  sym_addEvent = fts_new_symbol("addTrack");
 
   sym_seqevent = fts_new_symbol("seqevent");
   sym_upload = fts_new_symbol("upload");

@@ -85,6 +85,8 @@ extern void sequence_event_init(sequence_event_t *event);
 
 struct _sequence_track
 { 
+  fts_object_t o;
+
   /* list of tracks in sequence */
   sequence_track_t *next;
 
