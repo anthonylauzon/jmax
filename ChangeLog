@@ -1,3 +1,7 @@
+2004-02-13  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* packages/*/Makefile.am: added -release version libtool flag.
+
 2004-02-12  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/dtd/c/src/readsf.c (readsf_eof_alarm): seek to begin of file when eof is reached.
