@@ -1,3 +1,11 @@
+2004-05-26  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* include/fts/Makefile.am: added missing config-macosx.h and config-win32.h in list of files to  distribute.
+
+	* include/Makefile.am: added missing ftsconfig-macosx.h in list of files to distribute.
+
+	* macosxbuild/jMaxProject/Makefile.am: added missing .plist files in list of files to distribute.
+
 2004-05-25  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
 
 	* packages/dtd/c/src/dtd_thread.c, dtd_thread.h, readsf.c, writesf.c: fixed compilation with gcc-3.3.3
