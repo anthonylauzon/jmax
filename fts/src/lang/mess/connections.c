@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.5 $ IRCAM $Date: 1998/10/21 16:35:26 $
+ *      $Revision: 1.6 $ IRCAM $Date: 1998/11/25 15:13:06 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -370,7 +370,7 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
 void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
 {
   int inlet;
-  fts_patcher_t *patcher;
+
 
   for (inlet = inlets; inlet < obj->cl->ninlets; inlet++)
     {
