@@ -25,14 +25,12 @@
  */
 
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
-
-#include "lang/veclib/include/vec_fft.h"
-#include "lang/veclib/complex.h"
-#include "lang/veclib/portable/rfft_shuffle.h"
-#include "lang/veclib/portable/cfft.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include <fts/lang/veclib.h>
+#include <fts/lang/veclib/portable/cfft.h>
+#include <fts/lang/veclib/portable/rfft_shuffle.h>
 
 /**************************************************************************************
  *

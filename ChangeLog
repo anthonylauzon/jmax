@@ -1,3 +1,17 @@
+2001-02-09  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* Removed packages/alsa0.6dev and moved it to an external package
+
+	* Changed header files structure:
+          - fts header files are in include/fts
+          - private header files remains in fts/src
+          - packages now #include <fts/fts.h>
+          - a package can be compiled either inside the jMax source tree
+            or outside without changing the sources
+          - header files tree is the same in the source tree and in the
+            installation
+
+
 2001-01-15  Francois Dechelle  <dechelle@lipari.ircam.fr>
 
 	* Fixed error in fts/src/sys/Makefile

@@ -31,9 +31,9 @@
 
 #include <string.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 /* 
    Client message functions; use the prefix fts_mess_client.
@@ -608,8 +608,7 @@ fts_mess_client_new_connection(int ac, const fts_atom_t *av)
 
       if (to && from)
 	{
-	  if(fts_connection_new(id, from, outlet, to, inlet))
-	    ;
+	  fts_connection_new( id, from, outlet, to, inlet);
 	}
       else
 	printf_mess("System Error in FOS message CONNECT: Error trying to connect non existing objects", ac, av);

@@ -24,9 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/datalib.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
 
 extern void fts_object_set_config(void);  
 extern void fts_atom_list_config(void);

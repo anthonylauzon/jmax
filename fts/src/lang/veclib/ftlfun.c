@@ -27,11 +27,8 @@
 
 /* ftlfun.c */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/ftl.h"
-#include "lang/dsp.h"
-#include "lang/veclib/ftlfun.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
 
 /* just vec so far */
 /* just unrolled so far */

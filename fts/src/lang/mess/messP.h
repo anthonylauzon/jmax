@@ -73,10 +73,6 @@ extern void fts_patcher_remove_object(fts_patcher_t *this, fts_object_t *obj);
 extern int  fts_patcher_get_objects_count( fts_patcher_t *this);
 extern void fts_patcher_assign_variable(fts_symbol_t name, fts_atom_t *value, void *data);
 
-/* Functions for direct .pat loading support */
-
-extern void fts_patparse_parse_patlex(fts_object_t *parent, fts_patlex_t *in);
-
 extern void fts_patcher_reassign_inlets_outlets(fts_patcher_t *obj);
 
 

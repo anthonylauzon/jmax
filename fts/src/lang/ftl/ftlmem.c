@@ -35,9 +35,9 @@
  */
 
 #include <string.h>
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/ftl.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/ftl.h>
 
 /* 
    Handle table for FTL objects

@@ -24,10 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/files/files.h"
-#include "runtime/files/directories.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 #include <unistd.h>
 #include <string.h>

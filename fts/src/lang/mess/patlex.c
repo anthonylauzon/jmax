@@ -29,9 +29,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/patlex.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "patlex.h"
 
 
 /**

@@ -27,14 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/fpe.h"
-#include "lang/utils.h"
-#include "lang/datalib.h"
-#include "lang/ftl.h"
-#include "lang/veclib/include/veclib.h"
-#include "runtime/files/post.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/files/post.h>
 
 
 /* --------------------------------------------------------------------------- */

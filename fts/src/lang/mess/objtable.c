@@ -40,8 +40,8 @@
    The 0 id map by definition to the NULL pointer.
    */
 
-#include "sys.h"
-#include "lang/mess.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
 
 #define OBJECT_TABLE_INIT_SIZE (1024)
 #define OBJECT_TABLE_GROW  2

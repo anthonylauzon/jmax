@@ -28,17 +28,12 @@
    (client printing) functions.
 */
 
-#include "sys.h"
-
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "lang.h"
-#include "runtime/time.h"
-#include "runtime/devices.h"
-#include "runtime/client.h"
-#include "runtime/files/post.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 
 /******************************************************************************/

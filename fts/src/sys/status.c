@@ -23,8 +23,7 @@
  * Authors: Francois Dechelle, Norbert Schnell.
  *
  */
-#include "status.h"
-#include "mem.h"
+#include <fts/sys.h>
 
 fts_status_t
 fts_new_status(const char *description)

@@ -54,11 +54,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
-#include "lang/datalib.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include <fts/lang/datalib.h>
+#include "messP.h"
 
 /* Forward declarations */
 

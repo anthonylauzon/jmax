@@ -75,11 +75,11 @@
 
 #include <sys/time.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime.h"
-#include "tiles/ucs.h"
-#include "tiles/messtile.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
+#include "ucs.h"
+#include "messtile.h"
 
 
 /******************************************************************************/

@@ -27,6 +27,6 @@
 
 /* mathtypes.c */
 
-#include "complex.h"
+#include <fts/lang/veclib.h>
 
 complex CZERO = {0.0f, 0.};

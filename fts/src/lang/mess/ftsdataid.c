@@ -28,9 +28,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "messP.h"
 
 #define DATA_TABLE_INIT_SIZE (1024)
 #define DATA_TABLE_GROW  2

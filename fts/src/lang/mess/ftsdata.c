@@ -25,15 +25,14 @@
  */
 
 #include <assert.h>
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
-#include "lang/datalib.h"
-#include "lang/mess/messP.h"
-#include "lang/mess/ftsdata.h"
-
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include <fts/lang/datalib.h>
 /* (fd) I know, this is not correct. But it is needed ... */
-#include "runtime.h"
+#include <fts/runtime.h>
+#include "messP.h"
+
 
 /* (nos):
    Added a pseudo generic "new" function for fts_data.

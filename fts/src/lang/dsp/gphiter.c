@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
 #include "gphiter.h"
 
 extern fts_symbol_t fts_s_propagate_input;

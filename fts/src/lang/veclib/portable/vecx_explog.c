@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VECX_FUN(exp, float, float, FUN_exp)
 DEFINE_FTS_VECX_FUN(log, float, float, FUN_log)

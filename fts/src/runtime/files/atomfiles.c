@@ -53,10 +53,9 @@
 
 #include <unistd.h>
 #include <string.h>
-#include "sys.h"
-#include "lang.h"
-#include "runtime/files/files.h"
-#include "runtime/files/atomfiles.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 #define ATOM_FILE_BUF_SIZE 512
 

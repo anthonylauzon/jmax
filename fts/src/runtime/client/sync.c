@@ -27,12 +27,15 @@
 
 #include <string.h>
 
-#include "protocol.h"
-#include "sys.h"
-#include "lang.h"
-#include "runtime/sched.h"
-#include "runtime/devices.h"
-#include "runtime/client/client.h"
+#include <fts/runtime/client/protocol.h>
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/sched.h>
+#include <fts/runtime/devices.h>
+#include <fts/runtime/client/client.h>
+#include <fts/runtime/client/incoming.h>
+#include <fts/runtime/client/outgoing.h>
+#include <fts/runtime/client/updates.h>
 
 static void fts_sync_dispatch(int ac, const fts_atom_t *av);
 

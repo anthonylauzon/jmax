@@ -24,10 +24,10 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/datalib.h"
-#include "runtime.h"		/* @@@ */
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
+#include <fts/runtime.h>		/* @@@ */
 /* Heaps */
 
 static fts_heap_t *atom_list_cell_heap;
@@ -36,8 +36,8 @@ static fts_heap_t *atom_list_iterator_heap;
 
 /* Remote call codes */
 
-#define ATOM_LIST_UPDATE 1
-#define ATOM_LIST_SET    2
+#define ATOM_LIST_UPDATE         1
+#define ATOM_LIST_SET            2
 #define ATOM_LIST_REMOTE_NAME    3
 
 /********************************************************************************/
@@ -94,7 +94,7 @@ static fts_data_class_t *fts_atom_list_data_class = 0;
 
 struct fts_atom_list
 {
-  fts_data_t dataobj;  
+  fts_data_t dataobj;
   fts_symbol_t name;	       /* list name */
   fts_atom_list_cell_t *head;
   fts_atom_list_cell_t *tail;
@@ -108,7 +108,7 @@ fts_atom_list_t *fts_atom_list_new( void)
   list = (fts_atom_list_t *) fts_heap_alloc(atom_list_heap);
 
   if (list)
-    {      
+    {
       list->name = 0;
       list->head = 0;
       list->tail = 0;

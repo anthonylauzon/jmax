@@ -24,9 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/files/soundformats.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 /* generally explicitly supported file format symbols (see down for explain) */
 fts_symbol_t fts_s_aiffc = 0;

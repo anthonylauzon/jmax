@@ -48,13 +48,13 @@
    without the MTC full message in between.
    */
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices.h"
-#include "runtime/sched.h"
-#include "runtime/time.h"
-#include "runtime/midi/midiport.h"
-#include "runtime/midi/midi.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/devices.h>
+#include <fts/runtime/sched.h>
+#include <fts/runtime/time.h>
+#include <fts/runtime/midi/midiport.h>
+#include <fts/runtime/midi/midi.h>
 
 /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 fts_symbol_t fts_midi_hack_default_device_name = 0;

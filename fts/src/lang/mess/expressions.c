@@ -65,10 +65,10 @@
 
 /* #define EXPRESSION_TRACE_DEBUG */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
-#include "lang/utils.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include "messP.h"
 
 /* Operator codes: symbols can store a special operator code,
    to identify them as operators, and to do direct access to some

@@ -24,11 +24,11 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/datalib.h"
-#include "runtime.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
+#include <fts/runtime.h>
+#include "messP.h"
 
 /* Remote call codes */
 

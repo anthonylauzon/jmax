@@ -29,9 +29,10 @@
   Generic, may be debug, function to deal with atoms
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils/hashtab.h"
+#include <string.h>
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
 
 static fts_hash_table_t fts_atom_type_table;
 

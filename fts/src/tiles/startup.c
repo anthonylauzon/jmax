@@ -34,12 +34,14 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
-#include "tiles/ucs.h"
-#include "tiles/messtile.h"
+#include "lang/veclib/vecmod.h"
+
+#include "ucs.h"
+#include "messtile.h"
 
 static void fts_kernel_config(void);
 static void fts_assign_boot_devices(int argc, char **argv);
@@ -56,7 +58,7 @@ static char root_dir[256];
 
 static void fts_set_root_dir( const char *fts_exec_name)
 {
-  char *p;
+  char *p = NULL;
   int i;
 
   strcpy( root_dir, fts_exec_name);

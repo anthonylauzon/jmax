@@ -74,9 +74,9 @@
 
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "messP.h"
 
 static fts_heap_t *daemon_heap;
 static fts_heap_t *plist_cell_heap;

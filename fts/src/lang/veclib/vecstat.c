@@ -25,7 +25,7 @@
  */
 
 
-#include "vecstat.h"
+#include <fts/lang/veclib/vecstat.h>
 
 fts_status_description_t fts_vec_NoMemory = 
 {

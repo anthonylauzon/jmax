@@ -24,8 +24,9 @@
  *
  */
 
-#include "fts.h"
-#include "bytestream.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/devices/bytestream.h>
 
 static fts_symbol_t fts_s__superclass = 0;
 static fts_symbol_t fts_s_bytestream = 0;

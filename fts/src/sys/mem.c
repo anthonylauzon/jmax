@@ -51,7 +51,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "sys.h"
+#include <fts/sys.h>
 
 #ifndef SAFE_MEM
 #define real_malloc(size, filename, line)       malloc((size))

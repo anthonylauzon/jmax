@@ -28,8 +28,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include "protocol.h"
-#include "protcodec.h"
+#include <fts/runtime/client/protocol.h>
+#include <fts/runtime/client/protcodec.h>
 
 /* ********************************************************************** */
 /*                                                                        */

@@ -28,9 +28,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
 
 /* #define LOAD_DEBUG  */
 

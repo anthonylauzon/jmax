@@ -35,11 +35,11 @@
 /* Include files */
 
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/sched.h"
-#include "runtime/devices.h"
-#include "runtime/audio/audio.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/sched.h>
+#include <fts/runtime/devices.h>
+#include <fts/runtime/audio/audio.h>
 
 
 

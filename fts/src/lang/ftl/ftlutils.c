@@ -24,9 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/ftl.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/ftl.h>
 
 void
 ftl_memory_declaration_init( ftl_memory_declaration *decl, int size)

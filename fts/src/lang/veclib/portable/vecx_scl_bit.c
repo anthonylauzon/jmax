@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VECX_OPSCL(scl_bitand, int, int, int, OP_bitand)
 DEFINE_FTS_VECX_OPSCL(scl_bitor, int, int, int, OP_bitor)

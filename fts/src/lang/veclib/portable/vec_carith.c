@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VEC_COP(cadd, complex, complex, complex, OP_cadd)
 DEFINE_FTS_VEC_COP(csub, complex, complex, complex, OP_csub)

@@ -54,10 +54,10 @@
 
   */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include "messP.h"
 
 
 typedef struct fts_object_doctor

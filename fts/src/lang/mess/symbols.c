@@ -32,20 +32,20 @@
 
 #include <string.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "messP.h"
 
 #undef PREDEF_SYMBOL
 #define PREDEF_SYMBOL(V,S) fts_symbol_t V;
-#include "predefsymbols.h"
+#include <fts/lang/mess/predefsymbols.h>
 
 static void fts_predefine_symbols(void)
 {
 
 #undef PREDEF_SYMBOL
 #define PREDEF_SYMBOL(V,S) V = fts_new_symbol(S);
-#include "predefsymbols.h"
+#include <fts/lang/mess/predefsymbols.h>
 
 }
 

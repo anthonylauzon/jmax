@@ -25,13 +25,13 @@
  */
 
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/datalib.h"
-#include "lang/ftl.h"
-#include "lang/dsp.h"
-#include "runtime.h"	/* @@@@ what should we do ?? */
-#include "lang/mess/fpe.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
+#include <fts/lang/ftl.h>
+#include <fts/lang/dsp.h>
+#include <fts/runtime.h>	/* @@@@ what should we do ?? */
+#include "../mess/fpe.h"
 
 /*
  * An ftl_data_t object implementing a set of control functions for the DSP engine.

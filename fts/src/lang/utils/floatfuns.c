@@ -25,8 +25,7 @@
  */
 
 
-#include "fts.h"
-#include "floatfuns.h"
+#include <fts/lang.h>
 #include <math.h>
 #include <assert.h>
 

@@ -29,13 +29,13 @@
   */
 
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices/devices.h"
-#include "runtime/devices/profdev.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/devices/devices.h>
+#include <fts/runtime/devices/profdev.h>
 
 #ifdef HAS_UNIX
-#include "runtime/devices/unixdev.h"
+#include <fts/runtime/devices/unixdev.h>
 #endif
 
 extern void null_init(void);

@@ -58,10 +58,10 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices/devices.h"
-#include "runtime/devices/unixdev.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/devices/devices.h>
+#include <fts/runtime/devices/unixdev.h>
 
 /* Errors */
 

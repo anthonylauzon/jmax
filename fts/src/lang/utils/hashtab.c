@@ -24,9 +24,7 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
+#include <fts/lang.h>
 
 fts_heap_t *hash_cell_heap = 0;
 

@@ -41,11 +41,9 @@
 
 #include <audiofile.h>
 #include <string.h>
-
-#include "sys.h"
-#include "lang.h"
-#include "runtime/files/soundfiles.h"
-#include "runtime/files/soundformats.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 #ifndef HAVE_AF_VIRTUAL_PARAMETERS 
 #define READ_BLOCK_SIZE 1024

@@ -48,9 +48,9 @@
 
 #define INITIAL_SELECTION_SIZE 16
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "messP.h"
 
 static void
 selection_object_size_to_fit(fts_selection_t *this)

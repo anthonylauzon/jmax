@@ -24,8 +24,9 @@
  *
  */
 
-#include "fts.h"
-#include "srconv.h"
+#include <string.h>
+#include <math.h>
+#include <fts/lang.h>
 
 #define FILTER_SIZE 24
 #define FILTER_OVER_BITS 11

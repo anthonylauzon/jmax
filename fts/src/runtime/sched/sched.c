@@ -27,12 +27,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "sys.h"
-#include "lang.h"
-#include "runtime/sched.h"
-#include "runtime/client.h"
-#include "runtime/midi.h"
-#include "runtime/time.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 double fts_sched_msecs = 0.0;
 double fts_sched_ticks = 0.0;

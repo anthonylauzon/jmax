@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VEC_FUN(sin, float, float, FUN_sin)
 DEFINE_FTS_VEC_FUN(cos, float, float, FUN_cos)

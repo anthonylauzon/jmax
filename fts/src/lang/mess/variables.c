@@ -39,11 +39,11 @@
  */
 
 
-#include "sys.h"
-#include "lang.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
-#include "lang/datalib.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
+#include <fts/lang/utils.h>
+#include "messP.h"
 
 /****************************************************************************
  *

@@ -24,9 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
 
 extern void fts_ffuns_init(void);
 extern void fts_fourpoint_init(void);

@@ -29,11 +29,10 @@
 
 #include <string.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
-#include "lang/utils.h"
-
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include "messP.h"
 /* Return Status declarations */
 
 fts_status_description_t fts_DuplicatedMetaclass = {"Duplicated metaclass"};

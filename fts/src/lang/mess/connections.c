@@ -25,10 +25,9 @@
  */
 
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
-#include "lang/dsp/gphiter.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "messP.h"
 
 /* Note that in this code there are error messages sent as blip;
    this is ok during editing, but the same error may occour while

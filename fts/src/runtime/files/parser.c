@@ -32,8 +32,9 @@
    */
 
 #include <stdlib.h>
-#include "sys.h"
-#include "lang.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 /* Semantic function: each of them parse a single value
    and add it to the value_list, 

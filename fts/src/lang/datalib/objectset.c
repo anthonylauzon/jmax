@@ -25,11 +25,11 @@
  */
 
 #include <assert.h>
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/datalib.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
 
-#include "runtime.h"
+#include <fts/runtime.h>
 
 /* Implementation of an object set as FTS Data; note that for the moment
    the implementation is very limited, and include a *readonly* java part.

@@ -28,9 +28,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "protocol.h"
-#include "sys.h"
-#include "lang.h"
+#include <fts/runtime/client/protocol.h>
+#include <fts/sys.h>
+#include <fts/lang.h>
 
 /*
  * Defining INCOMING_DEBUG_TRACE will produce a trace

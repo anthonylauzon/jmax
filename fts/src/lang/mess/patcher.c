@@ -55,13 +55,10 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "sys.h"
-#include "lang.h"
-#include "lang/mess/messP.h"
-#include "lang/mess/classes.h"
-#include "lang/mess/objects.h"
-#include "runtime/client.h"
-#include "runtime/files.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include "messP.h"
+#include <fts/runtime.h>
 
 extern fts_metaclass_t *inlet_metaclass;
 extern fts_metaclass_t *outlet_metaclass;

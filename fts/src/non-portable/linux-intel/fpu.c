@@ -37,7 +37,7 @@
 
 #include <signal.h>
 
-#include "sys/hw.h"
+#include <fts/sys/hw.h>
 
 /* (fd) HACK !!! */
 extern void fts_fpe_handler( int which);

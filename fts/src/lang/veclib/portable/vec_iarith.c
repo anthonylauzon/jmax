@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VEC_OP(iadd, int, int, int, OP_add)
 DEFINE_FTS_VEC_OP(isub, int, int, int, OP_sub)

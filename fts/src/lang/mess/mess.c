@@ -25,11 +25,10 @@
  */
 
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
-#include "lang/mess/objtable.h"
-#include "lang/mess/clipboard.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "messP.h"
+#include "clipboard.h"
 
 extern void fts_autosave_init(void);
 

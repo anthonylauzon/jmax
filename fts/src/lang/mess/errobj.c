@@ -33,10 +33,10 @@
 */
 
 #include <stdarg.h>
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/datalib.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/datalib.h>
+#include "messP.h"
 
 /*
  * The error object; actually, error object are patchers, marked as errors,

@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VECX_VECSCL(isum, int, int, FUN_sum, 0)
 DEFINE_FTL_VECX_VECSCL(isum, int, int, FUN_sum, 0)

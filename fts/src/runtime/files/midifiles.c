@@ -25,12 +25,11 @@
  * These MIDI file functions are base on the midifilelib code by Tim Thompson and Michael Czeiszperger.
  *
  */
-#include "sys.h"
-#include "lang.h"
-#include "files.h"
-#include "midifiles.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 /* MIDI status bytes */
 #define NOTE_OFF 0x80

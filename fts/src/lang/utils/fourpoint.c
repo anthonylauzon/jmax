@@ -24,8 +24,7 @@
  *
  */
 
-#include "fts.h"
-#include "fourpoint.h"
+#include <fts/lang.h>
 
 fts_fourpoint_t fts_fourpoint_table[FTS_FOURPOINT_TABLE_SIZE];
 

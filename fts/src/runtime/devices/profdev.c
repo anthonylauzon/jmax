@@ -45,10 +45,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/files.h"
-#include "runtime/devices/devices.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/files.h>
+#include <fts/runtime/devices/devices.h>
 
 /* forward declarations */
 

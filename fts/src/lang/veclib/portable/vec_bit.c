@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VEC_FUN(bitnot, int, int, FUN_bitnot)
 DEFINE_FTS_VEC_OP(bitand, int, int, int, OP_bitand)

@@ -33,11 +33,11 @@
 
 #include <stdio.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/ftl.h"
-#include "lang/dsp.h"
-#include "lang/datalib.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/ftl.h>
+#include <fts/lang/dsp.h>
+#include <fts/lang/datalib.h>
 #include "fpe.h"
 
 static fts_object_set_t *fpe_objects = 0;

@@ -49,7 +49,7 @@
    respected.
 */
 
-#include "sys.h"
+#include <fts/sys.h>
 
 #ifdef LINUX
 #include <unistd.h>

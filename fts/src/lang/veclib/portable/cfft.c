@@ -25,9 +25,9 @@
  */
 
 #include <math.h>
-#include "sys.h"
-#include "lang/veclib/complex.h"
-#include "lang/veclib/portable/cfft.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/complex.h>
+#include <fts/lang/veclib/portable/cfft.h>
 
 /***************************************************************************
  *

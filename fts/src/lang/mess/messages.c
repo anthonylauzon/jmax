@@ -25,11 +25,11 @@
  */
 
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
 /* (fd) For post */
-#include "runtime/files.h"
+#include <fts/runtime/files.h>
+#include "messP.h"
 
 #ifdef DEBUG 
 #define INIT_CHECK_STATUS 1

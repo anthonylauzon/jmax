@@ -48,10 +48,11 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/utils.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/utils.h>
+#include "messP.h"
+#include "patlex.h"
 
 enum abstraction_mode {fts_abstraction_cache, fts_abstraction_declaration};
 

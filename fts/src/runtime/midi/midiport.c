@@ -24,9 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang.h"
-#include "midiport.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 #define SYSEX_BLOCK_SIZE 512
 

@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/mess.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
 
 /* local */
 static void list_realloc(fts_list_t *array, int size)

@@ -24,7 +24,7 @@
  *
  */
 
-#include "protocol.h"
+#include <fts/runtime/client/protocol.h>
 
 const char *protocol_printable_cmd( int cmd)
 {

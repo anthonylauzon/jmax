@@ -24,8 +24,8 @@
  *
  */
 
-#include "sys.h"
-#include "lang/veclib/include/vecdef.h"
+#include <fts/sys.h>
+#include <fts/lang/veclib/include/vecdef.h>
 
 DEFINE_FTS_VEC_CFUN(cabs, complex, complex, FUN_cabs)
 DEFINE_FTS_VEC_CFUN(conj, complex, complex, FUN_conj)

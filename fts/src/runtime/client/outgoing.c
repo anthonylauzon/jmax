@@ -40,13 +40,13 @@
 
 #include <string.h>
 
-#include "protocol.h"
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices.h"
-#include "runtime/time.h"
-#include "runtime/client/client.h"
-#include "runtime/client/outgoing.h"
+#include <fts/runtime/client/protocol.h>
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime/devices.h>
+#include <fts/runtime/time.h>
+#include <fts/runtime/client/client.h>
+#include <fts/runtime/client/outgoing.h>
 
 #ifdef INCOMING_DEBUG_TRACE
 extern const char *protocol_printable_cmd( int cmd);

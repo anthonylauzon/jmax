@@ -26,16 +26,16 @@
 
 #include <string.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/ftl.h"
-#include "lang/dsp.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/lang/ftl.h>
+#include <fts/lang/dsp.h>
 #include "gphiter.h"
 #include "sigconn.h"
 
-#include "runtime/files.h"
-#include "runtime/sched.h"
-#include "runtime/time.h"
+#include <fts/runtime/files.h>
+#include <fts/runtime/sched.h>
+#include <fts/runtime/time.h>
 
 extern void fts_audio_add_unused_zero_fun(void);
 extern void fts_audio_activate_devices(void);

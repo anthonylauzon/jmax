@@ -41,9 +41,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/clipboard.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include "clipboard.h"
 
 typedef struct 
 {

@@ -31,10 +31,9 @@
 */
 
 #include <math.h>
-#include "sys.h"
-#include "lang.h"
-#include "runtime/sched.h"
-#include "runtime/time.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
 
 /* #define TIME_DEBUG */
 #ifdef TIME_DEBUG

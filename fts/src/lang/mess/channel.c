@@ -24,9 +24,9 @@
  *
  */
 
-#include "sys.h"
-#include "lang.h"
-#include "lang/mess/messP.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include "messP.h"
 #include "channel.h"
 
 /***************************************************************************

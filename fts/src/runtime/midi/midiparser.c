@@ -24,13 +24,10 @@
  *
  */
 
-#include "sys.h"
-#include "lang.h"
-#include "runtime/devices.h"
-#include "runtime/sched.h"
-#include "runtime/time.h"
-#include "midiport.h"
-#include "midiparser.h"
+#include <fts/sys.h>
+#include <fts/lang.h>
+#include <fts/runtime.h>
+
 
 /* MIDI status bytes */
 #define MASK_CHANNEL_MESSAGE 0x80

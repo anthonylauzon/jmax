@@ -31,10 +31,10 @@
 
 #include <stdarg.h>
 
-#include "sys.h"
-#include "lang/mess.h"
-#include "lang/mess/messP.h"
-#include "runtime/files/post.h"
+#include <fts/sys.h>
+#include <fts/lang/mess.h>
+#include <fts/runtime.h>
+#include "messP.h"
 
 /* stuff from runtime/client */
 extern void fts_client_release_object(fts_object_t *c);

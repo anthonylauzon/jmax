@@ -30,7 +30,7 @@
 /*
  * FPE handling and collection support 
  */
-#include "lang/datalib/objectset.h"
+#include <fts/lang/datalib/objectset.h>
 
 extern void fts_fpe_start_collect( fts_object_set_t *set);
 extern void fts_fpe_stop_collect( void);
