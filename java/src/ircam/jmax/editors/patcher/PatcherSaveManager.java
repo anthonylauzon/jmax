@@ -175,7 +175,7 @@ public class PatcherSaveManager
     // Test if file exists already
     if (file.exists())
       {
-	int result = JOptionPane.showConfirmDialog( container.getFrame(),
+	int result = JOptionPane.showConfirmDialog( ec.getFrame(),
 						    "File \"" + file.getName() + "\" exists.\nOK to overwrite ?",
 						    "Warning",
 						    JOptionPane.YES_NO_OPTION,
@@ -251,7 +251,7 @@ public class PatcherSaveManager
 						    JOptionPane.WARNING_MESSAGE);
 
 	if ( result != JOptionPane.OK_OPTION)
-	  return false;
+	  return;
       }
 
     /////////////////////////????????????????
