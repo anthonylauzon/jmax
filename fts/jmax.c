@@ -119,14 +119,14 @@ int jmax_run(int argc, char** argv)
       return -2;
     }
 
-    jmax_log("trying to load %s\n", library);
+    jmax_log("Trying to load %s\n", library);
 
     handle = jmax_dl_load(library);
     if (handle == NULL) {
       continue;
     }
 
-    jmax_log("succeeded\n");
+    jmax_log("Succeeded\n");
 
     init_args  = (jni_init_args_t) jmax_dl_symbol(handle, "JNI_GetDefaultJavaVMInitArgs");
     create_jvm  = (jni_create_jvm_t) jmax_dl_symbol(handle, "JNI_CreateJavaVM");
@@ -135,7 +135,7 @@ int jmax_run(int argc, char** argv)
       break;
     }
 
-    jmax_log("found jvm symbols\n");
+    jmax_log("Didn't find the JVM entry points\n");
 
     jmax_dl_close(handle);
   }
@@ -335,7 +335,7 @@ jmax_vfprintf(FILE *fp, const char *format, va_list args)
  *
  */
 
-#define JMAX_KEY        "Software\\Ircam\\jMax\\3.0" 
+#define JMAX_KEY        "Software\\Ircam\\jMax" 
 #define IBM_RELEASE_13  "1.3" 
 #define IBM_JRE_13	"Software\\IBM\\Java2 Runtime Environment"
 #define SUN_RELEASE_13  "1.3" 
@@ -419,7 +419,6 @@ jmax_get_available_jvm(void)
       jmax_append_jvm(buf);
     }
   }
-
 }
 
 static int
@@ -441,17 +440,34 @@ static int
 jmax_get_root_from_registry(char *buf, jint bufsize)
 {
   HKEY key;
+  HKEY version_key;
+  char version[256];
 
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
     jmax_log("Error opening registry key '%s'\n", JMAX_KEY);
     return 0;
   }
 
-  if (!jmax_get_string_from_registry(key, "jmaxRoot", buf, bufsize)) {
-    jmax_log("Failed reading value of registry key: %s\\jmaxRoot\n", JMAX_KEY);
+  if (!jmax_get_string_from_registry(key, "CurrentVersion", version, 256)) {
+    jmax_log("Failed to read the value of registry key: '%s\\CurrentVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
+
+  if (RegOpenKeyEx(key, version, 0, KEY_READ, &version_key) != 0) {
+    jmax_log("Error opening registry key '%s\\%s'\n", JMAX_KEY, version);
+    return 0;
+  }
+
+  if (!jmax_get_string_from_registry(version_key, "jmaxRoot", buf, bufsize)) {
+    jmax_log("Failed to read the value of registry key: '%s\\%s\\jmaxRoot'\n", JMAX_KEY, version);
+    RegCloseKey(key);
+    RegCloseKey(version_key);
+    return 0;
+  }
+
+  RegCloseKey(key);
+  RegCloseKey(version_key);
 
   return 1;
 }

@@ -123,6 +123,12 @@ extern "C" {
 #include <fts/client.h>
 #include <fts/OLDclient.h>
 
+
+/*
+ * FTS version 
+ */
+FTS_API const char *fts_get_version( void);
+
 /*
  * FTS global initialization 
  */

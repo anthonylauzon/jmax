@@ -308,14 +308,6 @@ SOURCE=..\c\src\mididecrypt.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\c\src\midiformat.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\c\src\midiparse.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\c\src\mtof.c
 # End Source File
 # Begin Source File

@@ -98,12 +98,12 @@
 ;;
 ;; Site specific configurations
 ;;
-(load (file-cat jmax-root "config" "site.scm"))
+(load (file-cat jmax-scm-root "site.scm"))
 
 ;;
 ;; Load the machine file if existing
 ;; 
-(define machine-file (file-cat jmax-root "config" jmax-host ".scm"))
+(define machine-file (file-cat jmax-scm-root (cat jmax-host ".scm")))
 (if (file-exists (new-file machine-file))
     (load machine-file))
 
@@ -115,14 +115,10 @@
 ;;
 ;; Load the machine type file if existing
 ;; 
-(define machine-type-file1 (file-cat jmax-root "config" (cat jmax-host-type ".scm")))
-(define machine-type-file2 (file-cat jmax-root "scm" "config" (cat jmax-host-type ".scm")))
-
-(if (file-exists (new-file machine-type-file1))
-    (load machine-type-file1)
-    (if (file-exists (new-file machine-type-file2))
-	(load machine-type-file2)
-	(println "Didn't find a configuration file for host type " jmax-host-type)))
+(define machine-type-file (file-cat jmax-scm-root (cat jmax-host-type ".scm")))
+(if (file-exists (new-file machine-type-file))
+    (load machine-type-file)
+    (println "Didn't find a configuration file for host type " jmax-host-type))
 
 ;;
 ;; do the real startup 

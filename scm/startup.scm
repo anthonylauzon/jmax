@@ -81,7 +81,7 @@
 ;; Load installation default packages.
 ;; Use silent load (load-silently) as a protection against user errors
 ;;
-(load-silently (file-cat jmax-root "config" "packages.scm"))
+(load-silently (file-cat jmax-scm-root "require.scm"))
 
 ;;
 ;; Set sample rate and audio buffer.

@@ -177,7 +177,7 @@ void fts_platform_init( int argc, char **argv)
 /*                                                                             */
 /* *************************************************************************** */
 
-#define JMAX_KEY        "Software\\Ircam\\jMax\\3.0" 
+#define JMAX_KEY        "Software\\Ircam\\jMax" 
 
 static int
 fts_get_string_from_registry(HKEY key, const char *name, char *buf, int bufsize)
@@ -198,17 +198,34 @@ static int
 fts_get_root_from_registry(char *buf, int bufsize)
 {
   HKEY key;
+  HKEY version_key;
+  char version[256];
 
   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, JMAX_KEY, 0, KEY_READ, &key) != 0) {
     post("Error opening registry key '%s'\n", JMAX_KEY);
     return 0;
   }
 
-  if (!fts_get_string_from_registry(key, "jmaxRoot", buf, bufsize)) {
-    post("Failed to read the value of registry key: %s\\jmaxRoot\n", JMAX_KEY);
+  if (!fts_get_string_from_registry(key, "CurrentVersion", version, 256)) {
+    post("Failed to read the value of registry key: '%s\\CurrentVersion'\n", JMAX_KEY);
     RegCloseKey(key);
     return 0;
   }
+
+  if (RegOpenKeyEx(key, version, 0, KEY_READ, &version_key) != 0) {
+    post("Error opening registry key '%s\\%s'\n", JMAX_KEY, version);
+    return 0;
+  }
+
+  if (!fts_get_string_from_registry(version_key, "jmaxRoot", buf, bufsize)) {
+    post("Failed to read the value of registry key: '%s\\%s\\jmaxRoot'\n", JMAX_KEY, version);
+    RegCloseKey(key);
+    RegCloseKey(version_key);
+    return 0;
+  }
+
+  RegCloseKey(key);
+  RegCloseKey(version_key);
 
   return 1;
 }
