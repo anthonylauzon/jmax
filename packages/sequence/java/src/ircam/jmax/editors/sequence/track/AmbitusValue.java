@@ -39,7 +39,9 @@ public class AmbitusValue extends AbstractEventValue
   {
       if(name.equals("duration"))
 	  duration = value;
-      
+      else if(name.equals("pitch") && ((Integer)value).intValue() > 127)
+	  value = new Integer(127);
+	  
       super.setProperty(name, value);
   }
   public Object getProperty(String name)
@@ -83,7 +85,18 @@ public class AmbitusValue extends AbstractEventValue
       ScrEventWidget widget = new ScrEventWidget(BoxLayout.Y_AXIS, gc);
       return widget;
     }
-    
+   
+    public Enumeration getPropertyNames()
+      {
+	  return new ArrayEnumeration(defNamesArray);
+      }
+    public int getPropertyCount()
+      {
+	  return defPropertyCount;
+      }
+ 
+    String defNamesArray[] = {"pitch", "duration"};
+    int defPropertyCount = 2;
   }
 
   public JPopupMenu getPopupMenu()
@@ -147,3 +160,8 @@ public class AmbitusValue extends AbstractEventValue
     static String nameArray[] = {"pitch", "duration"};
     static int propertyCount = 2;
 }
+
+
+
+
+

@@ -6,6 +6,7 @@ import java.awt.Component;
 import ircam.jmax.editors.sequence.SequenceGraphicContext;
 import javax.swing.*;
 import java.io.*;
+import java.util.*;
 
 /**
  * A convenience implementation of the ValueInfo interface.
@@ -43,6 +44,29 @@ public class AbstractValueInfo implements ValueInfo {
 	return instance;
     }
 
+    public Enumeration getPropertyNames()
+    {
+	return new EmptyEnumeration();
+    }
+    public int getPropertyCount()
+    {
+	return 0; 
+    }
+
+    /**
+     * A convenience class to implement an empty enumeration */
+    public class EmptyEnumeration implements Enumeration {
+	public boolean hasMoreElements()
+	{
+	    return false;
+	}
+	
+	public Object nextElement()
+	{
+	    return null;
+	}
+    }
+    
   //--- AbstractValueInfo fields
   public static AbstractValueInfo instance = new AbstractValueInfo();
   public static final String fs = File.separator;
@@ -63,5 +87,15 @@ public class AbstractValueInfo implements ValueInfo {
   }
 
 }
+
+
+
+
+
+
+
+
+
+
 
 

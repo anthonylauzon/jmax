@@ -62,7 +62,36 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	    flavors = new DataFlavor[1];
 	flavors[0] = sequenceFlavor;
 
+	addInfoType(info);
+    }
+
+    void addInfoType(ValueInfo info)
+    {
+	String name;
+
 	infos.addElement(info);
+	
+	for(Enumeration e = info.getPropertyNames(); e.hasMoreElements();)
+	    {
+		name = (String)e.nextElement();
+		if(!propertyNameExist(name))
+		    {
+			namePropertyVector.addElement(name);
+			numProperties++;
+		    }
+	    }
+    }
+
+    boolean propertyNameExist(String name)
+    {
+	String aName;
+	for(Enumeration e = namePropertyVector.elements(); e.hasMoreElements();)
+	    {
+		aName = (String)e.nextElement();
+		if(aName.equals(name))
+		    return true;
+	    }
+	return false;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -119,8 +148,6 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 
 	if(nArgs>1)
 	    notifyObjectsAdded(maxTime);
-	else
-	    notifyObjectAdded(evt, index);
     }
 
   public void requestEventCreation(float time, String type, int nArgs, Object args[])
@@ -179,8 +206,22 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 
     public TrackEvent getNextEvent(Event evt)
     {
-	int index = indexOf(evt) + 1;
-	if((index != EMPTY_COLLECTION) && (index < events_fill_p))
+	int index;
+	if(evt instanceof UtilTrackEvent)
+	    index = getFirstEventAfter(evt.getTime()+0.001);		
+	else
+	    index = indexOf(evt) + 1;
+
+	if((index != EMPTY_COLLECTION) && (index < events_fill_p) && (index >= 0))
+	    return events[index];
+	else return null;
+    }
+
+    public TrackEvent getPreviousEvent(double time)
+    {
+	int index = getFirstEventBefore(time);
+
+	if((index != EMPTY_COLLECTION) && (index < events_fill_p) && (index >= 0))
 	    return events[index];
 	else return null;
     }
@@ -191,6 +232,7 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
     public int indexOf(Event event)
     {
 	int index = getFirstEventAt(event.getTime());
+
 	if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
 	    {
 		return index;
@@ -236,9 +278,64 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 		else 
 		    min = med;
 	    }
+	
 	if (events[min].getTime() == time) return min;
 	else if (events[max].getTime() == time) return max;
 	else return NO_SUCH_EVENT;
+    }
+
+    public int getFirstEventAfter(double time)
+    {
+	if (events_fill_p == 0) 
+	    return EMPTY_COLLECTION;
+	
+	else if (events[events_fill_p - 1].getTime()<= time)
+		return NO_SUCH_EVENT;	
+	
+	int min = 0;
+	int max = events_fill_p - 1;
+	int med = 0;
+	
+	while (max > min+1)
+	    {
+		med = (max + min) / 2;
+		
+		if (events[med].getTime() >= time)
+		    //if (events[med].getTime() > time)
+		    max = med;
+		else 
+		    min = med;
+	    }
+	
+	return max;
+	
+	//else return NO_SUCH_EVENT;
+    }
+
+    public int getFirstEventBefore(double time)
+    {
+	if (events_fill_p == 0) 
+	    return EMPTY_COLLECTION;	
+	else if (events[0].getTime() >= time)  
+	    return NO_SUCH_EVENT;
+	else if (events[events_fill_p-1].getTime() < time)
+	    return events_fill_p-1;
+
+	int min = 0;
+	int max = events_fill_p - 1;
+	int med = 0;
+	
+	while (max > min+1)
+	    {
+		med = (max + min) / 2;
+		
+		if (events[med].getTime() >= time)
+		    max = med;
+		else 
+		    min = med;
+	    }
+	
+	return min;
     }
     
     /**
@@ -822,8 +919,20 @@ public class FtsTrackObject extends FtsObject implements TrackDataModel, Clipabl
 	return name;
     }
 
+    public int getNumProperty()
+    {
+	return numProperties;
+    }
+
+    public Enumeration getPropertyNames()
+    {
+	return namePropertyVector.elements();
+    }
+
     //---  AbstractSequence fields
-    
+    int numProperties = 0;
+    Vector namePropertyVector = new Vector();
+
     int events_size   = 256;	// 
     int events_fill_p  = 0;	// next available position
     TrackEvent events[] = new TrackEvent[256];

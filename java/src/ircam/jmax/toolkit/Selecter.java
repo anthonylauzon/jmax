@@ -171,7 +171,7 @@ public class Selecter extends InteractionModule implements XORPainter {
 
   boolean active = false;
   Rectangle tempRect = new Rectangle();
-  Graphics itsRunningG;
+  protected Graphics itsRunningG;
 }
 
 

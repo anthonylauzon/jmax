@@ -51,7 +51,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   {
     super(theName, theImageIcon);
 
-    itsSelecter = new Selecter(this);
+    //itsSelecter = new Selecter(this);
+    itsSelecter = new SequenceSelecter(this);
   }
 
   /**
@@ -109,7 +110,6 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
     }
   }
 
-
   public void selectionPointDoubleClicked(int x, int y, int modifiers) 
     {
 	edit(x, y, modifiers);
@@ -157,7 +157,8 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   abstract void multipleObjectSelected();
 
   //--- Fields
-  Selecter itsSelecter;
+    //Selecter itsSelecter;
+    SequenceSelecter itsSelecter;
 
   Point startingPoint = new Point();
 

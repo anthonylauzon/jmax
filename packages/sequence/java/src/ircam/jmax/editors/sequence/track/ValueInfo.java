@@ -4,6 +4,7 @@ package ircam.jmax.editors.sequence.track;
 import java.awt.*;
 import javax.swing.*;
 import ircam.jmax.editors.sequence.*;
+import java.util.*;
 
 /**
  * A ValueInfo contains a set of informations about a specific EventValue,
@@ -31,5 +32,10 @@ public interface ValueInfo {
      * Creates a widget (an editor for this value) that will be
      * used inside the Sequencer editor */
     abstract public Component newWidget(SequenceGraphicContext gc);
+
+    abstract public Enumeration getPropertyNames();
+    abstract public int getPropertyCount();
 }
+
+
 

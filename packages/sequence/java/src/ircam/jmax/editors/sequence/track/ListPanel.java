@@ -65,7 +65,9 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	  track.setProperty("active", Boolean.TRUE);
 
       SequenceSelection.getCurrent().addListSelectionListener(this);
-      setSize(300, data.length()*20+20);
+
+      setSize((data.getNumProperty()+1)*100 +25, data.length()*20+20);
+
       addMouseListener(this);
       addKeyListener(this);
 
@@ -89,8 +91,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 
     /**
      * TrackDataListener interface
-     */
-    
+     */    
     public void objectChanged(Object spec) 
     {
 	select((TrackEvent)spec, data.indexOf((TrackEvent)spec), currentParamInEvent);
@@ -99,17 +100,15 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     
     public void objectAdded(Object spec, int index) 
     {
-	setSize(300, getSize().height+20);
-	setPreferredSize(new Dimension(300, getPreferredSize().height+20));
-	select((TrackEvent)spec, index, 0);
-	repaint();
+	setSize(getSize().width, getSize().height+20);
+	setPreferredSize(new Dimension(getSize().width, getPreferredSize().height+20));
     }
 
     public void objectsAdded(int maxTime){}
     
     public void objectDeleted(Object whichObject, int index) 
     {
-	setSize(300, getSize().height-20);
+	setSize(getSize().width, getSize().height-20);
 	deselect((TrackEvent)whichObject, index);
 	repaint();
     }
@@ -122,12 +121,12 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
     
     public Dimension getPreferredSize()
     {
-	return new Dimension(300, data.length()*20+20);
+	return new Dimension((data.getNumProperty()+1)*100+25, data.length()*20+20);
     }
 
     public Dimension getMinimumSize()
     {
-	return new Dimension(300, 250);
+	return new Dimension((data.getNumProperty()+1)*100+25, 250);
     }
 
     public void paintComponent(Graphics g) 
@@ -151,9 +150,15 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		evt = (TrackEvent) e.nextElement();
 	  
 		g.drawString(""+numberFormat.format(evt.getTime()), 5, y-2);
-		g.drawString(""+((Integer)evt.getProperty("pitch")).intValue(), 5+xstep, y-2);
-		g.drawString(""+((Integer)evt.getProperty("duration")).intValue(), 5+2*xstep, y-2);	  
 		
+		//for on the property names
+		int i = 1;
+		for(Enumeration e1 = track.getTrackDataModel().getPropertyNames(); e1.hasMoreElements();)
+		    {
+			//drawProperty(evt.getProperty((String)e1.nextElement()), y, i++, g);
+			g.drawString(getPropertyAsString(evt.getProperty((String)e1.nextElement())), 5+i*xstep, y-2);
+			i++;
+		    }
 		y = y+ystep;
 	    }
 	  
@@ -163,6 +168,22 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	  g.drawLine(5, (ystep)*i, 5+r.width, (ystep)*i);
     }
    
+    String getPropertyAsString(Object prop)
+    {
+	if(prop instanceof Integer)
+	    return ""+((Integer)prop).intValue();
+	else
+	    if(prop instanceof Float)
+		return ""+((Float)prop).floatValue();
+	    else if(prop instanceof Boolean)
+		return ""+((Boolean)prop).booleanValue();
+	    else if(prop instanceof Double)
+		return ""+((Double)prop).doubleValue();
+	    else if(prop instanceof String)
+		return (String)prop;
+	    else return "";
+    }
+
     void drawSelection(Graphics g, Rectangle r)
     {
 	int index;
@@ -295,7 +316,6 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	notifyDeselection(index, evt);
 	endEdit();
     }
-
     //listSelectionListener interface
     public void valueChanged(ListSelectionEvent e)
     {
@@ -321,25 +341,22 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 			index = data.indexOf(evt);
 			select(evt, index, currentParamInEvent);
 		    }
+		else
+		    deselect(null, -1);
 	    }	
     }
 
     void doEdit(int index, int param, TrackEvent evt)
     {
 	isEditing = true;
-	area.setBounds(xstep*param+1, index*ystep+2, xstep, ystep-4);
+	area.setBounds(xstep*param+1, index*ystep+2, xstep-10, ystep-4);
 	area.requestFocus();
-	switch(param)
-	    {
-	    case 0:
-		area.setText(""+evt.getTime());
-		break;
-	    case 1:
-		area.setText(""+((Integer)evt.getProperty("pitch")).intValue());
-		break;
-	    case 2:
-		area.setText(""+((Integer)evt.getProperty("duration")).intValue());
-	    }
+
+	if(param == 0)
+	    area.setText(""+evt.getTime());
+	else
+	    area.setText(getPropertyAsString(evt.getProperty(getPropNameByIndex(param-1))));
+
 	area.setVisible(true);	
     }
 
@@ -349,6 +366,21 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 	area.setVisible(false);
 	requestFocus();
 	isEditing = false;
+    }
+
+    String getPropNameByIndex(int index)
+    {
+	String name;
+	int i = 0;
+	for(Enumeration e = data.getPropertyNames(); e.hasMoreElements();)
+	    {
+		name = (String)e.nextElement();
+		if(i==index) 
+		    return name;
+		else
+		    i++;
+	    }
+	return "";
     }
 
     void setEventValue()
@@ -372,6 +404,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 		    }
 		else
 		    {
+			//qui devo capire il tipo del parametro non dal valore ma altrove!!!!!!!!!
 			try { 
 			    value = Integer.valueOf(area.getText()).intValue(); // parse int
 			} catch (NumberFormatException exc) {
@@ -381,22 +414,7 @@ public class ListPanel extends PopupToolbarPanel implements TrackDataListener, M
 			    return;
 			}
 			if(value<0) value=0;
-			switch(currentParamInEvent)
-			    {
-			    case 0:
-			
-				//currentEvent.move(value);
-				break;
-			    case 1:
-				if(value>127) value=127;
-				currentEvent.setProperty("pitch", new Integer(value));
-				break;
-			    case 2:
-				currentEvent.setProperty("duration", new Integer(value));
-				break;
-			    default:
-				break;
-			    }
+			currentEvent.setProperty(getPropNameByIndex(currentParamInEvent-1), new Integer(value));
 		    }
 	    }
 	endEdit();

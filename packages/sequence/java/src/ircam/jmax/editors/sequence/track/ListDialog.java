@@ -3,6 +3,7 @@ package ircam.jmax.editors.sequence.track;
 
 import java.awt.*;
 import javax.swing.*;
+import java.util.*;
 import java.awt.event.*;
 import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.menus.*;
@@ -22,15 +23,7 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 	JPanel panel = new JPanel();
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	
-	JPanel labelPanel = new JPanel();
-	labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
-	JLabel aLabel = new JLabel(" time               pitch                duration", JLabel.LEFT);
-	aLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-	aLabel.setPreferredSize(new Dimension(300 , 20));
-	labelPanel.add(aLabel);
-	labelPanel.add(Box.createHorizontalGlue());
-
-	panel.add(labelPanel);
+	panel.add(initLabelsPanel());
 	
 	list = new ListPanel(track, this, this);
 	scroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
@@ -51,9 +44,33 @@ class ListDialog extends JDialog implements TrackDataListener, TrackListListener
 
 	setLocation(200, 200);
 	Dimension dim = panel.getSize();
+	
 	if(dim.height+30>700) dim.height = 700;
 	else dim.height += 30;
 	setSize(dim);
+    }
+
+    JPanel initLabelsPanel()
+    {
+	JPanel labelPanel = new JPanel();
+	labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
+	
+	String name;
+	JLabel aLabel;
+
+	aLabel = new JLabel("time" , JLabel.LEFT);
+	aLabel.setPreferredSize(new Dimension(100 , 20));
+	labelPanel.add(aLabel);
+
+	for(Enumeration e = track.getTrackDataModel().getPropertyNames(); e.hasMoreElements();)
+	    {
+		name = (String)e.nextElement();
+		aLabel = new JLabel(name , JLabel.LEFT);
+		aLabel.setPreferredSize(new Dimension(100 , 20));
+		labelPanel.add(aLabel);
+	    }
+	labelPanel.add(Box.createHorizontalGlue());
+	return labelPanel;
     }
 
     /**

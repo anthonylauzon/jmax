@@ -517,7 +517,6 @@ public class SequencePanel extends JPanel implements Editor, TrackListener, Trac
 	else return (int) ((size)/geometry.getXZoom() - maxTransp)-1;
     }
 
-
     /**
      * A graphic JPanel that represents a ruler containing time indications */
     class Ruler extends JPanel {

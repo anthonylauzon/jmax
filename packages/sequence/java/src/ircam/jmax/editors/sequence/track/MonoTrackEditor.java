@@ -172,6 +172,18 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
       return viewMode;
     }
 
+    
+    public void showListDialog()
+    {
+	if(listDialog==null) 
+	    createListDialog();
+	listDialog.setVisible(true);
+    }
+
+    private void createListDialog()
+    {
+	listDialog = new ListDialog(track, gc.getFrame());
+    }
 
     /**
      * Track editor interface */
@@ -188,6 +200,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
 
     public void dispose()
     {
+	if(listDialog != null)
+	    listDialog.dispose();
     }
 
     public SequenceSelection getSelection()
@@ -213,6 +227,8 @@ public class MonoTrackEditor extends PopupToolbarPanel implements ListSelectionL
     MonoTrackRenderer renderer;
 
     Track track;
+
+    ListDialog listDialog = null;
 
     int viewMode = PEAKS_VIEW;
     static public final int PEAKS_VIEW = 2;

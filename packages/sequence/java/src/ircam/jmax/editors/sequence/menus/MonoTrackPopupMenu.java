@@ -92,8 +92,17 @@ public class MonoTrackPopupMenu extends JPopupMenu
 
     add(viewMenu);
 
+    item = new JMenuItem("View as list");
+    item.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e)
+	    {
+		MonoTrackPopupMenu.getPopupTarget().showListDialog();
+	    }
+    });
+    add(item);
+
     addSeparator();
-        
+
     item = new JMenuItem("Remove Track");
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)

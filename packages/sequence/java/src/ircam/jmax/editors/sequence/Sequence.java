@@ -153,7 +153,8 @@ public class Sequence extends JFrame implements EditorContainer{
 	return getLocation();
     }
     public Rectangle getViewRectangle(){
-	return getContentPane().getBounds();
+	//return getContentPane().getBounds();
+	return itsSequencePanel.scrollTracks.getViewport().getViewRect();
     }
 }
 

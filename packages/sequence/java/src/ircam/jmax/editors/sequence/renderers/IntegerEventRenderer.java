@@ -77,7 +77,7 @@ public class IntegerEventRenderer implements ObjectRenderer {
     /*if(((Integer)e.getProperty("integer")).intValue() < 0) 
       y -= heigth;*/
 
-    /* for now the height can eb negatiev for the negative values (to speed the render)*/
+    /* for now the height can be negative for the negative values (to speed the render)*/
     if(heigth<0)
 	{
 	    y += heigth;

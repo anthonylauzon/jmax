@@ -90,15 +90,22 @@ public class MonoTrackRenderer extends AbstractRenderer{
       TrackEvent last = null;
 		    
       double time = gc.getAdapter().getInvX(x);
-		    
-      for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
-      {      
-	  aTrackEvent = (TrackEvent) e.nextElement();
-	  
-	  if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-	      last = aTrackEvent;
-      }
-		    
+
+      if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() == MonoTrackEditor.PEAKS_VIEW)
+	  for (Enumeration e = gc.getDataModel().intersectionSearch(time, time +1); e.hasMoreElements();) 
+	      {      
+		  aTrackEvent = (TrackEvent) e.nextElement();
+		  
+		  if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+		      last = aTrackEvent;
+	      }
+      else
+	  {
+	      aTrackEvent = gc.getDataModel().getPreviousEvent(time);
+	      if(aTrackEvent!=null)
+		  if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+		      last = aTrackEvent;
+	  }    
       return last;
   }
 
@@ -135,6 +142,7 @@ public class MonoTrackRenderer extends AbstractRenderer{
   
   private MaxVector tempList;
 }
+
 
 
 

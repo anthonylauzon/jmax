@@ -164,6 +164,11 @@ public class SequenceGraphicContext extends GraphicContext {
 	return ((Sequence) getFrame()).itsSequencePanel.toolbar;
     }
 
+    /*public  Rectangle getWindowViewRect()
+      {
+      return ((Sequence) getFrame()).itsSequencePanel.scrollTracks.getViewPort().getViewRect();
+      }*/
+
   //---- Fields 
     
     TrackDataModel itsDataModel;

@@ -63,8 +63,7 @@ public interface TrackDataModel {
      * returns an enumeration of all the events between start and end index
      */
     public abstract Enumeration getEvents(int startIndex, int endIndex);
-    
-    
+        
     /**
      * returns a given event 
      */
@@ -74,7 +73,10 @@ public interface TrackDataModel {
      * returns the next in time event 
      */
     public abstract TrackEvent getNextEvent(Event evt);
-
+    /**
+     * returns the next in time event 
+     */
+    public abstract TrackEvent getPreviousEvent(double time);
     /**
      * return the index of the given event, if it exists, or the error constants
      * NO_SUCH_EVENT, EMPTY_COLLECTION 
@@ -136,7 +138,6 @@ public interface TrackDataModel {
      */
     public abstract void removeEvent(TrackEvent theEvent);
     
-
     /**
      * Deletes all the events 
      */
@@ -169,6 +170,9 @@ public interface TrackDataModel {
      * Return the number of different types in this model */
     public abstract int getNumTypes();
 
+    public abstract int getNumProperty();
+
+    public abstract Enumeration getPropertyNames();
 
     /**
      * Move all the events of the given model in this model, and
@@ -197,5 +201,6 @@ public interface TrackDataModel {
     public int NO_SUCH_EVENT = Integer.MIN_VALUE;
   
 }
+
 
 

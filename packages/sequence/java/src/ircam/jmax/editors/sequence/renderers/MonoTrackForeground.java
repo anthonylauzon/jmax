@@ -59,7 +59,6 @@ public class MonoTrackForeground implements Layer {
     TrackEvent temp;
     Dimension d = gc.getGraphicDestination().getSize();
     Rectangle tempr = (Rectangle) g.getClip();
-    //Rectangle r = new Rectangle (0,0,d.width, d.height);
     
     g.clipRect(ScoreBackground.KEYEND, 0, gc.getGraphicDestination().getSize().width-ScoreBackground.KEYEND, gc.getGraphicDestination().getSize().height);
 
@@ -69,6 +68,13 @@ public class MonoTrackForeground implements Layer {
 	temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
       }
 
+    //draw the first object out of left bound  
+    if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() == MonoTrackEditor.STEPS_VIEW)
+	{
+	    temp = ((FtsTrackObject)gc.getDataModel()).getPreviousEvent(gc.getLogicalTime());
+	    if(temp != null) 
+		temp.getRenderer().render( temp, g, gc.getSelection().isInSelection(temp), gc);
+	}
     g.setClip(tempr);
   }
 

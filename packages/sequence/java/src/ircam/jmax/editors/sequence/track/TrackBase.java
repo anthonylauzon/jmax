@@ -69,7 +69,6 @@ public class TrackBase implements Track{
 
     public int getMaximumTime()
     {
-	System.err.println("trackBase getMaximumTime");
 	return (int)model.getMaximumTime();
     }
 
