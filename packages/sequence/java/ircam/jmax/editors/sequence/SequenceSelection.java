@@ -486,6 +486,30 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 		    }
 		}
 	}
+  
+  public void selectNextByType()
+	{
+    TrackEvent evt = null;
+		if(itsModel.length()>0 && size()>0)
+		{
+      int last = getMaxSelectionIndex();
+      if(last < itsModel.length()-1)
+      {
+        String type = (String)(itsModel.getEventAt(last).getProperty("type"));
+        
+        for(int i = last+1; i<itsModel.length()-1; i++)
+        {
+          evt = itsModel.getEventAt(i);
+          if(((String)evt.getProperty("type")).equals(type))
+          {
+            deselectAll();
+            select(evt);
+            return;
+          }
+        }
+      }
+		}
+	}  
 	
 	public void selectPrevious()
 	{
@@ -506,6 +530,31 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 		    }
 		}
 	}
+  
+  public void selectPreviousByType()
+	{
+    TrackEvent evt = null;
+		if(itsModel.length()>0 && size()>0)
+		{
+      int first = getMinSelectionIndex();
+      if(first > 0)
+      {
+        String type = (String)(itsModel.getEventAt(first).getProperty("type"));
+        
+        for(int i = first-1; i >= 0; i--)
+        {
+          evt = itsModel.getEventAt(i);
+          if(((String)evt.getProperty("type")).equals(type))
+          {
+            deselectAll();
+            select(evt);
+            return;
+          }
+        }
+      }
+		}
+	}  
+  
   /**
 		* An usefull (and fast) class to traverse the selection, to be used
    * when the objects are not changed in the loop (read only) */

@@ -448,13 +448,13 @@ public void processKeyEvent(KeyEvent e)
         break;
       case KeyEvent.VK_LEFT:       
         if(getSelection().size() == 0 && (currentSelMarkers != null && currentSelMarkers.size() > 0))
-          currentSelMarkers.selectPrevious();
+          currentSelMarkers.selectPreviousByType();
         else
           getSelection().selectPrevious();
         break;
       case KeyEvent.VK_RIGHT:
         if(getSelection().size() == 0 && (currentSelMarkers != null && currentSelMarkers.size() > 0))
-          currentSelMarkers.selectNext();
+          currentSelMarkers.selectNextByType();
         else
           getSelection().selectNext();
         break;

@@ -140,15 +140,20 @@ void initPropertiesToDraw()
 {
   if( !propInited)
   {
+    String pname;
     int i = 0;
-    int count = markersTrack.getPropertyCount();
+    int count = markersTrack.getPropertyCount()-1;
     propertyNames = new String[ count];
     propertyToDraw = new boolean[ count];
     for(Enumeration e = markersTrack.getPropertyNames(); e.hasMoreElements();)
     {
-      propertyNames[i] = (String)e.nextElement();	
-      propertyToDraw[i] = (propertyNames[i].equals("tempo") || propertyNames[i].equals("meter"));
-      i++;
+      pname = (String)e.nextElement();	
+      if(!pname.equals("type"))
+      {
+        propertyNames[i] = pname;
+        propertyToDraw[i] = (propertyNames[i].equals("tempo") || propertyNames[i].equals("meter"));
+        i++;
+      }
     }
     numPropToDraw = 2;
     propInited = true;
@@ -202,7 +207,12 @@ public void paintMeasures(Graphics g, Rectangle clip)
 			type = (String)(evt.getProperty("type"));
 			x = pa.getX(evt)+getXIndentation();
 			boolean selected = markersSelection.isInSelection(evt);
-			if(type.equals("tempo"))
+			
+      if(selected) g.setColor(selLineColor);
+      else g.setColor(lineColor);
+      g.drawLine( x, 0, x, d.height);
+      
+      if(type.equals("tempo"))
 			{
 				if( selected)
 					color = selTempoColor;
@@ -234,8 +244,8 @@ public void paintMeasures(Graphics g, Rectangle clip)
 							str = prop.toString();
 						strw = fm.stringWidth(str);
 						
-            g.drawString( str, x - strw/2 + 1, h);
-            drawPropertyBounds(g, propertyNames[i], selected, color, x - strw/2 + 1, h, strw, DELTA_H-/*2*/3);
+            //g.drawString( str, x - strw/2 + 1, h);
+            drawProperty(g, propertyNames[i], str, selected, color, x - strw/2 + 1, h, strw, DELTA_H-3);
           }
 					h+=DELTA_H;
 				}
@@ -243,7 +253,7 @@ public void paintMeasures(Graphics g, Rectangle clip)
 	}
 }
 
-void drawPropertyBounds(Graphics g, String propName, boolean selected, Color oldColor, int x, int y, int strw, int strh)
+void drawProperty(Graphics g, String propName, String propVal, boolean selected, Color oldColor, int x, int y, int strw, int strh)
 {
   if(propName.equals("bar #"))
   {
@@ -253,29 +263,32 @@ void drawPropertyBounds(Graphics g, String propName, boolean selected, Color old
       g.setColor(borderColor);
     g.drawRect(x-1, y-strh-1, strw+1, strh+2);
     g.setColor(oldColor);
+    g.drawString( propVal, x, y);
   }
   else
     if(propName.equals("label"))
     {
       if(selected)
-        g.setColor(selTempoColor);
+        g.setColor(/*selTempoColor*/ selLabelColor);
       else
         g.setColor(tempoColor);
       g.fillRect(x-1, y-strh-1, strw+1, strh+2);
       
       if(selected)
-        g.setColor(selBorderColor);
+        g.setColor( selBorderColor);
       else
         g.setColor(Color.gray);
       
       g.drawRect(x-1, y-strh-1, strw+1, strh+2);
+      
+      g.drawString( propVal, x, y);
       g.setColor(oldColor);
     }
   else 
     if(propName.equals("cue"))
     {
       if(selected)
-        g.setColor(selTempoColor);
+        g.setColor( /*selTempoColor*/ selLabelColor);
       else
         g.setColor(cueColor);
       g.fillRect(x-1, y-strh-1, strw+1, strh+2);
@@ -286,8 +299,17 @@ void drawPropertyBounds(Graphics g, String propName, boolean selected, Color old
         g.setColor(cueBorderColor);
       
       g.drawRect(x-1, y-strh-1, strw+1, strh+2);
+      
+      //g.setColor(oldColor);
+      g.drawString( propVal, x, y);
       g.setColor(oldColor);
     }  
+  else
+  {
+    g.setColor(oldColor);
+    g.drawString( propVal, x, y);
+  }
+ 
 }
 
 int getXIndentation()
@@ -295,7 +317,7 @@ int getXIndentation()
 	if( isInSequence)
 		return 2+TrackContainer.BUTTON_WIDTH;
 	else
-		return 0;
+		return /*0*/2;
 }
 
 public TrackEvent firstMarkerContaining(int x, int y)
@@ -325,11 +347,11 @@ public void processKeyEvent(KeyEvent e)
     {
       case KeyEvent.VK_LEFT:       
         if(markersSelection != null && markersSelection.size() > 0)
-          markersSelection.selectPrevious();
+          markersSelection.selectPreviousByType();
         break;
       case KeyEvent.VK_RIGHT:
         if(markersSelection != null && markersSelection.size() > 0)
-          markersSelection.selectNext();
+          markersSelection.selectNextByType();
         break;
       default:
         break;
@@ -405,9 +427,7 @@ public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelectio
 	this.markersSelection = markersSelection;
 	markersSelection.addListSelectionListener(this);
 	markersTrack = markers;
-	markersTrack.addListener(this);
-	
-	//initPropertiesToDraw();
+	markersTrack.addListener(this);	
 }
 public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 {
@@ -419,9 +439,7 @@ public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 	{
 		markersSelection = null;
 		markersTrack = null;
-	}
-	//initPropertiesToDraw();
-	
+	}	
 	repaint();
 	popup = null;
 }
@@ -442,8 +460,8 @@ Geometry geometry;
 FtsGraphicObject ftsObj;
 PartitionAdapter pa;
 SequenceEditor container;
-public final static int TEMPO_HEIGHT = /*23*/25; 
-public final static int DELTA_H = /*10*/11; 
+public final static int TEMPO_HEIGHT = 25; 
+public final static int DELTA_H = 11; 
 public static Dimension tempoDimension = new Dimension(SequenceWindow.DEFAULT_WIDTH, TEMPO_HEIGHT);
 public boolean isInSequence;
 FtsTrackObject markersTrack = null;
@@ -460,6 +478,11 @@ Color selBorderColor = new Color(255, 0, 0, 100);
 Color borderColor = new Color(165, 165, 165, 150);
 Color cueBorderColor = new Color(0, 0, 255, 150);
 Color cueColor = new Color(00, 0, 255, 50);
+
+Color selLabelColor = new Color(255, 0, 0, 70);
+
+Color selLineColor = new Color(255, 0, 0, 20);
+Color lineColor = new Color(165, 165, 165, 25);
 }    
 
 

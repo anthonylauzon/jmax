@@ -68,15 +68,18 @@ public class TempoBarPopupMenu extends JPopupMenu
 			for(Enumeration e = markers.getPropertyNames(); e.hasMoreElements();)
 			{
 				name = (String) e.nextElement();	
-				item = new JRadioButtonMenuItem(name);
-				item.addActionListener(listener);				
-				add(item);
-			}
+        if(!name.equals("type"))
+				{
+          item = new JRadioButtonMenuItem(name);
+          item.addActionListener(listener);				
+          add(item);
+        }
+      }
 	}
 
 	public void update()
   {
-		for(int i = 0; i< tempoBar.propertyToDraw.length; i++)
+		for(int i = 0; i< tempoBar.propertyToDraw.length-1; i++)
 			((JMenuItem)getComponent(i)).setSelected( tempoBar.propertyToDraw[i]);
 	}
 
