@@ -40,7 +40,6 @@ pack.c \
 pipe.c \
 poly.c \
 prepend.c \
-print.c \
 random.c \
 route.c \
 select.c \
@@ -55,9 +54,6 @@ abs.c \
 clip.c \
 exscale.c \
 ftom.c \
-binop.c \
 logscale.c \
 mtof.c \
 scale.c \
-blip.c \
-

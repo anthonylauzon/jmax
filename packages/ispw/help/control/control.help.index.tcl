@@ -2,32 +2,6 @@
 ## help declarations for the ispw control classes
 ##
 
-## logic operators (4)
-helpPatch | $dir/logic.help.jmax
-helpPatch || $dir/logic.help.jmax
-helpPatch && $dir/logic.help.jmax
-helpPatch & $dir/logic.help.jmax
-
-## comparison operators (6)
-helpPatch <= $dir/compare.help.jmax
-helpPatch == $dir/compare.help.jmax
-helpPatch > $dir/compare.help.jmax
-helpPatch >= $dir/compare.help.jmax
-helpPatch != $dir/compare.help.jmax
-helpPatch < $dir/compare.help.jmax
-
-## arithmetics (6)
-helpPatch % $dir/arith.help.jmax
-helpPatch * $dir/arith.help.jmax
-helpPatch + $dir/arith.help.jmax
-helpPatch - $dir/arith.help.jmax
-helpPatch inv* $dir/arith.help.jmax
-helpPatch inv+ $dir/arith.help.jmax
-
-##shifting operators (2)
-helpPatch << $dir/shift.help.jmax
-helpPatch >> $dir/shift.help.jmax
-
 ## misc math (10)
 helpPatch abs $dir/abs.help.jmax
 helpPatch accum $dir/accum.help.jmax
@@ -111,9 +85,6 @@ helpPatch touchout $dir/touchout.help.jmax
 # polyphonic (2)
 helpPatch poly $dir/poly.help.jmax
 helpPatch voxalloc $dir/voxalloc.help.jmax
-
-## print (1)
-helpPatch print $dir/print.help.jmax
 
 ## Summary
 helpSummary "ISPW control" $dir/ispw.control.summary.jmax

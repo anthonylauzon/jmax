@@ -41,7 +41,6 @@ extern void pack_config(void);
 extern void pipe_config(void);
 extern void poly_config(void);
 extern void prepend_config(void);
-extern void print_config(void);
 extern void random_config(void);
 extern void route_config(void);
 extern void select_config(void);
@@ -56,12 +55,10 @@ extern void voxalloc_config(void);
 extern void abs_config(void);
 extern void clip_config(void);
 extern void exscale_config(void);
-extern void binop_config(void);
 extern void ftom_config(void);
 extern void logscale_config(void);
 extern void mtof_config(void);
 extern void scale_config(void);
-extern void blip_config(void);
 
 
 static void
@@ -82,7 +79,6 @@ control_module_init(void)
   pipe_config();
   poly_config();
   prepend_config();
-  print_config();
   random_config();
   route_config();
   select_config();
@@ -97,13 +93,10 @@ control_module_init(void)
   abs_config();
   clip_config();
   exscale_config();
-  binop_config();
   ftom_config();
   logscale_config();
   mtof_config();
   scale_config();
-
-  blip_config();
 }
 
 fts_module_t control_module = {"control", "ISPW miscellaneous control classes", control_module_init};
