@@ -61,6 +61,7 @@ extern fts_package_t* fts_system_package;
 void fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 void fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 void fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+void fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 void fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 void fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
 void fts_package_abstraction_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
@@ -294,17 +295,17 @@ fts_project_apply(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 
   /* check if the midi configuration changed and if so, reopen the
      existing midi ports with the new settings */
-  if (project->midi_changed) {
+  if (project->midi_changed && (project->midi != NULL) && (fts_array_get_size(project->midi) > 0)) {
     fts_midiport_reopen_default(fts_array_get_size(project->midi), fts_array_get_atoms(project->midi));
     project->midi_changed = 0;
   }
 
-  if (project->midi_in_changed) {
+  if (project->midi_in_changed && (project->midi_in != NULL) && (fts_array_get_size(project->midi_in) > 0)) {
     fts_midiport_reopen_default_in(fts_array_get_size(project->midi_in), fts_array_get_atoms(project->midi_in));
     project->midi_in_changed = 0;
   }
 
-  if (project->midi_out_changed) {
+  if (project->midi_out_changed && (project->midi_out != NULL) && (fts_array_get_size(project->midi_out) > 0)) {
     fts_midiport_reopen_default_out(fts_array_get_size(project->midi_out), fts_array_get_atoms(project->midi_out));
     project->midi_out_changed = 0;
   }
@@ -595,13 +596,73 @@ fts_project_saveas(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_package_bmax_file_close((fts_package_t*) project, &f);
 }
 
+static void 
+fts_project_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_project_t *project = (fts_project_t *)o;
+
+  fts_package_print(o, winlet, s, ac, at);
+
+  /* save midi */
+  if ((project->midi != NULL) && (fts_array_get_size(project->midi) > 0)) {
+    post("  %s ", fts_symbol_name(fts_s_midi));
+    post_atoms(fts_array_get_size(project->midi), fts_array_get_atoms(project->midi));
+    post("\n");
+  }
+
+  /* save midi in */
+  if ((project->midi_in != NULL) && (fts_array_get_size(project->midi_in) > 0)) {
+    post("  %s ", fts_symbol_name(fts_s_midi_in));
+    post_atoms(fts_array_get_size(project->midi_in), fts_array_get_atoms(project->midi_in));
+    post("\n");
+  }
+
+  /* save midi out */
+  if ((project->midi_out != NULL) && (fts_array_get_size(project->midi_in) > 0)) {
+    post("  %s ", fts_symbol_name(fts_s_midi_out));
+    post_atoms(fts_array_get_size(project->midi_out), fts_array_get_atoms(project->midi_out));
+    post("\n");
+  }
+
+  /* save audio */
+  if ((project->audio != NULL) && (fts_array_get_size(project->audio) > 0)) {
+    post("  %s ", fts_symbol_name(fts_s_audio));
+    post_atoms(fts_array_get_size(project->audio), fts_array_get_atoms(project->audio));
+    post("\n");
+  }
+
+  /* save audio in */
+  if ((project->audio_in != NULL) && (fts_array_get_size(project->audio_in) > 0)) {
+    post("  %s ", fts_symbol_name(fts_s_audio_in));
+    post_atoms(fts_array_get_size(project->audio_in), fts_array_get_atoms(project->audio_in));
+    post("\n");
+  }
+
+  /* save audio out */
+  if ((project->audio_out != NULL) && (fts_array_get_size(project->audio_out) > 0)) {
+    post("  %s ", fts_symbol_name(fts_s_audio_out));
+    post_atoms(fts_array_get_size(project->audio_out), fts_array_get_atoms(project->audio_out));
+    post("\n");
+  }
+ 
+  /* save fifo size */
+  if (project->fifo_size > 0) {
+    post("  %s %d\n", fts_symbol_name(fts_s_fifo_size), project->fifo_size);
+  }
+ 
+  /* save sample rate */
+  if (project->sample_rate > 0) {
+    post("  %s %d\n", fts_symbol_name(fts_s_sample_rate), project->sample_rate);
+  }
+}
+
 
 static fts_status_t
 fts_project_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
   int i, inlet;
 
-  fts_class_init(cl, sizeof(fts_project_t), 0, 0, 0);
+  fts_class_init(cl, sizeof(fts_project_t), 1, 0, 0);
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, fts_project_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, fts_project_delete);
@@ -631,6 +692,7 @@ fts_project_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
     fts_method_define_varargs(cl, inlet, fts_s_audio_in, fts_project_audio_in);
     fts_method_define_varargs(cl, inlet, fts_s_audio_out, fts_project_audio_out);
     fts_method_define_varargs(cl, inlet, fts_s_apply, fts_project_apply);
+    fts_method_define_varargs(cl, inlet, fts_s_print, fts_project_print);
 
     inlet = 0;
   }
@@ -862,6 +924,12 @@ fts_current_project_apply(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   fts_project_apply((fts_object_t*) fts_project, winlet, s, ac, at);
 }
 
+static void 
+fts_current_project_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fts_project_print((fts_object_t*) fts_project, winlet, s, ac, at);
+}
+
 static fts_status_t
 fts_current_project_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
@@ -885,6 +953,7 @@ fts_current_project_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fts_s_save, fts_current_project_save);
   fts_method_define_varargs(cl, 0, fts_s_saveas, fts_current_project_saveas);
   fts_method_define_varargs(cl, 0, fts_s_apply, fts_current_project_apply);
+  fts_method_define_varargs(cl, 0, fts_s_print, fts_current_project_print);
 
   return fts_Success;
 }

@@ -100,6 +100,10 @@ SOURCE=..\c\src\getdur.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\c\src\locate.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\c\src\module.c
 # End Source File
 # Begin Source File

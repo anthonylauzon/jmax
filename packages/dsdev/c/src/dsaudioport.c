@@ -502,6 +502,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     desc.dwFlags = DSBCAPS_PRIMARYBUFFER;
     if (caps.dwFreeHwMixingStreamingBuffers > 0) {
       desc.dwFlags |= DSBCAPS_LOCHARDWARE;
+      fts_log("[dsdev]: Allocating primary buffer on hardware\n");
     }
     
     hr = IDirectSound_CreateSoundBuffer(dev->direct_sound, &desc, &dev->primary_buffer, NULL);
@@ -532,6 +533,7 @@ dsaudioport_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     desc.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_GETCURRENTPOSITION2;
     if (caps.dwFreeHwMixingStreamingBuffers > 0) {
       desc.dwFlags |= DSBCAPS_LOCHARDWARE;
+      fts_log("[dsdev]: Allocating secondary buffer on hardware\n");
     }
 
     desc.lpwfxFormat = dev->format;

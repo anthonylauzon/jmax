@@ -1035,7 +1035,7 @@ fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_package_bmax_file_close( this, &f);
 }
 
-static void 
+void 
 fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_package_t *this = (fts_package_t *)o;

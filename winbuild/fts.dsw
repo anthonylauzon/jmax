@@ -3,6 +3,108 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "control"=..\packages\control\winbuild\control.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "data"=..\packages\data\winbuild\data.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utils
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "data_java"=..\packages\data\winbuild\data_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dsdev"=..\packages\dsdev\winbuild\dsdev.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "dtd"=..\packages\dtd\winbuild\dtd.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "explode"=..\packages\explode\winbuild\explode.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "explode_java"=..\packages\explode\winbuild\explode_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "fts"=.\fts.dsp - Package Owner=<4>
 
 Package=<5>
@@ -18,6 +120,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "ftsclient"=..\client\winbuild\ftsclient.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "ftsdll"=.\ftsdll.dsp - Package Owner=<4>
 
 Package=<5>
@@ -26,6 +140,99 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "guiobj"=..\packages\guiobj\winbuild\guiobj.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name data
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "guiobj_java"=..\packages\guiobj\winbuild\guiobj_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "io"=..\packages\io\winbuild\io.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ispw"=..\packages\ispw\winbuild\ispw.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name data
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utils
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ispw_java"=..\packages\ispw\winbuild\ispw_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ispwmath"=..\packages\ispwmath\winbuild\ispwmath.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -50,6 +257,201 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "lists"=..\packages\lists\winbuild\lists.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "math"=..\packages\math\winbuild\math.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name data
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "midi"=..\packages\midi\winbuild\midi.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "mmio"=..\packages\mmio\winbuild\mmio.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "numeric"=..\packages\numeric\winbuild\numeric.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "qlist"=..\packages\qlist\winbuild\qlist.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "qlist_java"=..\packages\qlist\winbuild\qlist_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "sequence"=..\packages\sequence\winbuild\sequence.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "sequence_java"=..\packages\sequence\winbuild\sequence_java.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "signal"=..\packages\signal\winbuild\signal.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name data
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "system"=..\packages\system\winbuild\system.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "utils"=..\packages\utils\winbuild\utils.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "winmidi"=..\packages\winmidi\winbuild\winmidi.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name ftsdll
+    End Project Dependency
 }}}
 
 ###############################################################################
