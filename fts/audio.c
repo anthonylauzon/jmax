@@ -274,6 +274,31 @@ fts_audiolabel_get( fts_symbol_t name)
 }
 
 static void
+audiolabel_rename(fts_symbol_t new_name, fts_audiolabel_t* label)
+{
+  fts_atom_t k, v;
+  fts_iterator_t keys, values;
+  fts_audiolabel_t* cur_label;
+  
+  fts_hashtable_get_keys(&audiolabel_table, &keys);
+  fts_hashtable_get_values(&audiolabel_table, &values);
+  
+  while (fts_iterator_has_more(&keys))
+  {
+    fts_iterator_next(&keys, &k);
+    fts_iterator_next(&values, &v);
+    cur_label = (fts_audiolabel_t*)fts_get_object(&v);
+    if (cur_label == label)
+    {
+      fts_hashtable_remove(&audiolabel_table, &k);
+      fts_set_symbol(&k, new_name);
+      fts_hashtable_put(&audiolabel_table, &k, &v);
+      break;
+    }
+  }
+}
+
+static void
 audiolabel_put( fts_symbol_t name, fts_audiolabel_t *label)
 {
   fts_atom_t k, v;
@@ -396,6 +421,8 @@ audiolabel_change_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   else
     self->name = new_label;
   
+  audiolabel_rename(self->name, self);
+
   fts_set_symbol(&a, self->name);
   fts_client_send_message(o, fts_s_label, 1, &a);  
 
