@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.4 $ IRCAM $Date: 1998/10/12 17:13:15 $
+ *      $Revision: 1.5 $ IRCAM $Date: 1998/10/21 16:35:26 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -360,20 +360,36 @@ void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int do_cl
 
 
 /*   
- * Assuming that the number of inlets and outlets
+ * Assuming that the number of inlets or outlets
  * of the object will become as specified by the arguments,
  * delete all the connections that will be not pertinent
  * anymore; tell the client also !!
  */
 
-void fts_object_trim_connections(fts_object_t *obj, int inlets, int outlets)
-{
-  int inlet, outlet;
-  fts_atom_t at[1];
-  fts_patcher_t *patcher;
-  int id;
 
-  /* first the outgoing connections */
+void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets)
+{
+  int inlet;
+  fts_patcher_t *patcher;
+
+  for (inlet = inlets; inlet < obj->cl->ninlets; inlet++)
+    {
+      fts_connection_t *p;
+
+      /* must call the real disconnect function, so that all the daemons
+	 and methods  can fire correctly */
+
+      for (p = obj->in_conn[inlet]; p; p = obj->in_conn[inlet])
+	fts_connection_delete(p);
+    }
+}
+
+
+void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets)
+{
+  int outlet;
+  fts_patcher_t *patcher;
+
 
   for (outlet = outlets; outlet < obj->cl->noutlets; outlet++)
     {
@@ -384,19 +400,6 @@ void fts_object_trim_connections(fts_object_t *obj, int inlets, int outlets)
 	 */
 
       for (p = obj->out_conn[outlet]; p ;  p = obj->out_conn[outlet])
-	fts_connection_delete(p);
-    }
-
-  /* then the incoming connections */
-
-  for (inlet = inlets; inlet < obj->cl->ninlets; inlet++)
-    {
-      fts_connection_t *p;
-
-      /* must call the real disconnect function, so that all the daemons
-	 and methods  can fire correctly */
-
-      for (p = obj->in_conn[inlet]; p; p = obj->in_conn[inlet])
 	fts_connection_delete(p);
     }
 }

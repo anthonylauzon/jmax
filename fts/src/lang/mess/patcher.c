@@ -73,14 +73,33 @@ static void fts_inlet_remove_from_patcher(fts_inlet_t *this, fts_patcher_t *patc
 	    (*p) = this->next;
 	    break;
 	  }
+
+      /* If we removed the outlet with the highest number,
+	 remove the last outlets without objects from the patcher */
+
+      if ((this->position + 1) == fts_object_get_inlets_number((fts_object_t *)patcher))
+	if (patcher->inlets[this->position] == 0)
+	  {
+	    int i;
+
+	    i = this->position;
+
+	    while (patcher->inlets[i] == 0)
+	      i--;
+
+	    fts_patcher_redefine_number_of_inlets(patcher, i + 1);
+	  }
     }
 }
 
 
 static void fts_inlet_add_to_patcher(fts_inlet_t *this, fts_patcher_t *patcher)
 {
-  if ((this->position >= 0) && (this->position < fts_object_get_inlets_number((fts_object_t *)patcher)))
+  if (this->position >= 0)
     {
+      if (this->position >= fts_object_get_inlets_number((fts_object_t *)patcher))
+	fts_patcher_redefine_number_of_inlets(patcher, this->position + 1);
+
       this->next = patcher->inlets[this->position];
       patcher->inlets[this->position] = this;
     }
@@ -89,30 +108,34 @@ static void fts_inlet_add_to_patcher(fts_inlet_t *this, fts_patcher_t *patcher)
 void fts_inlet_reposition(fts_object_t *o, int pos)
 {
   fts_inlet_t *this  = (fts_inlet_t *) o;
-  fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  /* Remove the inlet from the patcher */
-
-  fts_inlet_remove_from_patcher(this, patcher);
-
-  /* Change or create the description */
-
-  if (o->argv)
-    fts_set_int(&(o->argv[1]), pos);
-  else
+  if (pos != this->position)
     {
-      fts_atom_t a[2];
+      fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-      fts_set_symbol(&(a[0]), fts_s_inlet);
-      fts_set_int(&(a[1]), pos);
-      fts_object_set_description(o, 2, a);
+      /* Remove the inlet from the patcher */
+
+      fts_inlet_remove_from_patcher(this, patcher);
+
+      /* Change or create the description */
+
+      if (o->argv)
+	fts_set_int(&(o->argv[1]), pos);
+      else
+	{
+	  fts_atom_t a[2];
+
+	  fts_set_symbol(&(a[0]), fts_s_inlet);
+	  fts_set_int(&(a[1]), pos);
+	  fts_object_set_description(o, 2, a);
+	}
+
+      /* update the inlet structure */
+
+      this->position = pos;
+
+      fts_inlet_add_to_patcher(this, patcher);
     }
-
-  /* update the inlet structure */
-
-  this->position = pos;
-
-  fts_inlet_add_to_patcher(this, patcher);
 }
 
 
@@ -258,14 +281,34 @@ static void fts_outlet_remove_from_patcher(fts_outlet_t *this, fts_patcher_t *pa
 	    (*p) = this->next;
 	    break;
 	  }
+
+
+      /* If we removed the outlet with the highest number,
+	 remove the last outlets without objects from the patcher */
+
+      if ((this->position + 1) == fts_object_get_outlets_number((fts_object_t *)patcher))
+	if (patcher->outlets[this->position] == 0)
+	  {
+	    int i;
+
+	    i = this->position;
+
+	    while (patcher->outlets[i] == 0)
+	      i--;
+
+	    fts_patcher_redefine_number_of_outlets(patcher, i + 1);
+	  }
     }
 }
 
 
 static void fts_outlet_add_to_patcher(fts_outlet_t *this, fts_patcher_t *patcher)
 {
-  if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
+  if (this->position >= 0)
     {
+      if (this->position >= fts_object_get_outlets_number((fts_object_t *)patcher))
+	fts_patcher_redefine_number_of_outlets(patcher, this->position + 1);
+
       this->next = patcher->outlets[this->position];
       patcher->outlets[this->position] = this;
     }
@@ -275,27 +318,32 @@ static void fts_outlet_add_to_patcher(fts_outlet_t *this, fts_patcher_t *patcher
 void fts_outlet_reposition(fts_object_t *o, int pos)
 {
   fts_outlet_t *this  = (fts_outlet_t *) o;
-  fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  /* Remove the outlet from the patcher */
-
-  fts_outlet_remove_from_patcher(this, patcher);
-
-  /* Change or create the description */
-
-  if (o->argv)
-    fts_set_int(&(o->argv[1]), pos);
-  else
+  if (pos != this->position)
     {
-      fts_atom_t a[2];
 
-      fts_set_symbol(&(a[0]), fts_s_outlet);
-      fts_set_int(&(a[1]), pos);
-      fts_object_set_description(o, 2, a);
+      fts_patcher_t  *patcher = fts_object_get_patcher(o);
+
+      /* Remove the outlet from the patcher */
+
+      fts_outlet_remove_from_patcher(this, patcher);
+
+      /* Change or create the description */
+
+      if (o->argv)
+	fts_set_int(&(o->argv[1]), pos);
+      else
+	{
+	  fts_atom_t a[2];
+
+	  fts_set_symbol(&(a[0]), fts_s_outlet);
+	  fts_set_int(&(a[1]), pos);
+	  fts_object_set_description(o, 2, a);
+	}
+
+      this->position = pos;
+      fts_outlet_add_to_patcher(this, patcher);
     }
-
-  this->position = pos;
-  fts_outlet_add_to_patcher(this, patcher);
 }
 
 
@@ -728,37 +776,8 @@ patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 static void
 patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_object_property_changed(o, fts_s_name);
-  fts_object_property_changed(o, fts_s_patcher_type);
-}
-
-
-/* Daemons to set nins and nouts */
-
-static void
-patcher_put_ninlets(fts_daemon_action_t action, fts_object_t *obj,
-		    fts_symbol_t property, fts_atom_t *value)
-{
-  fts_patcher_t *this = (fts_patcher_t *) obj;
-  int ninlets, noutlets;
-
-  ninlets = fts_get_int(value);
-  noutlets = fts_object_get_outlets_number(obj);
-
-  fts_patcher_redefine_ins_outs(this, ninlets, noutlets);
-}
-
-static void
-patcher_put_noutlets(fts_daemon_action_t action, fts_object_t *obj,
-		     fts_symbol_t property, fts_atom_t *value)
-{
-  fts_patcher_t *this = (fts_patcher_t *) obj;
-  int ninlets, noutlets;
-
-  ninlets = fts_object_get_inlets_number(obj);
-  noutlets = fts_get_int(value);
-
-  fts_patcher_redefine_ins_outs(this, ninlets, noutlets);
+  fts_client_send_property(o, fts_s_name);
+  fts_client_send_property(o, fts_s_patcher_type);
 }
 
 
@@ -849,11 +868,6 @@ patcher_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("load_init"), patcher_load_init, 0, 0); 
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("open"), patcher_open, 0, 0); 
   fts_method_define(cl,fts_SystemInlet, fts_new_symbol("close"), patcher_close, 0, 0); 
-
-  /* daemons for setting nins and nouts */
-
-  fts_class_add_daemon(cl, obj_property_put, fts_s_ninlets, patcher_put_ninlets);
-  fts_class_add_daemon(cl, obj_property_put, fts_s_noutlets, patcher_put_noutlets);
 
   /* daemon for properties */
 
@@ -1075,146 +1089,81 @@ fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom
  * To do this, it heavily rely on the internals of the message system; the patcher
  * is a primitive special class for the message system.
  * 
- *
- * Also, this function assume that the inlet/outlet housekeeping is done in the editor;
- * it do not delete redundant inlets or outlets.
  */
 
-void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new_noutlets)
+void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets)
 {
   fts_object_t *obj_this = (fts_object_t *)this;
   int old_ninlets;
-  int old_noutlets;
 
   old_ninlets = fts_object_get_inlets_number((fts_object_t *) this);
-  old_noutlets = fts_object_get_outlets_number((fts_object_t *) this);
+
+  if (old_ninlets == new_ninlets)
+    return;
 
   /* Delete all the connections that will not be pertinent any more */
 
-  fts_object_trim_connections(obj_this, new_ninlets, new_noutlets);
+  fts_object_trim_inlets_connections(obj_this, new_ninlets);
 
   /* Reallocate and copy the patcher inlets, incoming connections and inlets properties if needed */
 
-  if (old_ninlets != new_ninlets)
+
+  if (new_ninlets == 0)
     {
-      if (new_ninlets == 0)
-	{
-	  /* No new inlets, but (since the != test is true) there
-	     are old inlets to delete */
+      /* No new inlets, but (since the != test is true) there
+	 are old inlets to delete */
 
-	  fts_block_free((char *)this->inlets, old_ninlets * sizeof(fts_inlet_t *));
-	  fts_block_free((char *)obj_this->in_conn, old_ninlets * sizeof(fts_connection_t *));
+      fts_block_free((char *)this->inlets, old_ninlets * sizeof(fts_inlet_t *));
+      fts_block_free((char *)obj_this->in_conn, old_ninlets * sizeof(fts_connection_t *));
 
-	  this->inlets = 0;
-	  obj_this->in_conn = 0;
-	}
-      else  if (old_ninlets > 0)
-	{
-	  /* There are new inlets: and there are  old inlets, so reallocate and move */
-
-	  int i;
-	  fts_inlet_t  **new_inlets;
-	  fts_connection_t **new_in_conn;
-
-	  new_inlets  = (fts_inlet_t **)  fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
-	  new_in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
-
-	  for (i = 0; i < new_ninlets; i++)
-	    {
-	      if (i < old_ninlets)
-		{
-		  new_inlets[i] = this->inlets[i];
-		  new_in_conn[i] = obj_this->in_conn[i];
-		}
-	      else
-		{
-		  new_inlets[i] = 0;
-		  new_in_conn[i] = 0;
-		}
-	    }
-
-	  fts_block_free((char *)this->inlets, old_ninlets * sizeof(fts_inlet_t *));
-	  fts_block_free((char *)obj_this->in_conn, old_ninlets * sizeof(fts_connection_t *));
-	      
-	  this->inlets = new_inlets;
-	  obj_this->in_conn = new_in_conn;
-	}
-      else 
-	{
-	  int i;
-
-	  /* There are new inlets, but there were no inlets before, so just allocate without
-	     copying old stuff */
-
-	  this->inlets = (fts_inlet_t **) fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
-	  obj_this->in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
-
-	  for (i = 0; i < new_ninlets; i++)
-	    {
-	      this->inlets[i] = 0;
-	      obj_this->in_conn[i] = 0;
-	    }
-	}
+      this->inlets = 0;
+      obj_this->in_conn = 0;
     }
-
-  /* Reallocate and copy the patcher outlets, incoming connections and outlets properties if needed */
-
-
-  if (old_noutlets != new_noutlets)
+  else  if (old_ninlets > 0)
     {
-      if (new_noutlets == 0)
+      /* There are new inlets: and there are  old inlets, so reallocate and move */
+
+      int i;
+      fts_inlet_t  **new_inlets;
+      fts_connection_t **new_in_conn;
+
+      new_inlets  = (fts_inlet_t **)  fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
+      new_in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
+
+      for (i = 0; i < new_ninlets; i++)
 	{
-	  /* No new outlets, but (since the != test is true) there
-	     are old outlets to delete */
-
-	  fts_block_free((char *)this->outlets, old_noutlets * sizeof(fts_outlet_t *));
-	  fts_block_free((char *)obj_this->out_conn, old_noutlets * sizeof(fts_connection_t *));
-
-	  this->outlets = 0;
-	  obj_this->out_conn = 0;
-	}
-      else  if (old_noutlets > 0)
-	{
-	  /* There are new outlets: and there are no old outlets, so reallocate and move */
-
-	  int i;
-	  fts_outlet_t  **new_outlets;
-	  fts_connection_t **new_out_conn;
-
-	  new_outlets  = (fts_outlet_t **)  fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
-	  new_out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
-
-	  for (i = 0; i < new_noutlets; i++)
+	  if (i < old_ninlets)
 	    {
-	      new_outlets[i] = 0;
-
-	      if (i < old_noutlets)
-		new_out_conn[i] = obj_this->out_conn[i];
-	      else
-		new_out_conn[i] = 0;
+	      new_inlets[i] = this->inlets[i];
+	      new_in_conn[i] = obj_this->in_conn[i];
 	    }
+	  else
+	    {
+	      new_inlets[i] = 0;
+	      new_in_conn[i] = 0;
+	    }
+	}
 
-	  fts_block_free((char *)this->outlets, old_noutlets * sizeof(fts_outlet_t *));
-	  fts_block_free((char *)obj_this->out_conn, old_noutlets * sizeof(fts_connection_t *));
+      fts_block_free((char *)this->inlets, old_ninlets * sizeof(fts_inlet_t *));
+      fts_block_free((char *)obj_this->in_conn, old_ninlets * sizeof(fts_connection_t *));
 	      
-	  this->outlets = new_outlets;
-	  obj_this->out_conn = new_out_conn;
-	}
-      else 
+      this->inlets = new_inlets;
+      obj_this->in_conn = new_in_conn;
+    }
+  else 
+    {
+      int i;
+      
+      /* There are new inlets, but there were no inlets before, so just allocate without
+	 copying old stuff */
+
+      this->inlets = (fts_inlet_t **) fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
+      obj_this->in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
+
+      for (i = 0; i < new_ninlets; i++)
 	{
-	  int i;
-
-	  /* There are new outlets, but there were no outlets before, so just allocate without
-	     copying old stuff */
-
-	  this->outlets = (fts_outlet_t **) fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
-	  obj_this->out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets*sizeof(fts_connection_t *));
-
-	  for (i = 0; i < new_noutlets; i++)
-	    {
-	      this->outlets[i] = 0;
-	      obj_this->out_conn[i] = 0;
-	    }
+	  this->inlets[i] = 0;
+	  obj_this->in_conn[i] = 0;
 	}
     }
 
@@ -1227,7 +1176,7 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
 
     fts_set_symbol(&a[0], fts_s_patcher);
     fts_set_int(&a[1], new_ninlets);
-    fts_set_int(&a[2], new_noutlets);
+    fts_set_int(&a[2], fts_object_get_outlets_number((fts_object_t *) this));
     obj_this->cl = fts_class_instantiate(3, a);
   }
 
@@ -1239,6 +1188,97 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
     for (p = this->objects; p ; p = p->next_in_patcher)
       if (fts_object_is_inlet(p))
 	fts_inlet_reposition(p, ((fts_inlet_t *)p)->position);
+  }
+
+  fts_object_property_changed((fts_object_t *)this, fts_s_ninlets);
+}
+
+void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets)
+{
+  fts_object_t *obj_this = (fts_object_t *)this;
+  int old_noutlets;
+
+  old_noutlets = fts_object_get_outlets_number((fts_object_t *) this);
+
+  if (old_noutlets == new_noutlets)
+    return;
+
+  /* Delete all the connections that will not be pertinent any more */
+
+  fts_object_trim_outlets_connections(obj_this, new_noutlets);
+
+  /* Reallocate and copy the patcher outlets, incoming connections and outlets properties if needed */
+
+  if (new_noutlets == 0)
+    {
+      /* No new outlets, but there
+	 are old outlets to delete */
+
+      fts_block_free((char *)this->outlets, old_noutlets * sizeof(fts_outlet_t *));
+      fts_block_free((char *)obj_this->out_conn, old_noutlets * sizeof(fts_connection_t *));
+
+      this->outlets = 0;
+      obj_this->out_conn = 0;
+    }
+  else  if (old_noutlets > 0)
+    {
+      /* There are new outlets: and there are no old outlets, so reallocate and move */
+
+      int i;
+      fts_outlet_t  **new_outlets;
+      fts_connection_t **new_out_conn;
+
+      new_outlets  = (fts_outlet_t **)  fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
+      new_out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets * sizeof(fts_connection_t *));
+
+      for (i = 0; i < new_noutlets; i++)
+	{
+	  new_outlets[i] = 0;
+
+	  if (i < old_noutlets)
+	    new_out_conn[i] = obj_this->out_conn[i];
+	  else
+	    new_out_conn[i] = 0;
+	}
+
+      fts_block_free((char *)this->outlets, old_noutlets * sizeof(fts_outlet_t *));
+      fts_block_free((char *)obj_this->out_conn, old_noutlets * sizeof(fts_connection_t *));
+	      
+      this->outlets = new_outlets;
+      obj_this->out_conn = new_out_conn;
+    }
+  else 
+    {
+      int i;
+
+      /* There are new outlets, but there were no outlets before, so just allocate without
+	 copying old stuff */
+
+      this->outlets = (fts_outlet_t **) fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
+      obj_this->out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets*sizeof(fts_connection_t *));
+
+      for (i = 0; i < new_noutlets; i++)
+	{
+	  this->outlets[i] = 0;
+	  obj_this->out_conn[i] = 0;
+	}
+    }
+
+  /*
+   *  change the patcher class (of course, not the metaclass).
+   */
+
+  {
+    fts_atom_t a[3];
+
+    fts_set_symbol(&a[0], fts_s_patcher);
+    fts_set_int(&a[1], fts_object_get_inlets_number((fts_object_t *) this));
+    fts_set_int(&a[2], new_noutlets);
+    obj_this->cl = fts_class_instantiate(3, a);
+  }
+
+  {
+    fts_object_t *p;
 
     /* Reinstall the outlets */
 
@@ -1246,6 +1286,8 @@ void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new
       if (fts_object_is_outlet(p))
 	fts_outlet_reposition(p, ((fts_outlet_t *)p)->position);
   }
+
+  fts_object_property_changed((fts_object_t *)this, fts_s_noutlets);
 }
 
 /* Functions for object management; register and remove  an object in a patcher.
@@ -1347,7 +1389,8 @@ void fts_patcher_reassign_inlets_outlets(fts_patcher_t *this)
 
   /* make a redefine the old patcher */
 
-  fts_patcher_redefine_ins_outs(this, ninlets, noutlets);
+  fts_patcher_redefine_number_of_inlets(this,  ninlets);
+  fts_patcher_redefine_number_of_outlets(this, noutlets);
 
   /* Store the inlets in the inlet arrays; not so redundant as may seems,
      because patcher_redefine do not reposition inlets with 

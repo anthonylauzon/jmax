@@ -296,14 +296,7 @@ public class ErmesSketchWindow extends MaxEditor implements ComponentListener {
   public void inspectAction()
   {
     if (ErmesSketchPad.currentSelection.getOwner() == itsSketchPad)
-      {
-	if (ErmesSketchPad.currentSelection.isEmpty())
-	  ErmesPatcherInspector.inspect(itsPatcher);
-	else
-	  ErmesSketchPad.inspectSelection();
-      }
-    else
-      ErmesPatcherInspector.inspect(itsPatcher);
+      ErmesSketchPad.inspectSelection();
   }
 
   protected void Cut()

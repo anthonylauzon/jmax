@@ -94,7 +94,6 @@ class ErmesObjPatcher extends ErmesObjEditableObject
   // ----------------------------------------
   public void inspect() 
   {
-    // ErmesPatcherInspector.inspect( (FtsContainerObject) itsFtsObject);
   }
 
   //--------------------------------------------------------

@@ -58,10 +58,6 @@ ErmesObjFloat:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjFloat.java)
 .PHONY: ErmesObjFloat
 
-ErmesObjFloatDialog:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjFloatDialog.java)
-.PHONY: ErmesObjFloatDialog
-
 ErmesObjIn:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjIn.java)
 .PHONY: ErmesObjIn
@@ -113,10 +109,6 @@ ErmesObjSlider:
 ErmesObjSliderDialog:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjSliderDialog.java)
 .PHONY: ErmesObjSliderDialog
-
-ErmesObjIntegerDialog:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjIntegerDialog.java)
-.PHONY: ErmesObjIntegerDialog
 
 ErmesObjNumberBox:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesObjNumberBox.java)

@@ -517,31 +517,11 @@ public class FtsObject
     return ninlets;
   }
 
-  /** Set the number of inlets; it is the application
-    responsability that it is actually possible to change
-    the number of inlets of the object */
-
-  public void setNumberOfInlets(int n)
-  {
-    ninlets = n;
-    Fts.getServer().putObjectProperty(this, "ins", n);
-  }
-
   /** Get the number of outlets of the object */
 
   public int getNumberOfOutlets()
   {
     return noutlets;
-  }
-
-  /** Set the number of outlets; it is the application
-    responsability that it is actually possible to change
-    the number of outlets of the object */
-
-  public void setNumberOfOutlets(int n)
-  {
-    noutlets = n;
-    Fts.getServer().putObjectProperty(this, "outs", n);
   }
 
   /** Utility function Get the patcher data contaning the object if any */

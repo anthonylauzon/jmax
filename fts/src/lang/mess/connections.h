@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.2 $ IRCAM $Date: 1998/10/06 18:34:42 $
+ *      $Revision: 1.3 $ IRCAM $Date: 1998/10/12 17:13:15 $
  *
  *  Eric Viara for Ircam, January 1995
  *
@@ -25,7 +25,8 @@ extern fts_connection_t *fts_connection_new(int id, fts_object_t *, int woutlet,
 extern void fts_connection_delete(fts_connection_t *conn);
 
 extern void fts_object_move_connections(fts_object_t *old, fts_object_t *new, int doclient);
-extern void fts_object_trim_connections(fts_object_t *obj, int inlets, int outlets);
+extern void fts_object_trim_inlets_connections(fts_object_t *obj, int inlets);
+extern void fts_object_trim_outlets_connections(fts_object_t *obj, int outlets);
 
 #define fts_connection_get_id(c)     ((c)->id)
 

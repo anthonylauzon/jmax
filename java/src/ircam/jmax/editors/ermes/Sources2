@@ -5,7 +5,6 @@ SOURCES := \
 	$(INCLUDE_PATH)/ErmesDataEditor.java		\
 	$(INCLUDE_PATH)/ErmesDrawable.java		\
 	$(INCLUDE_PATH)/ErmesModule.java		\
-	$(INCLUDE_PATH)/ErmesNumberDialog.java		\
 	$(INCLUDE_PATH)/ErmesObjBang.java		\
 	$(INCLUDE_PATH)/ErmesObjComment.java		\
 	$(INCLUDE_PATH)/ErmesObjEditField.java		\

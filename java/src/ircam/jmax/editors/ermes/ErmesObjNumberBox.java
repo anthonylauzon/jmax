@@ -89,7 +89,6 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
 
   public void inspect() 
   {
-    new ErmesNumberDialog( itsSketchPad.GetSketchWindow(), this);
   }
 
   boolean isUIController() 

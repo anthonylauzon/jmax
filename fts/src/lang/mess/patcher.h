@@ -40,7 +40,11 @@ extern void fts_patcher_set_template(fts_patcher_t *patcher, fts_template_t *tem
 
 extern void fts_inlet_reposition(fts_object_t *o, int pos);
 extern void fts_outlet_reposition(fts_object_t *o, int pos);
-extern void fts_patcher_redefine_ins_outs(fts_patcher_t *this, int new_ninlets, int new_noutlets);
+
+extern void fts_patcher_redefine_number_of_inlets(fts_patcher_t *this, int new_ninlets);
+extern void fts_patcher_redefine_number_of_outlets(fts_patcher_t *this, int new_noutlets);
+
+
 extern fts_patcher_t *fts_patcher_redefine(fts_patcher_t *this, int aoc, const fts_atom_t *aot);
 
 extern fts_object_t *fts_patcher_get_inlet(fts_object_t *patcher, int inlet);
