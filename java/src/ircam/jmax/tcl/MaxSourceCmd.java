@@ -35,12 +35,12 @@ class MaxSourceCmd implements Command
 
 	if (file.isAbsolute())
 	  dirName = file.getParent();
+	else  if (file.getParent() == null)
+	  dirName = MaxApplication.getProperty("user.dir");
 	else
-	  {
-	    dirName = ( MaxApplication.jmaxProperties.getProperty("user.dir") + 
-			MaxApplication.jmaxProperties.getProperty("file.separator") +
-			file.getParent());
-	  }
+	  dirName = ( MaxApplication.getProperty("user.dir") + 
+		      MaxApplication.getProperty("file.separator") +
+		      file.getParent());
 
 	if (dirName != null)
 	  interp.eval("_doSourceFile " + dirName + " " + fileName);
