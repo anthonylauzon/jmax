@@ -20,10 +20,10 @@
 <TABLE WIDTH=100% BORDER=0 CELLSPACING=0 CELLPADDING=0>
 <TR>
   <TD ALIGN=LEFT>
-    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
+    <A HREF="http://www.ircam.fr/jmax/"><IMG SRC="../images/jmax_logo_tiny.gif" BORDER=0 ALT="jMax"></A>
   </TD>
   <TD ALIGN=RIGHT>
-    <A HREF="http://www.ircam.fr/"><IMG SRC="../../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
+    <A HREF="http://www.ircam.fr/"><IMG SRC="../images/ircam_banner.gif" BORDER=0 ALT="IRCAM - Centre Georges Pompidou"></A>
   </TD>
 </TR>
 </TABLE>
@@ -94,12 +94,12 @@ from one mode to the other (also CTRL-e) and indicates the current mode:
 <CENTER>
 <TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
   <TR>
-    <TD ALIGN=TOP><IMG SRC="../../images/tool_edit_mode.gif" BORDER=0></TD>
+    <TD ALIGN=TOP><IMG SRC="../images/tool_edit_mode.gif" BORDER=0></TD>
     <TD><b>edit mode</b><BR>
       the toolbar is shown and objects can be added, connected, ... in the patcher window</TD>
   </TR>
   <TR>
-    <TD ALIGN=TOP><IMG SRC="../../images/tool_lock_mode.gif" BORDER=0></TD>
+    <TD ALIGN=TOP><IMG SRC="../images/tool_lock_mode.gif" BORDER=0></TD>
     <TD><b>lock mode</b><BR>
       the patch can not be edited and the graphical controllers are active
   </TR>
@@ -123,52 +123,52 @@ of object which can be instantiated in the patcher window:
 <CENTER>
 <TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_ext.gif" BORDER=0></TD> 
+    <TD VALIGN=TOP><IMG SRC="../images/tool_ext.gif" BORDER=0></TD> 
     <TD><b>generic object</b><BR>
       the generic <i>j</i>Max object ones uses by typing first the class name in</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_patcher.gif" BORDER=0></TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_patcher.gif" BORDER=0></TD>
     <TD><b>patcher object</b><BR>
       the patcher object to create a patcher inside the patcher</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_in.gif" BORDER=0></TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_in.gif" BORDER=0></TD>
     <TD><b>inlet</b><BR>
       an inlet for a (sub)patcher or template</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_text.gif" BORDER=0></TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_out.gif" BORDER=0></TD>
     <TD><b>comment box</b><BR>
       an outlet for a (sub)patcher or template</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_bang.gif" BORDER=0></TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_bang.gif" BORDER=0></TD>
     <TD><b>bang button</b><BR>
       a button which outputs a <tt>bang</tt> message when pressed</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_toggle.gif" BORDER=0> </TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_toggle.gif" BORDER=0> </TD>
     <TD><b>toggle button</b><BR>
       a button toggling between (and outputting) <tt>0</tt> and <tt>1</tt> when pressed</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_slider.gif" BORDER=0> </TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_slider.gif" BORDER=0> </TD>
     <TD><b>slider</b><BR>
       a slider outputting integers</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_int.gif" BORDER=0></TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_int.gif" BORDER=0></TD>
     <TD><b>int box</b><BR>
       the ISPW compatible integer box to display and input integer values</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_float.gif" BORDER=0></TD> 
+    <TD VALIGN=TOP><IMG SRC="../images/tool_float.gif" BORDER=0></TD> 
     <TD><b>float box</b><BR>
       the ISPW compatible float box to display and input float values</TD>
   </TR>
   <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/tool_mess.gif" BORDER=0></TD>
+    <TD VALIGN=TOP><IMG SRC="../images/tool_mess.gif" BORDER=0></TD>
     <TD><b>message box</b><BR>
       the ISPW compatible message box</TD>
   </TR>
@@ -403,55 +403,17 @@ Comment usually show simple unformatted text.  Comments can also show
 an icon (without any size limits); to do that, the content of the
 comment must be a single word, starting with the <code>%</code>
 character, naming an icon.
-<P>
-<i>j</i>Max predefine a number of usefull icons:
 
 <P>
-<CENTER>
-<TABLE WIDTH=90% BORDER=0 CELLSPACING=1 CELLPADDING=5 BGCOLOR=#CCCCCC>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/jmax_logo_tiny.gif" BORDER=0></TD> 
-    <TD><b>%jmax</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/new.gif" BORDER=0></TD>
-    <TD><b>%new</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/hot.gif" BORDER=0></TD>
-    <TD><b>%hot</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/stop.gif" BORDER=0></TD>
-    <TD><b>%stop</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/at_work.gif" BORDER=0></TD>
-    <TD><b>%at_work</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/question.gif" BORDER=0> </TD>
-    <TD><b>%question</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/warning.gif" BORDER=0> </TD>
-    <TD><b>%warning</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/info.gif" BORDER=0></TD>
-    <TD><b>%info</b></TD>
-  </TR>
-  <TR>
-    <TD VALIGN=TOP><IMG SRC="../../images/linux.gif" BORDER=0></TD> 
-    <TD><b>%linux</b></TD>
-  </TR>
-</TABLE>
-</CENTER>
+<i>j</i>Max predefine a number of usefull icons; the complete list
+can be found in file tcl/icons.tcl.
+
 <p>
 You can define named icons using the <code>declareIcon</code> 
 <code>tcl</code> command, either in your <code>.jmaxrc</code> file or
 in yours project files.  See the documentation of <A
 HREF="projects.html#commands"> the <code>tcl</code> commands</A>.
+
 <P>
 <A NAME="buttons">
 <HR>

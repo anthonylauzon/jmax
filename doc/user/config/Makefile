@@ -24,41 +24,13 @@
 #
 
 FILES_TO_INSTALL=\
-config_io.gif		\
-config_sys.gif		\
-doc_compile.gif		\
-doc_ctrl_obj.gif	\
-doc_dev.gif		\
-doc_dsp_obj.gif		\
-doc_kernel_ref.gif	\
-doc_release.gif		\
-doc_user.gif		\
-getting.gif		\
-installation.gif	\
-ircam_banner.gif	\
-jmax_logo_tiny.gif	\
-language.gif		\
-packages.gif		\
-patcher.gif		\
-projects.gif		\
-tool_bang.gif		\
-tool_edit_mode.gif	\
-tool_ext.gif		\
-tool_float.gif		\
-tool_in.gif		\
-tool_int.gif		\
-tool_lock_mode.gif	\
-tool_mess.gif		\
-tool_out.gif		\
-tool_patcher.gif	\
-tool_slider.gif		\
-tool_text.gif		\
-tool_toggle.gif		\
-variable.gif		\
+io.html		\
+system.html	\
+hosttypes.html	\
 
 install:
-	$(INSTALL_DIR) $(doc_install_dir)/images
-	for f in $(FILES_TO_INSTALL) ; do $(INSTALL_DATA) $$f $(doc_install_dir)/images ; done
+	$(INSTALL_DIR) $(doc_install_dir)/user/config
+	for f in $(FILES_TO_INSTALL) ; do $(INSTALL_DATA) $$f $(doc_install_dir)/user/config ; done
 .PHONY: install
 
 # remove the files copied by make install ?
