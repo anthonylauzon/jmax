@@ -138,7 +138,8 @@ public class Selecter extends InteractionModule implements XORPainter {
     tempRect.setBounds(startSelection.x, startSelection.y, movingPoint.x-startSelection.x, movingPoint.y-startSelection.y);
     normalizeRectangle(tempRect);
 
-    itsRunningG.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
+    if((tempRect.width>=2)||(tempRect.height>=2)) 
+	itsRunningG.drawRect(tempRect.x, tempRect.y, tempRect.width, tempRect.height);
 
     itsRunningG.setPaintMode();
     itsRunningG.setColor(Color.black);
