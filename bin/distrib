@@ -1,2 +1,3 @@
 all	all	jmax
 all	all	jmax-make-abstraction-index
+src	all	jmax-make-dirs

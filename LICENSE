@@ -8,8 +8,11 @@ All rights reserved.
 This license (the "License") contains terms related to the use by
 you (the "Licensee") of this distribution of jMax (the "Software").
 
-1) Ircam grants the Licensee a non-exclusive license to use the Software
-for non-commercial use.
+1) Ircam grants the Licensee a non-exclusive license to use and copy
+the Software and its documentation for educational, research, and
+not-for-profit purposes without fee and without a signed licensing
+agreement provided that the above copyright notice and these license
+conditions appear in all copies.
 
 2) Ircam grants the Licensee the rights to redistribute the Software as
 long as the following conditions are met: 1. The Software is left
@@ -21,7 +24,8 @@ transfer.
 
 4) Licensee may terminate this License at any time. This License will
 terminate immediately and without notice if Licensee fails to respect
-the terms of this License.
+the terms of this License. In case of termination, the software and its
+documentation can no longer be used by Licensee.
 
 6) DISCLAIMER OF WARRANTY: THE SOFTWARE IS PROVIDED "AS IS" AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE

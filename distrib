@@ -1,6 +1,7 @@
 all		all	INSTALL.sh
 free		all	LICENSE
 free-light	all	LICENSE
+src		all	Makefile
 all		all 	README
 all		all	VERSION
 all		all	bin
@@ -12,4 +13,5 @@ all		all	images
 all		all	java
 all		all	packages
 all		all	tcl
+src		all	tests
 

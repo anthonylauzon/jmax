@@ -28,15 +28,19 @@ help ()
     cat >&2 << HELP_EOF
 
 Usage:
-    jmax-tar-distrib -type <type> -arch <arch>
+    jmax-tar-distrib -type <type> -arch <arch> [-dest <file>] [-tmp <dir>]
 
-Creates the tar file of jMax distribution for architecture <arch> and type <type>.
+Creates tar file of jMax distribution for architecture <arch> and type <type>.
 
 Options:
   -type <type>                 (mandatory)
-    defines the type of the release (free, forum, ...)
+    create release type <type> (free, ircam, src, ...)
   -arch <arch>                 (mandatory)
-    defines the architecture of the release (origin, linuxpc, ...)
+    create release for architecture <arch> (sgi, linuxpc, ...)
+  -dest <file>                 (optional)
+    creates tar file <file>.
+  -tmp <dir>                   (optional)
+    use <dir> as temporary directory. Defaults to /tmp
 
 HELP_EOF
 }
@@ -47,16 +51,15 @@ decrypt_options ()
     OPT="none"
     ARCH="none"
     TYPE="none"
-    TAR="tar"
-    TARFILE="none"
-    ROOTDIR="none"
+    DEST_FILE="none"
+    TMP="/tmp"
 
     for ARG in $@
     do
 	if [ $OPT = "none" ]
 	then
 	    case $ARG in
-	    \-arch | \-tar | \-type )
+	    \-arch | \-type | \-dest | \-tmp )
 		OPT=$ARG ;;
 	    *)
 		help ;
@@ -68,8 +71,10 @@ decrypt_options ()
 		ARCH=$ARG ;;
 	    \-type )
 		TYPE=$ARG ;;
-	    \-tar )
-		TAR=$ARG ;;
+	    \-tmp )
+		TMP=$ARG ;;
+	    \-dest )
+		DEST_FILE=$ARG ;;
 	    esac
 	    OPT="none";
 	fi
@@ -97,13 +102,6 @@ check_options ()
 	exit 1
     fi
 
-    #if $TAR --version | grep -s GNU >/dev/null 
-    #then
-    #    echo > /dev/null
-    #else
-    #    echo $TAR is not GNU tar. Cannot use it!
-    #    exit 2
-    #fi
 }
 
 # ---------------------------------------------------------------------------
@@ -119,24 +117,19 @@ compute_version_number ()
 # ---------------------------------------------------------------------------
 create_dest_dir()
 {
-    if [ _${TMP}_ = __ ]
-    then
-	TMP=/tmp
-    fi
-
-    DEST_DIR=${TMP}/max-${VERSION}
+    DEST_DIR=${TMP}/$$/max-${VERSION}
     if [ -d ${DEST_DIR} ]
     then
 	/bin/rm -rf ${DEST_DIR}
     fi
-    mkdir ${DEST_DIR}
+    mkdir -p ${DEST_DIR}
     chmod 755 ${DEST_DIR}
 }
 
 # ---------------------------------------------------------------------------
 remove_dest_dir()
 {
-    /bin/rm -rf ${DEST_DIR}
+    /bin/rm -rf ${TMP}/$$
 }
 
 
@@ -216,26 +209,34 @@ copy_files ()
 # Create the tar file
 create_tar ()
 {
-    TARDIR=${RELEASES_DIR}/${VERSION}
-    if [ ! -d ${TARDIR} ]
+    if [ $DEST_FILE != "none" ]
     then
-	mkdir -p ${TARDIR}
-    fi
-    if [ ! -w ${TARDIR} ]
-    then
-	chmod u+w ${TARDIR}
-    fi
+	echo "Creating tar file $DEST_FILE"
+	(cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $DEST_FILE
+    else
+	TARDIR=${RELEASES_DIR}/${VERSION}
+	if [ ! -d ${TARDIR} ]
+	then
+	    mkdir -p ${TARDIR}
+	fi
+	if [ ! -w ${TARDIR} ]
+	then
+	    chmod u+w ${TARDIR}
+	fi
 
-    TARFILE=${TARDIR}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
-    if [ ! -w ${TARFILE} ]
-    then
-	chmod u+w ${TARFILE}
-    fi
+	TARFILE=${TARDIR}/jmax.${TYPE}.${ARCH}.${VERSION}.tar.gz
 
-    echo "Creating tar file $TARFILE"
-    (cd ${TMP} ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
-    chmod 444 ${TARFILE}
-    chmod 555 ${TARDIR}
+	if [ ! -w ${TARFILE} ]
+	then
+	    chmod u+w ${TARFILE}
+	fi
+
+	echo "Creating tar file $TARFILE"
+	(cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION} ) | gzip -9 > $TARFILE
+
+	chmod 444 ${TARFILE}
+	chmod 555 ${TARDIR}
+    fi
 }
 
 # ***************************************************************************
