@@ -26,7 +26,6 @@ proc _doSourceFile {dir file} {
 }
 
 
-## 
 ## A default implementation of the browse command
 ## so that the kernel code can call it
 ##

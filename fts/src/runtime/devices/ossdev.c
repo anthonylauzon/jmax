@@ -140,10 +140,12 @@ static void oss_audio_set_parameters()
    set the dac_opened/adc_opened fields in the right
    status and call the following function; work also
    to close the unix device.
+
+   Return 0 in case of success, -1 in case of errors in opening.
   */
 
 
-static void
+static int
 oss_audiodev_update_device()
 {
   if (oss_audio_data.device_opened)
@@ -154,23 +156,59 @@ oss_audiodev_update_device()
 
   if (oss_audio_data.dac_opened && oss_audio_data.adc_opened)
     {
-      oss_audio_data.fd = open(AUDIO_DEVICE, O_RDWR, 0);
-      oss_audio_set_parameters();
-      oss_audio_data.device_opened = 1;
+      int fd;
+
+      fd = open(AUDIO_DEVICE, O_RDWR, 0);
+
+      if (fd >= 0)
+	{
+	  oss_audio_data.fd = fd;
+	  oss_audio_set_parameters();
+	  oss_audio_data.device_opened = 1;
+	}
+      else
+	{
+	  fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
+	  return -1;
+	}
     }
   else
     {
       if (oss_audio_data.dac_opened)
 	{
-	  oss_audio_data.fd = open(AUDIO_DEVICE, O_WRONLY, 0);
-	  oss_audio_set_parameters();
-	  oss_audio_data.device_opened = 1;
+	  int fd;
+
+	  fd = open(AUDIO_DEVICE, O_RDWR, 0);
+
+	  if (fd >= 0)
+	    {
+	      oss_audio_data.fd = open(AUDIO_DEVICE, O_WRONLY, 0);
+	      oss_audio_set_parameters();
+	      oss_audio_data.device_opened = 1;
+	    }
+	  else
+	    {
+	      fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
+	      return -1;
+	    }
 	}
       else if (oss_audio_data.adc_opened)
 	{
-	  oss_audio_data.fd = open(AUDIO_DEVICE, O_RDONLY, 0);
-	  oss_audio_set_parameters();
-	  oss_audio_data.device_opened = 1;
+	  int fd;
+
+	  fd = open(AUDIO_DEVICE, O_RDWR, 0);
+
+	  if (fd >= 0)
+	    {
+	      oss_audio_data.fd = open(AUDIO_DEVICE, O_RDONLY, 0);
+	      oss_audio_set_parameters();
+	      oss_audio_data.device_opened = 1;
+	    }
+	  else
+	    {
+	      fprintf(stderr, "Error opening OSS device: %s\n", strerror(errno));
+	      return -1;
+	    }
 	}
     }
 }
@@ -253,15 +291,19 @@ oss_dac_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Parameter parsing  */
   
-  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100);
-  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 1024);
-  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 8);
+  oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100.);
+  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 128);
+  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 4);
 
   /* open the device */
 
   oss_audio_data.dac_opened = 1;
 
-  oss_audiodev_update_device();
+  if (oss_audiodev_update_device())
+    {
+      oss_audio_data.dac_opened = 0;
+      return &fts_dev_open_error;
+    }
 
   /* Allocate the DAC  formatting buffer */
 
@@ -367,12 +409,18 @@ oss_adc_open(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   /* Parameter parsing  */
 
   oss_audio_data.sampling_rate = (int) fts_param_get_float(fts_s_sampling_rate, 44100);  
+  oss_audio_data.fragment_size = fts_get_int_by_name(nargs, args, fts_new_symbol("fragment_size"), 128);
+  oss_audio_data.max_fragments = fts_get_int_by_name(nargs, args, fts_new_symbol("max_fragments"), 4);
 
   /* open the device */
 
   oss_audio_data.adc_opened = 1;
 
-  oss_audiodev_update_device();
+  if (oss_audiodev_update_device())
+    {
+      oss_audio_data.adc_opened = 0;
+      return &fts_dev_open_error;
+    }
 
   /* Allocate the ADC  formatting buffer */
 

@@ -1,4 +1,4 @@
-set jmaxHostArch linuxpc
+set jmaxArch linuxpc
 
 defineDevice analogIn  { oss_adc } "OSS audio in"
 defineDevice analogOut { oss_dac } "OSS audio out"

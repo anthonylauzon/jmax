@@ -30,7 +30,7 @@ typedef struct fts_atom_array    fts_atom_array_t;
 typedef struct fts_plist                 fts_plist_t;
 
 typedef enum fts_daemon_action {
-  obj_property_put, obj_property_get, obj_property_remove, 
+  obj_property_put, obj_property_get, obj_property_remove
 } fts_daemon_action_t;
 
 

@@ -38,4 +38,3 @@ if {[systemProperty "jmaxHostType"] != ""} then {
     }
 }
 
-
