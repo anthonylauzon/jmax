@@ -65,7 +65,7 @@ version.c \
 parser.y \
 tokenizer.l
 
-
+BUILT_SOURCES=parser.h
 noinst_HEADERS= parser.h
 
 bin_PROGRAMS=fts
@@ -82,4 +82,5 @@ AM_CFLAGS=
 # explicit dependency between expression.c and parser.h 
 # for first checkout
 expression.c: parser.h
+
 
