@@ -365,10 +365,10 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
 
   /** execute the watch all */
 
-  void callWatchAll(String property, Object value)
+  void callWatchAll(String property, Object value, Object author)
   {
     if (containerPropertyHandlerTable != null)
-      containerPropertyHandlerTable.callHandlers(property, value);
+      containerPropertyHandlerTable.callHandlers(property, value, author);
   }
 
   /** The Tcl eval for an object; just eval the script, but handle

@@ -221,9 +221,9 @@ abstract public class FtsObject implements MaxTclInterpreter
 	table.addElement(this);
       }
 
-      void callHandler(String name, Object value)
+      void callHandler(String name, Object value, Object author)
       {
-	if (name.equals(this.name))
+	if (name.equals(this.name) && (handler != author))
 	  handler.propertyChanged(FtsObject.this, name, value);
       }
     }
@@ -271,10 +271,10 @@ abstract public class FtsObject implements MaxTclInterpreter
       new PropertyHandlerEntry(property, handler, owner);
     }
 
-    synchronized void callHandlers(String name, Object value)
+    synchronized void callHandlers(String name, Object value, Object author)
     {
       for (int i = 0; i < table.size(); i++)
-	((PropertyHandlerEntry) table.elementAt(i)).callHandler(name, value);
+	((PropertyHandlerEntry) table.elementAt(i)).callHandler(name, value, author);
     }
   }
 
@@ -308,15 +308,30 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void put(String name, int value)
   {
-    put(name, new Integer(value));
+    put(name, new Integer(value), null);
   }
 
   public void put(String name, float value)
   {
-    put(name, new Float(value));
+    put(name, new Float(value), null);
   }
 
   public void put(String name, Object value)
+  {
+    put(name, value, null);
+  }
+
+  public void put(String name, int value, Object author)
+  {
+    put(name, new Integer(value), author);
+  }
+
+  public void put(String name, float value, Object author)
+  {
+    put(name, new Float(value), author);
+  }
+
+  public void put(String name, Object value, Object author)
   {
     Object old;
 
@@ -329,7 +344,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
 	Fts.getServer().putObjectProperty(this, name, value);
 
-	localPut(name, value);
+	localPut(name, value, author);
       }
   }
 
@@ -438,8 +453,12 @@ abstract public class FtsObject implements MaxTclInterpreter
   /** Local put is a version of put that do not send
     values to FTS.
     */
-
   void localPut(String name, Object value)
+  {
+    localPut(name, value, null);
+  }
+
+  void localPut(String name, Object value, Object author)
   {
     // local and hardcoded properties
 
@@ -473,12 +492,12 @@ abstract public class FtsObject implements MaxTclInterpreter
     // Call the handlers 
 
     if (propertyHandlerTable != null)
-      propertyHandlerTable.callHandlers(name, value);
+      propertyHandlerTable.callHandlers(name, value, author);
 
     // Call the handlers in the parent
 
     if (parent != null)
-      parent.callWatchAll(name, value);
+      parent.callWatchAll(name, value, author);
   }
 
 
