@@ -17,7 +17,7 @@ classes:
 	cd ..\java\src\ircam\jmax
 
 	cd guiobj
-	$(JAVAC) -classpath ..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\java\jacl.jar;..\..\..\..\..\..\..\java\tcljava.jar;..\..\..\..\classes;..\..\..\..\src -d ..\..\..\..\classes *.java
+	$(JAVAC) -classpath ..\..\..\..\..\..\..\java\jmax.jar;..\..\..\..\..\..\..\java\lib\jacl\jacl.jar;..\..\..\..\..\..\..\java\lib\jacl\tcljava.jar;..\..\..\..\classes;..\..\..\..\src -d ..\..\..\..\classes *.java
 	-@cd ..
 
 	cd ..\..\..\..\winbuild
