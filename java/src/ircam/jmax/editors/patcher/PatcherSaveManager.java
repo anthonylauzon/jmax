@@ -73,8 +73,12 @@ public class PatcherSaveManager
       return false;
     
     String path = file.getAbsolutePath();
-    if( ! path.endsWith(".jmax"))
+    
+    if((MaxFileChooser.getSaveType() == MaxFileChooser.JMAX_FILE_TYPE) && ! path.endsWith(".jmax"))
       file = new File( path+".jmax");
+    else
+      if((MaxFileChooser.getSaveType() == MaxFileChooser.PAT_FILE_TYPE) && ! path.endsWith(".pat"))
+	file = new File( path+".pat");
 
     if (file.exists())
       {
