@@ -118,7 +118,7 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 /* Aux functions  for file building */
 
 static int
-fts_bmax_find_objidx_from_selection(fts_object_t *obj, fts_selection_t *sel)
+fts_bmax_find_objidx_in_selection(fts_object_t *obj, fts_selection_t *sel)
 {
   /* As object idx, i.e. the location where to store
      the object in the object frame, we compute the

@@ -1,10 +1,7 @@
 package ircam.jmax.fts;
 
-import tcl.lang.*;
-
 import java.io.*;
 import java.util.*;
-
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;

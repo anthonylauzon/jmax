@@ -285,6 +285,18 @@ abstract public class FtsContainerObject extends FtsObject implements MaxData, F
     downLoaded = true;
   }
 
+  /**
+   * Download the patcher content; if it was already downloaded, 
+   * actually do an incremental download of new objects
+   */
+
+  final void redownload()
+  {
+    Fts.getServer().sendDownloadPatcher(this);
+    Fts.getServer().syncToFts();
+    downLoaded = true;
+  }
+
   /** Call this method to tell the application layer
     that this object has been created from the editor,
     and so it is implicitly downloaded (i.e. consistent

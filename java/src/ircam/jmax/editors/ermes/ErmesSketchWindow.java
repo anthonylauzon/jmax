@@ -333,9 +333,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
     //fill the systemClipboard AND the FtsClipboard
 
-    Vector arg = new Vector();
-    arg.addElement(Fts.getSelection());
-    ErmesSketchPad.ftsClipboard.sendMessage(-1, "copy", arg);
+    itsSketchPad.ftsClipboard.copy(Fts.getSelection());
 
     /*itsClipboardProvider.addSelection(Fts.getSelection());*/
     MaxApplication.systemClipboard.setContents(itsClipboardProvider, itsClipboardProvider);
@@ -355,9 +353,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsPatcher.watch("newObject", this);
     itsPatcher.watch("newConnection", this);
 
-    Vector arg = new Vector();
-    arg.addElement(this);
-    ErmesSketchPad.ftsClipboard.sendMessage(-1, "paste", arg);
+    itsSketchPad.ftsClipboard.paste(itsPatcher);
 
     itsPatcher.removeWatch("newObject", this);    
     itsPatcher.removeWatch("newConnection", this);    

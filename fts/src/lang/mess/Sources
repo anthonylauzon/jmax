@@ -17,6 +17,6 @@ voidobj.c       \
 patlex.c        \
 patabs.c        \
 patparser.c     \
-selection.c
-
+selection.c     \
+clipboard.c
 

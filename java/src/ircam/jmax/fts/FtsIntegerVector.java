@@ -1,6 +1,8 @@
 package ircam.jmax.fts;
 
 import java.io.*;
+import java.util.*;
+
 import ircam.jmax.mda.*;
 import ircam.jmax.utils.*;
 
@@ -103,7 +105,7 @@ public class FtsIntegerVector implements FtsDataObject
   {
     if (object != null)
       {
-	Fts.getServer().sendObjectMessage(object, -1, "update", null);
+	Fts.getServer().sendObjectMessage(object, -1, "update", (Vector) null);
 	Fts.getServer().syncToFts();
       }
   }

@@ -83,8 +83,6 @@ public class FtsConnection
 
   public void delete()
   {
-    System.err.println("Connection delete " + this);
-
     if (deleted)
       return;
 

@@ -62,6 +62,10 @@ public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
     FtsObject patcher;
     int id;
 
+    // Load the environement file if needed
+
+    MaxEnv.loadEnvFileFor(file);
+
     // Build an empty patcher son of root.
 
     server = Fts.getServer();

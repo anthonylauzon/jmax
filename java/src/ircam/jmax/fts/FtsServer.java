@@ -479,6 +479,27 @@ public class FtsServer
       }
   }
 
+  /** Send an "object message" with a unique FtsObject argument  to FTS.*/
+
+  final void sendObjectMessage(FtsObject dst, int inlet, String selector, FtsObject arg)
+  {
+    if (FtsServer.debug)
+      System.err.println("sendObjectMessage(" + dst + ", " + inlet + ", " + selector + ", " + arg + ")");
+
+    try
+      {
+	port.sendCmd(FtsClientProtocol.fts_message_cmd);
+	port.sendObject(dst);
+	port.sendInt(inlet);
+	port.sendString(selector);
+	port.sendObject(arg);
+	port.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+      }
+  }
+
 
   /** Send set" messages to the system inlet 0 of an FTS object with as arguments elements
     from an int arrays

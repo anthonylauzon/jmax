@@ -412,8 +412,6 @@ fts_client_parse_char(char c)
 
 	    fts_set_connection(&(parser.av[parser.ac]), fts_connection_table_get(id));
 
-	    fprintf(stderr, "Got connection Id %d, connection %lx\n", id, fts_get_connection(&(parser.av[parser.ac])));
-
 	    (parser.ac)++;
 
 	    if (parser.ac >= MAX_NARGS) 

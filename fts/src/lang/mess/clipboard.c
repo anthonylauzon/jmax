@@ -17,17 +17,17 @@ typedef struct
 
   fts_symbol_t file;
 
-} clipboard_t;
+} fts_clipboard_t;
 
 
 static void
 clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  char *name;
+  const char *name;
   char buf[1024];
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-  if (at == 1)
+  if (ac == 1)
     name = "clipboard";
   else
     name = fts_symbol_name(fts_get_symbol(at));
@@ -42,7 +42,7 @@ clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
-  fts_binary_file_load(fts_symbol_file(this->file), fts_get_object(at));
+  fts_binary_file_load(fts_symbol_name(this->file), fts_get_object(at));
 }
 
 
@@ -71,7 +71,7 @@ clipboard_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 
   /* initialize the class */
 
-  fts_class_init(cl, sizeof(clipboard_t), 0, 0, 0); 
+  fts_class_init(cl, sizeof(fts_clipboard_t), 0, 0, 0); 
 
   a[0] = fts_s_symbol;
   a[1] = fts_s_symbol;

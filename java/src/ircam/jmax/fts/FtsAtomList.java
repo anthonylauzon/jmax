@@ -97,7 +97,7 @@ public class FtsAtomList implements FtsDataObject
   {
     if (object != null)
       {
-	Fts.getServer().sendObjectMessage(object, -1, "update", null);
+	Fts.getServer().sendObjectMessage(object, -1, "update", (Vector) null);
 	Fts.getServer().syncToFts();
       }
   }

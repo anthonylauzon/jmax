@@ -63,6 +63,10 @@ public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
     File file = ((MaxFileDocumentSource) source).getFile();
     FtsObject patcher;
     int id;
+    
+    // Load the environment file if needed 
+
+    MaxEnv.loadEnvFileFor(file);
 
     server = Fts.getServer();
     id = server.getNewObjectId();

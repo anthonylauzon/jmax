@@ -164,6 +164,8 @@ abstract public class FtsObject implements MaxTclInterpreter
       obj = new FtsValueObject(parent, className, makeDescription(2, msg), objId);
     else if (className.equals("__selection"))
       obj = new FtsSelection(parent, className, "__selection", objId);
+    else if (className.equals("__clipboard"))
+      obj = new FtsClipboard(parent, className, "__clipboard", objId);
     else
       obj = new FtsStandardObject(parent, className, makeDescription(2, msg), objId);
 

@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.7 $ IRCAM $Date: 1998/04/22 20:27:45 $
+ *      $Revision: 1.8 $ IRCAM $Date: 1998/05/13 16:04:32 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -73,6 +73,10 @@ fts_mess_init(void)
   /* Create the selection class */
 
   fts_selection_config();
+
+  /* Create the selection class */
+
+  fts_clipboard_config();
 
   /* Initialize the .pat abstraction subsystem */
   
