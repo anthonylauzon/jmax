@@ -212,8 +212,8 @@ mat_copy(mat_t *org, mat_t *copy)
   
   mat_set_size(copy, org->m, org->n);
   
-  for(i=0; i<m*n; i++)
-    copy->data[i] = org->data[i];
+  for (i = 0; i < m * n; i++)
+    fts_atom_assign(copy->data + i, org->data + i);
 }
 
 
@@ -692,13 +692,13 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s,
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
 
-  if(pos < 0)        pos = 0;
-  else if(pos > m)   pos = m;
+  if      (pos < 0)   pos = 0;
+  else if (pos > m)   pos = m;
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if(numrows <= 0) return; /* nothing to append */
+  if (numrows <= 0) return; /* nothing to append */
 
   /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m + numrows, n);
@@ -727,6 +727,7 @@ mat_insert_rows (fts_object_t *o, int winlet, fts_symbol_t s,
   fts_object_set_state_dirty(o);
 }
 
+
 /** insert @p num rows of atoms at row @p pos
 *  may insert num rows behind last row m --> append num rows
 *
@@ -754,27 +755,27 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
-  if(pos < 0)   pos = 0;
-  else if(pos > n) pos = n;
+  if      (pos < 0)  pos = 0;
+  else if (pos > n)  pos = n;
   
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)      return; /* nothing to append */
+  if (numcols <= 0)      return; /* nothing to append */
   
   /* make space, may change ptr, sets new atoms at the end to void */
   mat_set_size(self, m, n + numcols);
   new_n = n+numcols;
   
   /* move rows */
-  start = (m-1)*new_n + pos;
+  start  = (m-1) * new_n + pos;
   tomove = new_n-pos-numcols;
   
-  for(i = 0; i < m; i++)
+  for (i = 0; i < m; i++)
   {
-    for(j=tomove-1; j >= 0; j--)
+    for (j = tomove - 1; j >= 0; j--)
       self->data[start+j+numcols] = self->data[start+j];
-    for(j = 0; j < numcols; j++)
+    for (j = 0; j < numcols; j++)
       fts_set_int(&self->data[start + j], 0);
     start = start - new_n;
   }
@@ -785,6 +786,7 @@ mat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   
   fts_object_set_state_dirty(o);
 }
+
 
 static void
 mat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -800,21 +802,21 @@ mat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
-  if(pos < 0)   pos = 0;
-  else if(pos > n) pos = n;
+  if      (pos < 0)  pos = 0;
+  else if (pos > n)  pos = n;
   
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)      return; /* nothing to append */
+  if (numcols <= 0)      return; /* nothing to append */
   
   /* move rows */
-  start = pos + numcols;
+  start  = pos + numcols;
   tomove = n-pos-numcols;
   
   for(i = 0; i < m; i++)
   {
-    for(j=0; j < tomove; j++)
+    for (j = 0; j < tomove; j++)
       self->data[start-numcols+j] = self->data[start+j];
     start = start + n;
   }
@@ -915,6 +917,7 @@ mat_return_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_return(&t);
 }
 
+
 static void
 mat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -954,6 +957,7 @@ mat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   }
 }
 
+
 static void
 mat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -968,6 +972,7 @@ mat_return_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
       fts_return(mat_get_element(self, i, j));
   }
 }
+
 
 static void
 mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1003,6 +1008,7 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_post("mat: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
 }
 
+
 static void
 mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1029,6 +1035,7 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   else
     fts_post("mat: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
 }
+
 
 static void
 mat_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1393,6 +1400,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_set_equals_function(cl, mat_equals_function);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
+  fts_class_message        (cl, fts_s_set, mat_type,     mat_set_from_instance);
   
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
@@ -1435,7 +1443,7 @@ mat_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, mat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)>]] | \n    [<tuple: { one row of init values }> ...]", "matrix of atoms");
   fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set matrix values at given index");
-  fts_class_doc(cl, fts_s_set_from_instance, "<mat: other>", "set from mat instance");
+  fts_class_doc(cl, fts_s_set, "<mat: other>", "set from mat instance");
   fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row");
 
   fts_class_doc(cl, fts_s_append, "<list: values>", "append row of atoms (up to given number of columns)");
