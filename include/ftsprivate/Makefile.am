@@ -5,6 +5,7 @@ audioconfig.h \
 bmaxfile.h \
 class.h \
 client.h \
+clientmanager.h \
 connection.h \
 config.h \
 dsp.h \
