@@ -82,10 +82,10 @@ public class SilkInterpreter extends SchemeInterpreter
 	super();
 	itsInterp = new Scheme(null);
 
-	//schemeEnvironment = new Environment();
-	schemeEnvironment = new SettingsEnvironment();
+	schemeEnvironment = new Environment();
+	//schemeEnvironment = new SettingsEnvironment();
 	setCurrentEnvironment(schemeEnvironment);
-	define("these-settings", schemeEnvironment);
+	//define("these-settings", schemeEnvironment);
 
 	Primitive.installPrimitives(schemeEnvironment); 
 	load(new InputPort(new StringReader(SchemePrimitives.CODE)));
