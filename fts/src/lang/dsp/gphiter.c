@@ -82,20 +82,43 @@ static int graph_iterator_is_object_already_in_stack( graph_iterator_t *iter, ft
   return 0;
 }
 
-static void graph_iterator_handle_special_object( fts_connection_t *connection, fts_object_t **new_object, int *outlet)
+static void handle_connection_to_system_object( graph_iterator_t *iter, fts_connection_t *connection)
 {
-  fts_object_t *special_object;
+  fts_object_t *system_object, *newobject;
 
-  special_object = connection->dst;
-  if (fts_object_is_patcher( special_object))
+  system_object = connection->dst;
+
+  if (fts_object_is_patcher( system_object))
     {
-      *new_object = fts_patcher_get_inlet( special_object, connection->winlet);
-      *outlet = 0;
+      newobject = fts_patcher_get_inlet( system_object, connection->winlet);
+      if (newobject == 0)
+	{
+	  fprintf( stderr, "Warning (gphiter.c): patcher without inlet...\n");
+	  return;
+	}
+
+      if (!graph_iterator_is_object_already_in_stack( iter, newobject))
+	graph_iterator_push( iter, newobject, 0);
     }
-  else if (fts_object_is_outlet( special_object))
+  else if (fts_object_is_outlet( system_object))
     {
-      *new_object = (fts_object_t *)fts_object_get_patcher( special_object);
-      *outlet = ((fts_outlet_t *)special_object)->position;
+      newobject = (fts_object_t *)fts_object_get_patcher( system_object);
+
+      if (!graph_iterator_is_object_already_in_stack( iter, newobject))
+	graph_iterator_push( iter, newobject, ((fts_outlet_t *)system_object)->position);
+    }
+  else if (fts_object_is_send( system_object))
+    {
+      fts_object_t *rcvobject;
+
+      rcvobject = fts_send_get_first_receive( system_object);
+      while ( rcvobject)
+	{
+	  if (!graph_iterator_is_object_already_in_stack( iter, rcvobject))
+	    graph_iterator_push( iter, rcvobject, 0);
+
+	  rcvobject = fts_receive_get_next_receive( rcvobject);
+	}
     }
 }
 
@@ -110,10 +133,11 @@ static void graph_iterator_pop( graph_iterator_t *iter)
   iter->top = next;
 }
 
-static int is_special_object( fts_object_t *obj)
+static int is_system_object( fts_object_t *obj)
 {
   return fts_object_is_patcher(obj) 
-    || fts_object_is_outlet(obj);
+    || fts_object_is_outlet(obj)
+    || fts_object_is_send(obj);
 }
 
 static void graph_iterator_step( graph_iterator_t *iter)
@@ -127,20 +151,16 @@ static void graph_iterator_step( graph_iterator_t *iter)
 
       graph_iterator_step( iter);
     }
-  else if ( is_special_object( iter->top->connection->dst))
+  else if ( is_system_object( iter->top->connection->dst))
     {
-      fts_object_t *replacement_object;
-      int outlet;
+      stack_element_t *oldtop;
 
-      graph_iterator_handle_special_object( iter->top->connection, &replacement_object, &outlet);
+      oldtop = iter->top;
 
-      if ( !replacement_object)
-	return;
+      handle_connection_to_system_object( iter, iter->top->connection);
 
-      iter->top->connection = iter->top->connection->next_same_src;
-
-      if (!graph_iterator_is_object_already_in_stack( iter, replacement_object))
-	graph_iterator_push( iter, replacement_object, outlet);
+      /* Advance to skip system object */
+      oldtop->connection = oldtop->connection->next_same_src;
 
       graph_iterator_step( iter);
     }

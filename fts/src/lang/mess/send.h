@@ -4,8 +4,8 @@
 extern fts_metaclass_t *fts_send_metaclass;
 extern fts_metaclass_t *fts_receive_metaclass;
 
-#define fts_object_is_send(o) ((o)->cl->mcl == send_metaclass)
-#define fts_object_is_receive(o) ((o)->cl->mcl == receive_metaclass)
+#define fts_object_is_send(o) ((o)->cl->mcl == fts_send_metaclass)
+#define fts_object_is_receive(o) ((o)->cl->mcl == fts_receive_metaclass)
 
 extern int fts_send_message_to_receives(fts_symbol_t name, fts_symbol_t selector, int ac, const fts_atom_t *at);
 extern int fts_receive_exists(fts_symbol_t name);

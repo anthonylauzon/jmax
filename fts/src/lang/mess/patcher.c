@@ -49,25 +49,6 @@ fts_metaclass_t *outlet_metaclass;
    by the patcher object on its outlet; for the DSP, they are like through.
 */
 
-#if 0
-static void
-inlet_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-
-  /* If the operation is a nop (i.e. a copy on the same buffer),
-     do not generate it */
-
-  if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
-    {
-      fts_set_symbol( argv,   fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol( argv+1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_long( argv+2, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
-    }
-}
-#endif
 /* function and method to reposition an inlet, without using redefinition (bad
    for properties !!)
    */
@@ -110,10 +91,6 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       
       this->position = -1;
     }
-
-#if 0
-  dsp_list_insert(o); /* put object in list */
-#endif
 }
 
 
@@ -125,10 +102,6 @@ inlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if ((this->position >= 0) && (this->position < fts_object_get_inlets_number((fts_object_t *)patcher)))
     patcher->inlets[this->position] = 0;
-
-#if 0
-  dsp_list_remove(o);
-#endif
 }
 
 
@@ -151,18 +124,6 @@ inlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_init,   inlet_init, 2, a);
 
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, inlet_delete, 0, 0);
-
-#if 0
-  /* Dsp for outlets/inlets is now handled by the compiler directly */
-
-  a[0] = fts_s_ptr; 
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, inlet_put, 1, a);
-
-
-  /* signal inlet (outlet is included to anything) */
-
-  dsp_sig_inlet(cl, 0);
-#endif
 
   return fts_Success;
 }
@@ -192,26 +153,6 @@ outlet_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_
 
   fts_outlet_send((fts_object_t *)patcher, this->position, s, ac, at);
 }
-
-#if 0
-static void
-outlet_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  fts_atom_t argv[3];
-  fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_ptr_arg(ac, at, 0, 0);
-
-  /* If the operation is a nop (i.e. a copy on the same buffer),
-     do not generate it */
-
-  if (fts_dsp_get_input_name(dsp, 0) != fts_dsp_get_output_name(dsp, 0))
-    {
-      fts_set_symbol( argv,   fts_dsp_get_input_name(dsp, 0));
-      fts_set_symbol( argv+1, fts_dsp_get_output_name(dsp, 0));
-      fts_set_long( argv+2, fts_dsp_get_input_size(dsp, 0));
-      dsp_add_funcall(ftl_sym.cpy.f, 3, argv);
-    }
-}
-#endif
 
 /* function to reposition an outlet, without using redefinition (bad
    for properties !!)
@@ -251,10 +192,6 @@ outlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
       this->position = -1;
     }
-
-#if 0
-  dsp_list_insert(o); /* put object in list */
-#endif
 }
 
 
@@ -266,10 +203,6 @@ outlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
   if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
     patcher->outlets[this->position] = 0;
-
-#if 0
-  dsp_list_remove(o);
-#endif
 }
 
 
@@ -295,13 +228,6 @@ outlet_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define(cl, fts_SystemInlet, fts_s_delete, outlet_delete, 0, 0);
 
   fts_method_define_varargs(cl, 0, fts_s_anything, outlet_anything);
-
-#if 0
-  /* Dsp for outlets/inlets is now handled by the compiler directly */
-
-  a[0] = fts_s_ptr; 
-  fts_method_define(cl, fts_SystemInlet, fts_s_put, outlet_put, 1, a);
-#endif
 
   /* signal inlet (inlet is included to anything) */
 
