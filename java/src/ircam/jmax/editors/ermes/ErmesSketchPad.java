@@ -36,6 +36,9 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   final static int FromOutToIn 	    = 1;
   final static int FromInToOut 	    = -1;
   final static int NoDirections     = 0;
+  final static int CENTER_JUSTIFICATION = 20;
+  final static int LEFT_JUSTIFICATION = 21;
+  final static int RIGHT_JUSTIFICATION = 22;
   public static int debug_count_update = 1;
   public static int debug_count_paint  = 1;
   public final static int DEBUG_COUNT  = 50;
@@ -46,6 +49,8 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
   public int sketchFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
   int SKETCH_WIDTH = 1200/*800*/;
   int SKETCH_HEIGHT = 1200/*800*/;
+
+  int itsJustificationMode = CENTER_JUSTIFICATION;
 
   int inCount = 0;   //ref count of ErmesObjIn objects (used if this is a subpatcher)
   int outCount = 0;  //the same for ErmesObjOut objects
@@ -262,6 +267,24 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
     ToSave();
     repaint();
   }
+
+  public void ChangeJustification(String theJustification){
+    if(theJustification.equals("Center")) itsJustificationMode = CENTER_JUSTIFICATION;
+    else if(theJustification.equals("Left")) itsJustificationMode = LEFT_JUSTIFICATION;
+    else if(theJustification.equals("Right")) itsJustificationMode = RIGHT_JUSTIFICATION;
+
+    ErmesObject aObject;
+    for (Enumeration e = itsSelectedList.elements(); e.hasMoreElements();) {
+      aObject = (ErmesObject) e.nextElement();
+      if((aObject instanceof ErmesObjEditableObject)||(aObject instanceof ErmesObjComment))
+	aObject.ChangeJustification(itsJustificationMode);
+    }
+    ToSave();
+    repaint();
+
+  }
+
+
 
   //--------------------------------------------------------
   //	ClickOnConnection

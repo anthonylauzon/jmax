@@ -188,10 +188,27 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
     String aString;
     int i=0;
     int insetY =(currentRect.height-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
-    for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-      aString = (String)e.nextElement();
-      theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2,itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-      i++;
+
+    if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }    
+    else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, itsX+WIDTH_DIFF-4, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }
+    else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-(WIDTH_DIFF-4), itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
     }
   }
 

@@ -50,6 +50,7 @@ import ircam.jmax.fts.*;
     itsSketchPad.GetEditField().setFont(itsFont);
     itsSketchPad.GetEditField().setText("");
     itsSketchPad.GetEditField().itsOwner = this; //redirect the only editable field to point here...
+    itsJustification = itsSketchPad.itsJustificationMode;
     currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
     Reshape(itsX, itsY, preferredSize.width, preferredSize.height);
     
@@ -70,6 +71,7 @@ import ircam.jmax.fts.*;
   public boolean Init(ErmesSketchPad theSketchPad, int x, int y, String args) {
     itsFont = itsSketchPad.sketchFont;
     itsFontMetrics = itsSketchPad.getFontMetrics(itsFont); //bugsgi*/
+    itsJustification = itsSketchPad.itsJustificationMode;
     FIELD_HEIGHT = itsFontMetrics.getHeight();
     preferredSize = new Dimension(70,FIELD_HEIGHT+2*HEIGHT_DIFF);
     super.Init(theSketchPad, x, y, args);

@@ -38,6 +38,7 @@ public class ErmesObject implements FtsPropertyHandler {
   boolean itsDragging = false;
   public Font itsFont = null;
   FontMetrics itsFontMetrics = null;
+  int itsJustification = ErmesSketchPad.CENTER_JUSTIFICATION;
   boolean itsResized = false;
   static Color itsUINormalColor = new Color(153, 204, 255);
   static Color itsUISelectedColor = new Color(51, 153, 204);
@@ -93,6 +94,11 @@ public class ErmesObject implements FtsPropertyHandler {
     ResizeToNewFont(itsFont);
   }
   
+  public void ChangeJustification(int theJustification) {
+    itsJustification = theJustification;
+  }
+
+
   void ResizeToNewFont(Font itsFont) {}
   
   public void Repaint()

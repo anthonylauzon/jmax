@@ -41,6 +41,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
 
   public Menu itsFileMenu;	
   public Menu itsEditMenu;	
+  public Menu itsJustificationMenu;
   public Menu itsFontMenu;	
   public Menu itsSizesMenu;	
   public Menu itsProjectMenu;	
@@ -48,6 +49,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
   public Menu itsSubWindowsMenu;
   CheckboxMenuItem itsCurrentSizesMenu;
   CheckboxMenuItem itsCurrentFontMenu;
+  CheckboxMenuItem itsCurrentJustificationMenu;
 
   boolean itsClosing = false;
   boolean itsChangingRunEditMode = false;
@@ -193,6 +195,10 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     return(theName.equals("8")|| theName.equals("9")||theName.equals("10")||theName.equals("12")||theName.equals("14")||theName.equals("18")||theName.equals("24")||theName.equals("36")||theName.equals("48"));
   }
 
+  private boolean IsInJustificationMenu(String theName) {
+    return(theName.equals("Left")|| theName.equals("Center")||theName.equals("Right"));
+  }
+
   private Menu CreateEditMenu() {
     MenuItem aMenuItem;
     CheckboxMenuItem aCheckItem;
@@ -260,6 +266,18 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       fontMenu.add(aCheckItem = new CheckboxMenuItem(aString));
       aCheckItem.addItemListener(this);
     }
+    fontMenu.add(new MenuItem("-"));
+    itsJustificationMenu = new Menu("Justification");
+    itsJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Left"));
+    aCheckItem.addItemListener(this);	     
+    itsJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Center"));
+    aCheckItem.addItemListener(this);	
+    aCheckItem.setState(true);
+    itsCurrentJustificationMenu = aCheckItem;
+    itsJustificationMenu.add(aCheckItem = new CheckboxMenuItem("Right"));
+    aCheckItem.addItemListener(this);	   
+    fontMenu.add(itsJustificationMenu);
+
     return fontMenu;
   }
 
@@ -674,6 +692,7 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
       if (IsInEditMenu(itemName)) EditMenuAction(aCheckItem, itemName);
       if (IsInFontMenu(itemName)) FontMenuAction(aCheckItem, itemName);
       if (IsInSizesMenu(itemName)) SizesMenuAction(aCheckItem, itemName);
+      if (IsInJustificationMenu(itemName)) JustificationMenuAction(aCheckItem, itemName);
     }
   }
 
@@ -923,6 +942,15 @@ public class ErmesSketchWindow extends Frame implements MaxWindow, KeyListener,F
     itsSketchPad.ChangeFont(new Font(itsSketchPad.sketchFont.getName(), itsSketchPad.sketchFont.getStyle(), fontSize));
     return true;
   }
+
+  private boolean JustificationMenuAction(MenuItem theMenuItem, String theString) {
+    itsCurrentJustificationMenu.setState(false);
+    itsSketchPad.ChangeJustification(theString);
+    itsCurrentJustificationMenu = (CheckboxMenuItem)theMenuItem;
+    itsCurrentJustificationMenu.setState(true);
+    return true;
+  }
+
 	
   ///////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////focusListener --inizio

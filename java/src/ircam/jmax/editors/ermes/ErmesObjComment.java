@@ -38,6 +38,7 @@ class ErmesObjComment extends ErmesObject {
     itsSketchPad.GetTextArea().setFont(itsFont);
     itsSketchPad.GetTextArea().setBackground(Color.white);
     itsSketchPad.GetTextArea().setText("");
+    itsJustification = itsSketchPad.itsJustificationMode;
     currentRect = new Rectangle();
     itsSketchPad.GetTextArea().itsOwner = this; //redirect the only editable field to point here...
     currentRect = new Rectangle(x, y, preferredSize.width, preferredSize.height);
@@ -212,10 +213,26 @@ class ErmesObjComment extends ErmesObject {
     String aString;
     int i=0;
     int insetY =(currentRect.height-itsFontMetrics.getHeight()*itsParsedTextVector.size())/2;//2
-    for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
-      aString = (String)e.nextElement();
-      theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2,itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
-      i++;
+    if(itsJustification == itsSketchPad.CENTER_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))/2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }    
+    else if(itsJustification == itsSketchPad.LEFT_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, itsX+2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
+    }
+    else if(itsJustification == itsSketchPad.RIGHT_JUSTIFICATION){
+      for (Enumeration e = itsParsedTextVector.elements(); e.hasMoreElements();) {
+	aString = (String)e.nextElement();
+	theGraphics.drawString(aString, itsX+(currentRect.width-itsFontMetrics.stringWidth(aString))-2, itsY+itsFontMetrics.getAscent()+insetY+itsFontMetrics.getHeight()*i);
+	i++;
+      }
     }
   }
   
