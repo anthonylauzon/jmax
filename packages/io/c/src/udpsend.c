@@ -83,8 +83,6 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   this->my_addr.sin_port = htons( port);
 
   protoencode_init( &this->encoder);
-
-  post( "Created udpsend object on port %d\n", port);
 }
 
 static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)

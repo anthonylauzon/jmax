@@ -115,8 +115,6 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
   port = fts_get_int_arg( ac, at, 1, 0);
 
-  post( "Created udpreceive object on port %d\n", port);
-
   this->socket = socket(AF_INET, SOCK_DGRAM, 0);
 
   if (this->socket == -1)
