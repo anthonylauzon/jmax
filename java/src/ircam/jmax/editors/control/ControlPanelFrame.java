@@ -65,7 +65,7 @@ public class ControlPanelFrame extends JFrame
 
     panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS));
 
-    dacSlipIndicator = new IndicatorWithMemory("Dac Slip");
+    dacSlipIndicator = new IndicatorWithMemory("Out of sync", "(dac slip...)");
     panel.add(dacSlipIndicator);
     new DspControlAdapter("dacSlip", control, dacSlipIndicator);
 
