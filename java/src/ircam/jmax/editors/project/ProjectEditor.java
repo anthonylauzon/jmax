@@ -97,20 +97,39 @@ public class ProjectEditor extends JFrame implements EditorContainer
 	FtsProject newProject = null;
 	String name = NewProjectDialog.getResultName();
 	String location = NewProjectDialog.getResultLocation();
-	
-	try{
-	  newProject = new FtsProject();
-	}
-	catch(IOException e)
+	String fileName = location+name;
+
+	if( ! NewProjectDialog.copyCurrentProject())
 	  {
-	    System.err.println("[ProjectEditor]: Error in FtsProject creation!");
-	    e.printStackTrace();
+	    try{
+	      newProject = new FtsProject();
+	    }
+	    catch(IOException e)
+	      {
+		System.err.println("[ProjectEditor]: Error in FtsProject creation!");
+		e.printStackTrace();
+	      }
+	    newProject.save( fileName);
+	    newProject.setFileName( fileName);
+	    newProject.setDir( location);	
+	    JMaxApplication.setCurrentProject( newProject);
+	    newProject.setAsCurrentProject();
 	  }
-	newProject.save( location+name);
-	newProject.setFileName( location+name);
-	newProject.setDir( location);	
-	JMaxApplication.setCurrentProject( newProject);
-	newProject.setAsCurrentProject();
+	else
+	  {
+	    /* save a copy of current project */
+	    JMaxApplication.getProject().save( fileName);
+	    
+	    /* load the copy */
+	    try
+	      {	
+		JMaxApplication.loadProject( fileName);
+	      }
+	    catch(IOException e)
+	      {
+		System.err.println("[ProjectEditor]: I/O error loading project "+fileName);
+	      }
+	  }
       }
   }
 

@@ -1607,6 +1607,8 @@ fts_package_new(fts_symbol_t name)
 void 
 fts_package_delete(fts_package_t* pkg)
 {
+  fts_client_send_message( (fts_object_t *)pkg, fts_s_destroyEditor, 0, 0);
+
   if( ((fts_object_t *)pkg)->patcher)
     {
       fts_patcher_remove_object( ((fts_object_t *)pkg)->patcher, (fts_object_t *)pkg);

@@ -63,7 +63,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
   private JMenu itsWindowsMenu;
   private TextMenu itsTextMenu;
   private JMenu itsHelpMenu;
-
+  private JMenuBar mb; 
   // ------ editorContainer interface ---------------
 
   public Editor getEditor(){
@@ -193,7 +193,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
   private final void makeMenuBar(){
     
-    JMenuBar mb = new JMenuBar();
+    mb = new JMenuBar();
 
     // Build the file menu
     itsFileMenu = new FileMenu(itsSketchPad); 
@@ -309,16 +309,17 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
     MaxWindowManager.getWindowManager().removeWindow(this);
   }
 
-    public void setCursor(Cursor cursor)
-    {
-	super.setCursor(cursor);
-	itsSketchPad.setCursor(cursor);
-    }
+  public void setCursor(Cursor cursor)
+  {
+    super.setCursor(cursor);
+    itsSketchPad.setCursor(cursor);
+  }
 
   public ErmesSketchPad getSketchPad()
   {
     return itsSketchPad;
   }
+
   /****************************************************************************/
   /*                                                                          */
   /*           LISTENERS                                                      */

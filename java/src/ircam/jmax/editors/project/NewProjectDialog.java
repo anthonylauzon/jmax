@@ -25,17 +25,7 @@
 
 package ircam.jmax.editors.project;
 
-// import javax.swing.*;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -67,7 +57,7 @@ public class NewProjectDialog extends JDialog
     titlePanel.add( titleLabel);
     titlePanel.add( Box.createHorizontalGlue());
 
-    //Create Project Name section.
+    /****************  Project Name ***************************************/
     JPanel namePanel = new JPanel();    
     namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.X_AXIS));
     namePanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEmptyBorder(), 
@@ -83,7 +73,7 @@ public class NewProjectDialog extends JDialog
     nameField.setMaximumSize( new Dimension( 2000, 25));
     namePanel.add( nameField);
     
-    //Create Project Location section
+    /****************************** Project Location  ********************/
     JPanel pathPanel = new JPanel();
     pathPanel.setLayout(new BoxLayout(pathPanel, BoxLayout.X_AXIS));
     pathPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEmptyBorder(), "Location"));
@@ -118,12 +108,23 @@ public class NewProjectDialog extends JDialog
     pathPanel.add( pathField);
     pathPanel.add( pathButton);
 
+    /******************** CheckBox "Init as Copy of Current" ****************/ 
+    JPanel checkPanel = new JPanel();
+    checkPanel.setLayout(new BoxLayout( checkPanel, BoxLayout.X_AXIS));    
+    copyCheckBox = new JCheckBox("Copy current project");
+    copyCheckBox.setSelected( true);
+    checkPanel.add( Box.createRigidArea( new Dimension( 5, 0)));
+    checkPanel.add( copyCheckBox);
+    checkPanel.add( Box.createHorizontalGlue());
+
     JPanel borderedPanel = new JPanel();
     borderedPanel.setLayout(new BoxLayout(borderedPanel, BoxLayout.Y_AXIS));
     borderedPanel.setBorder( BorderFactory.createEtchedBorder());
     borderedPanel.add( namePanel);
     borderedPanel.add( pathPanel);
-
+    borderedPanel.add( checkPanel);
+    
+    /********** buttons ************************/
     JPanel buttonsPanel = new JPanel();
     buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
     createButton = new JButton("Create");
@@ -225,11 +226,17 @@ public class NewProjectDialog extends JDialog
     return location;
   }
 
+  public static boolean copyCurrentProject()
+  {
+    return instance.copyCheckBox.isSelected();
+  }
+
   private static NewProjectDialog instance;
 
   Frame parent;
   JTextField nameField, pathField;
   JButton createButton;
+  JCheckBox copyCheckBox;
 
   public static final int CANCEL_OPTION = 0;
   public static final int CREATE_OPTION = 1;

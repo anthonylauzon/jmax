@@ -369,7 +369,10 @@ public class FtsPackage extends FtsObjectWithEditor
     
     showEditor();
   }
-  public void destroyEditor(){}
+  public void destroyEditor()
+  {
+    disposeEditor();
+  }
 
   public void setDirty( boolean d)
   {
