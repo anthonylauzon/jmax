@@ -23,6 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
+DISTDIR=.
+
 ifdef ARCH
 include Makefiles/Makefile.$(ARCH)
 endif

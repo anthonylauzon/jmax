@@ -203,10 +203,6 @@ build_package ()
     cp $SPEC_FILE $BUILD_DIR/src/$SOURCE_ROOT
 
     PRODUCT=`grep product $SPEC_FILE | awk 'NF >= 2 {print $2;}'`
-    IMAGE=`grep image $SPEC_FILE | awk 'NF >= 2 {print $2;}'`
-    SUBSYS=`grep subsys $SPEC_FILE | awk 'NF >= 2 {print $2;}'`
-    IDB_TAG=$PRODUCT.$IMAGE.$SUBSYS
-
     VERSION=` grep version $SPEC_FILE | awk 'NF >= 2 {print $2;}' | sed s/\"//g `
 
     (
@@ -216,7 +212,7 @@ build_package ()
 
 	/bin/rm -rf $IDB_FILE
 
-	( RAWIDB=$IDB_FILE ; export RAWIDB ; gmake $MAKEOPT ARCH=$ARCH INSTALL="install -idb $IDB_TAG" install )
+	( RAWIDB=$IDB_FILE ; export RAWIDB ; gmake $MAKEOPT ARCH=$ARCH INSTALL="install -idb ALL" install )
 
 	sort +4u -6 < $IDB_FILE > $IDB_FILE.sorted
 
@@ -244,9 +240,9 @@ umask 22
 
 set -x
 set -e
-#untar_source
+untar_source
 
-#compile_it
+compile_it
 
 build_package
 
