@@ -74,6 +74,23 @@ abstract public class ErmesObject implements DisplayObject
     static final int INOUTLET_MAX_SENSIBLE_AREA = 10;
   }
 
+
+  // This two flags say if the object parts are sensible, and if the in/outlets are sensibles
+  // global for all the objects.
+
+  private static boolean followingLocations = false;
+  private static boolean followingInOutletLocations = false;
+
+  final public static void setFollowingInOutletLocations(boolean v)
+  {
+    followingInOutletLocations = v;
+  }
+
+  final public static void setFollowingLocations(boolean v)
+  {
+    followingLocations = v;
+  }
+
   protected ErmesSketchPad itsSketchPad;
 
   protected FtsObject ftsObject = null;
@@ -439,7 +456,7 @@ abstract public class ErmesObject implements DisplayObject
 
   public SensibilityArea getSensibilityAreaAt( int mouseX, int mouseY)
   {
-    SensibilityArea area;
+    SensibilityArea area = null;
     final int x = ftsObject.getX();
     final int y = ftsObject.getY();
     final int w = ftsObject.getWidth();
@@ -462,92 +479,98 @@ abstract public class ErmesObject implements DisplayObject
     else
       horizontalOutletSensibility = Math.min(ObjectGeometry.INOUTLET_MAX_SENSIBLE_AREA, outletDistance / 2);
 
-    // if the point is the vertical inlet zone,
-    // check if the point in an inlet sensibility area
-
-    if ((nInlets > 0) &&
-	(mouseY >= inletsAnchorY - verticalInOutletSensibility) &&
-	(mouseY <= inletsAnchorY + verticalInOutletSensibility))
+    if (followingInOutletLocations)
       {
-	int start = getInletAnchorX(0);
-	int d;
+	// if the point is the vertical inlet zone,
+	// check if the point in an inlet sensibility area
 
-	if ((nInlets == 1) || (mouseX < start))
+	if ((nInlets > 0) &&
+	    (mouseY >= inletsAnchorY - verticalInOutletSensibility) &&
+	    (mouseY <= inletsAnchorY + verticalInOutletSensibility))
 	  {
-	    d = Math.abs(mouseX - start);
+	    int start = getInletAnchorX(0);
+	    int d;
 
-	    if (d < horizontalInletSensibility)
-	      return makeInletArea(mouseY, 0, d);
+	    if ((nInlets == 1) || (mouseX < start))
+	      {
+		d = Math.abs(mouseX - start);
+
+		if (d < horizontalInletSensibility)
+		  return makeInletArea(mouseY, 0, d);
+	      }
+	    else if (nInlets > 1)
+	      {
+		int n = (mouseX - start) / inletDistance;
+		d = (mouseX - start) % inletDistance;
+
+		if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
+		  return makeInletArea(mouseY, n, d);
+		else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
+		  return makeInletArea(mouseY, n + 1, inletDistance - d);
+	      }
 	  }
-	else if (nInlets > 1)
-	  {
-	    int n = (mouseX - start) / inletDistance;
-	    d = (mouseX - start) % inletDistance;
 
-	    if ((d < horizontalInletSensibility) && (n >= 0) && (n < nInlets))
-	      return makeInletArea(mouseY, n, d);
-	    else if ((d > inletDistance - horizontalInletSensibility) && (n >= 0) && (n < (nInlets - 1)))
-	      return makeInletArea(mouseY, n + 1, inletDistance - d);
+	// if we have outlets, and the point is the vertical outlet zone,
+	// check if the point in an outlet sensibility area
+
+	if ((nOutlets > 0) &&
+	    (mouseY >= outletsAnchorY - verticalInOutletSensibility) &&
+	    (mouseY <= outletsAnchorY + verticalInOutletSensibility))
+	  {
+	    int start = getOutletAnchorX(0);
+	    int d = 0, n = 0;
+
+	    if (nOutlets == 1)
+	      {
+		n = 0;
+		d = Math.abs(mouseX - start);
+	      }
+	    else if (nOutlets > 1)
+	      {
+		n = (mouseX - start) / outletDistance;
+		d = Math.abs((mouseX - start) % outletDistance);
+	      }
+
+	    if (n == 0)
+	      {
+		if (d < horizontalOutletSensibility)
+		  return makeOutletArea(mouseY, 0, d);
+	      }
+	    else if (n > 0)
+	      {
+		if ((d < horizontalOutletSensibility) && (n >= 0) && (n < nOutlets))
+		  return makeOutletArea(mouseY, n, d);
+		else if ((d > outletDistance - horizontalOutletSensibility) && (n >= 0) && (n < (nOutlets - 1)))
+		  return makeOutletArea(mouseY, n + 1, outletDistance - d);
+	      }
 	  }
       }
 
-    // if we have outlets, and the point is the vertical outlet zone,
-    // check if the point in an outlet sensibility area
-
-    if ((nOutlets > 0) &&
-	(mouseY >= outletsAnchorY - verticalInOutletSensibility) &&
-	(mouseY <= outletsAnchorY + verticalInOutletSensibility))
+    if (followingLocations)
       {
-	int start = getOutletAnchorX(0);
-	int d = 0, n = 0;
+	// Every other sensibility area is internal, so we check
+	// now if the point is inside the rectangle, and return null if outside
 
-	if (nOutlets == 1)
+	if ((mouseX < x) || (mouseX > (x + w)) ||
+	    (mouseY < y) || (mouseY > (y + h)))
+	  return null;
+
+	// Check for horizantal resize area (assuming a point inside the rectangle)
+
+	if ( mouseX >= x + w - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH 
+	     && mouseY > y + ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH
+	     && mouseY < y + h - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH)
 	  {
-	    n = 0;
-	    d = Math.abs(mouseX - start);
-	  }
-	else if (nOutlets > 1)
-	  {
-	    n = (mouseX - start) / outletDistance;
-	    d = Math.abs((mouseX - start) % outletDistance);
+	    return SensibilityArea.get(this, Squeack.HRESIZE_HANDLE);
 	  }
 
-	if (n == 0)
-	  {
-	    if (d < horizontalOutletSensibility)
-	      return makeOutletArea(mouseY, 0, d);
-	  }
-	else if (n > 0)
-	  {
-	    if ((d < horizontalOutletSensibility) && (n >= 0) && (n < nOutlets))
-	      return makeOutletArea(mouseY, n, d);
-	    else if ((d > outletDistance - horizontalOutletSensibility) && (n >= 0) && (n < (nOutlets - 1)))
-	      return makeOutletArea(mouseY, n + 1, outletDistance - d);
-	  }
+	// Try subclass specialized methods
+
+	area = findSensibilityArea(mouseX, mouseY);
+
+	if (area == null)
+	  area = SensibilityArea.get(this, Squeack.OBJECT);
       }
-
-    // Every other sensibility area is internal, so we check
-    // now if the point is inside the rectangle, and return null if outside
-
-    if ((mouseX < x) || (mouseX > (x + w)) ||
-	(mouseY < y) || (mouseY > (y + h)))
-      return null;
-
-    // Check for horizantal resize area (assuming a point inside the rectangle)
-
-    if ( mouseX >= x + w - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH 
-	 && mouseY > y + ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH
-	 && mouseY < y + h - ObjectGeometry.H_RESIZE_SENSIBLE_WIDTH)
-      {
-	return SensibilityArea.get(this, Squeack.HRESIZE_HANDLE);
-      }
-
-    // Try subclass specialized methods
-
-    area = findSensibilityArea(mouseX, mouseY);
-
-    if (area == null)
-      area = SensibilityArea.get(this, Squeack.OBJECT);
 
     return area;
   }
@@ -614,14 +637,28 @@ abstract public class ErmesObject implements DisplayObject
 		     ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
   }
 
+  // There are two intersect function: one cover the paint needs, and include all
+  // the possible space covered by temporary details like highlighted inlets,
+  // while the other, coreIntersect, only consider the core objetc, and it is 
+  // used for selection
+
   public final boolean intersects(Rectangle r)
   {
     return !((r.x + r.width <= ftsObject.getX()) ||
 	     (r.y + r.height <= (ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
-				 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP)) ||
+				 ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP - 1)) ||
 	     (r.x >= ftsObject.getX() + ftsObject.getWidth()) ||
 	     (r.y >= (ftsObject.getY() + ftsObject.getHeight() + ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT -
-		      ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP)));
+		      ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP + 1)));
+  }
+
+
+  public final boolean coreIntersects(Rectangle r)
+  {
+    return !((r.x + r.width <= ftsObject.getX()) ||
+	     (r.y + r.height <= ftsObject.getY()) ||
+	     (r.x >= ftsObject.getX() + ftsObject.getWidth()) ||
+	     (r.y >= (ftsObject.getY() + ftsObject.getHeight())));
   }
 
 

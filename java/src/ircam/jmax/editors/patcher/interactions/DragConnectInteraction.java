@@ -21,7 +21,7 @@ class DragConnectInteraction extends Interaction
   void configureInputFilter(InteractionEngine filter)
   {
     filter.setFollowingMoves(true); // need the drag
-    filter.setFollowingLocations(true);
+    filter.setFollowingInOutletLocations(true);
     filter.setAutoScrolling(true);
   }
 

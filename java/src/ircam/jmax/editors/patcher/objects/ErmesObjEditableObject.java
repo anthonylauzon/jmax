@@ -28,10 +28,11 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
     computeRenderer();
     renderer.update();
-    updateDimensions();
 
     if ((renderer instanceof TextRenderer) && (getWidth() == -1))
       setWidth( getFontMetrics().stringWidth( "pack 1 2 3") + 2*getTextXOffset());
+    else
+      updateDimensions();
   }
 
   public void updateDimensions()

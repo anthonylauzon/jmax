@@ -452,7 +452,7 @@ public class DisplayList
 
     public void processObject(ErmesObject object)
       {
-	if (object.intersects( rect))
+	if (object.coreIntersects( rect))
 	  {
 	    if (object.isSelected())
 	      {

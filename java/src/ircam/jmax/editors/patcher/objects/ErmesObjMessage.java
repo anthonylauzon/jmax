@@ -85,6 +85,8 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
 
   public void gotSqueack(int squeack, Point mouse, Point oldMouse)
   {
+
+    System.err.println("Message box received squeack " + Squeack.describe(squeack) + " at " + mouse);
     if (Squeack.isDown(squeack))
       {
 	ftsObject.sendMessage( 0, "bang", null);

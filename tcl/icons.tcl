@@ -3,8 +3,6 @@
 ## System Icons
 ##
 
-
-
 declareIcon _max_patcher_file_  $jmaxRootDir/images/mini_icon_pat.gif
 declareIcon _jmax_patcher_file_ $jmaxRootDir/images/mini_icon_jmax.gif
 declareIcon _jmax_tiny_logo_    $jmaxRootDir/images/jmax_logo_tiny.gif
@@ -23,6 +21,10 @@ declareIcon _floatbox_          $jmaxRootDir/images/tool_float.gif
 declareIcon _lock_mode_         $jmaxRootDir/images/tool_lock_mode.gif
 declareIcon _edit_mode_         $jmaxRootDir/images/tool_edit_mode.gif
 declareIcon _up_                $jmaxRootDir/images/tool_up.gif
+
+##
+## Icons usefull for graphic decorations inside comments
+##
 
 declareIcon %jmax               $jmaxRootDir/images/jmax_logo_tiny.gif
 declareIcon %new                $jmaxRootDir/images/new.gif

@@ -77,6 +77,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   // Control properties
 
   private boolean followingLocations = false;
+  private boolean followingInOutletLocations = false;
   private boolean followingMoves     = false;
 
   final void setFollowingMoves(boolean v)
@@ -103,11 +104,23 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   final void setFollowingLocations(boolean v)
   {
     followingLocations = v;
+    ErmesObject.setFollowingLocations(v); // Hack ? Should go thru displayList ?
   }
 
   final boolean isFollowingLocations()
   {
     return followingLocations;
+  }
+
+  final void setFollowingInOutletLocations(boolean v)
+  {
+    followingInOutletLocations = v;
+    ErmesObject.setFollowingInOutletLocations(v);  // Hack ? Should go thru displayList ?
+  }
+
+  final boolean isFollowingInOutletLocations()
+  {
+    return followingInOutletLocations;
   }
 
   // Utilities
@@ -158,7 +171,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     
     squeack |= getModifiersBits(e);
 
-    if (followingLocations)
+    if (followingLocations || followingInOutletLocations)
       {
 	area = displayList.getSensibilityAreaAt(mouse.x, mouse.y);
 
@@ -182,6 +195,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   Timer scrollTimer;
   ScrollDragAction scroller;
   boolean autoScroll = false;
+  boolean autoScrollOnMove = false;
   final private static int scrollMargin = 5;
 
   private void initAutoScroll()
@@ -197,9 +211,19 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
     autoScroll = v;
   }
 
+  void setAutoScrollingOnMove(boolean v)
+  {
+    autoScrollOnMove = v;
+  }
+
   boolean isAutoScrolling()
   {
     return autoScroll;
+  }
+
+  boolean isAutoScrollingOnMove()
+  {
+    return autoScrollOnMove;
   }
 
   class ScrollDragAction implements ActionListener
@@ -261,7 +285,8 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   {
     // Handle the auto scrolling and autoresizing
 
-    if (isAutoScrolling() && Squeack.isDrag(squeack) &&
+    if (((isAutoScrolling() && Squeack.isDrag(squeack)) || 
+	 (isAutoScrollingOnMove() && Squeack.isMove(squeack))) &&
 	(! sketch.pointIsVisible(mouse, scrollMargin)))
       {
 	if (scrollTimer.isRunning())
@@ -296,7 +321,9 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   {
     setFollowingMoves(false);
     setFollowingLocations(false);
+    setFollowingInOutletLocations(false);
     setAutoScrolling(false);
+    setAutoScrollingOnMove(false);
 
     interaction.configureInputFilter(this);
     interaction.reset();
@@ -311,7 +338,9 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   {
     setFollowingMoves(false);
     setFollowingLocations(false);
+    setFollowingInOutletLocations(false);
     setAutoScrolling(false);
+    setAutoScrollingOnMove(false);
 
     interaction.configureInputFilter(this);
     interaction.reset();
