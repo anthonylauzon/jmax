@@ -72,6 +72,20 @@ class FtsObject:
             self.__serverConnection.writeArgs(args[0])
         self.__serverConnection.endOfMessage()
         return
+
+
+    def sendProperty(self,*args) :
+        self.__serverConnection.writeObject(self)
+        self.__serverConnection.writeSymbol("set_object_property")
+        self.__serverConnection.writeObject(self)
+        if not type(args[0])==list:
+            print "FtsObject.send want a list as last parameters"
+            return
+        self.__serverConnection.writeArgs(args)
+        self.__serverConnection.endOfMessage()
+        return
+
+
     
     def getParent(self):
         """

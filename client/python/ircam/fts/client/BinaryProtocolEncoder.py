@@ -1,6 +1,7 @@
 from SymbolCache import SymbolCache
 from BinaryProtocol import BinaryProtocol
 from FtsRawString import FtsRawString
+from FtsObject import FtsObject
 
 class BinaryProtocolEncoder:
     """
