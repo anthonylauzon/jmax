@@ -17,19 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
- * Based on Max/ISPW by Miller Puckette.
- *
- * Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
- *
  */
-
-/* cfft.h */
 
 #ifndef _CFFT_H_
 #define _CFFT_H_
-
-#include <fts/lang/veclib/complex.h>
 
 /*********************************************************************************
  *
@@ -37,22 +28,22 @@
  *
  */
 
-FTS_API void cfft_inplc(complex * restrict buf, float *coef_re, float *coef_im, int size);
-FTS_API void cifft_inplc(complex * restrict buf, float *coef_re, float *coef_im, int size);
+void cfft_inplc(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
+void cifft_inplc(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
 
 /* (I)FFT with double oversampled coefficient tables */
-FTS_API void cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size);
-FTS_API void cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, int over, int size);
+void cfft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
+void cifft_inplc_over_coef(complex * restrict buf, float *coef_re, float *coef_im, unsigned int size);
 
-FTS_API void cfft_bitreversal_inplc(complex *buf, int *bitrev, int size);
-FTS_API void cfft_bitreversal_outplc(complex *in, complex *out, int *bitrev, int size);
+void cfft_bitreversal_inplc(complex *buf, unsigned int *bitrev, unsigned int size);
+void cfft_bitreversal_outplc(complex *in, complex *out, unsigned int *bitrev, unsigned int size);
 
-FTS_API int *cfft_make_bitreversed_table(int size);
+unsigned int *cfft_make_bitreversed_table(unsigned int size);
 
 /* declarations Added by MDC */
 
-FTS_API void cfft_bitreversal_over_inplc(complex * restrict buf, int * restrict bitrev, int over, int size);
-FTS_API void cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, int * restrict bitrev, int over, int size);
+void cfft_bitreversal_over_inplc(complex * restrict buf, unsigned int * restrict bitrev, unsigned int size);
+void cfft_bitreversal_over_outplc(complex * restrict in, complex * restrict out, unsigned int * restrict bitrev, unsigned int size);
 
 #endif
 

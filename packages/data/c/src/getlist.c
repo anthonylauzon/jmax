@@ -180,9 +180,6 @@ getlist_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_method_define_varargs(cl, 0, fvec_type, getlist_fvec);
   fts_method_define_varargs(cl, 0, vec_type, getlist_vec);
 
-  fts_method_define_varargs(cl, 0, row_type, getlist_row);
-  fts_method_define_varargs(cl, 0, col_type, getlist_col);
-
   fts_outlet_type_define_varargs(cl, 0, fts_s_list);
   
   return fts_Success;
