@@ -83,10 +83,6 @@ static void ossaudioport_input( fts_word_t *argv)
 	{
 	  short s0 = port->adc_fmtbuf[j];
 
-#ifdef FTS_HAS_BIG_ENDIAN
-	  SWAP_SHORT( s0);
-#endif
-
 	  out[i] = (float)s0 / 32767.0f;
 	  j += channels;
 	}
@@ -112,10 +108,6 @@ static void ossaudioport_output( fts_word_t *argv)
       for ( i = 0; i < n; i++)
 	{
 	  short s0 = (short) ( 32767.0f * in[i]);
-
-#ifdef FTS_HAS_BIG_ENDIAN
-	  SWAP_SHORT( s0);
-#endif
 
 	  port->dac_fmtbuf[j] = s0;
 	  j += channels;
@@ -171,7 +163,7 @@ static void ossaudioport_debug( int fd)
 
 static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  int sample_rate, p_sample_rate, fragparam, fragment_size, channels, p_channels, flags, format, i;
+  int sample_rate, p_sample_rate, fragparam, fragment_size, channels, p_channels, flags, format, wanted_format, i;
   float sr;
   ossaudioport_t *this = (ossaudioport_t *)o;
   char device_name[256];
@@ -223,8 +215,14 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
 #endif
 
   /* Set 16 bit format */
+#ifdef FTS_HAS_BIG_ENDIAN
+  format = AFMT_S16_BE;
+#endif
+#ifdef FTS_HAS_BIG_ENDIAN
   format = AFMT_S16_LE;
-  if ( (ioctl( this->fd, SNDCTL_DSP_SETFMT, &format) == -1) || (format != AFMT_S16_LE))
+#endif
+  wanted_format = format;
+  if ( (ioctl( this->fd, SNDCTL_DSP_SETFMT, &format) == -1) || (format != wanted_format))
     {
       fts_object_set_error( o, "Cannot set sample format to signed 16 bits little endian (%s)", strerror( errno));
       post("ossaudioport: cannot set sample format to signed 16 bits little endian (%s)\n", strerror( errno));
