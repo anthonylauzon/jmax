@@ -43,11 +43,11 @@ class ToolButton extends JToggleButton
 	ToolButton button = (ToolButton)e.getSource();
 	if ( !button.isSelected() )
 	  {
-	    button.setCursor( button.getButtonCursor());
-	    button.toolBar.getSketchPad().setCursor(button.getButtonCursor());
 	    button.state = true;
 	    button.setSelected( true);
 	    button.toolBar.buttonSelected( button);
+	    button.setCursor( button.getButtonCursor());
+	    button.toolBar.getSketchPad().setCursor(button.getButtonCursor());
 	  }
       } 
     };
