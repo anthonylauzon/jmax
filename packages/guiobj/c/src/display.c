@@ -32,7 +32,8 @@
 
 #define STRING_SIZE 256
 
-typedef struct {
+typedef struct 
+{
   fts_object_t o;
   fts_atom_t a;
   char string[STRING_SIZE];
@@ -278,8 +279,13 @@ static void
 display_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   display_t * this = (display_t *)o;
-
-  sprintf(this->string, "%#g", fts_get_float(at));
+  double f_num = fts_get_float(at);
+  long long int i_num = (long long int)f_num;
+      
+  if(i_num == f_num)
+    sprintf(this->string, "%lld.", i_num);
+  else
+    sprintf(this->string, "%g", f_num);
 
   display_deliver(this);
 }
@@ -367,8 +373,6 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 static void
 display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  display_t * this = (display_t *)o;
-
   fts_dsp_remove_object(o);
 }
 
@@ -400,5 +404,4 @@ display_config(void)
   fts_dsp_declare_function(sym_display, display_ftl);
 
   fts_class_install(sym_display, display_instantiate);
-
 }
