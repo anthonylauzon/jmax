@@ -660,22 +660,17 @@ public class AudioConfigPanel extends JPanel implements Editor
 	      label.requestSetInput( (String)value);
 	      break;
 	    case 3:
-	      try{
-		chn = Integer.parseInt( (String)value);
-	      }
-	      catch( NumberFormatException e){}
-
-	      label.requestSetInChannel( chn);
+	      chn = channelsCombo.getSelectedIndex();
+	      if( chn > -1)
+		label.requestSetInChannel( chn);
 	      break;
 	    case 4:
 	      label.requestSetOutput( (String)value);
 	      break;
 	    case 5:
-	      try{
-		chn = Integer.parseInt( (String)value);
-	      }
-	      catch( NumberFormatException e){}
-	      label.requestSetOutChannel( chn);
+	      chn = channelsCombo.getSelectedIndex();
+	      if( chn > -1)
+		label.requestSetOutChannel( chn);
 	      break;
 	    default:
 	      return;
