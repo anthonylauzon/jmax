@@ -12,7 +12,7 @@ INCLUDES=-I$(top_srcdir)/include
 noinst_HEADERS = jackaudio.h
 install-data-hook:
 	-rm $(DESTDIR)$(packagedir)/libjack.so
-	ln $(DESTDIR)$(packagedir)/libjmax-jack.so $(DESTDIR)$(packagedir)/libjack.so
+	cd $(DESTDIR)$(packagedir); ln -s libjmax-jack.so libjack.so
 
 # Must be uninstall-hook but there is a bug in automake 1.4-pr5 which doesn't call uninstall-hook 
 # see http://mail.gnu.org/pipermail/automake-patches/2002-January/000546.html
