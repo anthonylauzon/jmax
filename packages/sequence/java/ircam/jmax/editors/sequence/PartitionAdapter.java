@@ -375,8 +375,20 @@ public int getVerticalTransp()
 	int max = getY(maxPitch);
 	if(maxPitch<127) delta = max-ScoreBackground.SC_TOP;
 	else delta = 0;
-	
+		
 	return delta;
+}
+
+public void setMaxPitch(int max)
+{
+	maxPitch = max;
+	setMinScoreY();
+}
+
+public void setMinPitch(int min)
+{
+	minPitch = min;
+	setMaxScoreY();
 }
 
 public int getMaxPitch()
@@ -436,7 +448,7 @@ public void setMaxScoreY()
 	}
 	else
 	{
-		int minPtc = ((MidiTrackEditor)gc.getTrackEditor()).getMinimumPitchInTrack();
+		int minPtc = ((MidiTrackEditor)gc.getTrackEditor()).getMinimumPitchInTrack();		
 		maxY = getY(minPtc) - getVerticalTransp();
 		if(getViewMode() == MidiTrackEditor.PIANOROLL_VIEW) 
 			maxY += 2;
@@ -460,9 +472,9 @@ public int getMaxScoreY()
 public void propertyChange(PropertyChangeEvent e)
 {
 	if(e.getPropertyName().equals("maximumPitch"))
-		maxPitch = ((Integer)e.getNewValue()).intValue();
+		setMaxPitch(((Integer)e.getNewValue()).intValue());
 	else if(e.getPropertyName().equals("minimumPitch"))
-		minPitch = ((Integer)e.getNewValue()).intValue();
+		setMinPitch(((Integer)e.getNewValue()).intValue());
 	else if(e.getPropertyName().equals("viewMode"))
 		setViewMode(((Integer)e.getNewValue()).intValue());
 	else if(e.getPropertyName().equals("rangeMode"))

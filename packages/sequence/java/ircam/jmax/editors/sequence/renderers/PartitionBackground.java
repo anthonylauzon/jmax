@@ -184,7 +184,7 @@ private void drawGrayStaff(Graphics g, int startLine)
 	int positionY = SC_BOTTOM;
 	int start = SC_BOTTOM-startLine*STEP-transp;
 	
-	g.setColor(horizontalGridLinesColor);		
+	g.setColor( ScoreRenderer.horizontalGridLinesColor);		
 	for (int j = 0; j < 4; j++)
 	{
 		positionY = start-(j-1)*STEP;
@@ -235,7 +235,7 @@ private void drawHorizontalGrid(Graphics g)
 	/********* Third Bass Line ***********************************************/	
 	if(staffIsDrawable(6, maxPitch, minPitch))
 	{
-		g.setColor(horizontalGridLinesColor); 
+		g.setColor( ScoreRenderer.horizontalGridLinesColor); 
 		int positionY = SC_BOTTOM-19*STEP-transp;
 		g.drawLine(KEYX, positionY, d.width, positionY);
 		g.setColor(Color.black);
@@ -303,9 +303,9 @@ private void drawVerticalGrid(Graphics g)
 	int windowTime = (int) (gc.getAdapter().getInvX(d.width) - gc.getAdapter().getInvX(KEYEND))-1 ;
 	int timeStep;
 	
-	timeStep = findBestTimeStep(windowTime);
+	timeStep = findBestTimeStep(windowTime);	
 	
-	g.setColor(Color.lightGray);
+	g.setColor(ScoreRenderer.verticalLinesColor);
 	
 	int xPosition;
 	int snappedTime;
@@ -368,8 +368,8 @@ SequenceGraphicContext gc;
 Image itsImage;
 boolean toRepaintBack = false;
 boolean locked = false;
-public static final Color horizontalGridLinesColor = new Color(220, 220, 220);   
-public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
+
+/*public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);*/
 
 public static final int KEYX = 27;
 public static final int KEYWIDTH = 28;

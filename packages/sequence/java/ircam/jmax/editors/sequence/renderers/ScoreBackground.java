@@ -131,7 +131,7 @@ private void drawHorizontalGrid(Graphics g)
 	int positionY;
 	int maxGray = (SC_BOTTOM - maxPitchY)/GRAY_STEP;
 	int minGray = (SC_BOTTOM - minPitchY)/GRAY_STEP;
-	g.setColor(horizontalGridLinesColor);
+	g.setColor(ScoreRenderer.horizontalGridLinesColor);
 	for (int i = minGray+1; i <= maxGray; i++)
 	{
 		positionY = SC_BOTTOM-i*GRAY_STEP;
@@ -151,7 +151,7 @@ private void drawHorizontalGrid(Graphics g)
 	g.drawLine(KEYEND+1, maxPitchY-2-transp, d.width, maxPitchY-2-transp);
 	/********** Numbers **********************************************************/
 	g.setColor(Color.gray);
-	g.setFont(gridSubdivisionFont);
+	g.setFont(ScoreRenderer.gridSubdivisionFont);
 	
 	g.drawString(""+minPitch, 10, minPitchY+4-transp);
 	for(int j = minBlack+1; j <= maxBlack; j++)
@@ -278,7 +278,7 @@ private void drawVerticalGrid(Graphics g)
 	
 	timeStep = findBestTimeStep(windowTime);
 	
-	g.setColor(Color.lightGray);
+	g.setColor(ScoreRenderer.verticalLinesColor);
 	
 	int xPosition;
 	int snappedTime;
@@ -339,9 +339,6 @@ boolean toRepaintBack = false;
 boolean locked = false;
 boolean imageReady = true;
 
-public static final Color horizontalGridLinesColor = new Color(187, 187, 187); 
-//  public static final Font gridSubdivisionFont = new Font("Helvetica", Font.PLAIN, 10);
-public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
 public static final int KEYX = 31;
 public static final int KEYWIDTH = 24;
 public static final int SHORTKEYWIDTH = 16;

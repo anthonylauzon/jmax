@@ -178,6 +178,10 @@ PartitionBackground partitionBackground;
 
 public static final int XINTERVAL = 10;
 public static final int YINTERVAL = 3;
+
+public static final Color horizontalGridLinesColor = new Color(220, 220, 220);
+public static final Color verticalLinesColor = new Color(165, 165, 165, 100);
+public static final Font gridSubdivisionFont = new Font("Serif", Font.PLAIN, 10);
 }
 
 
