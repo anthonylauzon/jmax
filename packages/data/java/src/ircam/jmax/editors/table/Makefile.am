@@ -1,4 +1,4 @@
-SUBDIRS=
+SUBDIRS= actions menus renderers tools
 
 noinst_PROGRAMS = package
 package_SOURCES = \

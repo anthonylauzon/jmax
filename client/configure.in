@@ -75,6 +75,9 @@ cpp/Makefile
 java/Makefile
 java/ircam/Makefile
 java/ircam/ftsclient/Makefile
+include/Makefile
+include/fts/Makefile
+include/fts/client/Makefile
 tests/Makefile
 tests/cpp/Makefile
 tests/java/Makefile

@@ -119,6 +119,9 @@ AC_OUTPUT(
 Makefile
 fts/Makefile
 fts/version.c
+include/Makefile
+include/fts/Makefile
+include/ftsprivate/Makefile
 bin/Makefile
 bin/jmax
 tcl/Makefile
@@ -144,7 +147,6 @@ java/src/ircam/jmax/mda/Makefile
 java/src/ircam/jmax/script/Makefile
 java/src/ircam/jmax/script/pkg/Makefile
 java/src/ircam/jmax/script/scm/Makefile
-java/src/ircam/jmax/script/scm/kawa/Makefile
 java/src/ircam/jmax/script/scm/silk/Makefile
 java/src/ircam/jmax/script/tcl/Makefile
 java/src/ircam/jmax/toolkit/Makefile
@@ -229,7 +231,6 @@ packages/lists/Makefile
 packages/lists/c/Makefile
 packages/lists/c/src/Makefile
 packages/lists/help/Makefile
-packages/lists/templates/Makefile
 packages/math/Makefile
 packages/math/c/Makefile
 packages/math/c/src/Makefile
@@ -283,9 +284,8 @@ packages/system/c/Makefile
 packages/system/c/src/Makefile
 packages/system/help/Makefile
 packages/unixdtd/Makefile
-packages/unixdtd/c/Makefile
-packages/unixdtd/c/src/Makefile
 packages/utils/Makefile
 packages/utils/c/Makefile
 packages/utils/c/src/Makefile
+utils/rpm/jmax.spec
 )
