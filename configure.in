@@ -307,6 +307,10 @@ AC_ARG_WITH(jack-cflags,
        fi
     fi])
 
+dnl If --with-jack-ldflags is not given and pkg-config has not been foun
+dnl we set JACK_LDFLAGS with the default output of pkg-config --libs jack 
+dnl This default is given by jack-audio-connection-kit-devel-0.80.0-1-rh90
+dnl from PlanetCCRMA
 AC_ARG_WITH(jack-ldflags,
   [  --with-jack-ldflags=JACK_LDFLAGS	jack support ldflags (optional)],
   [JACK_LDFLAGS="$withval";
@@ -314,10 +318,13 @@ AC_ARG_WITH(jack-ldflags,
   [ if test "$with_jack" = "yes"; then
        if test $PKG_CONFIG != "no"; then
 	  JACK_LDFLAGS=`$PKG_CONFIG --libs jack`;
+       else
+          JACK_LDFLAGS="-ljack -lpthread -ldl -lrt";
        fi
     fi])
 
 HAVE_LIB_JACK="false"
+CAN_COMPILE_WITH_JACK="false"
 dnl output JACK feature
 if test "$with_jack" = "yes"
 then
@@ -351,6 +358,15 @@ then
 	dnl Check result value of test
 	if test "$HAVE_LIB_JACK" != "true"; then
 	   AC_MSG_ERROR([*** jack library not found ***])
+	fi
+
+	dnl Really check if we can compile with jack
+	AC_CHECK_FUNC(jack_get_ports,
+	[ CAN_COMPILE_WITH_JACK="true"],
+	[ CAN_COMPILE_WITH_JACK="false"])
+	dnl Check value of test
+	if test "$CAN_COMPILE_WITH_JACK" != "true"; then
+	   AC_MSG_ERROR([*** compilation with jack failed, if you haven't installed pkg-config, you should use --with-jack-cflags and --with-jack-ldflags ***])
 	fi
 
 	dnl Reset value of CPPFLAGS, CFLAGS, CXXFLAGS and LDFLAGS
