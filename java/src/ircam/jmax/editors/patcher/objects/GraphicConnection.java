@@ -229,8 +229,6 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
 
   public void paint( Graphics g) 
   {
-      //Color aubergine = new Color(100, 100, 190);
-
     if(type == FtsConnection.fts_connection_signal)	
 	{
 	    g.setColor(Color.black);
@@ -367,7 +365,7 @@ public class GraphicConnection implements DisplayObject, FtsConnectionListener
       }
 
     return ret;
-  }
+  } 
 
 
   // Print function

@@ -35,7 +35,7 @@ import ircam.fts.client.*;
  * Deals with the connection creation/deletion and saving/loading.
  */
 
-public class FtsConnection extends FtsObject implements Serializable
+public class FtsConnection extends FtsObject
 {
   /* numbering doubled on server side (mess_types.h) */
   public static final int fts_connection_invalid = 0; /* from error object or type missmatch */

@@ -104,12 +104,6 @@ public class TextRenderer implements ObjectRenderer
 		     owner.getY() + owner.getTextYOffset(), 
 		     owner.getWidth() - owner.getTextWidthOffset(),
 		     5);
-    
-    /*AffineTransform at = new AffineTransform();
-      at.scale(0.88, 1.0);
-      Font scaledFont = owner.getFont().deriveFont(at);
-      area.setFont(scaledFont);*/
-   
     area.setFont(owner.getFont());    
     area.setText(owner.getArgs()); 
   }
@@ -195,7 +189,7 @@ public class TextRenderer implements ObjectRenderer
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
-    SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
+      SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }
 

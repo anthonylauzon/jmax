@@ -934,7 +934,6 @@ public class FtsPatcherObject extends FtsObjectWithEditor
     connection.redefine((FtsGraphicObject)args[1].objectValue, args[2].intValue, 
 			(FtsGraphicObject)args[3].objectValue, args[4].intValue, 
 			args[5].intValue);
-    ((ErmesSketchWindow)getEditorFrame()).itsSketchPad.repaint();
   }
 
   public void releaseConnection(FtsConnection c)
