@@ -5,7 +5,6 @@ help ()
 
 Usage:
     jmax [-javaopt <java-option>]
-	    [-highpriority]
 	    [-nofork]
 	    [-nojar]
 	    [-verbose] [<other-jmax-options>]
@@ -16,10 +15,6 @@ Options and arguments:
   -javaopt <java-option>     (optional)
     Defines an option that is to be passed directly to the Java interpreter.
     Several [-javaopt java-option] can appear in the command line.
-
-  -highpriority              (optional)
-    Starts the FTS server with a raised priority in order to run more real-time
-    Defaults to false.
 
   -nofork
     Do not go into the background.  By default, jMax forks itself to give control 
@@ -54,7 +49,6 @@ ROOTDIR="none"
 VERBOSE=
 NOFORK=
 NOJAR=
-HIGHPRIORITY=
 
 for arg in $@
 do
@@ -66,8 +60,6 @@ do
 	\-help | \-h | \-\? )
 	    help ;
 	    exit 2 ;;
-	\-highpriority)
-	    HIGHPRIORITY="yes" ;;
 	\-verbose | \-v)
 	    VERBOSE="yes" ;;
 	\-nofork)
@@ -125,11 +117,6 @@ else
 fi
 
 CLASSPATH=.:${JAVA_CLASSES}:${JMAX_CLASSPATH}:${ROOTDIR}/java/lib/jacl1.0/jacl.jar:${ROOTDIR}/java/lib/swing/swingall.jar:${ROOTDIR}/java/lib/NetComponents.jar
-
-if [ $HIGHPRIORITY ]
-then
-    JMAXOPT="${JMAXOPT} -jmaxServerName fts.setuid"
-fi
 
 if [ $VERBOSE ]
 then
