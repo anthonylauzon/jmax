@@ -11,8 +11,6 @@ SYSTEM_LDFLAGS := -mips4 -n32
 SYSTEM_SOFLAGS := -mips4 -n32 
 
 SYSTEM_OPT_CFLAGS := -O3 -OPT:roundoff=3:IEEE_arithmetic=3:alias=typed:fast_io=ON:Olimit=0 -TARG:platform=ip32_5k:processor=r5000 -float_const -INLINE:=ON:dfe=ON  -LNO:opt=1 
-#SYSTEM_OPT_CFLAGS := -Ofast=ip32_5k 
-#SYSTEM_OPT_LDFLAGS = -Ofast=ip32_5k 
 SYSTEM_OPT_LDFLAGS = -O3
 SYSTEM_OPT_SOFLAGS = 
 
