@@ -37,7 +37,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
-public class ErrorTablePanel extends JPanel {
+public class ErrorTablePanel extends JPanel implements JMaxToolPanel{
 
   /*private final static Color selectedColor = new Color(204, 204, 255);*/
   static class ErrorTableCellRenderer extends DefaultTableCellRenderer
@@ -54,9 +54,21 @@ public class ErrorTablePanel extends JPanel {
       }
   }
 
-  public ErrorTablePanel(ErrorTableModel model)
+  public ErrorTablePanel(Fts fts)
   {
-    tableModel = model;
+    this.fts = fts;
+    
+    try
+	{
+	    set  = (FtsObjectSet) fts.makeFtsObject(fts.getRootObject(), "__objectset");
+	}
+    catch (FtsException e)
+	{
+	    System.out.println("System error: cannot get objectSet object");
+	}
+    
+    //tableModel = model;
+    tableModel = new ErrorTableModel(set);
     table = new JTable(tableModel);
     table.setPreferredScrollableViewportSize(new Dimension(400, 200));
     table.setRowHeight(17);
@@ -107,6 +119,42 @@ public class ErrorTablePanel extends JPanel {
 	    public void intervalRemoved(ListDataEvent e){};
 	    public void intervalAdded(ListDataEvent e){};
 	});
+    
+    fts.addEditListener(new FtsEditListener(){	    
+	    public void objectAdded(FtsObject object)
+	    {
+		if(!atomic) 
+		    SwingUtilities.invokeLater(new Runnable() {
+			    public void run()
+			    { 
+				findErrors();
+			    }});
+	    };
+	    public void objectRemoved(FtsObject object)
+	    {
+		if(!atomic) 
+		    SwingUtilities.invokeLater(new Runnable() {
+			    public void run()
+			    { 
+				findErrors();
+			    }});
+	    };
+	    public void connectionAdded(FtsConnection connection){};
+	    public void connectionRemoved(FtsConnection connection){};
+	    public void atomicAction(boolean active)
+	    {
+		atomic = active;
+		if(!atomic) findErrors();
+	    };
+	});
+
+    findErrors();
+  }
+
+  public void findErrors()
+  {
+      ////////////////////////////////////// retirer ca.... getObjectSet......
+      fts.getErrorFinder().findErrors(fts.getRootObject(), tableModel.getObjectSet());
   }
 
   public void setObjectSelectedListener(ObjectSelectedListener objectSelectedListener)
@@ -119,7 +167,21 @@ public class ErrorTablePanel extends JPanel {
       table.getSelectionModel().addListSelectionListener(l);
   }
 
+  /* ToolPanel interface */
+  public ToolTableModel getToolTableModel()
+  {
+      return tableModel;
+  }
+  public ListSelectionModel getListSelectionModel()
+  {
+      return table.getSelectionModel();
+  }
+  
+  private boolean atomic = false;
+  
   protected JTable table;
+  protected Fts fts;
+  private FtsObjectSet set;
   protected ErrorTableModel tableModel;
   private ObjectSelectedListener objectSelectedListener;
   public static ImageIcon errorIcon = SystemIcons.get("_error_object_");

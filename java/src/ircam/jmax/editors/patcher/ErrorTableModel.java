@@ -37,7 +37,7 @@ import ircam.jmax.fts.*;
  * A table model used to represent the content of an objectset of error objects
  * in a JTable. 
  */
-class ErrorTableModel extends AbstractTableModel
+class ErrorTableModel extends AbstractTableModel implements ToolTableModel
 {
   
   ErrorTableModel(FtsObjectSet set)
@@ -86,11 +86,17 @@ class ErrorTableModel extends AbstractTableModel
 	  return obj.getErrorDescription();    
   }
   
+    /* toglere!!!!!!!!!!!!!! */
   public FtsObjectSet getObjectSet()
   {
     return objectSet;
   }
-
+    
+  public ListModel getListModel()
+  {
+      return objectSet;
+  }
+  
   //--- Fields
   FtsObjectSet objectSet;
 }

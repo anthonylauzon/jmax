@@ -18,7 +18,6 @@ FindPanel.java\
 ErrorTableModel.java\
 ErrorTablePanel.java\
 FontCache.java\
-FpePanel.java\
 IconRenderer.java\
 JMaxToolPanel.java\
 KeyEventClient.java\

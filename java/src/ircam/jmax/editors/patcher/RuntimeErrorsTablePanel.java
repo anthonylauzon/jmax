@@ -37,7 +37,7 @@ import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.widgets.*;
 
-public class RuntimeErrorsTablePanel extends JPanel {
+public class RuntimeErrorsTablePanel extends JPanel implements JMaxToolPanel{
 
   /*private final static Color selectedColor = new Color(204, 204, 255);*/
   static class RuntimeErrorsTableCellRenderer extends DefaultTableCellRenderer
@@ -55,9 +55,20 @@ public class RuntimeErrorsTablePanel extends JPanel {
       }
   }
 
-  public RuntimeErrorsTablePanel(RuntimeErrorsTableModel model)
+  public RuntimeErrorsTablePanel(Fts fts)
   {
-    tableModel = model;
+    this.fts = fts;
+    
+    try
+	{
+	    runtimeErrorsSource  = (FtsRuntimeErrors) fts.makeFtsObject(fts.getRootObject(), "__runtimeerrors");
+	}
+    catch (FtsException e)
+	{
+	    System.out.println("System error: cannot get runtimeErrors object");
+	}
+
+    tableModel = new RuntimeErrorsTableModel(runtimeErrorsSource);
     table = new JTable(tableModel);
     table.setPreferredScrollableViewportSize(new Dimension(400, 200));
     table.setRowHeight(17);
@@ -122,8 +133,20 @@ public class RuntimeErrorsTablePanel extends JPanel {
       table.getSelectionModel().addListSelectionListener(l);
   }
 
+  /* ToolPanel interface */
+  public ToolTableModel getToolTableModel()
+  {
+      return tableModel;
+  }
+  public ListSelectionModel getListSelectionModel()
+  {
+      return table.getSelectionModel();
+  }
+
   protected JTable table;
+  protected Fts fts;
   protected RuntimeErrorsTableModel tableModel;
+  protected FtsRuntimeErrors runtimeErrorsSource;
   private ObjectSelectedListener objectSelectedListener;
 }
 

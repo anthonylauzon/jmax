@@ -37,7 +37,7 @@ import ircam.jmax.fts.*;
  * A table model used to represent the content of an objectset of error objects
  * in a JTable. 
  */
-class RuntimeErrorsTableModel extends AbstractTableModel
+class RuntimeErrorsTableModel extends AbstractTableModel implements ToolTableModel
 {
   
   RuntimeErrorsTableModel(ListModel list)

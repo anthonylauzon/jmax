@@ -25,45 +25,10 @@
 
 package ircam.jmax.editors.patcher;
 
-import java.awt.*; 
-import javax.swing.*; 
+import javax.swing.*;
 
-import ircam.jmax.*;
-import ircam.jmax.mda.*;
-import ircam.jmax.fts.*;
-import ircam.jmax.toolkit.*;
-
-/** The ermes module; the init function is called at init time
- *  by jmax, and install module related things
- */
-
-public class ErmesModule
+public interface JMaxToolPanel
 {
-  static public void initModule(boolean active)
-  {
-    if (active)
-      {
-	MaxRepaintManager manager = new MaxRepaintManager();
-	// Install the customized Repaint Manager
-	RepaintManager.setCurrentManager(manager);
-	// Optionally set the syncPaint flag
-	if (MaxApplication.getProperty("syncPaint") != null)
-	  ErmesSketchPad.setSyncPaint(true);
-	  //manager.setSyncPaint(true);
-	
-	//MaxApplication.getFts().addUpdateGroupListener(manager);
-
-	// Register the find panel and the fpe panel
-	FindPanel.registerFindPanel();
-	//FpePanel.registerFpePanel();
-	ToolsPanel.registerToolsPanel();
-      }
-
-    // Install the tcl commands
-
-    /* TclErmesPackage.installPackage(); Moved to ircam.jmax.script.tcl.TclInterpreter */
-  }
+  public ToolTableModel getToolTableModel();
+  public ListSelectionModel getListSelectionModel();
 }
-
-
-
