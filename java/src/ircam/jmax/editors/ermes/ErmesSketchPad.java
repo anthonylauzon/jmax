@@ -146,6 +146,16 @@ public class ErmesSketchPad extends Panel implements AdjustmentListener, MouseMo
 
   boolean itsScrolled = false;
 
+
+  // debug utility, to be removed //
+  public void paintAllRegions() {
+
+    itsElementRgn.paintRegion(getGraphics());
+    itsHSegmRgn.paintRegion(getGraphics());
+    itsVSegmRgn.paintRegion(getGraphics());
+  }
+
+
   //--------------------------------------------------------
   //	AddObjectForName
   //  adding an object given itsName and parameters.

@@ -154,5 +154,15 @@ class ErmesRegion
     Rectangle minimumRect = new Rectangle(left, top, right-left, bottom-top);
     return minimumRect;
   }
+
+  public void paintRegion(Graphics g) {
+    Rectangle aRect;
+
+    g.setColor(Color.red);
+    for(int i=0; i<itsRegions.size() ; i++){
+      aRect = (Rectangle) itsRegions.elementAt(i);
+      g.fillRect(aRect.x, aRect.y, aRect.width, aRect.height);
+    }
+  }
 }
 
