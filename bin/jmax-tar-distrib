@@ -150,11 +150,16 @@ chmod_dir ()
 # args: ARCH TYPE DIR
 copy_files ()
 {
-    if [ \! -f $3/distrib ] ;  then echo "File $3/distrib missing" >&2 ; exit 1 ; fi
+    if [ \! -f $3/distrib ]
+    then
+	echo "File $3/distrib missing" >&2
+	remove_dest_dir
+	exit 1
+    fi
 
     {
-	read TYPE_F ARCH_F NAME OTHERS
-	#echo read $TYPE_F $ARCH_F $NAME $OTHERS "<" $3/distrib
+	read TYPE_F ARCH_F NAME NEW_NAME
+	#echo read $TYPE_F $ARCH_F $NAME $NEW_NAME "<" $3/distrib
 
 	while [ $ARCH_F ] 
 	do
@@ -172,14 +177,20 @@ copy_files ()
 			chmod_dir $D
 		    fi
 
-		    cp $F $DEST_DIR/$F
-		    echo "Copyied $DEST_DIR/$F"
+		    if [ $NEW_NAME ]
+		    then
+			DST=$DEST_DIR/$NEW_NAME
+		    else
+			DST=$DEST_DIR/$F
+		    fi
 
+		    cp $F $DST
+		    echo "Copyied $DST"
 		    if ls -l $F | awk '{ exit(!(substr($1,4,1)=="x")); }'
 		    then
-			chmod 755 $DEST_DIR/$F
+			chmod 755 $DST
 		    else
-			chmod 644 $DEST_DIR/$F
+			chmod 644 $DST
 		    fi
 
 		elif [ -d "$3/$NAME" ]
@@ -195,11 +206,12 @@ copy_files ()
 		else
 
 		    echo "File or directory $3/$NAME not found" >&2
+		    remove_dest_dir
 		    exit 2
 
 		fi
 	    fi
-	    read TYPE_F ARCH_F NAME OTHERS
+	    read TYPE_F ARCH_F NAME NEW_NAME
 	    #echo read $TYPE_F $ARCH_F $NAME $OTHERS "<" $3/distrib
 	done
     } < $3/distrib
