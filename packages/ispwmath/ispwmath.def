@@ -1,9 +1,0 @@
-provided-package         = ispwmath
-name                     = ispwmath
-version                  = 0.0.0
-description              = ISPW math classes
-required-package         : jmax
-module-path              = $(dir)/c/lib/$(arch)/$(mode)
-module                   : ispwmath
-script                   = $(dir)/ispwmath.scm
-

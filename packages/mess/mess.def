@@ -1,8 +1,0 @@
-provided-package         = mess
-name                     = mess
-version                  = 0.0.0
-description              = message classes
-required-package         : jmax
-module-path              = $(dir)/c/lib/$(arch)/$(mode)
-module                   : mess
-script                   = $(dir)/mess.scm

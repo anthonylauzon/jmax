@@ -1,7 +1,0 @@
-provided-package         = pdtddev
-name                     = pdtddev
-version                  = 0.0.0
-description              = Posix Direct-To-Disk devices
-required-package         : jmax
-module-path              = $(dir)/c/lib/$(arch)/$(mode)
-module                   : pdtddev

@@ -1,7 +1,0 @@
-provided-package         = table
-name                     = table
-version                  = 0.0.0
-description              = integer table editor
-required-package         : jmax
-classpath                = $(dir)/java/classes
-classes                  : ircam.jmax.editors.table.TableExtension

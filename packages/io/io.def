@@ -1,8 +1,0 @@
-provided-package         = io
-name                     = io
-version                  = 0.0.0
-description              = I/O class library (udp, ...)
-required-package         : jmax
-module-path              = $(dir)/c/lib/$(arch)/$(mode)
-module                   : io
-
