@@ -379,6 +379,15 @@ static int check_better_sample_format(snd_pcm_t* handle,
   {
     --format;
     test_result = snd_pcm_hw_params_test_format(handle, params, format);	
+
+    /* avoid unsigned int formats, since there's no output function for that */
+    if (test_result >= 0  
+	&&  snd_pcm_format_linear(format)  &&  snd_pcm_format_unsigned(format))
+    {
+      test_result = -1;
+      fts_log("[alsaaudioport] avoiding unhandled format (%s)\n", 
+	      get_alsa_sample_format_name(format));
+    }
   }
 
   if (test_result >= 0)
