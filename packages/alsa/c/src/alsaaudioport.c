@@ -34,27 +34,15 @@
 
 #include "alsaaudio.h" 
 
-/* PCM device */
-static fts_symbol_t s_default;
-static fts_symbol_t s_hw_0_0;
-static fts_symbol_t s_plug_0_0;
 
 #define GUESS_CHANNELS -1
-/*
-  We open the default device.
-  This default can be overwritten in .asoundrc
-  with:
-  pcm.!default pcm.foo ....
-  @see ALSA documentation
-*/
-#define DEFAULT_PCM_NAME s_default
 
 /* Defaults:
    If these defaults are not available for current card, 
    we check which parameters are supported by audio card.
 */
 #define DEFAULT_FORMAT s_s32_le
-#define DEFAULT_ACCESS s_rw_noninterleaved
+#define DEFAULT_ACCESS s_mmap_noninterleaved
 #define DEFAULT_SAMPLING_RATE (44100.)
 #define DEFAULT_FIFO_SIZE 2048
 #define DEFAULT_INPUT_CHANNELS 26
@@ -400,30 +388,45 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
     int sampling_rate = (int)fts_get_number_float(at);
     /* close playback handle */
     if (NULL != self->playback.handle)
+    {
+      /* we change only if device was previously opened */
       snd_pcm_close(self->playback.handle);
-    
-    stream = &self->playback;
-    err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
-    
-    /* update output functions */
-    alsaaudioport_update_audioport_output_functions(self, stream);
+      
+      stream = &self->playback;
+      err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
+      
+      if (err < 0)
+      {
+	post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+	fts_log("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+      }
+      else
+      {
+	fts_log("[alsaaudioport] sample rate change: success \n");	
+	/* update output functions */
+	alsaaudioport_update_audioport_output_functions(self, stream);
+      }
+    }
     
     if (NULL != self->capture.handle)
+    {
+      /* we change only if device was previously opened */
       snd_pcm_close(self->capture.handle);
-    
-    stream = &self->capture;
-    err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
-    
-    /* update input functions */
-    alsaaudioport_update_audioport_input_functions(self, stream);
-
-    if (err < 0)
-    {
-      post("[alsaaudioport] sample rate change: failed \n");
-    }
-    else
-    {
-      post("[alsaaudioport] sample rate change: success \n");
+      
+      stream = &self->capture;
+      err = alsastream_open(stream, self->device_name, stream->stream, &stream->format, stream->channels, sampling_rate, stream->fifo_size, &stream->access);
+      
+      if (err < 0)
+      {
+	post("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+	fts_log("[alsaaudioport] sample rate change: failed (%s)\n", snd_strerror(err));
+      }
+      else
+      {
+	fts_log("[alsaaudioport] sample rate change: success \n");	
+	/* update input functions */
+	alsaaudioport_update_audioport_input_functions(self, stream);
+      }
     }
   }
 
@@ -523,6 +526,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   if (err != sampling_rate)
   {
     fts_log("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
+    post("[alsaaudioport] rate doesn't match (requested %iHz, get %iHz)\n", sampling_rate, err);
   }
     
   /*
@@ -558,7 +562,7 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   if ((err = snd_pcm_hw_params( stream->handle, hwparams)) < 0)
   {
     snd_pcm_hw_params_dump( hwparams, get_post_log());
-    post_log();
+/*     post_log(); */
     return err;
   }
 
@@ -838,23 +842,6 @@ static void FUN_NAME(fts_audioport_t* port) \
   24 bits: 8388607
 */
 
-/* INPUT_FUN_INTERLEAVED( alsa_input_16_rw_i, short, snd_pcm_readi, 0, 32767.0f) */
-/*   INPUT_FUN_INTERLEAVED( alsa_input_32_rw_i, long, snd_pcm_readi, 8, 8388607.0f) */
-/*   INPUT_FUN_INTERLEAVED( alsa_input_16_mmap_i, short, snd_pcm_mmap_readi, 0, 32767.0f) */
-/*   INPUT_FUN_INTERLEAVED( alsa_input_32_mmap_i, long, snd_pcm_mmap_readi, 8, 8388607.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_rw_i, short, snd_pcm_writei, 0, 32767.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_rw_i, long, snd_pcm_writei, 8, 8388607.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_16_mmap_i, short, snd_pcm_mmap_writei, 0, 32767.0f) */
-/*   OUTPUT_FUN_INTERLEAVED( alsa_output_32_mmap_i, long, snd_pcm_mmap_writei, 8, 8388607.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_rw_n, short, snd_pcm_readn, 0, 32767.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_rw_n, long, snd_pcm_readn, 8, 8388607.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_16_mmap_n, short, snd_pcm_mmap_readn, 0, 32767.0f) */
-/*   INPUT_FUN_NONINTERLEAVED( alsa_input_32_mmap_n, long, snd_pcm_mmap_readn, 8, 8388607.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_rw_n, short, snd_pcm_writen, 0, 32767.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_rw_n, long, snd_pcm_writen, 8, 8388607.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_16_mmap_n, short, snd_pcm_mmap_writen, 0, 32767.0f) */
-/*   OUTPUT_FUN_NONINTERLEAVED( alsa_output_32_mmap_n, long, snd_pcm_mmap_writen, 8, 8388607.0f) */
-
 
 /* /\* to access this table: functions_table[mode][format][inout] *\/ */
 /*   static ftl_wrapper_t functions_table[4][2][2] = { */
@@ -1107,6 +1094,8 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   alsaaudioport_update_audioport_input_functions(self, &self->capture);
 
   fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_INPUT);
+
+  fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
 }
 
 static void
@@ -1128,6 +1117,8 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   alsaaudioport_update_audioport_output_functions(self, &self->playback);
 
   fts_audioport_set_open((fts_audioport_t*)self, FTS_AUDIO_OUTPUT);
+
+  fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
 }
 
 static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -1138,6 +1129,7 @@ static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t 
   if (self->capture.handle != 0)
     snd_pcm_close(self->capture.handle);
 
+  fts_dsp_sample_rate_remove_listener(o);
 }
 
 static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
@@ -1151,6 +1143,7 @@ static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t
   if (self->playback.handle != 0)
     snd_pcm_close(self->playback.handle);
 
+  fts_dsp_sample_rate_remove_listener(o);
 }
 
 static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1197,70 +1190,12 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   }
 
   self->to_output = 0;
-
-    fts_dsp_sample_rate_add_listener(o, alsaaudioport_sample_rate_change);
-#if 0
-  {
-
-/*     /\* convert access type to function array index *\/ */
-/*     access_index = convert_alsa_access_to_access_index(access); */
-/*     if (-1 == access_index) */
-/*     { */
-/*       post("[alsaaudioport] playback access type unknown \n"); */
-/*       fts_object_error(o,"playback access type unknown \n"); */
-/*       return; */
-/*     } */
-/*     format_is_32 = (format == SND_PCM_FORMAT_S32_LE); */
-  
-/*     fts_audioport_set_input_channels( (fts_audioport_t *)self, self->capture.channels); */
-/*     fts_audioport_set_input_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][0]); */
-
-/*     self->input_buffer = alsaaudioport_allocate_buffer( access, self->capture.channels, fts_dsp_get_tick_size(), snd_pcm_format_physical_width(format)/8); */
-    }
-
-      /* convert access type to function array index */
-      access_index = convert_alsa_access_to_access_index(access);
-      if (-1 == access_index)
-      {
-	post("[alsaaudioport] playback access type unknown \n");
-	fts_object_error(o,"playback access type unknown \n");
-	return;
-      }
-
-      format_is_32 = (format == SND_PCM_FORMAT_S32_LE);
-
-#warning (OLD API) alsaaudioport_init use fts_audioport_set_output_channels (OLD API)
-/*     fts_audioport_set_output_channels( (fts_audioport_t *)self, self->playback.channels); */
-#warning (OLD API) alsaaudioport_init use fts_audioport_set_output_function (OLD API)
-/*     fts_audioport_set_output_function( (fts_audioport_t *)self, functions_table[access_index][format_is_32][1]); */
-
-#warning (OLD API) alsaaudioport_init use fts_audioport_set_xrun_function (OLD API)
-/*   fts_audioport_set_xrun_function( (fts_audioport_t *)self, alsaaudioport_xrun_function); */
-
-#ifdef DEBUG
-    if (self->capture.handle)
-    {
-      snd_pcm_dump( self->capture.handle, get_post_log());
-      post_log();
-    }
-    if (self->playback.handle)
-    {
-      snd_pcm_dump( self->playback.handle, get_post_log());
-      post_log();
-    }
-#endif
-
-
-  }
-#endif /* DEBUGGING */
-
 }
 
 static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsaaudioport_t *self = (alsaaudioport_t *)o;
 
-  fts_dsp_sample_rate_remove_listener(o);
   fts_audioport_delete( &self->head);
 
 
@@ -1322,9 +1257,6 @@ alsaaudioport_print_all_device(alsaaudioport_t* self)
 }
 
 
-
-
-
 static void alsaaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
@@ -1345,9 +1277,6 @@ void alsaaudioport_config( void)
 {
   fts_symbol_t s = fts_new_symbol("alsaaudioport");
 
-  s_default = fts_new_symbol( "default"); 
-  s_hw_0_0 = fts_new_symbol("hw:0,0");
-  s_plug_0_0 = fts_new_symbol("plughw:0,0");
   s_s32_le = fts_new_symbol( "S32_LE");
   s_s16_le = fts_new_symbol( "S16_LE");
   s_mmap_noninterleaved = fts_new_symbol( "mmap_noninterleaved");
