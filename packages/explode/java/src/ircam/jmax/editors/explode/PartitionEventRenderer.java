@@ -7,8 +7,8 @@ import java.awt.*;
  * black color, no labels.
  */
 public class PartitionEventRenderer implements EventRenderer {
-  final static int OVAL_WIDTH = 5;
-  final static int OVAL_HEIGHT = 5;
+  final static int NOTE_DEFAULT_WIDTH = 5;
+  final static int NOTE_DEFAULT_HEIGHT = 3;
   AdapterProvider itsAdapterProvider;
 
   int oldX, oldY;
@@ -20,9 +20,10 @@ public class PartitionEventRenderer implements EventRenderer {
   public void render(ScrEvent e, Graphics g) {
     int x = itsAdapterProvider.getAdapter().getX(e);
     int y = itsAdapterProvider.getAdapter().getY(e);
-    System.err.println("---evt x:"+ x+"---evt y:"+y);
-    g.fillOval(x, y, OVAL_WIDTH, OVAL_HEIGHT);
-      
+    int lenght = itsAdapterProvider.getAdapter().getLenght(e);
+
+    g.fillRect(x, y, lenght, NOTE_DEFAULT_HEIGHT);
+    g.drawString(""+e.getPitch(), x, y-5);
   }
   
 }

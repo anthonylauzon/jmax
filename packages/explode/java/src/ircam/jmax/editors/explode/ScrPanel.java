@@ -2,6 +2,7 @@ package ircam.jmax.editors.explode;
 
 import com.sun.java.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 
   /**
@@ -24,6 +25,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
   Renderer itsRenderer;
   Vector tools = new Vector();
 
+  int logicalTime = 0;
 
   Dimension size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
   ScrTool currentTool = null;
@@ -34,12 +36,29 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    */
   public ScrPanel(ExplodeDataModel ep) {
     
+    setLayout(new BorderLayout());
     setExplodeDataModel(ep);
     setAdapter(new PartitionAdapter()); 
     ((PartitionAdapter) itsAdapter).setXZoom(20);// just a try
+    ((PartitionAdapter) itsAdapter).setYZoom(300);// just a try
+    ((PartitionAdapter) itsAdapter).setYInvertion(true);// just a try
+    ((PartitionAdapter) itsAdapter).setYTransposition(122);// just a try
     itsRenderer = new ScoreRenderer(this, ep, this);
     itsExplodeDataModel.addListener(this);
     
+    Scrollbar aScrollbar = new Scrollbar(Scrollbar.HORIZONTAL, 0, 1000, 0, itsExplodeDataModel.getEventAt(itsExplodeDataModel.length()-1).getTime());
+    
+    aScrollbar.setUnitIncrement(1000);
+    aScrollbar.addAdjustmentListener(new AdjustmentListener() {
+      public void adjustmentValueChanged(AdjustmentEvent e) {
+	logicalTime = e.getValue();
+	int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
+	((PartitionAdapter)itsAdapter).setXTransposition(-logicalTime);
+	itsRenderer.render(getGraphics(), temp, temp+10);
+      }
+    });
+    add(aScrollbar, BorderLayout.SOUTH);
+
     //----
     //prepare the toolbar...
     initTools();
@@ -151,10 +170,10 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
    * Delegated to the current Renderer
    */
   public void paint(Graphics g) {
-    
-    itsRenderer.render(g);    
+    int temp = itsExplodeDataModel.indexOfFirstEventAfter(logicalTime);
+    itsRenderer.render(g, temp, temp+10);    
   }
-  
+
   /**
    * from Panel class...
    */

@@ -25,6 +25,13 @@ public interface ExplodeDataModel {
    */
   public abstract ScrEvent getEventAt(int index);
 
+
+  /**
+   * access the first event whose starting time is 
+   * after a given time
+   */
+  public abstract int indexOfFirstEventAfter(int time);
+
   /**
    * adds an event in the database
    */

@@ -11,6 +11,7 @@ abstract public class Adapter {
 
   Mapper XMapper;
   Mapper YMapper;
+  Mapper LenghtMapper;
 
   public int getX(ScrEvent e) {
     if (XMapper != null) return XMapper.get(e);
@@ -21,5 +22,24 @@ abstract public class Adapter {
     if (YMapper != null) return YMapper.get(e);
     else return 0;
   }
+
+  public void setX(ScrEvent e, int x) {
+    XMapper.set(e, x);
+  }
+
+  public void setY(ScrEvent e, int y) {
+    YMapper.set(e, y);
+  }
+
+  public int getLenght(ScrEvent e) {
+    if (LenghtMapper != null) return LenghtMapper.get(e);
+    else return 0;
+  }
+
+  public void setLenght(ScrEvent e, int lenght) {
+    LenghtMapper.set(e, lenght);
+  }
+
+
 }
 

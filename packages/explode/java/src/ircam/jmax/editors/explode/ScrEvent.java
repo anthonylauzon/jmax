@@ -11,16 +11,15 @@ public class ScrEvent {
   int itsDuration;
   int itsChannel;
   int itsSomethingElse;
-  static int DEFAULT_VALUE = -1;
 
 
   public ScrEvent() {
-    itsTime = DEFAULT_VALUE;
-    itsPitch = DEFAULT_VALUE;
-    itsVelocity = DEFAULT_VALUE;
-    itsDuration = DEFAULT_VALUE;
-    itsChannel = DEFAULT_VALUE;
-    itsSomethingElse = DEFAULT_VALUE;
+    itsTime = 0;
+    itsPitch = 64;
+    itsVelocity = 64;
+    itsDuration = 100;
+    itsChannel = 1;
+    itsSomethingElse = 0;
   }
 
   /**

@@ -7,6 +7,7 @@ import java.awt.*;
  * events.
  */
 public interface Renderer {
-  abstract public void render(Graphics g);
+
+  abstract public void render(Graphics g, int startEvent, int endEvent);
   abstract public EventRenderer getEventRenderer();
 }

@@ -71,38 +71,36 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   }
 
   /**
-   * The function called to repaint the score
+   * render (a part of) the score
    */
-  public void render(Graphics g) {
+  public void render(Graphics g, int startEvent, int endEvent) {
+    
+    if (!prepareBackground(g)) return;
+    g.setColor(Color.black);
 
+    for (int i = startEvent; i< endEvent; i++) {
+
+      temp = itsExplodeDataModel.getEventAt(i);
+      itsEventRenderer.render(temp, g);
+      
+    }
+
+  }
+
+  private boolean prepareBackground(Graphics g) {
     if (!imageReady) {
       /* received a paint while loading the image... don't paint yet */
       
       g.drawString("PLEASE WAIT.....", 100, 100);
-      return;
+      return false;
       
     }
+    else    
+      g.drawImage(itsImage, 12, 20,this);
     
-    Dimension d = itsContainer.getSize();
-    g.setColor(Color.white);
-    g.fillRect(0, 0, d.width, d.height);        
-    g.drawImage(itsImage, 12, 20,this);
-    
-    g.setColor(Color.black);
-    
-    
-    for (int i = 0; i< itsExplodeDataModel.length(); i++) {
-      
-      temp = itsExplodeDataModel.getEventAt(i);
-      
-      if (i< 10) {System.err.println("rendering time:"+temp.getTime()+", pitch:"+temp.getPitch()+", velocity:"+temp.getVelocity()+", duration:"+temp.getDuration());
-      itsEventRenderer.render(temp, g);
-      }
-    
-    }
+    return true;
   }
-
-
+  
 }
 
 

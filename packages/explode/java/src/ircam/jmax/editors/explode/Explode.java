@@ -3,6 +3,7 @@ package ircam.jmax.editors.explode;
 import java.io.*;
 import java.lang.*;
 import java.awt.event.*;
+import java.awt.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
@@ -24,6 +25,14 @@ public class Explode extends MaxEditor implements MaxDataEditor, AAAReadme {
 
     ExplodeRemoteData explodeRemoteData = (ExplodeRemoteData) maxData;
 
+
+    /* JDK1.1 version */
+    /*JScrollPane aScrollPane = new JScrollPane();
+      aScrollPane.add(new ScrPanel(explodeRemoteData));
+      aScrollPane.setSize(200, 200);*/
+    /* swing version (too slow!!) 
+       JScrollPane aScrollPane = new JScrollPane();
+       aScrollPane.getViewport().add(new ScrPanel(explodeRemoteData)); */
     
     getContentPane().add(new ScrPanel(explodeRemoteData));
     

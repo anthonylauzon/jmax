@@ -61,6 +61,16 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     return (ScrEvent) itsEvents.elementAt(index);
   }
 
+  public int indexOfFirstEventAfter(int time) {
+    //this implementation requires that the events are ordered by starting time
+    ScrEvent temp;
+    for (int i = 0; i<length(); i++) {
+      temp = getEventAt(i);
+      if (temp.getTime() >= time) return i;
+    }
+    System.err.println("=------------------can't find an event after"+time);
+    return 0;//can't find. Did you give a wrong value?
+  }
 
   /* a method inherited from FtsRemoteData */
   public final void call( int key, Object args[])

@@ -1,4 +1,5 @@
 SOURCES = \
+	DurationMapper.java	\
 	Explode.java		\
 	ExplodeDataModel.java	\
 	ExplodeDataListener.java	\
