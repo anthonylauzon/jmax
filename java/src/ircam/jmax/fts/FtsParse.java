@@ -707,7 +707,10 @@ public class FtsParse
     int i = 0;
 
     if (isSign(value.charAt(i)))
-      i++;
+      if (value.length() == 1)
+	return false;
+      else
+	i++;
 
     while (i < value.length())
       if (! isDigit(value.charAt(i++)))
