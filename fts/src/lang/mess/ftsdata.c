@@ -60,7 +60,7 @@ static void meta_data_init()
   fts_data_id_put( 1, meta_data);
 }
 
-fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name,  fts_data_export_fun_t export_fun)
+fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name)
 {
   int i;
   fts_data_class_t *class;
@@ -69,12 +69,16 @@ fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name,  fts_data_ex
   assert( class != 0);
 
   class->data_class_name = data_class_name;
-  class->export_fun      = export_fun;
 
   for (i = 0; i < FUNCTION_TABLE_SIZE; i++)
     class->functions_table[i] = 0;
 
   return class;
+}
+
+void fts_data_class_define_export_function( fts_data_class_t *class, fts_data_export_fun_t export_fun)
+{
+  class->export_fun = export_fun;
 }
 
 void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t function)

@@ -1,7 +1,8 @@
 #ifndef _FTSDATA_H_
 #define _FTSDATA_H_
 
-extern fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name,  fts_data_export_fun_t upload_fun);
+extern fts_data_class_t *fts_data_class_new( fts_symbol_t data_class_name);
+extern void fts_data_class_define_export_function( fts_data_class_t *class, fts_data_export_fun_t export_fun);
 extern void fts_data_class_define_function( fts_data_class_t *class, int key, fts_data_fun_t fun);
 
 extern void fts_data_init( fts_data_t *d, fts_data_class_t *class);

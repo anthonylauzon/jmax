@@ -403,25 +403,51 @@ patcher_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
 }
 
+/* Contained objects are deleted in the reverse order (last first);
+   it purpose is to reduce the number of redefinitions happening
+   and errors objects instantiated during a delete; locally to a patcher,
+   objects using variables come after objects defining the same variable,
+   so by deleting in the reverse order, we avoid redefinition within the
+   patchers; of course, if a variable is used somewhere else,
+   the user may be recomputed during delete.
+
+   Also, since the list is can be indirectly reordered by a recompute
+   (i.e. a deletion), the last member is recomputed at each
+   interaction; slow, but the only alternative is to use a dynamic array
+   instead of a list. We will do it if it is a problem.
+   */
 
 static void 
 patcher_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_patcher_t *this = (fts_patcher_t *) o;
-
+  fts_object_t *p;
   /*
    * delete its content; each destroied object will take away himself
    * from the list, including inlets and outlets; this will undo the
    * connections also to the inlets and outlets.
    */
 
-  fts_atom_array_free(this->args);
-
   while (this->objects)
-    fts_object_delete(this->objects);
+    {
+      /* find last */
+
+      p = this->objects;
+
+      while (p->next_in_patcher)
+	p = p->next_in_patcher;
+
+      /* Delete it */
+
+      fts_object_delete(p);
+
+      /* Restart all over again; slow
+	 but needed, see comment before the function */
+    }
 
   /* Delete all the variables */
 
+  fts_atom_array_free(this->args);
   fts_variables_undefine((fts_object_t *)this, (fts_object_t *)this);
 
   /* delete the inlets and inlets tables */

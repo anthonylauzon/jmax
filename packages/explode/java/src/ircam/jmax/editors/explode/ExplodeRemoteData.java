@@ -8,6 +8,11 @@ import java.util.*;
 
 public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 {
+  /** Key for remote call add */
+
+  static final int REMOTE_ADD   = 1;
+  static final int REMOTE_REMOVE = 2;
+
   /* Events are stored in an array; the array is larger than
      needed to allow insertions, and reallocated by need.
      Search is done with a binary search, while insertion/deleting
@@ -45,13 +50,9 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
 	    int med = (max + min) / 2;
 	    
 	    if (events[med].getTime() <= time) 
-
 	      min = med;
-
 	    else 
-
 	      max = med;
-
 	  }
 
 	return max;
@@ -130,8 +131,18 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     makeRoomAt(index);
     events[index] = event;
     System.err.println("added event ["+index+"] time: "+event.getTime()+" pitch: "+event.getPitch());
-    // @@@@: Spedire l'evento a FTS
+
+    // Send the new event to fts
     
+    Object args[] = new Object[6];
+    args[0] = new Integer(index);
+    args[1] = new evt.getTime();
+    args[2] = new evt.getPitch();
+    args[3] = new evt.getVelocity();
+    args[4] = new evt.getDuration();
+    args[5] = new evt.getSomething();
+    remoteCall(REMOTE_ADD, args);
+
     notifyListeners();
   }
 
@@ -140,15 +151,21 @@ public class ExplodeRemoteData extends FtsRemoteData implements ExplodeDataModel
     int removeIndex;
 
     // Linear search: a binary search would not
-    // work because we may have multiple events
-    // with the same key.
+    // work because we can have multiple events
+    // with the same key (time).
 
     for (removeIndex = 0 ; removeIndex < events_fill_p; removeIndex++)
       {
 	if (events[removeIndex] == event)
 	  {
 	    deleteRoomAt(removeIndex);
-	    // @@@ Spedire il remove a FTS
+
+	    // Send the remove command to fts
+
+	    Object args[] = new Object[1];
+	    args[0] = new Integer(index);
+	    remoteCall(REMOTE_REMOVE, args);
+
 	    notifyListeners();
 	  }
       }
