@@ -1,54 +1,179 @@
 
 package ircam.jmax.editors.console;
+import ircam.jmax.*;
+import java.io.*;
+import java.util.*;
+/**
+  The (new) TCL console, integrated with the jmax window.
+  This class is essentially a thread that opens a window,
+  puts a text area into it, and starts the interaction with the user.
+  This console also provide a PrintStream, to be used by other parts
+  of the system (es. FTS)
+  */
 
 import java.awt.*;
-import ircam.jmax.*;
-import ircam.jmax.utils.*;
-import ircam.jmax.editors.ermes.*;
-import java.util.*;
+import java.awt.event.*;
+import tcl.lang.*;
 
-/**
- * The ermes message window.
- */
-public class Console extends TextWindow implements MaxWindow {
+public class Console extends Thread implements MaxWindow{
+  StringBuffer itsSbuf = new StringBuffer();
+  TextArea text;
+  Frame itsFrame;
+  Interp itsInterp;
+  PrintWriter itsPrintWriter;
+
+  // "deprecated" variables needed in the MaxWindow interface. Redesign please.
   public Menu itsWindowsMenu;
-
   Vector itsWindowMenuList;
 
-  public Console(String title) {
-    super(title);
+  public Console(Interp i, int rows, int columns) {
+      StringBuffer sSbuf = new StringBuffer();
+      itsFrame = new Frame("JMax Console");
+      text = new TextArea(rows, columns);
+      itsInterp = i;
+      itsFrame.add(text);
+      itsFrame.setVisible(true);
+      // delegate keyboard events
+      text.addKeyListener(new ConsoleKeyListener(this));
+      //text.addMouseListener(new ConsoleMouseListener());
+      /*
+       * The console thread runs as a daemon so that it gets terminated 
+       * automatically when all other user threads are terminated.
+       */
+      itsPrintWriter = new PrintWriter(new ConsoleWriter(this));
+      setDaemon(true);
+  }
+
+  public Frame getFrame() {
+   return itsFrame; 
+  }
+  
+  public PrintWriter getPrintWriter() {
+    return itsPrintWriter;
+  }
+
+  public TextArea GetText() {
+    return text;
+  }
+  
+  public void PutLine(String s) {
+    //e.m.text.insert(s + "\n", 100000);
+    text.append(s + "\n");
+  }
+  
+  public void Put(String s) {
+    text.append(s);
+    //e.m.text.insert(s, 100000);
+  }
+  
+  /*
+   * The AppletConsole thread loops waiting for notification from the
+   * ConsoleKeyListener object, via the LineReadyNotify method.
+   */
+  
+  public synchronized void run() {
+    PutLine("\n  **** jmax console/ TCL interpreter started ****");
+    Put("\n% ");
+    while (true) {
+      try {
+	wait();
+	ProcessLine();
+      }
+      catch (InterruptedException e) {
+	System.out.println("AppletConsole: wait error");		
+      }
+    }
+  }
+  
+  /*
+   * The ConsoleKeyListener object tells the console thread that a 
+   * line of input is available and run() can proceed.
+   */
+  
+  public synchronized void LineReadyNotify(String s) {
+    itsSbuf.append(s);
+    notify();
+  }
+  
+  /*
+   * If itsSbuf contains a complete command, evaluate it and display the
+   * result in the text box.  Otherwise, display the secondary prompt.
+   */
+  
+  private void ProcessLine() {
+    String s = itsSbuf.toString();
     
-    itsWindowMenuList = new Vector();
-
-    MenuBar mb = new MenuBar();
-    itsWindowsMenu = CreateWindowsMenu();
-    mb.add(itsWindowsMenu);
-    setMenuBar(mb);
-  }
-
-  private Menu CreateWindowsMenu() {
-    Menu windowsMenu = new Menu("Windows");
-    windowsMenu.add(new MenuItem("Project Manager Ctrl+M"));
-    windowsMenu.add(new MenuItem("Jacl Console"));
-    AddWindowItems(windowsMenu);
-    return windowsMenu;
-  }
-
-  private void AddWindowItems(Menu theWindowMenu){
-    ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
-    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++) {
-      aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-      theWindowMenu.add(new MenuItem(aSketchWindow.getTitle()));
-    }
-    for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
-      aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-     if(aWindow!=this)theWindowMenu.add(new MenuItem(aWindow.GetDocument().GetName()));
+    if (itsInterp.commandComplete(s)) {
+      
+      try {
+	itsInterp.eval(s);
+	String result = itsInterp.getResult().toString();
+	if (result.length() > 0) {
+	  PutLine(result);
+	}
+      } catch (TclException e) {
+	
+	if (e.compCode == TCL.OK) {
+	  PutLine(itsInterp.getResult().toString());
+	} else if (e.compCode == TCL.ERROR) {
+	  PutLine(itsInterp.getResult().toString());
+	} else {
+	  PutLine("command returned bad code: " 
++ e.compCode);
+	}
+      }
+      itsSbuf.setLength(0);
+      Put("% ");
+    } else {
+      Put("> ");
     }
   }
+  
+  //----------- implementation of the MaxWindow interface -----------//
+  
+  public MaxDocument GetDocument(){
+    return null;
+  }
+  
+  public Frame GetFrame(){
+    return itsFrame;
+  }
 
+  public void InitFromDocument(MaxDocument theDocument){}
+
+  public void ToFront(){
+    itsFrame.toFront();
+  }
+
+  public boolean Close(){
+    return false;
+  }
+  
+  //"deprecated" methods. Redesign please
   public void AddWindowToMenu(String theName){
     itsWindowsMenu.add(new MenuItem(theName));
+  }
+
+  public void RemoveWindowFromMenu(String theName){
+    MenuItem aItem;
+    for(int i=0; i<itsWindowsMenu.countItems();i++){
+      aItem = itsWindowsMenu.getItem(i);
+      if(aItem.getLabel().equals(theName)){
+	itsWindowsMenu.remove(aItem);
+	return;
+      }
+    }
+  }
+
+  public void ChangeWinNameMenu(String theOldName, String theNewName){
+    MenuItem aItem;
+    for(int i=0; i<itsWindowsMenu.countItems();i++){
+      aItem = itsWindowsMenu.getItem(i);
+      if(aItem.getLabel().equals(theOldName)){
+	aItem.setLabel(theNewName);
+	return;
+      }
+    }
   }
 
   public void AddToSubWindowsMenu(String theTopWindowName, String theSubWindowName, boolean theFirstItem){
@@ -116,129 +241,5 @@ public class Console extends TextWindow implements MaxWindow {
     }
   }
 
-  public void RemoveWindowFromMenu(String theName){
-    MenuItem aItem;
-    for(int i=0; i<itsWindowsMenu.countItems();i++){
-      aItem = itsWindowsMenu.getItem(i);
-      if(aItem.getLabel().equals(theName)){
-	itsWindowsMenu.remove(aItem);
-	return;
-      }
-    }
-  }
-
-  public void ChangeWinNameMenu(String theOldName, String theNewName){
-    MenuItem aItem;
-    for(int i=0; i<itsWindowsMenu.countItems();i++){
-      aItem = itsWindowsMenu.getItem(i);
-      if(aItem.getLabel().equals(theOldName)){
-	aItem.setLabel(theNewName);
-	return;
-      }
-    }
-  }
-
-  private boolean IsInWindowsMenu(String theName) {
-    return(theName.equals("Project Manager Ctrl+M")||theName.equals("Jacl Console")|IsAWindowName(theName)|| IsAnEditorFrameName(theName));
-  }
-  
-  private boolean IsAWindowName(String theName){
-    ErmesSketchWindow aSketchWindow; 
-    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++) {
-      aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-      if(aSketchWindow.getTitle().equals(theName)) return true;
-    }
-    return false;
-  }
-  
-  private boolean IsAnEditorFrameName(String theName){
-    MaxWindow aWindow; 
-    for (int i=0; i< MaxApplication.itsEditorsFrameList.size(); i++) {
-      aWindow = (MaxWindow)MaxApplication.itsEditorsFrameList.elementAt(i);
-      if(aWindow.GetDocument().GetName().equals(theName)) return true;
-    }
-    return false;
-  } 
-  
-  //--------------------------------------------------------
-  //	action
-  //	high-level events handler
-  //--------------------------------------------------------
-  public boolean action(Event event, Object arg) {
-    if (event.target instanceof MenuItem) {
-      MenuItem aMenuItem = (MenuItem) event.target;
-      String itemName = aMenuItem.getLabel();
-      if (IsInWindowsMenu(itemName)) return WindowsMenuAction(aMenuItem, itemName);
-    }
-    return true;
-  }
-
-  private boolean WindowsMenuAction(MenuItem theMenuItem, String theString) {
-    if (theString.equals("Project Manager Ctrl+M")) {
-      MaxApplication.getApplication().itsProjectWindow.toFront();
-    }
-    if (theString.equals("Jacl Console")) {
-      MaxApplication.getApplication().GetShell().ToFront();
-    }
-    else BringToFront(theString);
-    return true;
-  }
-  
-  private void BringToFront(String theName){
-    ErmesSketchWindow aSketchWindow;
-    MaxWindow aWindow;
-    for (int i=0; i< MaxApplication.itsSketchWindowList.size(); i++) {
-      aSketchWindow = (ErmesSketchWindow) MaxApplication.itsSketchWindowList.elementAt(i);
-      if(aSketchWindow.getTitle().equals(theName)) {
-	aSketchWindow.toFront();
-	return;
-      }
-    }
-    for (int j=0; j< MaxApplication.itsEditorsFrameList.size(); j++) {
-      aWindow = (MaxWindow) MaxApplication.itsEditorsFrameList.elementAt(j);
-      if(aWindow.GetDocument().GetName().equals(theName)) {
-	aWindow.ToFront();
-	return;
-      }
-    }
-  }
-
-   public boolean keyDown(Event evt,int key){
-    if (evt.controlDown()){
-      if(key == 13) MaxApplication.getApplication().itsProjectWindow.toFront();
-      return true;
-    }
-    return false;
-  }
-  
-  public boolean handleEvent(Event event) {
-    if (event.id == Event.WINDOW_DESTROY) {
-      return true;
-    }
-    return super.handleEvent(event);
-  }
-
-  public void InitFromDocument(MaxDocument theDocument){}
-  
-  public Frame GetFrame(){
-    return this;
-  }
-
-  public void ToFront(){
-    toFront();
-  }
-
-  public MaxDocument GetDocument(){
-    return null;
-  }
-
-  public boolean Close(){
-    return false;
-  }  
 }
-
-
-
-
-
 

@@ -11,7 +11,7 @@ import ircam.jmax.dialogs.*;
 import ircam.jmax.editors.console.*;
 import ircam.jmax.editors.ermes.*;
 import ircam.jmax.editors.project.*;
-import cornell.applet.*;
+import tcl.lang.*;
 
 /**
  * The main application class in Ermes. Contains the global parameters 
@@ -49,18 +49,19 @@ public class MaxApplication extends Object {
 
   /** Get the unique active TCL interpreter */
 
-  public static MaxInterp getTclInterp()
+  public static Interp/*MaxInterp*/ getTclInterp()
   {
-    return (MaxInterp) itsShell.interp;
+    return /*(MaxInterp)*/ itsInterp;
   }
 
   /** Get the Post stream (usually the console, otherwise the stderr ?) */
 
-  public static PrintStream getPostStream()
+  public static PrintWriter getPostStream()
   {
-    return itsPrintStream;
+    return itsPrintWriter;
   }
 
+  static Interp itsInterp;//e.m.
   public static Vector itsSketchWindowList;
   public static Vector itsEditorsFrameList;
   ConnectionDialog itsConnDialog;
@@ -68,10 +69,10 @@ public class MaxApplication extends Object {
   String	pathForLoading;
   public FtsServer     itsServer = null;
   public boolean doAutorouting = true; // Should become a static in the Patcher editor
-  public static ConsShell itsShell;
+  //e.m.public static ConsShell itsShell;
   public static Properties ermesProperties;
 
-  public static PrintStream itsPrintStream;
+  public static PrintWriter itsPrintWriter;
   public Vector resourceVector = new Vector();
   int MAX_RESOURCE_FILE_LENGHT = 1024;
   public ErmesSketchWindow itsSketchWindow;
@@ -99,8 +100,7 @@ public class MaxApplication extends Object {
   public final static int OPEN_WITH_AUTO_ROUTING = 17;
   public final static int SELECT_ALL = 18;
   public final static int PRINT_WINDOW = 19;
-  //TextWindow itsTextWindow;
-  public Console itsConsole;
+  public Console itsConsole;//e.m.
   Dimension d = new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
   final int SCREENVERT = d.height;
   final int SCREENHOR = d.width;
@@ -115,31 +115,34 @@ public class MaxApplication extends Object {
     itsSketchWindowList = new Vector();
     itsEditorsFrameList = new Vector();
     
-    itsConsole = new Console("Ermes Console");
-    itsConsole.resize(150, 300);
-    itsPrintStream = itsConsole.getPrintStream();
-    itsPrintStream.println("loading resources...");
+    itsInterp = new tcl.lang.Interp();
+    itsConsole = new Console(itsInterp, 40, 40);//e.m.
+    itsConsole.getFrame().resize(150, 300);//e.m.
+    itsConsole.start();
+    itsConsole.getFrame().setVisible(true);
+    itsPrintWriter = itsConsole.getPrintWriter();
+    itsPrintWriter.println("loading resources...");
     LoadResources();
 
     ObeyCommand(NEW_PROJECT);
 
-    Rectangle r = itsProjectWindow.bounds();
-    itsShell = new ConsShell();//ermes package, ConsShell derives from cornell.jacl.Shell
-    itsShell.move(r.x + r.width, r.y/*+r.height+10*/); //put these constant in a conf. file
+    /*Rectangle r = itsProjectWindow.bounds();
+        itsShell = new ConsShell();//ermes package, ConsShell derives from cornell.jacl.Shell
+    itsShell.move(r.x + r.width, r.y); //put these constant in a conf. file
     itsShell.resize(300, 150);           //put these constants in a conf. file
     itsShell.init();
 
-    itsConsole.move(r.x+r.width/*+200*/, r.y+150);
+    itsConsole.move(r.x+r.width, r.y+150);
     itsConsole.pack();
-    itsConsole.show();
+    itsConsole.show();*/
 
 
     //      FIRST SCRIPT: user defined	
 
-    try {
+    /*try {
       itsShell.interp.EvalFile(ermesProperties.getProperty("user.home")+ermesProperties.getProperty("file.separator")+".ermesrc");
     } catch (cornell.Jacl.EvalException e) {
-      itsPrintStream.println("TCL error reading local .ermesrc " + e.info);
+      itsPrintWriter.println("TCL error reading local .ermesrc " + e.info);
     }
 
     //      SECOND SCRIPT: installation (system)
@@ -147,14 +150,15 @@ public class MaxApplication extends Object {
     try {
       itsShell.interp.EvalFile(ermesProperties.getProperty("root")+ermesProperties.getProperty("file.separator")+"config"+ermesProperties.getProperty("file.separator")+"ermesrc.tcl");
     } catch (cornell.Jacl.EvalException e) {
-      itsPrintStream.println("TCL error reading system ermesrc :"+ e.info);
-    }
+      itsPrintWriter.println("TCL error reading system ermesrc :"+ e.info);
+    }*/
 
     //if there were no connection statements in startup.tcl, ask the user
     if (itsServer == null) ObeyCommand(REQUIRE_CONNECTION);	// maybe to be moved in ConnectionDialog
-
+    
     SplashDialogThread aSplashThread = new SplashDialogThread(itsProjectWindow, "Splash");
     aSplashThread.start();
+    
   }
 	
 
@@ -172,19 +176,19 @@ public class MaxApplication extends Object {
       fis = new FileInputStream(pathForResources);
     }
     catch(FileNotFoundException e) {
-      itsPrintStream.println("ERROR: can't find resource configuration file in "+pathForResources);
+      itsPrintWriter.println("ERROR: can't find resource configuration file in "+pathForResources);
       return;
     }
     try {
       nOfBytes = fis.read(buffer, 0, MAX_RESOURCE_FILE_LENGHT);
     }
     catch(IOException e) {
-      itsPrintStream.println("ERROR: can't read resource configuration file");
+      itsPrintWriter.println("ERROR: can't read resource configuration file");
       return;
     }
     aST = new StringTokenizer(new String(buffer, 0));
     if (!Start_resource_type_list(aST)) {
-      itsPrintStream.println("wrong resources.erm file");
+      itsPrintWriter.println("wrong resources.erm file");
       return;
     }
 
@@ -196,12 +200,12 @@ public class MaxApplication extends Object {
       else if (aTempString.equals("***new_resource")){
 	aResId = Resource(aST);
 	if (aResId == null) {
-	  itsPrintStream.println("failed to successfull parse resource");
+	  itsPrintWriter.println("failed to successfull parse resource");
 	  break;
 	}
 	else resourceVector.addElement(aResId); 
       } else {
-	itsPrintStream.println("wrong resources.erm file");
+	itsPrintWriter.println("wrong resources.erm file");
 	return;
       }
     }
@@ -210,12 +214,12 @@ public class MaxApplication extends Object {
     
     /*for(Enumeration e = resourceVector.elements(); e.hasMoreElements();) {
       aResId = (MaxResourceId) e.nextElement();
-      itsPrintStream.println("RESOURCE TYPE "+aResId.resourceName);
-      itsPrintStream.println("associated extensions: ");
+      itsPrintWrite.println("RESOURCE TYPE "+aResId.resourceName);
+      itsPrintWriter.println("associated extensions: ");
       for (Enumeration e1 = aResId.resourceExtensions.elements(); e1.hasMoreElements();) {
-      itsPrintStream.println("\""+e1.nextElement()+"\"");
+      itsPrintWriter.println("\""+e1.nextElement()+"\"");
       }
-      itsPrintStream.println("associated handler: "+aResId.preferred_resource_handler);
+      itsPrintWriter.println("associated handler: "+aResId.preferred_resource_handler);
       }*/
   }
   
@@ -236,8 +240,8 @@ public class MaxApplication extends Object {
     String aTempString;
     if (!aST.hasMoreTokens()) return null;
     MaxResourceId aResId = new MaxResourceId(aST.nextToken(" \t\n\r\""));
-    //itsPrintStream.println(aST.nextToken());
-    itsPrintStream.println(aResId.resourceName + "...");
+    //itsPrintWriter.println(aST.nextToken());
+    itsPrintWriter.println(aResId.resourceName + "...");
     if (!aST.nextToken().equals("resource_extension_list")) return null;
     if (!aST.hasMoreTokens()) return null;
     
@@ -270,7 +274,7 @@ public class MaxApplication extends Object {
     else if (mode.equals("local"))
       itsServer = new FtsSubProcessServer();
 
-    itsServer.setPostStream(itsPrintStream);
+    itsServer.setPostStream(itsPrintWriter);
     itsServer.setParameter("ftsdir", theFtsdir);
     itsServer.setParameter("ftsname", theFtsname);
     itsServer.start();
@@ -528,7 +532,7 @@ public class MaxApplication extends Object {
 	int port = Integer.parseInt(itsConnDialog.portNo);
 	itsServer = new FtsSocketServer(itsConnDialog.hostName, port);
 
-	itsServer.setPostStream(itsConsole.getPrintStream());
+	itsServer.setPostStream(itsConsole.getPrintWriter());
 	itsServer.setParameter("ftsdir", "/u/worksta/dececco/projects/imax/fts/bin/origin/debug");
 
 	itsServer.setParameter("ftsname", "fts");
@@ -537,7 +541,7 @@ public class MaxApplication extends Object {
       }
       else if (itsConnDialog.connectionLine == itsConnDialog.LOCAL_CONNECTION) {
 	itsServer = new FtsSubProcessServer();
-	itsServer.setPostStream(itsConsole.getPrintStream());
+	itsServer.setPostStream(itsPrintWriter);
 	itsServer.setParameter("ftsdir", "/u/worksta/maggi/projects/fts");
 	itsServer.setParameter("ftsname", "fts");
 	itsServer.start();	//?
@@ -621,11 +625,9 @@ public class MaxApplication extends Object {
 	aWindow = (MaxWindow)e.nextElement();
 	if(!aWindow.Close()) return true;
       }
-      itsConsole.hide();
-      itsShell.hide();
+      itsConsole.getFrame().hide();
       itsProjectWindow.hide();
-      itsConsole.dispose();
-      itsShell.dispose();
+      itsConsole.getFrame().dispose();//e.m.
       itsProjectWindow.dispose();
       if (itsServer != null) itsServer.stop();
       Runtime.getRuntime().exit(0);
@@ -803,20 +805,20 @@ public class MaxApplication extends Object {
     return itsProjectWindow;
   }
 	
-  public Console GetConsole() {
+  /*e.m.public Console GetConsole() {
     return itsConsole;
-  }
+  }*/
 
-  public ConsShell GetShell() {
+  /*e.m. public ConsShell GetShell() {
     return itsShell;
-  }
+  }*/
 
   public Project GetCurrentProject() {
     return itsProjectWindow.itsProject;
   }
 	
-  public PrintStream GetPrintStream(){
-	return itsPrintStream;	
+  public PrintWriter GetPrintWriter(){
+	return itsPrintWriter;	
   }
 	
   public void UpdateProjectMenu(){
@@ -850,7 +852,8 @@ public class MaxApplication extends Object {
     // main function parse the argument line and create the main class...
     //create a new default Properties object
     ermesProperties = new Properties(System.getProperties());
-    
+    Interp itsInterp = new Interp();
+    System.out.println(itsInterp.toString());
     //start parsing arguments
     // don't check for valid options, so the user can set
     // command line arguments that can be accessed from tcl scripts

@@ -30,7 +30,7 @@ public class FtsServer
 
   /** The stream used for post operations */
 
-  PrintStream postStream;
+  PrintWriter postStream;
 
   /** The FtsPort used to communicate with FTS */
 
@@ -50,7 +50,7 @@ public class FtsServer
   {
     this.name = name;
     this.connection = connection;
-    this.postStream = System.err;
+    this.postStream = new PrintWriter(System.err);
 
     this.connection.setServer(this);
   }
@@ -61,7 +61,7 @@ public class FtsServer
    * for the post output.
    */
 
-  FtsServer(String name, FtsPort connection, PrintStream stream)
+  FtsServer(String name, FtsPort connection, PrintWriter stream)
   {
     this.name = name;
     this.connection = connection;
@@ -77,7 +77,7 @@ public class FtsServer
    * posted from FTS (print object).
    */
 
-  public void setPostStream(PrintStream stream)
+  public void setPostStream(PrintWriter stream)
   {
     this.postStream = stream;
   }
