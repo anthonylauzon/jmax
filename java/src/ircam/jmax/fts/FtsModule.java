@@ -14,7 +14,6 @@ public class FtsModule
 
     MaxDataHandler.installDataHandler( new FtsDotPatFileDataHandler()); 
     MaxDataType.installDataType(new FtsPatchDataType());
-    MaxDataType.installDataType(new FtsGroupDataType()); // ??
 
     // Install the FTS tcl commands
 

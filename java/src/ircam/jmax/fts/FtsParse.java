@@ -498,7 +498,7 @@ public class FtsParse
 
   /** Parse an object argument description (without the class Name) */
 
-  public static void parseObjectArgs(String str, Vector values)
+  public static void parseObjectArguments(String str, Vector values)
   {
     FtsParse parser = new FtsParse(str);
 

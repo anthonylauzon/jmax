@@ -72,6 +72,14 @@ FtsOutletObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsOutletObject.java)
 .PHONY: FtsOutletObject
 
+FtsAbstractContainerObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAbstractContainerObject.java)
+.PHONY: FtsAbstractContainerObject
+
+FtsSelection:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSelection.java)
+.PHONY: FtsContainerObject
+
 FtsContainerObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsContainerObject.java)
 .PHONY: FtsContainerObject

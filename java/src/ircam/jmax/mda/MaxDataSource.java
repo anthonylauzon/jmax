@@ -52,14 +52,6 @@ public class MaxDataSource
   {
     return new MaxFileDataSource(file);
   }  
-
-  /** This static method produce a data source from an internal  buffer
-   */
-
-  public static MaxDataSource makeStringDataSource(StringBuffer dataSource)
-  {
-    return new MaxStringDataSource(dataSource);
-  }
 }
 
 

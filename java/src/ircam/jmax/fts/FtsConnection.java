@@ -30,7 +30,7 @@ public class FtsConnection
 
     FtsServer.getServer().connectObjects(from, outlet, to, inlet);
 
-    from.getParent().addConnection(this);
+    from.getParent().addConnectionToContainer(this);
   }
 
 
@@ -55,7 +55,7 @@ public class FtsConnection
   {
     FtsServer.getServer().disconnectObjects(from, outlet, to, inlet);
 
-    from.getParent().removeConnection(this);
+    from.getParent().removeConnectionFromContainer(this);
   }
 
   /** Access the From. The From is the FtsObject origin of the connection. */

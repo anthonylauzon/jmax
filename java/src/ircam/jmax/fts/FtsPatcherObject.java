@@ -75,12 +75,11 @@ public class FtsPatcherObject extends FtsContainerObject
   {
     super(parent, "patcher", description);
 
-    String className;
     Vector args;
 
     args = new Vector();
     
-    className = FtsParse.parseObject(description, args);
+    FtsParse.parseObjectArguments(description, args);
 
     setObjectName((String) args.elementAt(0));
     setNumberOfInlets(((Integer) args.elementAt(1)).intValue());
@@ -103,7 +102,7 @@ public class FtsPatcherObject extends FtsContainerObject
 
   public FtsPatcherObject(FtsContainerObject parent)
   {
-    super(parent, "patcher", "patcher unnamed 0 0");
+    super(parent, "patcher", "unnamed 0 0");
 
     setObjectName("unnamed");
     setNumberOfInlets(0);
@@ -116,6 +115,25 @@ public class FtsPatcherObject extends FtsContainerObject
 						   noutlets);
     if (parent.isOpen())
       updated = true;
+  }
+
+
+  /** Special method to redefine a patcher without looosing its content 
+   */
+
+  public void redefinePatcher(String description)
+  {
+    Vector args;
+
+    args = new Vector();
+    
+    FtsParse.parseObjectArguments(description, args);
+
+    setObjectName((String) args.elementAt(0));
+    setNumberOfInlets(((Integer) args.elementAt(1)).intValue());
+    setNumberOfOutlets(((Integer) args.elementAt(2)).intValue());
+
+    updateFtsObject();
   }
 
 
@@ -134,14 +152,13 @@ public class FtsPatcherObject extends FtsContainerObject
     updateDescription();
   }
 
-
   /** update the description;
     temporary code, waiting for the real thing (the green box)
    */
 
   void updateDescription()
   {
-    description = "patcher " + objectName + " " + ninlets + " " + noutlets;
+    description = objectName + " " + ninlets + " " + noutlets;
   }
 
   /** Save the object to a TCL stream. 
@@ -183,7 +200,7 @@ public class FtsPatcherObject extends FtsContainerObject
       {
 	FtsObject obj   =  (FtsObject) objects.elementAt(i);
 	
-	if (! (obj instanceof FtsDeclarationObject))
+	if ((! (obj instanceof FtsDeclarationObject)) &&  obj.isPersistent())
 	  {
 	    writer.print("set obj(" + obj.getObjId() + ")" + " [");
 

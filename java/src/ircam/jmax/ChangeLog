@@ -1,3 +1,8 @@
+Thu Mar  5 12:37:19 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
+
+	* Added the FtsAsbstractContainer class and the FtsSelection class
+	  to handle selection.
+
 Mon Mar  2 14:47:16 1998  Maurizio de Cecco  <dececco@astor.ircam.fr>
 
 	* Added the "canMakeNewInstance" method to MaxDataType, to check 

@@ -8,6 +8,7 @@ import ircam.jmax.editors.ermes.*;
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 import java.util.*;
 /**
  * The class that handles the data put in the clipboard, for patchers.
@@ -45,28 +46,18 @@ public class ErmesClipboardProvider implements Transferable, ClipboardOwner {
   void addGraphicObjects(Vector theSelectedList) {
     // actually call, for now,  the objects' saveAsTcl method.
     flushContent();
-    PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
-    ErmesObject aErmesObject;
-    for(Enumeration e=theSelectedList.elements(); e.hasMoreElements();) {
-      aErmesObject = (ErmesObject) e.nextElement();
-      aErmesObject.itsFtsObject.saveAsTcl(aPrintWriter);
-      aPrintWriter.println("");
-      //store the object also in the "ftsGroup" flavor
-      itsFtsGroup.addElement(aErmesObject.itsFtsObject);
-    }
-    //this is a trial to fill the clipboard making the right handler
-    //print into it
 
-    StringBuffer targetStringBuff = new StringBuffer("");
     try 
       {
-	FtsGroupData data = new FtsGroupData();
-	data.setContent(itsFtsGroup);
-	data.setDataSource(MaxDataSource.makeStringDataSource(targetStringBuff));
-	data.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
-	data.setName("internal");
-	data.save();
+	PrintWriter aPrintWriter = new PrintWriter(itsStringWriter);
+	IndentedPrintWriter pw = new IndentedPrintWriter(aPrintWriter); 
+	FtsSelection selection = FtsServer.getServer().getRootObject().getSelection();
 
+	for(Enumeration e = theSelectedList.elements(); e.hasMoreElements();)
+	  selection.addObject(((ErmesObject) e.nextElement()).itsFtsObject);
+
+	selection.saveAsTcl(pw);
+	selection.clean();
       }
     catch (Exception e)
       {

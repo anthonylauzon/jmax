@@ -10,18 +10,17 @@ import ircam.jmax.*;
  *  This is the super class of all
  * objects that include other objects, like
  * patchers, template and abstractions.
+ * 
+ * This is a specialization of the FtsAbstractContainer that 
+ * necessarly represent a patcher in the FTS meaning; i.e. 
+ * a real patcher or template/abstraction instance.
+ * So it add inlets/outlets housekeeping, patcher opening, patcher after load init,
+ * patcher relative properties, script evaluation, .pat file support, find and object
+ * naming support.
  */
 
-abstract public class FtsContainerObject extends FtsObject
+abstract public class FtsContainerObject extends FtsAbstractContainerObject
 {
-  /** The objects contained in the patcher */
-
-  Vector objects     = new Vector();
-
-  /** All the connections between these objects */
-
-  Vector connections = new Vector();
-
   /** The objects that are also inlets */
 
   Vector inlets      = new Vector();
@@ -73,55 +72,6 @@ abstract public class FtsContainerObject extends FtsObject
     FtsServer.getServer().redefinePatcherObject(this, objectName, ninlets, noutlets);
   }
 
-  /** Add an object to this container  */
-
-  final void addObject(FtsObject obj)
-  {
-    objects.addElement(obj);
-    put("newObject", obj); // the newObject property keep the last object created
-  }
-
-  /** Remove an object from this container. */
-
-  final void removeObject(FtsObject obj)
-  {
-    objects.removeElement(obj);
-  }
-
-  /** Replace an object with an other one; 
-   * Cannot be called for inlets and outlets, only
-   * for real standard object
-   */
-
-  void replace(FtsObject oldObject, FtsObject newObject)
-  {
-    // replace it in the object list
-
-    removeObject(oldObject);
-    addObject(newObject);
-
-    // replace it in all the connections
-
-    for (int i = 0; i < connections.size(); i++)
-      ((FtsConnection)connections.elementAt(i)).replace(oldObject, newObject);
-  }
-
-
-  /** Add an connection to this container. */
-
-  final void addConnection(FtsConnection obj)
-  {
-    connections.addElement(obj);
-    put("newConnection", obj); // the newConnection property keep the last connection created
-  }
-
-  /** Remove an connection from this container. */
-
-  final void removeConnection(FtsConnection obj)
-  {
-    connections.removeElement(obj);
-  }
-
   /** Add an inlet. */
 
   final void addInlet(FtsInletObject in, int pos)
@@ -170,21 +120,6 @@ abstract public class FtsContainerObject extends FtsObject
   final void addOutlet(FtsObject in)
   {
     outlets.addElement(in);
-  }
-
-
-  /** Get the connections. */
-
-  public final Vector getConnections()
-  {
-    return connections;
-  }
-
-  /** Get the objects. */
-
-  public final Vector getObjects()
-  {
-    return objects;
   }
 
   /** Open tell FTS that this patcher is "alive" */
@@ -261,11 +196,41 @@ abstract public class FtsContainerObject extends FtsObject
 
   public static Stack containerStack = new Stack(); // should not be public !
 
+
   public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
   {
     containerStack.push(this);
+
+    // We need to call _BasicThisWrapper because in this way we
+    // provide a "local" environment to the code being executed, i.e. al
+    // the variables will be locals
+
+    TclObject list = TclList.newInstance();
+
+    TclList.append(interp, list, TclString.newInstance("_BasicThisWrapper"));
+    TclList.append(interp, list, ReflectObject.newInstance(interp, this));
+    TclList.append(interp, list, script);
+
+    interp.eval(list, 0);
+
+
     interp.eval(script, 0);
     containerStack.pop();
+  }
+
+
+  /** Selection
+   * Get the unique FtsSelect object for this container
+   */
+
+  FtsSelection selection = null;
+
+  public FtsSelection getSelection()
+  {
+    if (selection == null)
+      selection = new FtsSelection(this);
+    
+    return selection;
   }
 
   /*****************************************************************************/

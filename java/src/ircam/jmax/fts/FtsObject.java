@@ -99,7 +99,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     // to a specific API as soon as the patcher object is ready.
 
     if (className.equals("patcher"))
-      return new FtsPatcherObject(parent, description);
+      throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "patcher"));
     else if (className.equals("inlet"))
       throw new FtsException(new FtsError(FtsError.INSTANTIATION_ERROR, "inlet"));
     else if (className.equals("outlet"))
@@ -539,7 +539,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   /** Fts Object ID  */
 
-  private int ftsId;
+  private int ftsId = -1;
 
   /** The parent object. Usually the container patcher or abstraction or template */
 
@@ -663,7 +663,7 @@ abstract public class FtsObject implements MaxTclInterpreter
     this.description = description;
     this.parent = parent;
 
-    parent.addObject(this);
+    parent.addObjectToContainer(this);
   }
 
 
@@ -758,7 +758,7 @@ abstract public class FtsObject implements MaxTclInterpreter
 
   public void delete()
   {
-    parent.removeObject(this); 
+    parent.removeObjectFromContainer(this); 
     FtsServer.getServer().freeObject(this);
   }
 
@@ -854,6 +854,16 @@ abstract public class FtsObject implements MaxTclInterpreter
   /*                               SAVING                                      */
   /*                                                                           */
   /*****************************************************************************/
+
+  /** An object in a patcher is saved only if this function return true; some 
+      objects in the application layer can be not intendend to be save, like
+      the Selection itself.
+      */
+
+  protected boolean isPersistent()
+  {
+    return true;
+  }
 
   /** Save the object to a PrintWriter as TCL code; actually defined by the object */
 

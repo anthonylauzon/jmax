@@ -189,7 +189,7 @@ public class FtsServer
 
     args = new Vector();
     
-    FtsParse.parseObjectArgs(description, args);
+    FtsParse.parseObjectArguments(description, args);
 
     try
       {
@@ -437,18 +437,20 @@ public class FtsServer
 
   final void freeObject(FtsObject obj)
   {
-    try
+    if (obj.getObjId() != -1)
       {
-	unregisterObject(obj);
-	port.sendCmd(FtsClientProtocol.fts_free_object_cmd);
-	port.sendObject(obj);
-	port.sendEom();
-      }
-    catch (java.io.IOException e)
-      {
+	try
+	  {
+	    unregisterObject(obj);
+	    port.sendCmd(FtsClientProtocol.fts_free_object_cmd);
+	    port.sendObject(obj);
+	    port.sendEom();
+	  }
+	catch (java.io.IOException e)
+	  {
+	  }
       }
   }
-
 
   /** Send an "object message" messages to FTS.*/
 
