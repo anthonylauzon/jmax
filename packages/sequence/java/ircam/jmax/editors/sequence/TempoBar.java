@@ -91,7 +91,8 @@ public JPopupMenu getMenu()
 	if(popup == null)
 		createPopup();
 		
-	popup.update();
+  if(popup != null)
+    popup.update();
 	return popup;
 }
 
@@ -161,7 +162,8 @@ void initPropertiesToDraw()
 }
 void createPopup()
 {
-	popup = new TempoBarPopupMenu(this);
+  if(propertyNames.length > 0)
+    popup = new TempoBarPopupMenu(this);
 }
 
 public void paintComponent(Graphics g)
@@ -471,8 +473,8 @@ public static Dimension tempoDimension = new Dimension(SequenceWindow.DEFAULT_WI
 public boolean isInSequence;
 FtsTrackObject markersTrack = null;
 SequenceSelection markersSelection = null;
-String[] propertyNames;
-public boolean[] propertyToDraw;
+String[] propertyNames = new String[0];
+public boolean[] propertyToDraw = new boolean[0];
 int numPropToDraw;
 
 TempoBarPopupMenu popup = null;

@@ -62,12 +62,17 @@ protected void processMouseEvent(MouseEvent e)
 	else
 		isPopup = e.isPopupTrigger();
 		
-	if ( isPopup) 
+	if( isPopup) 
 	{
+    JPopupMenu menu = null;
 	  if (provider != null)
-	    provider.getMenu().show(e.getComponent(), e.getX()-10, e.getY()-10);
-	  else getMenu().show(e.getComponent(), e.getX()-10, e.getY()-10);
-	}
+	    menu = provider.getMenu();
+	  else 
+      menu = getMenu();
+	
+    if(menu != null)
+      menu.show( e.getComponent(), e.getX()-10, e.getY()-10);
+  }
 	else 
 		super.processMouseEvent(e);
 }
