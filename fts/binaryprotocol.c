@@ -193,10 +193,12 @@ static void end_object_action( unsigned char input, fts_binary_protocol_t *binar
   fts_atom_t v;
   int id;
 
-  fts_stack_push( &binary_protocol->input_buffer, unsigned char, input);
-  id = get_int_from_bytes( fts_stack_base( &binary_protocol->input_buffer));
 
-  /* @@@@@ client specific code @@@@@ */
+  /* call registered callback */
+  /* @@@@@ example of client specific code @@@@@ */
+/*   fts_stack_push( &binary_protocol->input_buffer, unsigned char, input); */
+/*   id = get_int_from_bytes( fts_stack_base( &binary_protocol->input_buffer)); */
+
 /*   obj = binary_protocol_get_object( binary_protocol, id); */
 
 /*   if (obj == NULL) */
@@ -217,39 +219,36 @@ static void end_message_action( unsigned char input, fts_binary_protocol_t *bina
   int argc;
   fts_atom_t *argv;
 
-  argc = fts_stack_size( &binary_protocol->input_args);
-  argv = (fts_atom_t *)fts_stack_base( &binary_protocol->input_args);
+  return;
+  /* call registered callback */
+  /* @@@@@ example of client specific code @@@@@ */
+/*   argc = fts_stack_size( &client->input_args); */
+/*   argv = (fts_atom_t *)fts_stack_base( &client->input_args); */
 
-  selector = fts_get_symbol( argv+1);
+/*   selector = fts_get_symbol( argv+1); */
 
-  if ( fts_is_void( argv))
-  {
-    fts_log( "[binary_protocol] message %s to null object\n", selector);
-    goto skipped;
-  }
+/*   if ( fts_is_void( argv)) */
+/*   { */
+/*     fts_log( "[client] message %s to null object\n", selector); */
+/*     goto skipped; */
+/*   } */
     
-  target = fts_get_object( argv);
-  argc -= 2;
-  argv += 2;
+/*   target = fts_get_object( argv); */
+/*   argc -= 2; */
+/*   argv += 2; */
 
-#ifdef BINARY_PROTOCOL_LOG
-  fts_log( "[binary_protocol]: Received message dest=0x%x selector=%s args=", target, selector);
-  fts_log_atoms( argc, argv);
-  fts_log( "\n");
-#endif
+/* #ifdef CLIENT_LOG */
+/*   fts_log( "[client]: Received message dest=0x%x selector=%s args=", target, selector); */
+/*   fts_log_atoms( argc, argv); */
+/*   fts_log( "\n"); */
+/* #endif */
 
-/*   /\* Binary_Protocol messages are sent to the system inlet *\/ */
+/*   /\* Client messages are sent to the system inlet *\/ */
 /*   if (target) */
-/*   { */
 /*     fts_send_message( target, selector, argc, argv); */
-/*   } */
-/*   else */
-/*   { */
 
-/*   } */
-
-skipped:
-  fts_stack_clear( &binary_protocol->input_args);
+/* skipped: */
+/*   fts_stack_clear( &client->input_args); */
 }
 
 static void state_next( fts_binary_protocol_t *binary_protocol, unsigned char input)
