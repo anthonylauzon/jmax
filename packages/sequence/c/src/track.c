@@ -793,7 +793,7 @@ _track_make_bars(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
           next_bar_time += bar_duration;
         }
         
-        if(next_bar_time - time < MARKERS_BAR_TOLERANCE)
+        if(next_bar_time - time > MARKERS_BAR_TOLERANCE)
           fts_post("track make-bars: bar @ %g is short by %g msec\n", time, next_bar_time - time);
         
         /* next given bar */

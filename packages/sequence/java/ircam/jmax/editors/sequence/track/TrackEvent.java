@@ -190,8 +190,10 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
 /**
 * Set the named property */
 public void setProperty( String name, Object theValue)
-{    
-  sendSetProperty( name, theValue);
+{ 
+  Object oldValue = value.getProperty(name);  
+  if( oldValue == null || ((oldValue != null) && !theValue.toString().equals( oldValue.toString())))
+    sendSetProperty( name, theValue);
 }
 
 public void unsetProperty( String name)
@@ -214,7 +216,6 @@ public void unsetProperty( String name)
 void sendSetProperty( String propName, Object propValue)
 {    
   args.clear();
-  /*args.addSymbol( FtsSymbol.get( propName));*/
   args.addSymbol( FtsSymbol.get( value.getPropertyMessage(propName)));
   
   if( propValue instanceof String)
