@@ -2,73 +2,22 @@
 package ircam.jmax.editors.explode;
 
 import java.util.*;
+import ircam.jmax.toolkit.*;
 
 /**
  * A selection of explode events. Use the static constructor to create the
  * (unique) selection of the system.
  */ 
-public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
+public class ExplodeSelection extends AbstractSelection implements ExplodeDataListener {
 
   /**
    * constructor
    */
   private ExplodeSelection(ExplodeDataModel theModel) 
   {
+    super();
     itsModel = theModel;
-    selected = new Hashtable();
-    listeners = new Vector();
   }
-
-  /**
-   * select the given object 
-   */
-  public void select(Object obj) 
-  {
-    selected.put(obj, obj);
-    notifyListeners();
-  }
-
-  /**
-   * remove the object from the selection
-   */
-  public void deSelect(Object obj) 
-  {
-    selected.remove(obj);
-    notifyListeners();
-  }
-
-
-  /**
-   * returns true if the object is currently selected
-   */
-  public boolean isInSelection(Object obj) 
-  {
-    return selected.containsKey(obj);
-  }
-
-
-  /**
-   * returns an enumeration of all the selected objects
-   */
-  public Enumeration getSelected() 
-  {
-    return selected.elements();
-  }
-
-  public int size()
-  {
-    return selected.size();
-  }
-
-  /**
-   * deselects all the objects
-   */
-  public void deselectAll() 
-  {
-    selected.clear();
-    notifyListeners();
-  }
-
 
   /**
    * selects all the objects of the data model
@@ -79,7 +28,6 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
       {
 	select(e.nextElement());
       }
-    notifyListeners();
   }
 
   /**
@@ -104,37 +52,6 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
     return itsSelection;
   }
 
-  /**
-   * require to be notified when data change
-   */
-  public static void addListener(ExplodeDataListener theListener) 
-  {
-    listeners.addElement(theListener);
-  }
-
-  /**
-   * remove the listener
-   */
-  public static void removeListener(ExplodeDataListener theListener) 
-  {
-    listeners.removeElement(theListener);
-  }
-
-
-  /**
-   * call back the listener, the selection content changed
-   */
-  private static void notifyListeners()
-  {
-    SelectionListener sl;
-
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();)
-      {
-	sl = (SelectionListener) e.nextElement();
-	sl.selectionChanged();
-      }
-  }
-
 
   /** ExplodeDataListener interface*/
 
@@ -156,9 +73,7 @@ public class ExplodeSelection implements SelectionHandler, ExplodeDataListener {
   //--- Fields
   private static ExplodeSelection itsSelection; 
   ExplodeDataModel itsModel;
-  static Hashtable selected;
 
-  private static Vector listeners;
 }
 
 

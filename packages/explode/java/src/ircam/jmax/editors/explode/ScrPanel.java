@@ -7,6 +7,8 @@ import java.util.*;
 import java.io.*;
 
 import ircam.jmax.*;
+import ircam.jmax.toolkit.*;
+
   /**
    * The actual panel of a score editor. It contains the "sensible" part.
    * The graphic representation is handled by 
@@ -83,7 +85,7 @@ public class ScrPanel extends JPanel implements ExplodeDataListener, ToolbarProv
       gc.setStatusBar(itsStatusBar);
     }
 
-    ExplodeSelection.addListener(this);
+    ExplodeSelection.getSelection().addSelectionListener(this);
     gc.getDataModel().addListener(this);
 
     

@@ -1,10 +1,14 @@
 
 package ircam.jmax.editors.explode;
 
+import ircam.jmax.toolkit.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
 import com.sun.java.swing.ImageIcon;
+
 
 /**
  * the tool used to perform the different operations associated

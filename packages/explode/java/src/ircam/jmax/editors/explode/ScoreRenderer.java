@@ -209,7 +209,6 @@ public class ScoreRenderer implements Renderer, ImageObserver{
   GraphicContext gc;
 
   ExplodeDataModel itsExplodeDataModel;
-  SelectionHandler itsSelection;
 
   static Image itsImage; //all the ScoreRenderer uses the same .gif
   static boolean imageReady = false; //all of them depend on the same load
