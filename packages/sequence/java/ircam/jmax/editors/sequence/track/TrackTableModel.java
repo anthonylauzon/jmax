@@ -72,7 +72,7 @@ public Class getColumnClass(int col)
  * in the Explode. Row is the event number, column is the field to change. 
  * @see WholeNumberField*/
 public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
-{
+{	
 	if(columnIndex == 0) return;
 	
 	Event event = model.getEventAt(rowIndex);

@@ -291,12 +291,9 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_array_append_symbol(array, seqsym_pitch);
   fts_array_append_float(array, self->pitch);
 
-  if(self->type >= scoob_interval)
-  {
-    fts_array_append_symbol(array, seqsym_interval);
-    fts_array_append_float(array, self->interval);
-  }
-
+	fts_array_append_symbol(array, seqsym_interval);
+	fts_array_append_float(array, self->interval);
+  
   fts_array_append_symbol(array, seqsym_duration);
   fts_array_append_float(array, self->duration);
 
@@ -306,15 +303,14 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     {
       fts_array_append_symbol(array, scoob_properties[i].name);
 
-      if (fts_is_object(atoms + i)  &&
-	  !fts_object_has_id(fts_get_object(atoms + i)))
+      if (fts_is_object(atoms + i)  && !fts_object_has_id(fts_get_object(atoms + i)))
       { /* object has no client-id: upload only string representation 
-	   todo: prevent string from being edited in table editor */
-	fts_symbol_t objdescription = fts_get_class_name(atoms + i);
-	fts_array_append_symbol(array, objdescription);
+        todo: prevent string from being edited in table editor */
+				fts_symbol_t objdescription = fts_get_class_name(atoms + i);
+				fts_array_append_symbol(array, objdescription);
       }
       else
-	fts_array_append(array, 1, atoms + i);
+				fts_array_append(array, 1, atoms + i);
     }
   }
 }

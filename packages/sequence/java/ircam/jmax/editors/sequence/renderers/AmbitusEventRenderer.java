@@ -85,13 +85,31 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 	String type = pa.getType(e);
 	int cue = pa.getCue(e);
 		
-	if (height == 0)
-		height = Adapter.NOTE_DEFAULT_HEIGTH;
-		
-	if( type.equals("rest"))
+	if( type.equals("note"))
 	{
-		y = y-height/2;
+		if(height > Adapter.NOTE_DEFAULT_HEIGTH)
+		{
+			height = height*2+Adapter.NOTE_DEFAULT_HEIGTH;
+			y = y-height/2;
+		}
+		else
+		{
+			height = Adapter.NOTE_DEFAULT_HEIGTH;
+			y = y-height+2;
+		}
+	}
+	else
+	{
+		if (height == 0)
+			height = Adapter.NOTE_DEFAULT_HEIGTH;
 		
+		if( type.equals("rest"))
+			y = y-height/2;
+		else
+			y = y-height+2;
+	}	
+	if( type.equals("rest"))
+	{		
 		Color col, bordCol;
 		switch(state)
 		{
@@ -120,9 +138,51 @@ public void render(Object obj, Graphics g, int state, GraphicContext theGc)
 		g.fillRect(x , y + height/2 - 1, length, /*2*/ 3);
 		}
 	else
+		if(type.equals("note") && height > Adapter.NOTE_DEFAULT_HEIGTH) // note with Ambitus 
 		{
-		y = y-height+2;
-		
+			Color col, bordCol, noteCol;
+			switch(state)
+			{
+				default:
+				case Event.SELECTED:
+					col = restSelColor;
+					noteCol = selectedColor;
+					bordCol = noteSelColor;
+					break;
+				case Event.DESELECTED:
+					col = restColor;
+					noteCol = deselectedColor;
+					bordCol = noteColor;
+					break;
+				case Event.HIGHLIGHTED:
+					col = restHighlightColor;
+					noteCol = highlightColor;
+					bordCol = noteHighlightColor;
+					break;
+			}
+			g.setColor(col);
+			g.fillRect(x, y, length, height);  
+			g.setColor(bordCol);
+			g.drawRect(x, y, length, height);
+			g.setColor(noteCol);
+			g.fillRect(x, y+height/2-1, length, Adapter.NOTE_DEFAULT_HEIGTH);
+			
+			if(pa.getViewMode()==MidiTrackEditor.NMS_VIEW)
+			{
+				int alt = pa.getAlteration(e);
+				g.setFont(SequenceFonts.getFont(36));
+				switch(alt)
+				{
+					case PartitionAdapter.ALTERATION_DIESIS:
+						g.drawString( SequenceFonts.diesis, x-8, y+5);
+						break;
+					case PartitionAdapter.ALTERATION_BEMOLLE:
+						g.drawString( SequenceFonts.bemolle, x-8, y+5);
+				}
+			}	
+		}
+	else
+	{		
 		switch(state)
 		{
 			case Event.SELECTED:
@@ -206,13 +266,29 @@ public void renderBounds(Object obj, Graphics g, boolean selected, GraphicContex
 	String type = pa.getType(e);
 	int cue = pa.getCue(e);
 	
-	if (height == 0)
-		height = Adapter.NOTE_DEFAULT_HEIGTH;
-	
-	if( type.equals("rest"))
-		y = y-height/2;
+	if( type.equals("note"))
+	{
+		 if( height > Adapter.NOTE_DEFAULT_HEIGTH)
+		 {
+			 height = height*2+Adapter.NOTE_DEFAULT_HEIGTH;
+			 y = y-height/2;
+		 }
+		else
+		{
+			height = Adapter.NOTE_DEFAULT_HEIGTH;
+			y = y-height+2;
+		}
+	}
 	else
-		y = y-height+2;
+	{
+		if (height == 0)
+			height = Adapter.NOTE_DEFAULT_HEIGTH;
+	
+		if( type.equals("rest"))
+			y = y-height/2;
+		else
+			y = y-height+2;
+	}
 	
 	if( selected)
 		g.setColor(Color.red);
@@ -255,6 +331,13 @@ public boolean contains(Object obj, int x, int y, GraphicContext theGc)
 		
 	if( type.equals("rest"))
 		return (evtx<=x && (evtx+evtlength >= x) && evty-evtheight/2<=y && evty + evtheight/2 >= y);
+	else if( type.equals("note"))
+		{
+			if( evtheight > Adapter.NOTE_DEFAULT_HEIGTH)
+				return (evtx<=x && (evtx+evtlength >= x) && evty-evtheight-Adapter.NOTE_DEFAULT_HEIGTH/2<=y && evty + evtheight + Adapter.NOTE_DEFAULT_HEIGTH/2 >= y);
+			else
+				return (evtx<=x && (evtx+evtlength >= x) && evty-evtheight+2<=y && evty+2 >= y);		
+		}
 	else
 		return (evtx<=x && (evtx+evtlength >= x) && evty-evtheight+2<=y && evty+2 >= y);
 }
@@ -289,6 +372,13 @@ public boolean touches(Object obj, int x, int y, int w, int h, GraphicContext th
 	
 	if( type.equals("rest"))
 		eventRect.setBounds(evtx, evty-evtheight/2, evtlength, evtheight);
+	else if( type.equals("note"))
+	{
+		if( evtheight > Adapter.NOTE_DEFAULT_HEIGTH)
+			eventRect.setBounds(evtx, evty-evtheight-Adapter.NOTE_DEFAULT_HEIGTH/2, evtlength, evtheight*2+Adapter.NOTE_DEFAULT_HEIGTH);
+		else
+			eventRect.setBounds(evtx, evty-evtheight+2, evtlength, evtheight);		
+	}
 	else
 		eventRect.setBounds(evtx, evty-evtheight+2, evtlength, evtheight);
 	
@@ -314,6 +404,11 @@ final static int CUE_HEIGHT = 13;
 Color restColor = new Color(165, 165, 165, 60);
 Color restSelColor = new Color(255, 0, 0, 60);
 Color restHighlightColor = new Color(0, 255, 0, 60);
+
+Color noteColor = new Color(165, 165, 165, 100);
+Color noteSelColor = new Color(255, 0, 0, 100);
+Color noteHighlightColor = new Color(0, 255, 0, 100);
+
 Color deselectedColor = new Color( 0, 0, 0, 180);
 Color selectedColor = new Color(255, 0, 0, 180);
 Color highlightColor = new Color(0, 255, 0, 180);
