@@ -232,14 +232,14 @@ abstract public class GraphicObject implements DisplayObject, Serializable
 
   public final int getWidth() 
   {
-    return ScaleTransform.getInstance().scaleX(ftsObject.getWidth());
+    return ScaleTransform.getInstance().scaleX(ftsObject.getWidth() + getVariableWidth());
   }
 
   public void setWidth( int w) 
   {
     if (w > 0)
       {
-	ftsObject.setWidth(ScaleTransform.getInstance().invScaleX( w));
+	ftsObject.setWidth(ScaleTransform.getInstance().invScaleX( w - getVariableWidth()));
 	updateInOutlets();
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
@@ -286,7 +286,7 @@ abstract public class GraphicObject implements DisplayObject, Serializable
     else
       ftsObject.setCurrentBounds( ScaleTransform.getInstance().invScaleX(x),
 				  ScaleTransform.getInstance().invScaleY(y),
-				  ScaleTransform.getInstance().invScaleX(w),
+				  ScaleTransform.getInstance().invScaleX(w - getVariableWidth()),
 				  isSquare() ? ScaleTransform.getInstance().invScaleX(h) 
 				  : ScaleTransform.getInstance().invScaleY(h ));
     

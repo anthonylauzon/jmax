@@ -98,7 +98,7 @@ public class Standard extends Editable implements FtsObjectErrorListener
       {
 	varName = name;	
 	varWidth = getFontMetrics().stringWidth( varName) + 6;
-	setWidth( getWidth() + varWidth);
+	setWidth( getWidth());
       }
     else
       if( name.equals(""))
