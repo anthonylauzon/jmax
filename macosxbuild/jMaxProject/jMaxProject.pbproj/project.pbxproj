@@ -101,10 +101,6 @@
 			settings = {
 			};
 		};
-		F53D6D41035DFB96016640F1 = {
-			isa = PBXTargetDependency;
-			target = F880FFF80283022401664092;
-		};
 		F544CD9303387B6001664092 = {
 			isa = PBXFileReference;
 			name = thread.c;
@@ -4127,7 +4123,6 @@
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
-				F53D6D41035DFB96016640F1,
 			);
 			isa = PBXLibraryTarget;
 			name = ispw.jar;
