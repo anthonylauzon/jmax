@@ -334,7 +334,7 @@ extern void fts_timer_free(fts_timer_t *timer);
  *
  * @ingroup time
  */
-extern double fts_timer_get_time(fts_timer_t *timer)
+extern double fts_timer_get_time(fts_timer_t *timer);
 
 /**
  * Start timer.

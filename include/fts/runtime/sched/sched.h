@@ -174,9 +174,9 @@ extern void fts_sched_remove( fts_sched_t *sched, fts_object_t *object);
 #define fts_sched_advance_clock(s, t) (fts_clock_advance(&(s)->clock, (t)))
 #define fts_sched_set_time(s, t) (fts_clock_set_time(&(s)->clock, (t)))
 
-extern void fts_sched_call(fts_sched_t *sched, double time);
+/* system functions */
+extern void fts_sched_init(fts_sched_t *sched);
 extern void fts_sched_run(fts_sched_t *sched);
-extern void fts_sched_do_select(fts_sched_t *sched);
 extern void fts_sched_halt(fts_sched_t *sched);
 
 #endif
