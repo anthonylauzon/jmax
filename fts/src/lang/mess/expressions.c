@@ -31,6 +31,10 @@
  * The FTS '$' get variable operator (on a symbol only, for the moment)
  * 
  * The FTS '.' get property or nested variable of an object operator.
+ *
+ * The FTS ''' evaluate to the next atom in the expression, also if the atom
+ * is a reserved word; note that this is not an operator, but a meta-linguistic
+ * operartor, like parentesys.
  * 
  * A syntax for constant arrays definition { foo, bar, zoo }
  *
@@ -81,7 +85,8 @@
 #define FTS_OP_ELSE          24
 #define FTS_OP_ASSIGN        25
 #define FTS_OP_ARRAY_REF     26
-#define FTS_OP_FIRST_UNUSED  27
+#define FTS_OP_FIRST_UNUSED  28
+
 
 #define FTS_BINARY_OP_TYPE 0
 #define FTS_UNARY_OP_TYPE  1
@@ -117,6 +122,7 @@ static int op_binary[FTS_OP_FIRST_UNUSED];
 #define fts_is_dollar(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_dollar))
 #define fts_is_dot(a)            (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_dot)) 
 #define fts_is_assign(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_equal))
+#define fts_is_quote(a)         (fts_is_symbol((a)) && (fts_get_symbol(a) == fts_s_quote))
 
 /* Function hash table */
 
@@ -433,6 +439,27 @@ static int fts_expression_eval_one(fts_expression_state_t *e)
 		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
 					"Syntax error, expression start with operator", 0);
 	    }
+	  else  if (fts_is_quote(current_in(e)))
+	    {
+	      fprintf(stderr, "In quotes\n");
+
+	      next_in(e);
+
+	      if (more_in(e))
+		{
+		  value_stack_push(e, current_in(e));
+
+		  fprintf(stderr, "Pushing");
+		  fprintf_atoms(stderr, 1, current_in(e));
+		  fprintf(stderr, "\n");
+		  /* next_in(e); */
+
+		  status = waiting_op;
+		}
+	      else
+		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
+					"Syntax error, value missing after quote", 0);
+	    }
 	  else  if (fts_is_open_cpar(current_in(e)))
 	    {
 
@@ -695,6 +722,21 @@ static int fts_expression_eval_simple(fts_expression_state_t *e)
 	      /* Unary operator, push it and still wait for an argument */
 
 	      op_stack_push(e, fts_get_operator(current_in(e)), FTS_UNARY_OP_TYPE);
+	    }
+	  else  if (fts_is_quote(current_in(e)))
+	    {
+	      next_in(e);
+
+	      if (more_in(e))
+		{
+		  value_stack_push(e, current_in(e));
+
+		  next_in(e);
+		  status = waiting_op;
+		}
+	      else
+		return expression_error(e, FTS_EXPRESSION_SYNTAX_ERROR, 
+					"Syntax error, value missing after quote", 0);
 	    }
 	  else  if (fts_is_open_cpar(current_in(e)))
 	    {

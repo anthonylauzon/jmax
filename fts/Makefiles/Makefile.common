@@ -143,6 +143,7 @@ FTS_LIBS = $(LIBDIR)/libAudio.a  \
 	   $(LIBDIR)/libUtils.a  \
 	   $(LIBDIR)/libDatalib.a  \
 	   $(LIBDIR)/libMess.a   \
+	   $(LIBDIR)/libSTtools.a  \
 	   $(LIBDIR)/libSys.a
 
 

@@ -20,7 +20,7 @@
 #include "sys.h"
 #include "lang/mess.h"
 
-extern fts_atom_t fts_null = FTS_NULL;
+fts_atom_t fts_null = FTS_NULL;
 
 void fprintf_atoms(FILE *f, int ac, const fts_atom_t *at)
 {

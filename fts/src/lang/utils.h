@@ -22,5 +22,6 @@ extern fts_module_t fts_utils_module;
 #include "utils/floatfuns.h"
 #include "utils/wto.h"
 #include "utils/ieeewrap.h"
+#include "utils/srconv.h"
 
 #endif

@@ -16,4 +16,5 @@ SOURCES = \
   hashtab.c \
   ramps.c \
   units.c \
+  srconv.c \
   wto.c

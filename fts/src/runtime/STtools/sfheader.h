@@ -36,6 +36,10 @@
 #define SF_SONIC 97
 #define SF_WAV 96
 
+/* Added LINUXPC as SF_MIPS; here SF_MIPS refer to a 
+   little endian Dec Mips machine, *not* to the big endian
+   Sgi machines (mips are multi-endianess, i believe) */
+
 #if NeXT
 #define SF_MACHINE SF_NEXT
 #elif sgi
@@ -46,9 +50,11 @@
 #define SF_MACHINE SF_VAX
 #elif __sun
 #define SF_MACHINE SF_SUN
+#elif LINUXPC
+#define SF_MACHINE SF_MIPS
 #endif
 
-#define STlittleEndianCPU (SF_MACHINE == SF_MIPS) /* || SF_MACHINE == SF_VAX) */
+#define STlittleEndianCPU (SF_MACHINE == SF_MIPS) /* || SF_MACHINE == SF_VAX ) */
 #define STbigEndianCPU (SF_MACHINE == SF_NEXT || SF_MACHINE == SF_SUN)
 
 #define SF_SHORT sizeof(short)
