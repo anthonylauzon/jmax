@@ -22,6 +22,7 @@
 
 
 #ifndef FTS_SAMPLE_CONVERSION_ROUTINES_H
+#include <fts/fts.h>
 #include "sample_conversions.h"
 #endif
 

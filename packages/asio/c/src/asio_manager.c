@@ -40,10 +40,13 @@ ASIO_API asio_audioport_config();
 
 void asio_config()
 {
+
   fts_post("----------------------------------------------------------\n"
 	         " ASIO is a trademark of Steinberg Soft-und Hardware GmbH,\n"
 	         "----------------------------------------------------------\n");
   asio_audioport_config();
   asio_manager_config();
+
+
 }
 
