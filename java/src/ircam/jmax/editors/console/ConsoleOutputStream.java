@@ -46,10 +46,10 @@ class ConsoleOutputStream extends OutputStream
 
   public void write( int b) 
   {
-    buffer.append( (char)b );
-
-    if (b == '\n')
-      flush();
+      if (b != '\n')
+	  buffer.append( (char)b );
+      else
+	  flush();
   }
 
   public void flush()

@@ -45,7 +45,7 @@ public class FontCache {
   static MaxVector fontMetricsTable  = new MaxVector();
 
 
-  private static int lookupFontIndex( String fontName, int fontSize)
+  private static int lookupFontIndex( String fontName, int fontSize, int fontStyle)
   {
     Object[] objects = fontTable.getObjectArray();
     int osize = fontTable.size();
@@ -55,7 +55,8 @@ public class FontCache {
 	Font font = (Font) objects[i];
 
 	if ((fontSize == font.getSize()) &&
-	    (fontName.equals(font.getName())))
+	    (fontName.equals(font.getName()))&&
+	    (fontStyle == font.getStyle()))
 	  return i;
       }
 		
@@ -63,17 +64,18 @@ public class FontCache {
   }
   
 
-  public static final Font lookupFont( String fontName, int fontSize)
+  public static final Font lookupFont( String fontName, int fontSize, int fontStyle)
   {
     int idx;
 
-    idx = lookupFontIndex(fontName, fontSize);
+    idx = lookupFontIndex(fontName, fontSize, fontStyle);
 
     if (idx < 0)
       {
 	// Not found, make and store a new one
 
-	Font font = new Font( fontName, Font.PLAIN, fontSize);
+	  //Font font = new Font( fontName, Font.PLAIN, fontSize);
+	Font font = new Font( fontName, fontStyle, fontSize);
 
 	fontTable.addElement(font);
 	fontMetricsTable.addElement(Toolkit.getDefaultToolkit().getFontMetrics( font));
@@ -85,17 +87,17 @@ public class FontCache {
   }
 
 
-  public static final FontMetrics lookupFontMetrics( String fontName, int fontSize)
+  public static final FontMetrics lookupFontMetrics( String fontName, int fontSize, int fontStyle)
   {
     int idx;
 
-    idx = lookupFontIndex(fontName, fontSize);
+    idx = lookupFontIndex(fontName, fontSize, fontStyle);
 
     if (idx < 0)
       {
 	// Not found, make and store a new one
 
-	Font font = new Font( fontName, Font.PLAIN, fontSize);
+	  Font font = new Font( fontName, /*Font.PLAIN*/fontStyle, fontSize);
 	FontMetrics fontMetrics = Toolkit.getDefaultToolkit().getFontMetrics( font);
 	fontTable.addElement(font);
 	fontMetricsTable.addElement(fontMetrics);
@@ -106,6 +108,8 @@ public class FontCache {
       return (FontMetrics) fontMetricsTable.elementAt(idx);
   }
 }
+
+
 
 
 

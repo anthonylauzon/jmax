@@ -31,6 +31,7 @@ endif
 
 all:
 	(cd fts; $(MAKE) $@)
+
 	(cd java ; $(MAKE) $@)
 	(cd lib; $(MAKE) $@)
 	(cd packages; $(MAKE) $@)

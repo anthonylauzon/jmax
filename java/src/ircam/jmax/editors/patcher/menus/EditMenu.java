@@ -185,10 +185,11 @@ public class EditMenu extends EditorMenu
 				 clipboardContent.isDataFlavorSupported(ErmesSelection.patcherSelectionFlavor));
 	  }
 
-	selectAllItem.setEnabled(true);
+	selectAllItem.setEnabled(true);	
       }
   }
 }
+
 
 
 

@@ -1,4 +1,4 @@
-//
+
 // jMax
 // Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 // 
@@ -30,6 +30,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import java.awt.image.*;
+import java.io.*;
+import ircam.jmax.*;
+import ircam.jmax.toolkit.*;
+
 import ircam.jmax.editors.patcher.*;
 
 class ErmesToolButton extends JToggleButton
@@ -49,17 +54,22 @@ class ErmesToolButton extends JToggleButton
     public void mousePressed(MouseEvent e){
       ErmesToolButton button = (ErmesToolButton)e.getSource();
       if(!button.isSelected()){
-	button.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
-	button.state = true;
-	button.setSelected(true);
-	button.toolBar.buttonSelected( button);
+	  /*****************/
+	  //jdk117-->jdk1.3//
+	  button.setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+	  //button.setCursor(Cursors.get(button.getDescription()));
+	  /*****************/
+
+	  button.state = true;
+	  button.setSelected(true);
+	  button.toolBar.buttonSelected( button);
       }
     } 
     public void mouseReleased(MouseEvent e){
     }     
   };
 
-  ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String message)
+  ErmesToolButton(ErmesToolBar  toolBar, String description, ImageIcon theIcon, String cursorName, String message)
   {
     super( theIcon);
 
@@ -68,6 +78,20 @@ class ErmesToolButton extends JToggleButton
     this.description = description;
     this.message = message;
     this.toolBar = toolBar;
+    
+    /*****************/
+    //jdk117-->jdk1.3//
+    /*ImageObserver observer =  new ImageObserver(){
+      public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
+      {
+      return true;
+      }
+      };	
+      Image image = Toolkit.getDefaultToolkit().getImage(cursorName);
+      Toolkit.getDefaultToolkit().prepareImage(image, 64, 64, observer);
+      Cursor cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0,1), description+" cursor");
+      Cursors.loadCursor(description, cursor);*/
+    /*****************/
 
     addMouseListener(ErmesToolButton.mListener);
   }

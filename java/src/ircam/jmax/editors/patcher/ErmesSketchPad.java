@@ -101,16 +101,19 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     Graphics gr;
 
     if (isLocked()/* && syncPaint*/){
-      SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
-      gr = getGraphics();
-      gr.setClip(invalid);
-      displayList.updatePaint(gr);
-      /*if(!glass.isVisible())
-	glass.setVisible(true);
-	glass.repaint();*/
+	gr = getGraphics();
+	if(gr!=null)
+	    {
+		SwingUtilities.computeIntersection(rect.x, rect.y, rect.width, rect.height, invalid);
+		gr.setClip(invalid);
+		displayList.updatePaint(gr);
+	    }
+	/*if(!glass.isVisible())
+	  glass.setVisible(true);
+	  glass.repaint();*/
     }    
     else
-      repaint(invalid); 
+	repaint(invalid); 
   }
 
   // ------------------------------------------------
@@ -182,6 +185,7 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   // --------------------------------------------------------------------
 
   private String defaultFontName;
+  private int defaultFontStyle;
   private int defaultFontSize;
   
   public final String getDefaultFontName() 
@@ -193,7 +197,10 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     return defaultFontSize;
   }
-
+  public final int getDefaultFontStyle() 
+  {
+    return defaultFontStyle;
+  }
   public final void setDefaultFontName(String v) 
   {
     defaultFontName = v;
@@ -203,7 +210,10 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
   {
     defaultFontSize = v;
   }
-
+  public final void setDefaultFontStyle(int s) 
+  {
+    defaultFontStyle = s;
+  }
   boolean automaticFitToText = false;
   public void setAutomaticFitToText(boolean fit){
     automaticFitToText = fit;
@@ -335,6 +345,10 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
 	defaultFontSize = ircam.jmax.utils.Platform.FONT_SIZE;
     else
       defaultFontSize = Integer.parseInt(s);
+
+
+    defaultFontStyle = ircam.jmax.utils.Platform.FONT_STYLE;
+
 
     // Install the display List object
 
@@ -933,7 +947,12 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
     showMessage(message);
 
     stopTextEditing();
+    /*****************/
+    //jdk117-->jdk1.3//
     setCursor( Cursor.getPredefinedCursor( Cursor.CROSSHAIR_CURSOR));
+    //setCursor(Cursors.get(description));     
+    /*****************/
+
     engine.setTopInteraction(Interactions.addModeInteraction);    
   }
 
@@ -1152,6 +1171,9 @@ public class ErmesSketchPad extends JComponent implements  Editor , FtsUpdateGro
       itsPatcherData.startUpdates();
   }
 }
+
+
+
 
 
 

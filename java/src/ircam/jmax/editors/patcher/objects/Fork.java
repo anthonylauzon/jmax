@@ -48,7 +48,7 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
   private static final int MINIMUM_WIDTH = DEFAULT_WIDTH;
   private static final int CONST_HEIGHT = 12;
 
-  private int n_outlets = 0; /* @@@@@*/
+  private int nOutlets = 0; /* @@@@@*/
 
   public Fork( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
@@ -60,11 +60,11 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
     int width = getWidth();
 
     if (width == -1)
-      setWidth( DEFAULT_WIDTH);
+      setWidthShift( DEFAULT_WIDTH);
     else if (width <= MINIMUM_WIDTH)
-      setWidth( MINIMUM_WIDTH);
+      setWidthShift( MINIMUM_WIDTH);
     else
-      setWidth(width);
+      setWidthShift(width);
 
     super.setHeight(CONST_HEIGHT);
   }
@@ -73,45 +73,65 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
 
   public void setWidth( int theWidth)
   {
-    if (theWidth < MINIMUM_WIDTH)
-      theWidth = MINIMUM_WIDTH;
-
-    /* int */n_outlets = (theWidth - 2 * ObjectGeometry.INOUTLET_PAD) / DEFAULT_DISTANCE + 1;
-
-    sendArgs[0].setInt(n_outlets); 
-    ftsObject.sendMessage(FtsObject.systemInlet, "set_outlets", 1, sendArgs);
-
-    theWidth = (n_outlets - 1) * DEFAULT_DISTANCE + 2 * ObjectGeometry.INOUTLET_PAD;
-    super.setWidth( theWidth);
+      int minWidth = ObjectGeometry.HIGHLIGHTED_INOUTLET_WIDTH * nOutlets;
+      
+      if (theWidth < minWidth)
+	  theWidth = minWidth;
+      
+      super.setWidth( theWidth);
   }
 
-  /*
-  public void inletsChanged(int n)
+  public void setWidthShift( int theWidth) 
   {
-    redraw();
-    redrawConnections();
-    itsSketchPad.getDisplayList().updateConnectionsFor(this);
+      int minWidth = 2 * outletDistance + 2 * ObjectGeometry.INOUTLET_PAD - 1;
+
+      if (theWidth < minWidth)
+	  {
+	      theWidth = minWidth;
+	      nOutlets = 2;
+	  }
+      else
+	  nOutlets = (theWidth - 2 * ObjectGeometry.INOUTLET_PAD) / outletDistance + 1;
+      
+      sendArgs[0].setInt(nOutlets); 
+      ftsObject.sendMessage(FtsObject.systemInlet, "set_outlets", 1, sendArgs);
+
+      theWidth = (nOutlets - 1) * outletDistance + 2 * ObjectGeometry.INOUTLET_PAD;
+
+      ftsObject.setWidth(theWidth);
+      itsSketchPad.getDisplayList().updateConnectionsFor(this);
   }
 
-  public void outletsChanged(int n)
-  {
-    redraw();
-    redrawConnections();
-    itsSketchPad.getDisplayList().updateConnectionsFor(this);
-  }
-  */
+  
+    /*public void inletsChanged(int n)
+      {
+      updateInOutlets();
+      redraw();
+      redrawConnections();
+	itsSketchPad.getDisplayList().updateConnectionsFor(this);
+	}
+	
+	public void outletsChanged(int n)
+	{
+	updateInOutlets();
+	redraw();
+	redrawConnections();
+	itsSketchPad.getDisplayList().updateConnectionsFor(this);
+	}*/
+ 
 
-  public void updateInOutlets()
-  {
-    /*
-    inletDistance = DEFAULT_DISTANCE;
-    outletDistance = DEFAULT_DISTANCE;
-    */
-  }
+    /*public void updateInOutlets()
+      {
+    
+      inletDistance = DEFAULT_DISTANCE;
+      outletDistance = DEFAULT_DISTANCE;
+    
+      }*/
 
   public int getOutletAnchorX(int outlet)
   {
-    return getX() + ObjectGeometry.INOUTLET_PAD + outlet * DEFAULT_DISTANCE;
+      //return getX() + ObjectGeometry.INOUTLET_PAD + outlet * DEFAULT_DISTANCE;
+      return getX() + ObjectGeometry.INOUTLET_PAD + outlet * outletDistance;
   }
 
   public int getOutletAnchorY(int outlet)
@@ -121,7 +141,8 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
 
   public int getInletAnchorX(int inlet)
   {
-    return getX() + ObjectGeometry.INOUTLET_PAD + inlet * DEFAULT_DISTANCE;
+      return getX() + ObjectGeometry.INOUTLET_PAD;
+	  // + inlet * DEFAULT_DISTANCE;
   }
 
   public int getInletAnchorY(int inlet)
@@ -149,9 +170,9 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
 
   public void paintOutlets(Graphics g)
   {
-    /*int n_outlets = ftsObject.getNumberOfOutlets();*/
+    /*int nOutlets = ftsObject.getNumberOfOutlets();*/
 
-    for ( int i = 0; i < n_outlets; i++)
+    for ( int i = 0; i < nOutlets; i++)
       {
 	int x, y;
 
@@ -188,10 +209,10 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
 	paintInlets(g);
 	paintOutlets(g);
 
-	g.drawLine(x_out, y + h/2, getOutletAnchorX(n_outlets-1), y + h/2);
+	g.drawLine(x_out, y + h/2, getOutletAnchorX(nOutlets-1), y + h/2);
 	g.drawLine(x_out, y + 1, x_out, y + h - 2);
 	
-	for(int i=1; i<n_outlets; i++)
+	for(int i=1; i<nOutlets; i++)
 	  {
 	    x_out = getOutletAnchorX(i);
 	    g.drawLine(x_out, y + h/2, x_out, y + h - 2);
@@ -207,13 +228,13 @@ class Fork extends GraphicObject /*implements FtsOutletsListener*/
 	paintInlets(g);
 	paintOutlets(g);
 
-	g.drawLine(x_out, y + h/2, getOutletAnchorX(n_outlets-1), y + h/2);
-	g.drawLine(x_out, y + h/2 + 1, getOutletAnchorX(n_outlets-1), y + h/2 + 1);
+	g.drawLine(x_out, y + h/2, getOutletAnchorX(nOutlets-1), y + h/2);
+	g.drawLine(x_out, y + h/2 + 1, getOutletAnchorX(nOutlets-1), y + h/2 + 1);
 
 	g.drawLine(x_out, y + 1, x_out, y + h - 2);
 	g.drawLine(x_out + 1, y + 1, x_out + 1, y + h - 2);
 	
-	for(int i=1; i<n_outlets; i++)
+	for(int i=1; i<nOutlets; i++)
 	  {
 	    x_out = getOutletAnchorX(i);
 	    g.drawLine(x_out, y + h/2, x_out, y + h - 2);

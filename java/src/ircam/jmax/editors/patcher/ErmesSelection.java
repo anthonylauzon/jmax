@@ -54,7 +54,7 @@ public class ErmesSelection implements Transferable
   private ErmesSketchPad owner;
 
   public static DataFlavor patcherSelectionFlavor = new DataFlavor(ircam.jmax.fts.FtsSelection.class, "PatcherSelection");
-  public static DataFlavor flavors[];
+  public static DataFlavor flavors[] = { patcherSelectionFlavor };
 
   public Object getTransferData(DataFlavor flavor)
   {

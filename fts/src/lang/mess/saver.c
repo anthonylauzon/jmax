@@ -866,6 +866,7 @@ fts_bmax_code_new_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   fts_bmax_code_new_property(f, obj, fts_s_font);
   fts_bmax_code_new_property(f, obj, fts_s_fontSize);
+  fts_bmax_code_new_property(f, obj, fts_s_fontStyle);
 
   /* slider properties */
   fts_bmax_code_new_property(f, obj, fts_s_orientation);
@@ -951,6 +952,7 @@ fts_bmax_code_new_top_object(fts_bmax_file_t *f, fts_object_t *obj, int objidx)
 
   fts_bmax_code_new_property(f, obj, fts_s_font);
   fts_bmax_code_new_property(f, obj, fts_s_fontSize);
+  fts_bmax_code_new_property(f, obj, fts_s_fontStyle);
 
   fts_bmax_code_new_property(f, obj, fts_s_wx);
   fts_bmax_code_new_property(f, obj, fts_s_wy);

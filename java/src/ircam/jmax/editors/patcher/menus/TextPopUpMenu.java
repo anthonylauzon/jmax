@@ -55,7 +55,10 @@ public class TextPopUpMenu extends JMenu
 
   private JMenu itsFontsMenu;
   private ButtonGroup itsFontMenuGroup;
-
+  
+  private JMenu itsStylesMenu;
+  private ButtonGroup itsStylesMenuGroup;
+  
   public TextPopUpMenu()
   {
     super("Text");
@@ -84,6 +87,10 @@ public class TextPopUpMenu extends JMenu
     itsFontsMenu = new JMenu("Fonts");
     FillFontMenu(itsFontsMenu);
     add(itsFontsMenu);
+
+    itsStylesMenu = new JMenu("Styles");
+    FillStylesMenu(itsStylesMenu);
+    add(itsStylesMenu);
   }
 
   private void FillSizesMenu( JMenu menu)
@@ -103,8 +110,12 @@ public class TextPopUpMenu extends JMenu
 
   private void FillFontMenu( JMenu theFontMenu)
   {
+      /*****************/
+      //jdk117-->jdk1.3//
       String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
       //String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+      /*****************/
+
       JRadioButtonMenuItem item;
       itsFontMenuGroup = new ButtonGroup();
 
@@ -117,6 +128,21 @@ public class TextPopUpMenu extends JMenu
 	  }
   }
 
+  private void FillStylesMenu( JMenu menu)
+  {
+    String styles[] = {"plain", "bold", "italic"};
+    JRadioButtonMenuItem item; 
+    itsStylesMenuGroup = new ButtonGroup();
+
+    for (int i = 0; i < styles.length; i++)
+      {
+	item = new JRadioButtonMenuItem(styles[i]);
+	menu.add(item);
+	item.addActionListener(Actions.fontStylesPopUpAction);
+	itsStylesMenuGroup.add(item);
+      }
+  }
+
   public static TextPopUpMenu getInstance()
   {
     return textPopup;
@@ -125,8 +151,9 @@ public class TextPopUpMenu extends JMenu
   public static void update(GraphicObject obj)
   {
     JRadioButtonMenuItem item;
-    String fontName = obj.getFontName();;
-    int    fontSize = obj.getFontSize();
+    String fontName = obj.getFontName();
+    int fontSize = obj.getFontSize();
+    int fontStyle = obj.getFontStyle();
 
     for( int i = 0; i < textPopup.itsFontsMenu.getItemCount(); i++)
       {
@@ -147,6 +174,21 @@ public class TextPopUpMenu extends JMenu
 	    item.setSelected(true);
 	    break;
 	  }
+      }
+    
+    switch(fontStyle)
+      {
+      case Font.PLAIN:
+	textPopup.itsStylesMenu.getItem(0).setSelected(true);
+	break;
+      case Font.BOLD:
+	textPopup.itsStylesMenu.getItem(1).setSelected(true);
+	break;
+      case Font.ITALIC:
+	textPopup.itsStylesMenu.getItem(2).setSelected(true);
+	break;
+      default:
+	textPopup.itsStylesMenu.getItem(0).setSelected(true);
       }
   }
 }

@@ -933,6 +933,7 @@ fts_object_send_properties(fts_object_t *obj)
 
       fts_object_property_changed(obj, fts_s_font);
       fts_object_property_changed(obj, fts_s_fontSize);
+      fts_object_property_changed(obj, fts_s_fontStyle);
 
       if (fts_object_is_patcher(obj) && (! fts_object_is_error(obj)))
 	{
@@ -1024,6 +1025,7 @@ static void fts_object_move_properties(fts_object_t *old, fts_object_t *new)
   fts_move_property(old, new, fts_s_width);
   fts_move_property(old, new, fts_s_font);
   fts_move_property(old, new, fts_s_fontSize);
+  fts_move_property(old, new, fts_s_fontStyle);
 }
 
 /* Send a blip for an object, i.e. a message that will be shown

@@ -69,7 +69,8 @@ public class ChooseNumberPopUp extends JPopupMenu
     // Remove all the components
 
     for (int i = 0; i < (this.max - this.min); i++)
-      remove(getComponentAtIndex(0));
+	//remove(getComponentAtIndex(0));
+	remove(getComponent(0));
 
     // Rebuild the menu
 

@@ -60,6 +60,10 @@ public class TextMenu extends EditorMenu
   private ButtonGroup itsFontMenuGroup;
   JRadioButtonMenuItem fakeFontButton;
 
+  private JMenu itsStylesMenu;
+  private ButtonGroup itsStylesMenuGroup;
+  JRadioButtonMenuItem fakeStylesButton;
+
   ErmesSketchPad sketch;
 
   class TextMenuListener implements MenuListener
@@ -91,7 +95,12 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
+    /*****************/
+    //jdk117-->jdk1.3//
     automaticFitItem = new JRadioButtonMenuItem("Automatic Fit To Text");
+    //automaticFitItem = new AntialiasingRadioButtonMenuItem("Automatic Fit To Text");
+    /*****************/
+
     add(automaticFitItem);
     automaticFitItem.addActionListener(Actions.setAutomaticFitAction);
 
@@ -99,13 +108,32 @@ public class TextMenu extends EditorMenu
 
     addSeparator();
 
+    /*****************/
+    //jdk117-->jdk1.3//
     itsSizesMenu = new JMenu("Sizes");
-    FillSizesMenu( itsSizesMenu);
+    //itsSizesMenu = new AntialiasingMenu("Sizes");
+    /*****************/
+
+    FillSizesMenu( itsSizesMenu);    
     add(itsSizesMenu);
 
+    /*****************/
+    //jdk117-->jdk1.3//
     itsFontsMenu = new JMenu("Fonts");
+    //itsFontsMenu = new AntialiasingMenu("Fonts");
+    /*****************/
+
     FillFontMenu(itsFontsMenu);
     add(itsFontsMenu);
+
+    /*****************/
+    //jdk117-->jdk1.3//
+    itsStylesMenu = new JMenu("Styles");
+    //itsStylesMenu = new AntialiasingMenu("Styles");
+    /*****************/
+
+    FillStylesMenu(itsStylesMenu);
+    add(itsStylesMenu);
 
     addMenuListener(new TextMenuListener());
   }
@@ -121,18 +149,47 @@ public class TextMenu extends EditorMenu
 
     for (int i = 0; i < sizes.length; i++)
       {
-	item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
-	menu.add(item);
-	item.addActionListener(Actions.fontSizesAction);
-	itsSizesMenuGroup.add(item);
+
+	  /*****************/
+	  //jdk117-->jdk1.3//
+	  item = new JRadioButtonMenuItem(Integer.toString(sizes[i]));
+	  //item = new AntialiasingRadioButtonMenuItem(Integer.toString(sizes[i]));
+	  /*****************/
+	  menu.add(item);
+	  item.addActionListener(Actions.fontSizesAction);
+	  itsSizesMenuGroup.add(item);
       }
   }
 
+  private void FillStylesMenu( JMenu menu)
+  {
+    String styles[] = {"plain", "bold", "italic"};
+    JRadioButtonMenuItem item; 
+    itsStylesMenuGroup = new ButtonGroup();
+
+    fakeStylesButton = new JRadioButtonMenuItem( "fake");
+    itsSizesMenuGroup.add(fakeSizeButton);
+
+    for (int i = 0; i < styles.length; i++)
+      {
+	  /*****************/
+	  //jdk117-->jdk1.3//
+	  item = new JRadioButtonMenuItem(styles[i]);
+	  //item = new AntialiasingRadioButtonMenuItem(styles[i]);
+	  /*****************/
+	  menu.add(item);
+	  item.addActionListener(Actions.fontStylesAction);
+	  itsStylesMenuGroup.add(item);
+      }
+  }
   private void FillFontMenu( JMenu theFontMenu)
   {
+      /*****************/
+      //jdk117-->jdk1.3//
       String[] itsFontList = Toolkit.getDefaultToolkit().getFontList();
       //String[] itsFontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-      
+      /*****************/
+
       JRadioButtonMenuItem item;
       itsFontMenuGroup = new ButtonGroup();
 
@@ -141,7 +198,11 @@ public class TextMenu extends EditorMenu
 
       for ( int i = 0; i < itsFontList.length; i++)
 	  {
+	      /*****************/
+	      //jdk117-->jdk1.3//
 	      item = new JRadioButtonMenuItem(itsFontList[i]);
+	      //item = new AntialiasingRadioButtonMenuItem(itsFontList[i]);	      
+	      /*****************/
 	      theFontMenu.add(item);
 	      itsFontMenuGroup.add(item);
 	      item.addActionListener(Actions.fontAction);
@@ -161,6 +222,7 @@ public class TextMenu extends EditorMenu
     JRadioButtonMenuItem item;
     String fontName;
     int    fontSize;
+    int    fontStyle;
 
     if (ErmesSelection.patcherSelection.isEmpty())
       {
@@ -170,6 +232,7 @@ public class TextMenu extends EditorMenu
 
 	fontName = sketch.getDefaultFontName();
 	fontSize = sketch.getDefaultFontSize();
+	fontStyle = sketch.getDefaultFontStyle();
       }
     else if (ErmesSelection.patcherSelection.isSingleton())
       {
@@ -181,6 +244,7 @@ public class TextMenu extends EditorMenu
 
 	fontName = object.getFontName();
 	fontSize = object.getFontSize();
+	fontStyle = object.getFontStyle();
       }
     else
       {
@@ -189,6 +253,7 @@ public class TextMenu extends EditorMenu
 	fitItem.setEnabled(true); 
 	fakeFontButton.setSelected(true);
 	fakeSizeButton.setSelected(true);
+	fakeStylesButton.setSelected(true);
 
 	return;
       }
@@ -217,6 +282,29 @@ public class TextMenu extends EditorMenu
       }
     
     if(!sizeExist) fakeSizeButton.setSelected(true);
+  
+    switch(fontStyle)
+	{
+	case Font.PLAIN:
+	    itsStylesMenu.getItem(0).setSelected(true);
+	    break;
+	case Font.BOLD:
+	    itsStylesMenu.getItem(1).setSelected(true);
+	    break;
+	case Font.ITALIC:
+	    itsStylesMenu.getItem(2).setSelected(true);
+	    break;
+	default:
+	    itsStylesMenu.getItem(0).setSelected(true);
+	}
   }
 }
+
+
+
+
+
+
+
+
 

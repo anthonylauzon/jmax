@@ -200,6 +200,7 @@ abstract public class GraphicObject implements DisplayObject
   {
     String fontName;
     int fontSize;
+    int fontStyle;
 
     if(assistArgs == null)
       {
@@ -216,15 +217,18 @@ abstract public class GraphicObject implements DisplayObject
 
     fontName = ftsObject.getFont();
     fontSize = ftsObject.getFontSize();
+    fontStyle = ftsObject.getFontStyle();
 
     if (fontName == null)
       fontName = itsSketchPad.getDefaultFontName();
 
     if (fontSize < 0)      
-      fontSize = itsSketchPad.getDefaultFontSize();
+	fontSize = itsSketchPad.getDefaultFontSize();
+    if (fontStyle < 0)      
+	fontStyle = itsSketchPad.getDefaultFontStyle();
 
-    itsFont = FontCache.lookupFont(fontName, fontSize);
-    itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize);
+    itsFont = FontCache.lookupFont(fontName, fontSize, fontStyle);
+    itsFontMetrics = FontCache.lookupFontMetrics(fontName, fontSize, fontStyle);
 
     updateInOutlets();    
   }
@@ -274,7 +278,10 @@ abstract public class GraphicObject implements DisplayObject
 	itsSketchPad.getDisplayList().updateConnectionsFor(this);
       }
   }
-
+  public void setWidthShift( int w) 
+  {
+      setWidth(w);
+  }
   public final int getHeight() 
   {
     return ftsObject.getHeight();
@@ -314,6 +321,11 @@ abstract public class GraphicObject implements DisplayObject
     return itsFont.getSize();
   }
 
+  public int getFontStyle()
+  {
+    return itsFont.getStyle();
+  }
+
   public FontMetrics getFontMetrics() 
   {
     return itsFontMetrics;
@@ -321,12 +333,17 @@ abstract public class GraphicObject implements DisplayObject
 
   public void setFontName(String fontName)
   {
-    setFont(FontCache.lookupFont(fontName, itsFont.getSize()));
+    setFont(FontCache.lookupFont(fontName, itsFont.getSize(), itsFont.getStyle()));
   }
 
   public void setFontSize(int size)
   {
-    setFont(FontCache.lookupFont(itsFont.getName(), size));
+    setFont(FontCache.lookupFont(itsFont.getName(), size, itsFont.getStyle()));
+  }
+
+  public void setFontStyle(int style)
+  {
+      setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize(), style));
   }
 
   public void fontSmaller()
@@ -336,12 +353,12 @@ abstract public class GraphicObject implements DisplayObject
     size = itsFont.getSize();
 
     if (size > 8)
-      setFont(FontCache.lookupFont(itsFont.getName(), size - 2));
+      setFont(FontCache.lookupFont(itsFont.getName(), size - 2, itsFont.getStyle()));
   }
 
   public void fontBigger()
   {
-    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize() + 2));
+    setFont(FontCache.lookupFont(itsFont.getName(), itsFont.getSize() + 2, itsFont.getStyle()));
   }
 
   protected void setFont( Font theFont) 
@@ -350,7 +367,8 @@ abstract public class GraphicObject implements DisplayObject
     itsFontMetrics = itsSketchPad.getFontMetrics( theFont);
 
     ftsObject.setFont(itsFont.getName());
-    ftsObject.setFontSize(itsFont.getSize());;
+    ftsObject.setFontSize(itsFont.getSize());
+    ftsObject.setFontStyle(itsFont.getStyle());
   }
 
   public void fitToText()

@@ -143,7 +143,7 @@ static int            object_table_size_stack[OBJECT_TABLE_STACK_DEPTH];
 static int            object_table_tos = OBJECT_TABLE_STACK_DEPTH;
 static fts_object_t **object_table = 0;
 
-#define MAX_BUILTIN_SYMBOLS 89
+#define MAX_BUILTIN_SYMBOLS 90
 static fts_symbol_t builtin_symbols[MAX_BUILTIN_SYMBOLS];
 
 /* Macros to do checks operations */
@@ -1185,4 +1185,8 @@ void fts_vm_init()
 
   /* slider properties */
   builtin_symbols[88] =  fts_s_orientation;
+
+  builtin_symbols[89] =  fts_s_fontStyle;
 }
+
+

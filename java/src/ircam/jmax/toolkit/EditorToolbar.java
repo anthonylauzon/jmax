@@ -89,6 +89,22 @@ public class EditorToolbar extends JToolBar implements ActionListener{
 	aButton.setToolTipText(theTool.getName());
 	aButton.setMargin(new Insets(0,0,0,0));
 	aButton.addActionListener(this);
+	aButton.addMouseListener(new MouseListener(){
+	    public void mousePressed(MouseEvent e){
+		if (e.isPopupTrigger()) 
+		{
+		    Object aSource =  e.getSource();
+		    Tool aTool = (Tool) itsTools.get(aSource);
+		    
+		    if (aTool.getMenu() != null)
+			aTool.getMenu().show(e.getComponent(), e.getX()-10, e.getY()-10);
+		}
+	    }
+	    public void mouseClicked(MouseEvent e){}
+	    public void mouseReleased(MouseEvent e){}
+	    public void mouseEntered(MouseEvent e){}
+	    public void mouseExited(MouseEvent e){}
+	});
 	itsTools.put(aButton, theTool);
 	add(aButton);
 	itsButtonGroup.add(aButton);
@@ -119,7 +135,6 @@ public class EditorToolbar extends JToolBar implements ActionListener{
 	
 	manager.changeTool(aTool);    
     }
-    
     
     //---- Fields and accessors
     

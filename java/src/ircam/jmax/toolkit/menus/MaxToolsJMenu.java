@@ -34,6 +34,10 @@ import javax.swing.event.*;
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
 
+/*****************/
+//jdk117-->jdk1.3//
+//public class MaxToolsJMenu extends AntialiasingMenu implements ListDataListener 
+/*****************/
 public class MaxToolsJMenu extends JMenu implements ListDataListener 
 {
   ListModel toolFinders;
@@ -82,8 +86,13 @@ public class MaxToolsJMenu extends JMenu implements ListDataListener
 	MaxToolFinder toolFinder;
 
 	toolFinder = (MaxToolFinder) toolFinders.getElementAt(i);
-
+	
+	/*****************/
+	//jdk117-->jdk1.3//
 	mi = new JMenuItem(toolFinder.getToolName());
+	//mi = new AntialiasingMenuItem(toolFinder.getToolName());
+	/*****************/
+
 	add(mi);
 	mi.addActionListener(new ToolActionListener(mi, toolFinder));
       }
@@ -111,4 +120,7 @@ public class MaxToolsJMenu extends JMenu implements ListDataListener
 
 
                   
+
+
+
 

@@ -136,7 +136,8 @@ public class EditField extends JTextArea implements FocusListener
     sketch = editor;
 
     setFont(FontCache.lookupFont(ircam.jmax.utils.Platform.FONT_NAME,
-				 ircam.jmax.utils.Platform.FONT_SIZE));
+				 ircam.jmax.utils.Platform.FONT_SIZE,
+				 ircam.jmax.utils.Platform.FONT_STYLE));
 
     Keymap myMap = JTextComponent.addKeymap(null, getKeymap());
 
@@ -197,6 +198,7 @@ public class EditField extends JTextArea implements FocusListener
 	  }
 	else
 	  {
+
 	    SwingUtilities.invokeLater(new Runnable()
 				       {
 					 public void run()
@@ -218,6 +220,7 @@ public class EditField extends JTextArea implements FocusListener
     requestFocus();
   }
 
+    
   public void endEdit() 
   {
     String aTextString = getText().trim();
@@ -286,6 +289,14 @@ public class EditField extends JTextArea implements FocusListener
     if (owner != null)
       sketch.stopTextEditing();
   }
+    /*****************/
+    //jdk117-->jdk1.3//
+    /*public void paint(Graphics g)
+      {
+      ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);	
+      super.paint(g); 
+      }*/
+    /*****************/
 }
 
 

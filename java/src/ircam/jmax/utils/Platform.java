@@ -43,6 +43,7 @@ public class Platform
   static public int    ENTER_KEY   = 0;
   static public int    RETURN_KEY  = 0;
   static public int    FONT_SIZE   = 0;
+  static public int    FONT_STYLE  = 0;
   static public String FONT_NAME   = null;
   static public int    LEFT_KEY    = KeyEvent.VK_LEFT;
   static public int    RIGHT_KEY   = KeyEvent.VK_RIGHT;
@@ -108,6 +109,7 @@ public class Platform
     ENTER_KEY   = 3;
     RETURN_KEY  = 10;
     FONT_SIZE   = 9;
+    FONT_STYLE  = Font.PLAIN;
     FONT_NAME   = new String("monaco");
   }
 
@@ -128,6 +130,7 @@ public class Platform
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
     FONT_SIZE   = 10;
+    FONT_STYLE  = Font.PLAIN;
     FONT_NAME   = new String("SansSerif");
   }
 
@@ -143,6 +146,7 @@ public class Platform
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
     FONT_SIZE   = 18;
+    FONT_STYLE  = Font.PLAIN;
     FONT_NAME   = new String("monaco");
   }
 
@@ -176,11 +180,16 @@ public class Platform
     BACKSPACE_KEY = 127;
     ENTER_KEY   = 10;
     RETURN_KEY  = 10;
-    FONT_NAME = Toolkit.getDefaultToolkit().getFontList()[1];
+    //FONT_NAME = Toolkit.getDefaultToolkit().getFontList()[1];
     //FONT_NAME = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[1];
+    FONT_NAME = new String("default");
     FONT_SIZE   = 10;
-
+    FONT_STYLE  = Font.PLAIN;
     //FONT_NAME   = new String("helvetica");
   }
 }
  
+
+
+
+

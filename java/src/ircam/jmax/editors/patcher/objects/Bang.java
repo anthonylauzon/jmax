@@ -101,24 +101,26 @@ public class Bang extends GraphicObject implements FtsIntValueListener
     int h = getHeight();
 
     if ( isSelected())
-      g.setColor( Settings.sharedInstance().getUIColor().darker());
+	g.setColor( Settings.sharedInstance().getUIColor().darker());
     else
-      g.setColor( Settings.sharedInstance().getUIColor());
+	g.setColor( Settings.sharedInstance().getUIColor());
 
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
     g.setColor( itsFlashColor);
-    g.fillOval( x + CIRCLE_ORIGIN + 1,
-		y + CIRCLE_ORIGIN + 1,
-		w - 2*(CIRCLE_ORIGIN+1) - 1,
-		h - 2*(CIRCLE_ORIGIN+1) - 1);
+
+    int delta = w/5;
+    g.fillRect( x + delta + 1,
+		y + delta + 1,
+		w - 2*(delta+1),
+		h - 2*(delta+1));
 
     g.setColor(Color.black);
-    g.drawOval( x + CIRCLE_ORIGIN, 
-		y + CIRCLE_ORIGIN, 
-		w - 2*CIRCLE_ORIGIN - 1,
-		h - 2*CIRCLE_ORIGIN - 1);
-
+    g.drawRect( x + delta, 
+		y + delta, 
+		w - 2*delta - 1,
+		h - 2*delta - 1);
+      
     super.paint( g);
   }
   public void updatePaint(Graphics g) 
@@ -127,12 +129,18 @@ public class Bang extends GraphicObject implements FtsIntValueListener
     int y = getY();
     int w = getWidth();
     int h = getHeight();
-
+    
     g.setColor( itsFlashColor);
-    g.fillOval( x + CIRCLE_ORIGIN + 1,
-		y + CIRCLE_ORIGIN + 1,
-		w - 2*(CIRCLE_ORIGIN+1) - 1,
-		h - 2*(CIRCLE_ORIGIN+1) - 1);
+
+    /*g.fillOval( x + CIRCLE_ORIGIN + 1,
+      y + CIRCLE_ORIGIN + 1,
+      w - 2*(CIRCLE_ORIGIN+1) - 1,
+      h - 2*(CIRCLE_ORIGIN+1) - 1);*/    
+    int delta = w/5;
+    g.fillRect( x + delta + 1,
+		y + delta + 1,
+		w - 2*(delta+1),
+		h - 2*(delta+1));
   }
 
   //popup interaction 

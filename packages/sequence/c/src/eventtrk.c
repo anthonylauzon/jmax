@@ -148,7 +148,7 @@ void
 eventtrk_add_event(eventtrk_t *track, double time, event_t *event)
 {
   event_t *next = eventtrk_get_event_by_time(track, time);
-  
+
   insert_event_before(track, next, event);
 
   event_set_track(event, track);
@@ -536,7 +536,6 @@ eventtrk_export_to_midifile_with_dialog(fts_object_t *o, int winlet, fts_symbol_
 
   snprintf(str, 1024, "%s.mid", track_name? fts_symbol_name(track_name): "untitled");
   default_name = fts_new_symbol_copy(str);
-
   fts_set_symbol(a, seqsym_export_midi);
   fts_set_symbol(a + 1, fts_new_symbol("Save standard MIDI file"));
   fts_set_symbol(a + 2, fts_get_project_dir());

@@ -124,7 +124,8 @@ class EditModeInteraction extends Interaction
 	    editor.resetHighlighted();
 	    return Interactions.editCtrlInteraction;
 
-	  case (Squeack.DOWN | Squeack.HRESIZE_HANDLE):
+	  case (Squeack.DOWN | Squeack.HRESIZE_HANDLE): 
+	  case (Squeack.SHIFT | Squeack.DOWN | Squeack.HRESIZE_HANDLE):
 	    // Horizontal Resize
 	    editor.resetHighlighted();
 	    return Interactions.hResizeInteraction;

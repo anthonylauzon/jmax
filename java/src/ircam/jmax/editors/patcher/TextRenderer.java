@@ -188,6 +188,10 @@ public class TextRenderer implements ObjectRenderer
 
   public void render(Graphics g, int x, int y, int w, int h)
   {
-    SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
+      /*****************/
+      //jdk117-->jdk1.3//
+      //((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      /*****************/
+      SwingUtilities.paintComponent(g, area, ic, x, y, w, h);
   }
 }

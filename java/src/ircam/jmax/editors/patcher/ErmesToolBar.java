@@ -144,6 +144,7 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     add( cards, BorderLayout.CENTER);
 
     JPanel empty = new JPanel();
+
     cards.add( "lock", empty);
     cards.setBorder( new EmptyBorder( 0, 0, 0, 0));
  
@@ -190,9 +191,9 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
     cardLayout.show( cards, locked ? "lock" : "edit");
   }
 
-  private void addButton( String descr, String iconName, String message)
+  private void addButton( String descr, String iconName, String cursorName, String message)
   {
-    JToggleButton button = new ErmesToolButton(this, descr, Icons.get(iconName), message);
+    JToggleButton button = new ErmesToolButton(this, descr, Icons.get(iconName), cursorName, message);
     toolBar.add( button);
     if(!AddPopUp.initDone)
       AddPopUp.addAbbreviation(iconName, descr, message, true);
@@ -202,18 +203,20 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
 
   private void insertButtons()
   {
-    addButton( "", "_object_", "Adding New Object");
-    addButton( "messbox", "_message_box_", "Adding New Message Box");
-    addButton( "jpatcher", "_patcher_", "Adding New Patcher");
-    addButton( "inlet -1", "_inlet_", "Adding New Inlet");
-    addButton( "outlet -1","_outlet_",  "Adding New Outlet");
-    addButton( "fork 2","_fork_",  "Adding New Fork");
-    addButton( "comment", "_comment_","Adding New Comment");
-    addButton( "button",  "_button_", "Adding New Button");
-    addButton( "toggle",  "_toggle_", "Adding New Toggle");
-    addButton( "slider",  "_slider_", "Adding New Slider");
-    addButton( "intbox",   "_intbox_", "Adding New Integer Box");
-    addButton( "floatbox", "_floatbox_", "Adding New Float Box");
+    String path = MaxApplication.getProperty("jmaxRoot")+File.separator+"images"+File.separator;
+
+    addButton( "", "_object_", path+"cursor_standard.gif", "Adding New Object");
+    addButton( "messbox", "_message_box_", path+"cursor_message.gif", "Adding New Message Box");
+    addButton( "jpatcher", "_patcher_", path+"cursor_patcher.gif", "Adding New Patcher");
+    addButton( "inlet -1", "_inlet_", path+"cursor_in.gif", "Adding New Inlet");
+    addButton( "outlet -1","_outlet_", path+"cursor_out.gif", "Adding New Outlet");
+    addButton( "fork 2","_fork_", path+"cursor_fork.gif", "Adding New Fork");
+    addButton( "comment", "_comment_", path+"cursor_comment.gif","Adding New Comment");
+    addButton( "button",  "_button_", path+"cursor_bang.gif","Adding New Button");
+    addButton( "toggle",  "_toggle_", path+"cursor_toggle.gif","Adding New Toggle");
+    addButton( "slider",  "_slider_", path+"cursor_slider.gif","Adding New Slider");
+    addButton( "intbox",   "_intbox_", path+"cursor_integer.gif", "Adding New Integer Box");
+    addButton( "floatbox", "_floatbox_", path+"cursor_float.gif", "Adding New Float Box");
     AddPopUp.initDone();//????
   }
 
@@ -230,4 +233,11 @@ public class ErmesToolBar extends JPanel implements MaxDocumentListener{
       }
   }
 }
+
+
+
+
+
+
+
 

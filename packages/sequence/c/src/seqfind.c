@@ -52,14 +52,18 @@ seqfind_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(track)
     {
       event_t *event = eventtrk_get_first(track);
+      fts_atom_t a[2];
+      fts_atom_t atoms[64];
+      int n_atoms;
+	  
+      fts_set_ptr(a, &n_atoms);
+      fts_set_ptr(a + 1, atoms);
 	  
       while(event)
 	{
-	  fts_atom_t atoms[64];
-	  int n_atoms;
 	  int i;
 
-	  event_get_atoms(event, &n_atoms, atoms);
+	  fts_send_message((fts_object_t *)event, fts_SystemInlet, seqsym_get_atoms, 2, a);
 	      
 	  if(ac > n_atoms)
 	    ac = n_atoms;

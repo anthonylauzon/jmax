@@ -57,30 +57,59 @@ class HResizeInteraction extends Interaction
       }
     else if (Squeack.isDrag(squeack))
       {
-	if((!object.isSelected())||
-	   ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton()))){
-	  object.redraw();
-	  object.redrawConnections();
-	  object.setWidth(mouse.x - object.getX());
-	  object.redraw();
-	  object.redrawConnections();
-	}
-	else{
-	  if (ErmesSelection.patcherSelection.ownedBy(editor))
-	    {
-	      dx = mouse.x - oldMouse.x;
-	      ErmesSelection.patcherSelection.apply(new ObjectAction() {
-		public void processObject(GraphicObject obj)
-		  {
-		    obj.redraw();
-		    obj.redrawConnections();
-		    obj.setWidth(obj.getWidth() + dx);
-		    obj.redraw();
-		    obj.redrawConnections();
-		  }});
-	    }
-	}
-	editor.fixSize();
+	  if(!Squeack.isShift(squeack))
+	      {
+		  if((!object.isSelected())||
+		     ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton()))){
+		      object.redraw();
+		      object.redrawConnections();
+		      object.setWidth(mouse.x - object.getX());
+		      object.redraw();
+		      object.redrawConnections();
+		  }
+		  else{
+		      if (ErmesSelection.patcherSelection.ownedBy(editor))
+			  {
+			      dx = mouse.x - oldMouse.x;
+			      ErmesSelection.patcherSelection.apply(new ObjectAction() {
+				      public void processObject(GraphicObject obj)
+				      {
+					  obj.redraw();
+					  obj.redrawConnections();
+					  obj.setWidth(obj.getWidth() + dx);
+					  obj.redraw();
+					  obj.redrawConnections();
+				      }});
+			  }
+		  }
+	      }
+	  else
+	      {
+		  if((!object.isSelected())||
+		     ((object.isSelected())&&(ErmesSelection.patcherSelection.isSingleton()))){
+		      object.redraw();
+		      object.redrawConnections();
+		      object.setWidthShift(mouse.x - object.getX());
+		      object.redraw();
+		      object.redrawConnections();
+		  }
+		  else{
+		      if (ErmesSelection.patcherSelection.ownedBy(editor))
+			  {
+			      dx = mouse.x - oldMouse.x;
+			      ErmesSelection.patcherSelection.apply(new ObjectAction() {
+				      public void processObject(GraphicObject obj)
+				      {
+					  obj.redraw();
+					  obj.redrawConnections();
+					  obj.setWidthShift(obj.getWidth() + dx);
+					  obj.redraw();
+					  obj.redrawConnections();
+				      }});
+			  }
+		  }
+	      }
+	  editor.fixSize();
       }
     else if (Squeack.isUp(squeack))
       {

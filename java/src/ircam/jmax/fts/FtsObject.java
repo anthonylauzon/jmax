@@ -153,7 +153,7 @@ public class FtsObject
     
     if (data != null)
       data.addObject(obj);
-    
+
     return obj;
   }
 
@@ -1010,7 +1010,7 @@ public class FtsObject
       
       if(this instanceof FtsObjectWithEditor)
 	  parentFrame = ((FtsObjectWithEditor)this).getEditorFrame();
-      
+
       FtsObject current = this;
       while(((parentFrame==null)||(!parentFrame.isVisible()))&&(!isARootPatcher()))
       {
@@ -1034,7 +1034,9 @@ public class FtsObject
 			       {
 				   String path = fd.getSelectedFile().getAbsolutePath();
 				   sendArgs[0].setString(path); 
+				   System.err.println("send 1 "+callbackMethod+" with "+path);
 				   sendMessage(FtsObject.systemInlet, callbackMethod, 1, sendArgs);
+				   System.err.println("send 2 "+callbackMethod);
 			       } 
 			}
 		});

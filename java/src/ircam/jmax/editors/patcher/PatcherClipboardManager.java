@@ -92,6 +92,7 @@ public class PatcherClipboardManager implements ClipboardOwner
 	container.getFrame().setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR));
 
 	MaxApplication.systemClipboard.setContents(ErmesSelection.patcherSelection, this);
+
 	ftsClipboard.copy(sketch.getFts().getSelection());
 	sketch.setLastCopyCount(ftsClipboard.getCopyCount());
 	sketch.resetPaste(-1);
@@ -105,6 +106,8 @@ public class PatcherClipboardManager implements ClipboardOwner
   public void Copy(EditorContainer container)
   {
     ErmesSketchPad sketch = (ErmesSketchPad)container.getEditor();
+
+    DataFlavor[] flavor = ErmesSelection.patcherSelection.getTransferDataFlavors();
 
     if (sketch.canCopyText())
       {

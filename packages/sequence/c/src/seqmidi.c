@@ -339,28 +339,23 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, note_t *note)
   int channel = note_get_midi_channel(note);
   int pitch = note_get_pitch(note);
   double off_time = time + note_get_duration(note);
+
   long time_in_ticks = fts_midifile_seconds_to_ticks(file, 0.001 * time);
   event_t *stat = &(data->notestats[channel][pitch]);
 
-  /* in case of overlapping note of same pitch */
   if(notestat_is_on(stat))
     {
-      /* write note off of previous note (cut it off) */
       fts_midifile_write_note_off(file, time_in_ticks, channel, pitch, 0); 
-
-      /* remove note off event from sequence */
+    
       eventtrk_remove_event(data->note_off_track, (event_t *)stat);
-      
+    
       fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
     }
   else
-    /* write note on */
     fts_midifile_write_note_on(file, time_in_ticks, channel, pitch, velocity);
- 
-  /* set note status to on */
+    
   notestat_set_on(stat);
 
-  /* add corresponding note to note off track */
   eventtrk_add_event(data->note_off_track, off_time, (event_t *)stat);
 }
 
@@ -404,56 +399,41 @@ seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name
       fts_atom_t a[1];
       int i, j;
 
-      /* set midi file user data to write data structure */
       fts_midifile_set_user_data(file, &data);
 
-      /* init note track */
       data.track = track;
-	  
-      /* make note off track */
+  
       fts_set_symbol(a, seqsym_export_midi);  
       data.note_off_track = (eventtrk_t *)fts_object_create(eventtrk_class, 1, a);
-
-      /* init array of note status events */
+      
       for(i=0; i<=N_MIDI_CHANNELS; i++)
 	for(j=0; j<N_MIDI_PITCHES; j++)
 	  notestat_init(&(data.notestats[i][j]), i, j);
-	  
-      /* start writing the file */
-      fts_midifile_write_header(file, 0, 1, 384); /* format 0, 1 track, division = 384 */
-	  
-      /* write track header */
+  
+      fts_midifile_write_header(file, 0, 1, 384);
+	
       fts_midifile_write_track_begin(file);
-
-      /* write tempo */
-      fts_midifile_write_tempo(file, 500000); /* 120 bpm */
-
-      /* write events */
+      
+      fts_midifile_write_tempo(file, 500000);
+	
       event = eventtrk_get_first(track);
       while(event)
 	{
 	  double time = event_get_time(event);
-
-	  /* first write all pending note offs */
-	  seqmidi_write_note_offs(file, time);
 	  
-	  /* write note and declare note off */
+	  seqmidi_write_note_offs(file, time);
+  
 	  seqmidi_write_note_on(file, time, (note_t *)fts_get_object(&event->value));
-
-	  /* go to next event */
+	  
 	  event = event_get_next(event);
 	}  
-	  
-      /* write ALL still pending note offs */
+  
       seqmidi_write_note_offs(file, event_get_time(eventtrk_get_last(data.note_off_track)));
-
-      /* delete note off track */
+	
       fts_object_delete((fts_object_t *)(data.note_off_track));
+	
+      fts_midifile_write_track_end(file);
 
-      /* write track footer */
-      fts_midifile_write_track_end(file);	  
-
-      /* close midi file */
       fts_midifile_close(file);
     }
   else
@@ -461,7 +441,7 @@ seqmidi_write_midifile_from_note_track(eventtrk_t *track, fts_symbol_t file_name
       post("sequence track %s: cannot open file %s\n", fts_symbol_name(track_name), fts_symbol_name(file_name));
       return 0;
     }
-
   return 1;
 }
+
 
