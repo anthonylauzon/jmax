@@ -12,9 +12,9 @@ class DragReverseConnectInteraction extends Interaction
 {
   boolean dragged = false;
   Point dragStart = new Point();
-  ErmesObject src;
+  GraphicObject src;
   int outlet;
-  ErmesObject dst;
+  GraphicObject dst;
   int inlet;
 
   void configureInputFilter(InteractionEngine filter)
@@ -26,19 +26,19 @@ class DragReverseConnectInteraction extends Interaction
 
   // Utility method
 
-  private void doConnection(ErmesSketchPad editor, ErmesObject src, int outlet, ErmesObject dst, int inlet)
+  private void doConnection(ErmesSketchPad editor, GraphicObject src, int outlet, GraphicObject dst, int inlet)
   {
     try
       {
 	FtsConnection fc;
-	ErmesConnection connection;
+	GraphicConnection connection;
 
 	fc = Fts.makeFtsConnection(src.getFtsObject(),
 				   outlet, 
 				   dst.getFtsObject(),
 				   inlet);
 		    
-	connection = new ErmesConnection(editor,
+	connection = new GraphicConnection(editor,
 					 src,
 					 outlet,
 					 dst,
@@ -67,7 +67,7 @@ class DragReverseConnectInteraction extends Interaction
 	ErmesSelection.patcherSelection.redraw();
 	ErmesSelection.patcherSelection.deselectAll();
 
-	dst   = (ErmesObject) area.getTarget();
+	dst   = (GraphicObject) area.getTarget();
 	inlet = area.getNumber();
 
 	dragStart.x = dst.getInletAnchorX(inlet);
@@ -112,9 +112,9 @@ class DragReverseConnectInteraction extends Interaction
       {
 	dragged = true;
 
-	if ((! destinationChoosen) || src != (ErmesObject) area.getTarget() || outlet != area.getNumber())
+	if ((! destinationChoosen) || src != (GraphicObject) area.getTarget() || outlet != area.getNumber())
 	  {
-	    src    = (ErmesObject) area.getTarget();
+	    src    = (GraphicObject) area.getTarget();
 	    outlet = area.getNumber();
 	    editor.setHighlightedOutlet(src, outlet);
 	    destinationChoosen = true;

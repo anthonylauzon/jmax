@@ -50,10 +50,9 @@ public abstract class FtsRemoteData implements MaxData
   {
     if (master)
       {
-	Object args[] = new Object[1];
-
-	args[0] = this;
-	FtsRemoteMetaData.getRemoteMetaData().remoteCall(FtsRemoteMetaData.REMOTE_DELETE, args);
+	FtsRemoteMetaData.getRemoteMetaData().remoteCallStart(FtsRemoteMetaData.REMOTE_DELETE);
+	FtsRemoteMetaData.getRemoteMetaData().remoteCallAddArg(this);
+	FtsRemoteMetaData.getRemoteMetaData().remoteCallEnd();
       }
 
     release();
@@ -63,7 +62,58 @@ public abstract class FtsRemoteData implements MaxData
   {
     Mda.dispose(this);
     FtsRemoteDataID.release(id);
-    
+  }
+
+
+  /* NEW: family of var args remote calls;
+     unconsistent use of this functions will broke everything;
+     on the other side, these functions allow you to send
+     messages without allocating new objects.
+   */
+
+  public void remoteCallStart( int key)
+  {
+    Fts.getServer().remoteCallStart( this, key);
+  }
+
+  public void remoteCallAddArg( int arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallAddArg( Integer arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallAddArg( float arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallAddArg( Float arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallAddArg( FtsObject arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallAddArg( String arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallAddArg( FtsRemoteData arg)
+  {
+    Fts.getServer().remoteCallAddArg( arg);
+  }
+
+  public void remoteCallEnd()
+  {
+    Fts.getServer().remoteCallEnd();
   }
 
   /* We implement a family of remoteCall methods.

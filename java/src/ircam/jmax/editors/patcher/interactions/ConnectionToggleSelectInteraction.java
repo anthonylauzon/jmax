@@ -18,7 +18,7 @@ class ConnectionToggleSelectInteraction extends Interaction
   {
     if (squeack == (Squeack.SHIFT | Squeack.DOWN | Squeack.CONNECTION))
 	{
-	  ErmesConnection connection = (ErmesConnection) area.getTarget();
+	  GraphicConnection connection = (GraphicConnection) area.getTarget();
 
 	  if (connection.isSelected())
 	    ErmesSelection.patcherSelection.deselect(connection);

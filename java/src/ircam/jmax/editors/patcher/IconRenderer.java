@@ -10,20 +10,20 @@ import javax.swing.text.*;
 import javax.swing.event.*;
 
 //
-// The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
+// The edit field contained in the editable objects (Message, Standard).
 // That show an icon.
 //
 
 public class IconRenderer implements ObjectRenderer
 {
   Icon icon;
-  private ErmesObjEditableObject owner;
+  private Editable owner;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
 
-  public IconRenderer(ErmesObjEditableObject object, Icon i)
+  public IconRenderer(Editable object, Icon i)
   {
     super();
 

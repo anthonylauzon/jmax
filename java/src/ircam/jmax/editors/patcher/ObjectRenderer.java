@@ -3,7 +3,7 @@ package ircam.jmax.editors.patcher;
 import java.awt.*;
 
 //
-// The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
+// The edit field contained in the editable objects (Message, Standard).
 //
 
 public interface ObjectRenderer

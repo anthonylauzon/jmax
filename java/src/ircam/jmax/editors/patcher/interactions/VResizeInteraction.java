@@ -15,7 +15,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class VResizeInteraction extends Interaction
 {
-  ErmesObject object;
+  GraphicObject object;
 
   void configureInputFilter(InteractionEngine filter)
   {
@@ -28,14 +28,16 @@ class VResizeInteraction extends Interaction
   {
     if (Squeack.isDown(squeack) && Squeack.onVResizeHandle(squeack))
       {
-	object = (ErmesObject) area.getTarget();
+	object = (GraphicObject) area.getTarget();
 	editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
       }
     else if (Squeack.isDrag(squeack))
       {
 	object.redraw();
+	object.redrawConnections();
 	object.setHeight(mouse.y - object.getY());
 	object.redraw();
+	object.redrawConnections();
 	editor.fixSize(); 
       }
     else if (Squeack.isUp(squeack))

@@ -25,8 +25,10 @@ import ircam.jmax.editors.patcher.interactions.*;
  * offscreen and much, much more...
  */
 
-public class ErmesSketchPad extends JPanel
+public class ErmesSketchPad extends JPanel 
 {
+  Rectangle invalid = new Rectangle();
+
   private DisplayList displayList;
 
   public DisplayList getDisplayList()
@@ -103,8 +105,8 @@ public class ErmesSketchPad extends JPanel
   {
     FtsObject	fo;
     FtsConnection fc;
-    ErmesObject object;
-    ErmesConnection connection;
+    GraphicObject object;
+    GraphicConnection connection;
 
     numberOfPaste += 1;
 
@@ -149,22 +151,22 @@ public class ErmesSketchPad extends JPanel
 	fo.setX( newPosX);
 	fo.setY( newPosY);
 
-	object = ErmesObject.makeErmesObject( this, fo);
+	object = GraphicObject.makeGraphicObject( this, fo);
 	displayList.add( object);
 	ErmesSelection.patcherSelection.select( object);
 	object.redraw();
       }
 
-    ErmesObject fromObj, toObj;
+    GraphicObject fromObj, toObj;
     
     for ( Enumeration e2 = connectionVector.elements(); e2.hasMoreElements();) 
       {
 	fc = (FtsConnection)e2.nextElement();
 
-	connection = new ErmesConnection( this, 
-					  displayList.getErmesObjectFor(fc.getFrom()),
+	connection = new GraphicConnection( this, 
+					  displayList.getGraphicObjectFor(fc.getFrom()),
 					  fc.getFromOutlet(), 
-					  displayList.getErmesObjectFor(fc.getTo()),
+					  displayList.getGraphicObjectFor(fc.getTo()),
 					  fc.getToInlet(),
 					  fc);
 
@@ -188,7 +190,7 @@ public class ErmesSketchPad extends JPanel
 
     for ( int i = 0; i < osize; i++)
       {
-	ErmesObject object = ErmesObject.makeErmesObject( this, (FtsObject)objects[i]);
+	GraphicObject object = GraphicObject.makeGraphicObject( this, (FtsObject)objects[i]);
 	displayList.add( object);
 
 	if (object.getLayer() < 0)
@@ -202,13 +204,13 @@ public class ErmesSketchPad extends JPanel
 
     for ( int i = 0; i < csize; i++)
       {
-	ErmesConnection connection;
+	GraphicConnection connection;
 	FtsConnection fc = (FtsConnection)connections[i];
 
-	connection = new ErmesConnection( this, 
-					  displayList.getErmesObjectFor(fc.getFrom()),
+	connection = new GraphicConnection( this, 
+					  displayList.getGraphicObjectFor(fc.getFrom()),
 					  fc.getFromOutlet(), 
-					  displayList.getErmesObjectFor(fc.getTo()),
+					  displayList.getGraphicObjectFor(fc.getTo()),
 					  fc.getToInlet(),
 					  fc);
 	displayList.add(connection);
@@ -419,7 +421,7 @@ public class ErmesSketchPad extends JPanel
   void makeObject( String description, int x, int y)
   {
     FtsObject fo;
-    ErmesObject object;
+    GraphicObject object;
 
     try
       {
@@ -428,24 +430,24 @@ public class ErmesSketchPad extends JPanel
 	fo.setX( x);
 	fo.setY( y);
 
-	object = ErmesObject.makeErmesObject( this, fo);
+	object = GraphicObject.makeGraphicObject( this, fo);
 	displayList.add( object);
 	displayList.reassignLayers();
 
-	if (object instanceof ErmesObjExternal)
-	  ((ErmesObjExternal)object).errorChanged(false);
+	if (object instanceof Standard)
+	  ((Standard)object).errorChanged(false);
 
-	if (object instanceof ErmesObjEditableObject)
+	if (object instanceof Editable)
 	  {
 	    // The EditField is not really ready until the control
 	    // is returned back to the event loop; this is why we invoke textEditObject 
 	    // with an invoke later command.
 	    
-	    final ErmesObjEditableObject obj  = (ErmesObjEditableObject)object;
+	    final Editable obj  = (Editable)object;
 	    
 	    SwingUtilities.invokeLater(new Runnable() {
 				       public void run()
-					 { textEditObject((ErmesObjEditableObject)obj);}});
+					 { textEditObject((Editable)obj);}});
 	  }
 
 	object.redraw();
@@ -459,7 +461,7 @@ public class ErmesSketchPad extends JPanel
 
   /* Handling of the object text editing */
 
-  ErmesObjEditableObject editedObject = null;
+  Editable editedObject = null;
 
   final public EditField getEditField()
   {
@@ -471,17 +473,17 @@ public class ErmesSketchPad extends JPanel
     return editedObject != null;
   }
 
-  final public ErmesObjEditableObject getTextEditedObject()
+  final public Editable getTextEditedObject()
   {
     return editedObject;
   }
 
-  final public void textEditObject(ErmesObjEditableObject object)
+  final public void textEditObject(Editable object)
   {
     textEditObject(object, null);
   }
 
-  final public void textEditObject(ErmesObjEditableObject object, Point p)
+  final public void textEditObject(Editable object, Point p)
   {
     if (editedObject != null)
       stopTextEditing();
@@ -493,10 +495,7 @@ public class ErmesSketchPad extends JPanel
   final public void stopTextEditing()
   {
     if (editedObject != null)
-      {
-	itsEditField.endEdit();
-	editedObject.redraw();
-      }
+      itsEditField.endEdit();
 
     editedObject = null;
   }
@@ -507,7 +506,7 @@ public class ErmesSketchPad extends JPanel
 
     if (obj instanceof FtsObject) 
       {
-	ErmesObject object = displayList.getErmesObjectFor((FtsObject) obj);
+	GraphicObject object = displayList.getGraphicObjectFor((FtsObject) obj);
 
 	if (object != null)
 	  {
@@ -759,24 +758,24 @@ public class ErmesSketchPad extends JPanel
   // we store here the id of the higlighted inlet and outlet
 
   private int highlightedInlet;
-  private ErmesObject  highlightedInletObject = null;
+  private GraphicObject  highlightedInletObject = null;
 
   public int getHighlightedInlet()
   {
     return highlightedInlet;
   }
 
-  public ErmesObject getHighlightedInletObject()
+  public GraphicObject getHighlightedInletObject()
   {
     return highlightedInletObject;
   }
 
-  public boolean isHighlightedInlet(ErmesObject object, int inlet)
+  public boolean isHighlightedInlet(GraphicObject object, int inlet)
   {
     return ((highlightedInletObject == object) && (highlightedInlet == inlet));
   }
 
-  public boolean hasHighlightedInlet(ErmesObject object)
+  public boolean hasHighlightedInlet(GraphicObject object)
   {
     return (highlightedInletObject == object);
   }
@@ -786,42 +785,48 @@ public class ErmesSketchPad extends JPanel
     return (highlightedInletObject != null);
   }
 
-  public void setHighlightedInlet(ErmesObject object, int inlet)
+  public void setHighlightedInlet(GraphicObject object, int inlet)
   {
     highlightedInletObject = object;
     highlightedInlet       = inlet;
 
     if (highlightedInletObject != null)
-      highlightedInletObject.redraw();
+      {
+	highlightedInletObject.redraw();
+	highlightedInletObject.redrawConnections();
+      }
   }
 
   public void resetHighlightedInlet()
   {
     if (highlightedInletObject != null)
-      highlightedInletObject.redraw();
+      {
+	highlightedInletObject.redraw();
+	highlightedInletObject.redrawConnections();	
+      }
     
     highlightedInletObject = null;
   }
 
   int highlightedOutlet;
-  ErmesObject  highlightedOutletObject = null;
+  GraphicObject  highlightedOutletObject = null;
 
   public int getHighlightedOutlet()
   {
     return highlightedOutlet;
   }
 
-  public ErmesObject getHighlightedOutletObject()
+  public GraphicObject getHighlightedOutletObject()
   {
     return highlightedOutletObject;
   }
 
-  public boolean isHighlightedOutlet(ErmesObject object, int outlet)
+  public boolean isHighlightedOutlet(GraphicObject object, int outlet)
   {
     return ((highlightedOutletObject == object) && (highlightedOutlet == outlet));
   }
 
-  public boolean hasHighlightedOutlet(ErmesObject object)
+  public boolean hasHighlightedOutlet(GraphicObject object)
   {
     return (highlightedOutletObject == object);
   }
@@ -831,19 +836,25 @@ public class ErmesSketchPad extends JPanel
     return (highlightedOutletObject != null);
   }
 
-  public void setHighlightedOutlet(ErmesObject object, int outlet)
+  public void setHighlightedOutlet(GraphicObject object, int outlet)
   {
     highlightedOutletObject = object;
     highlightedOutlet       = outlet;
 
     if (highlightedOutletObject != null)
-      highlightedOutletObject.redraw();
+      {
+	highlightedOutletObject.redraw();
+	highlightedOutletObject.redrawConnections();
+      }
   }
 
   public void resetHighlightedOutlet()
   {
     if (highlightedOutletObject != null)
-      highlightedOutletObject.redraw();
+      {
+	highlightedOutletObject.redraw();
+	highlightedOutletObject.redrawConnections();
+      }
 
     highlightedOutletObject = null;
   }

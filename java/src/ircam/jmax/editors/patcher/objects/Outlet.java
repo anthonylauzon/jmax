@@ -12,9 +12,9 @@ import ircam.jmax.editors.patcher.*;
 // The "out" graphic object used in subpatchers.
 //
 
-public class ErmesObjOut extends ErmesObjInOut
+public class Outlet extends InOutlet
 {
-  public ErmesObjOut(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Outlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject, ((FtsOutletObject) theFtsObject).getPosition());
   }

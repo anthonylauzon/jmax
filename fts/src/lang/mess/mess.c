@@ -18,6 +18,8 @@
 #include "lang/mess/objtable.h"
 #include "lang/mess/clipboard.h"
 
+extern void fts_autosave_init();
+
 static void
 fts_mess_init(void)
 {
@@ -88,6 +90,10 @@ fts_mess_init(void)
 
   /* Now that everything is up and running, create the root patcher */
   fts_create_root_patcher();
+
+  /* panic Autosave init */
+
+  fts_autosave_init();
 }
 
 

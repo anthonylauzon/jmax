@@ -12,7 +12,7 @@ import ircam.jmax.editors.patcher.*;
  * The "number box" graphic object base class
  */
 
-abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
+abstract class NumberBox extends GraphicObject implements KeyEventClient {
   boolean valueValid = true;
   private StringBuffer currentText;
   private String filter;
@@ -20,7 +20,7 @@ abstract class ErmesObjNumberBox extends ErmesObject implements KeyEventClient {
   private static final int DEFAULT_HEIGHT = 15;
   private static final int DEFAULT_VISIBLE_DIGIT = 3;
 
-  public ErmesObjNumberBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject, String filter) 
+  public NumberBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject, String filter) 
   {
     super( theSketchPad, theFtsObject);
 

@@ -29,12 +29,12 @@ public class ShowErrorAction extends AbstractAction
 	    ErmesSelection.patcherSelection.hasObjects())
 	  {
 	    ErmesSelection.patcherSelection.apply(new ObjectAction() {
-	      public void processObject(ErmesObject object)
+	      public void processObject(GraphicObject object)
 		{ object.showErrorDescription();}});
 	  }
 	else
 	  sketch.getDisplayList().applyToObjects(new ObjectAction() {
-	    public void processObject(ErmesObject object)
+	    public void processObject(GraphicObject object)
 	      { object.showErrorDescription();}});
       }
   }

@@ -14,13 +14,13 @@ import ircam.jmax.editors.patcher.interactions.*;
 // The "integer box" graphic object.
 //
 
-public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListener
+public class IntBox extends NumberBox implements FtsIntValueListener
 {
   private int itsInteger = 0;
 
   private int itsStartingY, itsFirstY;
 
-  public ErmesObjInt( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public IntBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject, "-0123456789");
 
@@ -32,10 +32,7 @@ public class ErmesObjInt extends ErmesObjNumberBox implements FtsIntValueListene
     if (itsInteger != value) 
       {
 	itsInteger = value;
-
-	Graphics g = itsSketchPad.getGraphics();
-	paint(g);
-	g.dispose();
+	updateRedraw();
       }
   }
 

@@ -8,5 +8,5 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public interface ConnectionAction
 {
-  public void processConnection(ErmesConnection object);
+  public void processConnection(GraphicConnection object);
 }

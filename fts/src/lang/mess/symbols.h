@@ -125,6 +125,7 @@ extern fts_symbol_t fts_s_state;
 extern fts_symbol_t fts_s_abstraction;
 extern fts_symbol_t fts_s_template;
 extern fts_symbol_t fts_s_patcher_type;
+extern fts_symbol_t fts_s_filename;
 
 /* Symbols related to builtin classes */
 

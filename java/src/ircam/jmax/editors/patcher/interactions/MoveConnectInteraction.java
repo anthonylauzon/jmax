@@ -12,9 +12,9 @@ import ircam.jmax.editors.patcher.objects.*;
 class MoveConnectInteraction extends Interaction
 {
   Point moveStart = new Point();
-  ErmesObject src;
+  GraphicObject src;
   int outlet;
-  ErmesObject dst;
+  GraphicObject dst;
   int inlet;
 
   void configureInputFilter(InteractionEngine filter)
@@ -26,19 +26,19 @@ class MoveConnectInteraction extends Interaction
 
   // Utility method
 
-  private void doConnection(ErmesSketchPad editor, ErmesObject src, int outlet, ErmesObject dst, int inlet)
+  private void doConnection(ErmesSketchPad editor, GraphicObject src, int outlet, GraphicObject dst, int inlet)
   {
     try
       {
 	FtsConnection fc;
-	ErmesConnection connection;
+	GraphicConnection connection;
 
 	fc = Fts.makeFtsConnection(src.getFtsObject(),
 				   outlet, 
 				   dst.getFtsObject(),
 				   inlet);
 		    
-	connection = new ErmesConnection(editor,
+	connection = new GraphicConnection(editor,
 					 src,
 					 outlet,
 					 dst,
@@ -67,7 +67,7 @@ class MoveConnectInteraction extends Interaction
 	ErmesSelection.patcherSelection.redraw();
 	ErmesSelection.patcherSelection.deselectAll();
 
-	src    = (ErmesObject) area.getTarget();
+	src    = (GraphicObject) area.getTarget();
 	outlet = area.getNumber();
 
 	moveStart.x = src.getOutletAnchorX(outlet);
@@ -100,9 +100,9 @@ class MoveConnectInteraction extends Interaction
       }
     else if (Squeack.isMove(squeack) && Squeack.onInlet(squeack))
       {
-	if ((! destinationChoosen) || dst != (ErmesObject) area.getTarget() || inlet != area.getNumber())
+	if ((! destinationChoosen) || dst != (GraphicObject) area.getTarget() || inlet != area.getNumber())
 	  {
-	    dst   = (ErmesObject) area.getTarget();
+	    dst   = (GraphicObject) area.getTarget();
 	    inlet = area.getNumber();
 
 	    editor.setHighlightedInlet(dst, inlet);

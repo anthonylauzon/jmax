@@ -104,7 +104,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   final void setFollowingLocations(boolean v)
   {
     followingLocations = v;
-    ErmesObject.setFollowingLocations(v); // Hack ? Should go thru displayList ?
+    GraphicObject.setFollowingLocations(v); // Hack ? Should go thru displayList ?
   }
 
   final boolean isFollowingLocations()
@@ -115,7 +115,7 @@ final public class InteractionEngine implements MouseMotionListener, MouseListen
   final void setFollowingInOutletLocations(boolean v)
   {
     followingInOutletLocations = v;
-    ErmesObject.setFollowingInOutletLocations(v);  // Hack ? Should go thru displayList ?
+    GraphicObject.setFollowingInOutletLocations(v);  // Hack ? Should go thru displayList ?
   }
 
   final boolean isFollowingInOutletLocations()

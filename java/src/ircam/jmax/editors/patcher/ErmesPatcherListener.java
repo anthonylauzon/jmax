@@ -41,7 +41,7 @@ class ErmesPatcherListener implements FtsPatcherListener
     // this method.
     // You should know that an object is removed and then re-added
     // each time is redefined; this is currently handled in the 
-    // redefinition code in ErmesObject; if you decide to implement
+    // redefinition code in GraphicObject; if you decide to implement
     // this method, you must take care of this.
   }
 
@@ -69,15 +69,18 @@ class ErmesPatcherListener implements FtsPatcherListener
     SwingUtilities.invokeLater(new Runnable() {
       public void run()
 	{
-	  ErmesConnection conn;
+	  GraphicConnection conn;
 
-	  conn = window.itsSketchPad.getDisplayList().getErmesConnectionFor(c);
+	  conn = window.itsSketchPad.getDisplayList().getGraphicConnectionFor(c);
 
 	  // conn may be null if the connection has been delete by Ermes
 	  // first; a little hack, the whole deleting business should be cleaned up.
     
 	  if (conn != null)
-	    conn.delete();
+	    {
+	      conn.redraw();
+	      conn.delete();
+	    }
 	}
     });
   }

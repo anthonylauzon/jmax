@@ -35,6 +35,7 @@ patcherdata.c   \
 patlex.c	\
 patparser.c	\
 properties.c	\
+autosave.c	\
 saver.c		\
 selection.c	\
 send.c		\

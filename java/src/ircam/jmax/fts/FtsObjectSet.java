@@ -136,12 +136,11 @@ public class FtsObjectSet extends FtsRemoteData
 
   public void find(FtsObject context, String name)
   {
-    Object args[] = new Object[2];
+    remoteCallStart(REMOTE_FIND);
+    remoteCallAddArg(context);
+    remoteCallAddArg(name);
+    remoteCallEnd();
 
-    args[0] = context;
-    args[1] = name;
-
-    remoteCall(REMOTE_FIND, args);
     Fts.sync();
   }
 
@@ -160,13 +159,17 @@ public class FtsObjectSet extends FtsRemoteData
 
   public void findErrors(FtsObject context)
   {
-    remoteCall(REMOTE_FIND_ERRORS, context, (MaxVector) null);
+    remoteCallStart(REMOTE_FIND_ERRORS);
+    remoteCallAddArg(context);
+    remoteCallEnd();
   }
 
 
   public void findFriends(FtsObject target)
   {
-    remoteCall(REMOTE_FIND_FRIENDS, target, (MaxVector) null);
+    remoteCallStart(REMOTE_FIND_FRIENDS);
+    remoteCallAddArg(target);
+    remoteCallEnd();
   }
 }
 

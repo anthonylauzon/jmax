@@ -206,6 +206,15 @@ fts_mess_client_load_patcher_bmax(int ac, const fts_atom_t *av)
 	  if (id != FTS_NO_ID)
 	    fts_object_set_id(patcher, id);
 
+	  /* Save the file name, for future autosaves and other services */
+
+	  {
+	    fts_atom_t a;
+
+	    fts_set_symbol(&a, filename);
+	    fts_object_put_prop(patcher, fts_s_filename, &a);
+	  }
+
 	  /* activate the post-load init, like loadbangs */
 	  
 	  fts_message_send(patcher, fts_SystemInlet, fts_new_symbol("load_init"), 0, 0);

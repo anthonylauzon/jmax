@@ -29,7 +29,8 @@ SOURCES := \
            $(INCLUDE_PATH)/Probe.java          \
            $(INCLUDE_PATH)/ChooseNumberPopUp.java  \
            $(INCLUDE_PATH)/ChooseColorIdPopUp.java  \
-           $(INCLUDE_PATH)/NumberChoosenListener.java
+           $(INCLUDE_PATH)/NumberChoosenListener.java \
+
 
 
 

@@ -14,15 +14,15 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 //
 // The base class of the ermes objects which are user-editable
-// (ErmesObjMessage, ErmesObjExternal, ErmesObjPatcher).
+// (Message, Standard, Patcher).
 //
 
-abstract public class ErmesObjEditableObject extends ErmesObject implements FtsInletsListener, FtsOutletsListener
+abstract public class Editable extends GraphicObject implements FtsInletsListener, FtsOutletsListener
 {
   boolean editing = false;
   ircam.jmax.editors.patcher.ObjectRenderer renderer; // don't ask me why here we need the whole path
 
-  ErmesObjEditableObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  Editable( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
@@ -67,10 +67,8 @@ abstract public class ErmesObjEditableObject extends ErmesObject implements FtsI
 
   public void redefine( String text) 
   {
-    redraw();
     computeRenderer();
     renderer.update();
-    redraw();
     updateDimensions();
 
     super.redefine(text);

@@ -30,12 +30,14 @@ public class ResizeAction extends AbstractAction
     if (ErmesSelection.patcherSelection.ownedBy(sketch))
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
-	  public void processObject(ErmesObject object)
+	  public void processObject(GraphicObject object)
 	    {
 	      object.redraw();
+	      object.redrawConnections();
 	      object.setWidth(object.getWidth() + dx);
 	      object.setHeight(object.getHeight() + dy);
 	      object.redraw();
+	      object.redrawConnections();
 	    }});
 
 	sketch.fixSize();

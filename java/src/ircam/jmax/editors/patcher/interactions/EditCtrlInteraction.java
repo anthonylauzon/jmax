@@ -15,7 +15,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class EditCtrlInteraction extends Interaction
 {
-  ErmesObject object;
+  GraphicObject object;
 
   void configureInputFilter(InteractionEngine filter)
   {
@@ -36,7 +36,7 @@ class EditCtrlInteraction extends Interaction
     switch (squeack)
       {
       case Squeack.DOWN:
-	object = (ErmesObject) area.getTarget();
+	object = (GraphicObject) area.getTarget();
 	object.gotSqueack(squeack, mouse, oldMouse);
 	break;
 

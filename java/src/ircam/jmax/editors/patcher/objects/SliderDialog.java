@@ -8,17 +8,17 @@ import ircam.jmax.editors.patcher.*;
 
 /* Not static any ore */
 
-class ErmesObjSliderDialog extends Frame implements ActionListener {
+class SliderDialog extends Frame implements ActionListener {
 
   Button okButton;
   Button cancelButton;
   TextField itsMaxValueField, itsMinValueField, itsCurrentValueField;
-  ErmesObjSlider itsSliderObject = null;
+  Slider itsSliderObject = null;
   String itsMaxValue = "";
   String itsMinValue = "";
   String itsCurrentValue = "";
   
-  public ErmesObjSliderDialog() 
+  public SliderDialog() 
   {
     super( "Slider setting");
     
@@ -105,7 +105,7 @@ class ErmesObjSliderDialog extends Frame implements ActionListener {
       }
   }
     
-  public void ReInit( String theMaxValue, String theMinValue, String theCurrentValue,ErmesObjSlider theSlider, Frame theParent)
+  public void ReInit( String theMaxValue, String theMinValue, String theCurrentValue,Slider theSlider, Frame theParent)
   {
     itsMaxValue = theMaxValue;
     itsMinValue = theMinValue;

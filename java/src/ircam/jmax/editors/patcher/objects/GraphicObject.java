@@ -25,7 +25,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 
 // A survivor...
 
-abstract public class ErmesObject implements DisplayObject
+abstract public class GraphicObject implements DisplayObject
 {
   static class ObjectGeometry
   {
@@ -106,40 +106,40 @@ abstract public class ErmesObject implements DisplayObject
   // A Static method that work as a virtual constructor;
   // given an FTS object, build the proper FTS Object
 
-  static public ErmesObject makeErmesObject( ErmesSketchPad sketch, FtsObject object) 
+  static public GraphicObject makeGraphicObject( ErmesSketchPad sketch, FtsObject object) 
   {
-    ErmesObject eobj;
+    GraphicObject eobj;
     String theName = object.getClassName();
 
     if (theName.equals( "messbox"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjMessage( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Message( sketch, object);
     else if (theName.equals( "button"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjBang( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Bang( sketch, object);
     else if (theName.equals( "toggle"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjToggle( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Toggle( sketch, object);
     else if (theName.equals( "intbox"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjInt( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.IntBox( sketch, object);
     else if (theName.equals( "floatbox"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjFloat( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.FloatBox( sketch, object);
     else if (theName.equals( "comment"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjComment( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Comment( sketch, object);
     else if ( theName.equals( "slider"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjSlider( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Slider( sketch, object);
     else if (theName.equals( "inlet"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjIn( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Inlet( sketch, object);
     else if (theName.equals( "outlet"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjOut( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Outlet( sketch, object);
     else if (theName.equals( "jpatcher"))
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjPatcher( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Patcher( sketch, object);
     else
-      eobj = new ircam.jmax.editors.patcher.objects.ErmesObjExternal( sketch, object);
+      eobj = new ircam.jmax.editors.patcher.objects.Standard( sketch, object);
 
     object.setObjectListener(eobj);
 
     return eobj;
   }
 
-  protected ErmesObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  protected GraphicObject( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     String fontName;
     int fontSize;
@@ -171,7 +171,6 @@ abstract public class ErmesObject implements DisplayObject
     if (selected)
       ErmesSelection.patcherSelection.deselect(this);
     
-    redraw();
     itsSketchPad.getDisplayList().remove(this);
 
     dispose();
@@ -375,8 +374,20 @@ abstract public class ErmesObject implements DisplayObject
 			 ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
 			 ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
 			 ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+  }
 
-    itsSketchPad.getDisplayList().redrawConnectionsFor(this); // experimental
+  public void updateRedraw()
+  {
+    if (itsSketchPad.isLocked())
+      itsSketchPad.paintImmediately(ftsObject.getX(),
+				    ftsObject.getY() - ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT +
+				    ObjectGeometry.INLET_OFFSET + ObjectGeometry.INLET_OVERLAP,
+				    ftsObject.getWidth(),
+				    ftsObject.getHeight() + 2 * ObjectGeometry.HIGHLIGHTED_INOUTLET_HEIGHT  -
+				    ObjectGeometry.INLET_OFFSET - ObjectGeometry.INLET_OVERLAP -
+				    ObjectGeometry.OUTLET_OFFSET - ObjectGeometry.OUTLET_OVERLAP);
+    else
+      redraw();
   }
 
   public void redrawConnections()
@@ -396,7 +407,7 @@ abstract public class ErmesObject implements DisplayObject
   // redefine provide a default empty implementation
   // for the object that do not redefine themselves
 
-  public void redefine( String text) 
+  public void redefine(String text) 
   {
     updateInOutlets();
   }
@@ -678,7 +689,7 @@ abstract public class ErmesObject implements DisplayObject
     return ftsObject.getLayer();
   }
 
-  // Called at ErmesObject disposal
+  // Called at GraphicObject disposal
 
   public void dispose()
   {
@@ -720,7 +731,7 @@ abstract public class ErmesObject implements DisplayObject
 
   public String toString()
   {
-    return "ErmesObject<" + ftsObject.toString() + ">";
+    return "GraphicObject<" + ftsObject.toString() + ">";
   }
 }
 

@@ -14,7 +14,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 // The graphic "float box" object.
 //
 
-public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueListener
+public class FloatBox extends NumberBox implements FtsFloatValueListener
 {
   private float itsFloat = (float) 0.0;
 
@@ -26,7 +26,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
   private float previousVelocity;
   private int previousY;
 
-  ErmesObjFloat( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  FloatBox( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject, "-0123456789.");
 
@@ -37,9 +37,7 @@ public class ErmesObjFloat extends ErmesObjNumberBox implements FtsFloatValueLis
   {
     itsFloat = value;
 
-    Graphics g = itsSketchPad.getGraphics();
-    paint(g);
-    g.dispose();
+    updateRedraw();
   }
 
   // ValueAsText property

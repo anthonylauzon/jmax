@@ -11,13 +11,13 @@ import ircam.jmax.editors.patcher.*;
 // The abstract base class graphic in/outlet contained in subpatchers
 //
 
-abstract public class ErmesObjInOut extends ErmesObject {
+abstract public class InOutlet extends GraphicObject {
 
   protected int itsId;
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 10;
 
-  ErmesObjInOut( ErmesSketchPad theSketchPad, FtsObject theFtsObject, int id) 
+  InOutlet( ErmesSketchPad theSketchPad, FtsObject theFtsObject, int id) 
   {
     super(theSketchPad, theFtsObject);
 
@@ -49,10 +49,7 @@ abstract public class ErmesObjInOut extends ErmesObject {
   public void changeNo( int n) 
   {
     if (itsId != n) 
-      {
-	itsId = n;
-	redefine( "");
-      }
+      itsId = n;
 
     redraw();
   }

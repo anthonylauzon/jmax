@@ -17,12 +17,12 @@ import ircam.jmax.editors.patcher.interactions.*;
 // methods (mouseclick, move, doubleclick...).
 //
 
-public class ErmesConnection implements DisplayObject
+public class GraphicConnection implements DisplayObject
 {
-  private ErmesObject from;
+  private GraphicObject from;
   private int         outlet;
 
-  private ErmesObject to;
+  private GraphicObject to;
   private int         inlet;
 
   private ErmesSketchPad sketch;
@@ -39,9 +39,9 @@ public class ErmesConnection implements DisplayObject
 
   private float length;
 
-  public ErmesConnection(ErmesSketchPad theSketchPad,
-			 ErmesObject fromObj, int theOutlet,
-			 ErmesObject toObj, int theInlet,
+  public GraphicConnection(ErmesSketchPad theSketchPad,
+			 GraphicObject fromObj, int theOutlet,
+			 GraphicObject toObj, int theInlet,
 			 FtsConnection theFtsConnection) 
   {
     ftsConnection = theFtsConnection;
@@ -67,12 +67,12 @@ public class ErmesConnection implements DisplayObject
   }
 
 
-  public ErmesObject getSourceObject() 
+  public GraphicObject getSourceObject() 
   {
     return from;
   }
 
-  public ErmesObject getDestObject() 
+  public GraphicObject getDestObject() 
   {
     return to;
   }
@@ -97,7 +97,6 @@ public class ErmesConnection implements DisplayObject
     if (selected)
       ErmesSelection.patcherSelection.deselect(this);
 
-    redraw();
     sketch.getDisplayList().remove(this);
   }
 
@@ -244,7 +243,7 @@ public class ErmesConnection implements DisplayObject
 
   public String toString()
   {
-    return ("ErmesConnection<" + from + "." + outlet + "-" +
+    return ("GraphicConnection<" + from + "." + outlet + "-" +
 	    to + "." + inlet +
 	    " (" + start.x + "." + start.y + ")-" + length + "-(" + end.x + "." + end.y + ")>");
   }

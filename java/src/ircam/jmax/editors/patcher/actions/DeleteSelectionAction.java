@@ -26,7 +26,10 @@ public class DeleteSelectionAction extends AbstractAction
 
 	if (selection.ownedBy(sketch))
 	  if (! sketch.isTextEditingObject())
-	    selection.deleteAll();
+	    {
+	      selection.redraw();
+	      selection.deleteAll();
+	    }
       }
   }
 }

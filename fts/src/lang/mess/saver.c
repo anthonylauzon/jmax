@@ -33,6 +33,7 @@ struct fts_bmax_file
   fts_binary_file_header_t header; 
   fts_symbol_t *symbol_table;
   unsigned int symbol_table_size;
+  int symbol_table_static;
 };
 
 
@@ -63,19 +64,23 @@ static void swap_long( unsigned long *p)
   pu->c[2] = tmp;
 }
 
-#define SYMBOL_TABLE_SIZE 64
 
+
+/* Use static structure if it is possible; for the moment,
+ cannot save recursively; needed to avoid alloc during save
+ as much as possible, to try autosaves in panic situations.
+ */
+
+#define SYMBOL_TABLE_SIZE 32 * 1024
+
+static fts_bmax_file_t bmax_file;
+static fts_symbol_t bmax_file_table[SYMBOL_TABLE_SIZE];
 
 static fts_bmax_file_t *
-fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
+fts_open_bmax_file_for_writing(const char *name, int dobackup)
 {
   fts_bmax_file_t *f;
-  const char *name;
   fts_binary_file_header_t header;
-
-  /* Get the file name */
-
-  name = fts_symbol_name(file);
 
   if (dobackup)
     {
@@ -95,9 +100,10 @@ fts_open_bmax_file_for_writing(fts_symbol_t file, int dobackup)
 
   /* allocate a bmax descriptor, and initialize it */
 
-  f = (fts_bmax_file_t *) fts_malloc(sizeof(fts_bmax_file_t));
+  f = &bmax_file;
+  f->symbol_table_static = 1;
   f->symbol_table_size = SYMBOL_TABLE_SIZE;
-  f->symbol_table = (fts_symbol_t *) fts_malloc(f->symbol_table_size * sizeof(fts_symbol_t));
+  f->symbol_table = bmax_file_table;
 
   /* Initialize the header */
 
@@ -193,8 +199,8 @@ fts_close_bmax_file(fts_bmax_file_t *f)
 
   /* free the bmax file descriptor */
 
-  fts_free(f->symbol_table);
-  fts_free(f);
+  if (f->symbol_table_static == 0)
+      fts_free(f->symbol_table);
 }
 
 /* Aux functions  for file building */
@@ -293,8 +299,23 @@ static int fts_bmax_add_symbol(fts_bmax_file_t *f, fts_symbol_t sym)
     {
       /* resize symbol table  */
 
-      f->symbol_table_size = (f->symbol_table_size * 3) / 2;
-      f->symbol_table = fts_realloc((void *)f->symbol_table, f->symbol_table_size * sizeof(fts_symbol_t));
+      fts_symbol_t *new_table;
+      int new_size;
+      int i;
+
+      new_size  = (f->symbol_table_size * 3) / 2;
+      new_table = (fts_symbol_t *) fts_malloc(new_size * sizeof(fts_symbol_t)); 
+
+      for (i = 0; i < f->symbol_table_size; i++)
+	new_table[i] = f->symbol_table[i];
+
+      if (f->symbol_table_static == 0)
+	fts_free(f->symbol_table);
+
+
+      f->symbol_table = new_table;
+      f->symbol_table_size = new_size;
+      f->symbol_table_static = 0;
     }
 
   f->symbol_table[f->header.n_symbols] = sym;
@@ -1016,7 +1037,7 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(file, 1);
+  f = fts_open_bmax_file_for_writing(fts_symbol_name(file), 1);
 
   if (f)
     {
@@ -1030,6 +1051,35 @@ void fts_save_patcher_as_bmax(fts_symbol_t file, fts_object_t *patcher)
       /* Recompute the template instances if needed */
 
       fts_template_file_modified(file);
+    }
+}
+
+
+/* Save_simple is a version that:
+   1- get a char instead of a symbol (used in autosave to not 
+      generate new symbols in panic situation).
+   2- Do not update template instances, so to avoid allocating
+      memory.
+      
+
+      Used *only* for autosave
+   */
+
+
+void fts_save_simple_as_bmax(const char *filename, fts_object_t *patcher)
+{
+  fts_bmax_file_t *f;
+
+  f = fts_open_bmax_file_for_writing(filename, 1);
+
+  if (f)
+    {
+      fts_bmax_code_new_patcher(f, patcher, -1, 1);
+
+      /* code the return command */
+
+      fts_bmax_code_return(f);
+      fts_close_bmax_file(f);
     }
 }
 
@@ -1101,7 +1151,7 @@ void fts_save_selection_as_bmax(fts_symbol_t file, fts_object_t *selection)
 {
   fts_bmax_file_t *f;
 
-  f = fts_open_bmax_file_for_writing(file, 0);
+  f = fts_open_bmax_file_for_writing(fts_symbol_name(file), 0);
 
   if (f)
     {

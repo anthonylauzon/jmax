@@ -40,17 +40,17 @@ class FollowInteraction extends Interaction
 	  editor.setCursor( Cursor.getPredefinedCursor( Cursor.S_RESIZE_CURSOR));
 	else if (Squeack.onInlet(squeack))
 	  {
-	    if (! editor.isHighlightedInlet((ErmesObject) area.getTarget(), area.getNumber()))
+	    if (! editor.isHighlightedInlet((GraphicObject) area.getTarget(), area.getNumber()))
 	      {
-		editor.setHighlightedInlet((ErmesObject) area.getTarget(), area.getNumber());
+		editor.setHighlightedInlet((GraphicObject) area.getTarget(), area.getNumber());
 		editor.setCursor(Cursor.getDefaultCursor());
 	      }
 	  }
 	else if (Squeack.onOutlet(squeack))
 	  {
-	    if (! editor.isHighlightedOutlet((ErmesObject) area.getTarget(), area.getNumber()))
+	    if (! editor.isHighlightedOutlet((GraphicObject) area.getTarget(), area.getNumber()))
 	      {
-		editor.setHighlightedOutlet((ErmesObject) area.getTarget(), area.getNumber());
+		editor.setHighlightedOutlet((GraphicObject) area.getTarget(), area.getNumber());
 		editor.setCursor(Cursor.getDefaultCursor());
 	      }
 	  }

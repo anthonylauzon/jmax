@@ -17,7 +17,7 @@ public class FindAction extends MenuAction
     if (ErmesSelection.patcherSelection.isSingleton())
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
-	  public void processObject(ErmesObject object)
+	  public void processObject(GraphicObject object)
 	    { 
 	      FindPanel.open().findFriends(object.getFtsObject());
 	    }});

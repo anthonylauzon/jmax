@@ -17,7 +17,7 @@ public class InspectAction extends MenuAction
     if (ErmesSelection.patcherSelection.ownedBy(editor.itsSketchPad))
       {
 	ErmesSelection.patcherSelection.apply(new ObjectAction() {
-	  public void processObject(ErmesObject object)
+	  public void processObject(GraphicObject object)
 	    { object.inspect();}});
       }
   }

@@ -186,7 +186,7 @@ public class TextMenu extends JMenu
       }
     else if (ErmesSelection.patcherSelection.isSingleton())
       {
-	ErmesObject object = ErmesSelection.patcherSelection.getSingleton();
+	GraphicObject object = ErmesSelection.patcherSelection.getSingleton();
 
 	fontName = object.getFontName();
 	fontSize = object.getFontSize();

@@ -13,12 +13,12 @@ import javax.swing.text.*;
 import javax.swing.event.*;
 
 //
-// The edit field contained in the editable objects (ErmesObjMessage, ErmesObjExternal).
+// The edit field contained in the editable objects (Message, Editable).
 //
 
 public class EditField extends JTextArea
 {
-  private ErmesObjEditableObject owner = null;
+  private Editable owner = null;
   private ErmesSketchPad sketch = null;
 
   // Private action classes 
@@ -134,7 +134,7 @@ public class EditField extends JTextArea
   private Point location = new Point();
   private boolean doneOnce = false;
 
-  public void doEdit(ErmesObjEditableObject obj, Point p)
+  public void doEdit(Editable obj, Point p)
   {
     owner = obj;
     owner.setEditing(true);
@@ -204,8 +204,10 @@ public class EditField extends JTextArea
     if (! owner.getArgs().equals(aTextString) )
       {
 	owner.redraw();
+	owner.redrawConnections();
 	owner.redefine(aTextString);
 	owner.redraw();
+	owner.redrawConnections();
       } 
 
     setVisible(false);
@@ -222,8 +224,10 @@ public class EditField extends JTextArea
 	Dimension d = getPreferredSize();
 
 	owner.redraw();
+	owner.redrawConnections();
 	owner.setHeight(d.height + owner.getTextHeightOffset());
 	owner.redraw();
+	owner.redrawConnections();
 	setSize(d);
 	sketch.fixSize();
       }

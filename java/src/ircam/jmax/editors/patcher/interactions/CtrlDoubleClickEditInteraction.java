@@ -17,7 +17,7 @@ class CtrlDoubleClickEditInteraction extends Interaction
 {
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    ErmesObject object = (ErmesObject) area.getTarget();
+    GraphicObject object = (GraphicObject) area.getTarget();
 	  
     object.editContent();
     editor.endInteraction();

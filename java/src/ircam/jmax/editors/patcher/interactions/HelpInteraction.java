@@ -19,7 +19,7 @@ class HelpInteraction extends Interaction
 
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
-    ErmesObject object = null;
+    GraphicObject object = null;
 
     /* Please notes that since the ErrorDialog is modal, this interaction
        will continue to receive events, and will not execute the "endInteraction"
@@ -33,7 +33,7 @@ class HelpInteraction extends Interaction
       {
 	locked = true;
 
-	object = (ErmesObject) area.getTarget();
+	object = (GraphicObject) area.getTarget();
 
 	if (object != null)
 	  if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))

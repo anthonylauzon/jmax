@@ -15,7 +15,7 @@ import ircam.jmax.editors.patcher.interactions.*;
 // The "slider" graphic object
 //
 
-class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
+class Slider extends GraphicObject implements FtsIntValueListener
 {
   //
   // The graphic throttle contained into a 'slider' object.
@@ -23,25 +23,16 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   static final int THROTTLE_LATERAL_OFFSET = 2;
   static final int THROTTLE_HEIGHT = 5;
-  static private final int XOR_MODE = 0;
-  static private final int PAINT_MODE = 1;
 
   class Throttle
   {
     protected int itsX, itsY;
     protected int itsWidth, itsHeight;
 
-    private int itsPreviousX;
-    private int itsPreviousY;
-
-    private boolean erased = true;
-
     public Throttle() 
     {
       itsX = getX() + THROTTLE_LATERAL_OFFSET;
       itsY = getY() + getHeight() - BOTTOM_OFFSET - 2;
-      itsPreviousX = itsX;
-      itsPreviousY = itsY;
 
       itsWidth = getWidth() - 2*THROTTLE_LATERAL_OFFSET;
       itsHeight = THROTTLE_HEIGHT;
@@ -67,51 +58,19 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     }
 
 
-    void eraseAndPaint( Graphics g) 
-    {
-      if ( !erased)
-	paint( g, XOR_MODE);      
-
-      paint( g, PAINT_MODE);
-    }
-
-    void paintNoErase( Graphics g) 
-    {
-      paint( g, PAINT_MODE);
-    }
-
-    private  void paint( Graphics g, int mode) 
+    private  void paint(Graphics g) 
     {
       int deltaX = getX() + THROTTLE_LATERAL_OFFSET;
       int deltaY;
 
-      if ( mode == PAINT_MODE) 
-	deltaY = getY() + AbsoluteToSlider( itsY);
-      else
-	deltaY = itsPreviousY;
-
+      deltaY = getY() + AbsoluteToSlider( itsY);
       g.setColor( Settings.sharedInstance().getSelectedColor());
 
       if ( !isSelected()) 
-	{
-	  if ( mode == XOR_MODE) 
-	    g.setXORMode( Settings.sharedInstance().getUIColor());
-
-	  g.fillRect( deltaX + 1, deltaY + 1, itsWidth - 2, itsHeight - 2);
-	}
+	g.fillRect( deltaX + 1, deltaY + 1, itsWidth - 2, itsHeight - 2);
 
       g.setColor( Color.black);
-      if ( mode == XOR_MODE)
-	g.setXORMode( isSelected() ? Settings.sharedInstance().getSelectedColor() : Settings.sharedInstance().getUIColor());
-      
       g.drawRect( deltaX, deltaY, itsWidth - 1, itsHeight - 1);
-      if ( mode == XOR_MODE) 
-	{
-	  g.setPaintMode();//reset mode to normal
-	  erased = true;
-	}
-      else
-	erased = false;
     }
   
     void setWidth(int w)
@@ -119,37 +78,10 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
       itsWidth = w;
     }
 
-    void MoveAbsolute( int theX, int theY) 
+    void move( int theX, int theY) 
     {
       itsX = theX;
       itsY = theY; 
-    }
-
-    void Move( int theX, int theY)
-    {
-      storeOld();
-      MoveAbsolute( theX, theY);
-    }
-  
-    public void moveByAbsolute( int theDeltaH, int theDeltaV) 
-    {
-      itsX += theDeltaH;
-      itsY+=theDeltaV;    
-    }
-  
-    void moveBy( int theDeltaH, int theDeltaV) 
-    {
-      if ( theDeltaH != 0 || theDeltaV != 0) 
-	{
-	  storeOld();
-	  moveByAbsolute( theDeltaH, theDeltaV);
-	}
-    }
-	
-    private void storeOld() 
-    {
-      itsPreviousX = itsX;
-      itsPreviousY = itsY;
     }
   }
 
@@ -165,12 +97,12 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   int itsPixelRange;
   float itsStep;
 
-  private static ErmesObjSliderDialog itsSliderDialog = null;
+  private static SliderDialog itsSliderDialog = null;
 
   protected final static int BOTTOM_OFFSET = 5;
   protected final static int UP_OFFSET = 5;
 
-  ErmesObjSlider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  Slider( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
 
@@ -228,7 +160,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     itsThrottle.setWidth( getWidth() - 2 * THROTTLE_LATERAL_OFFSET);
 
-    itsThrottle.MoveAbsolute( itsThrottle.itsX,
+    itsThrottle.move( itsThrottle.itsX,
 			      (int)(getY() + getHeight() - BOTTOM_OFFSET - 2 - itsInteger/itsStep));
   }
 
@@ -275,17 +207,10 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
       
 	if ( itsThrottle != null) 
 	  {
-	    itsThrottle.Move( itsThrottle.itsX, (int) (getY() + getHeight() - BOTTOM_OFFSET - 2 -clippedValue/itsStep));
+	    itsThrottle.move( itsThrottle.itsX, (int) (getY() + getHeight() - BOTTOM_OFFSET - 2 -clippedValue/itsStep));
 	  }
-
-	Graphics g = itsSketchPad.getGraphics();
-
-	if ( itsSketchPad.isLocked())
-	  Paint_movedThrottle( g);
-	else
-	  paint( g);
-
-	g.dispose();
+	
+	updateRedraw();
       }
   }
 
@@ -294,7 +219,7 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
     Point aPoint = itsSketchPad.getSketchWindow().getLocation();
 
     if ( itsSliderDialog == null) 
-      itsSliderDialog = new ErmesObjSliderDialog();
+      itsSliderDialog = new SliderDialog();
 
     itsSliderDialog.setLocation( aPoint.x + getX(), aPoint.y + getY() - 25);
     itsSliderDialog.ReInit( String.valueOf( itsRangeMax), String.valueOf( itsRangeMin), String.valueOf( itsInteger), this, itsSketchPad.getSketchWindow());
@@ -317,18 +242,18 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
       {
 	itsInteger = (int)((( getY() + getHeight()) - y - BOTTOM_OFFSET) * itsStep);
 
-	itsThrottle.Move( itsThrottle.itsX, y - 2);
+	itsThrottle.move( itsThrottle.itsX, y - 2);
 	itsMovingThrottle = true;
       }
     else if( getY() + getHeight() - BOTTOM_OFFSET < y)
       {
 	itsInteger = itsRangeMin;
-	itsThrottle.Move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
+	itsThrottle.move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
       }
     else if( getY() + UP_OFFSET >= y)
       {
 	itsInteger = itsRangeMax;
-	itsThrottle.Move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
+	itsThrottle.move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
       }
 
     ((FtsSliderObject)ftsObject).setValue(itsInteger);	
@@ -355,21 +280,21 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
 	    ((FtsSliderObject)ftsObject).setValue(itsInteger + itsRangeMin);
 	
-	    itsThrottle.Move( itsThrottle.itsX, y - 2);
+	    itsThrottle.move( itsThrottle.itsX, y - 2);
 	  }
 	else if( getY() + getHeight() - BOTTOM_OFFSET < y)
 	  {
 	    itsInteger = itsRangeMin;
 	    ((FtsSliderObject)ftsObject).setValue(itsInteger);
 
-	    itsThrottle.Move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
+	    itsThrottle.move( itsThrottle.itsX, getY() + getHeight() - BOTTOM_OFFSET - 2);
 	  }
 	else if( getY() + UP_OFFSET > y)
 	  {
 	    itsInteger = itsRangeMax;
 	    ((FtsSliderObject)ftsObject).setValue(itsInteger);
 
-	    itsThrottle.Move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
+	    itsThrottle.move( itsThrottle.itsX, getY() + UP_OFFSET - 2);
 	  }
 
 	redraw();
@@ -398,11 +323,6 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
   }
 	
 
-  public void Paint_movedThrottle( Graphics g) 
-  {
-    itsThrottle.eraseAndPaint( g);
-  }
-
   public void paint( Graphics g) 
   {
     if( !isSelected()) 
@@ -412,15 +332,15 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
     g.fill3DRect( getX()+1, getY()+1, getWidth()-2,  getHeight()-2, true);
 
-    itsThrottle.paintNoErase( g);
+    itsThrottle.paint(g);
 
-    super.paint( g);
+    super.paint(g);
   }
 
   public void moveBy( int theDeltaH, int theDeltaV) 
   {
     super.moveBy( theDeltaH, theDeltaV);
-    itsThrottle.moveByAbsolute( theDeltaH, theDeltaV);
+    updateThrottle();
   }
 
   protected SensibilityArea findSensibilityArea( int mouseX, int mouseY)
@@ -435,3 +355,4 @@ class ErmesObjSlider extends ErmesObject implements FtsIntValueListener
 
   }
 }
+

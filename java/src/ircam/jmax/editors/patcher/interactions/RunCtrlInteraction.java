@@ -15,7 +15,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class RunCtrlInteraction extends Interaction
 {
-  ErmesObject object;
+  GraphicObject object;
 
   void configureInputFilter(InteractionEngine filter)
   {
@@ -25,7 +25,7 @@ class RunCtrlInteraction extends Interaction
   void gotSqueack(ErmesSketchPad editor, int squeack, SensibilityArea area, Point mouse, Point oldMouse)
   {
     if (Squeack.isDown(squeack) && (Squeack.onObject(squeack) || Squeack.onText(squeack)))
-      object = (ErmesObject) area.getTarget();
+      object = (GraphicObject) area.getTarget();
 
     // Take away the control modifier (always there)
 

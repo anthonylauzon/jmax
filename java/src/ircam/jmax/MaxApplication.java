@@ -329,7 +329,7 @@ public class MaxApplication extends Object
 	System.err.println("No Fts Server Specified");
 	return;
       }
-    
+
     // Look if there are documents to open in the 
     // command line.
 

@@ -13,15 +13,14 @@ import ircam.jmax.editors.patcher.interactions.*;
 // The "bang" graphic object.
 //
 
-class ErmesObjBang extends ErmesObject implements FtsIntValueListener
+class Bang extends GraphicObject implements FtsIntValueListener
 {
-  private boolean itsFlashing = false;
-  private Color itsFlashColor = Color.yellow;
+  private Color itsFlashColor = Settings.sharedInstance().getUIColor();
   private static final int DEFAULT_WIDTH = 20;
   private static final int MINIMUM_WIDTH = 15;
   private static final int CIRCLE_ORIGIN = 3;
 
-  public ErmesObjBang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Bang( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
 
@@ -72,38 +71,15 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
     int flash = value;
 
     if (flash <= 0)
-      itsFlashing = false;
+      itsFlashColor = Settings.sharedInstance().getUIColor();
     else if (flash >= bangColors.length) 
-      {
-	itsFlashing = true;
-	itsFlashColor = Color.yellow;
-      } 
+      itsFlashColor = Color.yellow;
     else 
-      {
-	itsFlashing = true;
-	itsFlashColor = bangColors[flash - 1];
-      }
+      itsFlashColor = bangColors[flash - 1];
 
-    Graphics g = itsSketchPad.getGraphics();
-    Paint_update( g);
-    g.dispose();
+    updateRedraw();
   }
 
-
-  private void Paint_update( Graphics g) 
-  {
-    if (itsFlashing)
-      g.setColor( itsFlashColor);
-    else if ( isSelected())
-      g.setColor( Settings.sharedInstance().getSelectedColor());
-    else
-      g.setColor( Settings.sharedInstance().getUIColor());
-
-    g.fillOval( getX() + CIRCLE_ORIGIN + 1,
-		getY() + CIRCLE_ORIGIN + 1,
-		getWidth() - 2*(CIRCLE_ORIGIN+1) - 1,
-		getHeight() - 2*(CIRCLE_ORIGIN+1) - 1);
-  }
 
   public void paint( Graphics g) 
   {
@@ -119,7 +95,11 @@ class ErmesObjBang extends ErmesObject implements FtsIntValueListener
 
     g.fill3DRect( x + 1, y + 1, w - 2, h - 2, true);
 
-    Paint_update(g);
+    g.setColor( itsFlashColor);
+    g.fillOval( getX() + CIRCLE_ORIGIN + 1,
+		getY() + CIRCLE_ORIGIN + 1,
+		getWidth() - 2*(CIRCLE_ORIGIN+1) - 1,
+		getHeight() - 2*(CIRCLE_ORIGIN+1) - 1);
 
     g.setColor(Color.black);
     g.drawOval( x + CIRCLE_ORIGIN, 

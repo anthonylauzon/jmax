@@ -14,13 +14,13 @@ import ircam.jmax.editors.patcher.*;
 // The "patcher" graphic object.
 //
 
-class ErmesObjPatcher extends ErmesObjEditableObject
+class Patcher extends Editable
 {
   // ----------------------------------------
   // Constructor
   // ----------------------------------------
 
-  ErmesObjPatcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  Patcher( ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super( theSketchPad, theFtsObject);
   }

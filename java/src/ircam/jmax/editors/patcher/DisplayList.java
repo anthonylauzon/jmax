@@ -58,31 +58,31 @@ public class DisplayList
 
   /* Objects */
 
-  void add(ErmesObject object)
+  void add(GraphicObject object)
   {
     displayObjects.addElement( object);
   }
 
-  private void addToBeginning(ErmesObject object)
+  private void addToBeginning(GraphicObject object)
   {
     displayObjects.insertElementAt( object, 0);
   }
 
-  public void remove( ErmesObject object)
+  public void remove( GraphicObject object)
   {
     displayObjects.removeElement( object);
     reassignLayers();
   }
 
-  ErmesObject getErmesObjectFor(FtsObject obj)
+  GraphicObject getGraphicObjectFor(FtsObject obj)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
 
     for ( int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesObject)
+      if (values[i] instanceof GraphicObject)
 	{
-	  ErmesObject object = (ErmesObject) values[i];
+	  GraphicObject object = (GraphicObject) values[i];
 
 	  if (object.getFtsObject() == obj)
 	    return object;
@@ -97,8 +97,8 @@ public class DisplayList
     int size = displayObjects.size();
 
     for ( int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesObject)
-	((ErmesObject) values[i]).dispose();
+      if (values[i] instanceof GraphicObject)
+	((GraphicObject) values[i]).dispose();
   }
 
   // Generic operation on objects in the display List
@@ -109,12 +109,12 @@ public class DisplayList
     int size = displayObjects.size();
 
     for (int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesObject)
-	action.processObject((ErmesObject) values[i]);
+      if (values[i] instanceof GraphicObject)
+	action.processObject((GraphicObject) values[i]);
   }
 
 
-  public void objectToFront(ErmesObject object)
+  public void objectToFront(GraphicObject object)
   {
     remove(object);
     add(object);
@@ -122,7 +122,7 @@ public class DisplayList
     sortDisplayList();
   }
 
-  public void objectToBack(ErmesObject object)
+  public void objectToBack(GraphicObject object)
   {
     remove(object);
     addToBeginning(object);
@@ -132,25 +132,25 @@ public class DisplayList
 
   /* Connections */
 
-  final public void add(ErmesConnection connection)
+  final public void add(GraphicConnection connection)
   {
     displayObjects.addElement(connection);
   }
 
-  public void remove(ErmesConnection connection)
+  public void remove(GraphicConnection connection)
   {
     displayObjects.removeElement( connection);
   }
 
-  ErmesConnection getErmesConnectionFor(FtsConnection c)
+  GraphicConnection getGraphicConnectionFor(FtsConnection c)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
 
     for ( int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesConnection)
+      if (values[i] instanceof GraphicConnection)
 	{
-	  ErmesConnection connection = (ErmesConnection) values[i];
+	  GraphicConnection connection = (GraphicConnection) values[i];
 
 	  if (connection.getFtsConnection() == c)
 	    return connection;
@@ -159,15 +159,15 @@ public class DisplayList
     return null;
   }
 
-  public void redrawConnectionsFor(ErmesObject obj)
+  public void redrawConnectionsFor(GraphicObject obj)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
 
     for ( int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesConnection)
+      if (values[i] instanceof GraphicConnection)
 	{
-	  ErmesConnection connection = (ErmesConnection) values[i];
+	  GraphicConnection connection = (GraphicConnection) values[i];
 
 	  if ((connection.getSourceObject() == obj) || 
 	      (connection.getDestObject() == obj))
@@ -175,15 +175,15 @@ public class DisplayList
 	}
   }
 
-  public void updateConnectionsFor(ErmesObject obj)
+  public void updateConnectionsFor(GraphicObject obj)
   {
     Object[] values = displayObjects.getObjectArray();
     int size = displayObjects.size();
 
     for ( int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesConnection)
+      if (values[i] instanceof GraphicConnection)
 	{
-	  ErmesConnection connection = (ErmesConnection) values[i];
+	  GraphicConnection connection = (GraphicConnection) values[i];
 
 	  if ((connection.getSourceObject() == obj) || 
 	      (connection.getDestObject() == obj))
@@ -199,8 +199,8 @@ public class DisplayList
     int size = displayObjects.size();
 
     for (int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesConnection)
-	action.processConnection((ErmesConnection) values[i]);
+      if (values[i] instanceof GraphicConnection)
+	action.processConnection((GraphicConnection) values[i]);
   }
 
 
@@ -218,8 +218,8 @@ public class DisplayList
     int layer = 0;
 
     for (int i = 0; i < size; i++)
-      if (values[i] instanceof ErmesObject)
-	((ErmesObject) values[i]).setLayer(layer++);
+      if (values[i] instanceof GraphicObject)
+	((GraphicObject) values[i]).setLayer(layer++);
   }
 
   public void sortDisplayList()
@@ -243,19 +243,19 @@ public class DisplayList
 
   private final boolean isAfter(Object do1, Object do2)
   {
-    if (do1 instanceof ErmesObject)
+    if (do1 instanceof GraphicObject)
       {
-	ErmesObject object1 = (ErmesObject) do1;
+	GraphicObject object1 = (GraphicObject) do1;
 
-	if (do2 instanceof ErmesObject)
+	if (do2 instanceof GraphicObject)
 	  {
-	    ErmesObject object2 = (ErmesObject) do2;
+	    GraphicObject object2 = (GraphicObject) do2;
 
 	    return (object1.getLayer() > object2.getLayer());
 	  }
-	else if (do2 instanceof ErmesConnection)
+	else if (do2 instanceof GraphicConnection)
 	  {
-	    ErmesConnection connection2 = (ErmesConnection) do2;
+	    GraphicConnection connection2 = (GraphicConnection) do2;
 
 	    return (object1.getLayer() >= connection2.getSourceObject().getLayer() ||
 		    object1.getLayer() >= connection2.getDestObject().getLayer());
@@ -263,21 +263,21 @@ public class DisplayList
 	else
 	  return false;
       }
-    else if (do1 instanceof ErmesConnection)
+    else if (do1 instanceof GraphicConnection)
       {
-	ErmesConnection connection1 = (ErmesConnection) do1;
+	GraphicConnection connection1 = (GraphicConnection) do1;
 
-	if (do2 instanceof ErmesObject)
+	if (do2 instanceof GraphicObject)
 	  {
-	    ErmesObject object2 = (ErmesObject) do2;
+	    GraphicObject object2 = (GraphicObject) do2;
 
 	    return (object2.getLayer() < connection1.getSourceObject().getLayer() &&
 		    object2.getLayer() < connection1.getDestObject().getLayer());
 
 	  }
-	else if (do2 instanceof ErmesConnection)
+	else if (do2 instanceof GraphicConnection)
 	  {
-	    ErmesConnection connection2 = (ErmesConnection) do2;
+	    GraphicConnection connection2 = (GraphicConnection) do2;
 
 	    return ((connection1.getSourceObject().getLayer() > connection2.getDestObject().getLayer() ||
 		     connection1.getSourceObject().getLayer() > connection2.getSourceObject().getLayer()) && 
@@ -367,10 +367,10 @@ public class DisplayList
 	  {
 	    DisplayObject object = (DisplayObject) values[i];
 
-	    if (object instanceof ErmesObjEditableObject)
+	    if (object instanceof Editable)
 	      {
-		((ErmesObjEditableObject)object).drawContent(g);
-		((ErmesObjEditableObject)object).updateDimensionsNoConnections(); // HACK ? Yes !
+		((Editable)object).drawContent(g);
+		((Editable)object).updateDimensionsNoConnections(); // HACK ? Yes !
 	      }
 
 	  }
@@ -379,8 +379,8 @@ public class DisplayList
 	  {
 	    DisplayObject object = (DisplayObject) values[i];
 
-	    if (object instanceof ErmesConnection)
-	      ((ErmesConnection)object).updateDimensions();
+	    if (object instanceof GraphicConnection)
+	      ((GraphicConnection)object).updateDimensions();
 	  }
       }
 
@@ -425,10 +425,6 @@ public class DisplayList
       case NO_DRAG:
 	break;
       }
-
-    // Needed in very heavy charge situations ?
-
-    Toolkit.getDefaultToolkit().sync();
   }		
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -448,7 +444,7 @@ public class DisplayList
   ConnectionAction connectionSelecter =
   new ConnectionAction()
   {
-    public void processConnection(ErmesConnection connection)
+    public void processConnection(GraphicConnection connection)
       {
 	if ((connection.getSourceObject().isSelected()) && (connection.getDestObject().isSelected()))
 	  ErmesSelection.patcherSelection.select( connection);
@@ -463,7 +459,7 @@ public class DisplayList
     boolean toggle = false;
     Rectangle rect;
 
-    public void processObject(ErmesObject object)
+    public void processObject(GraphicObject object)
       {
 	if (object.coreIntersects( rect))
 	  {
@@ -527,7 +523,7 @@ public class DisplayList
   ObjectAction allObjectSelecter =
   new ObjectAction()
   {
-    public void processObject(ErmesObject object)
+    public void processObject(GraphicObject object)
       {
 	ErmesSelection.patcherSelection.select(object);
       }
@@ -536,7 +532,7 @@ public class DisplayList
   ConnectionAction allConnectionSelecter =
   new ConnectionAction()
   {
-    public void processConnection(ErmesConnection connection)
+    public void processConnection(GraphicConnection connection)
       {
 	ErmesSelection.patcherSelection.select(connection);
       }
@@ -570,7 +566,7 @@ public class DisplayList
       this.r = r;
     }
     
-    public void processObject(ErmesObject object)
+    public void processObject(GraphicObject object)
     {
       object.rectangleUnion(r);
     }
@@ -614,7 +610,7 @@ public class DisplayList
       dy = v;
     }
     
-    public void processObject(ErmesObject object)
+    public void processObject(GraphicObject object)
     {
       object.moveBy(dx, dy);
     }

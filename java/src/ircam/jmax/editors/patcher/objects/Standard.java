@@ -14,14 +14,14 @@ import ircam.jmax.editors.patcher.*;
 //
 // The generic "extern" object in ermes. (example: adc1~)
 //
-public class ErmesObjExternal extends ErmesObjEditableObject implements FtsObjectErrorListener
+public class Standard extends Editable implements FtsObjectErrorListener
 {
   boolean fresh = true;
 
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
-  ErmesObjExternal( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  Standard( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super( theSketchPad, theFtsObject);
   }

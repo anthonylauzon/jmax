@@ -12,11 +12,11 @@ import ircam.jmax.editors.patcher.interactions.*;
 // The "message box" graphic object.
 //
 
-class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListener {
+class Message extends Editable implements FtsMessageListener {
 
   boolean itsFlashing = false;
 
-  public ErmesObjMessage(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
+  public Message(ErmesSketchPad theSketchPad, FtsObject theFtsObject)
   {
     super(theSketchPad, theFtsObject);
   }
@@ -72,14 +72,7 @@ class ErmesObjMessage extends ErmesObjEditableObject implements FtsMessageListen
 
   public void messageChanged(String message)
   {
-    // (fd) To be redone
-    // Should be a nice repaint ??
-
-    // updateDimensions();
-
-    Graphics g = itsSketchPad.getGraphics();
-    paint(g);
-    g.dispose();
+    updateRedraw();
   }
 
 

@@ -1,5 +1,7 @@
 package ircam.jmax.editors.patcher;
 
+import java.awt.*; 
+
 import ircam.jmax.mda.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.toolkit.*;
@@ -26,6 +28,8 @@ public class ErmesModule
     // Install the tcl commands
 
     TclErmesPackage.installPackage();
+
+    Fts.setSyncToolkitOnUpdates(true);
   }
 }
 

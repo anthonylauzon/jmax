@@ -1,21 +1,20 @@
 SOURCES := $(SOURCES)\
-	$(INCLUDE_PATH)/DisplayObject.java    \
-	$(INCLUDE_PATH)/ErmesObject.java    \
-	$(INCLUDE_PATH)/ErmesConnection.java    \
-	$(INCLUDE_PATH)/ErmesObjBang.java    \
-	$(INCLUDE_PATH)/ErmesObjComment.java    \
-	$(INCLUDE_PATH)/ErmesObjEditableObject.java    \
-	$(INCLUDE_PATH)/ErmesObjExternal.java    \
-	$(INCLUDE_PATH)/ErmesObjFloat.java    \
-	$(INCLUDE_PATH)/ErmesObjIn.java    \
-	$(INCLUDE_PATH)/ErmesObjInOut.java    \
-	$(INCLUDE_PATH)/ErmesObjInt.java    \
-	$(INCLUDE_PATH)/ErmesObjMessage.java    \
-	$(INCLUDE_PATH)/ErmesObjNumberBox.java    \
-	$(INCLUDE_PATH)/ErmesObjOut.java    \
-	$(INCLUDE_PATH)/ErmesObjPatcher.java    \
-	$(INCLUDE_PATH)/ErmesObjSlider.java    \
-	$(INCLUDE_PATH)/ErmesObjSliderDialog.java    \
-	$(INCLUDE_PATH)/ErmesObjToggle.java    \
+	$(INCLUDE_PATH)/Bang.java \
+	$(INCLUDE_PATH)/Comment.java \
+	$(INCLUDE_PATH)/DisplayObject.java \
+	$(INCLUDE_PATH)/Editable.java \
+	$(INCLUDE_PATH)/FloatBox.java \
+	$(INCLUDE_PATH)/GraphicConnection.java \
+	$(INCLUDE_PATH)/GraphicObject.java \
+	$(INCLUDE_PATH)/InOutlet.java \
+	$(INCLUDE_PATH)/Inlet.java \
+	$(INCLUDE_PATH)/IntBox.java \
+	$(INCLUDE_PATH)/Message.java \
+	$(INCLUDE_PATH)/NumberBox.java \
+	$(INCLUDE_PATH)/Outlet.java \
+	$(INCLUDE_PATH)/Patcher.java \
 	$(INCLUDE_PATH)/SensibilityArea.java \
-
+	$(INCLUDE_PATH)/Slider.java \
+	$(INCLUDE_PATH)/SliderDialog.java \
+	$(INCLUDE_PATH)/Standard.java \
+	$(INCLUDE_PATH)/Toggle.java

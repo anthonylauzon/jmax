@@ -53,7 +53,7 @@ public class ErmesSelection implements Transferable
   }
 
 
-  public void select(ErmesObject object) 
+  public void select(GraphicObject object) 
   {
     if (object.getSketchPad() != owner)
       setOwner(object.getSketchPad());
@@ -66,7 +66,7 @@ public class ErmesSelection implements Transferable
       }
   }
 
-  public void select( ErmesConnection connection) 
+  public void select( GraphicConnection connection) 
   {
     if (connection.getSketchPad() != owner)
       setOwner(connection.getSketchPad());
@@ -79,7 +79,7 @@ public class ErmesSelection implements Transferable
       }
   }
 
-  public void deselect( ErmesObject object) 
+  public void deselect( GraphicObject object) 
   {
     if (objects.contains( object))
       {
@@ -89,7 +89,7 @@ public class ErmesSelection implements Transferable
       }
   }
 
-  public void deselect( ErmesConnection connection) 
+  public void deselect( GraphicConnection connection) 
   {
     if (connections.contains( connection))
       {
@@ -99,13 +99,13 @@ public class ErmesSelection implements Transferable
       }
   }
 
-  public boolean isSelected(ErmesObject object)
+  public boolean isSelected(GraphicObject object)
   {
     return objects.contains( object);
   }
 
 
-  public boolean isSelected(ErmesConnection connection)
+  public boolean isSelected(GraphicConnection connection)
   {
     return connections.contains( connection);
   }
@@ -115,26 +115,26 @@ public class ErmesSelection implements Transferable
     return objects.size() == 1;
   }
 
-  public ErmesObject getSingleton()
+  public GraphicObject getSingleton()
   {
-    return (ErmesObject) objects.elementAt(0);
+    return (GraphicObject) objects.elementAt(0);
   }
   
   public void deselectAll() 
   {
-    ErmesObject object;
+    GraphicObject object;
 
     for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
       {
-	object = ( ErmesObject) e.nextElement();
+	object = ( GraphicObject) e.nextElement();
 	object.setSelected(false);
       }
 
-    ErmesConnection connection;
+    GraphicConnection connection;
 
     for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
       {
-	connection = (ErmesConnection) e.nextElement();
+	connection = (GraphicConnection) e.nextElement();
 	connection.setSelected(false);
       }
 
@@ -145,19 +145,19 @@ public class ErmesSelection implements Transferable
 
   public void redraw() 
   {
-    ErmesObject object;
+    GraphicObject object;
 
     for ( Enumeration e = objects.elements() ; e.hasMoreElements(); ) 
       {
-	object = ( ErmesObject) e.nextElement();
+	object = ( GraphicObject) e.nextElement();
 	object.redraw();
       }
 
-    ErmesConnection connection;
+    GraphicConnection connection;
 
     for ( Enumeration e = connections.elements() ; e.hasMoreElements(); ) 
       {
-	connection = (ErmesConnection) e.nextElement();
+	connection = (GraphicConnection) e.nextElement();
 	connection.redraw();
       }
   }
@@ -206,10 +206,10 @@ public class ErmesSelection implements Transferable
   public void deleteAll()
   {
     while (! connections.isEmpty())
-      ((ErmesConnection) connections.elementAt( 0)).delete();
+      ((GraphicConnection) connections.elementAt( 0)).delete();
     
     while (! objects.isEmpty())
-      ((ErmesObject) objects.elementAt( 0)).delete();
+      ((GraphicObject) objects.elementAt( 0)).delete();
   }
 
 
@@ -222,7 +222,7 @@ public class ErmesSelection implements Transferable
 
     for (int i = 0; i < size; i++)
       {
-	ErmesObject object = (ErmesObject) values[i];
+	GraphicObject object = (GraphicObject) values[i];
 
 	action.processObject(object);
       }
@@ -236,18 +236,20 @@ public class ErmesSelection implements Transferable
 
   public void moveAllBy( int dx, int dy)
   {
-    ErmesObject object;
+    GraphicObject object;
 
     Object[] values = objects.getObjectArray();
     int size = objects.size();
 
     for (int i = 0; i < size; i++)
       {
-	object = (ErmesObject) values[i];
+	object = (GraphicObject) values[i];
 
 	object.redraw();
+	object.redrawConnections();
 	object.moveBy(dx, dy);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -257,17 +259,19 @@ public class ErmesSelection implements Transferable
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject) e.nextElement();
+	GraphicObject object = (GraphicObject) e.nextElement();
 	if (object.getWidth() > max) 
 	  max = object.getWidth();
       }
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements();) 
       {
-	ErmesObject object = (ErmesObject) e.nextElement();
+	GraphicObject object = (GraphicObject) e.nextElement();
 	object.redraw();
+	object.redrawConnections();
 	object.setWidth(max);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -277,7 +281,7 @@ public class ErmesSelection implements Transferable
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject) e.nextElement();
+	GraphicObject object = (GraphicObject) e.nextElement();
 
 	if (object.getHeight() > max)
 	  max = object.getHeight();
@@ -285,10 +289,12 @@ public class ErmesSelection implements Transferable
 
     for ( Enumeration e = objects.elements(); e.hasMoreElements(); ) 
       {
-	ErmesObject object = (ErmesObject) e.nextElement();
+	GraphicObject object = (GraphicObject) e.nextElement();
 	object.redraw();
+	object.redrawConnections();
 	object.setHeight(max);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -298,11 +304,13 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	object.redraw();
+	object.redrawConnections();
 	object.moveBy( 0, value - object.getY());
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -312,11 +320,13 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	object.redraw();
+	object.redrawConnections();
 	object.moveBy( 0, value - (object.getY()+object.getHeight()));
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -326,11 +336,13 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	object.redraw();
+	object.redrawConnections();
 	object.moveBy( value - object.getX(), 0);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -340,11 +352,13 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	object.redraw();
+	object.redrawConnections();
 	object.moveBy( value - (object.getX() + object.getWidth()), 0);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -359,11 +373,13 @@ public class ErmesSelection implements Transferable
 
     for ( int i = 0; i < size; i++) 
       {
-	ErmesObject object = (ErmesObject) values[i];
+	GraphicObject object = (GraphicObject) values[i];
 
 	object.redraw();
+	object.redrawConnections();
 	object.setFontName( theFontName);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
@@ -376,21 +392,23 @@ public class ErmesSelection implements Transferable
 
     for ( int i = 0; i < size; i++)
       {
-	ErmesObject object = (ErmesObject) values[i];
+	GraphicObject object = (GraphicObject) values[i];
 
 	object.redraw();
+	object.redrawConnections();
 	object.setFontSize(fontSize);
 	object.redraw();
+	object.redrawConnections();
       }
   }
 
   public boolean openHelpPatches()
   {
-    ErmesObject object;
+    GraphicObject object;
       
     for (Enumeration en = objects.elements(); en.hasMoreElements(); )
       {
-	object = (ErmesObject) en.nextElement();
+	object = (GraphicObject) en.nextElement();
 	
 	if (! FtsHelpPatchTable.openHelpPatch( object.getFtsObject()))
 	  return false;
@@ -408,7 +426,7 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	if (min >= object.getY())
 	  min = object.getY();
@@ -423,7 +441,7 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	if (min >= object.getX())
 	  min = object.getX();
@@ -438,7 +456,7 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject object = (ErmesObject)e.nextElement();
+	GraphicObject object = (GraphicObject)e.nextElement();
 
 	if (max < object.getY() + object.getHeight()) 
 	  max = object.getY() + object.getHeight();
@@ -453,7 +471,7 @@ public class ErmesSelection implements Transferable
 
     for( Enumeration e = objects.elements(); e.hasMoreElements(); )
       {
-	ErmesObject	object = (ErmesObject)e.nextElement();
+	GraphicObject	object = (GraphicObject)e.nextElement();
 	if (max < object.getX() + object.getWidth()) 
 	  max = object.getX() + object.getWidth();
       }
@@ -470,10 +488,10 @@ public class ErmesSelection implements Transferable
   {
     if (hasObjects())
       {
-	((ErmesObject) objects.elementAt(0)).getBounds(bounds);
+	((GraphicObject) objects.elementAt(0)).getBounds(bounds);
 
 	for( int i = 1; i < objects.size(); i++)
-	  ((ErmesObject) objects.elementAt(i)).rectangleUnion(bounds);
+	  ((GraphicObject) objects.elementAt(i)).rectangleUnion(bounds);
 
 	return bounds;
       }

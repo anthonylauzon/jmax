@@ -102,6 +102,7 @@ fts_symbol_t fts_s_state;
 fts_symbol_t fts_s_abstraction;
 fts_symbol_t fts_s_template;
 fts_symbol_t fts_s_patcher_type;
+fts_symbol_t fts_s_filename;
 
 /* Symbols related to builtin classes */
 
@@ -228,6 +229,7 @@ fts_predefine_symbols(void)
   fts_s_abstraction = fts_new_symbol("abstraction");
   fts_s_template   = fts_new_symbol("template");
   fts_s_patcher_type = fts_new_symbol("type");
+  fts_s_filename   = fts_new_symbol("filename");
 
   /* Symbols related to builtin classes */
 

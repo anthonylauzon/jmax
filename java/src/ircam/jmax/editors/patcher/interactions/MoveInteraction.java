@@ -13,7 +13,7 @@ import ircam.jmax.editors.patcher.objects.*;
 
 class MoveInteraction extends Interaction
 {
-  ErmesObject object;
+  GraphicObject object;
 
   void configureInputFilter(InteractionEngine filter)
   {
@@ -25,9 +25,10 @@ class MoveInteraction extends Interaction
   {
     if (Squeack.isDown(squeack) && Squeack.onObject(squeack))
       {
-	object = (ErmesObject) area.getTarget();
+	object = (GraphicObject) area.getTarget();
 	editor.getDisplayList().objectToFront(object);
 	object.redraw();
+	object.redrawConnections();
 
 	if (! object.isSelected())
 	  {

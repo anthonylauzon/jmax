@@ -15,6 +15,7 @@ package ircam.jmax.fts;
 
 import java.util.*;
 import java.io.*;
+import java.awt.*;
 
 import ircam.jmax.*;
 import ircam.jmax.utils.*;
@@ -779,6 +780,147 @@ public class FtsServer  implements Runnable
       }
   }
 
+  /** Start a remote call */
+
+  final void remoteCallStart(FtsRemoteData data, int key)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendCmd(FtsClientProtocol.remote_call);
+	stream.sendRemoteData(data);
+	stream.sendInt(key);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(int arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendInt(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(Integer arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendInt(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(float arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendFloat(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(Float arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendFloat(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(FtsObject arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendObject(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(String arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendString(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+  final void remoteCallAddArg(FtsRemoteData arg)
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendRemoteData(arg);
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+
+  final void remoteCallEnd()
+  {
+    if (! connected)
+      return;
+
+    try
+      {
+	stream.sendEom();
+      }
+    catch (java.io.IOException e)
+      {
+	System.err.println("IOException in FtsServer:remoteCallStart()");
+      }
+  }
+
+
   /** Send a single argument "remote call" message to FTS. */
 
   final void remoteCall( FtsRemoteData data, int key, int arg)
@@ -1293,15 +1435,18 @@ public class FtsServer  implements Runnable
 	break;
 	
       case FtsClientProtocol.fts_update_group_start_cmd:
-	if (updateGroupListeners != null)
-	  for (int i = 0; i < updateGroupListeners.size(); i++)
-	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
+	// if (updateGroupListeners != null)
+	//for (int i = 0; i < updateGroupListeners.size(); i++)
+	// ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupStart();
 	break;
 
       case FtsClientProtocol.fts_update_group_end_cmd:
-	if (updateGroupListeners != null)
-	  for (int i = 0; i < updateGroupListeners.size(); i++)
-	    ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
+	// if (updateGroupListeners != null)
+	// for (int i = 0; i < updateGroupListeners.size(); i++)
+	// ((FtsUpdateGroupListener) updateGroupListeners.elementAt(i)).updateGroupEnd();
+
+	if (Fts.getSyncToolkitOnUpdates())
+	  Toolkit.getDefaultToolkit().sync();
 	break;
 
 	// Messages add to support creation on demand of FtsObject 

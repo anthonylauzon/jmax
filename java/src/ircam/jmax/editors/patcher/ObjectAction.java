@@ -8,5 +8,5 @@ import ircam.jmax.editors.patcher.objects.*;
 
 public interface ObjectAction
 {
-  public void processObject(ErmesObject object);
+  public void processObject(GraphicObject object);
 }

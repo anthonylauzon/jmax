@@ -12,9 +12,9 @@ import ircam.jmax.editors.patcher.*;
 // The graphic inlet contained in subpatchers
 //
 
-public class ErmesObjIn extends ErmesObjInOut {
+public class Inlet extends InOutlet {
 
-  public ErmesObjIn(ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  public Inlet(ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject, ((FtsInletObject) theFtsObject).getPosition());
   }

@@ -15,13 +15,13 @@ import ircam.jmax.editors.patcher.*;
 // The "comment" graphic object
 //
 
-public class ErmesObjComment extends ErmesObjEditableObject
+public class Comment extends Editable
 {
   //--------------------------------------------------------
   // CONSTRUCTOR
   //--------------------------------------------------------
 
-  ErmesObjComment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
+  Comment( ErmesSketchPad theSketchPad, FtsObject theFtsObject) 
   {
     super(theSketchPad, theFtsObject);
   }

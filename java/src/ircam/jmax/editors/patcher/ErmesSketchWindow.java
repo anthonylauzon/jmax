@@ -267,6 +267,7 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 	ftsClipboard.copy( Fts.getSelection());
 	lastCopyCount = ftsClipboard.getCopyCount();
 	itsSketchPad.resetPaste(0);
+	ErmesSelection.patcherSelection.redraw();
 	ErmesSelection.patcherSelection.deleteAll();
 
 	setCursor( temp);
@@ -386,13 +387,13 @@ public class ErmesSketchWindow extends JFrame implements ComponentListener, Wind
 
     if (ErmesSelection.patcherSelection.isSingleton())
       {
-	ErmesObject obj = (ErmesObject)ErmesSelection.patcherSelection.getSingleton();
+	GraphicObject obj = (GraphicObject)ErmesSelection.patcherSelection.getSingleton();
 
-	if (obj instanceof ErmesObjEditableObject)
+	if (obj instanceof Editable)
 	  {
 	    ErmesSelection.patcherSelection.deselectAll();
 
-	    itsSketchPad.textEditObject((ErmesObjEditableObject)obj);
+	    itsSketchPad.textEditObject((Editable)obj);
 	    itsSketchPad.getEditField().selectAll();
 	  }
       }
