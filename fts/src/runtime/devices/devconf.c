@@ -62,7 +62,9 @@ void fts_dev_configure(void)
 
 #ifdef HAS_PTHREADS
 
+#ifdef SGI
   sfdev_init();
+#endif
 
 #endif
 }

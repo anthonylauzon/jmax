@@ -25,23 +25,27 @@
 
 #include <unistd.h>
 
-#include <sys/resource.h>
-#include <sys/types.h>
-#include <bstring.h>
-#include <sys/time.h>
-
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <errno.h>
-#include <fcntl.h>
 
-#include <sys/bsd_types.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/resource.h>
+#include <sys/time.h> /* ? */
+/* should be: */
+#include <time.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-
 #include <arpa/inet.h>
 #include <netdb.h>
+
+#if 0
+#include <sys/bsd_types.h> /* ? */
+#endif
 
 #ifdef HAS_TTY_DEV
 #include <termios.h> 
@@ -467,7 +471,7 @@ open_socket_server(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   if (p->listener == -1)
     return &fts_dev_open_error;
 
-  bzero((char *)&serv_addr, sizeof(serv_addr));
+  memset((char *)&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   serv_addr.sin_port = htons(port);
@@ -805,7 +809,7 @@ open_socket_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
 
   /* Fill out address of server we want to connect to */
 
-  bzero((char *)&serv_addr, sizeof(serv_addr));
+  memset((char *)&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = inet_addr(address);
   serv_addr.sin_port = htons(port);
@@ -1291,7 +1295,7 @@ open_udp_client(fts_dev_t *dev, int nargs, const fts_atom_t *args)
   if (bind(sock, &my_addr, sizeof(struct sockaddr_in)) == -1)
     return &fts_dev_open_error;
 
-  bzero((char *)&(p->client_addr), sizeof(p->client_addr));
+  memset((char *)&(p->client_addr), 0, sizeof(p->client_addr));
   p->client_addr.sin_family = AF_INET;
   p->client_addr.sin_addr.s_addr = inet_addr(address);
   p->client_addr.sin_port = htons(port);

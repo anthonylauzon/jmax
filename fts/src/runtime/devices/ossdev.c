@@ -633,7 +633,7 @@ static void oss_adc_get( fts_word_t *argv)
   int n, i, nchannels, channel, j;
   audio_desc_t *aud;
 
-  aud = (audio_desc_t *)fts_dev_get_device_data(*((fts_dev_t *)fts_word_get_ptr( argv)));
+  aud = (audio_desc_t *)fts_dev_get_device_data(*((fts_dev_t **)fts_word_get_ptr( argv)));
 
   if (aud->fd < 0)
     return;
