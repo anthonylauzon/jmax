@@ -59,6 +59,50 @@ static fts_symbol_t s_play;
 static fts_symbol_t s_pause;
 
 
+void reader_set_state(readsf_t* self,
+		      fts_audiofile_t* sf, 
+		      dtd_buffer_t* com_buffer, 
+		      const int* const buffer_index,
+		      const int* const is_eof)
+{
+    dtd_thread_t* reader = (dtd_thread_t*)self->thread_worker->thread_function->object;
+    dtd_thread_set_state(reader, sf, com_buffer, buffer_index, is_eof);
+}
+
+static void create_reader_thread(readsf_t* self)
+{
+    fts_thread_worker_t* thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
+    dtd_thread_t* reader = (dtd_thread_t*)fts_object_create(dtd_thread_type, NULL, 0, 0);
+    fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
+    
+    thread_job->object = (fts_object_t*)reader;
+    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
+					      fts_s_read);
+    if (0 == thread_job->method)
+    {
+	fts_log("[readsf~] no such method \n");
+	fts_object_set_error((fts_object_t*)self, "no such method, init failed \n");
+	fts_free(thread_job);
+	return;
+    }
+    
+    thread_job->ac = 0;
+    thread_job->at = NULL;
+    thread_job->symbol = fts_s_read;
+    
+    thread_job->delay_ms = reader->delay_ms;
+    thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
+    thread_worker->thread_function = thread_job;
+    self->thread_worker = thread_worker;
+}
+
+static void delete_reader_thread(readsf_t* self)
+{
+    fts_object_destroy(self->thread_worker->thread_function->object);
+    fts_free(self->thread_worker->thread_function);
+    fts_free(self->thread_worker);
+}
+
 /* static void readsf_eof_alarm(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)*/
 static void readsf_eof_alarm(fts_object_t* o)
 {
@@ -199,35 +243,11 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 	sf = fts_audiofile_open_read(self->filename);
 	if (fts_audiofile_is_valid(sf))
-	{
-	    
-	    /* create the reader thread */
-	    dtd_thread_t* reader = (dtd_thread_t*)fts_object_create(dtd_thread_type, NULL, 0, 0);
-	    fts_thread_function_t* thread_job = fts_malloc(sizeof(fts_thread_function_t));
-	    reader->sf = sf;
-	    reader->com_buffer = self->com_buffer;
-	    reader->buffer_index = &self->buffer_index;
-	    reader->is_eof = &self->is_eof;
-	    thread_job->object = (fts_object_t*)reader;
-	    thread_job->method = fts_class_get_method(fts_object_get_class(thread_job->object),
-						      fts_s_read);
-	    if (0 == thread_job->method)
-	    {
-		fts_log("[readsf~] no such method \n");
-		fts_object_set_error(o, "no such method, init failed \n");
-		fts_free(thread_job);
-		return;		
-	    }
+	{	    
+	    /* set reader thread state */
+	    reader_set_state(self, sf, self->com_buffer, &self->buffer_index, &self->is_eof);
 
-	    thread_job->ac = 0;
-	    thread_job->at = NULL;
-	    thread_job->symbol = fts_s_read;
-	    
-	    thread_job->delay_ms = reader->delay_ms;
-
-	    self->thread_worker = fts_malloc(sizeof(fts_thread_worker_t));
-	    self->thread_worker->thread_function = thread_job;
-	    
+	    /* start reader thread */
 	    fts_thread_manager_create_thread(self->thread_worker);
 	    self->sf = sf;
 	    self->is_open = 1; 
@@ -250,11 +270,7 @@ static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
     if (1 == self->is_open)
     {
 	/* Here we stop the worker_thread */
-	fts_thread_manager_cancel_thread(self->thread_worker);
-	/* Delete memory allocated for the worker */
-	fts_object_destroy(self->thread_worker->thread_function->object);
-	fts_free(self->thread_worker->thread_function);
-	fts_free(self->thread_worker);	
+	fts_thread_manager_cancel_thread(self->thread_worker);	
 	/* we close the soundfile */
 	fts_audiofile_close(self->sf);	
 	/* Clear buffer */
@@ -342,6 +358,10 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   self->is_open = 0;
   self->is_started = 0;
   self->is_eof = 0;
+
+  /* create the reader thread */
+  create_reader_thread(self);
+  
   /* start the fts_thread_manager */
   fts_thread_manager_start();
 
@@ -372,12 +392,15 @@ static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   }
   fts_free(self->com_buffer);
 
+  /* delete the reader thread */
+  delete_reader_thread(self);
+
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 
 static void
-readsf_instantiate(fts_class_t* cl, int ac, const fts_atom_t* at)
+readsf_instantiate(fts_class_t* cl)
 {
   fts_class_init(cl, sizeof(readsf_t), readsf_init, readsf_delete);
   fts_class_message_varargs(cl, fts_s_put, readsf_put);
