@@ -25,23 +25,32 @@
 
 #include <fts/packages/data/data.h>
 
-enum fmat_format_enum {
-  fmat_real = 0, 
-  fmat_rect, 
-  fmat_polar
+#define FMAT_FORMATS_MAX 256
+
+enum fmat_format_id_enum {
+  fmat_format_id_vec, 
+  fmat_format_id_rect, 
+  fmat_format_id_polar,
+  fmat_format_id_real = FMAT_FORMATS_MAX
 };
 
 typedef struct
 {
   fts_symbol_t name;
-  int index;
+  enum fmat_format_id_enum index;
   int n_columns;
   fts_symbol_t columns[16];
 } fmat_format_t;
 
-DATA_API fmat_format_t *fmat_format_real;
+DATA_API fmat_format_t *fmat_format_vec;
 DATA_API fmat_format_t *fmat_format_rect;
 DATA_API fmat_format_t *fmat_format_polar;
+DATA_API fmat_format_t *fmat_format_real;
+
+#define fmat_format_get_name(f) ((f)->name)
+#define fmat_format_get_id(f) ((f)->index)
+#define fmat_format_get_n(f) ((f)->n_columns)
+#define fmat_format_get_column_name(f, i) ((f)->column[i])
 
 typedef struct
 {
@@ -58,52 +67,54 @@ typedef struct
 } fmat_t;
 
 /**
- * @ingroup fmat
+* @ingroup fmat
  */
 DATA_API fts_symbol_t fmat_symbol;
 
 /**
- * @ingroup fmat
+* @ingroup fmat
  */
 DATA_API fts_class_t *fmat_type;
 
 
 
 /** Get number of rows of matrix x.
- *
- * @fn int fmat_get_m(fmat_t *x)
- * @ingroup fmat
- */
+*
+* @fn int fmat_get_m(fmat_t *x)
+* @ingroup fmat
+*/
 #define fmat_get_m(x) ((x)->m)
 
 /** Get number of columns of matrix x.
- *
- * @fn int fmat_get_n(fmat_t *x)
- * @ingroup fmat
- */
+*
+* @fn int fmat_get_n(fmat_t *x)
+* @ingroup fmat
+*/
 #define fmat_get_n(x) ((x)->n)
 
+#define fmat_get_format(x) ((x)->format)
+#define fmat_set_format(x, f) ((x)->format = (f))
 
 /**
- * @ingroup fmat
+* @ingroup fmat
  */
 DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 
 /**
- * @fn float *fmat_get_ptr(fmat_t *x)
+* @fn float *fmat_get_ptr(fmat_t *x)
  * @ingroup fmat
  */
 #define fmat_get_ptr(m) ((m)->values)
 
 
 /**
- * @fn float *fmat_get_element(fmat_t *x, int i, int j)
+* @fn float *fmat_get_element(fmat_t *x, int i, int j)
  * @ingroup fmat
  */
 #define fmat_get_element(m, i, j) ((m)->values[(i) * (m)->n + (j)])
 
 /**
- * @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
+* @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
  * @ingroup fmat
  */
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
@@ -115,7 +126,7 @@ DATA_API void fmat_set_size(fmat_t *fmat, int m, int n);
 #define fmat_get_onset(fm) ((fm)->onset)
 
 /**
- * @ingroup fmat
+* @ingroup fmat
  */
 DATA_API void fmat_set_const(fmat_t *mat, float c);
 
@@ -125,7 +136,7 @@ DATA_API void fmat_set_const(fmat_t *mat, float c);
 DATA_API void fmat_copy(fmat_t *orig, fmat_t *copy);
 
 /**
- * @ingroup fmat
+* @ingroup fmat
  */
 DATA_API void fmat_set_with_onset_from_atoms(fmat_t *mat, int offset, int ac, const fts_atom_t *at);
 

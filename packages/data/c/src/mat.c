@@ -166,8 +166,6 @@ static void
 mat_grow(mat_t *mat, int size)
 {
   int alloc = mat->alloc;
-  fts_atom_t *p = mat->data;
-  int i;
 
   while(size > alloc)
     alloc += MAT_BLOCK_SIZE;
@@ -452,7 +450,6 @@ mat_append_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   mat_t *self = (mat_t *) o;
   int m = mat_get_m(self);
   int n = mat_get_n(self);
-  int i = fts_get_number_int(at);
 
   /* clip to row */
   if (ac > n)
@@ -482,10 +479,8 @@ static void
 mat_change_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   mat_t *self = (mat_t *) o;
-  int old_size = mat_get_m(self) * mat_get_n(self);
   int m = 0;
   int n = 0;
-  int i;
 
   if (ac == 1  &&  fts_is_number(at))
   {
