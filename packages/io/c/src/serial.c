@@ -62,7 +62,9 @@ static struct baud_speed {
   { 38400, B38400},
   { 57600, B57600},
   { 115200, B115200},
+#ifdef B230400
   { 230400, B230400}
+#endif
 };
   
 static speed_t baud_to_speed( int baud)

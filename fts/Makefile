@@ -34,11 +34,8 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: all
 
-install-arch:
+install:
 	( cd bin ; $(MAKE) $@ )
-.PHONY: install-arch
+.PHONY: install
 
-install-includes:
-	( cd src ; $(MAKE) $@ )
-.PHONY: install-includes
 

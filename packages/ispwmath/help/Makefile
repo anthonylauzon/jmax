@@ -23,9 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispwmath/help
 	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispwmath/help ; done
-.PHONY: install-noarch
+.PHONY: install
 
 

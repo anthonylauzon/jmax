@@ -31,13 +31,10 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/system
 	$(INSTALL_DATA) system.jpk $(lib_install_dir)/packages/system
 	( cd help; $(MAKE) $@)
-.PHONY: install-noarch
-
-install-arch:
 	( cd c ; $(MAKE) $@)
-.PHONY: install-arch
+.PHONY: install
 

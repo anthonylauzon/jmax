@@ -82,7 +82,7 @@ The following platforms are supported:
 <h3>Bugs</h3>
 
 <p>
-The following bugs were fixed:
+The following bug was partially fixed:
 <ul>
 <li> incorrect handling of "local" host name for connexion, which resulted
 in rsh problems, hostname setting and co...
@@ -125,7 +125,7 @@ each side of the connection.
 <h4>ALSA devices</h4>
 
 <p>
-jMax now uses the 0.5.x version of ALSA (build was done with a 0.5.6).
+jMax now uses the 0.5.x version of ALSA.
 
 <p>
 A ALSA raw MIDI device has been added. It is named alsaMidi and requires
@@ -143,21 +143,26 @@ There is a new graphical object in the toolbar (called "fork"), which changes it
 when ones drags it on the right border. It repeats it's input from all outletss in right to left order
 (replaces "trigger t t t t t ..." and "bangbang").
 
+<h3>Notes</h3>
+
+<h4>Building rpms or SGI packages</h4>
+
+<p>
+Building rpms and SGI packages is now moved to scripts in ./utils/rpm/buildrpm
+and ./utils/sgi/buildpkg. These scripts are quite self explanatory.
+
+
+<h4>New objects</h4>
+
 <p>
 A "for" object is new in the control package.
 
+<p>
 An object "vec" - a vector of generic values (atoms) - completes the first set in the data package.
 
 <p>
 In a new package called sequence lives an undocumented early beta version of a sequence object...
 
-<h3>Notes</h3>
-
-<h4>Building rpms</h4>
-
-<p>
-Building rpms (and SGI packages) is now moved to scripts located in ./utils,
-named buildrpm and buildsgipkg. These scripts are quite self explanatory.
 
 <h4>syspackages</h4>
 

@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-arch:
+install:
 	$(INSTALL_PROGRAM) fts.on0 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt
 	$(INSTALL_PROGRAM) fts.on1 $(lib_install_dir)/fts/bin/r10k-irix6.5/opt
-.PHONY: install-arch
+.PHONY: install

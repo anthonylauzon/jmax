@@ -23,8 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-noarch:
-	$(INSTALL_DIR) $(bin_install_dir)
+install:
 	$(INSTALL_PROGRAM) jmax $(bin_install_dir)
-.PHONY: install-noarch
+.PHONY: install
 

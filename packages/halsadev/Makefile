@@ -31,14 +31,11 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/halsadev
 	$(INSTALL_DATA) halsadev.jpk $(lib_install_dir)/packages/halsadev
-.PHONY: install-noarch
-
-install-arch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/halsadev/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libhalsadev.so $(lib_install_dir)/packages/halsadev/lib/$(ARCH)/opt )
-.PHONY: install-arch
+.PHONY: install
 
 

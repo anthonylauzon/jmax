@@ -57,10 +57,6 @@ install-exec:
 	( cd help; $(MAKE) $@)
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
-.PHONY: install-noarch
-
-install-arch:
-	( cd c; $(MAKE) $@)
-.PHONY: install-arch
+.PHONY: install
 
 

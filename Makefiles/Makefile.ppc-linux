@@ -25,7 +25,5 @@
 
 include $(DISTDIR)/Makefiles/Makefile.linux
 
-INSTALL_ARCHS=ppc-linux
-
 ARCH_PACKAGES=ossdev pdtddev
 

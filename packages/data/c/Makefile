@@ -31,8 +31,7 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/data/c
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/data/c/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libdata.so $(lib_install_dir)/packages/data/c/lib/$(ARCH)/opt )
-.PHONY: install-arch
+.PHONY: install

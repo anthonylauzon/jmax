@@ -31,7 +31,7 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw
 	$(INSTALL_DATA) ispw.jpk $(lib_install_dir)/packages/ispw
 	$(INSTALL_DATA) ispw.scm $(lib_install_dir)/packages/ispw
@@ -39,9 +39,6 @@ install-noarch:
 	( cd help; $(MAKE) $@)
 	( cd sounds; $(MAKE) $@)
 	( cd templates; $(MAKE) $@)
-.PHONY: install-noarch
-
-install-arch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; \
 		$(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
@@ -53,4 +50,4 @@ install-arch:
 		$(INSTALL_LIB) libsampling.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
 		$(INSTALL_LIB) libsignal.so $(lib_install_dir)/packages/ispw/lib/$(ARCH)/opt ; \
 	)
-.PHONY: install-arch
+.PHONY: install

@@ -41,9 +41,9 @@ clean:
 	(cd tiles; $(MAKE) $@)
 .PHONY: all
 
-install-includes:
+install:
 	$(INSTALL_DIR) $(include_install_dir)/fts
 	for f in *.h ; do $(INSTALL_DATA) $$f $(include_install_dir)/fts ; done
 	for d in lang runtime sys ; do (cd $$d ; $(MAKE) $@ ) ; done
-.PHONY: install-includes
+.PHONY: install
 

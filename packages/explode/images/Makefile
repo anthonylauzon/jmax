@@ -23,9 +23,9 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/explode/images
 	for f in *.gif ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/explode/images ; done
-.PHONY: install-noarch
+.PHONY: install
 
 

@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # This script builds a SGI package.
-# It requires that the sources are located in ../..
 #
 # The optional argument is the directory where the package is build
 #
@@ -12,18 +11,27 @@ then
     BUILD_DIR=$1
 fi
 
+# The root directory of sources
+ROOT_DIR=../..
+
+# Guess architecture
+case `uname -m` in
+IP27) ARCH=r10k-irix6.5 ;;
+IP32) ARCH=r5k-irix6.5 ;;
+esac
+
 set -x
 
 /bin/rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR
 
-VERSION=`cat ../VERSION`
-DISTFILE=../../jmax-$VERSION-src.tar.gz
+VERSION=`cat $ROOT_DIR/VERSION`
+DISTFILE=$ROOT_DIR/../jmax-$VERSION-src.tar.gz
 SRCROOTDIR=jmax-$VERSION
 
 gzip -cd $DISTFILE | (cd $BUILD_DIR ; tar xvf -)
 
-( cd $BUILD_DIR/jmax-$VERSION ; gmake ARCH=r10k-irix6.5 all)
+( cd $BUILD_DIR/jmax-$VERSION ; gmake ARCH=$ARCH all)
 
 /bin/rm -rf /tmp/jmax.idb /tmp/jmax.idb.sorted /tmp/jmax-sgi.spec
 
@@ -34,14 +42,14 @@ cp jmax-sgi.spec /tmp
 
     RAWIDB=/tmp/jmax.idb
     export RAWIDB
-    gmake ARCH=r10k-irix6.5 INSTALL="install -idb ALL" install
+    gmake ARCH=$ARCH INSTALL="install -idb ALL" install
 
     sort +4u -6 < /tmp/jmax.idb | awk '{ printf( "%s %s %s %s %c%s%c %c%s%c %s\n", $1, $2, $3, $4, 39, $5, 39, 39, $6, 39, $7); }' > /tmp/jmax.idb.sorted
 
     /usr/sbin/gendist -root .. -sbase .. -dist .. -idb /tmp/jmax.idb.sorted -spec /tmp/jmax-sgi.spec
 )
 
-( cd $BUILD_DIR ; tar cvf - jmax jmax.idb jmax.sw ) > ../../jmax-$VERSION.r10k.tardist 
+( cd $BUILD_DIR ; tar cvf - jmax jmax.idb jmax.sw ) > $ROOT_DIR/../jmax-$VERSION.r10k.tardist 
 /bin/rm -rf $BUILD_DIR
 
 

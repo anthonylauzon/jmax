@@ -23,8 +23,8 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/ispw/abs/compatibility
 	for f in *.abs *.tcl ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/ispw/abs/compatibility ; done
-.PHONY: install-noarch
+.PHONY: install
 

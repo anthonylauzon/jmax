@@ -23,20 +23,14 @@
 # Author: Francois Dechelle.
 #
 
-VERSION=$(shell cat ../VERSION)
+ROOTDIR=../..
 
 spec-files: jmax.spec jmax-sgi.spec
 
-jmax.spec: ../VERSION
-	awk -v version=$(VERSION) '\
+jmax.spec: $(ROOTDIR)/VERSION
+	awk -v version=`cat $(ROOTDIR)/VERSION` '\
 $$1 == "Version:" { printf( "Version: %s\n", version ); } \
 $$1 != "Version:" { print} \
 ' jmax.spec > jmax.spec.out
 	mv jmax.spec.out jmax.spec
 
-jmax-sgi.spec: ../VERSION
-	awk -v version=$(VERSION) '\
-$$1 == "version" { printf( "        version \"%s\"\n", version ); } \
-$$1 != "version" { print} \
-' jmax-sgi.spec > jmax-sgi.spec.out
-	mv jmax-sgi.spec.out jmax-sgi.spec

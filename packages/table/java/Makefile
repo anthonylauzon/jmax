@@ -32,7 +32,7 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/table/java/classes
 	( cd classes ; $(INSTALL_DATA) table.jar $(lib_install_dir)/packages/table/java/classes )
-.PHONY: install-noarch
+.PHONY: install

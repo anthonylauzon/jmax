@@ -31,10 +31,7 @@ clean:
 	(cd c; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
-.PHONY: install-noarch
-
-install-arch:
-.PHONY: install-arch
+install:
+.PHONY: install
 
 

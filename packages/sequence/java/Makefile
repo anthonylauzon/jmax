@@ -32,11 +32,10 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence/java/classes
 	( cd classes ; $(INSTALL_DATA) sequence.jar $(lib_install_dir)/packages/sequence/java/classes )
-.PHONY: install-noarch
+.PHONY: install
 
 
 

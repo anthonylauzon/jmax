@@ -31,10 +31,9 @@ clean:
 	(cd src; $(MAKE) clean)
 .PHONY: clean
 
-install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages/control/c
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/control/c/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libcontrol.so $(lib_install_dir)/packages/control/c/lib/$(ARCH)/opt )
-.PHONY: install-arch
+.PHONY: install
 
 

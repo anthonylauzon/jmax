@@ -32,9 +32,9 @@ scm:
 	java MethodsToScheme KawaMethodPrinter scheme_classes scheme_functions > kawa_interface.scm;
 	java MethodsToScheme SilkMethodPrinter scheme_classes scheme_functions > intrinsics.scm;
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/scm
 	for f in *.scm ; do $(INSTALL_DATA) $$f $(lib_install_dir)/scm ; done
 	(cd config ; $(MAKE) $@ )
-.PHONY: install-noarch
+.PHONY: install
 

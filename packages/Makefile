@@ -61,18 +61,11 @@ clean_java:
 	for i in $(MIXED_PACKAGES) ; do ( if [ -d $$i ] ; then cd $$i; $(MAKE) clean_java ; fi ) ; done
 .PHONY: clean_java
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages
 	for i in $(C_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
 	for i in $(JAVA_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
 	for i in $(MIXED_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
-.PHONY: install-noarch
-
-install-arch:
-	$(INSTALL_DIR) $(lib_install_dir)/packages
-	for i in $(C_PACKAGES) ; do ( cd $$i; $(MAKE) $@) ; done
-	for i in $(JAVA_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
-	for i in $(MIXED_PACKAGES) ; do ( cd $$i; $(MAKE) $@ ) ; done
-.PHONY: install-arch
+.PHONY: install
 
 

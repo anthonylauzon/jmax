@@ -31,12 +31,9 @@ clean:
 	(cd src; $(MAKE) $@)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/hammerfalldev
 	$(INSTALL_DATA) hammerfalldev.jpk $(lib_install_dir)/packages/hammerfalldev
-.PHONY: install-noarch
-
-install-arch:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/hammerfalldev/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libhammerfalldev.so $(lib_install_dir)/packages/hammerfall/lib/$(ARCH)/opt )
-.PHONY: install-arch
+.PHONY: install

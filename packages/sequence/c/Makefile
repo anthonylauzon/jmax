@@ -31,9 +31,9 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install-arch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sequence/c/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libsequence.so $(lib_install_dir)/packages/sequence/c/lib/$(ARCH)/opt )
-.PHONY: install-arch
+.PHONY: install
 
 

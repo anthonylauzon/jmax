@@ -32,8 +32,8 @@ clean:
 	(cd src ; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/qlist/java/classes
 	( cd classes ; $(INSTALL_DATA) qlist.jar $(lib_install_dir)/packages/qlist/java/classes )
-.PHONY: install-noarch
+.PHONY: install
 

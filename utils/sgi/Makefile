@@ -20,19 +20,16 @@
 # 
 # Based on Max/ISPW by Miller Puckette.
 #
-# Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
+# Author: Francois Dechelle.
 #
 
-INSTALL=install
-INSTALL_DATA=$(INSTALL) -m 644
-INSTALL_PROGRAM=$(INSTALL) -m 755
-INSTALL_SETUID=$(INSTALL) -m 4755
-INSTALL_LIB=$(INSTALL) -m 755
-INSTALL_DIR=$(INSTALL) -d -m 755
+ROOTDIR=../..
 
-prefix=/usr
-doc_install_dir=$(prefix)/webdocs/jMax
-lib_install_dir=$(prefix)/lib/jmax
-include_install_dir=$(prefix)/include
-bin_install_dir=$(prefix)/bin
+spec-files: jmax.spec
 
+jmax.spec: $(ROOTDIR)/VERSION
+	awk -v version=`cat $(ROOTDIR)/VERSION` '\
+$$1 == "version" { printf( "        version \"%s\"\n", version ); } \
+$$1 != "version" { print} \
+' jmax.spec > jmax.spec.out
+	mv jmax.spec.out jmax.spec

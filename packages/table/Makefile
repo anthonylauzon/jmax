@@ -31,12 +31,10 @@ clean:
 	(cd java ; $(MAKE) clean)
 .PHONY: clean
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/table
 	$(INSTALL_DATA) table.jpk $(lib_install_dir)/packages/table
 	( cd images; $(MAKE) $@)
 	( cd java; $(MAKE) $@)
-.PHONY: install-noarch
+.PHONY: install
 
-install-arch:
-.PHONY: install-arch

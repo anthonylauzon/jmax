@@ -23,7 +23,7 @@
 # Authors: Maurizio De Cecco, Francois Dechelle, Enzo Maggi, Norbert Schnell.
 #
 
-install-noarch:
+install:
 	$(INSTALL_DIR) $(lib_install_dir)/java/lib
 	if test -d swing ; then \
 		$(INSTALL_DIR) $(lib_install_dir)/java/lib/swing ; \
@@ -31,5 +31,5 @@ install-noarch:
 	fi
 	$(INSTALL_DIR) $(lib_install_dir)/java/lib/jacl
 	( cd jacl ; for f in jacl.jar README license.terms ; do $(INSTALL_DATA) $$f $(lib_install_dir)/java/lib/jacl ; done )
-.PHONY: install-noarch
+.PHONY: install
 

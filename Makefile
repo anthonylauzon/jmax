@@ -26,7 +26,7 @@
 DISTDIR=.
 
 ifdef ARCH
-include Makefiles/Makefile.$(ARCH)
+include $(DISTDIR)/Makefiles/Makefile.$(ARCH)
 endif
 
 all:
@@ -116,15 +116,6 @@ r10k-irix6.5:
 .PHONY: r10k-irix6.5
 
 #
-# sgi
-# target for SGI Irix 6.5 processors R5000 and R10000
-#
-sgi:
-	$(MAKE) r5k-irix6.5
-	$(MAKE) r10k-irix6.5
-.PHONY: sgi
-
-#
 # TAGS
 # do the TAGS file
 #
@@ -136,7 +127,7 @@ TAGS:
 # cvs-tag
 #
 cvs-tag: spec-files
-	if cvs -n update 2>&1 | egrep '^[UARMC] ' ; then \
+	if cvs -n update 2>&1 | egrep '^[ACMPRU] ' ; then \
 		echo "Not sync with cvs (do an update or commit)" ; \
 		exit 1 ; \
 	fi
@@ -149,7 +140,8 @@ cvs-tag: spec-files
 # update the spec files for version number
 #
 spec-files:
-	(cd utils ; $(MAKE) $@)
+	(cd utils/rpm ; $(MAKE) $@)
+	(cd utils/sgi ; $(MAKE) $@)
 .PHONY: spec-files
 
 #
@@ -179,40 +171,35 @@ dist:
 install: install-doc install-bin install-includes
 .PHONY: install
 
+MAKE_INSTALL=$(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)"
+
 install-doc:
 	$(INSTALL_DIR) $(doc_install_dir)
-	$(INSTALL_DATA) LICENCE.fr $(doc_install_dir)
-	$(INSTALL_DATA) LICENSE $(doc_install_dir)
-	$(INSTALL_DATA) README $(doc_install_dir)
-	$(INSTALL_DATA) VERSION $(doc_install_dir)
-	( cd doc ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" doc_install_dir=$(doc_install_dir) install )
+	$(INSTALL_DATA) LICENCE.fr LICENSE README VERSION $(doc_install_dir)
+	( cd doc ; $(MAKE_INSTALL) doc_install_dir=$(doc_install_dir) install )
 .PHONY: install-doc
 
 install-bin:
-	( cd bin ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DIR="$(INSTALL_DIR)" bin_install_dir=$(bin_install_dir) install-noarch )
+	$(INSTALL_DIR) $(bin_install_dir)
+	( cd bin ; $(MAKE_INSTALL) bin_install_dir=$(bin_install_dir) install )
 	$(INSTALL_DIR) $(lib_install_dir)
-	( cd config ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	( cd images ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	( cd java ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	( cd scm ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	( cd tcl ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	for a in $(INSTALL_ARCHS) ; do \
-		( cd fts ; $(MAKE) INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_SETUID="$(INSTALL_SETUID)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
-	done
-	( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) install-noarch )
-	for a in $(INSTALL_ARCHS) ; do \
-		( cd packages ; $(MAKE) INSTALL_LIB="$(INSTALL_LIB)" INSTALL_PROGRAM="$(INSTALL_PROGRAM)" INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" lib_install_dir=$(lib_install_dir) ARCH=$$a install-arch ) ; \
+	( cd config ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd images ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd java ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd scm ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd tcl ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
+	( cd fts ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install ) ; \
+	( cd packages ; $(MAKE_INSTALL) lib_install_dir=$(lib_install_dir) install )
 	done
 .PHONY: install-bin
 
 install-includes:
-	( cd fts ; $(MAKE) INSTALL_DATA="$(INSTALL_DATA)" INSTALL_DIR="$(INSTALL_DIR)" include_install_dir=$(include_install_dir) $@ )
+	( cd fts/src ; $(MAKE_INSTALL) include_install_dir=$(include_install_dir) install )
 .PHONY: install-includes
 
 #
 # new-patch, new-minor, new-major
-# version number manipulation
-# 'make new-patch' is the most frequent
+# version number manipulation ('make new-patch' is the most frequent...)
 #
 new-patch:
 	awk -F. '{printf( "%d.%d.%d\n", $1, $2, $3+1);}' VERSION
