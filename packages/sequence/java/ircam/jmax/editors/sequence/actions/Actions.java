@@ -31,6 +31,8 @@ import javax.swing.*;
 import ircam.jmax.toolkit.*;
 import ircam.jmax.toolkit.actions.*;
 
+import ircam.jmax.editors.sequence.*;
+
 /** This class define a set of static variables 
  *  containing all the standard actions used for the
  *  sequence editor; please notes that actions objects are
@@ -41,18 +43,45 @@ public class Actions
 {
   public static EditorAction exportAction    = new ExportAction();
   public static EditorAction importAction    = new ImportAction();
-
-  public static EditorAction cutAction       = new CutAction();
-  public static EditorAction copyAction      = new CopyAction();
-  public static EditorAction pasteAction     = new PasteAction();
-  public static EditorAction duplicateAction = new DuplicateAction();
-
-  public static EditorAction undoAction      = new UndoAction();
-  public static EditorAction redoAction      = new RedoAction();
+  public static EditorAction cutAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((SequenceEditor)container.getEditor()).cut();
+      }
+    };
+  public static EditorAction copyAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((SequenceEditor)container.getEditor()).copy();
+      }
+    };
+  public static EditorAction pasteAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((SequenceEditor)container.getEditor()).paste();
+      }
+    };
+  public static EditorAction duplicateAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((SequenceEditor)container.getEditor()).duplicate();
+      }
+    };
+  public static EditorAction undoAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((SequenceEditor)container.getEditor()).undo();
+      }
+    };
+  public static EditorAction redoAction = new EditorAction(){
+      public void doAction(EditorContainer container)
+      {
+	((SequenceEditor)container.getEditor()).redo();
+      }
+    };
 
   public static EditorAction removeTrackAction  = new RemoveTrackAction();
 
-    //public static EditorAction settingsAction  = new SettingsAction();
   //******** Merge reintroduction *******************//
   public static EditorAction mergeAction     = new MergeAction();
 
