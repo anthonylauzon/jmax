@@ -11,7 +11,7 @@ public class MdaModule
 
     // Install the local mda entities
 
-    MaxDataHandler.installDataHandler( new MaxTclFileDataHandler());
+    Mda.installDocumentHandler( new MaxTclFileDocumentHandler());
 
     // Install the tcl commands for Mda
 

@@ -1,3 +1,5 @@
+all_c: all
+clean_c: clean
 
 all:
 	(cd sys; $(MAKE) all)

@@ -19,7 +19,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/packages/table/java/classes ; jar -cvf table.jar ircam	)
+	(cd $(ROOTDIR)/packages/table/java/classes ; /bin/rm -f table.jar ; jar -cvf table.jar ircam	)
 .PHONY: jar
 
 

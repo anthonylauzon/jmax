@@ -85,6 +85,7 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
       itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, itsArgs);
     }
     catch (FtsException e){
+      System.err.println("Cannot create object: " + itsArgs);
       // Enzo !!! Aiuto :-> (MDC)
     }
     if (itsFtsObject instanceof FtsContainerObject)
@@ -144,20 +145,26 @@ public class ErmesObjExternal extends ErmesObjEditableObject {
 	   ErmesSketchPad.RequestOffScreen(itsSketchPad);
 	 }
 	 else{	//this 'else' shouldn't be reached...
-	   itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	   itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsDocument, (FtsContainerObject) itsFtsObject, GetSketchWindow());
 	   itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
 	 }
        }
-       else if(itsFtsObject instanceof FtsDataObject){
-	 //System.out.println("eccolo!");
+       else if(itsFtsObject instanceof FtsObjectWithData){
 	 try{
-	   FtsLocation aFtsLocation = new FtsLocation(itsFtsObject);
-	   if (aFtsLocation == null) 
-	     System.err.println("ftslocation null for "+itsFtsObject);
-	   MaxData aData = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(aFtsLocation));
-	   if (aData == null) System.err.println("null MaxData ");
-	   aData.edit();
-	   } catch (MaxDataException e){System.err.println("Max Data Exception: " + e);}
+	   // New !!! Actually the same thing can be done for 
+	   // patchers now !!!
+
+	   MaxData data;
+
+	   data = ((FtsObjectWithData) itsFtsObject).getData();
+
+	   Mda.edit(data);
+	   }
+	 catch (MaxDocumentException e)
+	   {
+	     // SHould do something better
+	     System.err.println(e);
+	   }
        }
      }
      else if (!itsSketchPad.itsRunMode) itsSketchPad.ClickOnObject(this, evt, x, y);

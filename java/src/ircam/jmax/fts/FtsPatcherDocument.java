@@ -7,37 +7,23 @@ import tcl.lang.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
-/** A FtsPatchData is the Max Data instance containing an FTS Patch,
- * It have two possible loaders, MaxTclFileDataHandler and FtsDotPatFileDataHandler
- * It implement the MaxTclData interfaces, i.e. it can be loaded from/stored to TCL files.
+/** A FtsPatcherDocument is the Max Document containing an FTS Patch.
+ * It implement the MaxTclDocument interfaces, i.e. it can be loaded from/stored to TCL files.
  */
 
-public class FtsPatchData extends MaxData implements MaxTclData
+public class FtsPatcherDocument extends MaxDocument implements MaxTclDocument
 {
-  FtsObject patcher;
-
-  public FtsPatchData()
+  public FtsPatcherDocument()
   {
-    super(MaxDataType.getTypeByName("patcher"));
+    super(Mda.getDocumentTypeByName("patcher"));
   }
 
-  void setPatcher(FtsObject patcher)
+  public void setRootData(MaxData patcher)
   {
-    this.patcher = patcher;
+    super.setRootData(patcher);
+    ((FtsContainerObject) patcher).setDocument(this);
   }
 
-  FtsObject getPatcher()
-  {
-    return patcher;
-  }
-
-  /** Get the content (a patcher) as TCL code */
-
-  public Object getContent()
-  {
-    return patcher;
-  }
-  
   /** Save the content (a patcher) as TCL code */
 
   public void saveContentAsTcl(PrintWriter pw)
@@ -46,7 +32,7 @@ public class FtsPatchData extends MaxData implements MaxTclData
 
     FtsServer.getServer().syncToFts();
 
-    patcher.saveAsTcl(pw);
+    ((FtsContainerObject) rootData).saveAsTcl(pw);
   }
 
   /** Eval function, to built the Patch Data from a Tcl file.
@@ -62,6 +48,8 @@ public class FtsPatchData extends MaxData implements MaxTclData
 
   public void eval(Interp interp, TclObject script) throws tcl.lang.TclException
   {
+    MaxData patcher;
+
     // Call the tcl function maxTclDataEval, with this as first argument,
     // and the script as second
 
@@ -73,17 +61,18 @@ public class FtsPatchData extends MaxData implements MaxTclData
 
     interp.eval(list, 0);
 
-    patcher = (FtsObject) ReflectObject.get(interp, interp.getResult());
+    patcher = (MaxData) ReflectObject.get(interp, interp.getResult());
+    setRootData(patcher);
   }
 
   /**
    * Highly experimental method for generating a binary file
    */
 
-  public void saveBmax(String fileName)
-  {
-    FtsServer.getServer().savePatcherBmax(patcher, fileName);
-  }
+//   public void saveBmax(String fileName)
+//   {
+//     FtsServer.getServer().savePatcherBmax(patcher, fileName);
+//   }
 }
 
 

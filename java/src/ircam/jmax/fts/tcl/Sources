@@ -1,23 +1,25 @@
-SOURCES = FtsAbstractionCmd.java \
-          FtsAbstractionPathCmd.java \
-          FtsAddListenerCmd.java \
-          FtsClassNameCmd.java   \
-          FtsConnectionCmd.java  \
-          FtsDeclareCmd.java     \
-          FtsHelpPatchCmd.java   \
-          FtsMessCmd.java        \
-          FtsObjectCmd.java      \
-          FtsPatcherCmd.java     \
-          FtsReferenceURLCmd.java \
-          FtsSetPropertyCmd.java  \
-          FtsSyncCmd.java        \
-          FtsTemplateCmd.java    \
-          FtsUcsCmd.java         \
-          FtsVersionCmd.java     \
-	  FtsCommentCmd.java     \
-	  FtsOutletCmd.java     \
-	  FtsInletCmd.java      \
-  	  FtsGetObjectByNameCmd.java \
+SOURCES = \
+	  FtsAbstractionCmd.java \
+	  FtsAbstractionPathCmd.java \
+	  FtsAddListenerCmd.java \
+	  FtsAtomListCmd.java \
+	  FtsClassNameCmd.java \
+	  FtsCommentCmd.java \
+	  FtsConnectionCmd.java \
+	  FtsDeclareCmd.java \
+	  FtsGetObjectByNameCmd.java \
+	  FtsHelpPatchCmd.java \
+	  FtsInletCmd.java \
 	  FtsIntegerVectorCmd.java \
-          TclFtsPackage.java
-
+	  FtsMessCmd.java \
+	  FtsObjectCmd.java \
+	  FtsOutletCmd.java \
+	  FtsPatcherCmd.java \
+	  FtsReferenceURLCmd.java \
+	  FtsSetDataCmd.java \
+	  FtsSetPropertyCmd.java \
+	  FtsSyncCmd.java \
+	  FtsTemplateCmd.java \
+	  FtsUcsCmd.java \
+	  FtsVersionCmd.java \
+	  TclFtsPackage.java

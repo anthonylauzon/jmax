@@ -444,7 +444,8 @@ fts_mess_client_new(int ac, const fts_atom_t *av)
 
       if (! new)
 	{
-	  post_mess("Error in object creation", ac - 2, av + 2);
+	  /* post_mess("Error in object creation", ac - 2, av + 2); */
+	  /* Error reporting is now done in Java */
 	  return;
 	}
 

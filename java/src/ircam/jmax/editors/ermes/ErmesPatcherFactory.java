@@ -8,14 +8,29 @@ import ircam.jmax.fts.*;
  * The factory of patcher editors...
  */
 public class ErmesPatcherFactory implements MaxDataEditorFactory {
-  /**
-   * creates a new instance of patcher editor starting from the MaxData to edit
-   */
-  public MaxDataEditor newEditor(MaxData theData) {
-    ErmesSketchWindow aSketchWindow = new ErmesSketchWindow(theData);
-    if (theData.getName()!=null) //loading
-      aSketchWindow.setRunMode(true);//bug24
 
+  public boolean canEdit(MaxData data)
+  {
+    return data instanceof FtsContainerObject;
+  }
+
+  /**
+   * creates a new instance of patcher editor starting from the MaxDocument to edit
+   */
+
+  public MaxDataEditor newEditor(MaxData theData) {
+    ErmesSketchWindow aSketchWindow = new ErmesSketchWindow((FtsContainerObject) theData);
+    String mode;
+
+    /* To set the initial state: set to edit mode only if the
+       initialMode property of a patcher is set and it is set
+       to something different than "run" (usually, "edit" :)
+       */
+
+    mode = (String) ((FtsContainerObject)theData).get("initialMode");
+
+    if ((mode == null) || mode.equals("run"))
+      aSketchWindow.setRunMode(true);
 
     return aSketchWindow;
   }

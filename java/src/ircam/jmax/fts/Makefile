@@ -23,30 +23,69 @@ all:
 	(cd tcl; $(MAKE) all)
 .PHONY: all
 
-FtsModule:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsModule.java)
-.PHONY: FtsModule
+FtsAbstractionObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAbstractionObject.java)
+.PHONY: FtsAbstractionObject
 
-FtsAbstractionTable:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAbstractionTable.java)
-.PHONY: FtsAbstractionTable
+FtsAtomList:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomList.java)
+.PHONY: FtsAtomList
+
+FtsBmaxRemoteDocumentHandler:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsBmaxRemoteDocumentHandler.java)
+.PHONY: FtsBmaxRemoteDocumentHandler
 
 FtsClientProtocol:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsClientProtocol.java)
 .PHONY: FtsClientProtocol
 
+FtsCommentObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsCommentObject.java)
+.PHONY: FtsCommentObject
+
 FtsConnection:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsConnection.java)
 .PHONY: FtsConnection
+
+FtsContainerObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsContainerObject.java)
+.PHONY: FtsContainerObject
+
+FtsDataObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDataObject.java)
+.PHONY: FtsDataObject
+
+FtsDeclarationObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDeclarationObject.java)
+.PHONY: FtsDeclarationObject
+
+FtsDotPatRemoteDocumentHandler:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatRemoteDocumentHandler.java)
+.PHONY: FtsDotPatRemoteDocumentHandler
+
+FtsError:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsError.java)
+.PHONY: FtsError
 
 FtsErrorStreamer:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsErrorStreamer.java)
 .PHONY: FtsErrorStreamer
 
+FtsException:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsException.java)
+.PHONY: FtsException
 
 FtsHelpPatchTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsHelpPatchTable.java)
 .PHONY: FtsHelpPatchTable
+
+FtsInletObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsInletObject.java)
+.PHONY: FtsInletObject
+
+FtsIntegerVector:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVector.java)
+.PHONY: FtsIntegerVector
 
 FtsMessage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsMessage.java)
@@ -56,85 +95,69 @@ FtsMessageHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsMessageHandler.java)
 .PHONY: FtsMessageHandler
 
+FtsMessageObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsMessageObject.java)
+.PHONY: FtsMessageObject
+
+FtsModule:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsModule.java)
+.PHONY: FtsModule
+
 FtsObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsObject.java)
 .PHONY: FtsObject
 
-FtsPatcherObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherObject.java)
-.PHONY: FtsPatcherObject
-
-FtsInletObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsInletObject.java)
-.PHONY: FtsInletObject
+FtsObjectWithData:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsObjectWithData.java)
+.PHONY: FtsObjectWithData
 
 FtsOutletObject:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsOutletObject.java)
 .PHONY: FtsOutletObject
 
-FtsAbstractContainerObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAbstractContainerObject.java)
-.PHONY: FtsAbstractContainerObject
-
-FtsSelection:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSelection.java)
-.PHONY: FtsContainerObject
-
-FtsContainerObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsContainerObject.java)
-.PHONY: FtsContainerObject
-
-FtsAbstractionObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAbstractionObject.java)
-.PHONY: FtsAbstractionObject
-
-FtsTemplateObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateObject.java)
-.PHONY: FtsTemplateObject
-
-FtsStandardObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsStandardObject.java)
-.PHONY: FtsStandardObject
-
-FtsMessageObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsMessageObject.java)
-.PHONY: FtsMessageObject
-
-FtsCommentObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsCommentObject.java)
-.PHONY: FtsCommentObject
-
-FtsVoidObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsVoidObject.java)
-.PHONY: FtsVoidObject
-
-FtsDeclarationObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDeclarationObject.java)
-.PHONY: FtsDeclarationObject
-
-FtsValueObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsValueObject.java)
-.PHONY: FtsValueObject
-
 FtsParse:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParse.java)
 .PHONY: FtsParse
+
+FtsParseToPort:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParseToPort.java)
+.PHONY: FtsParseToPort
+
+FtsPatcherDocument:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherDocument.java)
+.PHONY: FtsPatcherDocument
+
+FtsPatcherDocumentType:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherDocumentType.java)
+.PHONY: FtsPatcherDocumentType
+
+FtsPatcherObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatcherObject.java)
+.PHONY: FtsPatcherObject
 
 FtsPort:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPort.java)
 .PHONY: FtsPort
 
+FtsPropertyDescriptor:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyDescriptor.java)
+.PHONY: FtsPropertyDescriptor
+
 FtsPropertyHandler:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyHandler.java)
 .PHONY: FtsPropertyHandler
+
+FtsQlistObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsQlistObject.java)
+.PHONY: FtsQlistObject
 
 FtsReferenceURLTable:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsReferenceURLTable.java)
 .PHONY: FtsReferenceURLTable
 
-FtsSaveStream:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSaveStream.java)
-.PHONY: FtsSaveStream
+FtsSelection:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSelection.java)
+.PHONY: FtsSelection
 
 FtsServer:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsServer.java)
@@ -156,6 +179,10 @@ FtsSocketServerPort:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSocketServerPort.java)
 .PHONY: FtsSocketServerPort
 
+FtsStandardObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsStandardObject.java)
+.PHONY: FtsStandardObject
+
 FtsSubProcessPort:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSubProcessPort.java)
 .PHONY: FtsSubProcessPort
@@ -164,90 +191,29 @@ FtsSubProcessServer:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsSubProcessServer.java)
 .PHONY: FtsSubProcessServer
 
-FtsTemplateTable:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateTable.java)
-.PHONY: FtsTemplateTable
-
-FtsDotPatParser:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatParser.java)
-.PHONY: FtsDotPatParser
-
-FtsDotPatTokenizer:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatTokenizer.java)
-.PHONY: FtsDotPatTokenizer
-
-FtsLocation:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsLocation.java)
-.PHONY: FtsLocation
-
-FtsDotPatFileDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatFileDataHandler.java )
-.PHONY: FtsDotPatFileDataHandler
-
-FtsDotPatRemoteDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsDotPatRemoteDataHandler.java )
-.PHONY: FtsDotPatRemoteDataHandler
-
-FtsTpaFileDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTpaFileDataHandler.java)
-.PHONY: FtsTpaFileDataHandler
-
-FtsPatchData:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatchData.java)
-.PHONY: FtsPatchData
-
-FtsPatchDataType:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPatchDataType.java)
-.PHONY: FtsPatchDataType
-
-FtsPropertyDescriptor:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsPropertyDescriptor.java)
-.PHONY: FtsPropertyDescriptor
+FtsTableObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTableObject.java)
+.PHONY: FtsTableObject
 
 FtsTclPropertyParser:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTclPropertyParser.java)
 .PHONY: FtsTclPropertyParser
 
+FtsTemplateObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateObject.java)
+.PHONY: FtsTemplateObject
+
+FtsTemplateTable:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTemplateTable.java)
+.PHONY: FtsTemplateTable
+
 FtsUpdateGroupListener:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsUpdateGroupListener.java)
 .PHONY: FtsUpdateGroupListener
 
-FtsParseToPort:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsParseToPort.java)
-.PHONY: FtsParseToPort
-
-FtsIntegerVector:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVector.java)
-.PHONY: FtsIntegerVector
-
-FtsIntegerVectorData:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorData.java)
-.PHONY: FtsIntegerVectorData
-
-FtsIntegerVectorDataType:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsIntegerVectorDataType.java)
-.PHONY: FtsIntegerVectorDataType
-
-
-FtsAtomList:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomList.java)
-.PHONY: FtsAtomList
-
-FtsAtomListData:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomListData.java)
-.PHONY: FtsAtomListData
-
-FtsAtomListDataType:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsAtomListDataType.java)
-.PHONY: FtsAtomListDataType
-
-FtsTableObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsTableObject.java)
-.PHONY: FtsTableObject
-
-FtsQlistObject:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsQlistObject.java)
-.PHONY: FtsQlistObject
+FtsValueObject:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) FtsValueObject.java)
+PHONY:
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

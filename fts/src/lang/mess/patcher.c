@@ -97,7 +97,7 @@ inlet_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     {
       this->position = fts_get_long_arg(ac, at, 1, 0);
 
-      if (this->position < fts_object_get_outlets_number((fts_object_t *)patcher))
+      if (this->position < fts_object_get_inlets_number((fts_object_t *)patcher))
 	patcher->inlets[this->position] = this;
     }
   else
@@ -119,7 +119,7 @@ inlet_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_inlet_t *this   = (fts_inlet_t *) o;
   fts_patcher_t  *patcher = fts_object_get_patcher(o);
 
-  if ((this->position >= 0) && (this->position < fts_object_get_outlets_number((fts_object_t *)patcher)))
+  if ((this->position >= 0) && (this->position < fts_object_get_inlets_number((fts_object_t *)patcher)))
     patcher->inlets[this->position] = 0;
 
   dsp_list_remove(o);
@@ -602,7 +602,7 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	}
       else  if (old_ninlets > 0)
 	{
-	  /* There are new inlets: and there are no old inlets, so reallocate and move */
+	  /* There are new inlets: and there are  old inlets, so reallocate and move */
 
 	  int i;
 	  fts_inlet_t  **new_inlets;
@@ -639,6 +639,7 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	}
       else 
 	{
+	  int i;
 
 	  /* There are new inlets, but there were no inlets before, so just allocate without
 	     copying old stuff */
@@ -646,6 +647,13 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	  this->inlets = (fts_inlet_t **) fts_block_alloc(new_ninlets * sizeof(fts_inlet_t *));
 	  obj_this->in_conn = (fts_connection_t **) fts_block_zalloc(new_ninlets * sizeof(fts_connection_t *));
 	  obj_this->inlets_properties = (fts_plist_t **) fts_block_zalloc(new_ninlets * sizeof(fts_plist_t *));
+
+	  for (i = 0; i < new_ninlets; i++)
+	    {
+	      this->inlets[i] = 0;
+	      obj_this->in_conn[i] = 0;
+	      obj_this->inlets_properties[i] = 0;
+	    }
 	}
     }
 
@@ -711,6 +719,7 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	}
       else 
 	{
+	  int i;
 
 	  /* There are new outlets, but there were no outlets before, so just allocate without
 	     copying old stuff */
@@ -718,13 +727,20 @@ fts_patcher_redefine(fts_patcher_t *this, fts_symbol_t name, int new_ninlets, in
 	  this->outlets = (fts_outlet_t **) fts_block_alloc(new_noutlets * sizeof(fts_outlet_t *));
 	  obj_this->out_conn = (fts_connection_t **) fts_block_zalloc(new_noutlets*sizeof(fts_connection_t *));
 	  obj_this->outlets_properties = (fts_plist_t **) fts_block_zalloc(new_noutlets*sizeof(fts_plist_t *));
+
+	  for (i = 0; i < new_noutlets; i++)
+	    {
+	      this->outlets[i] = 0;
+	      obj_this->out_conn[i] = 0;
+	      obj_this->outlets_properties[i] = 0;
+	    }
 	}
     }
 
   /* If it is not an abstraction, change the description for noutlets */
 
   if (! fts_patcher_is_abstraction(this))
-    fts_set_int(&(obj_this->argv[2]), new_noutlets);
+    fts_set_int(&(obj_this->argv[3]), new_noutlets);
 
   /* Set the new name if not null */
 

@@ -38,18 +38,18 @@ class MaxOpenCmd implements Command {
       {
 	if (argv.length == 2)
 	  {
-	    MaxDataSource source = MaxDataSource.makeDataSource(argv[1].toString());
+	    MaxDocumentSource source = MaxDocumentSource.makeDocumentSource(argv[1].toString());
 
 	    if (source != null)
 	      {
 		try
 		  {
-		    MaxData data;
+		    MaxDocument document;
 
-		    data = MaxDataHandler.loadDataInstance(source);
-		    data.edit();
+		    document = Mda.loadDocument(source);
+		    document.edit();
 		  }
-		catch (MaxDataException e)
+		catch (MaxDocumentException e)
 		  {
 		    throw new TclException(interp, e.toString());
 		  }

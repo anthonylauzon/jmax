@@ -2,9 +2,9 @@ package ircam.jmax.mda;
 
 /** Generic exception for the mda package */
 
-public class MaxDataException extends Exception
+public class MaxDocumentException extends Exception
 {
-  public MaxDataException(String info)
+  public MaxDocumentException(String info)
   {
     super(info);
   }

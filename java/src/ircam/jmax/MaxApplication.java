@@ -208,7 +208,7 @@ public class MaxApplication extends Object
    * Currently, this is done in the wrong way: we get the list
    * of windows from the MaxWindowManager, and for those that 
    * are MaxEditor, we do the check;
-   * In reality, we should look in the MDA instance data base
+   * In reality, we should look in the MDA document data base
    * to do the work.
    */
 

@@ -126,6 +126,17 @@ public class FtsSelection
 	    obj.saveAsTcl(writer);
 
 	    writer.println("]");
+
+ 	    if ((! (obj instanceof FtsContainerObject)) && (obj instanceof FtsObjectWithData))
+ 	      {
+ 		FtsDataObject data;
+
+		data = (FtsDataObject) ((FtsObjectWithData) obj).getData();
+		    
+		writer.print("setData $obj(" + obj.getObjId() + ")" + " [");
+		data.saveAsTcl(writer);
+		writer.println("]");
+	      }
 	  }
       }
 

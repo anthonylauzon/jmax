@@ -22,75 +22,66 @@ all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
-
-MdaModule.java:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MdaModule.java)
-.PHONY: MdaModule
-
 MaxData:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxData.java)
 .PHONY: MaxData
-
-MaxDataException:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataException.java)
-.PHONY: MaxDataException
-
-MaxDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataHandler.java)
-.PHONY: MaxDataHandler
-
-MaxTclFileDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclFileDataHandler.java)
-.PHONY: MaxTclFileDataHandler
-
-MaxDataSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataSource.java)
-.PHONY: MaxDataSource
-
-MaxDataType:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataType.java)
-.PHONY: MaxDataType
-
-MaxFileDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileDataHandler.java)
-.PHONY: MaxFileDataHandler
-
-MaxFileDataSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileDataSource.java)
-.PHONY: MaxFileDataSource
-
-MaxFtsDataSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFtsDataSource.java)
-.PHONY: MaxFtsDataSource
-
-MaxURLDataHandler:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxURLDataHandler.java)
-.PHONY: MaxURLDataHandler
-
-MaxURLDataSource:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxURLDataSource.java)
-.PHONY: MaxURLDataSource
 
 MaxDataEditor:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataEditor.java)
 .PHONY: MaxDataEditor
 
-MaxEditorFactory:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxEditorFactory.java)
-.PHONY: MaxEditorFactory
+MaxDataEditorFactory:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDataEditorFactory.java)
+.PHONY: MaxDataEditorFactory
 
-MaxTclEditorFactory:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclEditorFactory.java)
-.PHONY:  MaxTclEditorFactory
+MaxDocument:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocument.java)
+.PHONY: MaxDocument
 
+MaxDocumentException:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentException.java)
+.PHONY: MaxDocumentException
 
-MaxTclData:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclData.java)
-.PHONY:  MaxTclData
+MaxDocumentHandler:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentHandler.java)
+.PHONY: MaxDocumentHandler
+
+MaxDocumentSource:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentSource.java)
+.PHONY: MaxDocumentSource
+
+MaxDocumentType:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxDocumentType.java)
+.PHONY: MaxDocumentType
+
+MaxFileDocumentSource:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxFileDocumentSource.java)
+.PHONY: MaxFileDocumentSource
+
+MaxTclDocument:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclDocument.java)
+.PHONY: MaxTclDocument
+
+MaxTclFileDocumentHandler:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclFileDocumentHandler.java)
+.PHONY: MaxTclFileDocumentHandler
 
 MaxTclInterpreter:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxTclInterpreter.java)
-.PHONY:  MaxTclInterpreter
+.PHONY: MaxTclInterpreter
+
+MaxURLDocumentSource:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxURLDocumentSource.java)
+.PHONY: MaxURLDocumentSource
+
+Mda:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) Mda.java)
+.PHONY: Mda
+
+MdaModule:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MdaModule.ja)
+.PHONY: MdaModule
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
 

@@ -6,7 +6,7 @@ import ircam.jmax.mda.*;
 
 /**
  * This command install a named tcl function as "editor factory"
- * for a named Max Data type; this function should create an editor
+ * for a named Max Document type; this function should create an editor
  * for it.
  *
  * The Command Syntax is : <p>
@@ -29,7 +29,7 @@ class JMaxCmd implements Command
 	String name;
 	String info;
 	TclObject body;
-	MaxData data;
+	MaxDocument document;
 
 	if (argv.length == 5)
 	  {
@@ -49,25 +49,25 @@ class JMaxCmd implements Command
 
 	// Create a new instance of the type
 
-	data = MaxDataType.getTypeByName(docType).newInstance();
+	document = Mda.getDocumentTypeByName(docType).newDocument();
 
-	if (data instanceof MaxTclData)
+	if (document instanceof MaxTclDocument)
 	  {
 	    // Set the name and info
 
-	    data.setName(name);
-	    data.setInfo(info);
+	    document.setName(name);
+	    document.setInfo(info);
 
-	    // Eval the body inside the data instance
+	    // Eval the body inside the document 
 
-	    ((MaxTclData) data).eval(interp, body);
+	    ((MaxTclDocument) document).eval(interp, body);
 
-	    // Finally, return the data to the tcl interpreter
+	    // Finally, return the document to the tcl interpreter
     
-	    interp.setResult(ReflectObject.newInstance(interp, data));
+	    interp.setResult(ReflectObject.newInstance(interp, document));
 	  }
 	else
-	  new TclException(interp, docType + " is not a tcl based jMax Type");
+	  new TclException(interp, docType + " is not a tcl based jMax Document");
       }
     else
       throw new TclNumArgsException(interp, 1, argv, "doc-type [version] name info doc-body");

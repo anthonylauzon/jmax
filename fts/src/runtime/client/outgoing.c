@@ -33,50 +33,52 @@
    Messages to the client; there is only one client at this level, so we don't have
    any client argument (a part for the coding of the client id in the stream).
 
-   Values are buffered in a local static buffer; a message can be aborted
-   and restarted just by calling the fts_client_mess_start.
+   We send the values as we get them; the device implement buffering
+   if it need it.
 
-   We don't check the message length here. (we should.).
+   1024 char max per atom.
 */
 
-static char outbuf[MAX_MESSAGE_LENGTH];
-static char *outbuf_fill;
+static char outbuf[1024];
+
+static void
+fts_client_send_string(char *msg)
+{
+  char *p;
+
+  for (p = msg; *p != '\0'; p++)
+    fts_char_dev_put(client_dev, *p);
+}
 
 void
 fts_client_mess_start_msg(int type)
 {
-  outbuf_fill = outbuf;
-
-  /* Coding the type */
-
-  *outbuf_fill = (char) type;
-  outbuf_fill++;
+  fts_char_dev_put(client_dev, (char) type);
 }
-
 
 void
 fts_client_mess_add_long(long value)
 {
-  sprintf(outbuf_fill, "%c%ld", LONG_POS_CODE, value);
+  sprintf(outbuf, "%c%ld", LONG_POS_CODE, value);
 
-  outbuf_fill = outbuf_fill + strlen(outbuf_fill);
+  fts_client_send_string(outbuf);
 }
 
 void
 fts_client_mess_add_object(fts_object_t *obj)
 {
-  sprintf(outbuf_fill, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
+  sprintf(outbuf, "%c%ld", OBJECT_CODE, (obj ? fts_object_get_id(obj) : 0));
 
-  outbuf_fill = outbuf_fill + strlen(outbuf_fill);
+  fts_client_send_string(outbuf);
 }
 
 
 void
 fts_client_mess_add_float(float value)
 {
-  sprintf(outbuf_fill, "%c%f", FLOAT_CODE, value);
+  sprintf(outbuf, "%c%f", FLOAT_CODE, value);
 
-  outbuf_fill = outbuf_fill + strlen(outbuf_fill);
+  fts_client_send_string(outbuf);
 }
 
 void
@@ -88,17 +90,13 @@ fts_client_mess_add_sym(fts_symbol_t s)
     fts_client_mess_add_string("(null)");
 }
 
+
 void
 fts_client_mess_add_string(const char *sp)
 {
-  *outbuf_fill = STRING_START_CODE;
-  outbuf_fill++;
+  sprintf(outbuf, "%c%s%c", STRING_START_CODE, sp, STRING_END_CODE);
 
-  strcpy(outbuf_fill, sp);
-  outbuf_fill = outbuf_fill + strlen(outbuf_fill);
-
-  *outbuf_fill = STRING_END_CODE;
-  outbuf_fill++;
+  fts_client_send_string(outbuf);
 }
 
 
@@ -130,23 +128,7 @@ fts_client_mess_send_msg(void)
 {
   /*  Add the eom code  */
 
-  *outbuf_fill = EOM_CODE;
-  outbuf_fill++;
-
-  /* write the message to the client/daemon */
-
-  if (! client_dev)
-    {
-      fprintf(stderr,"!!!! SENDING A MESSAGE, BUT NO CLIENTS CONNECTED\n"); 
-      fprintf(stderr,"%s\n",outbuf);
-    }
-  else
-    {
-      char *p;
-
-      for (p = outbuf; p < outbuf_fill; p++)
-	fts_char_dev_put(client_dev, *p);
-    }
+  fts_char_dev_put(client_dev, (char) EOM_CODE);
 }
 
 /* 

@@ -38,13 +38,13 @@ public class FtsHelpPatchTable
       {
 	try
 	  {
-	    MaxDataSource source = MaxDataSource.makeDataSource(getHelpPatch(obj.getClassName()));
-	    MaxData data;
+	    MaxDocumentSource source = MaxDocumentSource.makeDocumentSource(getHelpPatch(obj.getClassName()));
+	    MaxDocument document;
 
-	    data = MaxDataHandler.loadDataInstance(source);
-	    data.edit();
+	    document = Mda.loadDocument(source);
+	    document.edit();
 	  }
-	catch (MaxDataException e)
+	catch (MaxDocumentException e)
 	  {
 	    return false;
 	  }

@@ -952,26 +952,6 @@ abstract public class FtsObject implements MaxTclInterpreter
   /*                                                                           */
   /*****************************************************************************/
 
-  /** An object in a patcher is saved only if this function return true; some 
-      objects in the application layer can be not intendend to be save, like
-      the Selection itself.
-      */
-
-  protected boolean isPersistent()
-  {
-    return true;
-  }
-
-  /** An object in a patcher is shown if this function return true; some 
-      objects in the application layer can be not intendend to be shown, like
-      the Selection itself, and the void object.
-      */
-
-  public boolean isRepresented()
-  {
-    return true;
-  }
-
   /** Save the object to a PrintWriter as TCL code; actually defined by the object */
 
   abstract public void saveAsTcl(PrintWriter writer);

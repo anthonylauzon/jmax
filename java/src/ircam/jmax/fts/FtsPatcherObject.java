@@ -133,7 +133,7 @@ public class FtsPatcherObject extends FtsContainerObject
       {
 	FtsObject obj   =  (FtsObject) getObjects().elementAt(i);
 	
-	if ((! (obj instanceof FtsDeclarationObject)) &&  obj.isPersistent())
+	if (! (obj instanceof FtsDeclarationObject))
 	  {
 	    writer.print("set obj(" + obj.getObjId() + ")" + " [");
 
@@ -143,24 +143,15 @@ public class FtsPatcherObject extends FtsContainerObject
 
 	    // If the object have data, save the data
 
-	    if (obj instanceof FtsDataObject)
-	      {
-		MaxData data;
+ 	    if ((! (obj instanceof FtsContainerObject)) && (obj instanceof FtsObjectWithData))
+ 	      {
+ 		FtsDataObject data;
 
-
-		try
-		  {
-		    data = MaxDataHandler.loadDataInstance(MaxDataSource.makeDataSource(new FtsLocation(this)));
-
-		    writer.print("setData obj(" + obj.getObjId() + ")" + " [");
-		    data.saveTo(new MaxWriterDataSource(writer));
-
-		    writer.println("]");
-		  }
-		catch (MaxDataException e)
-		  {
-		    // Save nothing if we got an exception.
-		  }
+		data = (FtsDataObject) ((FtsObjectWithData) obj).getData();
+		    
+		writer.print("setData $obj(" + obj.getObjId() + ")" + " [");
+		data.saveAsTcl(writer);
+		writer.println("]");
 	      }
 	  }
       }

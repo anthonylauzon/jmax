@@ -78,10 +78,6 @@ public class TclFtsPackage
     interp.createCommand("setProperty", new FtsSetPropertyCmd());
     interp.createCommand("addListener", new FtsAddListenerCmd());
 
-    // version control ?
-
-    interp.createCommand("version", new FtsVersionCmd());
-
     // Sync
 
     interp.createCommand("sync", new FtsSyncCmd());
@@ -89,6 +85,8 @@ public class TclFtsPackage
     // Data
 
     interp.createCommand("integerVector", new FtsIntegerVectorCmd());
+    interp.createCommand("atomList", new FtsAtomListCmd());
+    interp.createCommand("setData", new FtsSetDataCmd());
   }
 }
 

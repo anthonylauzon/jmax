@@ -14,7 +14,7 @@ public class QListExtension extends tcl.lang.Extension
 {
   public void init(Interp interp)
   {
-    MaxDataType.getTypeByName("atomList").setDefaultEditorFactory(new QListFactory());
+    Mda.installEditorFactory(new QListFactory());
   }
 }
 

@@ -22,15 +22,6 @@ all:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) $(SOURCES))
 .PHONY: all
 
-MaxData:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxData.java)
-.PHONY: MaxData
-
-
-InstallEditorForCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) InstallEditorForCmd.java)
-.PHONY: InstallEditorForCmd
-
 TclMdaPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclMdaPackage.java)
 .PHONY: TclMdaPackage
@@ -38,15 +29,6 @@ TclMdaPackage:
 JMaxCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) JMaxCmd.java)
 .PHONY: JMaxCmd
-
-
-MaxInstallDataHandlerCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxInstallDataHandlerCmd.java)
-.PHONY: MaxInstallDataHandlerCmd
-
-MaxInstallDataTypeCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxInstallDataTypeCmd.java)
-.PHONY: MaxInstallDataTypeCmd
 
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

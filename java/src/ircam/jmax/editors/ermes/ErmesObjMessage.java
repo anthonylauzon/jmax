@@ -63,7 +63,7 @@ class ErmesObjMessage extends ErmesObjEditableObject /*2203implements ActionList
   {
     try
       {
-	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "messbox", itsArgs);
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "messbox", itsArgs);
       }
     catch (FtsException e)
       {

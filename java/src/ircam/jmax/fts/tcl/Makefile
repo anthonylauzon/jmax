@@ -35,9 +35,17 @@ FtsAddListenerCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsAddListenerCmd.java)
 .PHONY: FtsAddListenerCmd
 
+FtsAtomListCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsAtomListCmd.java)
+.PHONY: FtsAtomListCmd
+
 FtsClassNameCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsClassNameCmd.java)
 .PHONY: FtsClassNameCmd
+
+FtsCommentCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsCommentCmd.java)
+.PHONY: FtsCommentCmd
 
 FtsConnectionCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsConnectionCmd.java)
@@ -47,9 +55,21 @@ FtsDeclareCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsDeclareCmd.java)
 .PHONY: FtsDeclareCmd
 
+FtsGetObjectByNameCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsGetObjectByNameCmd.java)
+.PHONY: FtsGetObjectByNameCmd
+
 FtsHelpPatchCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsHelpPatchCmd.java)
 .PHONY: FtsHelpPatchCmd
+
+FtsInletCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsInletCmd.java)
+.PHONY: FtsInletCmd
+
+FtsIntegerVectorCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsIntegerVectorCmd.java)
+.PHONY: FtsIntegerVectorCmd
 
 FtsMessCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsMessCmd.java)
@@ -59,25 +79,21 @@ FtsObjectCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsObjectCmd.java)
 .PHONY: FtsObjectCmd
 
-FtsPatcherCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsPatcherCmd.java)
-.PHONY: FtsPatcherCmd
-
-FtsCommentCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsCommentCmd.java)
-.PHONY: FtsCommentCmd
-
 FtsOutletCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsOutletCmd.java)
 .PHONY: FtsOutletCmd
 
-FtsInletCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsInletCmd.java)
-.PHONY: FtsInletCmd
+FtsPatcherCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsPatcherCmd.java)
+.PHONY: FtsPatcherCmd
 
 FtsReferenceURLCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsReferenceURLCmd.java)
 .PHONY: FtsReferenceURLCmd
+
+FtsSetDataCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsSetDataCmd.java)
+.PHONY: FtsSetDataCmd
 
 FtsSetPropertyCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsSetPropertyCmd.java)
@@ -99,12 +115,9 @@ FtsVersionCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsVersionCmd.java)
 .PHONY: FtsVersionCmd
 
-FtsGetObjectByNameCmd:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) FtsGetObjectByNameCmd.java)
-.PHONY: FtsGetObjectByNameCmd
-
 TclFtsPackage:
-	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) TclFtsPackage.java)
+	(CLASSPATH=$(JMAX_CLASSPATH); export CLASSPATH;  javac $(JFLAGS) TclFtsPackage.ja)
 .PHONY: TclFtsPackage
+
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc

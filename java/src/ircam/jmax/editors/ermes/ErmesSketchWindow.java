@@ -94,17 +94,17 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
   private boolean alreadySaved =true;
   boolean neverSaved =true;
   //public String itsTitle;
-  public MaxData itsData;
+  public MaxDocument itsDocument;
   static int untitledCounter = 1;
 
   // the MaxDataEditor interface
 
   public void quitEdit() {
     /*
-      if (itsData == null || itsData.getDataSource() == null)
+      if (itsDocument == null || itsDocument.getDocumentSource() == null)
       System.err.println("asked quit for "+getTitle()+":null sources");
       else
-      System.err.println("asked quit for "+itsData.getDataSource().toString());
+      System.err.println("asked quit for "+itsDocument.getDocumentSource().toString());
       */
   }
   /** Tell the editor to syncronize, i.e. to store in the
@@ -124,25 +124,35 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   //----------alternative contructors:
   /**
-   * constructor from a MaxData-only (to be used for top-level patchers)
+   * constructor from a MaxDocument-only (to be used for top-level patchers)
    */
-  public ErmesSketchWindow(MaxData theData) {
-    super(MaxDataType.getTypeByName("patcher"));
-    if (theData.getName()==null) setTitle(GetNewUntitledName());
-    else {
-      setTitle(theData.getDataSource().toString()); 
-    }
-    itsData = theData;
-    itsPatcher = (FtsContainerObject)(theData.getContent());
+  public ErmesSketchWindow(FtsContainerObject patcher) {
+    super(Mda.getDocumentTypeByName("patcher"));
+
+    itsDocument = patcher.getDocument();
+
+    if (itsDocument.getName()==null)
+      setTitle(GetNewUntitledName());
+    else 
+      setTitle(itsDocument.getDocumentSource().toString()); 
+
+    itsPatcher = patcher;
+
     CommonInitializations();
     isSubPatcher = false;
     alreadySaved = true;
   }
+
+  // For the MaxDataEditor interface
   /**
-   * constructor from a MaxData AND a ftsContainer AND a father window (subpatchers editors)
+   * constructor from a MaxDocument AND a ftsContainer AND a father window (subpatchers editors)
    * added better window titles for patchers.
    */
 
+  public MaxData getData()
+  {
+    return (MaxData) itsPatcher;
+  }
 
   static String chooseWindowName(FtsContainerObject theFtsPatcher)
   {
@@ -152,12 +162,12 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
       return theFtsPatcher.getClassName();
   }
 
-  public ErmesSketchWindow(MaxData theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
+  public ErmesSketchWindow(MaxDocument theData, FtsContainerObject theFtsPatcher, ErmesSketchWindow theTopWindow) {
     //super(theData.getName());
     super(MaxWindowManager.getWindowManager().makeUniqueWindowTitle(chooseWindowName(theFtsPatcher)),
-	  MaxDataType.getTypeByName("patcher"));
+	  Mda.getDocumentTypeByName("patcher"));
     itsPatcher = theFtsPatcher;
-    itsData = theData;
+    itsDocument = theData;
     CommonInitializations();
     isSubPatcher = true;
     itsTopWindow = theTopWindow;
@@ -198,7 +208,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     //--------------------------------------------------------    
   public ErmesSketchWindow(boolean theIsSubPatcher, ErmesSketchWindow theTopWindow, boolean theIsAbstraction)
   {
-    super(MaxDataType.getTypeByName("patcher"));
+    super(Mda.getDocumentTypeByName("patcher"));
     isSubPatcher = theIsSubPatcher;
     isAbstraction = theIsAbstraction;
     itsTopWindow = theTopWindow;
@@ -740,7 +750,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     }
     else {
       Close(true);
-      itsData.dispose();
+      itsDocument.dispose();
     }
   }
 
@@ -749,7 +759,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     itsClosing = true;
     /*if (deleteOnFts)*/ itsPatcher.close();
     if (ShouldSave()) {
-      FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsData);
+      FileNotSavedDialog aDialog = new FileNotSavedDialog(this, itsDocument);
       aDialog.setLocation(300, 300);
       aDialog.setVisible(true);
       if(aDialog.GetNothingToDoFlag()) return;
@@ -782,16 +792,16 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   private boolean SaveBody(){
     setVisible(false);
-    setTitle(itsData.getDataSource().toString()); 
+    setTitle(itsDocument.getDocumentSource().toString()); 
     setVisible(true);
     CreateFtsGraphics(this);
 
     try
       {
-	itsData.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
-	itsData.save();
+	itsDocument.setInfo("Saved " + DateFormat.getDateInstance(DateFormat.FULL).format(new Date()));
+	itsDocument.save();
       }
-    catch (MaxDataException e)
+    catch (MaxDocumentException e)
       {
 	new ErrorDialog(this, e.getMessage());
 	return false;
@@ -810,7 +820,7 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     // The "canSave" method of a data tell if it can be saved
     // i.e. if it have a data source, and if we can write to its data source
 
-    if (itsData.canSave())
+    if (itsDocument.canSave())
       SaveBody();
     else
       SaveAs();
@@ -818,14 +828,14 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
 
   public void SaveAs() {
     String oldTitle = getTitle();
-    MaxDataSource source;
+    MaxDocumentSource source;
 
-    source  = MaxFileChooser.chooseFileToSave(this, "Save As", itsData.getDataSource());
+    source  = MaxFileChooser.chooseFileToSave(this, "Save As", itsDocument.getDocumentSource());
 
     if (source == null)
       return;
     else
-      itsData.bindToDataSource(source);
+      itsDocument.bindToDocumentSource(source);
     
     SaveBody();
   }

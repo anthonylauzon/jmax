@@ -19,7 +19,7 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/packages/qlist/java/classes ; jar -cvf qlist.jar ircam	)
+	(cd $(ROOTDIR)/packages/qlist/java/classes ; /bin/rm -f qlist.jar ; jar -cvf qlist.jar ircam	)
 .PHONY: jar
 
 

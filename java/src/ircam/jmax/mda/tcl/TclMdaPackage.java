@@ -6,7 +6,7 @@ import ircam.jmax.*;
 
 /**
  * Tcl Mda extension.
- * Add all the Max Data Architecture TCL commands to the tcl interpreter.
+ * Add all the Max Document Architecture TCL commands to the tcl interpreter.
  */
 
 public class TclMdaPackage
@@ -21,11 +21,6 @@ public class TclMdaPackage
   {
     Interp interp = MaxApplication.getTclInterp();
 
-    interp.createCommand("installDataType", new MaxInstallDataTypeCmd());
-    interp.createCommand("installDataHandler", new MaxInstallDataHandlerCmd()); 
-
-    // Don't use this, old stuff; a try to add a TCL defined editor.
-    // interp.createCommand("installEditorFor",  new InstallEditorForCmd()); 
     interp.createCommand("jmax",  new JMaxCmd());
   }
 }

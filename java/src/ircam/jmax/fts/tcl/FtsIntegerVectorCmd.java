@@ -34,7 +34,7 @@ public class FtsIntegerVectorCmd implements Command
 
   public void cmdProc(Interp interp, TclObject argv[]) throws TclException
   {
-    if (argv.length == 2) 
+    if (argv.length == 3) 
       {
 	FtsIntegerVector vector;
 	int size;
@@ -67,5 +67,8 @@ public class FtsIntegerVectorCmd implements Command
       }
   }
 }
+
+
+
 
 

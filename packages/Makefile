@@ -3,7 +3,6 @@ all:
 #	(cd gist; $(MAKE) -k all)
 #	(cd iana; $(MAKE) -k all)
 	(cd icebrowser; $(MAKE) -k all)
-	(cd espresso; $(MAKE) -k all)
 	(cd table; $(MAKE) -k all)
 	(cd qlist; $(MAKE) -k all)
 
@@ -14,7 +13,6 @@ all_c:
 
 all_java:
 	(cd icebrowser; $(MAKE) -k all)
-	(cd espresso; $(MAKE) -k all)
 	(cd table; $(MAKE) -k all)
 	(cd qlist; $(MAKE) -k all)
 
@@ -33,8 +31,8 @@ clean_c:
 
 clean_java:
 	(cd icebrowser; $(MAKE) clean)
-	(cd espresso; $(MAKE) clean)
 	(cd table; $(MAKE) clean)
+	(cd qlist; $(MAKE) clean)
 
 .PHONY: all
 .PHONY: all_c

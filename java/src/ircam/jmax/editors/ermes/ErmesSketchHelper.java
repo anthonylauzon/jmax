@@ -949,9 +949,7 @@ class ErmesSketchHelper extends Object{
   {
     String theName = fo.getClassName();
 
-    if (! fo.isRepresented())
-      return null;
-    else if (itsSketchPad.nameTable.containsKey(theName))
+    if (itsSketchPad.nameTable.containsKey(theName))
       return (Class) itsSketchPad.nameTable.get(theName);
     else {
       return ircam.jmax.editors.ermes.ErmesObjExternal.class;

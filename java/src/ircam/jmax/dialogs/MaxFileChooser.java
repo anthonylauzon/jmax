@@ -22,7 +22,7 @@ public class MaxFileChooser {
 
   /** CHoose a file for opening, in the current directory */
 
-  public static MaxDataSource chooseFileToOpen(Frame frame, String title)
+  public static MaxDocumentSource chooseFileToOpen(Frame frame, String title)
   {
     FileDialog fd = new FileDialog(frame, title);
     String file;
@@ -42,19 +42,19 @@ public class MaxFileChooser {
     if ((file == null) || file.equals(""))
       return null;
     else
-      return MaxDataSource.makeDataSource(new File(currentOpenDirectory, file));
+      return MaxDocumentSource.makeDocumentSource(new File(currentOpenDirectory, file));
   }
 
   /* CHoose a file to save */
 
-  public static MaxDataSource chooseFileToSave(Frame frame, String title)
+  public static MaxDocumentSource chooseFileToSave(Frame frame, String title)
   {
     return chooseFileToSave(frame, title, null);
   }
 
   /* CHoose a file to save, having an old File as initial content of the dialog box */
 
-  public static MaxDataSource chooseFileToSave(Frame frame, String title, MaxDataSource source)
+  public static MaxDocumentSource chooseFileToSave(Frame frame, String title, MaxDocumentSource source)
   {
     FileDialog fd = new FileDialog(frame, title);
     String file;
@@ -62,8 +62,8 @@ public class MaxFileChooser {
     String oldDir = null;
     File oldFile = null;
 
-    if ((source != null) && (source instanceof MaxFileDataSource))
-      oldFile = ((MaxFileDataSource) source).getFile();
+    if ((source != null) && (source instanceof MaxFileDocumentSource))
+      oldFile = ((MaxFileDocumentSource) source).getFile();
 
     if (oldFile != null)
       {
@@ -102,7 +102,7 @@ public class MaxFileChooser {
     if (oldFile == null)
       currentOpenDirectory = dir;
 
-    return MaxDataSource.makeDataSource(new File(dir, file));
+    return MaxDocumentSource.makeDocumentSource(new File(dir, file));
   }
 }
 

@@ -5,26 +5,26 @@ import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
-/** An instance of this data handler can load MaxData from
+/** An instance of this document handler can load MaxDocument from
  *  a tcl source obeyng the "jmax" command conventions.
  * This version actually ask FTS to load the file, using the new
  * incremental Application Layer architecture; the result
  * is a speed improvement of a factor of 40 (minimum).
  */
 
-public class FtsBmaxRemoteDataHandler extends MaxDataHandler
+public class FtsBmaxRemoteDocumentHandler extends MaxDocumentHandler
 {
-  public FtsBmaxRemoteDataHandler()
+  public FtsBmaxRemoteDocumentHandler()
   {
   }
 
   /** We can load from a file start with the "bmax" or the "mbxa" string (??) */
 
-  public boolean canLoadFrom(MaxDataSource source)
+  public boolean canLoadFrom(MaxDocumentSource source)
   {
-    if ((source instanceof MaxFileDataSource) && super.canLoadFrom(source))
+    if ((source instanceof MaxFileDocumentSource) && super.canLoadFrom(source))
       {
-	File file = ((MaxFileDataSource) source).getFile();
+	File file = ((MaxFileDocumentSource) source).getFile();
 
 	try
 	  {
@@ -58,11 +58,11 @@ public class FtsBmaxRemoteDataHandler extends MaxDataHandler
       return false;
   }
 
-  /** Make the real instance */
+  /** Make the real document */
 
-  protected MaxData loadInstance(MaxDataSource source)
+  protected MaxDocument loadDocument(MaxDocumentSource source)
   {
-    File file = ((MaxFileDataSource) source).getFile();
+    File file = ((MaxFileDocumentSource) source).getFile();
     FtsContainerObject patcher;
 
     // Build an empty patcher son of root.
@@ -77,11 +77,11 @@ public class FtsBmaxRemoteDataHandler extends MaxDataHandler
 
 	FtsServer.getServer().loadPatcherBmax(patcher, file.getAbsolutePath());
 
-	FtsPatchData obj = new FtsPatchData();
+	FtsPatcherDocument obj = new FtsPatcherDocument();
 
-	obj.setPatcher(patcher);
-	obj.setDataSource(source);
-	obj.setDataHandler(this);
+	obj.setRootData(patcher);
+	obj.setDocumentSource(source);
+	obj.setDocumentHandler(this);
 
 	return obj;
       }
@@ -91,26 +91,26 @@ public class FtsBmaxRemoteDataHandler extends MaxDataHandler
       }
   }
 
-  public void saveInstance(MaxData instance) throws MaxDataException
+  public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException
   {
-    if ((instance instanceof FtsPatchData) && (instance.getDataSource() instanceof MaxFileDataSource))
+    if ((document instanceof FtsPatcherDocument) && (source instanceof MaxFileDocumentSource))
       {
-	File file = ((MaxFileDataSource) instance.getDataSource()).getFile();
+	File file = ((MaxFileDocumentSource) source).getFile();
 
-	FtsServer.getServer().savePatcherBmax((FtsObject) instance.getContent(), file.getAbsolutePath());
+	FtsServer.getServer().savePatcherBmax((FtsObject) document.getRootData(), file.getAbsolutePath());
       }
     else
-      throw new MaxDataException("Cannot save a " + instance.getDataType() + " as Bmax file");
+      throw new MaxDocumentException("Cannot save a " + document.getDocumentType() + " as Bmax file");
   }
 
-  public boolean canSaveTo(MaxDataSource source)
+  public boolean canSaveTo(MaxDocumentSource source)
   {
-    return (source instanceof MaxFileDataSource);
+    return (source instanceof MaxFileDocumentSource);
   }
 
-  public boolean canSaveTo(MaxDataSource source, MaxData instance)
+  public boolean canSaveTo(MaxDocument document, MaxDocumentSource source)
   {
-    return ((instance instanceof FtsPatchData) && (source instanceof MaxFileDataSource));
+    return ((document instanceof FtsPatcherDocument) && (source instanceof MaxFileDocumentSource));
   }
 }
 

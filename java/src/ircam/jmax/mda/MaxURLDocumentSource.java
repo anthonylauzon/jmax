@@ -2,11 +2,11 @@ package ircam.jmax.mda;
 
 import java.net.*;
 
-class MaxURLDataSource extends MaxDataSource
+class MaxURLDocumentSource extends MaxDocumentSource
 {
   private URL url;
 
-  MaxURLDataSource(URL url)
+  MaxURLDocumentSource(URL url)
   {
     this.url = url;
   }
@@ -31,7 +31,7 @@ class MaxURLDataSource extends MaxDataSource
 
   /** Return a boolean that tell if the source correspond
       to an actually, phisically, existing source, or it
-      just express an address where a data source can be created.
+      just express an address where a document source can be created.
       */
 
   public boolean exists()

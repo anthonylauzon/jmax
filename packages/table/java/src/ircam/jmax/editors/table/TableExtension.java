@@ -14,7 +14,7 @@ public class TableExtension extends tcl.lang.Extension
 {
   public void init(Interp interp)
   {
-    MaxDataType.getTypeByName("integerVector").setDefaultEditorFactory(new TableFactory());
+    Mda.installEditorFactory(new TableFactory());
   }
 }
 

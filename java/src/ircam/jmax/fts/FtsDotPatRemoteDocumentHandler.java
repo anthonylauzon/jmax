@@ -5,26 +5,26 @@ import java.io.*;
 import ircam.jmax.*;
 import ircam.jmax.mda.*;
 
-/** An instance of this data handler can load MaxData from
+/** An instance of this document handler can load MaxDocument from
  *  a tcl source obeyng the "jmax" command conventions.
  * This version actually ask FTS to load the file, using the new
  * incremental Application Layer architecture; the result
  * is a speed improvement of a factor of 40 (minimum).
  */
 
-public class FtsDotPatRemoteDataHandler extends MaxDataHandler
+public class FtsDotPatRemoteDocumentHandler extends MaxDocumentHandler
 {
-  public FtsDotPatRemoteDataHandler()
+  public FtsDotPatRemoteDocumentHandler()
   {
   }
 
   /** We can load from a file start with the "max v2" string*/
 
-  public boolean canLoadFrom(MaxDataSource source)
+  public boolean canLoadFrom(MaxDocumentSource source)
   {
-    if ((source instanceof MaxFileDataSource) && super.canLoadFrom(source))
+    if ((source instanceof MaxFileDocumentSource) && super.canLoadFrom(source))
       {
-	File file = ((MaxFileDataSource) source).getFile();
+	File file = ((MaxFileDocumentSource) source).getFile();
 
 	try
 	  {
@@ -53,11 +53,11 @@ public class FtsDotPatRemoteDataHandler extends MaxDataHandler
       return false;
   }
 
-  /** Make the real instance */
+  /** Make the real document */
 
-  protected MaxData loadInstance(MaxDataSource source)
+  protected MaxDocument loadDocument(MaxDocumentSource source)
   {
-    File file = ((MaxFileDataSource) source).getFile();
+    File file = ((MaxFileDocumentSource) source).getFile();
     FtsContainerObject patcher;
 
     // Build an empty patcher son of root.
@@ -72,11 +72,11 @@ public class FtsDotPatRemoteDataHandler extends MaxDataHandler
 
 	FtsServer.getServer().loadPatcherDpat(patcher, file.getAbsolutePath());
 
-	FtsPatchData obj = new FtsPatchData();
+	FtsPatcherDocument obj = new FtsPatcherDocument();
 
-	obj.setPatcher(patcher);
-	obj.setDataSource(source);
-	obj.setDataHandler(this);
+	obj.setRootData(patcher);
+	obj.setDocumentSource(source);
+	obj.setDocumentHandler(this);
 
 	return obj;
       }
@@ -86,19 +86,19 @@ public class FtsDotPatRemoteDataHandler extends MaxDataHandler
       }
   }
 
-  public void saveInstance(MaxData instance) throws MaxDataException
+  public void saveDocument(MaxDocument document, MaxDocumentSource source) throws MaxDocumentException
   {
-    throw new MaxDataException("Cannot save in .pat file format");
+    throw new MaxDocumentException("Cannot save in .pat file format");
   }
 
   // Overwrite upper class method; we cannot save to a .pat file.
 
-  public boolean canSaveTo(MaxDataSource source)
+  public boolean canSaveTo(MaxDocumentSource source)
   {
     return false;
   }
 
-  public boolean canSaveTo(MaxDataSource source, MaxData instance)
+  public boolean canSaveTo(MaxDocument document, MaxDocumentSource source)
   {
     return false;
   }

@@ -5,6 +5,7 @@ import java.util.*;
 import tcl.lang.*;
 
 import ircam.jmax.*;
+import ircam.jmax.mda.*;
 
 /** 
  *  This is the super class of all
@@ -19,10 +20,45 @@ import ircam.jmax.*;
  * naming support.
  * Removed the inlets/outlets housekeeping: since the .pat parsing is done in FTS
  * we don't need to make them different from the other objects.
+ * 
+ * A container is both a MaxData and a FtsObjectWithData; of course, its data is itself.
  */
 
-abstract public class FtsContainerObject extends FtsObject
+abstract public class FtsContainerObject extends FtsObject implements MaxData, FtsObjectWithData
 {
+  /// MaxData implementation
+
+  /** The Max Document his container belong to, or null in case
+   *  we should ask the parent
+   */
+
+  FtsPatcherDocument document;
+
+  public MaxDocument getDocument()
+  {
+    if (document == null)
+      return parent.getDocument();
+    else
+      return (MaxDocument) document;
+  }
+
+  public void setDocument(MaxDocument document)
+  {
+    this.document = (FtsPatcherDocument) document;
+  }
+
+  // FtsObjectWithData implementation
+
+  public MaxData getData()
+  {
+    return this;
+  }
+
+  public void setData(MaxData data) throws FtsException
+  {
+    throw new FtsException(new FtsError(FtsError.ILLEGAL_OPERATION, "Cannot set the content of a  patcher"));
+  }
+
   /** The objects contained in the patcher */
 
   private Vector objects     = new Vector();
@@ -62,7 +98,7 @@ abstract public class FtsContainerObject extends FtsObject
 
   final void removeObjectFromContainer(FtsObject obj)
   {
-    put("deletedObject", obj); // the deleteObject property keep the last object deleted
+    localPut("deletedObject", obj); // the deleteObject property keep the last object deleted
 
     // First, look in the connections, and collect the connections
     // to be deleted then delete them

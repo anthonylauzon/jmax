@@ -3,25 +3,41 @@ package ircam.jmax.fts;
 import java.io.*;
 import java.util.*;
 
+import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 
 /** This class represent an Integer list in 
  *  FTS
  */
 
-public class FtsAtomList
+public class FtsAtomList implements FtsDataObject
 {
   FtsObject object = null; 
   Vector values = new Vector();
 
+  // Max Data implementation
+
+  public MaxDocument getDocument()
+  {
+    if (object != null)
+      return object.getParent().getDocument();
+    else
+      return null;
+  }
+
   public FtsAtomList()
   {
+  }
+
+  public FtsAtomList(FtsObject object)
+  {
+    this.object = object;
   }
 
   public int getSize()
   {
     return values.size();
   }
-
 
   public Vector getValues()
   {
@@ -116,7 +132,28 @@ public class FtsAtomList
 
   public void saveAsTcl(PrintWriter pw)
   {
-    // To be defined
+    pw.print("atomList {");
+
+    if (pw instanceof IndentedPrintWriter)
+      ((IndentedPrintWriter) pw).indentMore();
+
+    for (int i = 0; i < values.size(); i++)
+      {
+	Object element = values.elementAt(i);
+
+	if ((i % 16) == 0)
+	  pw.println(element.toString());
+	else
+	  {
+	    pw.print(element.toString());
+	    pw.print(" ");
+	  }
+      }
+
+    if (pw instanceof IndentedPrintWriter)
+      ((IndentedPrintWriter) pw).indentLess();
+
+    pw.println("}");
   }
 }
 

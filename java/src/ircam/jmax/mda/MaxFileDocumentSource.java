@@ -2,11 +2,11 @@ package ircam.jmax.mda;
 
 import java.io.*;
 
-public class MaxFileDataSource extends MaxDataSource
+public class MaxFileDocumentSource extends MaxDocumentSource
 {
   private File file;
 
-  MaxFileDataSource(File file)
+  MaxFileDocumentSource(File file)
   {
     this.file = file;
   }
@@ -25,15 +25,12 @@ public class MaxFileDataSource extends MaxDataSource
 
   public String getName()
   {
-    String name;
-
-    name = file.getName();
-    return name.substring(0, name.lastIndexOf('.'));
+    return  file.getName();
   }
 
   /** Return a boolean that tell if the source correspond
       to an actually, phisically, existing source, or it
-      just express an address where a data source can be created.
+      just express an address where a document source can be created.
       */
 
   public boolean exists()

@@ -1,14 +1,18 @@
 package ircam.jmax.editors.table;
 
 import ircam.jmax.mda.*;
+import ircam.jmax.fts.*;
 
 
 public class TableFactory implements MaxDataEditorFactory {
+
+  public boolean canEdit(MaxData data)
+  {
+    return data instanceof FtsIntegerVector;
+  }
   
   public MaxDataEditor newEditor(MaxData theData) {
-    Tabler aTabler = new Tabler(theData);
-    
-    return aTabler;
+    return new Tabler(theData);
   }
 }
 

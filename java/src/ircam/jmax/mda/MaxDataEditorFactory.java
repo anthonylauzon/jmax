@@ -8,6 +8,7 @@ package ircam.jmax.mda;
 
 public interface MaxDataEditorFactory
 {
+  abstract public boolean       canEdit(MaxData data);
   abstract public MaxDataEditor newEditor(MaxData data);
 }
 

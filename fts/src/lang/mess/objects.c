@@ -6,7 +6,7 @@
  *  send email to:
  *                              manager@ircam.fr
  *
- *      $Revision: 1.12 $ IRCAM $Date: 1998/04/16 18:04:48 $
+ *      $Revision: 1.13 $ IRCAM $Date: 1998/04/21 12:05:44 $
  *
  *  Eric Viara for Ircam, January 1995
  */
@@ -84,15 +84,6 @@ fts_object_new(fts_patcher_t *patcher, long id, int ac, const fts_atom_t *at)
   if (! cl)
     {
       obj =  fts_abstraction_new(patcher, id, ac, at);
-
-#ifdef DEBUG
-      if (! obj)
-	{
-	  fprintf(stderr, "Unable to create :"); /* @@@ ERROR !!! */
-	  fprintf_atoms(stderr, ac, at); 
-	  fprintf(stderr, "\n");	/* @@@ ERROR !!! */
-	}
-#endif
 
       return obj;
     }
@@ -420,9 +411,11 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 
   if (woutlet >= out->cl->noutlets || woutlet < 0)
     {
-      fprintf(stderr,"fts_object_connect: outlet %d out of range %d for object %s(%d)\n",
-	      woutlet,	out->cl->noutlets, 
-	      fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out)); /* @@@@ ERROR !!! */
+      /*
+	fprintf(stderr,"fts_object_connect: outlet %d out of range %d for object %s(%d)\n",
+	woutlet,	out->cl->noutlets, 
+	fts_symbol_name(fts_get_class_name(out->cl)), fts_object_get_id(out));
+      */
 
       return &fts_OutletOutOfRange;
     }
@@ -453,9 +446,11 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
     inlet = &in->cl->inlets[winlet];
   else
     {
+      /* 
       fprintf(stderr,"fts_object_connect: inlet %d out of range %d for object %s(%d)\n",
 	      winlet, in->cl->ninlets, 
-	      fts_symbol_name(fts_get_class_name(in->cl)), fts_object_get_id(in));/* @@@@ ERROR !!! */
+	      fts_symbol_name(fts_get_class_name(in->cl)), fts_object_get_id(in));
+      */
 
       return &fts_InletOutOfRange;
     }
@@ -466,7 +461,7 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 
       if (! mess)
 	{
-	  fprintf(stderr,"fts_object_connect: cannot connect %s(%d) #%d to %s(%d) #%d\n", 
+	  post("fts_object_connect: cannot connect %s(%d) #%d to %s(%d) #%d\n", 
 		  fts_symbol_name(fts_get_class_name(out->cl)),
 		  fts_object_get_id(out),
 		  woutlet,
@@ -475,8 +470,11 @@ fts_object_connect(fts_object_t *out, int woutlet, fts_object_t *in, int winlet)
 		  winlet
 		  );/* @@@@ ERROR !!! */
 
+	  /*
 	  fprintf(stderr, "fts_object_connect: method for message %s not found\n",
 		  fts_symbol_name(outlet->tmess.symb));
+	  */
+
 
 	  return &fts_ObjectCannotConnect;
 	}

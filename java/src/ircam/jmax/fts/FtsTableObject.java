@@ -10,7 +10,7 @@ import ircam.jmax.mda.*;
  * Class implementing the proxy of an FTS table object.
  */
 
-public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject, FtsDataObject
+public class FtsTableObject extends FtsObject implements FtsObjectWithData
 {
   /**
    * TableMessageHandler interpret the dedicated messages 
@@ -21,13 +21,11 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
   {
     public void handleMessage(FtsMessage msg)
     {
-      if (vector != null)
-	vector.updateFromMessage(msg);
+      vector.updateFromMessage(msg);
     }
   }
 
-  MaxData data = null;
-  FtsIntegerVector vector = null;
+  FtsIntegerVector vector;
   int vectorSize = 128;
 
   /*****************************************************************************/
@@ -57,69 +55,41 @@ public class FtsTableObject extends FtsObject implements FtsIntegerVectorObject,
     if (args.size() >= 3)
       vectorSize = Integer.parseInt(args.elementAt(2).toString());
 
+    vector = new FtsIntegerVector(this, vectorSize);
+
     installMessageHandler(new TableMessageHandler());
   }
 
-  /** Send the whole vector content to fts */
-
-  public void saveVectorToFts()
-  {
-    this.vector.changed();
-    FtsServer.getServer().syncToFts();
-  }
-
-  /** Load the whole vector content from fts */
-
-  public void loadVectorFromFts()
-  {
-    this.vector.forceUpdate();
-    FtsServer.getServer().syncToFts();
-  }
-
-  /** Bind this obejct to a vector; this means
-    handle from now on all the bidirectional updates
-    and similar things by redirecting them to the
-    vector
-    */
-
-  public void bindVector(FtsIntegerVector vector)
-  {
-    this.vector = vector;
-    vector.setObject(this);
-    vector.setSize(vectorSize);
-  }
-
-  /** unbind it */
-
-  public void unbindVector(FtsIntegerVector vector)
-  {
-    // We may have a pending save/update
-    FtsServer.getServer().syncToFts();
-
-    vector.setObject(null);
-  }
-
-  /** Tell MDA that this FTS object support a integerVector data object */
-
-  public MaxDataType getObjectDataType()
-  {
-    return MaxDataType.getTypeByName("integerVector");
-  }
+  // FtsObjectWithData implementation
 
   public MaxData getData()
   {
-    return data;
+    this.vector.forceUpdate();
+    FtsServer.getServer().syncToFts();
+
+    return vector;
   }
 
-  public void setData(MaxData data)
+  public void setData(MaxData data) throws FtsException
   {
-    this.data = data;
+    // We may have a pending save/update
+    // Sync, than discard the vector
+
+    FtsServer.getServer().syncToFts();
+    vector.setObject(null);
+
+    // set the new vector, bind to this object
+    // set the vector size  and sent it to FTS
+
+    vector = (FtsIntegerVector) data;
+    vector.setObject(this);
+    vector.setSize(vectorSize);
+    this.vector.changed();
   }
 
-  // Save the object *and* the table; it must be
-  // sure to have the complete table, so it ask it 
-  // to fts; this is orribly slow, of course
-  // TO be done 
+  // Save the object 
+  // Data is saved by the surrounding saved, patcher or selection
+  // because need more context
 
   public void saveAsTcl(PrintWriter writer)
   {

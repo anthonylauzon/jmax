@@ -70,7 +70,7 @@ class ErmesObjOut extends ErmesObject {
   {
     try
       {
-	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "outlet", Integer.toString(itsId));
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "outlet", Integer.toString(itsId));
       }
     catch (FtsException e)
       {

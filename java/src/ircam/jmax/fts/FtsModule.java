@@ -13,15 +13,11 @@ public class FtsModule
   {
     // Install the MDA entities
 
-    MaxDataHandler.installDataHandler( new FtsDotPatRemoteDataHandler());
+    Mda.installDocumentHandler( new FtsDotPatRemoteDocumentHandler());
+    // Not yet
+    // Mda.installDocumentHandler( new FtsBmaxRemoteDocumentHandler());
 
-    MaxDataHandler.installDataHandler( new FtsDataHandler()); 
-
-    MaxDataHandler.installDataHandler( new FtsBmaxRemoteDataHandler());
-
-    MaxDataType.installDataType(new FtsPatchDataType());
-    MaxDataType.installDataType(new FtsIntegerVectorDataType());
-    MaxDataType.installDataType(new FtsAtomListDataType());
+    Mda.installDocumentType(new FtsPatcherDocumentType());
 
     // Install the FTS tcl commands
 

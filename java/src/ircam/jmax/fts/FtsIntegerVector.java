@@ -1,19 +1,36 @@
 package ircam.jmax.fts;
 
 import java.io.*;
-
+import ircam.jmax.mda.*;
+import ircam.jmax.utils.*;
 
 /** This class represent an Integer vector in 
  *  FTS
  */
 
-public class FtsIntegerVector
+public class FtsIntegerVector implements FtsDataObject
 {
   FtsObject object = null; 
   int[] values = null;
 
   public FtsIntegerVector()
   {
+  }
+
+  public FtsIntegerVector(FtsObject object, int size)
+  {
+    this.object = object;
+    this.values = new int[size];
+  }
+
+  // Max Data implementation
+
+  public MaxDocument getDocument()
+  {
+    if (object != null)
+      return object.getParent().getDocument();
+    else
+      return null;
   }
 
   /** Get the vector size */
@@ -130,7 +147,26 @@ public class FtsIntegerVector
 
   public void saveAsTcl(PrintWriter pw)
   {
-    // To be defined
+    pw.print("integerVector " + values.length + " {");
+
+    if (pw instanceof IndentedPrintWriter)
+      ((IndentedPrintWriter) pw).indentMore();
+
+    for (int i = 0; i < values.length; i++)
+      {
+	if ((i % 8) == 0)
+	  pw.println(Integer.toString(values[i]));
+	else
+	{
+	  pw.print(Integer.toString(values[i]));
+	  pw.print("\t");
+	}
+      }
+
+    if (pw instanceof IndentedPrintWriter)
+      ((IndentedPrintWriter) pw).indentLess();
+
+    pw.println("}");
   }
 }
 

@@ -26,17 +26,20 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   Dimension preferredSize = new Dimension(512,412);
   ScrollPane itsScrollPane;
 
-  public FtsIntegerVectorData itsData;
+  public FtsIntegerVector itsData;
   static int untitledCounter = 1;
   
   public Tabler(MaxData theData) {
-    super(MaxDataType.getTypeByName("Table"));
+    super(Mda.getDocumentTypeByName("Table"));
 
-    if (theData.getName()==null) setTitle(GetNewUntitledName());
+    itsData = (FtsIntegerVector) theData;
+
+    if (itsData.getDocument().getName()==null)
+      setTitle(GetNewUntitledName());
     else {
-      setTitle(theData.getDataSource().toString()); 
+      setTitle(itsData.getDocument().getName());
     }
-    itsData = (FtsIntegerVectorData) theData;
+
     getContentPane().setLayout(new BorderLayout());
     getContentPane().setBackground(Color.white);
 
@@ -90,7 +93,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     
     Init();
     
-    itsTablePanel.fillTable((FtsIntegerVector) theData.getContent());
+    itsTablePanel.fillTable(itsData);
     itsTablePanel.repaint();
     preferredSize.width = itsTablePanel.getPreferredSize().width;//????????
 
@@ -100,14 +103,23 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     setVisible(true);
   }
 
+  public MaxData getData()
+  {
+    return itsData;
+  }
  
   public Tabler() {
     super();
   }
 
    // the MaxDataEditor interface
+  // S.V.P. this interface should be implemented !!!
 
-  public void quitEdit() {}
+  public void quitEdit()
+  {
+    Close();
+  }
+
   /** Tell the editor to syncronize, i.e. to store in the
    * data all the information possibly cached in the editor
    * and still not passed to the data instance; this usually
@@ -134,7 +146,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
     itsRefreshMenuItem.addActionListener(new ActionListener() {
       public  void actionPerformed(ActionEvent e)
 	{ 
-	  ((FtsIntegerVector)(itsData.getContent())).forceUpdate();
+	  itsData.forceUpdate();
 	  //scure itsTablePanel.recreateOffScreen();
 	  itsTablePanel.paint(itsTablePanel.getGraphics());
 	  itsTablePanel.UpdateOldValues();
@@ -142,7 +154,7 @@ public class Tabler extends MaxEditor implements MaxDataEditor {
   }
 
   public void setCoordinates(int x, int y){
-    if (x < 0 || x > ((FtsIntegerVector)itsData.getContent()).getSize()) return;
+    if (x < 0 || x > itsData.getSize()) return;
     itsCoordX.setText(""+x);
     itsCoordY.setText(""+y);
     itsCurrentValue.setText(""+(itsTablePanel.values[x]));

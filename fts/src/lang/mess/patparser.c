@@ -36,6 +36,7 @@ static fts_symbol_t fts_s_messbox;
 static fts_symbol_t fts_s_button;
 static fts_symbol_t fts_s_toggle;
 static fts_symbol_t fts_s_message;
+static fts_symbol_t fts_s_voidobj;
 static fts_symbol_t fts_s_comment;
 static fts_symbol_t fts_s_connect;
 static fts_symbol_t fts_s_pop;
@@ -96,6 +97,7 @@ void fts_patparser_init()
   fts_s_button = fts_new_symbol("button");
   fts_s_toggle = fts_new_symbol("toggle");
   fts_s_message = fts_new_symbol("message");
+  fts_s_voidobj = fts_new_symbol("ERROR");
   fts_s_comment = fts_new_symbol("comment");
   fts_s_connect = fts_new_symbol("connect");
   fts_s_pop = fts_new_symbol("pop");
@@ -654,14 +656,14 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
 	{
 	  /*
 	   * Empty object, built and return a 
-	   * arbitrary choosen "comment" object
+	   * "voidobj" object
 	   */
 
 	  fts_atom_t description[1];
 
 	  fts_patlex_push_back(in);
 
-	  fts_set_symbol(&description[0], fts_s_comment);
+	  fts_set_symbol(&description[0], fts_s_voidobj);
 
 	  obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, description);
 
@@ -686,6 +688,23 @@ static void fts_patparse_parse_object(fts_object_t *parent, fts_patlex_t *in,
       argc = fts_patparse_read_object_arguments(description + 1, in);
 
       obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, argc + 1 , description);
+
+      if (obj == 0)
+	{
+	  fts_atom_t void_description[1];
+
+	  /* the object do not exists, should give an error message here,
+	     and then return a voidobj object, so that we can continue
+	     the parsing */
+
+	  post("Cannot create object ");
+	  postatoms(argc + 1, description);
+	  post("\n");
+
+	  fts_set_symbol(&void_description[0], fts_s_voidobj);
+
+	  obj = fts_object_new((fts_patcher_t *)parent, FTS_NO_ID, 1, void_description);
+	}
 
       if (obj)
 	fts_patparse_set_text_graphic_properties(graphicDescr, obj);

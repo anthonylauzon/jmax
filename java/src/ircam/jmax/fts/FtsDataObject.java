@@ -1,20 +1,13 @@
 package ircam.jmax.fts;
 
+import java.io.*;
 import ircam.jmax.mda.*;
 
-/** FtsObject Objects having data to be edited as MaxData should
-  implement this interface.  Note that the method defined by this
-  interface should not be used by the editor, that should instead use
-  the standard MDA method (MaxData.makeInstance), passing a MaxDataSource
-  built either from a FtsLocation or a name.
-  FtsLocation can be built from a name or directly from an object.
-  */
+/** Interface (class later ??) for all the FtsDataObject,
+ * i.e. object representing editable data stored in FTS
+ */
 
-public interface FtsDataObject
+public interface FtsDataObject extends MaxData
 {
-  abstract  MaxDataType getObjectDataType();
-
-  abstract MaxData getData();
-  abstract void setData(MaxData data);
+  abstract public void saveAsTcl(PrintWriter pw);
 }
-  

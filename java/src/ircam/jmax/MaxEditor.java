@@ -15,14 +15,14 @@ import com.sun.java.swing.*;
  * such as the Window menu handling, initialisation, and others.
  */
 public abstract class MaxEditor extends JFrame implements KeyListener, FocusListener, WindowListener {
-  MaxDataType editedType;
+  MaxDocumentType editedType;
 
   public Menu itsFileMenu;
   public Menu itsNewFileMenu;
   public Menu itsEditMenu;	
   public Menu itsWindowsMenu;
 
-  public MaxEditor(String title, MaxDataType type)
+  public MaxEditor(String title, MaxDocumentType type)
   {
     super(title);
     
@@ -39,7 +39,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   }
 
   
-  public MaxEditor(MaxDataType type)
+  public MaxEditor(MaxDocumentType type)
   {
     super("");
 
@@ -87,25 +87,25 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   /** Use an Action object to do this stuff */
 
-  class NewDataCreator implements ActionListener
+  class NewDocumentCreator implements ActionListener
   {
-    MaxDataType type;
+    MaxDocumentType type;
 
-    NewDataCreator(MaxDataType type)
+    NewDocumentCreator(MaxDocumentType type)
     {
       this.type = type;
     }
 
     public void actionPerformed(ActionEvent e)
     {
-      MaxData data;
+      MaxDocument document;
 
       try
 	{
-	  data = type.newInstance();
-	  data.edit();
+	  document = type.newDocument();
+	  document.edit();
 	}
-      catch (MaxDataException ex)
+      catch (MaxDocumentException ex)
 	{
 	  new ErrorDialog(MaxEditor.this, ex.toString());
 	}
@@ -116,7 +116,7 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
   {
     MenuItem newMenu = new MenuItem("New " + editedType.getPrettyName() + " Ctrl+N");
 
-    newMenu.addActionListener(new NewDataCreator(editedType));
+    newMenu.addActionListener(new NewDocumentCreator(editedType));
 
     return newMenu;
   }
@@ -127,16 +127,16 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
     String aString;
     Menu newFileMenu = new Menu("New...");
     
-    for (Enumeration e = MaxDataType.getTypes().elements(); e.hasMoreElements();)
+    for (Enumeration e = Mda.getDocumentTypes().elements(); e.hasMoreElements();)
       {
-	final MaxDataType aDataType = (MaxDataType) e.nextElement();
+	final MaxDocumentType aDocumentType = (MaxDocumentType) e.nextElement();
 
-	if (aDataType.canMakeNewInstance() && aDataType.haveEditorFactory())
+	if (aDocumentType.canMakeNewDocument())
 	  {
-	    aMenuItem = new MenuItem(aDataType.getPrettyName());
+	    aMenuItem = new MenuItem(aDocumentType.getPrettyName());
 	    newFileMenu.add(aMenuItem); 
 
-	    aMenuItem.addActionListener(new NewDataCreator(aDataType));
+	    aMenuItem.addActionListener(new NewDocumentCreator(aDocumentType));
 	  }
       }
 
@@ -314,28 +314,28 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 
   public void Open()
   {
-    MaxDataSource source = MaxFileChooser.chooseFileToOpen(this, "Open File");
+    MaxDocumentSource source = MaxFileChooser.chooseFileToOpen(this, "Open File");
 
     if (source != null)
       {
 	try
 	  {
-	    MaxData data;
+	    MaxDocument document;
 
-	    data = MaxDataHandler.loadDataInstance(source);
+	    document = Mda.loadDocument(source);
 	
 	    try
 	      {
-		data.edit();
+		document.edit();
 	      }
-	    catch (MaxDataException e)
+	    catch (MaxDocumentException e)
 	      {
-		// Ignore MaxDataException exception in running the editor
+		// Ignore MaxDocumentException exception in running the editor
 		// May be an hack, may be is ok; move this stuff to an action
 		// handler !!
 	      }
 	  }
-	catch (MaxDataException e)
+	catch (MaxDocumentException e)
 	  {
 	    new ErrorDialog(this, e.toString());
 	  }
@@ -366,9 +366,9 @@ public abstract class MaxEditor extends JFrame implements KeyListener, FocusList
 	      {
 		try
 		  {
-		    editedType.newInstance().edit();
+		    editedType.newDocument().edit();
 		  }
-		catch (MaxDataException ex)
+		catch (MaxDocumentException ex)
 		  {
 		    // Ingnore exceptions here
 		  }

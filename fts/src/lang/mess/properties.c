@@ -102,8 +102,7 @@ fts_plist_get( const fts_plist_t *plist, fts_symbol_t property)
 {
   struct fts_plist_cell *c;
 
-  for( c = plist->head; c; c = c->next)
-    if (c->property == property)
+  for( c = plist->head; c; c = c->next)    if (c->property == property)
       return &(c->value);
 
   return 0;

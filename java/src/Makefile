@@ -23,7 +23,10 @@ doc_private:
 .PHONY: doc_private
 
 jar:  
-	(cd $(ROOTDIR)/java/classes ; jar -cvf ../classes/jmax.jar ircam )
+	(cd $(ROOTDIR)/java/classes ; /bin/rm -f jmax.jar ; jar -cvf ../classes/jmax.jar ircam )
 .PHONY: jar
 
 include $(ROOTDIR)/java/Makefiles/Makefile.misc
+
+
+

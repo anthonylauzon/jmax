@@ -1,29 +1,16 @@
-SOURCES =  \
- 	  MdaModule.java \
+SOURCES = \
 	  MaxData.java \
-	  MaxDataException.java \
-	  MaxDataHandler.java \
-	  MaxDataSource.java \
-	  MaxDataType.java \
-	  FtsDataHandler.java \
-	  MaxTclFileDataHandler.java \
-	  MaxFileDataSource.java \
-	  MaxFtsDataSource.java \
-	  MaxURLDataSource.java \
-	  MaxReaderDataSource.java \
-	  MaxWriterDataSource.java \
-	  MaxDataEditor.java    \
+	  MaxDataEditor.java \
 	  MaxDataEditorFactory.java \
-	  MaxTclEditorFactory.java  \
-	  MaxFtsData.java      \
-	  MaxTclData.java      \
-          MaxTclInterpreter.java \
-	  MaxStringDataHandler.java \
-	  MaxTclStringDataHandler.java \
-	  MaxTclWriterDataHandler.java
-
-
-
-
-
-
+	  MaxDocument.java \
+	  MaxDocumentException.java \
+	  MaxDocumentHandler.java \
+	  MaxDocumentSource.java \
+	  MaxDocumentType.java \
+	  MaxFileDocumentSource.java \
+	  MaxTclDocument.java \
+	  MaxTclFileDocumentHandler.java \
+	  MaxTclInterpreter.java \
+	  MaxURLDocumentSource.java \
+	  Mda.java \
+	  MdaModule.java

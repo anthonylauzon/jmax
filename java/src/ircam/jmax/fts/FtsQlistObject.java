@@ -10,7 +10,7 @@ import ircam.jmax.mda.*;
  * Class implementing the proxy of an FTS qlist object.
  */
 
-public class FtsQlistObject extends FtsObject implements FtsAtomListObject, FtsDataObject
+public class FtsQlistObject extends FtsObject  implements FtsObjectWithData
 {
   /**
    * QlistMessageHandler interpret the dedicated messages 
@@ -21,13 +21,11 @@ public class FtsQlistObject extends FtsObject implements FtsAtomListObject, FtsD
   {
     public void handleMessage(FtsMessage msg)
     {
-      if (list != null)
-	list.updateFromMessage(msg);
+      list.updateFromMessage(msg);
     }
   }
 
-  MaxData data = null;
-  FtsAtomList list = null;
+  FtsAtomList list = new FtsAtomList(this);
 
   /*****************************************************************************/
   /*                                                                           */
@@ -46,73 +44,44 @@ public class FtsQlistObject extends FtsObject implements FtsAtomListObject, FtsD
     installMessageHandler(new QlistMessageHandler());
   }
 
-  /** Send the whole list content to fts */
-
-  public void saveAtomListToFts()
-  {
-    this.list.changed();
-    FtsServer.getServer().syncToFts();
-  }
-
-  /** Load the whole list content from fts */
-
-  public void loadAtomListFromFts()
-  {
-    this.list.forceUpdate();
-    FtsServer.getServer().syncToFts();
-  }
-
-  /** Bind this obejct to a list; this means
-    handle from now on all the bidirectional updates
-    and similar things by redirecting them to the
-    list
-    */
-
-  public void bindList(FtsAtomList list)
-  {
-    this.list = list;
-    list.setObject(this);
-  }
-
-  /** unbind it */
-
-  public void unbindList(FtsAtomList list)
-  {
-    // We may have a pending save/update
-
-    FtsServer.getServer().syncToFts();
-    list.setObject(null);
-  }
-
-  /** Tell MDA that this FTS object support a AtomList data object */
-
-  public MaxDataType getObjectDataType()
-  {
-    return MaxDataType.getTypeByName("atomList");
-  }
+  // FtsObjectWithData implementation
 
   public MaxData getData()
   {
-    return data;
+    this.list.forceUpdate();
+    FtsServer.getServer().syncToFts();
+
+    return list;
   }
 
-  public void setData(MaxData data)
+  public void setData(MaxData data) throws FtsException
   {
-    this.data = data;
+    // We may have a pending save/update
+    // Sync, than discard the list
+
+    FtsServer.getServer().syncToFts();
+    list.setObject(null);
+
+    // set the new list, bind to this object
+    // and sent it to FTS
+
+    list = (FtsAtomList) data;
+    list.setObject(this);
+    this.list.changed();
   }
 
-  // Save the object *and* the qlist; it must be
-  // sure to have the complete qlist, so it ask it 
-  // to fts; this is orribly slow, of course
-  // TO be done 
+  // Save the object 
+  // Data is saved by the surrounding saved, patcher or selection
+  // because need more context
+
 
   public void saveAsTcl(PrintWriter writer)
   {
     // Save as "object ..."
 
     writer.print("object {" + description + "}");
-
     savePropertiesAsTcl(writer);
+
   }
 }
 

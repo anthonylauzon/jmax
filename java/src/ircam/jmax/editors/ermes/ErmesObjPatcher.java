@@ -74,7 +74,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
   {
     try
       {
-	itsFtsObject = (FtsContainerObject) FtsObject.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
+	itsFtsObject = FtsObject.makeFtsObject(itsFtsPatcher, "patcher", itsArgs);
 	((FtsContainerObject) itsFtsObject).setDownloaded();
       }
     catch (FtsException e)
@@ -191,7 +191,7 @@ public class ErmesObjPatcher extends ErmesObjEditableObject {
       }
       else{	//this 'else' shouldn't be reached...
 	if(itsArgs.equals("")) return false;
-	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsData, (FtsContainerObject) itsFtsObject, GetSketchWindow());
+	itsSubWindow = new ErmesSketchWindow( GetSketchWindow().itsDocument, (FtsContainerObject) itsFtsObject, GetSketchWindow());
 	itsSubWindow.itsSketchPad.PrepareInChoice();//???????
 	itsSubWindow.itsSketchPad.PrepareOutChoice();///?????????
 	itsSubWindow.setRunMode(itsSketchPad.itsRunMode);
