@@ -1,3 +1,11 @@
+2001-07-06  Francois Dechelle  <dechelle@lipari.ircam.fr>
+
+	* changed VERSION and all Makefiles using it, in order to include a version
+	status saying that the binaries are build from a cvs tree and not from a final
+	version.
+
+	* fixed a few bugs in readsf~/writesf~
+
 2001-07-02  Norbert Schnell  <schnell@ligeti.ircam.fr>
 
 	* updated doc
