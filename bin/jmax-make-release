@@ -131,6 +131,9 @@ check_options()
 check_cvs_sync ()
 {
     inform checking CVS
+
+    date
+
     ME=`whoami`
     HERE=`pwd | sed "s/.*$ME\///"`
     if rsh $HOST_FOR_CVS cd $HERE \; cvs -n update 2>&1 | egrep -s '^[UARMC] ' 
@@ -164,6 +167,9 @@ check_recompile ()
     do
 	for SUB_ARCH in `sub_archs $ARCH`
 	do
+
+    date
+
 	    # Java Makefiles do not allow yet to check recompilation with -q option
 	    # (all is a phony target ...)
 	    gmake -q ARCH=$SUB_ARCH MODE=opt all_c  > /dev/null 2>&1 || error "architecture \"$SUB_ARCH\" must be recompiled (recompile and retry)"
@@ -259,7 +265,7 @@ select_files ()
     fi
 
       {
-  	inform Processing $3
+#  	inform Processing $3
 
   	read TYPE_F ARCH_F PATTERN NEW_NAME
 
@@ -299,7 +305,7 @@ create_tar ()
     fi
 
     inform "creating tar file $TARFILE"
-    (cd ${DEST_DIR}/.. ; tar cvf - max-${VERSION_NUMBER} ) | gzip -9 > $TARFILE
+    (cd ${DEST_DIR}/.. ; tar cf - max-${VERSION_NUMBER} ) | gzip -9 > $TARFILE
 
     chmod 444 ${TARFILE}
     chmod 555 ${TARDIR}
@@ -315,7 +321,13 @@ create_tars ()
     do
 	for ARCH in $ARCHS
 	do
+
+    date
+
 	    select_files $TYPE $ARCH .
+
+
+    date
 
 	    create_tar $TYPE $ARCH 
 	done
@@ -327,7 +339,9 @@ tag_files ()
 {
     TAG=`echo $VERSION_NUMBER | sed -e 's/^/V_/' -e 's/\./_/g'`
     inform "tagging sources with tag $TAG"
-    cvs tag -F $TAG
+    ME=`whoami`
+    HERE=`pwd | sed "s/.*$ME\///"`
+    rsh $HOST_FOR_CVS cd $HERE \; cvs tag -F $TAG
 }
 
 
