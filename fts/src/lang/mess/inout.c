@@ -55,6 +55,18 @@ typedef struct _label_
   fts_channel_t channel;
 } label_t;
 
+typedef struct _send_
+{
+  fts_access_t access;
+  label_t *label;
+} send_t;
+
+typedef struct _receive_
+{
+  fts_access_t access;
+  label_t *label;
+} receive_t;
+
 #define label_get_channel(l) (&(l)->channel)
 
 static void
@@ -100,15 +112,15 @@ label_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 send_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_access_t *this = (fts_access_t *) o;
+  send_t *this = (send_t *) o;
 
-  fts_channel_output_message_from_targets(fts_access_get_channel(this), 0, s, ac, at);
+  fts_channel_output_message_from_targets(label_get_channel(this->label), 0, s, ac, at);
 }
 
 static void
 send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_access_t *this = (fts_access_t *) o;
+  send_t *this = (send_t *) o;
   label_t *label = 0;
 
   if(fts_is_symbol(at + 1))
@@ -123,30 +135,32 @@ send_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     label = (label_t *)fts_get_object(at + 1);
 
   fts_object_refer((fts_object_t *)label);
-  fts_channel_add_origin(label_get_channel(label), this);
+  fts_channel_add_origin(label_get_channel(label), (fts_access_t *)this);  
+
+  this->label = label;
 }
 
 static void
 send_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_access_t *this = (fts_access_t *) o;
+  send_t *this = (send_t *) o;
 
-  fts_channel_remove_origin(fts_access_get_channel(this), this);
-  fts_object_release((fts_object_t *)fts_access_get_channel(this));
+  fts_channel_remove_origin(label_get_channel(this->label), (fts_access_t *)this);
+  fts_object_release((fts_object_t *)this->label);
 }
 
 static void
 send_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_access_t *this = (fts_access_t *)o;
+  send_t *this = (send_t *)o;
 
-  fts_channel_find_friends(fts_access_get_channel(this), ac, at);
+  fts_channel_find_friends(label_get_channel(this->label), ac, at);
 }
 
 static fts_status_t
 send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_access_t), 1, 0, 0); 
+  fts_class_init(cl, sizeof(send_t), 1, 0, 0); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, send_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, send_delete);
@@ -166,7 +180,7 @@ send_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 static void
 receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_access_t *this = (fts_access_t *) o;
+  receive_t *this = (receive_t *) o;
   label_t *label = 0;
 
   if(fts_is_symbol(at + 1))
@@ -181,23 +195,24 @@ receive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     label = (label_t *)fts_get_object(at + 1);
 
   fts_object_refer((fts_object_t *)label);
-  fts_channel_add_target(label_get_channel(label), this);
+  fts_channel_add_target(label_get_channel(label), (fts_access_t *)this);
+
+  this->label = label;
 }
   
 static void
 receive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fts_access_t *this = (fts_access_t *) o;
+  receive_t *this = (receive_t *) o;
 
-  fts_channel_remove_target(fts_access_get_channel(this), this);
-
-  fts_object_release((fts_object_t *)fts_access_get_channel(this));
+  fts_channel_remove_target(label_get_channel(this->label), (fts_access_t *)this);
+  fts_object_release((fts_object_t *)this->label);
 }
 
 static fts_status_t
 receive_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
 {
-  fts_class_init(cl, sizeof(fts_access_t), 0, 1, 0); 
+  fts_class_init(cl, sizeof(receive_t), 0, 1, 0); 
 
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_init, receive_init);
   fts_method_define_varargs(cl, fts_SystemInlet, fts_s_delete, receive_delete);

@@ -67,14 +67,12 @@ void
 fts_channel_add_origin(fts_channel_t *channel, fts_access_t *origin)
 {
   channel_add_access(&channel->origins, origin);
-  origin->channel = channel;
 }
 
 void
 fts_channel_add_target(fts_channel_t *channel, fts_access_t *target)
 {
   channel_add_access(&channel->targets, target);
-  target->channel = channel;
 }
 
 void

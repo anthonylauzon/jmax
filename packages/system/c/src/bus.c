@@ -324,7 +324,7 @@ static void
 bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
 {
   bus_t *this = (bus_t *)o;
-  int n_channels;
+  int n_channels = 0;
   int i;
   
   ac--;

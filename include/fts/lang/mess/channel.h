@@ -29,11 +29,8 @@
 typedef struct _fts_access_
 {
   fts_object_t  o; /* channel access must be an FTS object */
-  struct _fts_channel_ *channel;
   struct _fts_access_ *next; /* next in list of same channel */
 } fts_access_t;
-
-#define fts_access_get_channel(a) ((a)->channel)
 
 typedef struct _fts_channel_
 {
