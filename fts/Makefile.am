@@ -49,6 +49,7 @@ sigconn.c \
 stack.c \
 symbol.c \
 template.c \
+thread.c \
 time.c \
 tuple.c \
 update.c \
