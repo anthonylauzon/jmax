@@ -27,6 +27,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <errno.h>
 #include <string.h>
 #if HAVE_UNISTD_H
@@ -109,23 +110,32 @@ static void
 oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   oldclient_t *this = (oldclient_t *)o;
+  fts_atom_t a;
   struct sockaddr_in my_addr;
   char *address;
-  unsigned short port;
+  unsigned short port = 0;
+  const char *host = "127.0.0.1";
+  struct hostent *hostptr;
 
-/*    ac--; */
-/*    at++; */
-/*    fts_socket_parse( fts_get_symbol_arg( ac, at, 0, 0), &address, &port); */
+  /*
+   * Get values from command line args
+   */
+  if (fts_cmd_args_get( fts_new_symbol( "port"), &a) && fts_is_int( &a))
+    port = fts_get_int( &a);
+  if (fts_cmd_args_get( fts_new_symbol( "host"), &a) && fts_is_symbol( &a))
+    host = fts_symbol_name( fts_get_symbol( &a));
 
-/*    if (address == NULL) */
-/*      { */
-/*        post( "[client] error parsing argument\n"); */
-/*        return; */
-/*      } */
+  hostptr = gethostbyname( host);
+
+  if ( !hostptr)
+    {
+      fprintf( stderr, "Unknown host: %s\n", host);
+      return;
+    }
 
   if ( (this->socket = socket( AF_INET, SOCK_DGRAM, 0) ) == -1)
     {
-      post( "[oldclient] error opening socket (%s)\n", strerror( errno));
+      fprintf( stderr, "[oldclient] error opening socket (%s)\n", strerror( errno));
       return;
     }
 
@@ -137,23 +147,25 @@ oldclient_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
   if (bind( this->socket, &my_addr, sizeof(struct sockaddr_in)) == -1)
     {
-      post( "[oldclient] cannot bind socket (%s)\n", strerror( errno));
+      fprintf( stderr, "[oldclient] cannot bind socket (%s)\n", strerror( errno));
       return;
     }
 
   memset( &this->client_addr, 0, sizeof(this->client_addr));
   this->client_addr.sin_family = AF_INET;
-  this->client_addr.sin_addr.s_addr = inet_addr(address);
+  this->client_addr.sin_addr = *(struct in_addr *)hostptr->h_addr_list[0];
   this->client_addr.sin_port = htons(port);
 
-  /* Send an init package: empty content, just the packet */
-  sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr));
+  /* Send an init packet: empty content, just the packet */
+  if ( sendto( this->socket, "init", 4, 0, &this->client_addr, sizeof( this->client_addr)) < 0)
+    {
+      fprintf( stderr, "[oldclient] cannot send init packet (%s)\n", strerror( errno));
+      return;
+    }
 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 
   fts_buffer_init( &this->output_buffer, unsigned char);
-
-  oldclient = this;
 }
 
 static void
@@ -164,6 +176,30 @@ oldclient_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   fts_sched_remove( (fts_object_t *)this);
   close( this->socket);
 }
+
+static fts_status_t oldclient_instantiate(fts_class_t *cl, int ac, const fts_atom_t *at)
+{
+  fts_class_init( cl, sizeof( oldclient_t), 0, 0, 0);
+
+  fts_method_define_varargs( cl, fts_SystemInlet, fts_s_init, oldclient_init);
+  fts_method_define(cl, fts_SystemInlet, fts_s_delete, oldclient_delete, 0, 0);
+
+  return fts_Success;
+}
+
+void fts_oldclient_start( void)
+{
+  fts_symbol_t s;
+  fts_atom_t a[1];
+
+  s = fts_new_symbol( "oldclient");
+  fts_class_install( s, oldclient_instantiate);
+
+  fts_set_symbol( a, s);
+  fts_object_new_to_patcher( fts_get_root_patcher(), 1, a, (fts_object_t **)&oldclient);
+}
+
+
 
 static void oldclient_put_char( oldclient_t *this, unsigned char c)
 {

@@ -21,6 +21,7 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 #include <fts/fts.h>
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/platform.h>
@@ -126,10 +127,6 @@ static void fts_cmd_args_parse( int argc, char **argv)
 	  fts_set_symbol( &value, fts_new_symbol_copy( *argv));
 	}
 
-      fprintf( stderr, "Putting %s -> ", fts_symbol_name( name));
-      fprintf_atoms( stderr, 1, &value);
-      fprintf( stderr, "\n");
-
       fts_cmd_args_put( name, &value);
 
       argc--;
@@ -191,6 +188,9 @@ extern void fts_kernel_symbol_init( void);
 extern void fts_kernel_template_init( void);
 extern void fts_kernel_variable_init( void);
 
+extern void fts_oldclient_start( void);
+
+
 void fts_init( int argc, char **argv)
 {
   /* *** Attention !!! The order is important *** */
@@ -231,4 +231,8 @@ void fts_init( int argc, char **argv)
   fts_cmd_args_parse( argc, argv);
 
   fts_platform_init();
+
+  fts_oldclient_start();
+
+  post ( "coucou\n");
 }
