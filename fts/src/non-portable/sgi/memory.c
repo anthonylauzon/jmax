@@ -56,7 +56,7 @@ int fts_memory_is_locked( void)
 */
 int fts_lock_memory( void)
 {
-  if (mlockall(MCL_CURRENT | MCL_FUTURE))
+  if (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
     {
       memory_is_locked = 1;
       return 1;

@@ -44,7 +44,7 @@ void fts_platform_init( void)
   fts_real_time_on();
 
   /* Get rid of root privilege if we have them */
-  if (setreuid(geteuid(), getuid()) == -1)
+  if (setreuid(getuid(), getuid()) == -1)
     {
       /* Should we post a message ? */
     }
