@@ -79,6 +79,8 @@ class MoveEditInteraction extends Interaction
 		ErmesSelection.patcherSelection.select(object);
 		object.redraw();
 	      }
+	    
+	    editor.setUndo( "Move", false, false);
 	  }
 
 	ErmesSelection.patcherSelection.moveAllBy(mouse.x - oldMouse.x, mouse.y - oldMouse.y);

@@ -305,5 +305,17 @@ abstract public class Editable extends GraphicObject implements FtsInletsListene
     ObjectPopUp.removeMenu(TextPopUpMenu.getInstance());
     ObjectPopUp.getInstance().remove( mySeparator);
   }
+
+  /************** Undo/Redo *******************/
+  public void undo()
+  {
+    super.undo();
+    forceHeight( uh);
+  }
+  public void redo()
+  {
+    super.redo();
+    forceHeight( rh);
+  }
 }
 

@@ -307,7 +307,6 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   public void endPaste()
   {
     pasting = false;
-    undoing = false;
 
     ErmesSelection.patcherSelection.deselectAll();
     for(Enumeration e = pastedObjects.elements(); e.hasMoreElements();)
@@ -329,7 +328,7 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
       {
 	GraphicObject obj = (GraphicObject)ErmesSelection.patcherSelection.getSingleton();
       
-	if (obj instanceof Editable)
+	if ((obj instanceof Editable) && !undoing)
 	  {
 	    ErmesSelection.patcherSelection.deselectAll();
       
@@ -341,6 +340,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	      });
 	  }
       }
+
+    undoing = false;
 
     repaint();
   }
@@ -591,7 +592,8 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
 	fromToolbar = false;
       }
     redraw();
-    if (doEdit && newObjectEdit && (!multiAdd) && (object instanceof Editable))
+
+    if (doEdit && newObjectEdit && (!multiAdd) && (object instanceof Editable) && !undoing)
       {
 	// The EditField is not really ready until the control
 	// is returned back to the event loop; this is why we invoke textEditObject 
@@ -694,8 +696,10 @@ public class ErmesSketchPad extends JComponent implements  Editor, Printable, Ft
   final public void stopTextEditing()
   {
     if (editedObject != null)
-      itsEditField.endEdit();
-
+      {
+	itsEditField.endEdit();
+	resetUndoRedo();
+      }
     editedObject = null;
   }
 
