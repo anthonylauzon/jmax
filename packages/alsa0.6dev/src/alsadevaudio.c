@@ -64,6 +64,9 @@ static alsa_dev_data_t *create_instance( int nargs, const fts_atom_t *args)
 {
   int n_channels, sampling_rate, fifo_size, frag_size, card, device, subdevice;
   alsa_dev_data_t *data;
+#if 1
+  int init_frag;
+#endif
 
   sampling_rate = (int) fts_param_get_float( fts_s_sampling_rate, DEF_SAMPLING_RATE);
   fifo_size = fts_param_get_int(fts_s_fifo_size, DEF_FIFO_SIZE);
@@ -81,12 +84,22 @@ static alsa_dev_data_t *create_instance( int nargs, const fts_atom_t *args)
   card = fts_get_int_by_name( nargs, args, fts_new_symbol( "card"), 0);
   device = fts_get_int_by_name( nargs, args, fts_new_symbol( "device"), 0);
   subdevice = fts_get_int_by_name( nargs, args, fts_new_symbol( "subdevice"), 0);
+#if 1
+  init_frag = fts_get_int_by_name( nargs, args, fts_new_symbol( "init_frag"), 0);
+#endif
+
+  subdevice = fts_get_int_by_name( nargs, args, fts_new_symbol( "subdevice"), 0);
 
   /* Allocation of device data */
   data = (alsa_dev_data_t *)fts_malloc( sizeof( alsa_dev_data_t));
 
+#if 1
+  if (snd_open( &data->md, card, device, subdevice, SND_PCM_SFMT_S32_LE, sampling_rate, frag_size, init_frag) < 0)
+    return 0;
+#else
   if (snd_open( &data->md, card, device, subdevice, SND_PCM_SFMT_S32_LE, sampling_rate, frag_size) < 0)
     return 0;
+#endif
 
   if (snd_start( &data->md) < 0)
     return 0;

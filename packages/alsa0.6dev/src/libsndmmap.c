@@ -106,7 +106,7 @@ static int snd_configure( snd_pcm_t *handle, int format, int sampling_rate, int 
   return 0;
 }
 
-int snd_open( mmapdev_t *d, int card, int dev, int subdev, int format, int sampling_rate, int frag_size)
+int snd_open( mmapdev_t *d, int card, int dev, int subdev, int format, int sampling_rate, int frag_size, int init_frag)
 {
   snd_pcm_params_info_t params_info;
   snd_pcm_setup_t setup;
@@ -159,7 +159,13 @@ int snd_open( mmapdev_t *d, int card, int dev, int subdev, int format, int sampl
   d->frag_size = setup.frag_size;
   d->n_fragments = setup.frags;
   d->n_channels = n_channels;
+
+#if 0
   d->fragment = 0; /* As noted by Paul, may be not the right initial value */
+#else
+  d->fragment = init_frag; /* As noted by Paul, may be not the right initial value */
+#endif
+
   d->capture_addr = snd_get_addr( d, d->capture_handle, format);
   d->playback_addr = snd_get_addr( d, d->playback_handle, format);
   d->xrun = 0;

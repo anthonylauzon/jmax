@@ -610,6 +610,11 @@ static void dtd_no_real_time( void)
 	  fprintf( stderr, "[dtdserver] cannot give up real-time priority (%s)\n", strerror( errno));
 	}
     }
+
+  /* Get rid of root privilege if we have them */
+  if (setreuid(getuid(), getuid()) == -1)
+    {
+    }
 }
 
 static void signal_handler( int sig)
