@@ -1,3 +1,23 @@
+2003-02-05  Patrice Tisserand  <Patrice.Tisserand@ircam.fr>
+
+	* remove platform dependant default project files:
+	   default_project_linux_alsa.jprj
+	   default_project_linux_jack.jprj
+	   default_project_linux_oss.jprj
+	   default_project_macosx.jprj
+	   default_project_win32.jrpj
+
+	* hardcoded platform dependant packages in fts_platform_init
+
+	* rename client_pipe_install into exported fts_client_pipe_start
+
+	* rename client_tcp_manager_install into exported fts_client_tcp_start
+
+	* move pipe connection test from fts_client_config (jmax/fts/client.c) to fts_init (jmax/fts/fts.c)
+
+	* merge fts_kernel_init and fts_kernel_classes_config
+
+	
 2003-02-04  Diemo Schwarz  <schwarz@ligeti.ircam.fr>
 
 	* play~ understands start message, for consistency with play.
