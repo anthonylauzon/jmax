@@ -156,7 +156,6 @@ public class ErmesSketchWindow extends MaxEditor implements MaxDataEditor, FtsPr
     super();
     if (theData.getName()==null) setTitle(GetNewUntitledName());
     else {
-      System.err.println("setto il titolo "+theData.getDataSource().toString());
       setTitle(theData.getDataSource().toString()); 
    }
     //else setTitle(theData.getName());
