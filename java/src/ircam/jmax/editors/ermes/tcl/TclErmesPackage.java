@@ -54,6 +54,9 @@ public class TclErmesPackage
     interp.createCommand("graphicson", new ErmesGraphicsOnCmd());
     interp.createCommand("graphicsoff", new ErmesGraphicsOffCmd());
 
+    /* preload commands*/
+    interp.createCommand("toolbarPreloadIcon", new ErmesToolbarPreloadIconCmd());
+
     /* debug */
     interp.createCommand("probe", new GlobalProbeCmd());
 

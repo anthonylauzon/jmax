@@ -64,6 +64,10 @@ MaxGetMaxVersionCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxGetMaxVersionCmd.java)
 .PHONY: MaxGetMaxVersionCmd
 
+MaxPreloadClassCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) MaxPreloadClassCmd.java)
+.PHONY: MaxPreloadClassCmd
+
 TclMaxPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclMaxPackage.java)
 .PHONY: TclMaxPackage

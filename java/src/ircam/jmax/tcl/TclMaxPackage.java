@@ -39,6 +39,10 @@ public class TclMaxPackage
 
     interp.createCommand("splash", new MaxSplashCmd());
     
+    /* Preload command */
+
+    interp.createCommand("preloadClass", new MaxPreloadClassCmd());
+
     /* hooks */
 
     interp.createCommand("when", new MaxWhenCmd());

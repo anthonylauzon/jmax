@@ -57,15 +57,21 @@ public class ErmesSwToolbar extends JPanel implements  MouseListener{
    */
   public void AddButton(String name, String gifFilePath) {
     ErmesSwToggleButton aToggleButton;
+    ImageIcon aImageIcon = loadIcon(gifFilePath);
+    
+    aToggleButton = new ErmesSwToggleButton(name, aImageIcon);
+    itsSwToolbar.add(aToggleButton);
+    aToggleButton.addMouseListener(this);
+  }
+
+  public static ImageIcon loadIcon(String gifFilePath) {
     ImageIcon aImageIcon = (ImageIcon) itsImages.get(gifFilePath);
     if (aImageIcon == null) {
       aImageIcon =  new ImageIcon(gifFilePath);
       itsImages.put(gifFilePath, aImageIcon);
     }
-    
-    aToggleButton = new ErmesSwToggleButton(name, aImageIcon);
-    itsSwToolbar.add(aToggleButton);
-    aToggleButton.addMouseListener(this);
+    //else already loaded
+    return aImageIcon;
   }
   
   void SelectAButton(ErmesSwToggleButton theButton) {

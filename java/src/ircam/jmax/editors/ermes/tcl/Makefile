@@ -91,6 +91,10 @@ GlobalProbeCmd:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) GlobalProbeCmd.java)
 .PHONY: GlobalProbeCmd
 
+ErmesToolbarPreloadIconCmd:
+	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) ErmesToolbarPreloadIconCmd.java)
+.PHONY: ErmesToolbarPreloadIconCmd
+
 TclErmesPackage:
 	(CLASSPATH=$(JMAX_CLASSPATH) ; export CLASSPATH ; javac $(JFLAGS) TclErmesPackage.java)
 .PHONY: TclErmesPackage

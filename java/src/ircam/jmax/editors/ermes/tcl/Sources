@@ -15,6 +15,7 @@ SOURCES =  \
           ErmesPatNewCmd.java \
           ErmesSelectedCmd.java \
 	  GlobalProbeCmd.java \
+          ErmesToolbarPreloadIconCmd.java \
 	  TclErmesPackage.java
 
 
