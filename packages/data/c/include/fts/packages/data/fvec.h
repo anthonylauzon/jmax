@@ -124,6 +124,15 @@ DATA_API fts_class_t *frow_class;
                            (fmat_get_ptr((s)->fmat) + (s)->index * fmat_get_n((s)->fmat)): \
                            (fmat_get_ptr((s)->fmat) + (s)->index))
 
+/** 
+ *
+ *  @fn
+ */
+#define fslice_get_element(s, i) \
+        ((s)->type == fslice_row						\
+	 ?  *(fmat_get_ptr((s)->fmat) + (s)->index * fmat_get_n((s)->fmat) + i) \
+	 :  *(fmat_get_ptr((s)->fmat) + (s)->index + i * fmat_get_n((s)->fmat)))
+/* general formula: ptr + i * stride */
 
 /** 
  *
