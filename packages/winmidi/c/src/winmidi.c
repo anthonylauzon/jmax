@@ -28,7 +28,13 @@ winmidiport_config(void);
 BOOL WINAPI 
 DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-  fts_log("[winmidi]: DllMain\n");
+  // TODO: [RS]: Check if calling fts_log is safe during a DllMain callback.
+  // (some system calls are forbidden,
+  //  cf: 
+  //  http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dllproc/base/dllmain.asp
+  // )
+
+  //fts_log("[winmidi]: DllMain\n");
   return TRUE;
 }
 
