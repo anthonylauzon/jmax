@@ -16,6 +16,8 @@
 
 extern void fts_template_init(void);
 
+extern void fts_template_register_binary(fts_symbol_t name, unsigned char *program, fts_symbol_t symbol_table[]);
+
 extern void fts_template_add_instance(fts_template_t *template, fts_object_t *object);
 extern void fts_template_remove_instance(fts_template_t *template, fts_object_t *object);
 

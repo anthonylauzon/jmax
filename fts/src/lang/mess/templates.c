@@ -54,13 +54,18 @@
 
 /* Template */
 
-enum template_mode {fts_template_cache, fts_template_declaration};
+
+enum template_mode {fts_template_filename_cached, fts_template_declaration, fts_template_binary_cached};
 
 struct fts_template
 {
   fts_symbol_t name;
   fts_symbol_t filename;
   fts_object_set_t *instances;
+  struct {
+    unsigned char *program;
+    fts_symbol_t *symbol_table;
+  } binary;
   enum template_mode mode;
 };
 
@@ -83,7 +88,7 @@ void fts_template_init()
   template_search_path_fill  = 0;
 }
 
-static void fts_template_register(fts_symbol_t name, fts_symbol_t filename, enum template_mode mode)
+static void fts_template_register_filename(fts_symbol_t name, fts_symbol_t filename, enum template_mode mode)
 {
   char buf[MAXPATHLEN];
   fts_template_t *template;
@@ -111,6 +116,30 @@ static void fts_template_register(fts_symbol_t name, fts_symbol_t filename, enum
   fprintf(stderr, "Registered template %s file %s mode %s\n",
 	  fts_symbol_name(name), fts_symbol_name(filename),
 	  ( mode == fts_template_declaration ? "declaration" : "cache")); /* @@@@ */
+#endif
+}
+
+void fts_template_register_binary(fts_symbol_t name, unsigned char *program, fts_symbol_t *symbol_table)
+{
+  fts_template_t *template;
+  fts_atom_t d;
+
+  /* Make the template */
+     
+  template = (fts_template_t *) fts_heap_alloc(template_heap);
+
+  template->name = name;
+  template->instances = 0;
+  template->binary.program = program;
+  template->binary.symbol_table = symbol_table;
+
+  template->mode = fts_template_binary_cached;
+
+  fts_set_ptr(&d, template);
+  fts_hash_table_insert(&template_table, name, &d);
+
+#ifdef TEMPLATE_DEBUG 
+  fprintf(stderr, "Registered binary template %s\n", fts_symbol_name(name)); /* @@@@ */
 #endif
 }
 
@@ -195,7 +224,7 @@ void fts_template_declare(fts_symbol_t name, fts_symbol_t filename)
     {
       /* Register the template */
 
-      fts_template_register(name, filename, fts_template_declaration);
+      fts_template_register_filename(name, filename, fts_template_declaration);
     }
 
   /* And give a try to error objects also */
@@ -258,7 +287,7 @@ static void fts_template_find_in_path_and_cache(fts_symbol_t name)
       sprintf(buf, "%s/%s.jmax", fts_symbol_name(filename), fts_symbol_name(name));
 
       if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))
-	fts_template_register(name, fts_new_symbol_copy(buf), fts_template_cache);
+	fts_template_register_filename(name, fts_new_symbol_copy(buf), fts_template_filename_cached);
     }
 }
 
@@ -303,10 +332,12 @@ static fts_object_t *fts_make_template_instance(fts_template_t *template,
 {
   fts_object_t *obj;
 
-  obj = fts_binary_file_load(fts_symbol_name(template->filename), (fts_object_t *) patcher, ac, at, e);
+  if (template->mode == fts_template_binary_cached)
+    obj = fts_run_mess_vm( (fts_object_t *)patcher, template->binary.program, template->binary.symbol_table, ac, at, e);
+  else
+    obj = fts_binary_file_load(fts_symbol_name(template->filename), (fts_object_t *) patcher, ac, at, e);
   
   /* flag the patcher as template, and set the template */
-
 
   if (obj)
     fts_patcher_set_template((fts_patcher_t *)obj, template);
@@ -323,7 +354,8 @@ fts_object_t *fts_template_new_declared(fts_patcher_t *patcher,
 
   template = fts_template_find(fts_get_symbol(&at[0]));
 
-  if (template && (template->mode ==  fts_template_declaration))
+  if (template 
+      && ((template->mode ==  fts_template_declaration) || (template->mode ==  fts_template_binary_cached)))
     return fts_make_template_instance(template, patcher, ac, at, e);
   else
     return 0;
@@ -346,7 +378,7 @@ fts_object_t *fts_template_new_search(fts_patcher_t *patcher,
       template = fts_template_find(fts_get_symbol(&at[0]));
     }
 
-  if (template && (template->mode == fts_template_cache))
+  if (template && (template->mode == fts_template_filename_cached))
     return fts_make_template_instance(template, patcher, ac, at, e);
   else
     return 0;

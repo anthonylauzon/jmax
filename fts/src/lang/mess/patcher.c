@@ -828,9 +828,14 @@ patcher_send_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 static void patcher_get_data(fts_daemon_action_t action, fts_object_t *obj,
 			     fts_symbol_t property, fts_atom_t *value)
 {
+  fts_atom_t a;
   fts_patcher_t *this = (fts_patcher_t *) obj;
 
-  if (! fts_patcher_is_error(this))
+  fts_object_get_prop( obj, fts_new_symbol( "no_upload"), &a);
+
+  if ( fts_is_int( &a) && fts_get_int( &a))
+    fts_set_void( value);
+  else if (! fts_patcher_is_error(this))
     fts_set_data(value, (fts_data_t *) (this->data));
   else
     fts_set_void(value);
