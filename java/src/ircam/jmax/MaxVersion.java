@@ -5,6 +5,6 @@ package ircam.jmax;
 public class MaxVersion {
   public static String getMaxVersion()
   {
-     return "jMax version 2.3.16";
+     return "jMax version 2.3.17";
   } 
 }
