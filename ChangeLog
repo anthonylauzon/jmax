@@ -6,6 +6,11 @@
 	  - all user(!) methods that change the dict call 
 	    data_object_set_dirty
 	    -> don't use user method dict_clean but dict_remove_all
+	  - mat.[ch]: 
+	    fix bug of clearing all atoms when reallocating in mat_set_size,
+	    remove unnecessary second clear from callers of mat_set_size
+	    add method to append a row of atoms
+	    hardcoded documentation of main user methods
 
 	* jmax/include/fts/predefsymbols.h:
 	  - (re)changed system dump message to _dump to free this symbol 
