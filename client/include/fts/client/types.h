@@ -24,7 +24,7 @@
 
 #include <windows.h>
 
-typedef HANDLE thread_t;
+typedef HANDLE client_thread_t;
 typedef HINSTANCE library_t;
 typedef FARPROC library_symbol_t;
 typedef SOCKET socket_t;
@@ -41,7 +41,7 @@ typedef HANDLE pipe_t;
 
 #include <pthread.h>
 
-typedef pthread_t thread_t;
+typedef pthread_t client_thread_t;
 typedef void* library_t;
 typedef void* library_symbol_t;
 typedef int socket_t;

@@ -8,10 +8,11 @@ in_out_tilda.c \
 iomodule.c \
 loopback.c \
 out.c \
-profileaudioport.c \
-serial.c \
-udp.c \
-wacom.c 
+
+#profileaudioport.c 
+#serial.c \
+#udp.c \
+#wacom.c 
 
 noinst_HEADERS= \
 iomodule.h

@@ -115,7 +115,7 @@ class FTSCLIENT_API FtsPlugin : public Fts {
   void (*_halt_function)(void);
 
   library_t _library;
-  thread_t _thread;
+  client_thread_t _thread;
   int _argc;
   const char **_argv;
 };

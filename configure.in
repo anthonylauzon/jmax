@@ -74,7 +74,6 @@ AC_ARG_ENABLE(electric-fence,
 
 dnl Check for platform-specific code
 AC_CANONICAL_HOST
-echo $host
 case "$host" in
 dnl FIXME: must add conditionnal tests for ALSA
 i*86-pc-linux-gnu)
@@ -90,6 +89,8 @@ mips-sgi-irix6.5)
     ;;
 powerpc-apple-darwin*)
     PLATFORM=macosx ;
+dnl Hack for problem of restrict finding (cc makes an error but does not return correct error code)
+    AC_DEFINE(restrict,)
     PLATFORM_PACKAGES="macosx"  ;;
 esac
 

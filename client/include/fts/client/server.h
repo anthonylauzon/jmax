@@ -113,7 +113,7 @@ private:
   static void *receiveThread( void *arg);
 #endif
 
-  thread_t _receiveThread;
+  client_thread_t _receiveThread;
 
   // Connection to FTS
   FtsServerConnection *_connection;
