@@ -55,7 +55,6 @@ public class ProjectEditor extends JFrame
     
     return projectEditor;
   }
-
   
   protected ProjectEditor()
   {

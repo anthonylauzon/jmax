@@ -383,6 +383,7 @@ public class ConfigPackagePanel extends JPanel
     FtsPackage ftsPackage;
   }
 
+
   /********************************/
   private JTabbedPane tabbedPane;
   private JTable requiresTable;
