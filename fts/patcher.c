@@ -534,7 +534,7 @@ receive_spost_description(fts_object_t *o, int wreceive, fts_symbol_t s, int ac,
       fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), 1, &a);
     }
   else
-    fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), o->argc - 1, o->argv + 1);
+    fts_spost_object_description_args((fts_bytestream_t *)fts_get_object(at), o->argc - 2, o->argv + 2);
 }
 
 static void
@@ -1326,7 +1326,7 @@ patcher_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
       if( fts_patcher_is_template( (fts_patcher_t *)o) || fts_patcher_is_abstraction( (fts_patcher_t *)o))
 	fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
       else
-	fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-1, o->argv+1);
+	fts_spost_object_description_args( (fts_bytestream_t *)fts_get_object(at), o->argc-2, o->argv+2);
     }  
   else
     fts_spost_object_description( (fts_bytestream_t *)fts_get_object(at), o);
