@@ -379,7 +379,7 @@ tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   int v_size = fts_get_int(at);
   int pix_size = fts_get_int(at + 1);
   int start = fts_get_int(at + 2);
-  int copy_size;
+  int copy_size, size;
   int i;
 
   tabeditor_copy_by_client_request(o, 0, 0, ac - 2, at + 2);
@@ -387,10 +387,11 @@ tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
     {
       int *ptr;
       copy_size = ivec_get_size( (ivec_t *)this->copy);
+      size = ivec_get_size( (ivec_t *)this->vec);
       ptr = ivec_get_ptr( (ivec_t *)this->vec);
-    
-      for(i=0; i< copy_size; i++)
-	ptr[start + i] = ptr[i + start + copy_size];
+     
+      for(i = start; i < size-copy_size; i++)
+	ptr[i] = ptr[i + copy_size];
 
       ivec_set_size((ivec_t *)this->vec, ivec_get_size( (ivec_t *)this->vec) - copy_size);
     }  
@@ -398,10 +399,11 @@ tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
     {
       float *ptr;
       copy_size = fvec_get_size( (fvec_t *)this->copy);
+      size = fvec_get_size( (fvec_t *)this->vec);
       ptr = fvec_get_ptr( (fvec_t *)this->vec);
     
-      for(i = 0; i < copy_size; i++)
-	ptr[start + i] = ptr[i + start + copy_size];
+      for(i = start; i < size-copy_size; i++)
+	ptr[i] = ptr[i + copy_size];
 
       fvec_set_size((fvec_t *)this->vec, fvec_get_size( (fvec_t *)this->vec) - copy_size);
     }
