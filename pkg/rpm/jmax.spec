@@ -3,7 +3,7 @@ Summary: graphical programming environment for developing audio applications
 Version: 2.4.11
 Release: 1
 Copyright: GPL
-Group: Development/Languages
+Group: Applications/Multimedia
 Source: ftp://ftp.ircam.fr/pub/IRCAM/equipes/temps-reel/jmax/releases/jmax-%{version}-src.tar.gz
 BuildRoot: /var/tmp/jmax-%{version}-root
 %description
