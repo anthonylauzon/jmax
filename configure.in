@@ -183,6 +183,9 @@ AC_MSG_RESULT( "$libtool_minor_version")
 if test "$libtool_major_version" -le 1 -a "$libtool_minor_version" -lt 4 ; then DOT_LIBS=-L.libs ; fi
 AC_SUBST(DOT_LIBS)
 
+dnl Checking if user compile with a sound support
+HAVE_A_SOUND_SUPPORT="false"
+
 dnl Set platform specifics
 case "$host" in
 
@@ -211,6 +214,7 @@ AM_PATH_ALSA(0.9.0,[
 	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
 	CFLAGS="$CFLAGS -DUSE_ALSA"
+	HAVE_A_SOUND_SUPPORT="true"
 ],[
 	DEFAULT_CONFIG_FILE=default_config_linux_oss.jcfg
 ])
@@ -367,6 +371,10 @@ AM_CONDITIONAL(COND_COMPILE_JACK, test "$HAVE_LIB_JACK" = "true")
 AC_SUBST(JACK_CFLAGS)
 AC_SUBST(JACK_LDFLAGS)
 
+dnl Refresh sound support
+if test "$HAVE_LIB_JACK" = "true"; then
+   HAVE_A_SOUND_SUPPORT="true"
+fi
 
 dnl ###########################################################################
 dnl choice of MidiShare package
@@ -393,7 +401,7 @@ AC_ARG_WITH(midishare-ldflags,
   MIDISHARE_LDFLAGS="-lMidiShare"
   )
 
-HAVE_LIB_JACK="false"
+HAVE_LIB_MIDISHARE="false"
 dnl output MidiShare feature
 if test "$with_midishare" = "yes"
 then
@@ -686,4 +694,13 @@ then
 echo
 echo Doxygen have been found, so FTS api documentation will be built
 echo
+fi
+
+if test "$HAVE_A_SOUND_SUPPORT" = "false"
+then
+echo
+echo "jMax will be compiled without standard sound support (ALSA or Jack)."
+echo Note that you can try to use the DEPRECATED oss packages at your own risk.
+echo Are you really sure you want to continue ?
+read
 fi
