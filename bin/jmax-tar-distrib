@@ -176,7 +176,7 @@ copy_files ()
 # Create the tar file
 create_tar ()
 {
-    TARDIR=${RELEASES_DIR}/${TYPE}/${ARCH}/${VERSION}
+    TARDIR=${RELEASES_DIR}/${VERSION}
     if [ ! -d ${TARDIR} ]
     then
 	mkdir -p ${TARDIR}
