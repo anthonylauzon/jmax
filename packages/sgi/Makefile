@@ -39,8 +39,6 @@ install:
 	$(INSTALL_DATA) sgi.jpk $(lib_install_dir)/packages/sgi/sgi.jpk
 	$(INSTALL_DIR) $(lib_install_dir)/packages/sgi/lib/$(ARCH)/opt
 	( cd lib/$(ARCH)/opt ; $(INSTALL_LIB) libsgi.so $(lib_install_dir)/packages/sgi/lib/$(ARCH)/opt/libsgi.so )
-	$(INSTALL_DIR) $(lib_install_dir)/packages/sgi/help
-	( cd help; for f in *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/sgi/help/$$f ; done )
 .PHONY: install
 
 # The following line is a hack that installs the <package>.jpk file on all platforms

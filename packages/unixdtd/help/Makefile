@@ -28,7 +28,7 @@ include $(JMAXDISTDIR)/Makefiles/Makefile.$(ARCH)
 
 install:
 	$(INSTALL_DIR) $(lib_install_dir)/packages/unixdtd/help
-	for f in *.tcl *.scm *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/unixdtd/help/$$f ; done
+	for f in *.tcl *.jmax ; do $(INSTALL_DATA) $$f $(lib_install_dir)/packages/unixdtd/help/$$f ; done
 .PHONY: install
 
 
