@@ -150,6 +150,7 @@ public class StatisticsDialog extends JDialog implements ActionListener, KeyList
     getContentPane().validate();
     pack();  
 
+    setResizable(false);
     setLocation(100, 100);
     setVisible(true);
   }
