@@ -651,16 +651,28 @@ fmat_set_from_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     int i = fts_get_number_int(at);
     int j = fts_get_number_int(at + 1);
     int size = m * n;
-    int onset = i * n + j;
+    int onset;
     
     ac -= 2;
     at += 2;
 
+    if(i > m)
+      i = m;
+    
+    if(j > n)
+      j = n;
+
+    while(i < 0)
+      i += m;
+    
+    while(j < 0)
+      j += n;
+
+    onset = i * n + j;
     if(onset + ac > size)
       ac = size - onset;
-    
-    if(i >= 0 && i < m && j >= 0 && j < n)
-      fmat_set_from_atoms(self, onset, 1, ac, at);
+        
+    fmat_set_from_atoms(self, onset, 1, ac, at);
 
     fts_object_changed(o);
     fts_return_object(o);
@@ -1721,8 +1733,46 @@ fmat_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
 }
 
-
-
+/******************************************************************************
+ *
+ *  element arithmetics
+ *
+ */
+static void
+fmat_elem_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  fmat_t *self = (fmat_t *)o;
+  
+  if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1) && fts_is_number(at + 2))
+  {
+    float *ptr = fmat_get_ptr(self);
+    int m = fmat_get_m(self);
+    int n = fmat_get_n(self);
+    int i = fts_get_number_int(at);
+    int j = fts_get_number_int(at + 1);
+    float op = fts_get_number_float(at + 2);
+    
+    ac -= 2;
+    at += 2;
+    
+    if(i > m)
+      i = m;
+    
+    if(j > n)
+      j = n;
+    
+    while(i < 0)
+      i += m;
+    
+    while(j < 0)
+      j += n;
+    
+    ptr[i * n + j] += op;
+    
+    fts_object_changed(o);
+    fts_return_object(o);
+  }
+}
 
 /******************************************************************************
  *
@@ -3885,7 +3935,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_s_set, fvec_class, fmat_set_from_fvec);
   fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
   fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
-  
+
   fts_class_message_varargs(cl, fts_new_symbol("pick"), fmat_pick_fmat);
   
   fts_class_message_number(cl, fts_s_col, fmat_get_col);
@@ -3934,6 +3984,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("mean"), fmat_get_mean);
   fts_class_message_void(cl, fts_new_symbol("zc"), fmat_get_zc);
   
+  fts_class_message_varargs(cl, fts_new_symbol("add"), fmat_elem_add);
+
   fmat_message(cl, fts_new_symbol("add"), fmat_add_fmat, fmat_add_number);
   fmat_message(cl, fts_new_symbol("sub"), fmat_sub_fmat, fmat_sub_number);
   fmat_message(cl, fts_new_symbol("mul"), fmat_mul_fmat, fmat_mul_number);

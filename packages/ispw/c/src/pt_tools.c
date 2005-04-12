@@ -106,7 +106,7 @@ pt_common_millers_bounded_q(complex *fft_spectrum, kernel_t *filter, float *q_po
     {
       float re = 0;
       float im = 0;
-      complex *band = fft_spectrum + filter[i].onset/2; /* onset made for float buffer */
+      complex *band = fft_spectrum + filter[i].onset;
       
       for(j=0; j<filter[i].n_filter_coeffs; j++)
 	{
@@ -398,107 +398,107 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   
   fft_buf = (complex *)fts_malloc(n_points * sizeof(complex));
   if ( !fft_buf)
-    { 
-      fts_post("pt: filter bank init: can't allocate FFT buffer!\n");
-      return(0);
-    }
-
+  { 
+    fts_post("pt: filter bank init: can't allocate FFT buffer!\n");
+    return(0);
+  }
+  
   filter_bank = (filter_bank_t *)fts_malloc(sizeof(filter_bank_t));
   if ( !filter_bank)
-    {
-      fts_free(fft_buf);
-      fts_post("pt: filter bank init: can't allocate structure!\n");
-      return(0);
-    }
-
+  {
+    fts_free(fft_buf);
+    fts_post("pt: filter bank init: can't allocate structure!\n");
+    return(0);
+  }
+  
   kernels = (kernel_t *)fts_malloc(n_channels * sizeof(kernel_t));
   if ( !kernels)
-    {
-      fts_free(fft_buf);
-      fts_free(filter_bank);
-      fts_post("pt: filter bank init: can't allocate kernels!\n");
-      return(0);
-    }
-
+  {
+    fts_free(fft_buf);
+    fts_free(filter_bank);
+    fts_post("pt: filter bank init: can't allocate kernels!\n");
+    return(0);
+  }
+  
   all_coeffs = (float *)fts_malloc(coeff_space * sizeof(float));
   if ( !all_coeffs)
-    {
-      fts_free(fft_buf);
-      fts_free(filter_bank);
-      fts_free(kernels);
-      fts_post("pt: filter bank init: can't allocate coefficients!\n");
-      return(0);
-    }
-
+  {
+    fts_free(fft_buf);
+    fts_free(filter_bank);
+    fts_free(kernels);
+    fts_post("pt: filter bank init: can't allocate coefficients!\n");
+    return(0);
+  }
+  
   /* lowest octave starts at point #2 -> freq=2./n_points */
   freq = 2.0f/n_points;
   for(i=0; i<n_channels; i++)
+  {
+    float bandwidth = q_factor * freq;
+    float filter_length = 1.0f / bandwidth; /* fixed filter cross over at 0.5f amplitude of hanning fr. */
+    float wind_length = (filter_length > (float)n_points)? ((float)n_points): (filter_length);
+    float wind_norm = 1.0f / wind_length;    /* normalize window */
+    float correct = wind_length / filter_length;
+    float d_wind_phase = FTS_TWO_PI / wind_length;
+    float d_sine_phase = freq * FTS_TWO_PI;
+    int n_filter_coeffs;
+    int down, up;
+    int j;
+    
+    for(j=0; j<n_points; j++)
+      fft_buf[j].re = fft_buf[j].im = 0.0;
+    
+    fft_buf[n_points/2].re = wind_norm;
+    fft_buf[n_points/2].im = 0;
+    
+    for(down=n_points/2-1, up=n_points/2+1, j=1; j<wind_length/2; j++, up++, down--)
     {
-      float bandwidth = q_factor * freq;
-      float filter_length = 1.0f / bandwidth; /* fixed filter cross over at 0.5f amplitude of hanning fr. */
-      float wind_length = (filter_length > (float)n_points)? ((float)n_points): (filter_length);
-      float wind_norm = 1.0f / wind_length;    /* normalize window */
-      float correct = wind_length / filter_length;
-      float d_wind_phase = FTS_TWO_PI / wind_length;
-      float d_sine_phase = freq * FTS_TWO_PI;
-      int n_filter_coeffs;
-      int down, up;
-      int j;
-      
-      for(j=0; j<n_points; j++)
-	fft_buf[j].re = fft_buf[j].im = 0.0;
-      
-      fft_buf[n_points/2].re = wind_norm;
-      fft_buf[n_points/2].im = 0;
-       
-      for(down=n_points/2-1, up=n_points/2+1, j=1; j<wind_length/2; j++, up++, down--)
-	{
-	  double wind = wind_norm * (0.5f + 0.5f * cos(j * d_wind_phase));
-	  fft_buf[down].re = fft_buf[up].re = cos(j * d_sine_phase) * wind;
-	  fft_buf[down].im = -(fft_buf[up].im = sin(j * d_sine_phase) * wind);
-	}
-      
-      fts_fft_declaresize(n_points);
-      fts_cfft_inplc(fft_buf, n_points);
-      
-      for(down = n_points/2-1; down >= 0; down--)
-	{
-	  float f = fft_buf[down].re;
-	  if(f > cutoff || f < -cutoff) break;
-	}
-      
-      for(up = 0; up < n_points/2; up++)
-	{
-	  float f = fft_buf[up].re;
-	  if(f > cutoff || f < -cutoff) break;
-	}
-      
-      if(up >= down)
-	{
-	  static int bugged = 0;
-	  if(!bugged)
+      double wind = wind_norm * (0.5f + 0.5f * cos(j * d_wind_phase));
+      fft_buf[down].re = fft_buf[up].re = cos(j * d_sine_phase) * wind;
+      fft_buf[down].im = -(fft_buf[up].im = sin(j * d_sine_phase) * wind);
+    }
+    
+    fts_fft_declaresize(n_points);
+    fts_cfft_inplc(fft_buf, n_points);
+    
+    for(down = n_points/2-1; down >= 0; down--)
+    {
+      float f = fft_buf[down].re;
+      if(f > cutoff || f < -cutoff) break;
+    }
+    
+    for(up = 0; up < n_points/2; up++)
+    {
+      float f = fft_buf[up].re;
+      if(f > cutoff || f < -cutoff) break;
+    }
+    
+    if(up >= down)
+    {
+      static int bugged = 0;
+      if(!bugged)
 	    {
 	      fts_post("filter bank initialisation failed\n");
 	      bugged = 1;
 	    }
-	  up = down;
-	}
-      
-      n_filter_coeffs = down - up + 1;
-      
-      kernels[i].filter_coeffs = all_coeffs + n_all_coeffs; /* here the coeffs are found then */
-      kernels[i].n_filter_coeffs = n_filter_coeffs;
-      kernels[i].onset = up * 2; /* * 2: onset for float instead of complex */
-      kernels[i].pow_corr = correct;
-      
-      /* copy coeffs to the *all_coeffs vector */
-      for(j=n_all_coeffs; j<n_all_coeffs+n_filter_coeffs; j++, up++) 
-	all_coeffs[j] = fft_buf[up].re;
-      
-      n_all_coeffs += n_filter_coeffs;
-      
-      freq += freq * q_factor;
+      up = down;
     }
+    
+    n_filter_coeffs = down - up + 1;
+    
+    kernels[i].filter_coeffs = all_coeffs + n_all_coeffs; /* here the coeffs are found then */
+    kernels[i].n_filter_coeffs = n_filter_coeffs;
+    kernels[i].onset = up; /* * 2: onset for float instead of complex */
+    kernels[i].pow_corr = correct;
+    
+    /* copy coeffs to the *all_coeffs vector */
+    for(j=n_all_coeffs; j<n_all_coeffs+n_filter_coeffs; j++, up++) 
+      all_coeffs[j] = fft_buf[up].re;
+    
+    n_all_coeffs += n_filter_coeffs;
+    
+    freq += freq * q_factor;
+  }
   
   filter_bank->kernels = kernels;
   filter_bank->n_channels = n_channels;
@@ -507,7 +507,7 @@ filter_bank_init(int channels_per_octave, float coeff_cut, int n_points)
   filter_bank->channels_per_octave = channels_per_octave;
   filter_bank->q_factor = q_factor;
   filter_bank->coeff_cut = coeff_cut;
-
+  
   fts_free(fft_buf);
   
   return(filter_bank);
