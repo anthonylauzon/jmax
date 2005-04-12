@@ -2051,7 +2051,7 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_eq_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2075,11 +2075,11 @@ fmat_ee_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fts_return_object(o);
   }
   else
-    fmat_error_dimensions(self, right, "ee");
+    fmat_error_dimensions(self, right, "eq");
 }
 
 static void
-fmat_ee_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fmat_eq_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -3992,7 +3992,8 @@ fmat_instantiate(fts_class_t *cl)
   fmat_message(cl, fts_new_symbol("div"), fmat_div_fmat, fmat_div_number);
   fmat_message(cl, fts_new_symbol("bus"), fmat_bus_fmat, fmat_bus_number);
   fmat_message(cl, fts_new_symbol("vid"), fmat_vid_fmat, fmat_vid_number);
-  fmat_message(cl, fts_new_symbol("ee"), fmat_ee_fmat, fmat_ee_number);
+  fmat_message(cl, fts_new_symbol("ee"), fmat_eq_fmat, fmat_eq_number);
+  fmat_message(cl, fts_new_symbol("eq"), fmat_eq_fmat, fmat_eq_number);
   fmat_message(cl, fts_new_symbol("ne"), fmat_ne_fmat, fmat_ne_number);
   fmat_message(cl, fts_new_symbol("gt"), fmat_gt_fmat, fmat_gt_number);
   fmat_message(cl, fts_new_symbol("ge"), fmat_ge_fmat, fmat_ge_number);
@@ -4103,7 +4104,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("div"), "<num|fmat: operand>", "divide current values by given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("bus"), "<num|fmat: operand>", "subtract current values from given scalar or fmat (element by element)");  
   fts_class_doc(cl, fts_new_symbol("vid"), "<num|fmat: operand>", "divide given scalar or fmat (element by element) by current values");
-  fts_class_doc(cl, fts_new_symbol("ee"), "<num|fmat: operand>", "replace current values by result of == comparison (0 or 1) with given scalar or fmat (element by element)");
+  fts_class_doc(cl, fts_new_symbol("eq"), "<num|fmat: operand>", "replace current values by result of == comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("ne"), "<num|fmat: operand>", "replace current values by result of != comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("gt"), "<num|fmat: operand>", "replace current values by result of > comparison (0 or 1) with given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("ge"), "<num|fmat: operand>", "replace current values by result of >= comparison (0 or 1) with given scalar or fmat (element by element)");
