@@ -330,14 +330,14 @@ concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
   if ((status = expression_eval_aux( tree->right, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok) \
     return status;											  \
   top = expression_stack_top( exp);									  \
-  if (fts_is_int( top) && fts_is_int( top-1))								  \
-    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_int( top));					  \
-  else if (fts_is_int( top) && fts_is_float( top-1))							  \
-    fts_set_int( top-1, fts_get_int( top-1) OP fts_get_float( top));					  \
-  else if (fts_is_float( top) && fts_is_int( top-1))							  \
-    fts_set_int( top-1, fts_get_float( top-1) OP fts_get_int( top));					  \
-  else if (fts_is_float( top) && fts_is_float( top-1))							  \
-    fts_set_int( top-1, fts_get_float( top-1) OP fts_get_float( top));					  \
+  if      (fts_is_int(top-1)    &&  fts_is_int(top))							  \
+    fts_set_int(top-1, fts_get_int(top-1)   OP fts_get_int(top));					  \
+  else if (fts_is_int(top-1)    &&  fts_is_float(top))							  \
+    fts_set_int(top-1, fts_get_int(top-1)   OP fts_get_float(top));					  \
+  else if (fts_is_float(top-1)  &&  fts_is_int(top))							  \
+    fts_set_int(top-1, fts_get_float(top-1) OP fts_get_int(top));					  \
+  else if (fts_is_float(top-1)  &&  fts_is_float(top))							  \
+    fts_set_int(top-1, fts_get_float(top-1) OP fts_get_float(top));					  \
   else													  \
     return operand_type_mismatch_error;									  \
   expression_stack_pop( exp, 1);
