@@ -218,6 +218,74 @@ cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
 
 /**********************************************************************
 *
+*  conditional functions
+*
+*/
+
+/* (if cond argtrue argfalse) */
+
+static fts_status_t
+if_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+    if (ac > 0)
+    {
+	double cond = 0.0;
+
+	if (fts_is_number(at))
+	    cond = fts_get_number_float(at);
+	else if (!fts_is_void(at))
+	    cond = 1.0;
+
+	if (cond != 0.0)
+	{   /* true */
+	    if (ac > 1)
+		fts_atom_assign(ret, at + 1);
+	    /* else: nothing */
+	}
+	else
+	{   /* false */
+	    if (ac > 2)
+		fts_atom_assign(ret, at + 2);
+	    /* else: really nothing */
+	}
+  
+	return fts_ok;
+    }
+    else
+	return fts_ignore;	
+}
+
+
+/* (case cond arg1 ... argn) is 1-based, cond = 0 meaning that nothing is output.
+
+   Note that this is not like a real case statment, where only one of
+   several cases is executed, but an expression where all arguments are
+   evaluated before one of them is chosen!
+*/
+
+static fts_status_t
+case_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+    if (ac > 0)
+    {
+	int cond = 0;	/* default: no output */
+
+	if (fts_is_number(at))
+	    cond = fts_get_number_int(at);
+
+	if (0 < cond  &&  cond < ac)
+	    fts_atom_assign(ret, at + cond);
+	/* else: nothing */
+
+	return fts_ok;
+    }
+    else
+	return fts_ignore;	
+ }
+
+
+/**********************************************************************
+*
 *  system functions
 *
 */
@@ -258,6 +326,8 @@ functions_config(void)
   fts_function_install( fts_new_symbol("random"), random_function);
   fts_function_install( fts_new_symbol("mod"), mod_function);
 
-  fts_function_install( fts_new_symbol("cat"), cat_function);
-  fts_function_install( fts_new_symbol("typeof"), typeof_function);
+  fts_function_install(fts_new_symbol("cat"),      cat_function);
+  fts_function_install(fts_new_symbol("if"),       if_function);
+  fts_function_install(fts_new_symbol("case"),     case_function);
+  fts_function_install(fts_new_symbol("typeof"),   typeof_function);
 }
