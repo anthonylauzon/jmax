@@ -3938,15 +3938,18 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("pick"), fmat_pick_fmat);
   
+  /* compatile fvec creators */
   fts_class_message_number(cl, fts_s_col, fmat_get_col);
   fts_class_message_number(cl, fts_s_row, fmat_get_row);
-  fts_class_message_number(cl, fts_new_symbol("diag"), fmat_get_diag);
-  fts_class_message_varargs(cl, fts_new_symbol("col"), fmat_set_col);
-  fts_class_message_varargs(cl, fts_new_symbol("row"), fmat_set_row);
-  
-  fts_class_message_varargs(cl, fts_new_symbol("getcol"), fmat_get_col);
-  fts_class_message_varargs(cl, fts_new_symbol("getrow"), fmat_get_row);
-  fts_class_message_varargs(cl, fts_new_symbol("getdiag"), fmat_get_diag);
+
+  /* compatile col and row set form list */
+  fts_class_message_varargs(cl, fts_s_col, fmat_set_col);
+  fts_class_message_varargs(cl, fts_s_row, fmat_set_row);
+
+  /* new fvec creators */
+  fts_class_message_varargs(cl, fts_new_symbol("colref"), fmat_get_col);
+  fts_class_message_varargs(cl, fts_new_symbol("rowref"), fmat_get_row);
+  fts_class_message_varargs(cl, fts_new_symbol("diagref"), fmat_get_diag);
   
   fts_class_message_varargs(cl, fts_new_symbol("setcol"), fmat_set_col);
   fts_class_message_varargs(cl, fts_new_symbol("setrow"), fmat_set_row);
