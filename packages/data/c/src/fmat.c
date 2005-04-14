@@ -260,16 +260,24 @@ fmat_set_size(fmat_t *self, int m, int n)
   }
 }
 
+
 void
 fmat_set_const(fmat_t *mat, float c)
 {
-  float *values = mat->values;
-  int size = mat->m * mat->n;
+  float *values;
+  int size;
+  int stride;
   int i;
 
-  for(i=0; i<size; i++)
-    values[i] = c;
+  if (fmat_or_slice_pointer(mat, &values, &size, &stride))
+  {
+    size *= stride;     /* size is num. elements in slice! */
+
+    for (i = 0; i < size; i += stride)
+      values[i] = c;
+  }
 }
+
 
 void
 fmat_set_from_atoms(fmat_t *mat, int onset, int step, int ac, const fts_atom_t *at)
@@ -449,6 +457,7 @@ fmat_get_min_value_in_range(fmat_t *mat, int a, int b)
  *
  */
 
+/** return parameters to iterate over one vector of an fmat or over an fvec */
 int
 fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
 {
@@ -468,6 +477,29 @@ fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
   
   return fvec_vector(obj, ptr, size, stride);
 }
+
+
+/** return parameters to iterate over all elements of fmat or fvec */
+int
+fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride)
+{
+  fts_class_t *cl = fts_object_get_class(obj);
+
+  if (cl == fmat_class)
+  {
+    fmat_t *fmat = (fmat_t *) obj;
+    
+    *ptr    = fmat_get_ptr(fmat);
+    *size   = fmat_get_m(fmat) * fmat_get_n(fmat);
+    *stride = 1;
+    
+    return 1;
+  }
+  else
+    return fvec_vector(obj, ptr, size, stride);
+}
+
+
 
 static void
 fmat_error_dimensions(fmat_t *fmat, fmat_t *op, const char *prefix)
@@ -790,13 +822,14 @@ fmat_set_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object(o);
 }
 
-static void
+/* used by fvec, too! */
+void
 fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
   
   if(ac > 0 && fts_is_number(at))
-    fmat_set_const(self, (float)fts_get_number_float(at));
+    fmat_set_const(self, (float) fts_get_number_float(at));
 
   fts_object_changed(o);
   fts_return_object(o);
@@ -1070,7 +1103,7 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int j = 0;
   
   if (m == 0  ||  n == 0)
-    fts_return_float(0);	/* empty matrix: no error, just return 0 */
+    fts_return_float(0);        /* empty matrix: no error, just return 0 */
   else
   {
     if (ac > 0  &&  fts_is_number(at))
@@ -1266,6 +1299,10 @@ fmat_pick_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_return_object(o);
 }
 
+
+
+/* fvec constructors: get vector object that references fmat */
+
 static void 
 fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1280,6 +1317,7 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   fts_return_object((fts_object_t *)fvec);
 }
+
 
 static void 
 fmat_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1296,6 +1334,7 @@ fmat_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_return_object((fts_object_t *)fvec);
 }
 
+
 static void 
 fmat_get_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
@@ -1311,10 +1350,11 @@ fmat_get_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_return_object((fts_object_t *)fvec);
 }
 
+
 /** append a row of atoms, augment m, clip row to n 
 * 
 * @method append
-* @param  atoms	row of atoms to append, will be clipped to width of matrix
+* @param  atoms   row of atoms to append, will be clipped to width of matrix
 */
 static void
 fmat_append_row_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -1427,38 +1467,38 @@ fmat_append_row_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  * @method insert
  * @param  int: pos    index of row where to insert
  * @param  tuples: atoms  list of tuples of rows of atoms to append, 
- *		       will be clipped to width of matrix
+ *                     will be clipped to width of matrix
  */
 static void
 fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t	*self = (fmat_t *) o;
+  fmat_t        *self = (fmat_t *) o;
   float *newptr;
   int m = fmat_get_m(self);
-  int	n = fmat_get_n(self);
-  int	pos = 0;	// row position at which to insert 
-  int numrows = 1;	// number of rows to insert
+  int   n = fmat_get_n(self);
+  int   pos = 0;        // row position at which to insert 
+  int numrows = 1;      // number of rows to insert
   int num, tomove, i;
 
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
 
-  if(pos < 0)	pos = 0;
+  if(pos < 0)   pos = 0;
   else if(pos > m) pos = m;
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if(numrows <= 0)	return;	
+  if(numrows <= 0)      return; 
 
   fmat_set_size(self, m + numrows, n);
 
   // move rows
   newptr = fmat_get_ptr(self) + n * pos;
-  num    = n * numrows;		// atoms to insert 
-  tomove = n * (m - pos);	// atoms to move 
+  num    = n * numrows;         // atoms to insert 
+  tomove = n * (m - pos);       // atoms to move 
 
-  if(pos < m)	
+  if(pos < m)   
     memmove(newptr + num, newptr, tomove * sizeof(float));
 
   for(i = 0; i < num; i++)
@@ -1479,28 +1519,28 @@ fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 * @method insert
 * @param  int: pos    index of row where to insert
 * @param  tuples: atoms  list of tuples of rows of atoms to append, 
-*		       will be clipped to width of matrix
+*                      will be clipped to width of matrix
 */
 static void
 fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t	*self = (fmat_t *) o;
+  fmat_t        *self = (fmat_t *) o;
   int m = fmat_get_m(self);
-  int	n = fmat_get_n(self);
-  int	pos = 0;	// col position at which to insert
-  int numcols = 1;	// number of rows to insert
+  int   n = fmat_get_n(self);
+  int   pos = 0;        // col position at which to insert
+  int numcols = 1;      // number of rows to insert
   int tomove, i, j, start, new_n;
   
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
-  if(pos < 0)	pos = 0;
+  if(pos < 0)   pos = 0;
   else if(pos > n) pos = n;
   
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)	return;	
+  if(numcols <= 0)      return; 
   
   fmat_set_size(self, m, n + numcols);
   new_n = n+numcols;
@@ -1524,23 +1564,23 @@ fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t	*self = (fmat_t *) o;
+  fmat_t        *self = (fmat_t *) o;
   int m = fmat_get_m(self);
-  int	n = fmat_get_n(self);
-  int	pos = 0;	
-  int numcols = 1;	// number of rows to delete
+  int   n = fmat_get_n(self);
+  int   pos = 0;        
+  int numcols = 1;      // number of rows to delete
   int tomove, i, j, start;
   
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
-  if(pos < 0)	pos = 0;
+  if(pos < 0)   pos = 0;
   else if(pos > n) pos = n;
   
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)	return;	
+  if(numcols <= 0)      return; 
   
   start = pos + numcols;
   tomove = n-pos-numcols;
@@ -1567,29 +1607,29 @@ fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 static void
 fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  fmat_t	*self = (fmat_t *) o;
-  float *killptr;
-  int m = fmat_get_m(self);
-  int	n = fmat_get_n(self);
-  int	pos = 0;
-  int numrows = 1;
-  int num, tomove;
+  fmat_t *self = (fmat_t *) o;
+  float  *killptr;
+  int     m = fmat_get_m(self);
+  int     n = fmat_get_n(self);
+  int     pos = 0;
+  int     numrows = 1;
+  int     num, tomove;
   
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
     
-  if(pos <  0) pos = 0;
-  else if (pos >= m) return;	
+  if      (pos <  0)  pos = 0;
+  else if (pos >= m)  return;    
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1);
 
-  if(numrows <= 0) return;	
-  else if (numrows >  m - pos) numrows = m - pos;
+  if      (numrows <= 0)        return;      
+  else if (numrows >  m - pos)  numrows = m - pos;
   
   killptr = fmat_get_ptr(self) + n * pos;
-  num     = n * numrows;	// number of atoms to insert
-  tomove  = n * (m - pos);	// number of atoms to move 
+  num     = n * numrows;        // number of atoms to insert
+  tomove  = n * (m - pos);      // number of atoms to move 
 
   memmove(killptr, killptr + num, tomove * sizeof(float));
   self->m -= numrows; 
@@ -3059,10 +3099,10 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       ptr[shift] = ptr[0];
       
       while(i < end)
-	    {
-	      next = (j + shift) % size;
-	      
-	      if(next != i)
+      {
+        next = (j + shift) % size;
+        
+        if(next != i)
         {
           float swap = ptr[next];
           
@@ -3074,7 +3114,7 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
           
           j = next;
         }
-	      else
+        else
         {
           ptr[i] = forward;
           
@@ -3083,7 +3123,7 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
           
           forward = ptr[i];
         }
-	    }
+      }
     }
   }
   
@@ -3259,7 +3299,7 @@ fmat_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   if(n_fade > m / 2)
     n_fade = m / 2;
-	  
+          
   f = 0.0;
   
   if(n == 1)
@@ -3903,13 +3943,14 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-fmat_message(fts_class_t *cl, fts_symbol_t s, fts_method_t marix_method, fts_method_t scalar_method)
+fmat_message (fts_class_t *cl, fts_symbol_t s, 
+              fts_method_t matrix_method, fts_method_t scalar_method)
 {
-	if(marix_method != NULL)
-		fts_class_message(cl, s, fmat_class, marix_method);
-
-	if(scalar_method != NULL)
-		fts_class_message_number(cl, s, scalar_method);
+  if(matrix_method != NULL)
+    fts_class_message(cl, s, fmat_class, matrix_method);
+  
+  if(scalar_method != NULL)
+    fts_class_message_number(cl, s, scalar_method);
 }
 
 static void
@@ -3938,11 +3979,11 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_new_symbol("pick"), fmat_pick_fmat);
   
-  /* compatile fvec creators */
+  /* compatible fvec creators */
   fts_class_message_number(cl, fts_s_col, fmat_get_col);
   fts_class_message_number(cl, fts_s_row, fmat_get_row);
 
-  /* compatile col and row set form list */
+  /* compatible col and row set from list */
   fts_class_message_varargs(cl, fts_s_col, fmat_set_col);
   fts_class_message_varargs(cl, fts_s_row, fmat_set_row);
 
@@ -3951,12 +3992,13 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("rowref"), fmat_get_row);
   fts_class_message_varargs(cl, fts_new_symbol("diagref"), fmat_get_diag);
   
-  fts_class_message_varargs(cl, fts_new_symbol("setcol"), fmat_set_col);
+  /* but these are preferred: */
   fts_class_message_varargs(cl, fts_new_symbol("setrow"), fmat_set_row);
+  fts_class_message_varargs(cl, fts_new_symbol("setcol"), fmat_set_col);
   
-  fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
+  fts_class_message_number (cl, fts_s_fill, fmat_fill_number);
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
-  fts_class_message_varargs(cl, fts_new_symbol("zero"), fmat_fill_zero);
+  fts_class_message_varargs(cl, fts_new_symbol("zero"),   fmat_fill_zero);
   fts_class_message_varargs(cl, fts_new_symbol("random"), fmat_fill_random);
   
   fts_class_message_varargs(cl, fts_s_append, fmat_append_row_varargs);
@@ -4064,6 +4106,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
+
+
   /* 
    * fmat class documentation 
    */

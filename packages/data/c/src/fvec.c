@@ -49,6 +49,11 @@ static fts_symbol_t sym_refer = NULL;
 
 static fts_symbol_t fvec_type_names[fvec_n_types];
 
+
+/* fmat functions used here */
+void fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+
+
 static int
 fvec_get_type_from_symbol(fts_symbol_t sym)
 {
@@ -138,7 +143,7 @@ fvec_create_vector(int size)
  *
  */
 
-#if 0	/* copied from fmat.c */
+#if 0   /* copied from fmat.c */
 
 #define FVEC_CLIENT_BLOCK_SIZE 128
 
@@ -237,7 +242,7 @@ fvec_editor_callback (fts_object_t *o, void *e)
 
 static void 
 fvec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, 
-		 int ac, const fts_atom_t *at)
+                 int ac, const fts_atom_t *at)
 {
   fvec_t *self = (fvec_t *) o;
   
@@ -251,7 +256,7 @@ fvec_open_editor(fts_object_t *o, int winlet, fts_symbol_t s,
 
 static void
 fvec_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, 
-		    int ac, const fts_atom_t *at)
+                    int ac, const fts_atom_t *at)
 {
   fvec_t *self = (fvec_t *) o;
   
@@ -261,7 +266,7 @@ fvec_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s,
 
 static void 
 fvec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, 
-		  int ac, const fts_atom_t *at)
+                  int ac, const fts_atom_t *at)
 {
   fvec_t *self = (fvec_t *) o;
   
@@ -285,7 +290,7 @@ fvec_close_editor(fts_object_t *o, int winlet, fts_symbol_t s,
 void fvec_changed(fvec_t *this)
 {
     if (this->editor)
-	tabeditor_send((tabeditor_t *) this->editor);
+        tabeditor_send((tabeditor_t *) this->editor);
 
     /* ??? no longer in fmat.  data_object_set_dirty((fts_object_t *) this); */
 }
@@ -325,9 +330,21 @@ fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
   }
 }
 
+
+/** get pointer, size, stride to access data in fmat 
+ *  referenced by this fvec
+ *
+ *  fvec onset and size must be >= 0  (as checked by fvec_set_dimensions)
+ */
 void
 fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
 {
+  /* clip x to be less or equal than upper limit u.
+     postcondition:  x <= u */
+# define CLIP(x, u)      do { if ((x) > (u))  { (x) = (u); } } while (0)
+# define CLIP2(x, l, u)  do { if      ((x) < (l))  { (x) = (l); }       \
+                              else if ((x) > (u))  { (x) = (u); } } while (0)
+
   fmat_t *fmat = fvec->fmat;
   float *fmat_ptr = fmat_get_ptr(fmat);
   int fmat_m = fmat_get_m(fmat);
@@ -355,7 +372,7 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
       *size = fvec_size;
       *stride = fmat_n;
-      break;
+    break;
       
     case fvec_type_row:
       
@@ -374,28 +391,38 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
       *size = fvec_size;
       *stride = 1;
-      break;
+    break;
       
     case fvec_type_diagonal:
-      
-      if(fvec_index < 0)
-        fvec_index = 0;
-      else if(fvec_index > fmat_m)
-        fvec_index = fmat_m;
-      
-      if(fvec_onset > fmat_n)
-        fvec_onset = fmat_n;
-        
-      if(fvec_index + fvec_size > fmat_m)
-        fvec_size = fmat_m - fvec_index;
-            
-      if(fvec_onset + fvec_size > fmat_n)
-        fvec_size = fmat_n - fvec_onset;
-          
-      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
-      *size = fvec_size;
+    {
+      int i, j; /* diagonal start indices */
+
+      if (fvec_index >= 0)
+      { /* superdiagonal: like col index */
+        CLIP(fvec_onset, fmat_m);
+        CLIP(fvec_onset, fmat_n - fvec_index);
+
+        i = fvec_onset;
+        j = fvec_index + fvec_onset;
+      }
+      else
+      { /* subdiagonal:   like row index */
+        CLIP(fvec_onset, fmat_m + fvec_index);
+        CLIP(fvec_onset, fmat_n);
+
+        i = -fvec_index + fvec_onset;
+        j = fvec_onset;
+      }
+
+      /* clip diagonal end indices to matrix size */
+      CLIP(fvec_size, fmat_m - i);
+      CLIP(fvec_size, fmat_n - j);
+
+      *ptr    = fmat_ptr + i * fmat_n + j;
+      *size   = fvec_size;
       *stride = fmat_n + 1;
-      break;
+    }
+    break;
 
     case fvec_type_unwrap:
       
@@ -415,7 +442,7 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
       *size = fvec_size;
       *stride = 1;
-      break;
+    break;
       
     case fvec_type_vector:
       
@@ -695,7 +722,7 @@ fvec_set_element (fvec_t *self, int i, float value)
  */
 static void
 fvec_set (fts_object_t *o, int winlet, fts_symbol_t is, 
-	  int ac, const fts_atom_t *at)
+          int ac, const fts_atom_t *at)
 {
   if (ac > 1  &&  fts_is_number(at))
   {
@@ -716,7 +743,7 @@ fvec_set (fts_object_t *o, int winlet, fts_symbol_t is,
     for (i = 0, j = onset; i < ac; i++, j += stride) 
     {
       if (fts_is_number(at + i))
-	ptr[j] = fts_get_number_float(at + i);
+        ptr[j] = fts_get_number_float(at + i);
     }
   
     fts_object_changed(o);
@@ -1612,10 +1639,10 @@ fvec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 static void
 fvec_message(fts_class_t *cl, fts_symbol_t s, fts_method_t slice_method, fts_method_t scalar_method)
-{	
-	fts_class_message(cl, s, fmat_class, slice_method);
-	fts_class_message(cl, s, fvec_class, slice_method);
-	fts_class_message_number(cl, s, scalar_method);	  
+{       
+        fts_class_message(cl, s, fmat_class, slice_method);
+        fts_class_message(cl, s, fvec_class, slice_method);
+        fts_class_message_number(cl, s, scalar_method);   
 }
 
 static void
@@ -1658,7 +1685,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_size, _fvec_get_size);
   fts_class_message_number(cl, fts_s_size, _fvec_set_size);
 
-  /* arithmetics */
+  /* arithmetics (on fvec or fmat!) */
   fvec_message(cl, fts_new_symbol("add"), fvec_add_fvec, fvec_add_number);
   fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);
   fvec_message(cl, fts_new_symbol("mul"), fvec_mul_fvec, fvec_mul_number);
@@ -1681,6 +1708,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("sum"), fvec_get_sum);
   fts_class_message_void(cl, fts_new_symbol("mean"), fvec_get_mean);
   fts_class_message_void(cl, fts_new_symbol("zc"), fvec_get_zc);
+
+  /* fmat methods that work on fvec, too: */
+  fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
 
   fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);

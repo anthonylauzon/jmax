@@ -1343,16 +1343,16 @@ mat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       if (fts_is_tuple(at + i))
       {
-	fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
-	int size = fts_tuple_get_size(tup);
+        fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
+        int size = fts_tuple_get_size(tup);
               
-	if (size > n)
+        if (size > n)
           n = size;
               
-	m++;
+        m++;
       }
       else
-	break;
+        break;
     }
     
     mat_set_size(self, m, n);
@@ -1386,49 +1386,49 @@ mat_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(mat_t), mat_init, mat_delete);
   
-  fts_class_message_varargs(cl, fts_s_name, fts_object_name);
-  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
-  fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
-    
-  fts_class_message_varargs(cl, fts_s_print, mat_print); 
-  
   fts_class_set_copy_function(cl, mat_copy_function);
+
+  fts_class_message_varargs(cl, fts_s_name,        fts_object_name);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  fts_class_message_varargs(cl, fts_s_dump_state,  mat_dump_state);
+  fts_class_message_varargs(cl, fts_s_print,       mat_print); 
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
-  fts_class_message(cl, fts_s_set, mat_type, mat_set_from_instance);
+  fts_class_message        (cl, fts_s_set, mat_type,     mat_set_from_instance);
   
-  fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
-  fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
-  fts_class_message_varargs(cl, fts_s_row, mat_set_row_elements);
-  fts_class_message_varargs(cl, fts_s_append, mat_append_row);
-  fts_class_message_varargs(cl, fts_s_insert, mat_insert_rows);
-  fts_class_message_varargs(cl, fts_s_delete, _mat_delete_rows);
+  fts_class_message_varargs(cl, fts_s_fill,      mat_fill);      
+  fts_class_message_varargs(cl, fts_s_set,       mat_set_elements);
+  fts_class_message_varargs(cl, fts_s_row,       mat_set_row_elements);
+  fts_class_message_varargs(cl, fts_s_append,    mat_append_row);
+  fts_class_message_varargs(cl, fts_s_insert,    mat_insert_rows);
+  fts_class_message_varargs(cl, fts_s_delete,   _mat_delete_rows);
   fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, sym_delete_cols, mat_delete_columns);
-  fts_class_message_void(cl, fts_s_sort, mat_sort);
-  fts_class_message_number(cl, fts_s_sort, mat_sort);
-  fts_class_message_void(cl, fts_s_sortrev, mat_sort);
-  fts_class_message_number(cl, fts_s_sortrev, mat_sort);
-  fts_class_message_void(cl, fts_s_unique, mat_unique);
-  fts_class_message_number(cl, fts_s_unique, mat_unique);
+
+  fts_class_message_void   (cl, fts_s_sort,      mat_sort);
+  fts_class_message_number (cl, fts_s_sort,      mat_sort);
+  fts_class_message_void   (cl, fts_s_sortrev,   mat_sort);
+  fts_class_message_number (cl, fts_s_sortrev,   mat_sort);
+  fts_class_message_void   (cl, fts_s_unique,    mat_unique);
+  fts_class_message_number (cl, fts_s_unique,    mat_unique);
   
-  fts_class_message_varargs(cl, fts_s_import, mat_import); 
-  fts_class_message_varargs(cl, fts_s_export, mat_export);
+  fts_class_message_varargs(cl, fts_s_import,    mat_import); 
+  fts_class_message_varargs(cl, fts_s_export,    mat_export);
   
-  fts_class_message_void(cl, fts_s_size, mat_return_size);
-  fts_class_message_void(cl, fts_s_rows, mat_return_size);
-  fts_class_message_void(cl, fts_s_cols, mat_return_size);
-  fts_class_message_varargs(cl, fts_s_size, mat_change_size);
+  fts_class_message_void   (cl, fts_s_size,      mat_return_size);
+  fts_class_message_void   (cl, fts_s_rows,      mat_return_size);
+  fts_class_message_void   (cl, fts_s_cols,      mat_return_size);
+  fts_class_message_varargs(cl, fts_s_size,      mat_change_size);
 
   fts_class_message_varargs(cl, fts_s_get_element, mat_return_element);
   
-  fts_class_inlet_bang(cl, 0, data_object_output);
-  
-  fts_class_message_varargs(cl, fts_s_openEditor, mat_open_editor);
-  fts_class_message_varargs(cl, fts_s_closeEditor, mat_close_editor); 
+  fts_class_message_varargs(cl, fts_s_openEditor,    mat_open_editor);
+  fts_class_message_varargs(cl, fts_s_closeEditor,   mat_close_editor); 
   fts_class_message_varargs(cl, fts_s_destroyEditor, mat_destroy_editor);  
   
-  fts_class_inlet_thru(cl, 0);
+  fts_class_inlet_bang(cl, 0, data_object_output);
+  
+  fts_class_inlet_thru (cl, 0);
   fts_class_outlet_thru(cl, 0);
   
   
