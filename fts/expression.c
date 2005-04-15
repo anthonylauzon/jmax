@@ -324,10 +324,15 @@ concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
     return operand_type_mismatch_error;									  \
   expression_stack_pop( exp, 1);
 
+
+/* macro generating code to evaluate binary comparison operator OP between 
+   all combinations of data types: 
+   (int|float) OP (int|float) and symbol OP symbol
+*/
 #define LBINOP_EVAL(OP)											  \
-  if ((status = expression_eval_aux( tree->left, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok)  \
+  if ((status = expression_eval_aux(tree->left,  exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok)  \
     return status;											  \
-  if ((status = expression_eval_aux( tree->right, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok) \
+  if ((status = expression_eval_aux(tree->right, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok) \
     return status;											  \
   top = expression_stack_top( exp);									  \
   if      (fts_is_int(top-1)    &&  fts_is_int(top))							  \
@@ -338,6 +343,9 @@ concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
     fts_set_int(top-1, fts_get_float(top-1) OP fts_get_int(top));					  \
   else if (fts_is_float(top-1)  &&  fts_is_float(top))							  \
     fts_set_int(top-1, fts_get_float(top-1) OP fts_get_float(top));					  \
+  else if (fts_is_symbol(top-1)  &&  fts_is_symbol(top))	/* string comparison */			  \
+      fts_set_int(top-1, strcmp(fts_symbol_name(fts_get_symbol(top-1)),					  \
+				fts_symbol_name(fts_get_symbol(top)))  OP  0); \
   else													  \
     return operand_type_mismatch_error;									  \
   expression_stack_pop( exp, 1);
