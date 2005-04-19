@@ -1157,24 +1157,28 @@ mat_unique (fts_object_t *o, int winlet, fts_symbol_t s,
 
   /* don't mat_sort(o, winlet, s, ac, at); */
 
-  for (i = 0; i < mat_get_m(self) - 1; i++)
+  if (col < mat_get_n(self))
   {
-    j = i + 1;
+    for (i = 0; i < mat_get_m(self) - 1; i++)
+    {
+      j = i + 1;
 
-    while (fts_atom_compare(mat_get_element(self, i, col),
-                            mat_get_element(self, j, col)) == 0)
-      j++;
+      while (fts_atom_compare(mat_get_element(self, i, col),
+			      mat_get_element(self, j, col)) == 0)
+	j++;	/* look for contiguous lines with equal index */
 
-    if (j > i + 1)
-    { /* remove lines with equal index.  
-         N.B.: self->m is changed! */
-      mat_delete_rows(self, i + 1, j - i - 1);
+      if (j > i + 1)
+      { /* remove lines with equal index.  
+	   N.B.: self->m is changed! */
+	mat_delete_rows(self, i + 1, j - i - 1);
+      }
     }
-  }
 
-  if (mat_editor_is_open(self))
-    mat_upload_data(self);
-  
+    if (mat_editor_is_open(self))
+      mat_upload_data(self);
+  }
+  /* else: the column doesn't exist, do nothing */
+
   fts_return_object(o);
 }
 
