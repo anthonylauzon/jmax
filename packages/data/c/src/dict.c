@@ -366,26 +366,28 @@ dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 {
   dict_t *self = (dict_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
+  fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
   fts_iterator_t key_iterator, value_iterator;
+  
+  fts_object_refer((fts_object_t *)mess);    
   
   fts_hashtable_get_keys(&self->hash, &key_iterator);
   fts_hashtable_get_values(&self->hash, &value_iterator);
   
   while(fts_iterator_has_more(&key_iterator))
   {
-    fts_message_t *dump_mess = fts_dumper_message_new(dumper, fts_s_set);
     fts_atom_t key, value;
     
     fts_iterator_next(&key_iterator, &key);
     fts_iterator_next(&value_iterator, &value);
         
-    /* dump key */
-    fts_message_append(dump_mess, 1, &key);
-    
-    /* dump value */
-    fts_message_append(dump_mess, 1, &value);
-    fts_dumper_message_send(dumper, dump_mess);
+    fts_message_set(mess, fts_s_set, 0, 0);
+    fts_message_append(mess, 1, &key);
+    fts_message_append(mess, 1, &value);
+    fts_dumper_message_send(dumper, mess);
   }
+  
+  fts_object_release((fts_object_t *)mess);
 }
 
 /**********************************************************

@@ -1497,7 +1497,7 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   
   if(self->type != fvec_type_vector)
   {
-    fts_message_t *mess = fts_dumper_message_new(dumper, sym_refer);
+    fts_message_t *mess = fts_dumper_message_get(dumper, sym_refer);
     fts_message_append_object(mess, (fts_object_t *)self->fmat);
     fts_message_append_symbol(mess, fvec_type_names[self->type]);
     fts_message_append_int(mess, self->index);
@@ -1507,11 +1507,11 @@ fvec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   }
   else if(self->fmat != fmat_null)
   {
-    fts_message_t *mess = fts_dumper_message_new(dumper, sym_vec);
+    fts_message_t *mess = fts_dumper_message_get(dumper, sym_vec);
     fts_message_append_int(mess, self->size);
     fts_dumper_message_send(dumper, mess);
     
-    mess = fts_dumper_message_new(dumper, fts_s_set);
+    mess = fts_dumper_message_get(dumper, fts_s_set);
     fts_message_append_object(mess, (fts_object_t *)self->fmat);
     fts_dumper_message_send(dumper, mess);
   }

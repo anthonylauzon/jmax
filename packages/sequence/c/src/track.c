@@ -2203,14 +2203,16 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   event_t *event = track_get_first(self);
   track_t *markers = track_get_markers(self);
+  fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+  
+  fts_object_refer((fts_object_t *)mess);  
 	
   /* save events */
   while(event)
   {
-    fts_atom_t *value = event_get_value(event);    
-    fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_append);
+    fts_atom_t *value = event_get_value(event);
     
-    /* save event time and value */
+    fts_message_set(mess, fts_s_append, 0, 0);    
     fts_message_append_float(mess, event_get_time(event));
     fts_message_append(mess, 1, value);
     fts_dumper_message_send(dumper, mess);
@@ -2231,6 +2233,8 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 	
 	if(self->editor != NULL && self->save_editor)
 		track_editor_dump_gui(self->editor, dumper);
+  
+  fts_object_release((fts_object_t *)mess);  
 }
 
 static void

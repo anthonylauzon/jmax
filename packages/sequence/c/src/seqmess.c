@@ -55,13 +55,17 @@ seqmess_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 {
   seqmess_t *this = (seqmess_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_message_t *mess;
+  fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
 
+  fts_object_refer((fts_object_t *)mess);    
+  
   /* send set message with pitch and duration */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_set(mess, fts_s_set, 0, 0);
   fts_message_append_symbol(mess, this->s);
   fts_message_append_int(mess, this->position);
   fts_dumper_message_send(dumper, mess);
+  
+  fts_object_release((fts_object_t *)mess);  
 }
 
 /**************************************************************

@@ -759,12 +759,12 @@ ivec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   int i;
   
   /* send size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  mess = fts_dumper_message_get(dumper, fts_s_size);  
   fts_message_append_int(mess, size);
   fts_dumper_message_send(dumper, mess);
   
   /* get new set message and append onset 0 */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
+  mess = fts_dumper_message_get(dumper, fts_s_set);
   fts_message_append_int(mess, 0);
   
   for(i=0; i<size; i++)
@@ -776,7 +776,7 @@ ivec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 	  fts_dumper_message_send(dumper, mess);
 	  
 	  /* new set message and append onset i + 1 */
-	  mess = fts_dumper_message_new(dumper, fts_s_set);
+	  mess = fts_dumper_message_get(dumper, fts_s_set);
 	  fts_message_append_int(mess, i + 1);
 	}
     }

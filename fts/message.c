@@ -117,7 +117,7 @@ fts_dumper_destroy(fts_dumper_t *dumper)
 }
 
 fts_message_t *
-fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector)
+fts_dumper_message_get(fts_dumper_t *dumper, fts_symbol_t selector)
 {
   fts_message_set(dumper->message, selector, 0, 0);
 

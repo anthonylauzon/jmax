@@ -452,10 +452,47 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 /******************************************************
-*
-*  add, remove, move, dump
-*
-*/
+ *
+ *  add, remove, move, dump
+ *
+ */
+
+/* add new track at end */
+static void
+sequence_append_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+{
+  sequence_t *this = (sequence_t *)o;
+  
+  if(ac > 0)
+  {
+    track_t *track = NULL;
+    
+    if(fts_is_a(at, track_class))
+      track = (track_t *)fts_get_object(at);
+    else if(fts_is_symbol(at))
+      track = (track_t *)fts_object_create(track_class, 1, at);
+    
+    if(track != NULL)
+    {
+      sequence_add_track(this, track);
+      
+      /* set name */
+      if(ac > 1 && fts_is_symbol(at + 1))
+        sequence_track_set_name(track, fts_get_symbol(at + 1));
+      
+      if(sequence_editor_is_open(this))
+      {
+        track_set_editor_open(track);
+        sequence_add_track_at_client(this, track);
+        fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
+        fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
+        fts_object_set_state_dirty(o);
+      }
+      
+      this->last_loaded_track = track; /* hack to fix loading */
+    }
+  }
+}
 
 /* add new track by client request */
 static void
@@ -479,7 +516,7 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
       /* set name */
       if(ac > 1 && fts_is_symbol(at + 1))
         sequence_track_set_name(track, fts_get_symbol(at + 1));
-
+      
       if(sequence_editor_is_open(this))
       {
         track_set_editor_open(track);
@@ -488,7 +525,8 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
         fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
         fts_object_set_state_dirty(o);
       }
-      this->last_loaded_track = track;/* hack to fix loading */
+      
+      this->last_loaded_track = track; /* hack to fix loading */
     }
   }
 }
@@ -527,24 +565,26 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   sequence_t *this = (sequence_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   track_t *track = sequence_get_first_track(this);
+  fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
   
-  while(track)
+  fts_object_refer((fts_object_t *)mess);  
+  
+  while(track != NULL)
   {
     fts_symbol_t name = track_get_name(track);
-    fts_class_t *type = track_get_type(track);
-    fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_add_track);
     
-    fts_message_append_symbol(mess, fts_class_get_name(type));
+    fts_message_set(mess, fts_s_append, 0, 0);
+    fts_message_append_object(mess, (fts_object_t *)track);
     
-    if(name)
+    if(name != NULL)
       fts_message_append_symbol(mess, name);
     
     fts_dumper_message_send(dumper, mess);
     
-    /* write track events */
-    track_dump_state((fts_object_t *)track, 0, 0, 1, at);
     track = sequence_track_get_next(track);
   }
+  
+  fts_object_release((fts_object_t *)mess);  
 }
 
 /* hack to fix loading */
@@ -556,6 +596,7 @@ sequence_append_event_at_last_loaded_track(fts_object_t *o, int winlet, fts_symb
   if(this->last_loaded_track!=NULL)
     fts_send_message((fts_object_t *)this->last_loaded_track, fts_s_append, ac, at); 
 }
+
 /******************************************************
 *
 *  class
@@ -641,6 +682,8 @@ sequence_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_member_upload, sequence_member_upload);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);
+
+  fts_class_message_varargs(cl, fts_s_append, sequence_append_track);
 
   fts_class_message_varargs(cl, seqsym_add_track, sequence_add_track_and_update);
   fts_class_message_varargs(cl, seqsym_remove_track, sequence_remove_track_and_update);

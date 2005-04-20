@@ -148,12 +148,12 @@ FTS_API void fts_dumper_destroy(fts_dumper_t *dumper);
 /**
  * Get an empty message from the dumper.
  *
- * @fn void fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector)
+ * @fn void fts_dumper_message_get(fts_dumper_t *dumper, fts_symbol_t selector)
  * @param dumper the dumper
  * @param selector the selector
  * @ingroup mess_dumper
  */
-FTS_API fts_message_t *fts_dumper_message_new(fts_dumper_t *dumper, fts_symbol_t selector);
+FTS_API fts_message_t *fts_dumper_message_get(fts_dumper_t *dumper, fts_symbol_t selector);
 
 /**
  * Dump a message (as object).

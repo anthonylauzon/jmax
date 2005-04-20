@@ -3844,7 +3844,7 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   int i, j;
 
   /* dump size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);
+  mess = fts_dumper_message_get(dumper, fts_s_size);
   fts_message_append_int(mess, m);
   fts_message_append_int(mess, n);
   fts_dumper_message_send(dumper, mess);
@@ -3852,7 +3852,7 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   for(i=0; i<m; i++)
   {
     /* new row */
-    mess = fts_dumper_message_new(dumper, fts_s_row);
+    mess = fts_dumper_message_get(dumper, fts_s_row);
     fts_message_append_int(mess, i);
 
     for(j=0; j<n; j++)
@@ -3865,7 +3865,7 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_dumper_message_send(dumper, mess);
   }
 
-  mess = fts_dumper_message_new(dumper, sym_sr);
+  mess = fts_dumper_message_get(dumper, sym_sr);
   fts_message_append_float(mess, fmat_get_sr(self));
   fts_dumper_message_send(dumper, mess);
 }

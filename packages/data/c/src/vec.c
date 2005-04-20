@@ -191,37 +191,38 @@ vec_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);      
   fts_atom_t *values = vec_get_ptr(this);
   int size = vec_get_size(this);
-  fts_message_t *mess;
+  fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
   int i;
-      
+  
+  fts_object_refer((fts_object_t *)mess);    
+  
   /* send size message */
-  mess = fts_dumper_message_new(dumper, fts_s_size);  
+  fts_message_set(mess, fts_s_size, 0, 0);  
   fts_message_append_int(mess, size);
   fts_dumper_message_send(dumper, mess);
-      
+  
   /* get new set message and append onset 0 */
-  mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_set(mess, fts_s_set, 0, 0);
   fts_message_append_int(mess, 0);
-      
+  
   for(i=0; i<size; i++)
-    {
-      if(fts_is_object(values + i))
-	fts_message_append_int(mess, 0);
-      else
-	fts_message_append(mess, 1, values + i);
+  {
+    fts_message_append(mess, 1, values + i);
 	  
-      if(fts_message_get_ac(mess) >= 256)
-	{
-	  fts_dumper_message_send(dumper, mess);
-	      
-	  /* new set message and append onset i + 1 */
-	  mess = fts_dumper_message_new(dumper, fts_s_set);
-	  fts_message_append_int(mess, i + 1);
-	}
-    }
+    if(fts_message_get_ac(mess) >= 256)
+    {
+      fts_dumper_message_send(dumper, mess);
       
+      /* new set message and append onset i + 1 */
+      fts_message_set(mess, fts_s_set, 0, 0);
+      fts_message_append_int(mess, i + 1);
+    }
+  }
+  
   if(fts_message_get_ac(mess) > 1) 
     fts_dumper_message_send(dumper, mess);
+
+  fts_object_release((fts_object_t *)mess);
 }
 
 /********************************************************

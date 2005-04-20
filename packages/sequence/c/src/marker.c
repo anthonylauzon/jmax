@@ -1243,20 +1243,25 @@ void
 marker_track_dump_state(track_t *self, fts_dumper_t *dumper)
 {
   event_t *event = track_get_first(self);
+  fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
+  
+  fts_object_refer((fts_object_t *)mess);
   
   /* save markers */
   while(event)
   { 
-    fts_message_t *mess = fts_dumper_message_new(dumper, seqsym_marker);
     fts_atom_t *value = event_get_value(event);
     fts_object_t *marker = fts_get_object(value);
     
+    fts_message_set(mess, seqsym_marker, 0, 0);
     fts_message_append_float(mess, event_get_time(event));
     scomark_array_function(marker, fts_message_get_args(mess));
     fts_dumper_message_send(dumper, mess);
     
     event = event_get_next(event);
   }
+  
+  fts_object_release((fts_object_t *)mess);
 }
 
 static scomark_t *
