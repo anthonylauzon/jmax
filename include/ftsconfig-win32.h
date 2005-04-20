@@ -65,11 +65,11 @@
 #define MAXPATHLEN _MAX_PATH
 
 /* Valid absolute paths are:  /c/jmax, c:/jmax, c:\jmax */
-#define fts_path_is_absolute(_p) \
+/*#define fts_path_is_absolute(_p) \
  ((_p[0] == '/') || \
   ((_p[1] == ':') && (_p[2] == '/')) || \
   ((_p[1] == ':') && (_p[2] == '\\')))
-
+*/
 
 #include <stdlib.h>
 #include <windows.h>
