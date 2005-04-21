@@ -1443,7 +1443,7 @@ mat_instantiate(fts_class_t *cl)
    * class doc 
    */
   
-  fts_class_doc(cl, mat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)>]] | \n    [<tuple: { one row of init values }> ...]", "matrix of atoms");
+  fts_class_doc(cl, mat_symbol, "[<num: # of rows> [<num: # of columns (default is 1)>]] | [<tuple: { one row of init values }> ...]", "matrix of atoms");
   fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]" , "set matrix values at given index");
   fts_class_doc(cl, fts_s_set, "<mat: other>", "set from mat instance");
   fts_class_doc(cl, fts_s_row, "<num: index> [<num:value> ...]", "set values of given row");

@@ -457,43 +457,6 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
 
-/* add new track at end */
-static void
-sequence_append_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  sequence_t *this = (sequence_t *)o;
-  
-  if(ac > 0)
-  {
-    track_t *track = NULL;
-    
-    if(fts_is_a(at, track_class))
-      track = (track_t *)fts_get_object(at);
-    else if(fts_is_symbol(at))
-      track = (track_t *)fts_object_create(track_class, 1, at);
-    
-    if(track != NULL)
-    {
-      sequence_add_track(this, track);
-      
-      /* set name */
-      if(ac > 1 && fts_is_symbol(at + 1))
-        sequence_track_set_name(track, fts_get_symbol(at + 1));
-      
-      if(sequence_editor_is_open(this))
-      {
-        track_set_editor_open(track);
-        sequence_add_track_at_client(this, track);
-        fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
-        fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
-        fts_object_set_state_dirty(o);
-      }
-      
-      this->last_loaded_track = track; /* hack to fix loading */
-    }
-  }
-}
-
 /* add new track by client request */
 static void
 sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
@@ -573,7 +536,7 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   {
     fts_symbol_t name = track_get_name(track);
     
-    fts_message_set(mess, fts_s_append, 0, 0);
+    fts_message_set(mess, seqsym_add_track, 0, 0);
     fts_message_append_object(mess, (fts_object_t *)track);
     
     if(name != NULL)
@@ -682,8 +645,6 @@ sequence_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_member_upload, sequence_member_upload);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);
-
-  fts_class_message_varargs(cl, fts_s_append, sequence_append_track);
 
   fts_class_message_varargs(cl, seqsym_add_track, sequence_add_track_and_update);
   fts_class_message_varargs(cl, seqsym_remove_track, sequence_remove_track_and_update);

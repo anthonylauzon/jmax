@@ -198,7 +198,7 @@ fts_heap_t *fts_heap_new(unsigned int block_size)
       idx = (block_size / sizeof(long)) /*- 1*/;/* removed -1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
 
       if (fts_heaps[idx])
-	return fts_heaps[idx];
+        return fts_heaps[idx];
       else
 	{
 	  fts_heap_t *p;
