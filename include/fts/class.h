@@ -36,10 +36,10 @@ FTS_API void fts_class_instantiate(fts_class_t *cl);
 #define FTS_FIRST_OBJECT_TYPEID   16
 
 /**************************************************
-*
-*  class documentation
-*
-*/
+ *
+ *  class documentation
+ *
+ */
 typedef struct fts_class_doc_line
 {
   fts_symbol_t name;
@@ -58,17 +58,16 @@ FTS_API void fts_class_doc_post(fts_class_t *cl);
 /* fts_class_doc_get appends doc atoms to array */
 FTS_API int  fts_class_doc_get (fts_class_t *cl, fts_array_t *output);
 
-
-
 /**************************************************
-*
-*  the class structure
-*
-*  N.B.: IF THIS STRUCTURE CHANGES, THE MACRO FTS_PRIMITIVE_CLASS IN
-*        atom.c MUST BE ADAPTED!
-*/
+ *
+ *  the class structure
+ *
+ *  N.B.: IF THIS STRUCTURE CHANGES, THE MACRO FTS_PRIMITIVE_CLASS IN
+ *        atom.c MUST BE ADAPTED!
+ */
 
-struct fts_class {
+struct fts_class
+{
   fts_object_t head;
   
   fts_symbol_t name; /* name of the class, i.e. the first name used to register it */
@@ -133,6 +132,8 @@ struct fts_class {
 #define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
 
 #define fts_class_get_doc(C) ((C)->doc)
+
+FTS_API void fts_class_get_messages(const fts_class_t *cl, fts_iterator_t *i);
 
 /**
 * Get a method of a class by its message symbol and argument type

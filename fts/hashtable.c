@@ -383,19 +383,19 @@ fts_hashtable_log( fts_hashtable_t *h)
 static int hashtable_iterator_has_more( fts_iterator_t *iter)
 {
   fts_hashtable_iterator_t *i = (fts_hashtable_iterator_t *) iter->data;
-
+  
   if (i->cell)
     return 1;
-
+  
   while ( i->index-- )
+  {
+    if ( i->table[i->index] )
     {
-      if ( i->table[i->index] )
-	{
-	  i->cell = i->table[i->index];
-	  return 1;
-	}
+      i->cell = i->table[i->index];
+      return 1;
     }
-
+  }
+  
   fts_heap_free( iter->data, iterator_heap);
   
   return 0;
@@ -404,24 +404,24 @@ static int hashtable_iterator_has_more( fts_iterator_t *iter)
 static void hashtable_iterator_next( fts_iterator_t *iter, fts_atom_t *a)
 {
   fts_hashtable_iterator_t *i = (fts_hashtable_iterator_t *) iter->data;
-
+  
   if ( !i->cell)
+  {
+    while( i->index--)
     {
-      while( i->index--)
-	{
-	  if (i->table[i->index])
+      if (i->table[i->index])
 	    {
 	      i->cell = i->table[i->index];
 	      break;
 	    }
-	}
     }
-
+  }
+  
   if (!i->cell)
     return;
-
+  
   *a = (i->keys) ? i->cell->key : i->cell->value;
-
+  
   i->cell = i->cell->next;
 }
 

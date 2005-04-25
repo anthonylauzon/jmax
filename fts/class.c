@@ -35,6 +35,8 @@ fts_class_t *fts_class_class;
 const int fts_system_inlet = -1;
 static int type_id = FTS_FIRST_OBJECT_TYPEID;
 
+static fts_heap_t *iterator_heap = 0;
+
 #define CLASS_INLET_MAX 255
 
 /***********************************************************************
@@ -292,8 +294,7 @@ method_key_init (void)
 static method_key_t *
 method_key_new (fts_symbol_t selector, fts_class_t * type)
 {
-  method_key_t *key =
-  (method_key_t *) fts_object_create (method_key_class, 0, 0);
+  method_key_t *key = (method_key_t *) fts_object_create (method_key_class, 0, 0);
   
   key->selector = selector;
   key->type = type;
@@ -330,11 +331,57 @@ method_put (fts_class_t * cl, const void *selector, fts_class_t * type, fts_meth
   fts_hashtable_put (cl->methods, &k, &a);
 }
 
+/***********************************************
+ *
+ *  class method iterator
+ *
+ */
+
+static void 
+class_message_iterator_next(fts_iterator_t *i, fts_atom_t *a)
+{
+  method_key_t *key;
+  fts_atom_t k;
+  int n = 0;
+  
+  fts_iterator_next((fts_iterator_t *)i->data, &k);
+  key = fts_get_pointer(&k);
+  n = (int)key->selector;
+  
+  if(n > 64)
+    fts_set_symbol(a, key->selector);
+  else
+    fts_set_int(a, n);
+}
+
+static int 
+class_message_iterator_has_more(fts_iterator_t *i)
+{
+  if(fts_iterator_has_more((fts_iterator_t *)i->data))
+    return 1;
+
+  fts_heap_free(i->data, iterator_heap);
+  
+  return 0;
+}
+
+void
+fts_class_get_messages(const fts_class_t *cl, fts_iterator_t *i)
+{
+  fts_iterator_t *iter = (fts_iterator_t *)fts_heap_alloc(iterator_heap);
+  
+  fts_hashtable_get_keys(cl->methods, iter);
+  
+  i->has_more = class_message_iterator_has_more;
+  i->next = class_message_iterator_next;
+  i->data = iter;
+}
+
 /********************************************
-*
-* inlet/outlet definitions
-*
-*/
+ *
+ * inlet/outlet definitions
+ *
+ */
 void
 fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t method)
 {
@@ -640,7 +687,7 @@ return 3;	/* return number of columns (group of atoms in list) */
 }
 
 
-void
+static void
 method_post_doc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_class_t *cl = fts_object_get_class(o);
@@ -733,6 +780,8 @@ fts_kernel_class_init (void)
   fts_class_class->methods = fts_hashtable_new (FTS_HASHTABLE_MEDIUM);
   
   fts_class_set_name (fts_class_class, fts_s_class);
+  
+  iterator_heap = fts_heap_new(sizeof(fts_iterator_t));
   
   method_key_init ();
 }
