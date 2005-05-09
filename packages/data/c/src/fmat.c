@@ -1383,6 +1383,8 @@ fmat_append_row_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
       else
         ptr[i] = 0.0;
     }
+    for(i=ac; i<n; i++)
+      ptr[i] = 0.0;
   }
   
   fts_object_changed(o);
