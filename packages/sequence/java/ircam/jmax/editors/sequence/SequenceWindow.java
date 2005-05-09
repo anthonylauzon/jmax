@@ -78,6 +78,7 @@ public class SequenceWindow extends JMaxEditor {
       public void windowClosing(WindowEvent e)
       {
         MaxWindowManager.getWindowManager().removeWindow(getFrame());
+        itsSequencePanel.close(true);
       }
       public void windowDeiconified(WindowEvent e){}
       public void windowIconified(WindowEvent e){}

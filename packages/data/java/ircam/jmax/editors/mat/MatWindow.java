@@ -87,6 +87,7 @@ public class MatWindow extends JMaxEditor {
       public void windowClosing(WindowEvent e)
       {
         MaxWindowManager.getWindowManager().removeWindow(getFrame());
+        itsMatPanel.close(false);
       }
       public void windowDeiconified(WindowEvent e){}
       public void windowIconified(WindowEvent e){}
