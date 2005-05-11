@@ -153,7 +153,6 @@ int propobj_equals(const propobj_t *a, const propobj_t *b);
 #include <fts/packages/data/ivec.h>
 #include <fts/packages/data/fmat.h>
 #include <fts/packages/data/fvec.h>
-#include <fts/packages/data/cvec.h>
 #include <fts/packages/data/dict.h>
 #include <fts/packages/data/bpf.h>
 

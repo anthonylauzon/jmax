@@ -731,8 +731,6 @@ data_config(void)
   mat_config();
   fmat_config();
   fvec_config();
-  col_config();
-  row_config();
   bpf_config();
   dict_config();
   tabeditor_config();
