@@ -122,7 +122,7 @@ struct _fts_audiofile_t
   char *error;
 };
 
-FTS_API fts_audiofile_t *fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t sample_format);
+FTS_API fts_audiofile_t *fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format);
 FTS_API fts_audiofile_t *fts_audiofile_open_read(fts_symbol_t filename);
 FTS_API void fts_audiofile_close(fts_audiofile_t* aufile);
 

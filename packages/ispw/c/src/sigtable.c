@@ -352,7 +352,7 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 
   if(file_name)
     {
-      fts_audiofile_t *af = fts_audiofile_open_write(file_name, 1, sr, format);
+      fts_audiofile_t *af = fts_audiofile_open_write(file_name, 1, sr, format, NULL);
       
       if (fts_audiofile_is_valid(af))
 	{

@@ -70,6 +70,30 @@ static fts_status_description_t unknown_class_error_description = {
 };
 static fts_status_t unknown_class_error = &unknown_class_error_description;
 
+/***********************************************************************
+ *
+ *  FTS object id string
+ *
+ */
+char *
+fts_object_get_identifier_string(fts_object_t *obj, char *str, int len)
+{
+  str[0] = '\0';
+
+  if (fts_object_has_client(obj))
+  {
+    snprintf(str, len, "#%d", fts_object_get_id(obj));
+    return str;
+  }
+  else if(fts_object_get_class(obj) != fts_tuple_class)
+  {
+    snprintf(str, len, "0x%p", obj);
+    return str;
+  }
+  
+  return NULL;
+}
+
 /******************************************************************************
  *
  *  patcher data

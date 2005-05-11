@@ -50,7 +50,6 @@
 
 typedef struct fts_atom_file fts_atom_file_t;
 
-FTS_API int fts_atomfile_check( fts_symbol_t file_name);
 FTS_API fts_atom_file_t *fts_atom_file_open(fts_symbol_t name, const char *mode);
 FTS_API void fts_atom_file_close(fts_atom_file_t *f);
 

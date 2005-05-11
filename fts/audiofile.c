@@ -180,7 +180,7 @@ fts_audiofile_open_read(fts_symbol_t filename)
 }
 
 fts_audiofile_t * 
-fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, fts_symbol_t sample_format)
+fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format)
 {
   if (fts_audiofile_loader != NULL) 
     {
@@ -194,7 +194,7 @@ fts_audiofile_open_write(fts_symbol_t filename, int channels, int sample_rate, f
       suffix = strrchr(fts_symbol_name(filename), '.');
 
       aufile->channels = channels;
-      aufile->sample_rate = sample_rate;
+      aufile->sample_rate = sr;
       fts_audiofile_set_sample_format_by_name(aufile, sample_format);
 
       if(suffix != NULL)

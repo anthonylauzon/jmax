@@ -79,6 +79,8 @@ FTS_API void fts_spost_float( fts_bytestream_t *stream, double f);
 FTS_API void fts_spost_symbol( fts_bytestream_t *stream, fts_symbol_t symbol);
 FTS_API void fts_spost_complex(fts_bytestream_t *stream, double re, double im);
 
+FTS_API void fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at);
+
 /**
  * Print an object description on a bytestream
  *

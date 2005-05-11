@@ -2280,7 +2280,7 @@ track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fts_message_set(mess, seqsym_markers, 0, 0);
     
     /* recursively save marker track */
-    fts_message_append_object(mess, markers);
+    fts_message_append_object(mess, (fts_object_t *)markers);
     fts_dumper_message_send(dumper, mess);
   }
   

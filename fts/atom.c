@@ -29,13 +29,10 @@
 #include <ftsprivate/class.h>
 #include <ftsprivate/message.h>
 
-
 static fts_atom_t __fts_null;
 const fts_atom_t *fts_null = &__fts_null;
 
-
-void fts_kernel_atom_init (void);
-
+void fts_kernel_atom_init(void);
 
 int fts_atom_identical( const fts_atom_t *first, const fts_atom_t *second)
 {

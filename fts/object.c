@@ -61,7 +61,7 @@ fts_object_free(fts_object_t *obj)
   fts_heap_free(obj, cl->heap);
 }
 
-void
+static void
 fts_object_reset(fts_object_t *obj)
 {
   fts_class_t *cl = fts_object_get_class(obj);

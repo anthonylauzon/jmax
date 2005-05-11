@@ -397,7 +397,15 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
       at++; /* skip class name */
     }
     else
-      fts_spost(stream, "<");
+    {
+      char buf[256];
+      char *idstr = fts_object_get_identifier_string(obj, buf, 255);
+      
+      if(idstr != NULL && idstr[0] != '\0')
+        fts_spost(stream, "[%s]<", idstr);
+      else
+        fts_spost(stream, "<");
+    }
     
     fts_spost_atoms(stream, ac, at);
 
@@ -525,6 +533,41 @@ fts_spost_object_description_args( fts_bytestream_t *stream, int ac, fts_atom_t 
     }
 
   fts_bytestream_flush( stream);
+}
+
+void
+fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at)
+{
+  if(ac == 1)
+  {
+    if(fts_is_object(at))
+    {
+      char buf[256];
+      fts_object_t *obj = fts_get_object(at);
+      fts_method_t meth = fts_class_get_method_varargs(fts_object_get_class(obj), fts_s_print);
+      char *idstr = fts_object_get_identifier_string(obj, buf, 255);
+      fts_atom_t a;
+      
+      if(idstr != NULL && idstr[0] != '\0')
+        fts_spost(stream, "[%s] ", idstr);
+      
+      if(meth)
+      {
+        fts_set_object(&a, stream);      
+        meth(obj, 0, 0, 1, &a);
+        return;
+      }
+    }
+    
+    /* simple value or object without print method */
+    fts_spost_atoms(stream, 1, at);
+    fts_spost(stream, "\n");
+  }
+  else if(ac > 0)
+  {
+    fts_spost_atoms(stream, ac, at);
+    fts_spost(stream, "\n");
+  }
 }
 
 /***********************************************************************

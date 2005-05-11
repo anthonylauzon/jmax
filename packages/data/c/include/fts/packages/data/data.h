@@ -145,12 +145,11 @@ void propobj_copy_function(const fts_object_t *from, fts_object_t *to);
 int propobj_equals(const propobj_t *a, const propobj_t *b);
 
 /******************************************************************* 
-*
-*  data classes
-*
-*/
+ *
+ *  data classes
+ *
+ */
 #include <fts/packages/data/mat.h>
-#include <fts/packages/data/vec.h>
 #include <fts/packages/data/ivec.h>
 #include <fts/packages/data/fmat.h>
 #include <fts/packages/data/fvec.h>

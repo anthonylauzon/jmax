@@ -1447,7 +1447,7 @@ fmat_append_row_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     for(j=0; j<append_n; j++)
       ptr[j] = append_ptr[j];
     
-    for(; i<n; i++)
+    for(; j<n; j++)
       ptr[j] = 0.0;
     
     append_ptr += append_n;
@@ -3642,8 +3642,7 @@ fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
         j = 0;
       }
       
-      fmat_set_m(self, m);
-      fmat_set_n(self, n);
+      fmat_reshape(self, m, n);
       
       fts_atom_file_close(file);
       
@@ -4183,7 +4182,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
   fts_class_doc(cl, fts_s_reverse, NULL, "reverse order of rows");
   fts_class_doc(cl, fts_new_symbol("rotate"), "[<num: # of elements (def 1)>]", "rotate by given number of rows");
-  fts_class_doc(cl, fts_s_sort,    "[<num: index of column>]", "sort rows by ascending values of given column");
+  fts_class_doc(cl, fts_s_sort, "[<num: index of column>]", "sort rows by ascending values of given column");
   fts_class_doc(cl, fts_s_sortrev, "[<num: index of column>]", "sort rows by descending values of given column");
   fts_class_doc(cl, fts_new_symbol("scramble"), NULL, "scramble rows randomly");
 

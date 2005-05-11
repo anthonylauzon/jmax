@@ -30,7 +30,6 @@
 #include <alloca.h>
 #endif
 
-extern void vec_config(void);
 extern void ivec_config(void);
 extern void fvec_config(void);
 extern void mat_config(void);
@@ -728,7 +727,6 @@ data_config(void)
   sym_expr = fts_new_symbol("expr");
   expr_class = fts_class_install(sym_expr, expr_instantiate);
   
-  vec_config();
   ivec_config();
   mat_config();
   fmat_config();

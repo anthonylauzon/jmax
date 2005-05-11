@@ -25,10 +25,10 @@
 
 #include <fts/packages/data/data.h>
 
+#define vec_t mat_t
+
 DATA_API fts_class_t *vec_type;
 DATA_API fts_symbol_t vec_symbol;
-
-typedef mat_t vec_t;
 
 #define vec_set_size(x, n) (mat_set_size((vec_t *)(x), (n), 1))
 #define vec_get_size(x) (((mat_t *)(x))->m)

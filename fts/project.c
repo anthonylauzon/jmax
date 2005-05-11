@@ -110,11 +110,11 @@ fts_project_get_dir(void)
     return fts_package_get_dir(fts_project);
   } else 
     if( loading_project_dir != NULL)
-	return loading_project_dir;
-    else
-      {
-	char buf[1024];
-	
-	return fts_new_symbol(getcwd(buf, 1024));
-      }
+      return loading_project_dir;
+  else
+  {
+    char buf[1024];
+    
+    return fts_new_symbol(getcwd(buf, 1024));
+  }
 }
