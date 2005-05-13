@@ -44,17 +44,18 @@
 
    An atom should not be longer than 1024 chars.
 
-   Atoms are read and written to/from "fts_atom_file_t" 
+   Atoms are read and written to/from "fts_atomfile_t" 
    
 */
 
-typedef struct fts_atom_file fts_atom_file_t;
+typedef struct fts_atomfile fts_atomfile_t;
 
-FTS_API fts_atom_file_t *fts_atom_file_open(fts_symbol_t name, const char *mode);
-FTS_API void fts_atom_file_close(fts_atom_file_t *f);
+FTS_API fts_atomfile_t *fts_atomfile_open_read(fts_symbol_t name);
+FTS_API fts_atomfile_t *fts_atomfile_open_write(fts_symbol_t name);
+FTS_API void fts_atomfile_close(fts_atomfile_t *f);
 
-FTS_API int fts_atom_file_read(fts_atom_file_t *f, fts_atom_t *at, char *separator);
-FTS_API int fts_atom_file_write(fts_atom_file_t *f, const fts_atom_t *at, char separator);
+FTS_API int fts_atomfile_read(fts_atomfile_t *f, fts_atom_t *at, char *separator);
+FTS_API int fts_atomfile_write(fts_atomfile_t *f, const fts_atom_t *at, char separator);
 
 FTS_API void fts_atomfile_import_handler(fts_class_t *cl, fts_method_t meth);
 FTS_API void fts_atomfile_export_handler(fts_class_t *cl, fts_method_t meth);

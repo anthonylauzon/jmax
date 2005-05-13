@@ -1,6 +1,6 @@
 /*
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * Copyright (C) 2004 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -17,8 +17,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ *
+ *  FTS midifile API (reading and writing of MIDI standard files)
+ *
+ *  This code is based on the midifilelib written by Tim Thompson and Michael Czeiszperger.
  *
  */
+#define MIDIFILE_BLOCK_SIZE 1024
 
 typedef struct _fts_midifile_ fts_midifile_t;
 
@@ -50,17 +56,19 @@ typedef struct fts_midifile_tempo_map_entry
 /* the midi file */
 struct _fts_midifile_
 {
-  FILE *fp;
+  FILE *file;
+  unsigned char buf[MIDIFILE_BLOCK_SIZE];
+  int buf_size;
+  int buf_idx;
   fts_symbol_t name;
   
   int format;
   int n_tracks;
-  int i_track; /* limit reading to one track of format 1 or 2 files */
   int division;
   int tempo;
 
   fts_midifile_tempo_map_entry_t *tempo_map; /* pointer to first tempo map entry */
-  fts_midifile_tempo_map_entry_t *tempo_map_end; /* pointer to last tempo map entry */
+  fts_midifile_tempo_map_entry_t *tempo_map_end; /* pointer to first tempo map entry */
   fts_midifile_tempo_map_entry_t *tempo_map_pointer; /* read pointer to tempo map */
 
   fts_midifile_read_functions_t *read;
@@ -77,6 +85,9 @@ struct _fts_midifile_
   int string_size;
   int string_alloc;
 
+  int sel_track; /* select a track (format 1 or 2 files) */
+  int sel_channel; /* select a MIDI channel */
+
   char *error; /* error message */
 
   void *user; /* user data */
@@ -88,7 +99,8 @@ struct _fts_midifile_
 
 #define fts_midifile_get_time(f) ((f)->time)
 
-#define fts_midifile_set_track(f, x) ((f)->i_track = (x))
+#define fts_midifile_select_track(f, x) ((f)->sel_track = (x))
+#define fts_midifile_select_channel(f, x) ((f)->sel_channel = (x))
 
 #define fts_midifile_set_user_data(f, p) ((f)->user = (void *)(p))
 #define fts_midifile_get_user_data(f) ((f)->user)
@@ -129,3 +141,10 @@ FTS_API void fts_midifile_write_midievent(fts_midifile_t *file, int ticks, fts_m
 FTS_API int fts_midifile_write_meta_event(fts_midifile_t *file, int ticks, int type, unsigned char *data, int size);
 FTS_API void fts_midifile_write_tempo(fts_midifile_t *file, int tempo);
 
+/*************************************************************
+ *
+ *  import/export
+ *
+ */
+FTS_API void fts_midifile_import_handler(fts_class_t *cl, fts_method_t meth);
+FTS_API void fts_midifile_export_handler(fts_class_t *cl, fts_method_t meth);

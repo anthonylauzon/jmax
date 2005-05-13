@@ -1,6 +1,6 @@
 /*
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * Copyright (C) 2004 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -19,50 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
-
-/***********************************************
- *
- *  API for audio files
- */
-
-typedef struct _fts_audiofile_t fts_audiofile_t;
-typedef struct _fts_audiofile_loader_t fts_audiofile_loader_t;
-
-/***********************************************
- *
- *  Audio file loader
- */
-
-struct _fts_audiofile_loader_t {
-  /* returns 0 if no errors occured, a non null value otherwise */
-  int (*open_write)(fts_audiofile_t* aufile);
-
-  /* returns 0 if no errors occured, a non null value otherwise */
-  int (*open_read)(fts_audiofile_t* aufile);
-
-  /* set buffer length returns 0 if no errors occured, a non null value otherwise */
-  int (*buffer_length)(fts_audiofile_t* aufile, unsigned int length);
-
-  /* returns the number of frames written or -1 in case an error occured */
-  int (*write)(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
-
-  /* returns the number of frames read, 0 if the file reached the end or -1 in case an error occured */
-  int (*read)(fts_audiofile_t* aufile, float** buf, int nbuf, unsigned int buflen);
-
-  /* returns 0 if no errors occured, a non null value otherwise */
-  int (*seek)(fts_audiofile_t* aufile, unsigned int offset);
-
-  /* returns 0 if no errors occured, a non null value otherwise */
-  int (*close)(fts_audiofile_t* aufile);
-};
-
-FTS_API fts_audiofile_loader_t* fts_audiofile_loader;
-FTS_API int fts_audiofile_set_loader(char* name, fts_audiofile_loader_t* loader);
-
-/***********************************************
- *
- *  Audio file 
- */
+#include <sndfile.h>
 
 /* file formats */
 FTS_API fts_symbol_t fts_s_dot_aiff;
@@ -84,16 +41,16 @@ FTS_API fts_symbol_t fts_s_float64;
 
 enum audiofile_sample_format
 {
-  audiofile_sample_format_null = -1, 
-  audiofile_int8 = 0, 
-  audiofile_int16, 
-  audiofile_int24, 
-  audiofile_int32, 
-  audiofile_uint8, 
-  audiofile_uint16, 
-  audiofile_uint24, 
-  audiofile_uint32, 
-  audiofile_float32, 
+  audiofile_sample_format_null = -1,
+  audiofile_int8 = 0,
+  audiofile_int16,
+  audiofile_int24,
+  audiofile_int32,
+  audiofile_uint8,
+  audiofile_uint16,
+  audiofile_uint24,
+  audiofile_uint32,
+  audiofile_float32,
   audiofile_float64,
   n_audiofile_sample_formats
 };
@@ -108,48 +65,31 @@ enum audiofile_format
   n_audiofile_file_formats
 };
 
-struct _fts_audiofile_t 
+typedef struct 
 {
   fts_symbol_t filename;
   fts_symbol_t mode;
-  int channels;
-  int sample_rate;
-  enum audiofile_sample_format sample_format;
-  unsigned int bytes_per_sample;
   enum audiofile_format file_format;
-  unsigned int frames;
-  void *handle;
+  enum audiofile_sample_format sample_format;
+  SF_INFO sfinfo;
+  SNDFILE *sfhandle;
   char *error;
-};
+} fts_audiofile_t;
 
-FTS_API fts_audiofile_t *fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format);
+#define fts_audiofile_get_sample_rate(_f) ((_f)->sfinfo.samplerate)
+#define fts_audiofile_get_num_channels(_f) ((_f)->sfinfo.channels)
+#define fts_audiofile_get_num_frames(_f) ((_f)->sfinfo.frames)
+
 FTS_API fts_audiofile_t *fts_audiofile_open_read(fts_symbol_t filename);
-FTS_API void fts_audiofile_close(fts_audiofile_t* aufile);
+FTS_API fts_audiofile_t *fts_audiofile_open_read_format(fts_symbol_t name, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format);
+FTS_API fts_audiofile_t *fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format);
+FTS_API void fts_audiofile_close(fts_audiofile_t *aufile);
 
-#define fts_audiofile_write(_f,_b,_n,_l) ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->write)(_f,_b,_n,_l) : -1)
-#define fts_audiofile_read(_f,_b,_n,_l ) ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->read)(_f,_b,_n,_l) : -1)
-#define fts_audiofile_seek(_f,_n) ((fts_audiofile_loader != NULL)? (*fts_audiofile_loader->seek)(_f,_n) : -1)
+FTS_API int fts_audiofile_write(fts_audiofile_t *audiofile, float **buf, int n_buf, int buflen);
+FTS_API int fts_audiofile_read(fts_audiofile_t *audiofile, float **buf, int n_buf, int buflen);
+FTS_API int fts_audiofile_write_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int buflen);
+FTS_API int fts_audiofile_read_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int buflen);
+FTS_API int fts_audiofile_seek(fts_audiofile_t *audiofile, int offset);
 
-#define fts_audiofile_is_valid(_f) (((_f) != NULL) && (_f)->error == NULL)
-
-#define fts_audiofile_get_filename(_f) (_f)->filename
-#define fts_audiofile_get_sample_rate(_f) (_f)->sample_rate
-#define fts_audiofile_get_num_channels(_f) (_f)->channels
-#define fts_audiofile_get_sample_format(_f) (_f)->sample_format
-#define fts_audiofile_get_file_format(_f) (_f)->file_format
-#define fts_audiofile_get_bytes_per_sample(_f) (_f)->bytes_per_sample
-#define fts_audiofile_get_num_frames(_f) (_f)->frames
-#define fts_audiofile_get_handle(_f) (_f)->handle
-#define fts_audiofile_get_error(_f) (_f)->error
-
-#define fts_audiofile_set_sample_rate(_f,_v) { (_f)->sample_rate = _v; }
-#define fts_audiofile_set_num_channels(_f,_v) { (_f)->channels = _v; }
-#define fts_audiofile_set_file_format(_f,_v) { (_f)->file_format = _v; }
-#define fts_audiofile_set_bytes_per_sample(_f,_v) { (_f)->bytes_per_sample = _v; }
-#define fts_audiofile_set_num_frames(_f,_v) { (_f)->frames = _v; }
-#define fts_audiofile_set_handle(_f,_v) { (_f)->handle = _v; }
-#define fts_audiofile_set_error(_f,_v) {(_f)->error = _v; }
-
-FTS_API void fts_audiofile_set_file_format_by_suffix(fts_audiofile_t* aufile, fts_symbol_t suffix);
-FTS_API void fts_audiofile_set_sample_format_by_name(fts_audiofile_t* aufile, fts_symbol_t name);
-
+FTS_API void fts_audiofile_import_handler(fts_class_t *cl, fts_method_t meth);
+FTS_API void fts_audiofile_export_handler(fts_class_t *cl, fts_method_t meth);

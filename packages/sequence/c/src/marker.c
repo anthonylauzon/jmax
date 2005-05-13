@@ -1564,7 +1564,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
   if (track_is_marker(self)  &&  ac > 0  &&  fts_is_symbol(at))
   {
     fts_symbol_t      filename = fts_get_symbol(at);
-    fts_atom_file_t  *file;
+    fts_atomfile_t  *file;
     fts_atom_t        a;
     char              c;
     double            time;
@@ -1576,7 +1576,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
 
     /* check file name for .txt? */
 
-    if (!(file = fts_atom_file_open(filename, "r")))
+    if (!(file = fts_atomfile_open_read(filename)))
     { /* we were responsible for this file, but can't open it: 
          don't return void */
       fts_post("can't open label text file '%s'\n", fts_symbol_name(filename));
@@ -1584,7 +1584,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
       return;
     }
 
-    while (waitingfor != L_ERROR  &&  fts_atom_file_read(file, &a, &c))
+    while (waitingfor != L_ERROR  &&  fts_atomfile_read(file, &a, &c))
     {
       switch (waitingfor)
       {
@@ -1631,7 +1631,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
     }
 
     fts_object_release(memstream); 
-    fts_atom_file_close(file);
+    fts_atomfile_close(file);
     fts_return_object((fts_object_t *) self);       
   }
   /* else: no marker track or wrong args -> don't handle this file */

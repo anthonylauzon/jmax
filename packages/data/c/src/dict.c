@@ -416,7 +416,7 @@ dict_atom_buf_free(fts_atom_t *buf, int size)
 static int 
 dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
+  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
   int atoms_alloc = DICT_ATOM_BUF_BLOCK_SIZE;
   fts_atom_t *atoms = 0;
   enum {read_key, read_comma, read_argument} state = read_key;
@@ -435,7 +435,7 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
   dict_remove_all(self);
   fts_set_void(&key);
   
-  while(error == 0 && fts_atom_file_read(file, &a, &c))
+  while(error == 0 && fts_atomfile_read(file, &a, &c))
   {
     switch(state)
     {
@@ -513,7 +513,7 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
   }
   
   dict_atom_buf_free(atoms, atoms_alloc);
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
   
   return i;
 }
@@ -521,7 +521,7 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
 static int 
 dict_export_to_coll(dict_t *self, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(file_name, "w");
+  fts_atomfile_t *file = fts_atomfile_open_write(file_name);
   fts_iterator_t key_iterator;
   fts_iterator_t value_iterator;
   int size = 0;
@@ -566,31 +566,31 @@ dict_export_to_coll(dict_t *self, fts_symbol_t file_name)
     }
     
     /* write key */
-    fts_atom_file_write(file, &key, ' ');
+    fts_atomfile_write(file, &key, ' ');
     
     /* write comma */
     fts_set_symbol(&a, fts_s_comma);
-    fts_atom_file_write(file, &a, ' ');
+    fts_atomfile_write(file, &a, ' ');
     
     /* write selector (if any) */
     if(s)
     {
       fts_set_symbol(&a, s);
-      fts_atom_file_write(file, &a, ' ');
+      fts_atomfile_write(file, &a, ' ');
     }
     
     /* write arguments */
     for(i=0; i<ac; i++)
-      fts_atom_file_write(file, at + i, ' ');
+      fts_atomfile_write(file, at + i, ' ');
     
     /* write semicolon and new line */
     fts_set_symbol(&a, fts_s_semi);
-    fts_atom_file_write(file, &a, '\n');
+    fts_atomfile_write(file, &a, '\n');
     
     size++;
   }
   
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
   
   return size;
 }

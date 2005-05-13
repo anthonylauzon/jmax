@@ -3581,7 +3581,7 @@ fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if(ac > 0 && fts_is_symbol(at))
   {
     fts_symbol_t file_name = fts_get_symbol(at);
-    fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
+    fts_atomfile_t *file = fts_atomfile_open_read(file_name);
     float *ptr = fmat_get_ptr(self);
     int m = 0;
     int n = 0;
@@ -3592,7 +3592,7 @@ fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     
     if(file != NULL)
     {
-      while(fts_atom_file_read(file, &a, &c))
+      while(fts_atomfile_read(file, &a, &c))
       {
         int alloc = self->alloc;
         m = i + 1;
@@ -3644,7 +3644,7 @@ fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       
       fmat_reshape(self, m, n);
       
-      fts_atom_file_close(file);
+      fts_atomfile_close(file);
       
       if(m * n > 0)
       {
@@ -3702,13 +3702,13 @@ fmat_export_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   if(ac > 0 && fts_is_symbol(at))
   {
     fts_symbol_t file_name = fts_get_symbol(at);
-    fts_atom_file_t *file;
+    fts_atomfile_t *file;
     float *ptr = fmat_get_ptr(self);
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
     int i, j;
     
-    file = fts_atom_file_open(file_name, "w");
+    file = fts_atomfile_open_write(file_name);
     
     if(file != NULL)
     {
@@ -3721,14 +3721,14 @@ fmat_export_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
         for(j=0; j<n-1; j++)
         {
           fts_set_float(&a, row[j]);
-          fts_atom_file_write(file, &a, ' ');
+          fts_atomfile_write(file, &a, ' ');
         }
         
         fts_set_float(&a, row[n - 1]);
-        fts_atom_file_write(file, &a, '\n');
+        fts_atomfile_write(file, &a, '\n');
       }
       
-      fts_atom_file_close(file);
+      fts_atomfile_close(file);
       
       if(m * n > 0)
         fts_return_object(o);

@@ -33,7 +33,7 @@ typedef struct
 {
   fts_dumper_t super;
   enum {dumpfile_closed, dumpfile_opened_read, dumpfile_opened_write} status;
-  fts_atom_file_t *file;
+  fts_atomfile_t *file;
   int block; /* writing message block */
   fts_symbol_t class; /* restoring class */
 } dumpfile_t;
@@ -49,7 +49,7 @@ dumpfile_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     {
       /* write comma after last dump message while in block */
       fts_set_symbol(&a, fts_s_comma);
-      fts_atom_file_write(this->file, &a, '\n');
+      fts_atomfile_write(this->file, &a, '\n');
     }
   
   /* writing block */
@@ -57,11 +57,11 @@ dumpfile_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       
   /* write selector */
   fts_set_symbol(&a, s);
-  fts_atom_file_write(this->file, &a, ' ');
+  fts_atomfile_write(this->file, &a, ' ');
 
   /* write args */
   for(i=0; i<ac; i++)
-    fts_atom_file_write(this->file, at + i, ' ');
+    fts_atomfile_write(this->file, at + i, ' ');
 }
 
 static fts_symbol_t
@@ -72,18 +72,18 @@ dumpfile_read_class_comment(dumpfile_t *this)
 
   this->class = 0;
 
-  while(fts_atom_file_read(this->file, &a, &c))
+  while(fts_atomfile_read(this->file, &a, &c))
     {
       if(fts_is_symbol(&a) && fts_get_symbol(&a) == sym_comment)
 	break;
     }
   
-  if(fts_atom_file_read(this->file, &a, &c) && fts_is_symbol(&a))
+  if(fts_atomfile_read(this->file, &a, &c) && fts_is_symbol(&a))
     this->class = fts_get_symbol(&a);
 
   while(c != '\n')
     {
-      if(!fts_atom_file_read(this->file, &a, &c))
+      if(!fts_atomfile_read(this->file, &a, &c))
 	break;
     }
 
@@ -100,7 +100,7 @@ dumpfile_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   if(this->file)
     {
-      fts_atom_file_close(this->file);
+      fts_atomfile_close(this->file);
       this->file = 0;
       this->class = 0;
       this->status = dumpfile_closed;
@@ -125,7 +125,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       
       if(mode == fts_s_read)
 	{
-	  this->file = fts_atom_file_open(name, "r");
+	  this->file = fts_atomfile_open_read(name);
 	  
 	  if(dumpfile_read_class_comment(this))
 	    this->status = dumpfile_opened_read;
@@ -134,7 +134,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	}
       else if(mode == fts_s_write)
 	{
-	  this->file = fts_atom_file_open(name, "w");
+	  this->file = fts_atomfile_open_write(name);
 	  this->status = dumpfile_opened_write;
 	}
       else
@@ -175,10 +175,10 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	      
 	      /* write class comment */
 	      fts_set_symbol(&a, sym_comment);
-	      fts_atom_file_write(this->file, &a, ' ');
+	      fts_atomfile_write(this->file, &a, ' ');
         
 	      fts_set_symbol(&a, class_name);
-	      fts_atom_file_write(this->file, &a, '\n');
+	      fts_atomfile_write(this->file, &a, '\n');
         
 	      /* set dumpfile as dumper */
 	      fts_set_object(&a, (fts_object_t *)o);
@@ -186,7 +186,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 	      
 	      /* write final semicolon */
 	      fts_set_symbol(&a, fts_s_semi);
-	      fts_atom_file_write(this->file, &a, '\n');	  
+	      fts_atomfile_write(this->file, &a, '\n');	  
         
 	      /* reset flag */
 	      this->block = 0;
@@ -229,7 +229,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	  fts_message_set(mess, 0, 0, 0);
 	  
 	  /* read message block */
-	  while(fts_atom_file_read(this->file, &a, &c))
+	  while(fts_atomfile_read(this->file, &a, &c))
 	    {
 	      if(fts_is_symbol(&a))
 		{

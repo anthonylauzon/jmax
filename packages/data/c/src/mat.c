@@ -238,9 +238,9 @@ mat_grow(mat_t *mat, int size)
 
 
 int 
-mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
+mat_read_atomfile_newline(mat_t *mat, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
+  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
   int m = 0;
   int n = 0;
   int i = 0;
@@ -253,7 +253,7 @@ mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
   
   mat_set_size(mat, 0, 0);
   
-  while(fts_atom_file_read(file, &a, &c))
+  while(fts_atomfile_read(file, &a, &c))
   {
     m = i + 1;
     
@@ -294,20 +294,20 @@ mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
   mat->m = m;
   mat->n = n;
   
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
   
   return(m * n);
 }
 
 int
-mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
+mat_write_atomfile_newline(mat_t *mat, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file;
+  fts_atomfile_t *file;
   int m = mat->m;
   int n = mat->n;
   int i, j;
   
-  file = fts_atom_file_open(file_name, "w");
+  file = fts_atomfile_open_write(file_name);
   
   if(!file)
     return -1;
@@ -318,19 +318,19 @@ mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name)
     fts_atom_t *row = mat->data + i * n;
     
     for(j=0; j<n-1; j++)        
-      fts_atom_file_write(file, row + j, ' ');
+      fts_atomfile_write(file, row + j, ' ');
     
-    fts_atom_file_write(file, row + n - 1, '\n');
+    fts_atomfile_write(file, row + n - 1, '\n');
   }
   
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
   return(m * n);
 }
 
 int 
-mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator, int ac, const fts_atom_t *at)
+mat_read_atomfile_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator, int ac, const fts_atom_t *at)
 {
-  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
+  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
   int m = 0;
   int n = 0;
   int i = 0;
@@ -346,7 +346,7 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
   
   mat_set_size(mat, 0, 0);
   
-  while(fts_atom_file_read(file, &a, &c))
+  while(fts_atomfile_read(file, &a, &c))
   {
     int skip = 0;
     int k;
@@ -412,21 +412,21 @@ mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t se
     mat->n = 0;      
   }
   
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
   
   return(m * n);
 }
 
 int
-mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator)
+mat_write_atomfile_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator)
 {
-  fts_atom_file_t *file;
+  fts_atomfile_t *file;
   int m = mat->m;
   int n = mat->n;
   fts_atom_t sep;
   int i, j;
   
-  file = fts_atom_file_open(file_name, "w");
+  file = fts_atomfile_open_write(file_name);
   
   if(!file)
     return -1;
@@ -439,12 +439,12 @@ mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t s
     fts_atom_t *row = mat->data + i * n;
     
     for(j=0; j<n; j++)  
-      fts_atom_file_write(file, row + j, ' ');
+      fts_atomfile_write(file, row + j, ' ');
     
-    fts_atom_file_write(file, &sep, '\n');
+    fts_atomfile_write(file, &sep, '\n');
   }
   
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
   
   return(m * n);
 }
@@ -987,9 +987,9 @@ mat_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     int size = 0;
     
     if (separator)
-      size = mat_read_atom_file_separator(self, file_name, separator, ac - 3, at + 3);
+      size = mat_read_atomfile_separator(self, file_name, separator, ac - 3, at + 3);
     else
-      size = mat_read_atom_file_newline(self, file_name);
+      size = mat_read_atomfile_newline(self, file_name);
     
     if(size <= 0)
       fts_post("mat: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
@@ -1022,9 +1022,9 @@ mat_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     int size = 0;
     
     if (separator)
-      size = mat_write_atom_file_separator(self, file_name, separator);
+      size = mat_write_atomfile_separator(self, file_name, separator);
     else
-      size = mat_write_atom_file_newline(self, file_name);
+      size = mat_write_atomfile_newline(self, file_name);
     
     if(size < 0)
       fts_post("mat: can't export to text file \"%s\"\n", fts_symbol_name(file_name));

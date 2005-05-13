@@ -63,12 +63,12 @@ DATA_API void mat_copy(mat_t *org, mat_t *copy);
 
 DATA_API void mat_set_with_onset_from_atoms(mat_t *mat, int offset, int ac, const fts_atom_t *at);
 
-DATA_API int mat_read_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
-DATA_API int mat_write_atom_file_newline(mat_t *mat, fts_symbol_t file_name);
+DATA_API int mat_read_atomfile_newline(mat_t *mat, fts_symbol_t file_name);
+DATA_API int mat_write_atomfile_newline(mat_t *mat, fts_symbol_t file_name);
 
-DATA_API int mat_read_atom_file_separator(mat_t *mat, fts_symbol_t file_name, 
+DATA_API int mat_read_atomfile_separator(mat_t *mat, fts_symbol_t file_name, 
 					      fts_symbol_t separator, int ac, const fts_atom_t *at);
-DATA_API int mat_write_atom_file_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator);
+DATA_API int mat_write_atomfile_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator);
 
 
 /* editor interaction */

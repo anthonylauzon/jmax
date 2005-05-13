@@ -1335,7 +1335,6 @@ fts_client_create_object(fts_object_t *obj, int client_id)
     fts_client_send_message(client, fts_s_register_object, ac, at);      
     fts_array_destroy(&array);
     
-    /* upload gui properties (does any FTM object has any of those???) */
     fts_send_message(obj, fts_s_update_gui, 0, 0);
   }
 }

@@ -1,6 +1,6 @@
 /*
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * Copyright (C) 2004 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -18,10 +18,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
+ *  FTS midifile API (reading and writing of MIDI standard files)
+ *
+ *  This code is based on the midifilelib written by Tim Thompson and Michael Czeiszperger.
+ *
  */
-
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #if HAVE_SYS_PARAM_H
@@ -39,31 +43,32 @@
 #define SYSTEM_EXCLUSIVE 0xf0
 #define SYSTEM_EXCLUSIVE_CONTINUE 0xf7
 #define SYSTEM_EXCLUSIVE_END 0xf7
-#define	META_EVENT 0xFF
+#define META_EVENT 0xFF
 
 /* meta event definitions */
-#define	SEQUENCE_NUMBER 0x00
-#define	TEXT_EVENT 0x01
+#define SEQUENCE_NUMBER 0x00
+#define TEXT_EVENT 0x01
 #define COPYRIGHT_NOTICE 0x02
 #define SEQUENCE_NAME 0x03
 #define INSTRUMENT_NAME 0x04
 #define LYRIC 0x05
 #define MARKER 0x06
-#define	CUE_POINT 0x07
+#define CUE_POINT 0x07
 #define CHANNEL_PREFIX 0x20
-#define	END_OF_TRACK 0x2f
-#define	SET_TEMPO 0x51
-#define	SMPTE_OFFSET 0x54
-#define	TIME_SIGNATURE 0x58
-#define	KEY_SIGNATURE 0x59
-#define	SEQUENCER_SPECIFIC 0x7f
+#define END_OF_TRACK 0x2f
+#define SET_TEMPO 0x51
+#define SMPTE_OFFSET 0x54
+#define TIME_SIGNATURE 0x58
+#define KEY_SIGNATURE 0x59
+#define SEQUENCER_SPECIFIC 0x7f
 
 /* magic strings */
 #define MThd 0x4d546864
 #define MTrk 0x4d54726b
 
 #define FTS_MIDIFILE_DEFAULT_TEMPO 500000
-#define FTS_MIDIFILE_ALL_TRACKS -1
+#define FTS_MIDIFILE_SELECT_ALL_TRACKS -1
+#define FTS_MIDIFILE_SELECT_ALL_CHANNELS 0
 
 /*************************************************************
 *
@@ -81,14 +86,25 @@ mferror(fts_midifile_t *midifile, char *s)
 *  read utilities
 *
 */
-
 /* read a single character and abort on EOF */
 static int
 readbyte(fts_midifile_t *midifile)
 {
-  int c = getc(midifile->fp);
+  int c;
   
-  if (c == EOF)
+  if(midifile->buf_idx >= midifile->buf_size)
+  {
+    /* read blaock */
+    midifile->buf_size = fread(midifile->buf, 1, MIDIFILE_BLOCK_SIZE, midifile->file);
+    midifile->buf_idx = 0;
+    
+    if(midifile->buf_size == 0)
+      return EOF;
+  }
+  
+  c = midifile->buf[midifile->buf_idx++];
+  
+  if(c == EOF)
   {
     mferror(midifile, "unexspected end of file");
     return EOF;
@@ -155,7 +171,7 @@ midifile_tempo_map_add_entry(fts_midifile_t *midifile, int tick, int tempo)
   
   if(tempo_map_entry_heap == NULL)
     tempo_map_entry_heap = fts_heap_new(sizeof(fts_midifile_tempo_map_entry_t));
-      
+  
   /* create new tempo map entry */
   entry = (fts_midifile_tempo_map_entry_t *)fts_heap_alloc(tempo_map_entry_heap);
   
@@ -215,7 +231,7 @@ midifile_tempo_map_destroy(fts_midifile_t *midifile)
 static void
 midifile_channel_message_call(fts_midifile_t *midifile, enum midi_type type, int channel, int byte1, int byte2)
 {
-  if (midifile->read->midi_event)
+  if(midifile->read->midi_event && (midifile->sel_channel == 0 || channel == midifile->sel_channel))
   {
     fts_midievent_t *event = fts_midievent_channel_message_new(type, channel, byte1, byte2);
     
@@ -225,7 +241,7 @@ midifile_channel_message_call(fts_midifile_t *midifile, enum midi_type type, int
   }
 }
 
-/* system exclusive message buffer */
+/* system exclusive message bufer */
 static void
 midifile_system_exclusive_start(fts_midifile_t *midifile)
 {
@@ -261,7 +277,7 @@ midifile_system_exclusive_call(fts_midifile_t *midifile)
   }
 }
 
-/* divers meta data buffer */
+/* divers meta data bufer */
 static void
 midifile_string_clear(fts_midifile_t *midifile)
 {
@@ -271,7 +287,7 @@ midifile_string_clear(fts_midifile_t *midifile)
 static void
 midifile_string_add_char(fts_midifile_t *midifile, int c)
 {
-  /* If necessary, allocate larger message buffer */
+  /* If necessary, allocate larger message bufer */
   if (midifile->string_size >= midifile->string_alloc)
   {
     midifile->string_alloc += 128;
@@ -285,18 +301,13 @@ midifile_string_add_char(fts_midifile_t *midifile, int c)
 static int 
 midifile_read_mt(fts_midifile_t *midifile, char *s)
 {
-  FILE *fp = midifile->fp;
-  int i;
-  
-  for(i=0; i<4; i++)
-  {
-    int c = getc(fp);
-    
-    if (c == EOF || c != s[i])
-      return 0;
-  }
-  
-  return 1;
+  if(readbyte(midifile) == s[0] &&
+     readbyte(midifile) == s[1] &&
+     readbyte(midifile) == s[2] &&
+     readbyte(midifile) == s[3])
+    return 1;
+  else
+    return 0;
 }
 
 /* read a header chunk */
@@ -486,7 +497,7 @@ midifile_read_track(fts_midifile_t *midifile)
           if (!sysex_continue)
             midifile_system_exclusive_start(midifile);
             
-          while (midifile->bytes > lookfor)
+            while (midifile->bytes > lookfor)
             {
               byte = readbyte(midifile);
               midifile_system_exclusive_byte(midifile, byte);
@@ -560,7 +571,7 @@ midifile_read_track(fts_midifile_t *midifile)
               
               if(midifile->format == 1)
                 midifile_tempo_map_add_entry(midifile, midifile->ticks, tempo);
-
+              
               if(midifile->division > 0)
                 midifile->time_conv = 0.001 * (double)tempo / (double)midifile->division;
               
@@ -652,23 +663,19 @@ midifile_read_track(fts_midifile_t *midifile)
 static void
 midifile_skip_track(fts_midifile_t *midifile)
 {
-  int sysex_continue = 0;
-  int status = 0;
-  int channel = 0;
-  
-  if (midifile_read_mt(midifile, "MTrk") == 0)
+  if(midifile_read_mt(midifile, "MTrk") == 0)
   {
     mferror(midifile, "exspected beginning of track (didn't find 'MTrk' tag)");
     return;
   }
- 
+  
   midifile->bytes = read32bit(midifile);
   
   /* time starts at zero */
   midifile->ticks = 0;
   midifile->time = 0.0;
   midifile->tempo_map_pointer = midifile->tempo_map;
-    
+  
   while(!midifile->error && midifile->bytes > 0)
   {
     int byte = readbyte(midifile);
@@ -699,48 +706,50 @@ midifile_skip_track(fts_midifile_t *midifile)
  *
  */
 
-/* write a single character and abort on error */
-static int
-writebyte(fts_midifile_t *midifile, unsigned char c)			
+static void
+writeblock(fts_midifile_t *midifile)
 {
-  FILE *fp = midifile->fp;
-  int i;
-	
-  i = putc(c, fp);
+  long size = midifile->buf_size;
+  long count = fwrite(midifile->buf, 1, size, midifile->file);
   
-  if (i == EOF)
-  {
-    mferror(midifile, "write error");
-    return EOF;
-  }
-  else
-  {
-    midifile->size++;
-    return i;
-  }
+  midifile->buf_size = 0;
+  midifile->buf_idx = 0;
+  
+  if(count == size)
+    midifile->size += count;  
+}
+
+/* write a single character and abort on error */
+static void
+writebyte(fts_midifile_t *midifile, unsigned char c)                        
+{  
+  if(midifile->buf_size >= MIDIFILE_BLOCK_SIZE)
+    writeblock(midifile);        
+  
+  midifile->buf[midifile->buf_size++] = c;
 }
 
 /* write multi-length bytes to MIDI format files */
 static void 
 writevarlen(fts_midifile_t *midifile, unsigned int value)
 {
-  unsigned int buffer;
+  unsigned int bufer;
   
-  buffer = value & 0x7f;
+  bufer = value & 0x7f;
   
   while((value >>= 7) > 0)
   {
-    buffer <<= 8;
-    buffer |= 0x80;
-    buffer += (value & 0x7f);
+    bufer <<= 8;
+    bufer |= 0x80;
+    bufer += (value & 0x7f);
   }
   
   while(1)
   {
-    writebyte(midifile, (unsigned)(buffer & 0xff));
+    writebyte(midifile, (unsigned)(bufer & 0xff));
     
-    if(buffer & 0x80)
-      buffer >>= 8;
+    if(bufer & 0x80)
+      bufer >>= 8;
     else
       return;
   }
@@ -811,13 +820,15 @@ int
 fts_midifile_write_track_begin(fts_midifile_t *midifile)
 {
   unsigned int trkhdr = MTrk;
-	
-  /* remember where the length was written, because we don't know how long it will be until we've finished writing */
-  midifile->bytes = ftell(midifile->fp);
+  
+  /* rememeber position to rewrite size later */ 
+  writeblock(midifile);
+  midifile->bytes = ftell(midifile->file);
   
   /* write the track chunk header */
   write32bit(midifile, trkhdr);
   write32bit(midifile, 0); /* write length as 0 and correct later */
+  writeblock(midifile);
   
   midifile->ticks = 0; /* time starts from zero */
   midifile->time = 0.0;
@@ -831,34 +842,40 @@ int
 fts_midifile_write_track_end(fts_midifile_t *midifile)
 {
   unsigned int trkhdr = MTrk;
-  int place_marker;
-  int size;
+  long filepos = 0;
+  int size = 0;
   
   /* write end of track meta event */
   writebyte(midifile, 0);
   writebyte(midifile, META_EVENT);
   writebyte(midifile, END_OF_TRACK);
-  
   writebyte(midifile, 0);
-	 
-  /* It's impossible to know how long the track chunk will be beforehand,
-    so the position of the track length data is kept so that it can
-    be written after the chunk has been generated */
-  place_marker = ftell(midifile->fp);
-	
-  if(fseek(midifile->fp, midifile->bytes, 0) < 0)
+  
+  /* flush write bufer and remember position */ 
+  writeblock(midifile);
+  filepos = ftell(midifile->file);
+  
+  /* get track size in bytes */
+  size = midifile->size;
+  
+  /* rewind to write read size at beginning of track */
+  if(fseek(midifile->file, midifile->bytes, 0) < 0)
   {
     mferror(midifile, "error seeking during final stage of write");
     return EOF;
   }
   
-  size = midifile->size; /* get number of written bytes until HERE! */
-  
-  /* Re-write the track chunk header with right length */
+  /* rewrite the track chunk header with right size */
   write32bit(midifile, trkhdr);
   write32bit(midifile, size);
+  writeblock(midifile);
   
-  fseek(midifile->fp, place_marker, 0);
+  /* flush write bufer and go back to end of track */
+  if(fseek(midifile->file, filepos, 0) < 0)
+  {
+    mferror(midifile, "error seeking during final stage of write");
+    return EOF;
+  }
   
   return 1;
 }
@@ -955,10 +972,7 @@ fts_midifile_write_meta_event(fts_midifile_t *midifile, int ticks, int type, uns
   writevarlen(midifile, size); 
   
   for(i=0; i<size; i++)
-  {
-    if(writebyte(midifile, data[i]) != data[i])
-      return -1; 
-  }
+    writebyte(midifile, data[i]);
   
   return size;
 }
@@ -1002,14 +1016,15 @@ fts_midifile_read_functions_init(fts_midifile_read_functions_t *read)
 }
 
 static void
-fts_midifile_init(fts_midifile_t *midifile, FILE *fp, fts_symbol_t name)
+fts_midifile_init(fts_midifile_t *midifile, t_filehandle file, fts_symbol_t name)
 {
-  midifile->fp = fp;
+  midifile->file = file;
+  midifile->buf_size = 0;
+  midifile->buf_idx = 0;
   midifile->name = name;
   
   midifile->format = 0;
   midifile->n_tracks = 0;
-  midifile->i_track = FTS_MIDIFILE_ALL_TRACKS;
   midifile->division = 0;
   midifile->tempo = FTS_MIDIFILE_DEFAULT_TEMPO;
   
@@ -1029,6 +1044,9 @@ fts_midifile_init(fts_midifile_t *midifile, FILE *fp, fts_symbol_t name)
   midifile->string_size = 0;
   midifile->string_alloc = 0;
   
+  midifile->sel_track = FTS_MIDIFILE_SELECT_ALL_TRACKS;
+  midifile->sel_channel = FTS_MIDIFILE_SELECT_ALL_CHANNELS;
+  
   midifile->error = 0;
   
   midifile->user = 0;
@@ -1037,53 +1055,51 @@ fts_midifile_init(fts_midifile_t *midifile, FILE *fp, fts_symbol_t name)
 fts_midifile_t *
 fts_midifile_open_read(fts_symbol_t name)
 {
-  char full_path[MAXPATHLEN];
-  FILE *fp;
+  char str[1024];
+  char *fullpath = fts_file_find((char *)fts_symbol_name(name), str, 1023);
   
-  if (fts_file_find( name, full_path, MAXPATHLEN) == NULL)
-    return 0;
-  
-  fp = fopen(full_path, "rb");
-  
-  if(fp != 0)
+  if(fullpath != NULL)
   {
-    fts_midifile_t *midifile = fts_malloc(sizeof(fts_midifile_t));
+    FILE *file = fopen(fullpath, "rb");
     
-    fts_midifile_init(midifile, fp, name);
-    
-    return midifile;
+    if(file != 0)
+    {
+      fts_midifile_t *midifile = fts_malloc(sizeof(fts_midifile_t));      
+      fts_midifile_init(midifile, file, name);
+      
+      return midifile;
+    }
   }
-  else
-    return 0;
+  
+  return NULL;
 }
 
 fts_midifile_t *
 fts_midifile_open_write(fts_symbol_t name)
 {
-  char full_path[1024];
-  FILE *fp;
+  char str[1024];
+  char *fullpath = fts_make_absolute_path(NULL, (char *)fts_symbol_name(name), str, 1023);
+  FILE *file = fopen(fullpath, "wb");
   
-  fts_make_absolute_path( NULL, name, full_path, MAXPATHLEN);
-  
-  fp = fopen(full_path, "wb");
-  
-  if(fp != 0)
+  if(file != NULL)
   {
     fts_midifile_t *midifile = fts_malloc(sizeof(fts_midifile_t));
-    
-    fts_midifile_init(midifile, fp, name);
+    fts_midifile_init(midifile, file, name);
     
     return midifile;
   }
-  else
-    return 0;
+  
+  return NULL;
 }
 
 void 
 fts_midifile_close(fts_midifile_t *midifile)
 {
+  /* flush bufered data to file */
+  writeblock(midifile);
+  
   midifile_tempo_map_destroy(midifile);
-  fclose(midifile->fp);
+  sysfile_close(midifile->file);
 }
 
 int
@@ -1094,11 +1110,11 @@ fts_midifile_read(fts_midifile_t *midifile)
   
   for(i=0; i<size; i++)
   {
-    if(midifile->i_track >= 0 && i > 0)
+    if(midifile->sel_track >= 0 && i > 0)
     {
-      if(i < midifile->i_track)
+      if(i < midifile->sel_track)
         midifile_skip_track(midifile);
-      else if(i == midifile->i_track)
+      else if(i == midifile->sel_track)
         midifile_read_track(midifile);
       else
         break;
@@ -1118,9 +1134,28 @@ fts_midifile_read(fts_midifile_t *midifile)
 *  timing
 *
 */
-
 int
 fts_midifile_time_to_ticks(fts_midifile_t *midifile, double time)
 {
   return (int)((time * (double)midifile->division) / (0.001 * (double)midifile->tempo) + 0.5);
 }
+
+/*************************************************************
+*
+*  import/export
+*
+*/
+void
+fts_midifile_import_handler(fts_class_t *cl, fts_method_t meth)
+{
+  fts_class_import_handler(cl, fts_new_symbol("midi"), meth);
+  fts_class_import_handler(cl, fts_new_symbol("mid"), meth);
+}
+
+void
+fts_midifile_export_handler(fts_class_t *cl, fts_method_t meth)
+{
+  fts_class_export_handler(cl, fts_new_symbol("midi"), meth);
+  fts_class_export_handler(cl, fts_new_symbol("mid"), meth);
+}
+

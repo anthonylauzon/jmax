@@ -267,9 +267,9 @@ ivec_grow(ivec_t *vec, int size)
 }
 
 int 
-ivec_read_atom_file(ivec_t *vec, fts_symbol_t file_name)
+ivec_read_atomfile(ivec_t *vec, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file = fts_atom_file_open(file_name, "r");
+  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
   int n = 0;
   fts_atom_t a;
   char c;
@@ -277,7 +277,7 @@ ivec_read_atom_file(ivec_t *vec, fts_symbol_t file_name)
   if(!file)
     return -1;
   
-  while(fts_atom_file_read(file, &a, &c))
+  while(fts_atomfile_read(file, &a, &c))
     {
       if(n >= vec->alloc)
 	ivec_grow(vec, n);
@@ -292,19 +292,19 @@ ivec_read_atom_file(ivec_t *vec, fts_symbol_t file_name)
 
   ivec_set_size(vec, n);
   
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
 
   return (n);
 }
 
 int
-ivec_write_atom_file(ivec_t *vec, fts_symbol_t file_name)
+ivec_write_atomfile(ivec_t *vec, fts_symbol_t file_name)
 {
-  fts_atom_file_t *file;
+  fts_atomfile_t *file;
   int size = ivec_get_size(vec);
   int i;
 
-  file = fts_atom_file_open(file_name, "w");
+  file = fts_atomfile_open_write(file_name);
 
   if(!file)
     return -1;
@@ -315,10 +315,10 @@ ivec_write_atom_file(ivec_t *vec, fts_symbol_t file_name)
       fts_atom_t a;
       
       fts_set_int(&a, ivec_get_element(vec, i));
-      fts_atom_file_write(file, &a, '\n');
+      fts_atomfile_write(file, &a, '\n');
     }
 
-  fts_atom_file_close(file);
+  fts_atomfile_close(file);
 
   return (i);
 }
@@ -649,7 +649,7 @@ ivec_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 
   if(file_format == sym_text)
     {
-      int size = ivec_read_atom_file(this, file_name);
+      int size = ivec_read_atomfile(this, file_name);
       
       if(size <= 0)
 	fts_post("ivec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
@@ -672,7 +672,7 @@ ivec_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 
   if(file_format == sym_text)
     {
-      int size = ivec_write_atom_file(this, file_name);
+      int size = ivec_write_atomfile(this, file_name);
       
       if(size < 0)
 	fts_post("ivec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));

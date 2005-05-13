@@ -1,6 +1,6 @@
 /*
  * jMax
- * Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
+ * Copyright (C) 2004 by IRCAM-Centre Georges Pompidou, Paris, France.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -18,244 +18,326 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
+ *
+ *  FTS audiofile API (reading and writing of audio files)
+ *
  */
-
 #include <string.h>
 #include <fts/fts.h>
 #include <ftsconfig.h>
-#if HAVE_SYS_PARAM_H
-#include <sys/param.h>
+#ifdef WIN32
+#include <malloc.h>
+#else
+#include <alloca.h>
 #endif
+#include <sndfile.h>
 
 /* sample formats */
 fts_symbol_t fts_s_int8;
 fts_symbol_t fts_s_int16;
 fts_symbol_t fts_s_int24;
 fts_symbol_t fts_s_int32;
-fts_symbol_t fts_s_uint8;
-fts_symbol_t fts_s_uint16;
-fts_symbol_t fts_s_uint24;
-fts_symbol_t fts_s_uint32;
 fts_symbol_t fts_s_float32;
 fts_symbol_t fts_s_float64;
 
 /* file formats */
+fts_symbol_t fts_s_audio;
 fts_symbol_t fts_s_aiff;
+fts_symbol_t fts_s_aif;
 fts_symbol_t fts_s_wav;
 fts_symbol_t fts_s_snd;
 fts_symbol_t fts_s_raw;
+fts_symbol_t fts_s_sf;
 
-fts_audiofile_loader_t* fts_audiofile_loader = NULL;
-
-int 
-fts_audiofile_set_loader(char* name, fts_audiofile_loader_t* loader)
+static void
+audiofile_set_format(fts_audiofile_t *audiofile, fts_symbol_t format)
 {
-  fts_audiofile_loader = loader;
-  fts_log("[audiofile] Setting audio file loader to %s\n", name);
-  return 0;
-}
-
-void
-fts_audiofile_set_file_format_by_suffix(fts_audiofile_t* aufile, fts_symbol_t suffix)
-{
-  if(suffix == fts_s_aiff)
-    aufile->file_format = audiofile_aiff;
-  else if(suffix == fts_s_wav)
-    aufile->file_format = audiofile_wave;
-  else if(suffix == fts_s_snd)
-    aufile->file_format = audiofile_snd;
+  audiofile->sfinfo.format &= (SF_FORMAT_SUBMASK | SF_FORMAT_ENDMASK);
+  
+  if(format == fts_s_raw)
+    audiofile->sfinfo.format |= SF_FORMAT_RAW;
+  else if(format == fts_s_aiff)
+    audiofile->sfinfo.format |= SF_FORMAT_AIFF;
+  else if(format == fts_s_aif)
+    audiofile->sfinfo.format |= SF_FORMAT_AIFF;
+  else if(format == fts_s_wav)
+    audiofile->sfinfo.format |= SF_FORMAT_WAV;
+  else if(format == fts_s_snd)
+    audiofile->sfinfo.format |= SF_FORMAT_AU;
+  else if(format == fts_s_sf)
+    audiofile->sfinfo.format |= SF_FORMAT_IRCAM;
   else
-    aufile->file_format = audiofile_file_format_null;
+    audiofile->sfinfo.format |= SF_FORMAT_AIFF;
 }
 
-void
-fts_audiofile_set_sample_format_by_name(fts_audiofile_t* aufile, fts_symbol_t name)
+static void
+audiofile_set_sample_format(fts_audiofile_t *audiofile, fts_symbol_t name)
 {
+  audiofile->sfinfo.format &= (SF_FORMAT_TYPEMASK | SF_FORMAT_ENDMASK);
+  
   if(name == fts_s_int8)
-    {
-      aufile->sample_format = audiofile_int8;
-      aufile->bytes_per_sample = 1;
-    }
+    audiofile->sfinfo.format |= SF_FORMAT_PCM_S8;
   else if(name == fts_s_int16)
-    {
-      aufile->sample_format = audiofile_int16;
-      aufile->bytes_per_sample = 2;
-    }
+    audiofile->sfinfo.format |= SF_FORMAT_PCM_16;
   else if(name == fts_s_int24)
-    {
-      aufile->sample_format = audiofile_int24;
-      aufile->bytes_per_sample = 3;
-    }
+    audiofile->sfinfo.format |= SF_FORMAT_PCM_24;
   else if(name == fts_s_int32)
-    {
-      aufile->sample_format = audiofile_int32;
-      aufile->bytes_per_sample = 4;
-    }
-  else if(name == fts_s_uint8)
-    {
-      aufile->sample_format = audiofile_uint8;
-      aufile->bytes_per_sample = 1;
-    }
-  else if(name == fts_s_uint16)
-    {
-      aufile->sample_format = audiofile_uint16;
-      aufile->bytes_per_sample = 2;
-    }
-  else if(name == fts_s_uint24)
-    {
-      aufile->sample_format = audiofile_uint24;
-      aufile->bytes_per_sample = 3;
-    }
-  else if(name == fts_s_uint32)
-    {
-      aufile->sample_format = audiofile_uint32;
-      aufile->bytes_per_sample = 4;
-    }
+    audiofile->sfinfo.format |= SF_FORMAT_PCM_32;
   else if(name == fts_s_float32)
-    {
-      aufile->sample_format = audiofile_float32;
-      aufile->bytes_per_sample = 4;
-    }
+    audiofile->sfinfo.format |= SF_FORMAT_FLOAT;
   else if(name == fts_s_float64)
-    {
-      aufile->sample_format = audiofile_float64;
-      aufile->bytes_per_sample = 8;
-    }
-  else
-    {
-      aufile->sample_format = audiofile_sample_format_null;
-      aufile->bytes_per_sample = 0;
-    }
+    audiofile->sfinfo.format |= SF_FORMAT_DOUBLE;
+}
+
+#define ERRBUF_SIZE 1024
+static char audiofile_errbuf[ERRBUF_SIZE];
+
+static void 
+audiofile_error(fts_audiofile_t *audiofile, const char *format, ...)
+{
+  va_list args; 
+
+  va_start( args, format); 
+  vsnprintf( audiofile_errbuf, ERRBUF_SIZE, format, args); 
+  va_end( args); 
+
+  audiofile->error = audiofile_errbuf;
 }
 
 static fts_audiofile_t *
 audiofile_new(fts_symbol_t filename, fts_symbol_t mode)
 {
-  fts_audiofile_t *aufile = (fts_audiofile_t *)fts_malloc(sizeof(fts_audiofile_t));
+  fts_audiofile_t *audiofile = (fts_audiofile_t *)fts_malloc(sizeof(fts_audiofile_t));
 
-  aufile->filename = filename;
-  aufile->mode = mode;
-
-  aufile->channels = 0;
-  aufile->sample_rate = 0;
-  aufile->sample_format = audiofile_sample_format_null;
-  aufile->bytes_per_sample = 0;
-  aufile->file_format = audiofile_file_format_null;
-  aufile->frames = 0;
+  audiofile->filename = filename;
+  audiofile->mode = mode;
+  audiofile->file_format = audiofile_file_format_null;
+  audiofile->sample_format = audiofile_sample_format_null;
+  memset(&audiofile->sfinfo, 0, sizeof(audiofile->sfinfo));
+  audiofile->sfhandle = NULL;
+  audiofile->error = NULL;
   
-  aufile->handle = NULL;
-  aufile->error = NULL;
+  return audiofile;
+}
 
-  return aufile;
+static int
+audiofile_set_info(fts_audiofile_t *audiofile, int channels, int sample_rate, fts_symbol_t format, fts_symbol_t sample_format)
+{
+  if(format == NULL || format == fts_s_audio || format == fts_s_default)
+  {
+    char *suffix = strrchr((char *)fts_symbol_name(audiofile->filename), '.');
+    
+    if(suffix != NULL)
+      format = fts_new_symbol(suffix + 1);
+    else
+      format = fts_s_aiff;        
+  }
+  
+  if(sample_format == NULL)
+    sample_format = fts_s_int16;
+  
+  if(channels > 0)
+    audiofile->sfinfo.channels = channels;
+  
+  if(sample_rate > 0)
+    audiofile->sfinfo.samplerate = sample_rate;
+
+  audiofile_set_format(audiofile, format);
+  audiofile_set_sample_format(audiofile, sample_format);
+  
+  return (sf_format_check(&audiofile->sfinfo) == TRUE);
 }
 
 fts_audiofile_t *
-fts_audiofile_open_read(fts_symbol_t filename)
+fts_audiofile_open_read(fts_symbol_t name)
 {
-  if (fts_audiofile_loader != NULL) 
+  const char *filename = (const char *)fts_symbol_name(name);
+  char str[1024];
+  char *fullpath = fts_file_find(filename, str, 1023);
+  
+  if(fullpath != NULL)
+  {
+    fts_audiofile_t *audiofile = audiofile_new(name, fts_s_read);
+    
+    audiofile->sfhandle = sf_open(fullpath, SFM_READ, &audiofile->sfinfo);
+    
+    if(audiofile->sfhandle != NULL)
+      return audiofile;
+    
+    fts_free(audiofile);
+  }
+  
+  return NULL;
+}
+
+fts_audiofile_t *
+fts_audiofile_open_read_format(fts_symbol_t name, int channels, int sample_rate, fts_symbol_t format, fts_symbol_t sample_format)
+{
+  const char *filename = (const char *)fts_symbol_name(name);
+  char str[1024];
+  char *fullpath = fts_file_find(filename, str, 1023);
+  
+  if(fullpath != NULL)
+  {
+    fts_audiofile_t *audiofile = audiofile_new(name, fts_s_read);
+    
+    if(audiofile_set_info(audiofile, channels, sample_rate, format, sample_format))
     {
-      int ret;
-      char buf[MAXPATHLEN];
-      fts_audiofile_t *aufile;
+      audiofile->sfhandle = sf_open(fullpath, SFM_READ, &audiofile->sfinfo);
       
-      if (fts_file_find( filename, buf, MAXPATHLEN) == NULL)
-	return NULL;
-      
-      aufile = audiofile_new(fts_new_symbol(buf), fts_s_read);
-
-      /* open file */
-      ret = fts_audiofile_loader->open_read(aufile);
-
-      /* allocate buffer with default length */
-      if(ret == 0)
-	ret = fts_audiofile_loader->buffer_length(aufile, 0);
-
-      return aufile;
+      if(audiofile->sfhandle != NULL)
+        return audiofile;
     }
-  else
-    {
-      fts_log("[audiofile] trying to open audiofile without loader set\n");
-      return NULL;
-    }
+    
+    fts_free(audiofile);
+  }
+  
+  return NULL;
 }
 
 fts_audiofile_t * 
-fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format)
+fts_audiofile_open_write(fts_symbol_t name, int channels, int sample_rate, fts_symbol_t format, fts_symbol_t sample_format)
 {
-  if (fts_audiofile_loader != NULL) 
+  char *filename = (char *)fts_symbol_name(name);
+  char str[1024];
+  char *fullpath = fts_make_absolute_path(NULL, filename, str, 1023);
+  
+  if(fullpath != NULL)
+  {
+    fts_audiofile_t *audiofile = audiofile_new(name, fts_s_write);
+    
+    if(audiofile_set_info(audiofile, channels, sample_rate, format, sample_format))
     {
-      fts_audiofile_t *aufile;
-      char buf[MAXPATHLEN];
-      char *suffix;
+      audiofile->sfhandle = sf_open(fullpath, SFM_WRITE, &audiofile->sfinfo);
 
-      fts_make_absolute_path( NULL, filename, buf, MAXPATHLEN);
-
-      aufile = audiofile_new(filename, fts_s_write);
-      suffix = strrchr(fts_symbol_name(filename), '.');
-
-      aufile->channels = channels;
-      aufile->sample_rate = sr;
-      fts_audiofile_set_sample_format_by_name(aufile, sample_format);
-
-      if(suffix != NULL)
-	fts_audiofile_set_file_format_by_suffix(aufile, fts_new_symbol(suffix + 1));
-      else
-	fts_audiofile_set_file_format_by_suffix(aufile, 0);
-
-      /* open file */
-      if (0 != fts_audiofile_loader->open_write(aufile))
-      {
-	fts_log("[audiofile] cannot open %s for writing \n", filename);
-	return NULL;
-      }      
-      /* allocate buffer with default length */
-      fts_audiofile_loader->buffer_length(aufile, 0);
-
-      return aufile;
+      if(audiofile->sfhandle != NULL)
+        return audiofile;
     }
-  else
-    {
-      fts_log("[audiofile] trying to open audiofile without loader set\n");
-      return NULL;
-    }
+
+    fts_free(audiofile);
+  }
+  
+  return NULL;
 }
 
 void 
-fts_audiofile_close(fts_audiofile_t* aufile)
+fts_audiofile_close(fts_audiofile_t *audiofile)
 {
-  if(fts_audiofile_loader != NULL)
-    {
-      if(aufile)
-	{
-	  fts_audiofile_loader->close(aufile);
-	  fts_free(aufile);
-	}
-    }
+  if(audiofile != NULL)
+  {
+    sf_close(audiofile->sfhandle);
+    fts_free(audiofile);
+  }
+}
+
+int
+fts_audiofile_read(fts_audiofile_t *audiofile, float **buf, int n_buf, int size)
+{
+  int n_channels = audiofile->sfinfo.channels;
+  float *buffer = (float *)alloca(sizeof(float) * size * n_channels);
+  int n, i, j, k;
+  
+  n = sf_read_float(audiofile->sfhandle, buffer, size * n_channels);
+  
+  /* un-interleave samples */
+  for(i=0, k=0; k<n; i++, k+=n_channels)
+  {
+    for(j=0; j<n_buf; j++)
+      buf[j][i] = buffer[k + j];
+  }
+  
+  return n / n_channels;
+}
+
+int 
+fts_audiofile_read_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int size)
+{
+  if(n_channels == audiofile->sfinfo.channels)
+    return sf_read_float(audiofile->sfhandle, buf, size * n_channels) / n_channels;
+  else 
+    return 0;
+}
+
+int 
+fts_audiofile_write(fts_audiofile_t *audiofile, float **buf, int n_buf, int size)
+{
+  int n_channels = audiofile->sfinfo.channels;
+  float *buffer = (float *)alloca(sizeof(float) * size * n_channels);
+  int n, i, j, k;
+  
+  if(n_buf > n_channels)
+    n_buf = n_channels;
+  
+  /* interleave samples */
+  for(i=0, k=0; i<size; i++, k+=n_channels)
+  {
+    for(j=0; j<n_buf; j++)
+      buffer[k + j] = buf[j][i];
+
+    for(; j<n_channels; j++)
+      buffer[k + j] = 0.0;
+}
+  
+  n = sf_write_float(audiofile->sfhandle, buffer, size * n_channels);
+  
+  return n / n_channels;
+}
+
+int 
+fts_audiofile_write_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int size)
+{
+  if(n_channels == audiofile->sfinfo.channels)
+    return sf_write_float(audiofile->sfhandle, buf, size * n_channels) / n_channels;
+  else 
+    return 0;
+}
+
+int 
+fts_audiofile_seek(fts_audiofile_t *audiofile, int offset)
+{
+  /* not yet implemented */
+  return -1;
+}
+
+void
+fts_audiofile_import_handler(fts_class_t *cl, fts_method_t meth)
+{
+  fts_class_import_handler(cl, fts_new_symbol("audio"), meth);
+  fts_class_import_handler(cl, fts_s_aiff, meth);
+  fts_class_import_handler(cl, fts_s_aif, meth);
+  fts_class_import_handler(cl, fts_s_wav, meth);
+  fts_class_import_handler(cl, fts_s_snd, meth);
+  fts_class_import_handler(cl, fts_s_raw, meth);
+  fts_class_import_handler(cl, fts_s_sf, meth);
+}
+
+void
+fts_audiofile_export_handler(fts_class_t *cl, fts_method_t meth)
+{
+  fts_class_import_handler(cl, fts_new_symbol("audio"), meth);
+  fts_class_export_handler(cl, fts_s_aiff, meth);
+  fts_class_export_handler(cl, fts_s_aif, meth);
+  fts_class_export_handler(cl, fts_s_wav, meth);
+  fts_class_export_handler(cl, fts_s_snd, meth);
+  fts_class_export_handler(cl, fts_s_raw, meth);
+  fts_class_export_handler(cl, fts_s_sf, meth);
 }
 
 void 
 fts_kernel_audiofile_init(void)
 {
+  fts_s_audio = fts_new_symbol("audio");
+  fts_s_aiff = fts_new_symbol("aiff");
+  fts_s_aif = fts_new_symbol("aif");
+  fts_s_wav = fts_new_symbol("wav");
+  fts_s_snd = fts_new_symbol("snd");
+  fts_s_raw = fts_new_symbol("raw");
+  fts_s_sf = fts_new_symbol("sf");
+
   fts_s_int8 = fts_new_symbol("int8");
   fts_s_int16 = fts_new_symbol("int16");
   fts_s_int24 = fts_new_symbol("int24");
   fts_s_int32 = fts_new_symbol("int32");
-  fts_s_uint8 = fts_new_symbol("uint8");
-  fts_s_uint16 = fts_new_symbol("uint16");
-  fts_s_uint24 = fts_new_symbol("uint24");
-  fts_s_uint32 = fts_new_symbol("uint32");
   fts_s_float32 = fts_new_symbol("float32");
   fts_s_float64 = fts_new_symbol("float64");
-
-  fts_s_aiff = fts_new_symbol("aiff");
-  fts_s_wav = fts_new_symbol("wav");
-  fts_s_snd = fts_new_symbol("snd");
-  fts_s_raw = fts_new_symbol("raw");
 }
-
-/** EMACS **
- * Local variables:
- * mode: c
- * c-basic-offset:2
- * End:
- */

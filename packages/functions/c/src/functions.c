@@ -488,7 +488,7 @@ info_class(fts_class_t *cl, mat_t *outmat)
     int i = 0;
     
     if (!outmat)
-      fts_post("FTM classes:\n");
+      fts_post("FTS classes:\n");
     
     fts_package_get_classes(pkg, &cl_it);
     
@@ -590,7 +590,7 @@ info_functions(mat_t *outmat)
   int i = 0;
   
   if (!outmat)
-    fts_post("FTM functions:\n");
+    fts_post("FTS functions:\n");
   
   fts_package_get_functions(pkg, &fun_it);
   
