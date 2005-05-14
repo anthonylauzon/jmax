@@ -22,23 +22,72 @@
 
 #include <fts/fts.h>
 
-void __fts_stack_init( fts_stack_t *s, int element_size)
+#define FTS_STACK_BLOCK_SIZE 256
+
+void 
+__fts_stack_init( fts_stack_t *s, int element_size)
 {
-  s->alloc = 256;
+  s->alloc = FTS_STACK_BLOCK_SIZE;
   s->element_size = element_size;
   s->buffer = fts_malloc( s->alloc * s->element_size);
-  s->top = -1;
+  s->size = 0;
 }
 
-void fts_stack_destroy( fts_stack_t *s)
+void 
+fts_stack_destroy( fts_stack_t *stack)
 {
-  fts_free( s->buffer);
+  fts_free( stack->buffer);
 }
 
-int __fts_stack_realloc( fts_stack_t *s)
+int 
+__fts_stack_realloc( fts_stack_t *stack, int alloc)
 {
-  s->alloc *= 2;
-  s->buffer = fts_realloc( s->buffer, s->alloc * s->element_size);
-
+  if(alloc > stack->alloc)
+  {
+    stack->buffer = fts_realloc( stack->buffer, alloc * stack->element_size);
+    stack->alloc = alloc;
+    
+    return 1;
+  }
+  
   return 0;
+}
+
+int
+__fts_stack_append(fts_stack_t *stack, void *p, int n)
+{
+  int alloc = stack->alloc;
+  int size = stack->size + n;
+  
+  if(alloc < size)
+  {
+    do 
+      alloc += FTS_STACK_BLOCK_SIZE;
+    while(alloc < size);
+
+    stack->buffer = fts_realloc( stack->buffer, alloc * stack->element_size);
+    stack->alloc = alloc;
+  }
+
+  memcpy(stack->buffer + stack->size * stack->element_size, p, n * stack->element_size);
+  
+  stack->size = size;
+  
+  return size;
+}
+
+void 
+fts_string_init(fts_stack_t *stack, char *str)
+{
+  stack->alloc = FTS_STACK_BLOCK_SIZE;
+  stack->element_size = sizeof(char);
+  stack->buffer = fts_malloc(stack->alloc);
+  
+  if(str != NULL)
+    __fts_stack_append(stack, str, strlen(str) + 1);
+  else
+  {
+    stack->size = 1;
+    ((char *)stack->buffer)[0] = '\0';
+  }
 }

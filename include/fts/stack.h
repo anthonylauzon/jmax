@@ -45,12 +45,15 @@
  * @ingroup stack
  */
 
-typedef struct _fts_stack_t {
+typedef struct _fts_stack_t 
+{
   void *buffer;
-  int top;
+  int size;
   int alloc;
   int element_size;
 } fts_stack_t;
+
+typedef fts_stack_t fts_string_t;
 
 /*@}*/
 
@@ -64,10 +67,10 @@ typedef struct _fts_stack_t {
  * @param t a C type that is the type of the element
  * @ingroup stack
  */
-#define fts_stack_init(B,T) __fts_stack_init(B, sizeof(T))
+#define fts_stack_init(s,t) __fts_stack_init(s, sizeof(t))
 
 /* This function is not to be called directly */
-FTS_API void __fts_stack_init( fts_stack_t *b, int element_size);
+FTS_API void __fts_stack_init(fts_stack_t *stack, int element_size);
 
 /**
  * Deinitializes a stack
@@ -76,7 +79,7 @@ FTS_API void __fts_stack_init( fts_stack_t *b, int element_size);
  * @param b the stack
  * @ingroup stack
  */
-FTS_API void fts_stack_destroy( fts_stack_t *stack);
+FTS_API void fts_stack_destroy(fts_stack_t *stack);
 
 /**
  * Clears the content of the stack
@@ -85,7 +88,7 @@ FTS_API void fts_stack_destroy( fts_stack_t *stack);
  * @param b the stack
  * @ingroup stack
  */
-#define fts_stack_clear(S) ((S)->top = -1)
+#define fts_stack_clear(s) ((s)->size = 0)
 
 /**
  * Push an element on the stack.<BR>
@@ -98,10 +101,11 @@ FTS_API void fts_stack_destroy( fts_stack_t *stack);
  * @param v the value to push
  * @ingroup stack
  */
-#define fts_stack_push(S,T,V) (((S)->top+1 >= (S)->alloc) ? __fts_stack_realloc((S)) : 0, ((T*)(S)->buffer)[++(S)->top] = (V))
+#define fts_stack_push(s,t,x) (((s)->size >= (s)->alloc) ? __fts_stack_realloc((s), 2 * (s)->alloc) : 0, ((t*)(s)->buffer)[(s)->size++] = (x))
 
 /* This function is not to be called directly */
-FTS_API int __fts_stack_realloc( fts_stack_t *b);
+FTS_API int __fts_stack_realloc( fts_stack_t *stack, int n);
+FTS_API int __fts_stack_append(fts_stack_t *stack, void *p, int n);
 
 /**
  * Pop n elements off the stack.<BR>
@@ -111,7 +115,7 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @param n the number of elements to pop
  * @ingroup stack
  */
-#define fts_stack_pop(B,N) ((B)->top -= (N))
+#define fts_stack_pop(s,n) ((s)->size -= (n))
 
 /**
  * Get the content of a stack
@@ -121,7 +125,7 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @return a pointer to the current content of the stack
  * @ingroup stack
  */
-#define fts_stack_base(S) ((S)->buffer)
+#define fts_stack_base(s) ((s)->buffer)
 
 /**
  * Get the top of a stack
@@ -131,7 +135,7 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @return the stack top
  * @ingroup stack
  */
-#define fts_stack_top(S) ((S)->top)
+#define fts_stack_top(s) ((s)->size-1)
 
 /**
  * Get the size of a stack (number of elements)
@@ -141,15 +145,28 @@ FTS_API int __fts_stack_realloc( fts_stack_t *b);
  * @return the stack size
  * @ingroup stack
  */
-#define fts_stack_size(S) ((S)->top + 1)
+#define fts_stack_size(s) ((s)->size)
 
+/* typed stacks */
 #define fts_stack_init_int(s) __fts_stack_init(s, sizeof(int))
-#define fts_stack_push_int(s, o) fts_stack_push(s, int, o)
-#define fts_stack_top_int(s) (((s)->top >= 0)? (((int *)fts_stack_base(s))[(s)->top]): NULL)
-#define fts_stack_get_int(s, i) (((i) >= 0 && (i) <= (s)->top)? (((int *)fts_stack_base(s))[(i)]): NULL)
+#define fts_stack_push_int(s, i) fts_stack_push(s, int, (i))
+#define fts_stack_top_int(s) (((s)->size > 0)? (((int *)fts_stack_base(s))[(s)->size-1]): NULL)
+#define fts_stack_pop_int(s) (((s)->size > 0)? (((int *)fts_stack_base(s))[--((s)->size)]): NULL)
+#define fts_stack_get_int(s, i) (((i) >= 0 && (i) < (s)->size)? (((int *)fts_stack_base(s))[(i)]): NULL)
 
 #define fts_stack_init_pointer(s) __fts_stack_init(s, sizeof(void *))
 #define fts_stack_push_pointer(s, o) fts_stack_push(s, void *, o)
-#define fts_stack_top_pointer(s) (((s)->top >= 0)? (((void **)fts_stack_base(s))[(s)->top]): NULL)
+#define fts_stack_pop_pointer(s) (((s)->size > 0)? (((void **)fts_stack_base(s))[--((s)->size)]): NULL)
+#define fts_stack_top_pointer(s) (((s)->size > 0)? (((void **)fts_stack_base(s))[(s)->size-1]): NULL)
 #define fts_stack_get_pointer(s, i) (((i) >= 0 && (i) <= (s)->top)? (((void **)fts_stack_base(s))[(i)]): NULL)
+
+/* strings */
+FTS_API void fts_string_init(fts_stack_t *stack, char *str);
+#define fts_string_set(s, x) ((s)->size = 0, __fts_stack_append((s), (x), strlen(x) + 1))
+#define fts_string_append(s, x) ((s)->size--, __fts_stack_append((s), (x), strlen(x) + 1))
+#define fts_string_append_char(s,t,x) (((s)->size >= (s)->alloc)? (__fts_stack_realloc((s), 2 * (s)->alloc)): 0, (((char *)(s)->buffer))[(s)->size-1] = (x), (((char *)(s)->buffer))[(s)->size] = '\0')
+#define fts_string_get_ptr(s) fts_stack_base(s)
+#define fts_string_get_size(s) (fts_stack_size(s) - 1)
+#define fts_string_clear(s) ((s)->size = 1, ((((char *)(s)->buffer))[0] = '\0'))
+#define fts_string_destroy(s) fts_stack_destroy(s)
 

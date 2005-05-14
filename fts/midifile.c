@@ -1016,7 +1016,7 @@ fts_midifile_read_functions_init(fts_midifile_read_functions_t *read)
 }
 
 static void
-fts_midifile_init(fts_midifile_t *midifile, t_filehandle file, fts_symbol_t name)
+fts_midifile_init(fts_midifile_t *midifile, FILE *file, fts_symbol_t name)
 {
   midifile->file = file;
   midifile->buf_size = 0;

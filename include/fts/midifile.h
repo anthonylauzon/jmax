@@ -42,7 +42,7 @@ typedef struct _fts_midifile_read_functions_
   void (*time_signature)(struct _fts_midifile_ *file, int numerator, int denominator, int clocks_per_metronome_click, int heals_per_quarter_note);
   void (*key_signature)(struct _fts_midifile_ *file, int n_sharps_or_flats, int major_or_minor);
   void (*text)(struct _fts_midifile_ *file, int type, int n, char *string);
-}fts_midifile_read_functions_t;
+} fts_midifile_read_functions_t;
 
 /* tempo map */
 typedef struct fts_midifile_tempo_map_entry

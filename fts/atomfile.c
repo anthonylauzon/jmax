@@ -36,7 +36,7 @@
 #include <io.h>
 #endif
 
-#define atomfile_BUF_SIZE 512
+#define ATOMFILE_BUF_SIZE 512
 
 struct fts_atomfile
 {
@@ -44,7 +44,7 @@ struct fts_atomfile
   FILE* file;
   
   /* for reading  */
-  char buf[atomfile_BUF_SIZE]; /* buffer of character read */
+  char buf[ATOMFILE_BUF_SIZE]; /* buffer of character read */
   long count; /* the current size of the buffer */
   long read; /* the index of the last char read */
 };
@@ -54,17 +54,22 @@ fts_atomfile_open_read(fts_symbol_t name)
 {
   char *filename = (char *)fts_symbol_name(name);
   char str[1024];
-  fts_atomfile_t *f = NULL;
   char *fullpath = fts_file_find(filename, str, 1023);
   
   if(fullpath != NULL)
   {
-    f = (fts_atomfile_t *)fts_malloc(sizeof(fts_atomfile_t));
-    f->file = fopen(fullpath, "r");
-    f->count = 0;
-    f->read = 0;
+    FILE *file = fopen(fullpath, "r");
     
-    return f;
+    if(file != NULL)
+    {
+      fts_atomfile_t *atomfile = (fts_atomfile_t *)fts_malloc(sizeof(fts_atomfile_t));
+      
+      atomfile->file = file;
+      atomfile->count = 0;
+      atomfile->read = 0;
+    
+      return atomfile;
+    }
   }
   
   return NULL;
@@ -75,13 +80,18 @@ fts_atomfile_open_write(fts_symbol_t name)
 {
   char *filename = (char *)fts_symbol_name(name);
   char str[1024];
-  fts_atomfile_t *f = NULL;
   char *fullpath = fts_make_absolute_path(NULL, filename, str, 1023);
+  FILE *file = fopen(fullpath, "w");
   
-  f = (fts_atomfile_t *)fts_malloc(sizeof(fts_atomfile_t));
-  f->file = fopen(fullpath, "w");
+  if(file != NULL)
+  {
+    fts_atomfile_t *atomfile = (fts_atomfile_t *)fts_malloc(sizeof(fts_atomfile_t));
+    atomfile->file = file;
+    
+    return atomfile;
+  }
   
-  return f;
+  return NULL;
 }
 
 void
@@ -102,9 +112,9 @@ fts_atomfile_close(fts_atomfile_t *f)
 #define IS_EOF(c) (0xff == (c))
 
 static void
-fts_atomfile_read_more(fts_atomfile_t *f)
+atomfile_read_more(fts_atomfile_t *f)
 {
-  f->count = fread(f->buf, 1, atomfile_BUF_SIZE, f->file);
+  f->count = fread(f->buf, 1, ATOMFILE_BUF_SIZE, f->file);
   f->read = 0;
 }
 
@@ -135,7 +145,7 @@ fts_atomfile_read(fts_atomfile_t *f, fts_atom_t *at, char *separator)
     if(!IS_EOF(c))
     {
       if (f->read >= f->count)
-        fts_atomfile_read_more(f);
+        atomfile_read_more(f);
       
       if (f->count == 0)
         c = 0xff;

@@ -1567,7 +1567,7 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
     fts_atomfile_t  *file;
     fts_atom_t        a;
     char              c;
-    double            time;
+    double            time = 0.0;
     fts_memorystream_t *memstream;
     enum { L_TIME, L_TEXT, L_ERROR } waitingfor = L_TIME;
 
