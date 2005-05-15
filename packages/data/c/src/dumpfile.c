@@ -39,7 +39,7 @@ typedef struct
 } dumpfile_t;
 
 static void
-dumpfile_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_dumper_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
   fts_atom_t a;
@@ -94,7 +94,7 @@ dumpfile_read_class_comment(dumpfile_t *this)
 }
 
 static void
-dumpfile_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
 
@@ -108,7 +108,7 @@ dumpfile_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
   
@@ -156,7 +156,7 @@ dumpfile_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_dump_object(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
 
@@ -182,7 +182,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
         
 	      /* set dumpfile as dumper */
 	      fts_set_object(&a, (fts_object_t *)o);
-	      (*meth_dump_state)(object, fts_system_inlet, fts_s_dump_state, 1, &a);
+	      (*meth_dump_state)(object, fts_s_dump_state, 1, &a, fts_nix);
 	      
 	      /* write final semicolon */
 	      fts_set_symbol(&a, fts_s_semi);
@@ -202,7 +202,7 @@ dumpfile_dump_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_restore_object(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
 
@@ -223,7 +223,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	    }
 
 	  /* clear object */
-	  fts_send_message(object, fts_s_clear, 0, 0);
+	  fts_send_message(object, fts_s_clear, 0, 0, fts_nix);
 	  
 	  /* reset message */
 	  fts_message_set(mess, 0, 0, 0);
@@ -253,7 +253,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 			  mess_ac = fts_message_get_ac(mess);
 			  mess_at = fts_message_get_at(mess);
 			  
-			  fts_send_message(object, fts_message_get_selector(mess), mess_ac, mess_at);
+			  fts_send_message(object, fts_message_get_selector(mess), mess_ac, mess_at, fts_nix);
 			  
 			  /* reset message */
 			  fts_message_set(mess, 0, 0, 0);
@@ -293,7 +293,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	      mess_ac = fts_message_get_ac(mess);
 	      mess_at = fts_message_get_at(mess);
 	      
-	      fts_send_message(object, fts_message_get_selector(mess), mess_ac, mess_at);
+	      fts_send_message(object, fts_message_get_selector(mess), mess_ac, mess_at, fts_nix);
 	    }
 
 	  /* read next class name */
@@ -314,7 +314,7 @@ dumpfile_restore_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
  */
 
 static void
-dumpfile_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
 
@@ -328,7 +328,7 @@ dumpfile_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-dumpfile_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dumpfile_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dumpfile_t *this = (dumpfile_t *)o;
 

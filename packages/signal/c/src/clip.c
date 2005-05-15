@@ -61,7 +61,7 @@ ftl_clip(fts_word_t *argv)
 }
 
 static void
-clip_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -82,7 +82,7 @@ clip_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  */
  
 static void
-clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   float *min = ftl_data_get_ptr(this->ftl_data_min);
@@ -92,7 +92,7 @@ clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set_max(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   float *max = ftl_data_get_ptr(this->ftl_data_max);
@@ -107,7 +107,7 @@ clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   float *min;
@@ -140,7 +140,7 @@ clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 
 static void
-clip_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
 

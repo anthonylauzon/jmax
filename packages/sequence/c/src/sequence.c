@@ -224,15 +224,17 @@ sequence_add_track_at_client(sequence_t *this, track_t *track)
   }
 }
 
-static void
-sequence_member_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_member_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_add_track_at_client((sequence_t *)o, (track_t *)fts_get_object(&at[0]));
+  
+  return fts_ok;
 }
 
 /* move track by client request */
-static void
-sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = sequence_get_first_track(this);
@@ -241,34 +243,40 @@ sequence_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   {
     /* add track at client and upload events */
     sequence_add_track_at_client(this, track);
-    fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
-		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);/* to create trackeditor */
+    fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0, fts_nix);
+		fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0, fts_nix);/* to create trackeditor */
 
     /* next track */
     track = sequence_track_get_next(track);
   }
+  
+  return fts_ok;
 }
 
-static void
-sequence_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
 	
   sequence_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
-  sequence_upload(o, 0, 0, 0, 0);
+  sequence_upload(o, NULL, 0, NULL, fts_nix);
+  
+  return fts_ok;
 }
 
-static void
-sequence_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
 
   sequence_set_editor_close(this);
+  
+  return fts_ok;
 }
 
-static void
-sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
 
@@ -277,6 +285,8 @@ sequence_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     sequence_set_editor_close(this);
     fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);
   }
+  
+  return fts_ok;
 }
 
 void 
@@ -307,8 +317,8 @@ sequence_set_editor_close(sequence_t *sequence)
   }
 }
 
-static void
-sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_import_midifile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
 
@@ -330,34 +340,40 @@ sequence_import_midifile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
       fts_midifile_close(file);
 
       if(sequence_editor_is_open(this))
-        sequence_upload(o, 0, 0, 0, 0);
+        sequence_upload(o, NULL, 0, NULL, fts_nix);
 
       /* fts_name_update(o); */
     }
     else
       fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
   }
+  
+  return fts_ok;
 }
 
-static void
-sequence_import_midifile_dialog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_import_midifile_dialog(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"), ac, at);
+  
+  return fts_ok;
 }
 
-static void
-sequence_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac == 0)
-    sequence_import_midifile_dialog(o, 0, 0, 0, 0);
+    sequence_import_midifile_dialog(o, NULL, 0, NULL, fts_nix);
   else if(ac == 1 && fts_is_symbol(at))
-    sequence_import_midifile(o, 0, 0, 1, at);
+    sequence_import_midifile(o, NULL, 1, at, fts_nix);
   else
     fts_object_error(o, "import: wrong arguments");
+  
+  return fts_ok;
 }
 
-static void
-sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
 
@@ -377,10 +393,12 @@ sequence_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
     /* fts_name_update(o); */
   }
+  
+  return fts_ok;
 }
 
-static void
-sequence_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = NULL;
@@ -401,13 +419,15 @@ sequence_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     if(track != NULL)
     {
       fts_set_object( &a, track);
-      fts_return( &a);
+      *ret = a;
     }
   }
+  
+  return fts_ok;
 }
   
-static void
-sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = sequence_get_first_track(this);
@@ -449,6 +469,8 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
     fts_spost(stream, "}\n");
   }
+  
+  return fts_ok;
 }
 
 /******************************************************
@@ -458,8 +480,8 @@ sequence_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 /* add new track by client request */
-static void
-sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_add_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   
@@ -484,19 +506,21 @@ sequence_add_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int a
       {
         track_set_editor_open(track);
         sequence_add_track_at_client(this, track);
-        fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0);
-        fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0);
+        fts_send_message((fts_object_t *)track, fts_s_upload, 0, 0, fts_nix);
+        fts_send_message((fts_object_t *)track, seqsym_set_editor, 0, 0, fts_nix);
         fts_object_set_state_dirty(o);
       }
       
       this->last_loaded_track = track; /* hack to fix loading */
     }
   }
+  
+  return fts_ok;
 }
 
 /* remove track by client request */
-static void
-sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_remove_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_get_object(at);
@@ -506,10 +530,12 @@ sequence_remove_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, in
 
   /* fts_name_update(o); */
   fts_object_set_state_dirty(o);
+  
+  return fts_ok;
 }
 
-static void
-sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_move_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = (track_t *)fts_get_object(at + 0);
@@ -520,10 +546,12 @@ sequence_move_track_and_update(fts_object_t *o, int winlet, fts_symbol_t s, int 
 
   /* fts_name_update(o); */
   fts_object_set_state_dirty(o);
+  
+  return fts_ok;
 }
 
-static void
-sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -548,16 +576,20 @@ sequence_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
   
   fts_object_release((fts_object_t *)mess);  
+  
+  return fts_ok;
 }
 
 /* hack to fix loading */
-static void
-sequence_append_event_at_last_loaded_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_append_event_at_last_loaded_track(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
 
   if(this->last_loaded_track!=NULL)
-    fts_send_message((fts_object_t *)this->last_loaded_track, fts_s_append, ac, at); 
+    fts_send_message((fts_object_t *)this->last_loaded_track, fts_s_append, ac, at, fts_nix); 
+  
+  return fts_ok;
 }
 
 /******************************************************
@@ -566,8 +598,8 @@ sequence_append_event_at_last_loaded_track(fts_object_t *o, int winlet, fts_symb
 *
 */
 
-static void
-sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   
@@ -608,19 +640,21 @@ sequence_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
         if(track != NULL)
           sequence_add_track(this, track);
         else
-          return;
+          return fts_ok;
       }
       else
       {
         fts_object_error(o, "bad arguments");
-        return;
+        return fts_ok;
       }
     }
   }
+  
+  return fts_ok;
 }
 
-static void
-sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+sequence_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = sequence_get_first_track(this);
@@ -632,6 +666,8 @@ sequence_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   }
 
   fts_client_send_message(o, fts_s_destroyEditor, 0, 0);
+  
+  return fts_ok;
 }
 
 static void

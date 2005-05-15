@@ -86,7 +86,7 @@ typedef struct value
 } value_t;
 
 static void
-value_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   value_t *x = (value_t *)o;
   fts_atom_t a = x->v->atom;
@@ -95,7 +95,7 @@ value_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-value_scalar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_scalar(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   value_t *x = (value_t *)o;
 
@@ -103,7 +103,7 @@ value_scalar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   value_t *x = (value_t *)o;
   fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
@@ -119,7 +119,7 @@ value_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-value_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   value_t *x = (value_t *)o;
 

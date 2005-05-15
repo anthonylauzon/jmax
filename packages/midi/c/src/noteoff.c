@@ -31,7 +31,7 @@ typedef struct
 } noteoff_t;
 
 static void
-noteoff_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int note = fts_get_int(at);
   int pitch = note >> 4;
@@ -43,7 +43,7 @@ noteoff_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-noteoff_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   noteoff_t *this = (noteoff_t *)o;
   double duration = fts_get_number_float(at);
@@ -55,7 +55,7 @@ noteoff_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-noteoff_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_set_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   noteoff_t *this = (noteoff_t *)o;
   int channel = fts_get_number_int(at);
@@ -69,7 +69,7 @@ noteoff_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-noteoff_set_velocity(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_set_velocity(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   noteoff_t *this = (noteoff_t *)o;
 
@@ -77,7 +77,7 @@ noteoff_set_velocity(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-noteoff_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   noteoff_t *this = (noteoff_t *)o;
 
@@ -98,52 +98,52 @@ noteoff_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-noteoff_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 4:
       if(fts_is_number(at + 3))
-	noteoff_set_duration(o, 0, 0, 1, at + 3);
+	noteoff_set_duration(o, 0, 1, at + 3, fts_nix);
     case 3:
       if(fts_is_number(at + 2))
-	noteoff_set_channel(o, 0, 0, 1, at + 2);
+	noteoff_set_channel(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	noteoff_set_velocity(o, 0, 0, 1, at + 1);
+	noteoff_set_velocity(o, 0, 1, at + 1, fts_nix);
     case 1:
-      noteoff_pitch(o, 0, 0, 1, at);
+      noteoff_pitch(o, 0, 1, at, fts_nix);
     case 0:
       break;
     }      
 }
 
 static void
-noteoff_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 static void
-noteoff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
 
 static void
-noteoff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteoff_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 3:
-      noteoff_set_duration(o, 0, 0, 1, at + 2);
+      noteoff_set_duration(o, 0, 1, at + 2, fts_nix);
     case 2:
-      noteoff_set_channel(o, 0, 0, 1, at + 1);
+      noteoff_set_channel(o, 0, 1, at + 1, fts_nix);
     case 1:
-      noteoff_set_velocity(o, 0, 0, 1, at + 0);
+      noteoff_set_velocity(o, 0, 1, at + 0, fts_nix);
     case 0:
       break;
     }

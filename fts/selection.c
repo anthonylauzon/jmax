@@ -109,13 +109,13 @@ fts_selection_add_object( fts_selection_t *sel, fts_object_t *obj)
 }
 
 static void
-selection_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_add(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_selection_add_object( (fts_selection_t *) o, fts_get_object(at));
 }
 
 static void
-selection_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
   int i;
@@ -132,7 +132,7 @@ selection_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 static void
-selection_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
   int i;
@@ -143,7 +143,7 @@ selection_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-selection_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
   int i;
@@ -157,7 +157,7 @@ selection_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-selection_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+selection_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_selection_t *this  = (fts_selection_t *) o;
 

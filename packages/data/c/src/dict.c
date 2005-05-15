@@ -264,7 +264,7 @@ dict_upload_data(dict_t *self)
  
         fts_client_upload_object(dobj, fts_object_get_client_id((fts_object_t *)self));
         
-        fts_send_message(dobj, fts_s_update_gui, 0, 0);
+        fts_send_message(dobj, fts_s_update_gui, 0, 0, fts_nix);
         
         fts_set_object(&a[2+i], dobj);
       }
@@ -291,8 +291,8 @@ dict_upload(dict_t *self)
 *
 */
 
-static void
-_dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_dict_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
@@ -301,10 +301,12 @@ _dict_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(dict_editor_is_open(self))
     dict_upload(self);
+  
+  return fts_ok;
 }
 
-static void
-_dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_dict_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
@@ -317,10 +319,12 @@ _dict_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   if(dict_editor_is_open(self))
     dict_upload(self);
+  
+  return fts_ok;
 }
 
-static void
-_dict_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_dict_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   int i;
@@ -332,10 +336,12 @@ _dict_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   
   if(dict_editor_is_open(self))
     dict_upload(self);
+  
+  return fts_ok;
 }
 
-static void
-_dict_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_dict_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
@@ -344,12 +350,14 @@ _dict_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_atom_t a;
     
     if(fts_hashtable_get(&self->hash, at, &a))
-      fts_return(&a);
+      *ret = a;
   }
+  
+  return fts_ok;
 }
 
-static void
-_dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_dict_set_from_dict(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
@@ -359,10 +367,12 @@ _dict_set_from_dict(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   
   if(dict_editor_is_open(self))
     dict_upload(self);
+  
+  return fts_ok;
 }
 
-static void
-dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -388,6 +398,8 @@ dict_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   }
   
   fts_object_release((fts_object_t *)mess);
+  
+  return fts_ok;
 }
 
 /**********************************************************
@@ -595,23 +607,23 @@ dict_export_to_coll(dict_t *self, fts_symbol_t file_name)
   return size;
 }
 
-static void
-dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_coll);
   int size = 0;
   
-  if(!file_name)
-    return;
+  if(!file_name)    
+    return fts_ok;
   
   if(file_format == sym_coll)
     size = dict_import_from_coll(self, file_name);    
   else
   {
     fts_post("dict: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
-    return;
+    return fts_ok;
   }
   
   if(size <= 0)
@@ -621,10 +633,12 @@ dict_import(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   
   if(dict_editor_is_open(self))
     dict_upload(self);
+  
+  return fts_ok;
 }
 
-static void
-dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -632,22 +646,24 @@ dict_export(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
   int size = 0;
   
   if(!file_name)
-    return;
+    return fts_ok;
   
   if(file_format == sym_coll)
     size = dict_export_to_coll(self, file_name);    
   else
   {
     fts_post("dict: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
-    return;
+    return fts_ok;
   }
   
   if(size <= 0)
     fts_post("dict: can't export to file \"%s\"\n", fts_symbol_name(file_name));  
+  
+  return fts_ok;
 }
 
-static void
-_dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_dict_get_keys(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
@@ -663,11 +679,13 @@ _dict_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     fts_tuple_append(tuple, 1, &key);
   }
   
-  fts_return_object((fts_object_t *)tuple);
+  fts_set_object(ret, (fts_object_t *)tuple);
+  
+  return fts_ok;
 }
 
-static void
-dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   int size = fts_hashtable_get_size(&self->hash);
@@ -711,10 +729,12 @@ dict_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     
     fts_spost(stream, "}\n");
   }
+  
+  return fts_ok;
 }
 
-static void
-dict_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
@@ -722,10 +742,12 @@ dict_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
   
   dict_upload(self);
+  
+  return fts_ok;
 }
 
-static void 
-dict_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t 
+dict_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *) o;
   
@@ -734,14 +756,18 @@ dict_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     dict_set_editor_close(self);
     fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
   }
+  
+  return fts_ok;
 }
 
-static void
-dict_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
   dict_set_editor_close(self);
+  
+  return fts_ok;
 }
 
 /**********************************************************
@@ -750,8 +776,8 @@ dict_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 *
 */
 
-static void
-dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   int i;
@@ -771,16 +797,20 @@ dict_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
     
   }
+  
+  return fts_ok;
 }
 
 
-static void
-dict_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+dict_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
   
   dict_remove_all(self);
   fts_hashtable_destroy(&self->hash);
+  
+  return fts_ok;
 }
 
 static void
@@ -827,7 +857,6 @@ dict_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_remove, "<any: key> ...", "remove entries");
   fts_class_doc(cl, fts_s_print, NULL, "print list of entries");
 }
-
 
 void
 dict_config(void)

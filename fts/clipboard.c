@@ -52,7 +52,7 @@ typedef struct {
 
 
 static void
-clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clipboard_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 #if WIN32  
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
@@ -84,7 +84,7 @@ clipboard_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clipboard_paste_in(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
   fts_object_t *dummy;
@@ -95,7 +95,7 @@ clipboard_paste_in(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 
 static void
-clipboard_copy_selection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clipboard_copy_selection(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 
@@ -104,7 +104,7 @@ clipboard_copy_selection(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-clipboard_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clipboard_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_clipboard_t *this  = (fts_clipboard_t *) o;
 

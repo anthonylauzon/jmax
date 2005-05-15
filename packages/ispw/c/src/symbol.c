@@ -29,7 +29,7 @@ typedef struct
 } symbol_obj_t;
 
 static void
-symbol_obj_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+symbol_obj_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   symbol_obj_t *this = (symbol_obj_t *) o;
 
@@ -37,7 +37,7 @@ symbol_obj_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-symbol_obj_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+symbol_obj_symbol(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   symbol_obj_t *this = (symbol_obj_t *) o;
 
@@ -48,7 +48,7 @@ symbol_obj_symbol(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-symbol_obj_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+symbol_obj_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   symbol_obj_t *this = (symbol_obj_t *) o;
 
@@ -57,7 +57,7 @@ symbol_obj_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_a
 
 
 static void
-symbol_obj_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+symbol_obj_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   symbol_obj_t *this = (symbol_obj_t *) o;
   
@@ -66,7 +66,7 @@ symbol_obj_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-symbol_obj_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+symbol_obj_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   symbol_obj_t *this = (symbol_obj_t *) o;
   

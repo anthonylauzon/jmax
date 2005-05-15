@@ -4336,7 +4336,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "../../client/include ../../include";
+				HEADER_SEARCH_PATHS = "../../client/include ../../include /usr/local/include";
 				INFOPLIST_FILE = "libfts-info.plist";
 				INSTALL_PATH = "@executable_path/../lib";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
@@ -4863,6 +4863,7 @@
 			files = (
 				5C54270D05AB0B8A0042B7A2,
 				5C54270E05AB0B8A0042B7A2,
+				5CAFE247083772C60031FF68,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5155,8 +5156,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C54273305AB0B8B0042B7A2,
-				5C54273405AB0B8B0042B7A2,
-				5C54273505AB0B8B0042B7A2,
 				5C54273605AB0B8B0042B7A2,
 				5C54273705AB0B8B0042B7A2,
 				5C54273805AB0B8B0042B7A2,
@@ -5164,8 +5163,6 @@
 				5C54273A05AB0B8B0042B7A2,
 				5C54273B05AB0B8B0042B7A2,
 				5C54273C05AB0B8B0042B7A2,
-				5C54273D05AB0B8B0042B7A2,
-				5C54273E05AB0B8B0042B7A2,
 				5C54273F05AB0B8B0042B7A2,
 				5C54274005AB0B8B0042B7A2,
 			);
@@ -5174,18 +5171,6 @@
 		};
 		5C54273305AB0B8B0042B7A2 = {
 			fileRef = F8B8E48A02867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C54273405AB0B8B0042B7A2 = {
-			fileRef = F8B8E48C02867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C54273505AB0B8B0042B7A2 = {
-			fileRef = F8B8E48F02867E1C01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -5228,18 +5213,6 @@
 		};
 		5C54273C05AB0B8B0042B7A2 = {
 			fileRef = F8B8E4A002867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C54273D05AB0B8B0042B7A2 = {
-			fileRef = F8B8E4A602867E1C01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C54273E05AB0B8B0042B7A2 = {
-			fileRef = F8B8E4AA02867E1C01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -7329,7 +7302,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C54288905AB0B950042B7A2,
-				5C54288A05AB0B950042B7A2,
 				5C54288B05AB0B950042B7A2,
 				5C54288C05AB0B950042B7A2,
 				5C54288D05AB0B950042B7A2,
@@ -7339,12 +7311,6 @@
 		};
 		5C54288905AB0B950042B7A2 = {
 			fileRef = F8DC5EF70286A1FA01664092;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		5C54288A05AB0B950042B7A2 = {
-			fileRef = F8DC5EF90286A1FA01664092;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -12503,7 +12469,7 @@
 				FRAMEWORK_SEARCH_PATHS = build;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "../../packages/data/c/include ../../packages/utils/c/include ../../include";
 				INFOPLIST_FILE = "libfunctions-info.plist";
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
@@ -13497,6 +13463,20 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
+		5CAFE246083772C60031FF68 = {
+			isa = PBXFileReference;
+			lastKnownFileType = archive.ar;
+			name = libsndfile.a;
+			path = /usr/local/lib/libsndfile.a;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		5CAFE247083772C60031FF68 = {
+			fileRef = 5CAFE246083772C60031FF68;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		5CB1CE1F065112B900B5A90F = {
 			children = (
 				5CB1CE200651132300B5A90F,
@@ -13933,14 +13913,6 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = tup.c;
 			path = ../../packages/control/c/src/tup.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F558B51303D586C7016640F1 = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = libftsutils.framework;
-			path = build/libftsutils.framework;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -21344,6 +21316,7 @@
 				F880FCFA0282F8A501664092,
 				F8448E660286DD3701664092,
 				F8F010FE028D8A2701664092,
+				5CAFE246083772C60031FF68,
 			);
 			isa = PBXGroup;
 			name = "External Frameworks";
@@ -24704,15 +24677,11 @@
 		F8B8E48902867E1C01664092 = {
 			children = (
 				F8B8E48A02867E1C01664092,
-				F8B8E48C02867E1C01664092,
-				F8B8E48F02867E1C01664092,
 				F8B8E49102867E1C01664092,
 				F8B8E49502867E1C01664092,
 				F8B8E49702867E1C01664092,
 				F8B8E49E02867E1C01664092,
 				F8B8E4A002867E1C01664092,
-				F8B8E4A602867E1C01664092,
-				F8B8E4AA02867E1C01664092,
 				F8EE4BA0031CEE1701664092,
 				F560D89303D486B7016640F1,
 				F8B8E49B02867E1C01664092,
@@ -24729,24 +24698,6 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = bpf.c;
 			path = ../../packages/data/c/src/bpf.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F8B8E48C02867E1C01664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			name = col.c;
-			path = ../../packages/data/c/src/col.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F8B8E48F02867E1C01664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			name = cvec.c;
-			path = ../../packages/data/c/src/cvec.c;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -24810,24 +24761,6 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = mat.c;
 			path = ../../packages/data/c/src/mat.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F8B8E4A602867E1C01664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			name = row.c;
-			path = ../../packages/data/c/src/row.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F8B8E4AA02867E1C01664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			name = vec.c;
-			path = ../../packages/data/c/src/vec.c;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -26407,7 +26340,6 @@
 			children = (
 				F8DC5EF70286A1FA01664092,
 				F8DC5EF80286A1FA01664092,
-				F8DC5EF90286A1FA01664092,
 				F78563BF02BA3BCE016640F1,
 				F54EC4DB03CB1DBF01664092,
 			);
@@ -26431,15 +26363,6 @@
 			lastKnownFileType = sourcecode.c.c;
 			name = macosxmidiport.c;
 			path = ../../packages/macosx/c/src/macosxmidiport.c;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		F8DC5EF90286A1FA01664092 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			name = qtfile.c;
-			path = ../../packages/macosx/c/src/qtfile.c;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -26908,7 +26831,6 @@
 		F8F010C9028D830301664092 = {
 			children = (
 				F53489AA03D58205016640F1,
-				F558B51303D586C7016640F1,
 			);
 			isa = PBXGroup;
 			name = frameworks;

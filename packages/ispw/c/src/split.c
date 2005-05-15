@@ -29,7 +29,7 @@ typedef struct {
 } split_t;
 
 static void
-split_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+split_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   split_t *this = (split_t *)o;
   long l = fts_get_int(at);
@@ -41,7 +41,7 @@ split_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-split_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+split_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   split_t *this = (split_t *)o;
   float f = fts_get_float(at);
@@ -53,39 +53,49 @@ split_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-split_bound(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+split_bound(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   split_t *this = (split_t *)o;
   float float_bound = fts_get_float_arg(ac, at, 0, 0.0f);
   long int_bound = float_bound;
+  int winlet = fts_object_get_message_inlet(o);
 
   this->int_bound[winlet-1] = ((float)int_bound == float_bound)? int_bound: int_bound + 1;
   this->float_bound[winlet-1] = float_bound;
 }
 
 static void
-split_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+split_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
-  split_bound(o, 1, 0, ac, at);
-  split_bound(o, 2, 0, ac - 1, at + 1);
+  fts_object_set_message_inlet(o, 1);
+  split_bound(o, 0, ac, at, fts_nix);
+  
+  fts_object_set_message_inlet(o, 2);
+  split_bound(o, 0, ac - 1, at + 1, fts_nix);
 }
 
 static void
-split_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+split_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   if(ac >= 1)
     {
       if(fts_is_float(at))
-	split_float(o, 0, 0, 1, at);
+	split_float(o, 0, 1, at, fts_nix);
       else if(fts_is_float(at))
-	split_int(o, 0, 0, 1, at);	
+	split_int(o, 0, 1, at, fts_nix);	
     }
 
   if(ac >= 2)
-    split_bound(o, 1, 0, 1, at + 1);
-
+  {
+    fts_object_set_message_inlet(o, 1);
+    split_bound(o, 0, 1, at + 1, fts_nix);
+  }
+  
   if(ac >= 3)
-    split_bound(o, 2, 0, 1, at + 2);
+  {
+    fts_object_set_message_inlet(o, 2);
+    split_bound(o, 0, 1, at + 2, fts_nix);
+  }
 }
 
 static void

@@ -58,7 +58,7 @@ biquad_coeff_clear(biquad_t* self)
 }
 
 static void
-biquad_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_state_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   biquad_state_t *state = (biquad_state_t *)ftl_data_get_ptr(self->biquad_state);
@@ -70,7 +70,7 @@ biquad_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-biquad_set_coef_a0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_set_coef_a0(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
@@ -79,7 +79,7 @@ biquad_set_coef_a0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-biquad_set_coef_a1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_set_coef_a1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
@@ -88,7 +88,7 @@ biquad_set_coef_a1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-biquad_set_coef_a2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_set_coef_a2(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
@@ -97,7 +97,7 @@ biquad_set_coef_a2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-biquad_set_coef_b1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_set_coef_b1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
@@ -106,7 +106,7 @@ biquad_set_coef_b1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-biquad_set_coef_b2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_set_coef_b2(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   biquad_coefs_t *coefs = (biquad_coefs_t *)ftl_data_get_ptr(self->biquad_coefs);
@@ -115,7 +115,7 @@ biquad_set_coef_b2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_set_coefs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
@@ -123,7 +123,7 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     case 5:
       if(fts_is_number(at + 4))
       {
-	biquad_set_coef_b2(o, 0, 0, 1, at + 4);
+	biquad_set_coef_b2(o, 0, 1, at + 4, fts_nix);
       }
       else
       {
@@ -132,7 +132,7 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     case 4:
       if(fts_is_number(at + 3))
       {
-	biquad_set_coef_b1(o, 0, 0, 1, at + 3);
+	biquad_set_coef_b1(o, 0, 1, at + 3, fts_nix);
       }
       else
       {
@@ -141,7 +141,7 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     case 3:
       if(fts_is_number(at + 2))
       {
-	biquad_set_coef_a2(o, 0, 0, 1, at + 2);
+	biquad_set_coef_a2(o, 0, 1, at + 2, fts_nix);
       }
       else
       {
@@ -151,7 +151,7 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     case 2:
       if(fts_is_number(at + 1))
       {
-	biquad_set_coef_a1(o, 0, 0, 1, at + 1);
+	biquad_set_coef_a1(o, 0, 1, at + 1, fts_nix);
       }
       else
       {
@@ -161,7 +161,7 @@ biquad_set_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     case 1:
       if(fts_is_number(at + 0))
       {
-	biquad_set_coef_a0(o, 0, 0, 1, at + 0);
+	biquad_set_coef_a0(o, 0, 1, at + 0, fts_nix);
       }
       else
       {
@@ -255,7 +255,7 @@ ftl_biquad_inplace(fts_word_t *argv)
 }
 
 static void
-biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -269,7 +269,7 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_ftl_data(argv+2, self->biquad_coefs);
       fts_set_int(argv+3, fts_dsp_get_input_size(dsp, 0));
 
-      biquad_state_clear(o, 0, 0, 0, 0);
+      biquad_state_clear(o, 0, 0, 0, fts_nix);
       fts_dsp_add_function(sym_biquad_inplace, 4, argv);
     }
   else
@@ -280,7 +280,7 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_set_ftl_data(argv+3, self->biquad_coefs);
       fts_set_int(argv+4, fts_dsp_get_input_size(dsp, 0));
 
-      biquad_state_clear(o, 0, 0, 0, 0);
+      biquad_state_clear(o, 0, 0, 0, fts_nix);
       fts_dsp_add_function(sym_biquad, 5, argv);
     }
 }
@@ -292,22 +292,22 @@ biquad_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-biquad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
 
   self->biquad_state = ftl_data_alloc(sizeof(biquad_state_t));
   self->biquad_coefs = ftl_data_alloc(sizeof(biquad_coefs_t));
 
-  biquad_state_clear(o, 0, 0, 0, 0);
+  biquad_state_clear(o, 0, 0, 0, fts_nix);
   biquad_coeff_clear(self);
-  biquad_set_coefs(o, 0, 0, ac, at);
+  biquad_set_coefs(o, 0, ac, at, fts_nix);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-biquad_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+biquad_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   biquad_t *self = (biquad_t *)o;
 

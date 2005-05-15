@@ -62,7 +62,7 @@ ftl_rsqrt(fts_word_t *argv )
 } 
 
 static void 
-sqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sqrt_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
@@ -74,7 +74,7 @@ sqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void 
-rsqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rsqrt_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   fts_atom_t argv[3];
@@ -92,13 +92,13 @@ rsqrt_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  */
 
 static void 
-vecsqrt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecsqrt_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void 
-vecsqrt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecsqrt_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

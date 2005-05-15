@@ -36,7 +36,7 @@ typedef struct {
 } fit_t;
 
 static void
-fit_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fit_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fit_t *this = (fit_t *)o;
   int i, n;
@@ -69,7 +69,7 @@ fit_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-fit_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fit_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fit_t *this = (fit_t *)o;
 
@@ -83,7 +83,7 @@ fit_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-fit_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fit_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fit_t *this = (fit_t *)o;
   float v = fts_get_number_float(at);
@@ -115,9 +115,10 @@ fit_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fit_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fit_point(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fit_t *this = (fit_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
   int i = winlet - 1;
   float v = fts_get_number_float(at);
       

@@ -36,7 +36,7 @@ typedef struct
 } line_t;
 
 static void
-line_int_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_int_advance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
  if(fts_object_outlet_is_connected(o, 0))
     {
@@ -60,7 +60,7 @@ line_int_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-line_float_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_float_advance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
  if(fts_object_outlet_is_connected(o, 0))
     {
@@ -84,18 +84,18 @@ line_float_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-line_advance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_advance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
 
   if(this->is_int)
-    line_int_advance(o, 0, 0, ac, at);
+    line_int_advance(o, 0, ac, at, fts_nix);
   else
-    line_float_advance(o, 0, 0, ac, at);    
+    line_float_advance(o, 0, ac, at, fts_nix);
 }
 
 static void
-line_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
 
@@ -108,7 +108,7 @@ line_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 
 static void
-line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_int_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
   double target = (double)fts_get_int_arg(ac, at, 0, 0);
@@ -139,7 +139,7 @@ line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       this->target = target;
       this->inval = 0;
 
-      line_int_advance(o, 0, 0, 0, 0);
+      line_int_advance(o, 0, 0, 0, fts_nix);
     }
   else
     {
@@ -151,7 +151,7 @@ line_int_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_float_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
   double target = (double)fts_get_float_arg(ac, at, 0, 0.0f);
@@ -182,7 +182,7 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       this->target = target;
       this->inval = 0;
 
-      line_float_advance(o, 0, 0, 0, 0);
+      line_float_advance(o, 0, 0, 0, fts_nix);
     }
   else
     {
@@ -194,18 +194,18 @@ line_float_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-line_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
 
   if(this->is_int)
-    line_int_number(o, 0, 0, ac, at);
+    line_int_number(o, 0, ac, at, fts_nix);
   else
-    line_float_number(o, 0, 0, ac, at);    
+    line_float_number(o, 0, ac, at, fts_nix);    
 }
 
 static void
-line_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_set_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
   double target = 0.0;
@@ -224,7 +224,7 @@ line_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-line_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_set_period(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
   double period = fts_get_number_float(at);
@@ -236,7 +236,7 @@ line_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-line_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_set_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
   int time = fts_get_number_int(at);
@@ -248,58 +248,58 @@ line_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-line_int_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_int_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 3:
       if(fts_is_number(at + 2))
-	line_set_period(o, winlet, s, 1, at + 2);
+	line_set_period(o, s, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	line_set_time(o, winlet, s, 1, at + 1);
+	line_set_time(o, s, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
-	line_int_number(o, winlet, s, 1, at + 0);
+	line_int_number(o, s, 1, at + 0, fts_nix);
     case 0:
       break;
     }
 }
 
 static void
-line_float_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_float_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 3:
       if(fts_is_number(at + 2))
-	line_set_period(o, winlet, s, 1, at + 2);
+	line_set_period(o, s, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	line_set_time(o, winlet, s, 1, at + 1);
+	line_set_time(o, s, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
-	line_float_number(o, winlet, s, 1, at + 0);
+	line_float_number(o, s, 1, at + 0, fts_nix);
     case 0:
       break;
     }
 }
 
 static void
-line_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
 
   if(this->is_int)
-    line_int_varargs(o, 0, 0, ac, at);
+    line_int_varargs(o, 0, ac, at, fts_nix);
   else
-    line_float_varargs(o, 0, 0, ac, at);    
+    line_float_varargs(o, 0, ac, at, fts_nix);
 }
 
 static void
-line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+line_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   line_t *this = (line_t *)o;
   int is_int = 0;
@@ -316,9 +316,9 @@ line_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   switch(ac)
     {
     case 2:
-      line_set_period(o, 0, 0, 1, at + 1);
+      line_set_period(o, 0, 1, at + 1, fts_nix);
     case 1:
-      line_set_value(o, 0, 0, 1, at);
+      line_set_value(o, 0, 1, at, fts_nix);
     case 0:
       break;
     }

@@ -80,13 +80,13 @@ prepend_set_realize(fts_object_t *o, int ac, const fts_atom_t *at)
 }
 
 static void
-prepend_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+prepend_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   prepend_set_realize(o, ac, at);
 }
 
 static void
-prepend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+prepend_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   prepend_t *x = (prepend_t *)o;
 
@@ -95,7 +95,7 @@ prepend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-prepend_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+prepend_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   prepend_t *x = (prepend_t *)o;
 

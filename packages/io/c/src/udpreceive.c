@@ -255,7 +255,7 @@ static void udpreceive_receive( fts_object_t *o, int size, const unsigned char* 
 }
 
 
-static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpreceive_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udpreceive_t *self = (udpreceive_t *)o;
   fts_bytestream_t* udp_stream;
@@ -294,7 +294,7 @@ static void udpreceive_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
 }
 
-static void udpreceive_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpreceive_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udpreceive_t *self = (udpreceive_t *)o;
 

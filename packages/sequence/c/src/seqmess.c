@@ -32,8 +32,8 @@
  *
  */
 
-static void
-seqmess_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+seqmess_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqmess_t *this = (seqmess_t *)o;
 
@@ -48,10 +48,12 @@ seqmess_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     case 0:
       break;
     }
+  
+  return fts_ok;
 }
 
-static void
-seqmess_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+seqmess_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqmess_t *this = (seqmess_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -66,6 +68,8 @@ seqmess_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_dumper_message_send(dumper, mess);
   
   fts_object_release((fts_object_t *)mess);  
+  
+  return fts_ok;
 }
 
 /**************************************************************
@@ -74,15 +78,17 @@ seqmess_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
  *
  */
 
-static void
-seqmess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+seqmess_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqmess_t *this = (seqmess_t *)o;
 
   this->s = NULL;
   this->position = 0;
 
-  seqmess_set(o, 0, 0, ac, at);
+  seqmess_set(o, NULL, ac, at, fts_nix);
+  
+  return fts_ok;
 }
 
 static void

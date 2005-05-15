@@ -150,7 +150,7 @@ fts_label_get(fts_patcher_t *patcher, fts_symbol_t name)
 }
 
 static void
-label_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_find_friends(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
 
@@ -158,7 +158,7 @@ label_find_friends(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }      
 
 static void
-label_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
 
@@ -166,7 +166,7 @@ label_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-label_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_mess(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
 
@@ -177,7 +177,7 @@ label_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-label_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_input_handler(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
 
@@ -185,7 +185,7 @@ label_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-label_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_add_listener(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
   fts_channel_t *channel = fts_label_get_channel(this);
@@ -196,7 +196,7 @@ label_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-label_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_remove_listener(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
   fts_channel_t *channel = fts_label_get_channel(this);
@@ -207,7 +207,7 @@ label_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *) o;
   
@@ -215,7 +215,7 @@ label_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-label_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *)o;
 
@@ -224,7 +224,7 @@ label_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-label_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+label_propagate_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_label_t *this = (fts_label_t *)o;
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);

@@ -30,25 +30,25 @@ typedef struct sigthrough
 } sigthru_t;
 
 static void
-sigthru_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
+sigthru_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fts_outlet_send(o, 1, s, ac, av); 
+  fts_outlet_send(o, 1, s, ac, at); 
 }
 
 static void
-sigthru_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
+sigthru_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-sigthru_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *av)
+sigthru_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }
 
 static void
-sigthru_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigthru_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
 

@@ -40,7 +40,7 @@ typedef struct
 } iir_t;
 
 static void
-iir_clear(fts_object_t *o, int inlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+iir_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   iir_t *this = (iir_t *)o;
   float *state = (float *)ftl_data_get_ptr(this->state);
@@ -51,12 +51,13 @@ iir_clear(fts_object_t *o, int inlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-iir_set_coef(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+iir_set_coef(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   iir_t *this = (iir_t *)o;
   float *coefs = (float *)ftl_data_get_ptr(this->coefs);
+  int winlet = fts_object_get_message_inlet(o);
 
-  coefs[i-1] = fts_get_float_arg(ac, at, 0, 0.0f);
+  coefs[winlet-1] = fts_get_float_arg(ac, at, 0, 0.0f);
 }
 
 /****************************************
@@ -66,7 +67,7 @@ iir_set_coef(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *a
  */
 
 static void
-iir_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+iir_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   iir_t *this = (iir_t *)o;
   fts_atom_t argv[6];
@@ -326,7 +327,7 @@ ftl_iir_n(fts_word_t *argv)
  */
 
 static void
-iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+iir_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   iir_t *this = (iir_t *)o;
 
@@ -362,7 +363,7 @@ iir_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
 
 static void
-iir_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+iir_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   iir_t *this = (iir_t *)o;
 

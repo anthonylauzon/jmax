@@ -175,7 +175,7 @@ typedef struct
 } sogs_t;
 
 static void
-sogs_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_bang_at_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang(o, 1);
 }
@@ -187,7 +187,7 @@ sogs_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 */
 
 static void
-sogs_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -290,7 +290,7 @@ ftl_sogs(fts_word_t *a)
 */
 
 static void
-sogs_set_position(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_position(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -301,7 +301,7 @@ sogs_set_position(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-sogs_set_position_variation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_position_variation(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -311,7 +311,7 @@ sogs_set_position_variation(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-sogs_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -321,7 +321,7 @@ sogs_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-sogs_set_pitch_variation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_pitch_variation(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -331,7 +331,7 @@ sogs_set_pitch_variation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-sogs_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -345,7 +345,7 @@ sogs_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-sogs_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -364,33 +364,33 @@ sogs_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-sogs_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
   {
     default:
     case 5:
       if(fts_is_number(at + 4))
-        sogs_set_duration(o, 0, 0, 1, at + 4);
+        sogs_set_duration(o, 0, 1, at + 4, fts_nix);
     case 4:
       if(fts_is_number(at + 3))
-        sogs_set_pitch_variation(o, 0, 0, 1, at + 3);
+        sogs_set_pitch_variation(o, 0, 1, at + 3, fts_nix);
     case 3:
       if(fts_is_number(at + 2))
-        sogs_set_pitch(o, 0, 0, 1, at + 2);
+        sogs_set_pitch(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-        sogs_set_position_variation(o, 0, 0, 1, at + 1);
+        sogs_set_position_variation(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at))
-        sogs_set_position(o, 0, 0, 1, at);
+        sogs_set_position(o, 0, 1, at, fts_nix);
     case 0:
       break;
   }
 }
 
 static void
-sogs_set_overlap(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_overlap(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
 
@@ -419,7 +419,7 @@ sogs_set_overlap(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sogs_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_set_target(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -427,7 +427,7 @@ sogs_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   if(ac > 0 && fts_is_number(at))
   {
     if(ac == 1)
-      sogs_set_position(o, 0, 0, 1, at);
+      sogs_set_position(o, 0, 1, at, fts_nix);
     else if(ac == 2 && fts_is_number(at + 1))
     {
       double target = fts_get_number_float(at) * params->sr;
@@ -440,7 +440,7 @@ sogs_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-sogs_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -461,7 +461,7 @@ sogs_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-sogs_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_go(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -569,7 +569,7 @@ sogs_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-sogs_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
   sogs_params_t *params = ftl_data_get_ptr(this->params);
@@ -585,7 +585,7 @@ sogs_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 */
 
 static void
-sogs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
 
@@ -649,7 +649,7 @@ sogs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
     /* set initial parameters */
     if(ac > 2)
-      sogs_set(o, 0, 0, ac - 2, at + 2);
+      sogs_set(o, 0, ac - 2, at + 2, fts_nix);
   }
   else
     fts_object_error(o, "first argument of fmat required");
@@ -658,7 +658,7 @@ sogs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-sogs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sogs_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sogs_t *this = (sogs_t *)o;
 

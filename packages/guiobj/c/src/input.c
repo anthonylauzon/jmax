@@ -66,7 +66,7 @@ input_ftl(fts_word_t* argv)
 }
 
 static void
-input_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+input_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   input_t* self = (input_t*)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
@@ -81,19 +81,19 @@ input_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t*
 }
 
 static void 
-input_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_activate();
 }
 
 static void
-input_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_desactivate();
 }
 
 static void 
-input_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int active = fts_dsp_is_active();
   fts_atom_t a;
@@ -103,13 +103,13 @@ input_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void 
-input_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_dsp_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_update_request(o);
 }
 
 static void 
-input_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_toggle(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(fts_dsp_is_active())
     fts_dsp_desactivate();
@@ -120,7 +120,7 @@ input_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   input_t *self = (input_t *)o;
 
@@ -139,7 +139,7 @@ input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-input_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+input_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_active_remove_listener(o);
 

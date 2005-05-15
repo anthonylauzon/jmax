@@ -31,7 +31,7 @@ typedef struct
 } route_t;
 
 static void
-route_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   route_t *self = (route_t *)o;
 
@@ -102,7 +102,7 @@ route_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   route_t *self = (route_t *)o;
 
@@ -136,7 +136,7 @@ route_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-route_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   route_t* self = (route_t*)o;
   int ns = self->ns;
@@ -161,27 +161,27 @@ route_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-route_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(s != NULL)
   {
-    route_message(o, winlet, s, ac, at);
+    route_message(o, s, ac, at, fts_nix);
   }
   else
   {
     if (0 == ac)
     {
-      route_bang(o, winlet, NULL, 0, at);
+      route_bang(o, NULL, 0, at, fts_nix);
     }
     else
     {
-      route_varargs(o, winlet, NULL, ac, at);    
+      route_varargs(o, NULL, ac, at, fts_nix);    
     }
   }
 }
 
 static void
-route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   route_t *self = (route_t *)o;
 
@@ -230,7 +230,7 @@ route_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-route_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+route_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   route_t *self = (route_t *)o;
 

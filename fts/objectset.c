@@ -89,18 +89,22 @@ void fts_objectset_get_objects( const fts_objectset_t *set, fts_iterator_t *i)
   fts_hashtable_get_keys(&set->hashtable, i);
 }
 
-static void 
-fts_objectset_method_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t 
+fts_objectset_method_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_objectset_t *this = (fts_objectset_t *)o;
   fts_hashtable_init( &this->hashtable, FTS_HASHTABLE_SMALL);
+  
+  return fts_ok;
 }
 
-static void 
-fts_objectset_method_destroy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t 
+fts_objectset_method_destroy(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_objectset_t *this = (fts_objectset_t *)o;
   fts_hashtable_destroy( &this->hashtable);
+  
+  return fts_ok;
 }
 
 static void

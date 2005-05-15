@@ -64,9 +64,10 @@ expr_atoms_realize(struct expr *x, int argc, const fts_atom_t *argv)
 }
 
 static void
-expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+expr_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   t_expr *x = (t_expr *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if (winlet == 0 && ex_eval(x, x->exp_stack, &x->exp_res))
     {
@@ -90,18 +91,21 @@ expr_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-expr_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+expr_atom(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
+  int winlet = fts_object_get_message_inlet(o);
+
   expr_atom_realize((t_expr *)o, at, winlet);
 
   if(winlet == 0)
-    expr_bang(o, 0, s, ac, at);
+    expr_bang(o, s, ac, at, fts_nix);
 }
 
 static void
-expr_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+expr_atoms(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   t_expr *x = (t_expr *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(winlet == 0)
     {
@@ -123,12 +127,12 @@ expr_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	    expr_atom_realize(x, at + i, i);
 	}
       
-      expr_bang(o, 0, s, ac, at);
+      expr_bang(o, s, ac, at, fts_nix);
     }
 }
 
 static void
-expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+expr_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   t_expr *e = (t_expr *)o;
 
@@ -168,7 +172,7 @@ expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-expr_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+expr_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 

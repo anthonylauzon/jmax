@@ -29,7 +29,7 @@ typedef struct
 } int_t;
 
 static void
-int_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+int_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int_t *this = (int_t *) o;
 
@@ -37,7 +37,7 @@ int_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+int_set(fts_object_t *o, fts_symbol_t s, int ac,  const fts_atom_t *at, fts_atom_t *ret)
 {
   int_t *this = (int_t *) o;
 
@@ -46,7 +46,7 @@ int_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *
 }
 
 static void
-int_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+int_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int_t *this = (int_t *) o;
 
@@ -58,13 +58,13 @@ int_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-int_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+int_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  int_input(o, winlet, 0, 1, at);
+  int_input(o, 0, 1, at, fts_nix);
 }
 
 static void
-int_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+int_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int_t *this = (int_t *) o;
   

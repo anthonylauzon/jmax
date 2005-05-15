@@ -47,7 +47,7 @@ typedef struct
 
 
 static void
-sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sampread_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampread_t *this = (sampread_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -74,7 +74,7 @@ sampread_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-sampread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sampread_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampread_t *this = (sampread_t *)o;
 
@@ -91,7 +91,7 @@ sampread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 static fts_symbol_t dsp_symbol = 0;
 
 static void
-sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sampread_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampread_t *this = (sampread_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -133,7 +133,7 @@ sampread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
  
 static void
-sampread_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sampread_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampread_t *this = (sampread_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -149,7 +149,7 @@ sampread_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 }
 
 static void
-sampread_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sampread_set_by_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampread_t *this = (sampread_t *)o;
   char name_str[64];
@@ -170,7 +170,7 @@ sampread_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const 
 }
 
 static void
-sampread_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sampread_jump(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampread_t *this = (sampread_t *)o;
   float f;

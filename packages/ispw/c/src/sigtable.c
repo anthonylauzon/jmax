@@ -69,7 +69,7 @@ typedef struct
 
 
 static void
-sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t name;
@@ -114,7 +114,7 @@ sigtable_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-sigtable_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
 
@@ -137,7 +137,7 @@ sigtable_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_
 /* this is a pseudo put function to check the table size and may reallocate the table */
 
 static void
-put_dsp_check_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+put_dsp_check_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   int n_samps = samples_unit_convert(this->unit, this->check_size, fts_dsp_get_sample_rate());
@@ -152,7 +152,7 @@ put_dsp_check_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
  */ 
  
 static void
-sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_read(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -212,7 +212,7 @@ sigtable_read(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_atom_t *at)
+sigtable_write(fts_object_t *o, fts_symbol_t sym, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -280,7 +280,7 @@ sigtable_write(fts_object_t *o, int winlet, fts_symbol_t sym, int ac, const fts_
 }
 
 static void
-sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_load(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -300,10 +300,9 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     fts_audiofile_t* af = fts_audiofile_open_read(file_name);
     int n_samples;
     
-    if (!fts_audiofile_is_valid(af)) 
+    if (af == NULL) 
     {
       fts_post("table~: %s: can't open soundfile to read \"%s\"\n", this->name, file_name);	
-      fts_audiofile_close(af);
       return;
     }
     
@@ -328,7 +327,7 @@ sigtable_load(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_save(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -354,10 +353,9 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
     {
       fts_audiofile_t *af = fts_audiofile_open_write(file_name, 1, sr, format, NULL);
       
-      if (fts_audiofile_is_valid(af))
+      if (af != NULL)
 	{
 	  int n_samples = fts_audiofile_write(af, &buf, 1, n_save);
-	  fts_audiofile_close(af);
 	  
 	  if(n_samples <= 0)
 	    fts_post("table~: %s: can't save samples to file \"%s\"\n", this->name , file_name);
@@ -368,14 +366,14 @@ sigtable_save(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-sigtable_clear(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   sampbuf_zero(&this->buf);
 }
 
 static void
-sigtable_realloc(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtable_realloc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtable_t *this = (sigtable_t *)o;
   float size = fts_get_float_arg(ac, at, 0, 0.0f);

@@ -98,7 +98,7 @@ ftl_arctan2(fts_word_t *argv)
 
 
 static void
-sigarctan2_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigarctan2_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t argv[5];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -114,7 +114,7 @@ sigarctan2_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-sigarctan2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigarctan2_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (! atan_table)
     {
@@ -133,7 +133,7 @@ sigarctan2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 
 static void
-sigarctan2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigarctan2_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

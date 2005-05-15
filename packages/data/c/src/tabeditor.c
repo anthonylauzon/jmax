@@ -274,14 +274,16 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
 *  client methods
 *
 */
-static void
-tabeditor_end_edit(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_end_edit(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_client_send_message(o, sym_end_edit, 0, 0);
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_get_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_get_to_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   if(ac > 1 && fts_is_number(at))
@@ -292,9 +294,12 @@ tabeditor_get_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   }
   else
     tabeditor_send_visibles(this);
+  
+  return fts_ok;
 }
-static void
-tabeditor_get_pixels_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+
+static fts_method_status_t
+tabeditor_get_pixels_to_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;  
   if(ac > 1 && fts_is_number(at))
@@ -305,10 +310,12 @@ tabeditor_get_pixels_to_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
   }
   else
     tabeditor_send_pixels(this);
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_set_visible_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_set_visible_window(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   
@@ -319,10 +326,12 @@ tabeditor_set_visible_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac
     this->zoom = (float)fts_get_number_float(at+2);	  
     this->pixsize = fts_get_number_int(at+3);	  
   }
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_copy_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   int start = fts_get_int(at);
@@ -374,10 +383,12 @@ tabeditor_copy_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
         dst[i] = src[start + i];
     }
   }
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   int v_size = fts_get_int(at);
@@ -386,7 +397,7 @@ tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   int copy_size, size;
   int i;
   
-  tabeditor_copy_by_client_request(o, 0, 0, ac - 2, at + 2);
+  tabeditor_copy_by_client_request(o, NULL, ac - 2, at + 2, fts_nix);
   if( tabeditor_is_ivec( this))
   {
     int *ptr;
@@ -419,10 +430,12 @@ tabeditor_cut_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
     tabeditor_send_pixels( this);
   
   tabeditor_send_visibles( this);
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_paste_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_paste_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   
@@ -479,10 +492,12 @@ tabeditor_paste_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, i
     
     fts_object_set_state_dirty( this->vec);
   }  
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_insert_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   
@@ -535,6 +550,8 @@ tabeditor_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
     
     fts_object_set_state_dirty( this->vec);
   }
+  
+  return fts_ok;
 }
 
 /********************************************************************
@@ -543,8 +560,8 @@ tabeditor_insert_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, 
 *
 */
 
-static void
-tabeditor_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_set_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   
@@ -575,6 +592,8 @@ tabeditor_set_elements(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
       fts_object_set_state_dirty( this->vec);
     }
   }
+  
+  return fts_ok;
 }
 
 void tabeditor_insert_append(tabeditor_t *tabeditor, int onset, int ac, const fts_atom_t *at)
@@ -609,8 +628,8 @@ int tabeditor_get_size( tabeditor_t *tabeditor)
 *  class
 *
 */
-static void
-tabeditor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   
@@ -632,10 +651,12 @@ tabeditor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
   
   this->copy = 0;
+  
+  return fts_ok;
 }
 
-static void
-tabeditor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tabeditor_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
   
@@ -643,6 +664,8 @@ tabeditor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   
   if(this->copy)
     fts_object_destroy((fts_object_t *)this->copy);
+  
+  return fts_ok;
 }
 
 static void

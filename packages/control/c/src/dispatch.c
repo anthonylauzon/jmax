@@ -29,13 +29,13 @@ typedef struct dispatch
 } dispatch_t;
 
 static void
-dispatch_values(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dispatch_values(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_varargs(o, 1, ac, at);
 }
 
 static void
-dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dispatch_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* use selector to find target */
   fts_atom_t *a = fts_name_get_value(fts_object_get_patcher(o), s);
@@ -46,7 +46,7 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_method_t method = NULL;;
 
       if(method)
-	method(obj, fts_system_inlet, fts_s_send, ac, at);
+	method(obj, fts_s_send, ac, at, fts_nix);
       else
 	fts_object_error(o, "cannot dispatch to object %s", fts_symbol_name(s));
     }
@@ -55,7 +55,7 @@ dispatch_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-dispatch_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dispatch_propagate_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);
   void *propagate_context = fts_get_pointer(at + 1);

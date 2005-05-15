@@ -71,26 +71,30 @@ scoob_description_function(fts_object_t *o, fts_array_t *array)
   scoob_array_function(o, array);
 }
 
-static void
-_scoob_set_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_set_type(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   fts_symbol_t type = fts_get_symbol(at);
   
   if(enumeration_get_index(scoob_type_enumeration, type) >= 0)
     self->type = type;
+  
+  return fts_ok;
 }
 
-static void
-_scoob_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_get_type(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   
-  fts_return_symbol(self->type);
+  fts_set_symbol(ret, self->type);
+  
+  return fts_ok;
 }
 
-static void
-_scoob_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_set_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;  
   double pitch = fts_get_number_float(at);
@@ -99,18 +103,22 @@ _scoob_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     pitch = 0.0;
   
   self->pitch = pitch;
+  
+  return fts_ok;
 }
 
-static void
-_scoob_get_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_get_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   
-  fts_return_float(self->pitch);
+  fts_set_float(ret, self->pitch);
+  
+  return fts_ok;
 }
 
-static void
-_scoob_set_interval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_set_interval(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   double interval = fts_get_number_float(at);
@@ -119,18 +127,22 @@ _scoob_set_interval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     interval = 0.0;
   
   self->interval = interval;
+  
+  return fts_ok;
 }
 
-static void
-_scoob_get_interval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_get_interval(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   
-  fts_return_float(self->interval);
+  fts_set_float(ret, self->interval);
+  
+  return fts_ok;
 }       
 
-static void
-_scoob_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   double duration = fts_get_number_float(at);
@@ -139,19 +151,23 @@ _scoob_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
     duration = 0.0;
   
   self->duration = duration;
+  
+  return fts_ok;
 }
 
-static void
-_scoob_get_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_get_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   
-  fts_return_float(self->duration);
+  fts_set_float(ret, self->duration);
+  
+  return fts_ok;
 }
 
 
-static void
-scoob_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scoob_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int i;
   
@@ -166,38 +182,42 @@ scoob_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       
     case 4:
       if(fts_is_number(at + 3))
-        _scoob_set_duration(o, 0, 0, 1, at + 3);
+        _scoob_set_duration(o, NULL, 1, at + 3, fts_nix);
       
     case 3:
       if(fts_is_number(at + 2))
-        _scoob_set_interval(o, 0, 0, 1, at + 2);
+        _scoob_set_interval(o, NULL, 1, at + 2, fts_nix);
       
     case 2:
       if(fts_is_number(at + 1))
-        _scoob_set_pitch(o, 0, 0, 1, at + 1);
+        _scoob_set_pitch(o, NULL, 1, at + 1, fts_nix);
       
     case 1:
       if (fts_is_symbol(at))
-        _scoob_set_type(o, 0, 0, 1, at);
+        _scoob_set_type(o, NULL, 1, at, fts_nix);
       else
         fts_object_error(o, "can't create scoob: need type as first argument");
       
     case 0:
       break;
   }
+  
+  return fts_ok;
 }
 
 
-static void
-scoob_set_from_scoob(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scoob_set_from_scoob(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   
   scoob_copy((scoob_t *)fts_get_object(at), self);
+  
+  return fts_ok;
 }
 
-static void
-_scoob_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scoob_stretch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   double stretch = 1.0;
@@ -218,6 +238,8 @@ _scoob_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if(stretch > 0.0)
     self->duration = (self->duration - duration) + duration * stretch;
+  
+  return fts_ok;
 }  
 
 /*
@@ -269,8 +291,8 @@ scoob_get_channel(scoob_t *self)
     return -1;
 }
 
-static void
-scoob_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scoob_get_property_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_array_t *array = fts_get_pointer(at);
   int n_types = enumeration_get_size(scoob_type_enumeration);
@@ -293,10 +315,12 @@ scoob_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_array_append_symbol(array, fts_s_float);
   
   propobj_class_append_properties(scoob_class, array);
+  
+  return fts_ok;
 }
 
-static void
-scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scoob_append_properties(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   fts_array_t *array = fts_get_pointer(at);
@@ -314,6 +338,8 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_array_append_float(array, self->duration);
   
   propobj_append_properties((propobj_t *)self, array);
+  
+  return fts_ok;
 }
 
 
@@ -325,8 +351,8 @@ scoob_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
  *
  */
 
-static void
-scoob_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scoob_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scoob_t *self = (scoob_t *)o;
   
@@ -337,13 +363,17 @@ scoob_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   self->interval = 0;
   self->duration = 100;
   
-  scoob_set(o, 0, 0, ac, at);
+  scoob_set(o, NULL, ac, at, fts_nix);
+  
+  return fts_ok;
 }
 
-static void
-scoob_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scoob_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_delete(o);
+  
+  return fts_ok;
 }
 
 static void

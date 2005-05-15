@@ -553,7 +553,7 @@ int fts_binary_protocol_decode(fts_binary_protocol_t* binary_protocol, int size,
 
 
 static void 
-binary_protocol_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+binary_protocol_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_binary_protocol_t* self = (fts_binary_protocol_t*) o;
 
@@ -569,7 +569,7 @@ binary_protocol_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-binary_protocol_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+binary_protocol_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_binary_protocol_t* self = (fts_binary_protocol_t*) o;
   

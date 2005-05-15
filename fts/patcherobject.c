@@ -179,12 +179,12 @@ fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, co
     fts_object_set_patcher(obj, patcher);
 
   /* call constructor */
-  fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
+  fts_class_get_constructor(cl)(obj, NULL, ac, at, fts_nix);
 
   if ( fts_object_get_status( obj) == FTS_OBJECT_STATUS_INVALID)
   {
     /* destroy invalid object */
-    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
+    fts_class_get_deconstructor(cl)(obj, NULL, 0, 0, fts_nix);
     fts_object_free(obj);
 
     return NULL;
@@ -356,7 +356,7 @@ eval_object_description_expression_callback( int ac, const fts_atom_t *at, void 
     if (ac > 0 && fts_is_symbol(at))
     {
       /* send message to fresh object */
-      if (fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1) != NULL)
+      if (fts_send_message(eval_data->obj, fts_get_symbol(at), ac - 1, at + 1, fts_nix) != NULL)
       {
         if(fts_object_get_status(eval_data->obj) == FTS_OBJECT_STATUS_INVALID)
           status = fts_status_new(fts_get_error());
@@ -1042,7 +1042,7 @@ object_move_properties(fts_object_t *old, fts_object_t *new)
 void
 fts_object_put_prop(fts_object_t *obj, fts_symbol_t property, const fts_atom_t *value)
 {
-  if(!fts_is_void(value) && fts_send_message(obj, property, 1, value) == NULL)
+  if(!fts_is_void(value) && fts_send_message(obj, property, 1, value, fts_nix) == NULL)
   {
     fts_object_patcher_data_t *data = fts_object_get_patcher_data(obj);
 

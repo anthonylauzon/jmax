@@ -67,7 +67,7 @@ do_rescale(scale_t *x)
 }
 
 static void
-scale_set_ilow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scale_set_ilow(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
 
@@ -77,7 +77,7 @@ scale_set_ilow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-scale_set_ihi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scale_set_ihi(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
 
@@ -87,7 +87,7 @@ scale_set_ihi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static void
-scale_set_olow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scale_set_olow(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
 
@@ -97,7 +97,7 @@ scale_set_olow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-scale_set_ohi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scale_set_ohi(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
 
@@ -106,7 +106,7 @@ scale_set_ohi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-scale_set_logincr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scale_set_logincr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
   double f;
@@ -124,7 +124,7 @@ scale_set_logincr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-scale_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scale_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -153,7 +153,7 @@ scale_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-scale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+scale_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scale_t *x = (scale_t *)o;
   int  i;

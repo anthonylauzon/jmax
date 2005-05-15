@@ -598,73 +598,73 @@ binop_put(fts_object_t *o, fts_dsp_descr_t *dsp, binop_definition_t *definition)
 }
 
 static void 
-binop_put_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_add(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_add);
 }
 
 static void 
-binop_put_sub(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_sub(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_sub);
 }
 
 static void 
-binop_put_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_mul(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_mul);
 }
 
 static void 
-binop_put_div(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_div(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_div);
 }
 
 static void 
-binop_put_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_bus(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_bus);
 }
 
 static void 
-binop_put_vid(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_vid(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_vid);
 }
 
 static void 
-binop_put_ee(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_ee(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_ee);
 }
 
 static void 
-binop_put_ne(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_ne(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_ne);
 }
 
 static void 
-binop_put_ge(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_ge(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_ge);
 }
 
 static void 
-binop_put_le(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_le(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_le);
 }
 
 static void 
-binop_put_gt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_gt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_gt);
 }
 
 static void 
-binop_put_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_put_lt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), &binop_lt);
 }
@@ -676,7 +676,7 @@ binop_put_lt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
  
 static void
-binop_set_scalar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_set_scalar(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
   float *ptr = (float *)ftl_data_get_ptr(this->data);
@@ -685,7 +685,7 @@ binop_set_scalar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-binop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -696,10 +696,10 @@ binop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       fts_atom_t a;
       
       fts_set_int(&a, 0);
-      binop_set_scalar(o, 0, 0, 1, &a);      
+      binop_set_scalar(o, 0, 1, &a, fts_nix);      
     }
   else if(ac == 1 && fts_is_number(at))
-    binop_set_scalar(o, 0, 0, 1, at);
+    binop_set_scalar(o, 0, 1, at, fts_nix);
   else
     fts_object_error(o, "bad Arguments");
 
@@ -708,7 +708,7 @@ binop_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-binop_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 

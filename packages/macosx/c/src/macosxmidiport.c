@@ -186,7 +186,7 @@ macosxmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
 }
 
 static void
-macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_input_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidiport_t *this = (macosxmidiport_t *)o;
   macosxmidi_t *manager;
@@ -250,7 +250,7 @@ macosxmidi_input_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_output_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidiport_t *this = (macosxmidiport_t *)o;
   macosxmidi_t *manager;
@@ -313,7 +313,7 @@ macosxmidi_output_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-macosxmidiport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidiport_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidiport_t *this = (macosxmidiport_t *)o;
   fts_atom_t k, a;

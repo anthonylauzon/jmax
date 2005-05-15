@@ -228,7 +228,7 @@ macosxmidi_resync(macosxmidi_t *this)
 }
 
 static void
-macosxmidi_get_default_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_default_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
@@ -238,7 +238,7 @@ macosxmidi_get_default_input( fts_object_t *o, int winlet, fts_symbol_t s, int a
 }
 
 static void
-macosxmidi_get_default_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_default_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
@@ -248,7 +248,7 @@ macosxmidi_get_default_output( fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
-macosxmidi_append_input_names( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_append_input_names(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_array_t *inputs = (fts_array_t *)fts_get_pointer(at);
@@ -270,7 +270,7 @@ macosxmidi_append_input_names( fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
-macosxmidi_append_output_names( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_append_output_names(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_array_t *outputs = (fts_array_t *)fts_get_pointer(at);
@@ -292,7 +292,7 @@ macosxmidi_append_output_names( fts_object_t *o, int winlet, fts_symbol_t s, int
 }
 
 static void
-macosxmidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_midiport_t **ptr = (fts_midiport_t **)fts_get_pointer(at + 0);
@@ -336,7 +336,7 @@ macosxmidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-macosxmidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_get_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_midiport_t **ptr = (fts_midiport_t **)fts_get_pointer(at + 0);
@@ -414,7 +414,7 @@ macosxmidi_scan_hashtable(fts_hashtable_t *ht)
 }
 
 static void
-macosxmidi_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   fts_bytestream_t* stream = fts_get_default_console_stream();
@@ -469,7 +469,7 @@ macosxmidi_notify(const MIDINotification *message, void *o)
 }
 
 static void
-macosxmidi_poll_fifo( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_poll_fifo(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
 
@@ -497,7 +497,7 @@ macosxmidi_runloop_thread(void *o)
 }
 
 static void
-macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
   pthread_t thread;
@@ -520,7 +520,7 @@ macosxmidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-macosxmidi_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxmidi_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxmidi_t *this = (macosxmidi_t *)o;
 

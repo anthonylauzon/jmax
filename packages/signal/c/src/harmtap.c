@@ -192,7 +192,7 @@ typedef struct _harmtap_
  */
 
 static void
-harmtap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -306,7 +306,7 @@ ftl_harmtap(fts_word_t *argv)
  */
 
 static void 
-harmtap_set_delayline(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_set_delayline(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params = ftl_data_get_ptr(this->params);
@@ -315,7 +315,7 @@ harmtap_set_delayline(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
-harmtap_set_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_set_delay(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params = ftl_data_get_ptr(this->params);
@@ -336,7 +336,7 @@ harmtap_set_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-harmtap_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_set_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params = ftl_data_get_ptr(this->params);
@@ -350,22 +350,22 @@ harmtap_set_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-harmtap_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0)
     {
       /* first set delay line */
       if(fts_is_a(at, delayline_class))
-	harmtap_set_delayline(o, 0, 0, 1, at);  
+	harmtap_set_delayline(o, 0, 1, at, fts_nix);  
       
       switch(ac)
 	{
 	case 3:
 	  if(fts_is_number(at + 2))
-	    harmtap_set_delay(o, 0, 0, 1, at + 2);
+	    harmtap_set_delay(o, 0, 1, at + 2, fts_nix);
 	case 2:
 	  if(fts_is_number(at + 1))
-	    harmtap_set_pitch(o, 0, 0, 1, at + 1);
+	    harmtap_set_pitch(o, 0, 1, at + 1, fts_nix);
 	case 1:
 	case 0:
 	  break;
@@ -374,7 +374,7 @@ harmtap_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-harmtap_set_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_set_window(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params = ftl_data_get_ptr(this->params);
@@ -391,7 +391,7 @@ harmtap_set_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-harmtap_set_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_set_fade(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params = ftl_data_get_ptr(this->params);
@@ -409,7 +409,7 @@ harmtap_set_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
   harmtap_params_t *params;
@@ -420,7 +420,7 @@ harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   params = ftl_data_get_ptr(this->params);
       
   harmtap_params_init(params);
-  harmtap_set(o, 0, 0, ac, at);
+  harmtap_set(o, 0, ac, at, fts_nix);
 
   if(params->delayline == NULL)
     fts_object_error(o, "first argument of delay~ required");
@@ -428,7 +428,7 @@ harmtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-harmtap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+harmtap_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   harmtap_t *this = (harmtap_t *)o;
 

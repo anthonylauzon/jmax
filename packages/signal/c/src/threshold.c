@@ -49,13 +49,13 @@ typedef struct
 } threshold_t;
 
 static void
-threshold_output_low(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_output_low(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang(o, 0);
 }
 
 static void
-threshold_output_high(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_output_high(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang(o, 1);
 }
@@ -72,7 +72,7 @@ set_times(threshold_t *this)
 }
 
 static void
-threshold_status_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_status_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -82,7 +82,7 @@ threshold_status_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-threshold_status_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_status_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -92,7 +92,7 @@ threshold_status_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-threshold_hi_thresh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_hi_thresh(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -104,7 +104,7 @@ threshold_hi_thresh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-threshold_hi_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_hi_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -116,7 +116,7 @@ threshold_hi_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
   
 static void
-threshold_lo_thresh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_lo_thresh(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -128,7 +128,7 @@ threshold_lo_thresh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
   
 static void
-threshold_lo_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_lo_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -140,7 +140,7 @@ threshold_lo_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
   
 static void
-threshold_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data = (threshold_data_t *)ftl_data_get_ptr(this->data);
@@ -179,7 +179,7 @@ threshold_reset(threshold_t *this, double sr, int tick_size)
 }
 
 static void
-threshold_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -222,7 +222,7 @@ ftl_threshold(fts_word_t *argv)
 }
 
 static void
-threshold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   threshold_t *this = (threshold_t *)o;
   threshold_data_t *data;
@@ -235,13 +235,13 @@ threshold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   data->wait = 0;
   this->ticks_per_msec = 1.0;
 
-  threshold_set(o, 0, 0, ac, at);
+  threshold_set(o, 0, ac, at, fts_nix);
   
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-threshold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+threshold_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

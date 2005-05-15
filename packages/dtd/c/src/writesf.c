@@ -148,7 +148,7 @@ static void writesf_dsp( fts_word_t *argv)
   }
 }
 
-static void writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void writesf_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t *self = (writesf_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -166,9 +166,9 @@ static void writesf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 
 
 /* forward declaration */
-static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void writesf_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
-static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void writesf_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   fts_audiofile_t* sf;
@@ -177,16 +177,15 @@ static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   if (1 == self->is_open)
   {
     /* call close */
-    writesf_close(o, winlet, s, ac, at);
+    writesf_close(o, s, ac, at, fts_nix);
   }
 
   if (ac > 0 && fts_is_symbol(at))
   {
     self->filename = fts_get_symbol(at);	    
-    sf = fts_audiofile_open_write(self->filename, self->n_channels,
-				  (int)(fts_dsp_get_sample_rate()),
-				  fts_s_int16);
-    if (fts_audiofile_is_valid(sf))
+    sf = fts_audiofile_open_write(self->filename, self->n_channels, (int)(fts_dsp_get_sample_rate()), NULL, fts_s_int16);
+    
+    if (sf != NULL)
     {		
       /* set writer thread state */
       writer_set_state(self, sf, self->com_buffer, &self->buffer_index, &self->is_eof);
@@ -206,7 +205,7 @@ static void writesf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	fts_object_open_dialog(o, fts_s_open, s_open_file, ac, at);
 }
 
-static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void writesf_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   int i;
@@ -230,7 +229,7 @@ static void writesf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   }
 }
 
-static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void writesf_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   fts_post("[writesf~] start \n");
@@ -238,7 +237,7 @@ static void writesf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 
-static void writesf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void writesf_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   dtd_buffer_t* com_buffer;
@@ -259,7 +258,7 @@ static void writesf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_post("[writesf~] stop\n");
 }
 
-static void writesf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void writesf_pause(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   fts_post("[writesf~] pause \n");
@@ -267,7 +266,7 @@ static void writesf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   self->is_started = self->is_started % 2;
 }
 
-static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void writesf_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   int n_channels;
@@ -316,14 +315,14 @@ static void writesf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
-static void writesf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void writesf_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
   int i;
   int j;
 
   /* call close for thread */
-  writesf_close(o, winlet, s, ac, at);
+  writesf_close(o, s, ac, at, fts_nix);
   /* Memory Deallocation */
   for (i = 0; i < 2; ++i)
   {

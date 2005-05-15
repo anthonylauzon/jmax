@@ -212,9 +212,10 @@ class_outlet_has_declaration (fts_class_outlet_t * out, const fts_atom_t * p)
 *
 */
 
-static void
-dummy_method (fts_object_t * o, int winlet, fts_symbol_t s, int ac, const fts_atom_t * at)
+static fts_method_status_t
+dummy_method (fts_object_t * o, fts_symbol_t s, int ac, const fts_atom_t *at,  fts_atom_t *ret)
 {
+  return fts_ok;
 }
 
 
@@ -687,12 +688,14 @@ return 3;	/* return number of columns (group of atoms in list) */
 }
 
 
-static void
-method_post_doc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+method_post_doc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_class_t *cl = fts_object_get_class(o);
   
   fts_class_doc_post(cl);
+  
+  return fts_ok;
 }
 
 void

@@ -335,7 +335,7 @@ cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
   for(i=0; i<ac && n<MAX_CONCAT_LENGTH; i++)
   {
     if(fts_is_int(at + i))
-      snprintf(buf + n, MAX_CONCAT_LENGTH, "%d", fts_get_int(at + i));
+      snprintf(buf + n, MAX_CONCAT_LENGTH, "%d", (int)fts_get_int(at + i));
     else if(fts_is_float(at + i))
       snprintf(buf + n, MAX_CONCAT_LENGTH, "%g", fts_get_float(at + i));
     else if(fts_is_symbol(at + i))
@@ -548,7 +548,7 @@ informal_class(fts_class_t *cl)
   fts_symbol_t clname = fts_class_get_name(cl);
   fts_iterator_t iter;  
   
-  post("complete message list of %s", fts_symbol_name(clname));
+  fts_post("complete message list of %s\n", fts_symbol_name(clname));
   
   fts_class_get_messages(cl, &iter);
   
@@ -574,10 +574,10 @@ informal_class(fts_class_t *cl)
         doc = fts_class_doc_get_next(doc);
       }
       
-      post("  %s %s", fts_symbol_name(sel), has_doc? "": "... hidden");
+      fts_post("  %s %s", fts_symbol_name(sel), has_doc? "": "... hidden\n");
     }
     else
-      post("  inlet %d", fts_get_int(&a));
+      fts_post("  inlet %d\n", fts_get_int(&a));
   }
 }
 

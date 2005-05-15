@@ -42,7 +42,7 @@ typedef struct _pick_
  */
 
 static void 
-pick_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pick_t *this = (pick_t *)o;
 
@@ -51,7 +51,7 @@ pick_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-pick_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pick_t *this = (pick_t *)o;
 
@@ -59,7 +59,7 @@ pick_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void 
-pick_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_set_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pick_t *this = (pick_t *)o;
   fmat_t *fmat = (fmat_t *)fts_get_object(at);
@@ -83,7 +83,7 @@ pick_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 
 static void 
-pick_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pick_t *this = (pick_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -151,7 +151,7 @@ pick_ftl(fts_word_t *argv)
  */
 
 static void
-pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   pick_t *this = (pick_t *)o;
   int size = 1024;
@@ -171,7 +171,7 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 	    size = 0;
 	}
       else if(fts_is_a(at, fmat_class))
-	pick_set_fmat(o, 0, 0, 1, at);
+	pick_set_fmat(o, 0, 1, at, fts_nix);
       else
 	{
 	  fts_object_error(o, "bad argument");
@@ -192,7 +192,7 @@ pick_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pick_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pick_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pick_t *this = (pick_t *)o;
 

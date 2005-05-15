@@ -42,7 +42,7 @@ typedef struct
 } dcopy_t;
 
 static void
-dcopy_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dcopy_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dcopy_t *this = (dcopy_t *)o;
   fts_object_t *vec = fts_get_object(at);
@@ -80,7 +80,7 @@ dcopy_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-dpaste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dpaste_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dcopy_t *this = (dcopy_t *)o;
   fts_object_t *vec = fts_get_object(at);
@@ -123,7 +123,7 @@ dpaste_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-dcopy_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dcopy_set_line(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dcopy_t *this = (dcopy_t *)o;
   delayline_t *line = (delayline_t *)fts_get_object(at);
@@ -139,14 +139,14 @@ dcopy_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-dcopy_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dcopy_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dcopy_t *this = (dcopy_t *)o;
 
   this->line = NULL;
 
   if(ac > 0 && fts_is_a(at, delayline_class))
-    dcopy_set_line(o, 0, 0, 1, at);
+    dcopy_set_line(o, 0, 1, at, fts_nix);
   else
   {
     fts_object_error(o, "first argument must be a delay line");
@@ -155,7 +155,7 @@ dcopy_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-dcopy_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dcopy_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dcopy_t *this = (dcopy_t *)o;
 

@@ -51,7 +51,7 @@ typedef struct dsp_control
 
 
 static void 
-dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_poll(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dsp_control_t *this = (dsp_control_t *)o;
   fts_atom_t a[1];
@@ -123,14 +123,14 @@ dsp_control_poll(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 static void 
-dsp_control_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_dsp_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_t *this = (fts_object_t *)o;
   fts_client_send_message(this, sym_client_dsp_on, 1, at);
 }
 
 static void 
-dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dsp_control_t *this = (dsp_control_t *)o;
 
@@ -152,13 +152,13 @@ dsp_control_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-dsp_control_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_active_remove_listener(o);
 }
 
 static void 
-dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t a[1];
   dsp_control_t *this = (dsp_control_t *)o;
@@ -174,26 +174,26 @@ dsp_control_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-dsp_control_fpe_start_collect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_fpe_start_collect(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_objectset_t *set = (fts_objectset_t *) fts_get_object(at);      
   fts_fpe_start_collect(set);
 }
 
 static void 
-dsp_control_fpe_stop_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_fpe_stop_collect(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_fpe_stop_collect();
 }
 
 static void 
-dsp_control_fpe_clear_collect( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_fpe_clear_collect(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_fpe_empty_collection();
 }
 
 static void 
-dsp_control_remote_dsp_on( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_remote_dsp_on(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (ac == 1 && fts_is_int(at))
     {
@@ -207,24 +207,24 @@ dsp_control_remote_dsp_on( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void 
-dsp_control_remote_dsp_print( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_remote_dsp_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dsp_chain_post();
 }
 
 static void 
-dsp_control_remote_set_poll_interval( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_remote_set_poll_interval(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ( (ac == 1) && fts_is_int( at))
     {
-      dsp_control_t *this = (dsp_control_t *)d;
+      dsp_control_t *this = (dsp_control_t *)o;
 
       this->poll_interval = fts_get_int(&at[0]);
     }
 }
 
 static void 
-dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_set_check_nan(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /*if ( (ac == 1) && fts_is_int( at))
     ftl_program_set_check_nan( dsp_get_current_dsp_chain(), fts_get_int( at));
@@ -232,7 +232,7 @@ dsp_control_set_check_nan( fts_object_t *d, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void 
-dsp_control_restart( fts_object_t *d, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_control_restart(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_restart();
 }

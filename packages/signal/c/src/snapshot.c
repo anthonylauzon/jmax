@@ -42,7 +42,7 @@ ftl_snapshot(fts_word_t *argv)
 
 
 static void
-snapshot_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+snapshot_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   snapshot_t *this = (snapshot_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -55,7 +55,7 @@ snapshot_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-snapshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+snapshot_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   snapshot_t *this = (snapshot_t *)o;
   float *val;
@@ -69,7 +69,7 @@ snapshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-snapshot_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+snapshot_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   snapshot_t *this = (snapshot_t *)o;
   float *val = (float *)ftl_data_get_ptr(this->val);
@@ -78,7 +78,7 @@ snapshot_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-snapshot_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+snapshot_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   snapshot_t *this = (snapshot_t *)o;
   float *val = (float *)ftl_data_get_ptr(this->val);
@@ -87,7 +87,7 @@ snapshot_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-snapshot_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+snapshot_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

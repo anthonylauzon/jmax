@@ -32,6 +32,9 @@
 static fts_atom_t __fts_null;
 const fts_atom_t *fts_null = &__fts_null;
 
+static fts_atom_t __fts_nix;
+fts_atom_t *fts_nix = &__fts_nix;
+
 void fts_kernel_atom_init(void);
 
 int fts_atom_identical( const fts_atom_t *first, const fts_atom_t *second)
@@ -238,4 +241,5 @@ void fts_kernel_atom_init( void)
   fts_class_set_name( &string_class, fts_s_string);
 
   fts_set_void( &__fts_null);
+  fts_set_void( &__fts_nix);
 }

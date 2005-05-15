@@ -72,7 +72,7 @@ param_call_listeners(fts_param_t *param)
       /* call listeners */
       while(listener)
 	{
-	  listener->callback(listener->object, 0, 0, n, a);
+	  listener->callback(listener->object, 0, n, a, fts_nix);
 	  listener = listener->next;
 	}
       
@@ -86,7 +86,7 @@ param_call_listeners(fts_param_t *param)
       /* call listeners */
       while(listener)
 	{
-	  listener->callback(listener->object, 0, 0, 1, &param->value);
+	  listener->callback(listener->object, 0, 1, &param->value, fts_nix);
 	  listener = listener->next;
 	}
       
@@ -125,7 +125,7 @@ fts_param_set_float(fts_param_t *param, double f)
  */
 
 static void
-param_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
 
@@ -133,7 +133,7 @@ param_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
   
 static void
-param_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
 
@@ -150,7 +150,7 @@ param_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_set_from_instance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
   fts_param_t *param = (fts_param_t *)fts_get_object(at);
@@ -160,7 +160,7 @@ param_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-param_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_input_atom(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
 
@@ -169,13 +169,13 @@ param_input_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-param_output_from_recieve(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_output_from_recieve(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_varargs(o, 0, ac, at);
 }
 
 static void
-param_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_add_listener(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
   
@@ -183,7 +183,7 @@ param_add_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-param_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_remove_listener(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
   
@@ -191,7 +191,7 @@ param_remove_listener(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-param_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
 
@@ -199,15 +199,15 @@ param_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-param_get_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_get_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
 
-  fts_return(&this->value);
+  *ret = this->value;
 }
 
 static void
-param_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -231,7 +231,7 @@ param_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *)o;
 
@@ -240,13 +240,13 @@ param_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   if(ac > 0)
   {
-    param_set(o, 0, NULL, ac, at);
+    param_set(o, NULL, ac, at, fts_nix);
     this->persistence = -1;
   }
 }
 
 static void
-param_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+param_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_param_t *this = (fts_param_t *) o;
 

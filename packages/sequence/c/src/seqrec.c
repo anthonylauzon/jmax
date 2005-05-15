@@ -43,7 +43,7 @@ typedef struct
 */
 
 static void 
-seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqrec_t *this = (seqrec_t *)o;
   
@@ -55,7 +55,7 @@ seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       track_merge(this->track, this->recording);
       
       if(track_editor_is_open(this->track))
-        fts_send_message((fts_object_t *)this->track, fts_s_upload, 0, 0);
+        fts_send_message((fts_object_t *)this->track, fts_s_upload, 0, 0, fts_nix);
     }
     
     this->start_location = 0.0;
@@ -65,7 +65,7 @@ seqrec_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqrec_t *this = (seqrec_t *)o;
   double time = 0.0;
@@ -92,7 +92,7 @@ seqrec_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_pause(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqrec_t *this = (seqrec_t *)o;
   double now = fts_timebase_get_time(this->timebase);
@@ -105,7 +105,7 @@ seqrec_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_record_atom(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqrec_t *this = (seqrec_t *)o;
   
@@ -132,7 +132,7 @@ seqrec_record_atom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-seqrec_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_set_reference(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqrec_t *this = (seqrec_t *)o;
   
@@ -150,7 +150,7 @@ seqrec_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 */
 
 static void
-seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqrec_t *this = (seqrec_t *)o;
   
@@ -172,7 +172,7 @@ seqrec_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-seqrec_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqrec_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqrec_t *this = (seqrec_t *)o;
   

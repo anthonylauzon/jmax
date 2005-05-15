@@ -73,7 +73,7 @@ typedef struct
 } trigger_t;
 
 static void
-trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+trigger_anything(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   trigger_t *x = (trigger_t *)o;
   int outlet = x->noutlets;
@@ -127,7 +127,7 @@ trigger_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-trigger_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+trigger_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   trigger_t *x = (trigger_t *)o;
   trigger_outlet_t *trigger_outlet_table;
@@ -197,7 +197,7 @@ trigger_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-trigger_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+trigger_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   trigger_t *x = (trigger_t *)o;
 

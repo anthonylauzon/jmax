@@ -98,7 +98,7 @@ bus_reset(bus_t *this, int n_tick, double sr)
 }
 
 static void
-bus_put_epilogue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bus_put_epilogue(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bus_t *this = (bus_t *)o;
   int n_tick = fts_dsp_get_tick_size();
@@ -129,7 +129,7 @@ bus_ftl(fts_word_t *a)
 }
 
 static void
-bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+bus_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bus_t *this = (bus_t *)o;
   int n_channels = 0;
@@ -164,7 +164,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
 }
 
 static void
-bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+bus_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bus_t *this = (bus_t *)o;
 
@@ -217,7 +217,7 @@ access_get_edge(access_t *this)
 }
 
 static void
-access_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_set_bus(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_edge_t *edge = access_get_edge(this);
@@ -239,7 +239,7 @@ access_set_bus(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_set_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   int *ptr = ftl_data_get_ptr(this->index);
@@ -253,17 +253,17 @@ access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-access_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 1 && fts_is_number(at + 1))
-    access_set_index(o, 0, 0, 1, at + 1);
+    access_set_index(o, 0, 1, at + 1, fts_nix);
 
   if(ac > 0 && fts_is_a(at, bus_class))
-    access_set_bus(o, 0, 0, 1, at);
+    access_set_bus(o, 0, 1, at, fts_nix);
 }
 
 static void
-access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+access_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   bus_t **bus;
@@ -303,7 +303,7 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
     fts_object_refer((fts_object_t *)*bus);
 
     if(ac > 1 && fts_is_number(at + 1))
-      access_set_index(o, 0, 0, 1, at + 1);    
+      access_set_index(o, 0, 1, at + 1, fts_nix);    
   }
   else
     fts_object_error(o, "bus~ required");
@@ -312,7 +312,7 @@ access_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 }
 
 static void
-access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+access_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
 
@@ -339,7 +339,7 @@ access_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 */
 
 static void
-throw_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+throw_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -377,12 +377,12 @@ throw_ftl(fts_word_t *a)
 }
 
 static void
-throw_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+throw_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_edge_t *edge;
 
-  access_init(o, 0, 0, ac, at);
+  access_init(o, 0, ac, at, fts_nix);
 
   edge = access_get_edge(this);
 
@@ -412,7 +412,7 @@ throw_instantiate(fts_class_t *cl)
 */
 
 static void
-catch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+catch_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -447,12 +447,12 @@ catch_ftl(fts_word_t *a)
 }
 
 static void
-catch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+catch_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_edge_t *edge;
 
-  access_init(o, 0, 0, ac, at);
+  access_init(o, 0, ac, at, fts_nix);
 
   edge = access_get_edge(this);
 
@@ -482,7 +482,7 @@ catch_instantiate(fts_class_t *cl)
 *
 */
 static void
-recycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+recycle_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -520,12 +520,12 @@ recycle_ftl(fts_word_t *a)
 }
 
 static void
-recycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+recycle_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   fts_dsp_edge_t *edge;
 
-  access_init(o, 0, 0, ac, at);
+  access_init(o, 0, ac, at, fts_nix);
 
   edge = access_get_edge(this);
 

@@ -45,7 +45,7 @@ typedef struct _delwrite_t
 } delwrite_t;
 
 static void
-delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delwrite_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delwrite_t *this = (delwrite_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, fts_s_default);
@@ -79,7 +79,7 @@ delwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-delwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delwrite_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delwrite_t *this = (delwrite_t *)o;
 
@@ -99,7 +99,7 @@ delwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delwrite_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delwrite_t *this = (delwrite_t *)o;
   fts_atom_t argv[5];
@@ -141,7 +141,7 @@ delwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-delwrite_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delwrite_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delwrite_t *this = (delwrite_t *)o;
 
@@ -150,7 +150,7 @@ delwrite_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-delwrite_realloc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delwrite_realloc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delwrite_t *this = (delwrite_t *)o;
   float size  = fts_get_float_arg(ac, at, 1, 0.0f);

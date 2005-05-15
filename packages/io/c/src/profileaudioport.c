@@ -45,7 +45,7 @@ typedef struct {
   double last_time;
 } profileaudioport_t;
 
-static void profileaudioport_output_estimation( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void profileaudioport_output_estimation(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 
@@ -80,7 +80,7 @@ static void profileaudioport_output( fts_word_t *argv)
     }
 }
 
-static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void profileaudioport_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 #ifndef WIN32
@@ -105,7 +105,7 @@ static void profileaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, 
   this->samples_count = 0;
 }
 
-static void profileaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void profileaudioport_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   profileaudioport_t *this = (profileaudioport_t *)o;
 

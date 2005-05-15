@@ -470,4 +470,5 @@ FTS_API void fts_atom_copy (const fts_atom_t *from, fts_atom_t *to);
  * @ingroup atom
  */
 FTS_API const fts_atom_t *fts_null;
+FTS_API fts_atom_t *fts_nix;
 

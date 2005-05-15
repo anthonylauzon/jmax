@@ -30,7 +30,7 @@ typedef struct
 } accum_t;
 
 static void
-accum_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+accum_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   accum_t *this = (accum_t *)o;
 
@@ -51,7 +51,7 @@ accum_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-accum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+accum_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   accum_t *this = (accum_t *)o;
 
@@ -62,7 +62,7 @@ accum_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-accum_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+accum_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   accum_t *this = (accum_t *)o;
 
@@ -76,7 +76,7 @@ accum_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-accum_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+accum_add(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   accum_t *this = (accum_t *)o;
 
@@ -87,7 +87,7 @@ accum_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-accum_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+accum_mul(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   accum_t *this = (accum_t *)o;
 
@@ -98,9 +98,9 @@ accum_mul(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-accum_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+accum_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  accum_set(o, 0, 0, ac, at);
+  accum_set(o, 0, ac, at, fts_nix);
 }
 
 static void

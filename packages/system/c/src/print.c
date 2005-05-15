@@ -31,7 +31,7 @@ typedef struct
 } print_t;
 
 static void
-print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_t *this = (print_t *)o;
 
@@ -58,7 +58,7 @@ print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       {
         fts_atom_t a;
         fts_set_object(&a, this->stream);
-        (*meth)(obj, 0, 0, 1, &a);
+        (*meth)(obj, 0, 1, &a, fts_nix);
         return;
       }
     }
@@ -85,7 +85,7 @@ print_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-print_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_t *this = (print_t *)o;
 

@@ -44,7 +44,7 @@ typedef struct {
  */
  
 static void 
-messconst_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *)o;
 
@@ -92,7 +92,7 @@ messconst_eval(messconst_t *this)
 
 
 static void
-messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *)o;
 
@@ -101,7 +101,7 @@ messconst_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-messconst_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_click(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *)o;
 
@@ -124,7 +124,7 @@ messconst_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_spost_description(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *) o;
 
@@ -132,7 +132,7 @@ messconst_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-messconst_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *) o;
   fts_atom_t a;
@@ -142,7 +142,7 @@ messconst_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
  
 static void 
-messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_set_expression(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *) o;
   int n_inlets;
@@ -183,29 +183,31 @@ messconst_set_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-messconst_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *) o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
   fts_message_t *mess;
 
-  mess = fts_dumper_message_new( dumper, fts_s_set);
+  mess = fts_dumper_message_get( dumper, fts_s_set);
   fts_message_append( mess, fts_array_get_size( &this->descr), fts_array_get_atoms( &this->descr));
   fts_dumper_message_send( dumper, mess);
 }
 
 static void
-messconst_set_argument(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_set_argument(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *) o;
+  int winlet = fts_object_get_message_inlet(o);
 
   fts_array_set_element(&this->inlets, winlet, at);
 }
 
 static void
-messconst_set_first_and_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_set_first_and_eval(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *) o;
+  int winlet = fts_object_get_message_inlet(o);
 
   fts_array_set_element(&this->inlets, winlet, at);
   messconst_eval(this);
@@ -218,7 +220,7 @@ messconst_set_first_and_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac
  */
 
 static void
-messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *)o;
   fts_atom_t *values;
@@ -265,11 +267,11 @@ messconst_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
   /* if old one, then we must call the set method by hand, giving as argument the description */
   if(!new)
-    messconst_set_expression( (fts_object_t *)this, fts_system_inlet, fts_s_set, ac, at);
+    messconst_set_expression( (fts_object_t *)this, fts_s_set, ac, at, fts_nix);
 }
 
 static void
-messconst_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messconst_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messconst_t *this = (messconst_t *)o;
 

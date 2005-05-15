@@ -1099,7 +1099,7 @@ fts_midifile_close(fts_midifile_t *midifile)
   writeblock(midifile);
   
   midifile_tempo_map_destroy(midifile);
-  sysfile_close(midifile->file);
+  fclose(midifile->file);
 }
 
 int

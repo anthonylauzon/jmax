@@ -103,7 +103,7 @@ extern fts_class_t *fts_pipestream_class;
 static fts_class_t *client_manager_class;
 
 static void 
-client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+client_manager_select(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_manager_t *self = (client_manager_t *)o;
   socket_t new_socket;
@@ -134,7 +134,7 @@ client_manager_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+client_manager_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_manager_t *self = (client_manager_t *)o;
   int port;
@@ -185,7 +185,7 @@ client_manager_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-client_manager_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+client_manager_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_manager_t *self = (client_manager_t *)o;
 

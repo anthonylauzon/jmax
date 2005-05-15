@@ -42,7 +42,7 @@ static fts_symbol_t sym_tilda_ramp = 0;
  */
 
 static void
-tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tilda_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tilda_t *this = (tilda_t *)o;
   fts_ramp_t *ramp = (fts_ramp_t *)ftl_data_get_ptr(this->data);  
@@ -119,7 +119,7 @@ tilda_ftl_ramp(fts_word_t *argv)
  */
 
 static void
-tilda_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tilda_set_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tilda_t *this = (tilda_t *)o;
 
@@ -139,7 +139,7 @@ tilda_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-tilda_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tilda_set_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tilda_t *this = (tilda_t *)o;
   float value = fts_get_number_float(at);
@@ -157,7 +157,7 @@ tilda_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tilda_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   tilda_t *this = (tilda_t *)o;
 
@@ -177,10 +177,10 @@ tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 	  fts_atom_t a;
 	  
 	  fts_set_int(&a, 0);
-	  tilda_set_value(o, 0, 0, 1, &a);
+	  tilda_set_value(o, 0, 1, &a, fts_nix);
 	}
       else
-	tilda_set_value(o, 0, 0, 1, at);  
+	tilda_set_value(o, 0, 1, at, fts_nix);  
       
       fts_object_set_inlets_number(o, 1);
     }
@@ -190,15 +190,15 @@ tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
       this->ramp = 1;
       this->data = ftl_data_alloc(sizeof(fts_ramp_t));
 
-      tilda_set_value(o, 0, 0, 1, at + 0);
-      tilda_set_time(o, 0, 0, 1, at + 1);
+      tilda_set_value(o, 0, 1, at + 0, fts_nix);
+      tilda_set_time(o, 0, 1, at + 1, fts_nix);
     }
   else
     fts_object_error(o, "bad arguments");
 }
 
 static void
-tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tilda_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   tilda_t *this = (tilda_t *)o;
 

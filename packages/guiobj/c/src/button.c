@@ -44,7 +44,7 @@ typedef struct
  */
 
 static void
-button_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
   fts_atom_t a;
@@ -57,7 +57,7 @@ button_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-button_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
   fts_atom_t a;
@@ -73,7 +73,7 @@ button_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
  */
  
 static void 
-button_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
 
@@ -82,7 +82,7 @@ button_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_on(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
@@ -110,7 +110,7 @@ button_on(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  */
  
 static void
-button_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_set_color(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
 
@@ -123,7 +123,7 @@ button_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-button_set_flash(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_set_flash(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
 
@@ -136,7 +136,7 @@ button_set_flash(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-button_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t * this = (button_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -150,7 +150,7 @@ button_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   FILE *file = (FILE *)fts_get_pointer( at);
   fts_atom_t a;
@@ -170,7 +170,7 @@ button_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 
 static void
-button_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+button_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   button_t *this = (button_t *)o;
 

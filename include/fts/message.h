@@ -227,30 +227,30 @@ FTS_API void fts_message_cache_free(fts_message_cache_t *cache);
 /**
  * Invoke a method.
  *
- * @fn int fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+ * @fn int fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at, fts_atom_t *ret)
  * @param method the method
  * @param o the target object
  * @param ac argument count
  * @param at argument values
  */
-FTS_API void fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at);
+FTS_API void fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /**
  * Send an arbitrary message to an object (invoke method).
  *
- * @fn int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @fn int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
  * @param o the target object
  * @param s the message symbol
  * @param ac argument count
  * @param at argument values
  * @return non-zero if succeeded, 0 if no method found for given arguments
  */
-FTS_API fts_method_t fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_t fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /**
  * Send an arbitrary cached message to an object (invoke method).
  *
- * @fn int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_message_cache_t *cache)
+ * @fn int fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret, fts_message_cache_t *cache)
  * @param o the target object
  * @param s the message symbol
  * @param ac argument count
@@ -258,28 +258,10 @@ FTS_API fts_method_t fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, c
  * @param cache message cache
  * @return non-zero if succeeded, 0 if no method found for given arguments
  */
-FTS_API fts_method_t fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_message_cache_t *cache);
+FTS_API fts_method_t fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret, fts_message_cache_t *cache);
 
 /* deprecated */
-#define fts_invoke_varargs(m, o, n, a) fts_invoke_method((m), (o), (n), (a))
-#define fts_send_message_varargs(o, s, n, a) fts_send_message((o), (s), (n), (a))
-
-/**
- * Return a value from a method.
- * The returned value is an atom that is copied by the calling code.
- * (Although the fts functions are called fts_<blabla>_float, the values
- * passed and stored in fts_atom_t are double!)
- *
- * @fn void fts_return( fts_atom_t *p)
- * @param p a pointer to the atom to be returned
- * @ingroup message
- */
-FTS_API void fts_return( fts_atom_t *p);
-FTS_API void fts_return_int(int x);
-FTS_API void fts_return_float(double x);
-FTS_API void fts_return_symbol(fts_symbol_t x);
-FTS_API void fts_return_object(fts_object_t *x);
-
-FTS_API fts_atom_t *fts_get_return_value( void);
+#define fts_invoke_varargs(m, o, n, a) do { fts_atom_t _r = *fts_null; fts_invoke_method((m), (o), (n), (a), &_r); } while(0)
+#define fts_send_message_varargs(o, s, n, a) do { fts_atom_t _r = *fts_null; fts_send_message((o), (s), (n), (a), &_r); } while(0)
 
 #endif

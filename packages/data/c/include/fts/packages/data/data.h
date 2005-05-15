@@ -36,7 +36,7 @@
 
 #define data_float_equals(f, g) (fabs((f) - (g)) < 1.0e-7)
 
-DATA_API void data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);  
+DATA_API fts_method_status_t data_object_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);  
 
 /******************************************************************* 
 *
@@ -54,8 +54,8 @@ typedef struct
 
 DATA_API fts_class_t *expr_class;
 
-DATA_API void expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *at, fts_atom_t *ret);
-DATA_API void expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_atom_t *at, fts_atom_t *ret);
+DATA_API fts_method_status_t expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *at, fts_atom_t *ret);
+DATA_API fts_method_status_t expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /******************************************************************* 
 *
@@ -137,8 +137,8 @@ propobj_property_t *propobj_class_get_property_by_index(fts_class_t *cl, int ind
 void propobj_class_append_properties(fts_class_t *cl, fts_array_t *array);
 void propobj_append_properties(propobj_t *self, fts_array_t *array);
 void propobj_post_properties(propobj_t *self, fts_bytestream_t *stream);
-void propobj_dump_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-void propobj_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+fts_method_status_t propobj_dump_properties(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+fts_method_status_t propobj_remove_property(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 void propobj_copy(propobj_t *org, propobj_t *copy);
 void propobj_copy_function(const fts_object_t *from, fts_object_t *to);

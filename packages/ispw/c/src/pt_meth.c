@@ -70,7 +70,7 @@ static void fix_pitch_base(pt_common_obj_t *x)
  *   common pt methods
  */
  
-static void pt_common_meth_ref_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_ref_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    float p = fts_get_float_arg(ac, at, 0, 69.0f);
@@ -80,7 +80,7 @@ static void pt_common_meth_ref_pitch(fts_object_t *o, int winlet, fts_symbol_t s
    fix_pitch_base(x);
 }
 
-static void pt_common_meth_ref_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_ref_freq(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    float f = fts_get_float_arg(ac, at, 0, 440.0f);
@@ -90,7 +90,7 @@ static void pt_common_meth_ref_freq(fts_object_t *o, int winlet, fts_symbol_t s,
    fix_pitch_base(x);
 }
 
-static void pt_common_meth_rough_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_rough_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    long n = fts_get_int_arg(ac, at, 0, 0);
@@ -98,7 +98,7 @@ static void pt_common_meth_rough_pitch(fts_object_t *o, int winlet, fts_symbol_t
    x->ctl.pitch_rough = n? 1: 0;
 }
 
-static void pt_common_meth_pitch_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_pitch_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    long pitch_low = fts_get_int_arg(ac, at, 0, 0);
@@ -115,7 +115,7 @@ static void pt_common_meth_pitch_range(fts_object_t *o, int winlet, fts_symbol_t
    fix_pitch_range(x);
 }
 
-static void pt_common_meth_stick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_stick(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    float f = fts_get_float_arg(ac, at, 0, 0.3f);
@@ -125,7 +125,7 @@ static void pt_common_meth_stick(fts_object_t *o, int winlet, fts_symbol_t s, in
    x->ctl.pitch_stick = f;
 }
 
-static void pt_common_meth_amp_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_amp_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    float f1 = fts_get_float_arg(ac, at, 0, 0.001f);
@@ -136,7 +136,7 @@ static void pt_common_meth_amp_range(fts_object_t *o, int winlet, fts_symbol_t s
    x->ctl.power_on = f2 * f2 * scale;
 }
 
-static void pt_common_meth_quality_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_quality_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    float f1 = fts_get_float_arg(ac, at, 0, 0.25f);
@@ -146,7 +146,7 @@ static void pt_common_meth_quality_range(fts_object_t *o, int winlet, fts_symbol
    x->ctl.quality_on = f2 * f2;
 }
 
-static void pt_common_meth_debouncetime(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_debouncetime(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    long n = fts_get_int_arg(ac, at, 0, 150);
@@ -154,7 +154,7 @@ static void pt_common_meth_debouncetime(fts_object_t *o, int winlet, fts_symbol_
    x->ctl.debounce_time = (n > 0)? n: 0;
 }
 
-static void pt_common_meth_stretch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_stretch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    float f = fts_get_float_arg(ac, at, 0, 1.0f);
@@ -163,7 +163,7 @@ static void pt_common_meth_stretch(fts_object_t *o, int winlet, fts_symbol_t s, 
    x->ctl.pitch_stretch = f;
 }
 
-static void pt_common_meth_coefs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_coefs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    pt_common_obj_t *x = (pt_common_obj_t *)o;
    int i;
@@ -183,7 +183,7 @@ static void pt_common_meth_coefs(fts_object_t *o, int winlet, fts_symbol_t s, in
    }
 }
 
-static void pt_common_meth_obsolete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_obsolete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    fts_post("%s:\n", CLASS_NAME);
    fts_post("   The messages:\n");
@@ -192,7 +192,7 @@ static void pt_common_meth_obsolete(fts_object_t *o, int winlet, fts_symbol_t s,
    fts_post("   Use 'reference-pitch', 'amp-range' and 'quality-range' instead!\n");
 }
 
-static void pt_common_meth_print_kernel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_common_meth_print_kernel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
    long channel = fts_get_int_arg(ac, at, 0, -1);
    pt_common_print_millers_kernels(channel);

@@ -47,7 +47,7 @@ monitor_ftl( fts_word_t *argv)
 }
 
 static void 
-monitor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   monitor_t *self = (monitor_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -62,19 +62,19 @@ monitor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-monitor_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_activate();
 }
 
 static void 
-monitor_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_desactivate();
 }
 
 static void 
-monitor_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int active = fts_dsp_is_active();
   fts_atom_t a;
@@ -84,13 +84,13 @@ monitor_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void 
-monitor_dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_dsp_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_update_request(o);
 }
 
 static void 
-monitor_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_toggle(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(fts_dsp_is_active())
     fts_dsp_desactivate();
@@ -101,7 +101,7 @@ monitor_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   monitor_t *self = (monitor_t *)o;
 
@@ -120,7 +120,7 @@ monitor_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-monitor_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+monitor_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_active_remove_listener(o);
   fts_dsp_object_delete((fts_dsp_object_t*)o);

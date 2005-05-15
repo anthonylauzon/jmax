@@ -36,7 +36,7 @@ typedef struct
 
 
 static void
-ramp_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
 
@@ -49,7 +49,7 @@ ramp_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-ramp_increment_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_increment_and_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
 
@@ -69,7 +69,7 @@ ramp_increment_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-ramp_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
 
@@ -87,7 +87,7 @@ ramp_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 
 static void
-ramp_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_set_target(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
   double target = fts_get_number_float(at);
@@ -118,7 +118,7 @@ ramp_set_target(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-ramp_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
   double duration = fts_get_number_float(at);
@@ -161,7 +161,7 @@ ramp_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-ramp_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_set_period(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
   double period = fts_get_number_float(at);
@@ -173,7 +173,7 @@ ramp_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-ramp_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
   int running = this->running;
@@ -189,10 +189,10 @@ ramp_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     default:
     case 3:
       if(fts_is_number(at + 2))
-	ramp_set_period(o, winlet, s, 1, at + 2);
+	ramp_set_period(o, s, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	ramp_set_duration(o, winlet, s, 1, at + 1);
+	ramp_set_duration(o, s, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at))
 	{
@@ -209,7 +209,7 @@ ramp_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-ramp_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
 
@@ -226,27 +226,27 @@ ramp_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     default:
     case 3:
       if(fts_is_number(at + 2))
-	ramp_set_period(o, 0, 0, 1, at + 2);
+	ramp_set_period(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	ramp_set_duration(o, 0, 0, 1, at + 1);
+	ramp_set_duration(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
-	ramp_set_target(o, 0, 0, 1, at + 0);
+	ramp_set_target(o, 0, 1, at + 0, fts_nix);
     case 0:
       break;
     }
 }
 
 static void
-ramp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ramp_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ramp_t *this = (ramp_t *)o;
 
   this->running = 0;
   this->period = 20.0;
 
-  ramp_set(o, 0, 0, ac, at);
+  ramp_set(o, 0, ac, at, fts_nix);
 }
 
 static void

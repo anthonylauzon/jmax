@@ -102,7 +102,7 @@ static void delete_reader_thread(readsf_t* self)
   fts_free(self->thread_worker);
 }
 
-static void readsf_eof_alarm(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void readsf_eof_alarm(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
   /* set bang to last outlet */
@@ -217,7 +217,7 @@ static void readsf_dsp( fts_word_t *argv)
 
 }
 
-static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t *self = (readsf_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -236,11 +236,11 @@ static void readsf_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 /* forward declaration */
-static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void readsf_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 
 
-static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
   fts_audiofile_t* sf;
@@ -248,7 +248,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   if (1 == self->is_open)
   {
     /* call close */
-    readsf_close(o, winlet, s, ac, at);
+    readsf_close(o, s, ac, at, fts_nix);
   }
 
   if (ac > 0 && fts_is_symbol(at))
@@ -256,7 +256,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     self->filename = fts_get_symbol(at);
 
     sf = fts_audiofile_open_read(self->filename);
-    if (fts_audiofile_is_valid(sf))
+    if (sf != NULL)
     {	    
       /* set reader thread state */
       reader_set_state(self, sf, self->com_buffer, &self->buffer_index, &self->is_eof);
@@ -276,7 +276,7 @@ static void readsf_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	fts_object_open_dialog(o, fts_s_open, s_open_file, ac, at);
 }
 
-static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
   int i;
@@ -307,7 +307,7 @@ static void readsf_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   }
 }
 
-static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
 
@@ -315,7 +315,7 @@ static void readsf_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 
-static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
 
@@ -323,7 +323,7 @@ static void readsf_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   self->read_index = 0;
 }
 
-static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void readsf_pause(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
 
@@ -332,7 +332,7 @@ static void readsf_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
 }
 
-static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void readsf_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
   int n_channels;
@@ -383,14 +383,14 @@ static void readsf_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
   fts_class_outlet_bang(fts_object_get_class(o), n_channels);
 }
 
-static void readsf_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void readsf_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   readsf_t* self = (readsf_t*)o;
   int i;
   int j;
 
   /* call close for thread and file */
-  readsf_close(o, winlet, s, ac, at);
+  readsf_close(o, s, ac, at, fts_nix);
 
   /* Memory Deallocation */
   for (i = 0; i < 2; ++i)

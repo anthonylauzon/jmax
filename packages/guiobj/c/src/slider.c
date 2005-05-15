@@ -39,7 +39,7 @@ typedef struct
 } slider_t;
 
 static void
-slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;  
   fts_atom_t a;
@@ -55,7 +55,7 @@ slider_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-slider_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   fts_atom_t a;
@@ -65,7 +65,7 @@ slider_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
 
@@ -82,7 +82,7 @@ slider_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-slider_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
 
@@ -90,7 +90,7 @@ slider_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-slider_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   int n = fts_get_number_int(at);
@@ -105,7 +105,7 @@ slider_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-slider_incr(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+slider_incr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t*)o;
   int n;
@@ -126,20 +126,20 @@ slider_incr(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-slider_set_and_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set_and_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_number(at))
-    slider_number(o, 0, 0, 1, at);
+    slider_number(o, 0, 1, at, fts_nix);
 }
 
 static void
-slider_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  slider_set_and_output(o, 0, 0, 1, at);
+  slider_set_and_output(o, 0, 1, at, fts_nix);
 }
 
 static void
-slider_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   fts_atom_t a;
@@ -151,7 +151,7 @@ slider_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-slider_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set_max(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   fts_atom_t a;
@@ -163,7 +163,7 @@ slider_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-slider_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   fts_atom_t a;
@@ -188,7 +188,7 @@ slider_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-slider_set_orientation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set_orientation(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
 
@@ -196,7 +196,7 @@ slider_set_orientation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void 
-slider_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
 
@@ -207,7 +207,7 @@ slider_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_set_from_instance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   slider_t *in = (slider_t *)fts_get_object(at);
@@ -231,7 +231,7 @@ slider_set_from_instance(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-slider_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t * self = (slider_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -242,7 +242,7 @@ slider_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-slider_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t * self = (slider_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -262,7 +262,7 @@ slider_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-slider_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+slider_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   slider_t *self = (slider_t *)o;
   FILE *file = (FILE *)fts_get_pointer( at);

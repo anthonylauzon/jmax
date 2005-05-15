@@ -109,34 +109,34 @@ expression_stack_print( fts_expression_t *exp, const char *msg)
 {
   int i, fp;
   fts_atom_t *p = (fts_atom_t *)fts_stack_base(&exp->stack);
-
+  
   fprintf( stderr, "%s:\n", msg);
-
+  
   fp = exp->fp;
-
+  
   fprintf( stderr, "fp = %d\n", fp);
-
+  
   for ( i = fts_stack_top( &exp->stack); i >= 0; i--)
+  {
+    fprintf( stderr, "[%2d] ", i);
+    if ( i == fp - FRAME_OFFSET)
     {
-      fprintf( stderr, "[%2d] ", i);
-      if ( i == fp - FRAME_OFFSET)
-	{
-	  fprintf( stderr, "%-7s %d\n", "FP", fts_get_int( p+i));
-	  fp = fts_get_int( p+i);
-	}
-      else if (fts_is_int( p+i))
-	fprintf( stderr, "%-7s %d\n", "INT", fts_get_int(p+i));
-      else if (fts_is_float( p+i))
-	fprintf( stderr, "%-7s %g\n", "FLOAT", fts_get_float(p+i));
-      else if (fts_is_void( p+i))
-	fprintf( stderr, "%-7s\n", "VOID");
-      else if (fts_is_symbol( p+i))
-	fprintf( stderr, "%-7s %s\n", "SYMBOL", fts_get_symbol(p+i));
-      else if (fts_is_object( p+i))
-	fprintf( stderr, "%-7s %s\n", "OBJECT", fts_object_get_class_name( fts_get_object(p+i)));
-      else if (fts_is_pointer( p+i))
-	fprintf( stderr, "%-7s %p\n", "POINTER", fts_get_pointer(p+i));
+      fprintf( stderr, "%-7s %d\n", "FP", (int)fts_get_int( p+i));
+      fp = fts_get_int( p+i);
     }
+    else if (fts_is_int( p+i))
+      fprintf( stderr, "%-7s %d\n", "INT", (int)fts_get_int(p+i));
+    else if (fts_is_float( p+i))
+      fprintf( stderr, "%-7s %g\n", "FLOAT", fts_get_float(p+i));
+    else if (fts_is_void( p+i))
+      fprintf( stderr, "%-7s\n", "VOID");
+    else if (fts_is_symbol( p+i))
+      fprintf( stderr, "%-7s %s\n", "SYMBOL", fts_symbol_name(fts_get_symbol(p+i)));
+    else if (fts_is_object( p+i))
+      fprintf( stderr, "%-7s %s\n", "OBJECT", fts_symbol_name(fts_object_get_class_name( fts_get_object(p+i))));
+    else if (fts_is_pointer( p+i))
+      fprintf( stderr, "%-7s %p\n", "POINTER", fts_get_pointer(p+i));
+  }
 }
 
 static void
@@ -226,7 +226,7 @@ concatenate_symbol_int( fts_atom_t *left, fts_atom_t *right)
   buffer = alloca( len + 256);
 
   strcpy( buffer, sym);
-  sprintf( buffer + len, "%d", fts_get_int( right));
+  sprintf( buffer + len, "%d", (int)fts_get_int( right));
 
   return fts_new_symbol( buffer);
 }
@@ -240,7 +240,7 @@ concatenate_int_symbol( fts_atom_t *left, fts_atom_t *right)
   sym = fts_symbol_name(fts_get_symbol( right));
   buffer = alloca( strlen( sym) + 256);
 
-  sprintf( buffer, "%d", fts_get_int( left));
+  sprintf( buffer, "%d", (int)fts_get_int( left));
   strcpy( buffer + strlen(buffer), sym);
 
   return fts_new_symbol( buffer);
@@ -361,9 +361,10 @@ static fts_status_t
 expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable_t *locals, fts_hashtable_t *globals, int env_ac, const fts_atom_t *env_at, fts_expression_callback_t callback, void *data)
 {
   int ac;
-  fts_atom_t *at, *top, ret[1];
+  fts_atom_t *at, *top;
   fts_status_t status = fts_ok;
   fts_object_t *obj;
+  fts_atom_t ret;
 
   if (!tree)
     return fts_ok;
@@ -413,10 +414,10 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
 
     obj = fts_object_create( fts_tuple_class, ac, at);
     fts_object_refer( obj);
-    fts_set_object( ret, obj);
+    fts_set_object(&ret, obj);
 
     expression_stack_pop_frame( exp);
-    expression_stack_push( exp, ret);
+    expression_stack_push( exp, &ret);
 
     break;
 
@@ -432,18 +433,19 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
 
-    if (!fts_is_object( at))
+    if (!fts_is_object(at))
       return operand_type_mismatch_error;
+      
+    /* clear return value */
+    fts_set_void(&ret);
 
-    fts_set_void( fts_get_return_value());
-
-    if(fts_send_message(fts_get_object( at), fts_s_get_element, ac - 1, at + 1) == NULL || fts_is_void( fts_get_return_value()))
+    if(fts_send_message(fts_get_object( at), fts_s_get_element, ac - 1, at + 1, &ret) == NULL || fts_is_void(&ret))
       return fts_ignore;
       
-    fts_atom_refer(fts_get_return_value());
+    fts_atom_refer(&ret);
 
     expression_stack_pop_frame( exp);
-    expression_stack_push( exp, fts_get_return_value());
+    expression_stack_push( exp, &ret);
 
     break;
 
@@ -474,16 +476,16 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       if (!fun)
         return fts_status_format("undefined function %s", fts_symbol_name(fun_name));
       
-      fts_set_void(ret);
+      fts_set_void(&ret);
       
-      status = (*fun)(ac - 1, at + 1, ret);
+      status = (*fun)(ac - 1, at + 1, &ret);
       
       expression_stack_pop_frame( exp);
       
-      if(!fts_is_void(ret))
+      if(!fts_is_void(&ret))
       {
-        expression_stack_push( exp, ret);
-        fts_atom_refer(ret);
+        expression_stack_push( exp, &ret);
+        fts_atom_refer(&ret);
       }
       
       return status;
@@ -496,9 +498,10 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       
       fts_object_refer(obj);
       
-      fts_set_void( fts_get_return_value());
+      /* clear return value */
+      fts_set_void(&ret);
       
-      if(fts_send_message(obj, selector, ac - 2, at + 2) == NULL)
+      if(fts_send_message(obj, selector, ac - 2, at + 2, &ret) == NULL)
       {
         fts_symbol_t clname = fts_object_get_class_name(obj);
         
@@ -510,11 +513,11 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       
       expression_stack_pop_frame( exp);
       
-      if(!fts_is_void( fts_get_return_value()))
+      if(!fts_is_void(&ret))
       {
         /* push return value */
-        expression_stack_push( exp, fts_get_return_value());
-        fts_atom_refer(fts_get_return_value());
+        expression_stack_push( exp, &ret);
+        fts_atom_refer(&ret);
       }
       
       fts_object_release(obj);
@@ -522,13 +525,13 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
     else if (ac == 1)
     {
       /* it is a plain parenthized term */
-      ret[0] = at[0];
+      ret = at[0];
       
-      fts_atom_refer(ret);
+      fts_atom_refer(&ret);
       
       expression_stack_pop_frame( exp);
       
-      expression_stack_push( exp, ret);
+      expression_stack_push( exp, &ret);
     }
     else
       return invalid_parenthized_expression_error;
@@ -824,17 +827,17 @@ static void expression_print_aux( fts_parsetree_t *tree, int indent)
   switch( tree->token) {
   case TK_COMMA: fprintf( stderr, ",\n"); break;
   case TK_SPACE: fprintf( stderr, "SPACE\n"); break;
-  case TK_INT: fprintf( stderr, "INT %d\n", fts_get_int( &tree->value)); break;
+  case TK_INT: fprintf( stderr, "INT %d\n", (int)fts_get_int( &tree->value)); break;
   case TK_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
-  case TK_SYMBOL: fprintf( stderr, "SYMBOL %s\n", fts_get_symbol( &tree->value)); break;
+  case TK_SYMBOL: fprintf( stderr, "SYMBOL %s\n", fts_symbol_name(fts_get_symbol( &tree->value))); break;
   case TK_PAR: fprintf( stderr, "()\n"); break;
   case TK_TUPLE: fprintf( stderr, "{}\n"); break;
   case TK_ELEMENT: fprintf( stderr, "[]\n"); break;
   case TK_DOLLAR: 
     if (fts_is_int( &tree->value))
-      fprintf( stderr, "$%d\n", fts_get_int( &tree->value)); 
+      fprintf( stderr, "$%d\n", (int)fts_get_int( &tree->value)); 
     else if (fts_is_symbol( &tree->value))
-      fprintf( stderr, "$%s\n", fts_get_symbol( &tree->value)); 
+      fprintf( stderr, "$%s\n", fts_symbol_name(fts_get_symbol( &tree->value))); 
     break;
   case TK_UPLUS: fprintf( stderr, "+u\n"); break;
   case TK_UMINUS: fprintf( stderr, "-u\n"); break;
@@ -930,7 +933,7 @@ fts_expression_is_valid( fts_expression_t *exp)
  *
  */
 void
-fts_kernel_expression_init( void)
+fts_kernel_expression_init(void)
 {
   expression_heap = fts_heap_new( sizeof( fts_expression_t));
 }

@@ -568,7 +568,7 @@ messbox_update(fts_object_t *o)
  *
  */
 
-static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
@@ -578,7 +578,7 @@ static void messbox_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 
-static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
@@ -586,12 +586,12 @@ static void messbox_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 
-static void messbox_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_update(o);
 }
 
-static void messbox_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *) fts_get_object(at);
@@ -600,7 +600,7 @@ static void messbox_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 }
 
 
-static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
   FILE *file;
@@ -678,7 +678,7 @@ static void messbox_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
   fprintf( file, ";\n");
 }
 
-static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_find(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
@@ -702,7 +702,7 @@ static void messbox_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
    evalution of the box content.
 */
 
-static void messbox_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
@@ -713,7 +713,7 @@ static void messbox_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     messbox_update(o);
 }
 
-static void messbox_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
@@ -723,9 +723,10 @@ static void messbox_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     messbox_update(o);
 }
 
-static void messbox_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_append(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(messbox_list_is_primitive(ac, at))
     fts_atom_list_append(this->atom_list, ac, at);
@@ -734,7 +735,7 @@ static void messbox_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     messbox_update(o);
 }
 
-static void messbox_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *)o;
 
@@ -743,14 +744,14 @@ static void messbox_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 
-static void messbox_eval(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_eval(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
 
-static void messbox_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_click(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
 
@@ -765,12 +766,12 @@ static void messbox_click(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   fts_eval_atom_list(this, this->atom_list, ac, at, o, 0);
 }
 
-static void messbox_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_update(o);
 }
 
-static void messbox_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void messbox_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   messbox_t *this = (messbox_t *) o;
   fts_atom_t a;
@@ -780,7 +781,7 @@ static void messbox_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s
 }
 
 static void
-messbox_spost_description(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messbox_spost_description(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int descr_ac = fts_object_get_description_size(o);
   fts_atom_t *descr_at = fts_object_get_description_atoms(o);

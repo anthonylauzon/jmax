@@ -293,7 +293,7 @@ fmat_set_from_atoms(fmat_t *mat, int onset, int step, int ac, const fts_atom_t *
   }
 }
 
-void
+static void
 fmat_set_from_tuples(fmat_t *mat, int ac, const fts_atom_t *at)
 {
   int n = fmat_get_n(mat);
@@ -597,19 +597,21 @@ fmat_upload(fmat_t *self)
  *   user methods
  *
  */
-static void
-fmat_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_from_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
   fmat_copy((fmat_t *)fts_get_object(at), self);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_set_from_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_from_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fts_object_t *obj = fts_get_object(at);
@@ -626,11 +628,13 @@ fmat_set_from_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     ptr[i] = vec[j];
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_set_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_from_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   bpf_t *bpf = (bpf_t *)fts_get_object(at);
@@ -647,11 +651,13 @@ fmat_set_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     ptr[j + 1] = bpf_get_value(bpf, i);
   }
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_set_from_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_from_ivec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   ivec_t *ivec = (ivec_t *)fts_get_object(at);
@@ -668,11 +674,13 @@ fmat_set_from_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     ptr[i] = (float)iptr[i];
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_set_from_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_from_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
 
@@ -707,12 +715,14 @@ fmat_set_from_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     fmat_set_from_atoms(self, onset, 1, ac, at);
 
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -764,11 +774,13 @@ fmat_set_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_set_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -819,12 +831,14 @@ fmat_set_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     }
   }
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /* used by fvec, too! */
-void
-fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -832,11 +846,13 @@ fmat_fill_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     fmat_set_const(self, (float) fts_get_number_float(at));
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_fill_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -902,17 +918,17 @@ fmat_fill_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
       }
       
       fts_hashtable_destroy(&locals);
-
-      fts_set_void(fts_get_return_value());
     }
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_fill_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_fill_zero(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -935,11 +951,13 @@ fmat_fill_zero(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     ptr[i] = 0.0;
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_fill_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_fill_random(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *values = self->values;
@@ -978,47 +996,52 @@ fmat_fill_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     values[i] = (float)fts_random_range(lower, upper);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-_fmat_get_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_get_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fts_atom_t a[2];
-  fts_atom_t t;
   
   fts_set_int(a + 0, fmat_get_m(self));
   fts_set_int(a + 1, fmat_get_n(self));
-  fts_set_object(&t, fts_object_create(fts_tuple_class, 2, a));
+  fts_set_object(ret, fts_object_create(fts_tuple_class, 2, a));
   
-  fts_return(&t);
+  return fts_ok;
 }
 
-static void
-_fmat_get_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_get_m(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fts_atom_t a;
   
   fts_set_int(&a, fmat_get_m(self));
   
-  fts_return(&a);
+  *ret = a;
+  
+  return fts_ok;
 }
 
-static void
-_fmat_get_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_get_n(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fts_atom_t a;
   
   fts_set_int(&a, fmat_get_n(self));
   
-  fts_return(&a);
+  *ret = a;
+  
+  return fts_ok;
 }
 
-static void
-_fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = 0;
@@ -1034,13 +1057,15 @@ _fmat_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fmat_set_size(self, m, n);
       
       fts_object_changed(o);
-      fts_return_object(o);
+      fts_set_object(ret, o);
     }
   }  
+  
+  return fts_ok;
 }
 
-static void
-_fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_set_m(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fts_get_number_int(at);
@@ -1050,12 +1075,14 @@ _fmat_set_m(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fmat_set_m(self, m);
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
+  
+  return fts_ok;
 }
 
-static void
-_fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_set_n(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int n = fts_get_number_int(at);
@@ -1065,20 +1092,24 @@ _fmat_set_n(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     fmat_set_n(self, n);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
+  
+  return fts_ok;
 }
 
-static void
-_fmat_get_sr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_get_sr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
-  fts_return_float(fmat_get_sr(self));
+  fts_set_float(ret, fmat_get_sr(self));
+  
+  return fts_ok;
 }
 
-static void
-_fmat_set_sr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_set_sr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   double sr = fts_get_number_float(at);
@@ -1089,12 +1120,14 @@ _fmat_set_sr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fmat_set_sr(self, sr);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /* called by get element message */
-static void
-_fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -1103,7 +1136,7 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   int j = 0;
   
   if (m == 0  ||  n == 0)
-    fts_return_float(0);        /* empty matrix: no error, just return 0 */
+    fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
   else
   {
     if (ac > 0  &&  fts_is_number(at))
@@ -1124,18 +1157,20 @@ _fmat_get_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     if (j >= n)
       i = n - 1;
   
-    fts_return_float(fmat_get_element(self, i, j));
+    fts_set_float(ret, fmat_get_element(self, i, j));
   }
+  
+  return fts_ok;
 }
 
-static void
-_fmat_get_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_fmat_get_interpolated(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
-  double ret = 0.0;
+  double r = 0.0;
   
   if(ac > 0)
   {
@@ -1197,27 +1232,29 @@ _fmat_get_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     
     if(i_frac != 0.0)
     {
-      ret = (1.0 - i_frac) * ptr[i * n + j] + i_frac * ptr[(i + 1) * n + j];
+      r = (1.0 - i_frac) * ptr[i * n + j] + i_frac * ptr[(i + 1) * n + j];
       
       if(j_frac != 0.0)
       {
         double g = (1.0 - i_frac) * ptr[i * n + j + 1] + i_frac * ptr[(i + 1) * n + j + 1];
         
-        ret = (1.0 - j_frac) * ret + j_frac * g;
+        r = (1.0 - j_frac) * r + j_frac * g;
       }
     }
     else if(j_frac != 0.0)
-      ret = (1.0 - j_frac) * ptr[i * n + j] + j_frac * ptr[i * n + j + 1];
+      r = (1.0 - j_frac) * ptr[i * n + j] + j_frac * ptr[i * n + j + 1];
     else
-      ret = ptr[i * n + j];
+      r = ptr[i * n + j];
   }
   
-  fts_return_float(ret);
+  fts_set_float(ret, r);
+  
+  return fts_ok;
 }
 
 
-static void
-fmat_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_tuple(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -1233,11 +1270,13 @@ fmat_get_tuple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   for(i=0; i<m*n; i++)
     fts_set_float(atoms + i, ptr[i]);
 
-  fts_return_object((fts_object_t *)tuple);
+  fts_set_object(ret, (fts_object_t *)tuple);
+  
+  return fts_ok;
 }
 
-static void
-fmat_pick_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_pick_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int onset = 0;
@@ -1277,7 +1316,7 @@ fmat_pick_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
         break;
       }
     case 0:
-      return;  
+      return fts_ok;  
   }
 
   if(onset + size > src_m)
@@ -1296,15 +1335,17 @@ fmat_pick_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     ptr += src_n;
   }
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 
 
 /* fvec constructors: get vector object that references fmat */
 
-static void 
-fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
@@ -1315,12 +1356,14 @@ fmat_get_col(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(ac > 0)
     fvec_set_dimensions(fvec, ac, at);
   
-  fts_return_object((fts_object_t *)fvec);
+  fts_set_object(ret, (fts_object_t *)fvec);
+  
+  return fts_ok;
 }
 
 
-static void 
-fmat_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
@@ -1331,12 +1374,14 @@ fmat_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   if(ac > 0)
     fvec_set_dimensions(fvec, ac, at);
   
-  fts_return_object((fts_object_t *)fvec);
+  fts_set_object(ret, (fts_object_t *)fvec);
+  
+  return fts_ok;
 }
 
 
-static void 
-fmat_get_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_diag(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
@@ -1347,7 +1392,9 @@ fmat_get_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   if(ac > 0)
     fvec_set_dimensions(fvec, ac, at);
   
-  fts_return_object((fts_object_t *)fvec);
+  fts_set_object(ret, (fts_object_t *)fvec);
+  
+  return fts_ok;
 }
 
 
@@ -1356,8 +1403,8 @@ fmat_get_diag(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 * @method append
 * @param  atoms   row of atoms to append, will be clipped to width of matrix
 */
-static void
-fmat_append_row_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_append_row_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
@@ -1388,11 +1435,13 @@ fmat_append_row_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_append_row_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_append_row_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -1418,11 +1467,13 @@ fmat_append_row_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     ptr[i] = 0.0;    
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_append_row_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_append_row_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -1455,7 +1506,9 @@ fmat_append_row_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /** insert @p num rows of atoms at row @p pos
@@ -1471,8 +1524,8 @@ fmat_append_row_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  * @param  tuples: atoms  list of tuples of rows of atoms to append, 
  *                     will be clipped to width of matrix
  */
-static void
-fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_insert_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t        *self = (fmat_t *) o;
   float *newptr;
@@ -1491,7 +1544,8 @@ fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if(numrows <= 0)      return; 
+  if(numrows <= 0)
+    return fts_ok; 
 
   fmat_set_size(self, m + numrows, n);
 
@@ -1507,7 +1561,9 @@ fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     self->values[n*pos + i] = 0.0;
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /** insert @p num rows of atoms at row @p pos
@@ -1523,8 +1579,8 @@ fmat_insert_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 * @param  tuples: atoms  list of tuples of rows of atoms to append, 
 *                      will be clipped to width of matrix
 */
-static void
-fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_insert_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t        *self = (fmat_t *) o;
   int m = fmat_get_m(self);
@@ -1542,7 +1598,8 @@ fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)      return; 
+  if(numcols <= 0)
+    return fts_ok; 
   
   fmat_set_size(self, m, n + numcols);
   new_n = n+numcols;
@@ -1560,11 +1617,13 @@ fmat_insert_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_delete_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t        *self = (fmat_t *) o;
   int m = fmat_get_m(self);
@@ -1582,7 +1641,8 @@ fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
-  if(numcols <= 0)      return; 
+  if(numcols <= 0)
+    return fts_ok; 
   
   start = pos + numcols;
   tomove = n-pos-numcols;
@@ -1597,7 +1657,9 @@ fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fmat_set_size(self, m, n - numcols);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /** delete @p num rows of atoms 
@@ -1606,8 +1668,8 @@ fmat_delete_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
  * @param  int: pos    index of row where to delete @p num rows, default 0
  * @param  int: num    number of rows to delete, default 1
  */
-static void
-fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_delete_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *) o;
   float  *killptr;
@@ -1620,14 +1682,18 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
     
-  if      (pos <  0)  pos = 0;
-  else if (pos >= m)  return;    
+  if (pos <  0)  
+    pos = 0;
+  else if (pos >= m)
+    return fts_ok;    
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1);
 
-  if      (numrows <= 0)        return;      
-  else if (numrows >  m - pos)  numrows = m - pos;
+  if (numrows <= 0)
+    return fts_ok;
+  else if (numrows >  m - pos)
+    numrows = m - pos;
   
   killptr = fmat_get_ptr(self) + n * pos;
   num     = n * numrows;        // number of atoms to insert
@@ -1637,7 +1703,9 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   self->m -= numrows; 
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -1646,8 +1714,8 @@ fmat_delete_rows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  *
  */
 
-static void
-fmat_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   const fmat_t *self = (fmat_t *) o;
   const int size = fmat_get_m(self) * fmat_get_n(self);
@@ -1662,12 +1730,14 @@ fmat_get_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if (p[i] < min)
         min = p[i];
     
-    fts_return_float(min);
+    fts_set_float(ret, min);
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_max(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   const fmat_t *self = (fmat_t *) o;
   const int size = fmat_get_m(self) * fmat_get_n(self);
@@ -1682,12 +1752,14 @@ fmat_get_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       if (p[i] > max)
         max = p[i];
     
-    fts_return_float(max);
+    fts_set_float(ret, max);
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_absmax(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   const fmat_t *self = (fmat_t *) o;
   const int size = fmat_get_m(self) * fmat_get_n(self);
@@ -1702,12 +1774,14 @@ fmat_get_absmax(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       if (fabsf(p[i]) > max)
         max = fabsf(p[i]);
     
-    fts_return_float(max);
+    fts_set_float(ret, max);
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_sum(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   const fmat_t *self = (fmat_t *) o;
   const int size = fmat_get_m(self) * fmat_get_n(self);
@@ -1718,11 +1792,13 @@ fmat_get_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   for (i=0; i<size; i++)
     sum += p[i];
   
-  fts_return_float(sum);
+  fts_set_float(ret, sum);
+  
+  return fts_ok;
 }
 
-static void
-fmat_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_mean(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   const fmat_t *self = (fmat_t *) o;
   const int size = fmat_get_m(self) * fmat_get_n(self);
@@ -1736,14 +1812,16 @@ fmat_get_mean(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     for (i=0; i<size; i++)
       sum += p[i];
     
-    fts_return_float(sum / (double)size);
+    fts_set_float(ret, sum / (double)size);
   }
   else
-    fts_return_float(0.0);
+    fts_set_float(ret, 0.0);
+  
+  return fts_ok;
 }
 
-static void
-fmat_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_zc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *) o;
   float *p = fmat_get_ptr(self);
@@ -1771,8 +1849,10 @@ fmat_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
       }
     }
     
-    fts_return_int(zc);
+    fts_set_int(ret, zc);
   }
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -1780,8 +1860,8 @@ fmat_get_zc(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *  element arithmetics
  *
  */
-static void
-fmat_elem_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_elem_add(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -1812,8 +1892,10 @@ fmat_elem_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     ptr[i * n + j] += op;
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -1822,8 +1904,8 @@ fmat_elem_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 
-static void
-fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_add_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -1844,14 +1926,16 @@ fmat_add_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       l[i] += r[i];
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "add");
+  
+  return fts_ok;
 }
 
-static void
-fmat_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_add_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -1863,11 +1947,13 @@ fmat_add_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] += r;
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_sub_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_sub_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -1888,14 +1974,16 @@ fmat_sub_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       l[i] -= r[i];
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "sub");
+  
+  return fts_ok;
 }
 
-static void
-fmat_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_sub_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -1907,11 +1995,13 @@ fmat_sub_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] -= r;
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_mul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_mul_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -1932,14 +2022,16 @@ fmat_mul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       l[i] *= r[i];
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "mul");
+  
+  return fts_ok;
 }
 
-static void
-fmat_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_mul_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -1951,11 +2043,13 @@ fmat_mul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] *= r;
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_div_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_div_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -1976,14 +2070,16 @@ fmat_div_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       l[i] /= r[i];
 
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "div");
+  
+  return fts_ok;
 }
 
-static void
-fmat_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_div_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -1995,11 +2091,13 @@ fmat_div_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] /= r;
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_bus_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_bus_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2020,14 +2118,16 @@ fmat_bus_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       l[i] = r[i] - l[i];
 
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "bus");
+  
+  return fts_ok;
 }
 
-static void
-fmat_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_bus_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2039,11 +2139,13 @@ fmat_bus_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] = r - p[i];
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_vid_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_vid_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2064,14 +2166,16 @@ fmat_vid_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       l[i] = r[i] / l[i];
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "vid");
+  
+  return fts_ok;
 }
 
-static void
-fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_vid_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2083,7 +2187,9 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     p[i] = r / p[i];
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -2092,8 +2198,8 @@ fmat_vid_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  *
  */
 
-static void
-fmat_eq_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_eq_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2114,14 +2220,16 @@ fmat_eq_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       l[i] = (float)(l[i] == r[i]);
  
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "eq");
+  
+  return fts_ok;
 }
 
-static void
-fmat_eq_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_eq_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2133,11 +2241,13 @@ fmat_eq_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] == r);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_ne_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2158,14 +2268,16 @@ fmat_ne_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       l[i] = (float)(l[i] != r[i]);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "ne");
+  
+  return fts_ok;
 }
 
-static void
-fmat_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_ne_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2177,11 +2289,13 @@ fmat_ne_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] != r);
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_gt_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2202,14 +2316,16 @@ fmat_gt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       l[i] = (float)(l[i] > r[i]);
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "gt");
+  
+  return fts_ok;
 }
 
-static void
-fmat_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_gt_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2221,11 +2337,13 @@ fmat_gt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] > r);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_ge_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2246,14 +2364,16 @@ fmat_ge_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       l[i] = (float)(l[i] >= r[i]);
 
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "ge");
+  
+  return fts_ok;
 }
 
-static void
-fmat_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_ge_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2265,11 +2385,13 @@ fmat_ge_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] >= r);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_lt_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2290,14 +2412,16 @@ fmat_lt_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       l[i] = (float)(l[i] < r[i]);
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "lt");
+  
+  return fts_ok;
 }
 
-static void
-fmat_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_lt_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2309,11 +2433,13 @@ fmat_lt_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] < r);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_le_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2334,14 +2460,16 @@ fmat_le_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
       l[i] = (float)(l[i] <= r[i]);
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_dimensions(self, right, "le");
+  
+  return fts_ok;
 }
 
-static void
-fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_le_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float r = (float)fts_get_number_float(at);
@@ -2353,7 +2481,9 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
     p[i] = (float)(p[i] <= r);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 
@@ -2362,8 +2492,8 @@ fmat_le_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 *  misc math funs
 *
 */
-static void
-fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_abs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2375,11 +2505,13 @@ fmat_abs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     ptr[i] = fabsf(ptr[i]);
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_logabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2391,11 +2523,13 @@ fmat_logabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     ptr[i] = logf(fabsf(ptr[i]));
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_log(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2407,11 +2541,13 @@ fmat_log(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     ptr[i] = logf(ptr[i]);
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_exp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2423,11 +2559,13 @@ fmat_exp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     ptr[i] = expf(ptr[i]);
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_sqrabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2439,11 +2577,13 @@ fmat_sqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     ptr[i] *= ptr[i];
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_sqrt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2455,7 +2595,9 @@ fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     ptr[i] = sqrtf(ptr[i]);
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -2463,8 +2605,8 @@ fmat_sqrt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 *  complex conversion
 *
 */
-static void
-fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_convert_rect(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -2484,14 +2626,16 @@ fmat_convert_rect(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     }
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "rect");
+  
+  return fts_ok;
 }
 
-static void
-fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_convert_polar(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -2511,10 +2655,12 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     }
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "polar");
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -2522,8 +2668,8 @@ fmat_convert_polar(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
  *  complex arithmetics and math
  *
  */
-static void
-fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_cmul_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -2600,14 +2746,16 @@ fmat_cmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       fmat_error_complex(right, "cmul");
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "cmul");
+  
+  return fts_ok;
 }
 
-static void
-fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_cmul_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -2622,15 +2770,17 @@ fmat_cmul_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       l[i] *= r;              
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "cmul");
+  
+  return fts_ok;
 }
 
 
-static void
-fmat_cabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_cabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2652,14 +2802,16 @@ fmat_cabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fmat_reshape(self, m, 1);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "cabs");
+  
+  return fts_ok;
 }
 
-static void
-fmat_csqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_csqrabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2681,14 +2833,16 @@ fmat_csqrabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fmat_reshape(self, m, 1);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "csqrabs");
+  
+  return fts_ok;
 }
 
-static void
-fmat_clogabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_clogabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2710,14 +2864,16 @@ fmat_clogabs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     fmat_reshape(self, m, 1);
   
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "clogabs");
+  
+  return fts_ok;
 }
 
-static void
-fmat_clog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_clog(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2738,14 +2894,16 @@ fmat_clog(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "clog");
+  
+  return fts_ok;
 }
 
-static void
-fmat_cexp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_cexp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2766,10 +2924,12 @@ fmat_cexp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "cexp");
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -2778,8 +2938,8 @@ fmat_cexp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 *
 */
 
-static void
-fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_fft(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -2803,7 +2963,7 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     fts_rfft_inplc(fft_ptr, fft_size);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else if(n == 2)
   {
@@ -2822,14 +2982,16 @@ fmat_fft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     fts_cfft_inplc(fft_ptr, fft_size);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "fft");
+  
+  return fts_ok;
 }
 
-static void
-fmat_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_ifft(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2838,7 +3000,7 @@ fmat_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   if(n == 2)
   {
-    unsigned int fft_size = fts_get_fft_size(m);
+    int fft_size = fts_get_fft_size(m);
     int i;
     
     /* zero padding */      
@@ -2848,14 +3010,16 @@ fmat_ifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_cifft_inplc((complex *)ptr, fft_size);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "ifft");
+  
+  return fts_ok;
 }
 
-static void
-fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_rifft(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -2864,7 +3028,7 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   if(n == 2)
   {
-    unsigned int fft_size = fts_get_fft_size(2 * m);
+    int fft_size = fts_get_fft_size(2 * m);
     int i;
     
     /* zero padding */      
@@ -2876,10 +3040,12 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fmat_reshape(self, fft_size, 1);
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fmat_error_complex(self, "rifft");
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -2888,8 +3054,8 @@ fmat_rifft(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 *
 */
 
-static void
-fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_xmul_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -2932,14 +3098,16 @@ fmat_xmul_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
       ptr[i] = res[i]; 
     
     fts_object_changed(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
   else
     fts_object_error((fts_object_t *)self, "xmul: can't multiply matrix %d x %d with matrix %d x %d", m, n, in_m, in_n);
+  
+  return fts_ok;
 }
 
-static void
-fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_get_dot(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fmat_t *right = (fmat_t *)fts_get_object(at);
@@ -2959,12 +3127,14 @@ fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     for(i=0; i<m; i++)
       sum += l[i] * r[i];
     
-    fts_return_float(sum);
+    fts_set_float(ret, sum);
   }
   else if(n == 1)
     fmat_error_dimensions(self, right, "dot");
   else
     fts_object_error(o, "dot: matrices must be column vectors");
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -2973,8 +3143,8 @@ fmat_get_dot(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 *
 */
 
-static void
-fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_normalize(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int size = fmat_get_m(self) * fmat_get_n(self); 
@@ -3006,7 +3176,9 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /********************************************************************
@@ -3015,8 +3187,8 @@ fmat_normalize(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
 
-static void
-fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_reverse(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3043,11 +3215,13 @@ fmat_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_rotate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self); 
@@ -3130,7 +3304,9 @@ fmat_rotate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 static int 
@@ -3151,8 +3327,8 @@ fmat_element_compare_descending(const void *left, const void *right)
   return (l < r) - (r < l);
 }
 
-static void
-fmat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_sort(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3189,11 +3365,13 @@ fmat_sort(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_tros(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_tros(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3230,11 +3408,13 @@ fmat_tros(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_scramble(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3273,7 +3453,9 @@ fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   }  
     
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -3281,8 +3463,8 @@ fmat_scramble(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *  envelopes
  *
  */
-static void
-fmat_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_fade(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3341,11 +3523,13 @@ fmat_fade(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_lookup_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3383,11 +3567,13 @@ fmat_lookup_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
   }
   
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_lookup_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   float *ptr = fmat_get_ptr(self);
@@ -3400,11 +3586,13 @@ fmat_lookup_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     ptr[i] = bpf_get_interpolated(bpf, ptr[i]);
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
-    
-static void
-fmat_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+
+static fts_method_status_t
+fmat_env_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;  
   fts_object_t *obj = fts_get_object(at);
@@ -3455,11 +3643,13 @@ fmat_env_fmat_or_slice(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
   }
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_env_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;  
   bpf_t *bpf = (bpf_t *)fts_get_object(at);
@@ -3482,11 +3672,13 @@ fmat_env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
   }
 
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_apply_expr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   expr_t *expr = (expr_t *)fts_get_object(at);
@@ -3495,7 +3687,7 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   float *ptr = fmat_get_ptr(self);
   fts_hashtable_t locals;
   fts_atom_t key_self, key_x, value;
-  fts_atom_t ret;
+  fts_atom_t r;
   int i;
   
   fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
@@ -3514,20 +3706,20 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_set_float(&value, f);
     fts_hashtable_put(&locals, &key_x, &value);
 
-    expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
+    expr_evaluate(expr, &locals, ac - 1, at + 1, &r);
     
-    if(fts_is_number(&ret))
-      ptr[i] = fts_get_number_float(&ret);
+    if(fts_is_number(&r))
+      ptr[i] = fts_get_number_float(&r);
     else
       ptr[i] = 0.0;
   }
   
   fts_hashtable_destroy(&locals);
 
-  fts_set_void(fts_get_return_value());
-    
   fts_object_changed(o);
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
 /******************************************************************************
@@ -3536,8 +3728,8 @@ fmat_apply_expr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  *
  */
 
-static void
-fmat_import_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
 
@@ -3563,7 +3755,7 @@ fmat_import_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       if(m > 0)
       {
         fts_object_changed(o);
-        fts_return_object(o);
+        fts_set_object(ret, o);
       }
       else
         fts_object_error(o, "import: coudn't read any audio data from file \"%s\"", fts_symbol_name(file_name));
@@ -3571,10 +3763,12 @@ fmat_import_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     else
       fts_object_error(o, "import: cannot open audio file \"%s\"", fts_symbol_name(file_name));
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -3649,7 +3843,7 @@ fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       if(m * n > 0)
       {
         fts_object_changed(o);
-        fts_return_object(o);
+        fts_set_object(ret, o);
       }
       else
         fts_object_error(o, "import: coudn't read any text data from file \"%s\"", fts_symbol_name(file_name));
@@ -3657,10 +3851,12 @@ fmat_import_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     else
       fts_object_error(o, "import: cannot open text file \"%s\"", fts_symbol_name(file_name));
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_export_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -3685,17 +3881,19 @@ fmat_export_audiofile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
       fts_audiofile_close(sf);
 
       if(size > 0)
-        fts_return_object(o);
+        fts_set_object(ret, o);
       else
         fts_object_error(o, "export: coudn't write any audio data to file \"%s\"", fts_symbol_name(file_name));
     }
     else
       fts_object_error(o, "export: cannot create audio file \"%s\"", fts_symbol_name(file_name));
   }
+  
+  return fts_ok;
 }
 
-static void
-fmat_export_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -3731,13 +3929,15 @@ fmat_export_textfile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
       fts_atomfile_close(file);
       
       if(m * n > 0)
-        fts_return_object(o);
+        fts_set_object(ret, o);
       else
         fts_object_error(o, "export: coudn't write any text data to file \"%s\"", fts_symbol_name(file_name));
     }
     else
       fts_object_error(o, "export: cannot open audio file \"%s\"", fts_symbol_name(file_name));
   }
+  
+  return fts_ok;
 }
 
 /*********************************************************
@@ -3756,8 +3956,8 @@ fmat_editor_callback(fts_object_t *o, void *e)
     fmat_upload(self);
 }
 
-static void 
-fmat_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
@@ -3767,19 +3967,23 @@ fmat_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_object_add_listener(o, fmat_editor, fmat_editor_callback);
   
   fmat_upload(self);
+  
+  return fts_ok;
 }
 
-static void
-fmat_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   
   fmat_set_editor_close( self);
   fts_object_remove_listener(o, fmat_editor);
+  
+  return fts_ok;
 }
 
-static void 
-fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *) o;
   
@@ -3789,6 +3993,8 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
     fts_object_remove_listener(o, fmat_editor);
   }
+  
+  return fts_ok;
 }
 
 /********************************************************************
@@ -3797,8 +4003,8 @@ fmat_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  *
  */
 
-static void
-fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = fmat_get_m(self);
@@ -3830,11 +4036,13 @@ fmat_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     fts_spost(stream, "}\n");
   }
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -3869,6 +4077,8 @@ fmat_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   mess = fts_dumper_message_get(dumper, sym_sr);
   fts_message_append_float(mess, fmat_get_sr(self));
   fts_dumper_message_send(dumper, mess);
+  
+  return fts_ok;
 }
 
 /*********************************************************
@@ -3890,8 +4100,8 @@ fmat_initialize(fmat_t *self)
   self->opened = 0;
 }
 
-static void
-fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
   int m = 0;
@@ -3926,15 +4136,19 @@ fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   }
   else
     fmat_set_size(self, m, n);  
+  
+  return fts_ok;
 }
 
-static void
-fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fmat_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
 
   if(self->values != NULL)
     fts_free(self->values - HEAD_POINTS);
+  
+  return fts_ok;
 }
 
 /*********************************************************
@@ -3944,8 +4158,7 @@ fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-fmat_message (fts_class_t *cl, fts_symbol_t s, 
-              fts_method_t matrix_method, fts_method_t scalar_method)
+fmat_message (fts_class_t *cl, fts_symbol_t s, fts_method_t matrix_method, fts_method_t scalar_method)
 {
   if(matrix_method != NULL)
     fts_class_message(cl, s, fmat_class, matrix_method);

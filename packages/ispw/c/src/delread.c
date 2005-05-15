@@ -65,7 +65,7 @@ delread_set_delay(delread_t *this)
 }
 
 static void
-delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delread_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delread_t *this = (delread_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -94,7 +94,7 @@ delread_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-delread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delread_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delread_t *this = (delread_t *)o;
 
@@ -112,7 +112,7 @@ delread_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delread_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delread_t *this = (delread_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -168,7 +168,7 @@ delread_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-delread_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delread_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delread_t *this = (delread_t *)o;
   this->time = fts_get_float_arg(ac, at, 0, 0.0f);

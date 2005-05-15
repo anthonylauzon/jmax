@@ -31,7 +31,7 @@ typedef struct
 } speedlim_t;
 
 static void
-speedlim_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+speedlim_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   speedlim_t *this = (speedlim_t *)o;
 
@@ -59,7 +59,7 @@ speedlim_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-speedlim_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+speedlim_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   speedlim_t *this = (speedlim_t *)o;
 
@@ -79,7 +79,7 @@ speedlim_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-speedlim_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+speedlim_set_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   speedlim_t *this = (speedlim_t *)o;
   double time = fts_get_number_float(at);
@@ -91,7 +91,7 @@ speedlim_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-speedlim_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+speedlim_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   speedlim_t *this = (speedlim_t *)o;
 
@@ -100,7 +100,7 @@ speedlim_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->time = 0.0;
 
   if(ac > 0 && fts_is_number(at))
-    speedlim_set_time(o, 0, 0, 1, at);
+    speedlim_set_time(o, 0, 1, at, fts_nix);
 }
 
 static void

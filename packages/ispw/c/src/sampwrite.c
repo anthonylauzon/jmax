@@ -39,7 +39,7 @@ typedef struct
 } sampwrite_t;
 
 static void
-sampwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sampwrite_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampwrite_t *this = (sampwrite_t *)o;
 
@@ -64,7 +64,7 @@ sampwrite_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-sampwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sampwrite_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampwrite_t *this = (sampwrite_t *)o;
 
@@ -83,7 +83,7 @@ sampwrite_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 static fts_symbol_t dsp_symbol = 0;
 
 static void
-sampwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sampwrite_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampwrite_t *this = (sampwrite_t *)o;
   fts_atom_t argv[3];
@@ -115,7 +115,7 @@ sampwrite_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 
 static void
-sampwrite_bang(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sampwrite_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampwrite_t *this = (sampwrite_t *)o;
   const long zero = 0;
@@ -124,7 +124,7 @@ sampwrite_bang(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 }
 
 static void
-sampwrite_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sampwrite_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampwrite_t *this = (sampwrite_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -146,7 +146,7 @@ sampwrite_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-sampwrite_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sampwrite_set_by_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sampwrite_t *this = (sampwrite_t *)o;
   char name_str[64];

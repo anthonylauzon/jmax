@@ -67,7 +67,7 @@ wave_data_set_ptr(ftl_data_t ftl_data, float *ptr)
  */
 
 static void 
-wave_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wave_set_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   wave_t *this = (wave_t *)o;
   fmat_t *fmat = (fmat_t *)fts_get_object(at);
@@ -86,7 +86,7 @@ wave_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
 
 static void
-wave_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wave_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   wave_t *this = (wave_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -126,7 +126,7 @@ wave_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  */
 
 static void
-wave_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wave_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   wave_t *this = (wave_t *)o;
 
@@ -143,14 +143,14 @@ wave_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   else if(ac == 1 && fts_is_a(at, fmat_class))
     {
       this->fmat = 1;
-      wave_set_fmat(o, 0, 0, 1, at);
+      wave_set_fmat(o, 0, 1, at, fts_nix);
     }
   else
     fts_object_error(o, "bad arguments");
 }
 
 static void
-wave_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wave_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   wave_t *this = (wave_t *)o;
 

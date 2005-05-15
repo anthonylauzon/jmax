@@ -41,10 +41,9 @@ wavetable_load(wavetab_t *wavetab)
       int i;
       float* tmp = &buf[0];
 
-      if(!fts_audiofile_is_valid(sf))
+      if(sf == NULL)
 	{
 	  fts_post("tab1~: %s: can't open wave table file\n", file_name);
-	  fts_audiofile_close(sf);
 	  return;
 	}
       

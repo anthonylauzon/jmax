@@ -32,7 +32,7 @@ typedef struct
 } range_t;
 
 static void
-range_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   range_t *this = (range_t *)o;
   int v = fts_get_int(at);
@@ -60,7 +60,7 @@ range_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   range_t *this = (range_t *)o;
   float v = fts_get_float(at);
@@ -88,9 +88,10 @@ range_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-range_set_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_set_point(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   range_t *this = (range_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
   int i = winlet - 1;
 
   if(fts_is_int(at))
@@ -110,7 +111,7 @@ range_set_point(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-range_set_points(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_set_points(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   range_t *this = (range_t *)o;
   int i;
@@ -142,7 +143,7 @@ range_set_points(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  *
  */
 static void
-range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   range_t *this = (range_t *)o;
   int n;
@@ -155,7 +156,7 @@ range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->i_points = fts_zalloc(sizeof(int) * n);
   this->f_points = fts_zalloc(sizeof(float) * n);
 
-  range_set_points(o, 0, 0, ac, at);
+  range_set_points(o, 0, ac, at, fts_nix);
 
   this->n = n;
 
@@ -164,7 +165,7 @@ range_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-range_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+range_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   range_t *this = (range_t *)o;
 

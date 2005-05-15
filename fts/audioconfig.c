@@ -348,7 +348,7 @@ fts_audioconfig_set_defaults(fts_audioconfig_t* audioconfig)
 #define AUDIO_CONFIG_DEBUG
 
 static void
-audioconfig_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
@@ -414,7 +414,7 @@ audioconfig_upload_label(fts_object_t *o, fts_audiolabel_t *label, int index)
 }
 
 static void
-audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_insert_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int index = fts_get_int(at);
@@ -440,10 +440,10 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
   
   if (6 == ac)
   {
-    fts_send_message((fts_object_t*)label, fts_s_input, 1, at + 2);
-    fts_send_message((fts_object_t*)label, fts_new_symbol("input_channel"), 1, at + 3);
-    fts_send_message((fts_object_t*)label, fts_s_output, 1, at + 4);
-    fts_send_message((fts_object_t*)label, fts_new_symbol("output_channel"), 1, at + 5);
+    fts_send_message((fts_object_t*)label, fts_s_input, 1, at + 2, fts_nix);
+    fts_send_message((fts_object_t*)label, fts_new_symbol("input_channel"), 1, at + 3, fts_nix);
+    fts_send_message((fts_object_t*)label, fts_s_output, 1, at + 4, fts_nix);
+    fts_send_message((fts_object_t*)label, fts_new_symbol("output_channel"), 1, at + 5, fts_nix);
   }
 
   audioconfig_upload_label(o, label, index);
@@ -451,7 +451,7 @@ audioconfig_insert_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 
 
 static void
-audioconfig_remove_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_remove_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int index = fts_get_int(at);
@@ -599,7 +599,7 @@ fts_audioconfig_dump( fts_audioconfig_t *this, fts_bmax_file_t *f)
 }
 
 static void 
-audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_buffer_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   int buffer_size = fts_get_int(at);
@@ -615,7 +615,7 @@ audioconfig_buffer_size(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_sample_rate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 /* #warning NOT YET IMPLEMENTED (audioconfig_sample_rate) */
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
@@ -632,7 +632,7 @@ audioconfig_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+audioconfig_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t *self = (fts_audioconfig_t *)o;
   fts_audiolabel_t* label = self->labels;
@@ -664,16 +664,17 @@ audioconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 
 static void
-audioconfig_set_to_defaults(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_set_to_defaults(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
-  audioconfig_clear(o, winlet, fts_s_clear, 0, 0);
-  audioconfig_upload(o, winlet, fts_s_upload, 0, 0);
+  
+  audioconfig_clear(o, fts_s_clear, 0, 0, fts_nix);
+  audioconfig_upload(o, fts_s_upload, 0, 0, fts_nix);
   fts_config_set_dirty((fts_config_t*)fts_config_get(), 0);
 }
 
 static void
-audioconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
   fts_audiolabel_t* label = self->labels;
@@ -700,7 +701,7 @@ audioconfig_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 
@@ -709,7 +710,7 @@ audioconfig_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-audioconfig_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audioconfig_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioconfig_t* self = (fts_audioconfig_t*)o;
 }

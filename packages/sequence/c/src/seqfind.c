@@ -36,7 +36,7 @@ typedef struct _seqfind_
  */
 
 static void
-seqfind_all_values(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_all_values(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqfind_t *this = (seqfind_t *)o;
   event_t *event = track_get_first(this->track);
@@ -56,7 +56,7 @@ seqfind_all_values(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-seqfind_first_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_first_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqfind_t *this = (seqfind_t *)o;
   event_t *event = track_get_first(this->track);
@@ -78,7 +78,7 @@ seqfind_first_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-seqfind_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_event(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqfind_t *this = (seqfind_t *)o;
   track_t *track = this->track;
@@ -117,7 +117,7 @@ seqfind_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-seqfind_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_segment(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqfind_t *this = (seqfind_t *)o;
   track_t *track = this->track;
@@ -160,7 +160,7 @@ seqfind_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-seqfind_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_set_track(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqfind_t *this = (seqfind_t *)o;
 
@@ -176,7 +176,7 @@ seqfind_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  */
 
 static void
-seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqfind_t *this = (seqfind_t *)o;
 
@@ -192,7 +192,7 @@ seqfind_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-seqfind_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqfind_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqfind_t *this = (seqfind_t *)o;
 

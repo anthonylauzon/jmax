@@ -941,7 +941,7 @@ static fts_object_t *fts_run_mess_vm( fts_object_t *parent, fts_binary_file_desc
 	    p += 4;
 
 
-	    fts_send_message(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos]);
+	    fts_send_message(object_stack[object_tos], sel, nargs, &eval_stack[eval_tos], fts_nix);
 	  }
 	break;
 
@@ -2024,7 +2024,7 @@ void fts_save_selection_as_bmax( FILE *file, fts_object_t *selection)
  */
 
 static void
-saver_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+saver_dumper_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   saver_dumper_t *this = (saver_dumper_t *)o;
   
@@ -2034,13 +2034,13 @@ saver_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-saver_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+saver_dumper_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dumper_init((fts_dumper_t *)o, saver_dumper_send);
 }
   
 static void
-saver_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+saver_dumper_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dumper_destroy((fts_dumper_t *)o);
 }

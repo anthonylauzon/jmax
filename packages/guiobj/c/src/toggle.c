@@ -30,7 +30,7 @@ typedef struct
 } toggle_t;
 
 static void 
-toggle_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t *self = (toggle_t *) o;
   fts_atom_t a;
@@ -40,7 +40,7 @@ toggle_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void 
-toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t *self = (toggle_t *) o;
 
@@ -58,17 +58,17 @@ toggle_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-toggle_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t *self = (toggle_t *) o;
 
-  toggle_set(o, 0, 0, 1, at);
+  toggle_set(o, 0, 1, at, fts_nix);
 
   fts_outlet_int(o, 0, self->value);
 }
 
 static void 
-toggle_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_toggle(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t *self = (toggle_t *) o;
 
@@ -80,7 +80,7 @@ toggle_toggle(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+toggle_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   FILE *file;
   fts_atom_t xa, ya, wa;
@@ -95,7 +95,7 @@ toggle_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-toggle_dump_state(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+toggle_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t* self = (toggle_t*)o;
   fts_dumper_t* dumper = (fts_dumper_t*)fts_get_object(at);
@@ -106,7 +106,7 @@ toggle_dump_state(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-toggle_dump_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+toggle_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t* self = (toggle_t*)o;
   fts_dumper_t* dumper = (fts_dumper_t*)fts_get_object(at);
@@ -115,7 +115,7 @@ toggle_dump_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-toggle_update_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+toggle_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t* self = (toggle_t*)o;
   fts_atom_t a;
@@ -125,7 +125,7 @@ toggle_update_gui(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-toggle_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+toggle_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   toggle_t* self = (toggle_t*)o;
   

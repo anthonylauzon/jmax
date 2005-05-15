@@ -36,7 +36,7 @@ typedef struct {
 } wrap_t;
 
 static void
-wrap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wrap_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   wrap_t *this = (wrap_t *)o;
   float a = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -55,7 +55,7 @@ wrap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-wrap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wrap_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 
@@ -66,7 +66,7 @@ wrap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-wrap_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wrap_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   wrap_t *this = (wrap_t *)o;
   float f = fts_get_number_float(at);
@@ -104,7 +104,7 @@ wrap_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-wrap_a(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wrap_a(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   wrap_t *this = (wrap_t *)o;
   float a = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -120,7 +120,7 @@ wrap_a(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 }
 
 static void
-wrap_b(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+wrap_b(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   wrap_t *this = (wrap_t *)o;
   float b = fts_get_float_arg(ac, at, 0, 0.0f);

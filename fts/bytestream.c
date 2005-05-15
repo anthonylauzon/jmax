@@ -66,9 +66,10 @@ void fts_bytestream_set_output(fts_bytestream_t *stream, fts_bytestream_output_t
   stream->flush = flush;
 }
 
-static void
-fts_bytestream_bytestream(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
+static fts_method_status_t
+fts_bytestream_bytestream(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{  
+  return fts_ok;
 }
 
 void fts_bytestream_class_init(fts_class_t *cl)
@@ -174,7 +175,8 @@ static void fts_memorystream_flush(fts_bytestream_t *stream)
 {
 }
 
-static void fts_memorystream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fts_memorystream_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_memorystream_t *this = (fts_memorystream_t *) o;
 
@@ -186,15 +188,20 @@ static void fts_memorystream_init( fts_object_t *o, int winlet, fts_symbol_t s, 
 			    fts_memorystream_flush);
   
   fts_stack_init( &this->output_buffer, unsigned char);
+  
+  return fts_ok;
 }
 
-static void fts_memorystream_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+fts_memorystream_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_memorystream_t *this = (fts_memorystream_t *) o;
 
   fts_bytestream_destroy((fts_bytestream_t *) this);
 
   fts_stack_destroy( &this->output_buffer);
+  
+  return fts_ok;
 }
 
 static void fts_memorystream_instantiate(fts_class_t *cl)

@@ -122,7 +122,7 @@ typedef struct
 } fts_key_t;
 
 static void
-key_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+key_multi_action(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int code = fts_get_int(at + 0);
   int status = fts_get_int(at + 1);
@@ -134,7 +134,7 @@ key_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-key_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+key_action(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int status = fts_get_int(at + 1);
 
@@ -145,7 +145,7 @@ key_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+key_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_key_t *this = (fts_key_t *)o;
 
@@ -176,7 +176,7 @@ key_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-key_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+key_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_key_t *this = (fts_key_t *)o;
 
@@ -201,7 +201,7 @@ key_instantiate(fts_class_t *cl)
  */
 
 static void
-keystat_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+keystat_multi_action(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   int code = fts_get_int(at + 0);
   int status = fts_get_int(at + 1);
@@ -211,7 +211,7 @@ keystat_multi_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-keystat_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+keystat_action(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   int status = fts_get_int(at + 1);
 
@@ -219,7 +219,7 @@ keystat_action(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+keystat_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_key_t *this = (fts_key_t *)o;
 
@@ -252,7 +252,7 @@ keystat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-keystat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+keystat_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_key_t *this = (fts_key_t *)o;
 

@@ -75,7 +75,7 @@ env_set_current(env_t *this, bpf_t *bpf)
  */
 
 static void 
-env_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_output_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang(o, 1);
 }
@@ -189,7 +189,7 @@ env_continue(env_t *this)
 }
 
 static void 
-env_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
   bpf_t *bpf = (bpf_t *)fts_get_object(at);
@@ -198,16 +198,16 @@ env_set_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-env_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
-  env_set_bpf(o, 0, 0, 1, at);
+  env_set_bpf(o, 0, 1, at, fts_nix);
   env_start(this);
 }
 
 static void 
-env_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
   double value = fts_get_float(at);
@@ -224,7 +224,7 @@ env_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-env_set_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_array(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
   bpf_t *bpf = this->local;
@@ -266,28 +266,28 @@ env_set_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-env_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_array(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
   if(ac)
     {
-      env_set_array(o, 0, 0, ac, at);
+      env_set_array(o, 0, ac, at, fts_nix);
       env_start(this);
     }
 }
 
 static void 
-env_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac == 1 && fts_is_a(at, bpf_type))
-    env_set_bpf(o, 0, 0, 1, at);
+    env_set_bpf(o, 0, 1, at, fts_nix);
   else
-    env_set_array(o, 0, 0, ac, at);
+    env_set_array(o, 0, ac, at, fts_nix);
 }
 
 static void 
-env_adsr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_adsr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
   bpf_t *bpf = this->local;
@@ -349,7 +349,7 @@ env_adsr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void 
-env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
   
@@ -357,7 +357,7 @@ env_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-env_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_go(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
@@ -365,7 +365,7 @@ env_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 }
 
 static void
-env_release(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_release(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
@@ -373,7 +373,7 @@ env_release(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-env_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_speed(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
@@ -396,7 +396,7 @@ env_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-env_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
@@ -419,7 +419,7 @@ env_reset(env_t *this, int n_tick, double sr)
 }
 
 static void
-env_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -551,7 +551,7 @@ env_ftl(fts_word_t *argv)
  */
 
 static void
-env_set_mode_sustain(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_mode_sustain(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
@@ -559,7 +559,7 @@ env_set_mode_sustain(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-env_set_mode_continue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_set_mode_continue(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 
@@ -567,7 +567,7 @@ env_set_mode_continue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   env_t *this = (env_t *)o;
 
@@ -592,13 +592,13 @@ env_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
   this->editid = 0;
 
-  env_set(o, 0, 0, ac, at);
+  env_set(o, 0, ac, at, fts_nix);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-env_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+env_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   env_t *this = (env_t *)o;
 

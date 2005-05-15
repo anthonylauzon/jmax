@@ -32,7 +32,7 @@ typedef struct
 } mtof_t;
 
 static void
-mtof_tune(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mtof_tune(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mtof_t *this = (mtof_t *)o;
 
@@ -63,7 +63,7 @@ mtof_tune(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     }
 }
 static void
-mtof_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mtof_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mtof_t *this = (mtof_t *)o;
   double midi = fts_get_number_float(at);
@@ -73,7 +73,7 @@ mtof_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-ftom_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ftom_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mtof_t *this = (mtof_t *)o;
   double freq = fts_get_number_float(at);
@@ -88,14 +88,14 @@ ftom_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-mtof_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mtof_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mtof_t *this = (mtof_t *)o;
 
   this->ref_note = 69.0;
   this->ref_freq = 440.0;
 
-  mtof_tune(o, 0, 0, ac, at);
+  mtof_tune(o, 0, ac, at, fts_nix);
 }
 
 static void

@@ -60,9 +60,10 @@ sync_output(sync_t *this)
 }
 
 static void
-sync_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sync_t *this = (sync_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
   unsigned int bit = 1 << winlet;
   
   fts_atom_assign(this->a + winlet, at);
@@ -118,7 +119,7 @@ sync_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
 }
 
 static void
-sync_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_set_trigger(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sync_t *this = (sync_t *)o;
 
@@ -126,7 +127,7 @@ sync_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sync_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_set_require(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sync_t *this = (sync_t *)o;
   unsigned int once = 0;
@@ -139,7 +140,7 @@ sync_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sync_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_set_mode(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sync_t *this = (sync_t *)o;
   fts_symbol_t mode = fts_get_symbol(at);
@@ -169,7 +170,7 @@ sync_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-sync_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_set_mode_any(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sync_t *this = (sync_t *)o;
 
@@ -180,7 +181,7 @@ sync_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-sync_set_mode_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_set_mode_all(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sync_t *this = (sync_t *)o;
 
@@ -193,7 +194,7 @@ sync_set_mode_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  *
  */
 static void
-sync_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sync_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   sync_t *this = (sync_t *)o;
   int n = 0;

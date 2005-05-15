@@ -34,7 +34,7 @@ static fts_symbol_t sym_f = 0;
 static fts_symbol_t sym_i = 0;
 
 static void
-unpack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+unpack_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   unpack_t *this = (unpack_t *)o;
   int i;
@@ -68,7 +68,7 @@ unpack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+unpack_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   unpack_t *this = (unpack_t *)o;
   int i;
@@ -110,7 +110,7 @@ unpack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-unpack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+unpack_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   unpack_t *this = (unpack_t *)o;
 

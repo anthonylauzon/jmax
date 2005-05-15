@@ -44,7 +44,7 @@ void dtd_thread_set_state(dtd_thread_t* self,
 
 
 static void
-dtd_thread_read(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dtd_thread_read(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     dtd_thread_t* self = (dtd_thread_t*)o;
     dtd_buffer_t* com_buffer;
@@ -78,7 +78,7 @@ dtd_thread_read(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-dtd_thread_write(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dtd_thread_write(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     dtd_thread_t* self = (dtd_thread_t*)o;
     dtd_buffer_t* com_buffer;
@@ -122,7 +122,7 @@ dtd_thread_write(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 static void
-dtd_thread_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dtd_thread_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     dtd_thread_t* self = (dtd_thread_t*)o;
 
@@ -132,7 +132,7 @@ dtd_thread_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-dtd_thread_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dtd_thread_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     dtd_thread_t* self = (dtd_thread_t*)o;
     self->sf = 0;

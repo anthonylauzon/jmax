@@ -299,8 +299,8 @@ midievent_copy_function(const fts_object_t *from, fts_object_t *to)
   midievent_copy((fts_midievent_t *)from, (fts_midievent_t *)to);
 }
 
-static void
-midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+midievent_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
@@ -409,18 +409,22 @@ midievent_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
         break;
     }
   }
+  
+  return fts_ok;
 }
   
-static void
-_midievent_get_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_get_type(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
-  fts_return_symbol(fts_midi_types[this->type]);
+  fts_set_symbol(ret, fts_midi_types[this->type]);
+  
+  return fts_ok;
 }
 
-static void
-_midievent_set_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_set_first(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
@@ -455,25 +459,29 @@ _midievent_set_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
     else
       fts_midievent_song_select_set(this, byte);
   }
+  
+  return fts_ok;
 }
 
-static void
-_midievent_get_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_get_first(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
   if(fts_midievent_is_channel_message(this))
-    fts_return_int(fts_midievent_channel_message_get_first(this));
+    fts_set_int(ret, fts_midievent_channel_message_get_first(this));
   
   else if(fts_midievent_is_song_position_pointer(this))
-    fts_return_int(fts_midievent_song_position_pointer_get_first(this));
+    fts_set_int(ret, fts_midievent_song_position_pointer_get_first(this));
   
   else if(fts_midievent_is_song_select(this))
-    fts_return_int(fts_midievent_song_select_get(this));
+    fts_set_int(ret, fts_midievent_song_select_get(this));
+  
+  return fts_ok;
 }
 
-static void
-_midievent_set_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_set_second(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
@@ -499,22 +507,26 @@ _midievent_set_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
     else
       fts_midievent_song_position_pointer_set_second(this, byte);
   }
+  
+  return fts_ok;
 }
 
-static void
-_midievent_get_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_get_second(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
   if(fts_midievent_is_channel_message(this) && fts_midievent_channel_message_has_second_byte(this))
-    fts_return_int(fts_midievent_channel_message_get_second(this));
+    fts_set_int(ret, fts_midievent_channel_message_get_second(this));
   
   else if(fts_midievent_is_song_position_pointer(this))
-    fts_return_int(fts_midievent_song_position_pointer_get_second(this));
+    fts_set_int(ret, fts_midievent_song_position_pointer_get_second(this));
+  
+  return fts_ok;
 }
 
-static void
-_midievent_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_set_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
@@ -529,30 +541,36 @@ _midievent_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
     else
       fts_midievent_channel_message_set_second(this, channel);
   }
+  
+  return fts_ok;
 }
 
-static void
-_midievent_get_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_get_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
   if(fts_midievent_is_channel_message(this))
-    fts_return_int(fts_midievent_channel_message_get_channel(this));
+    fts_set_int(ret, fts_midievent_channel_message_get_channel(this));
+  
+  return fts_ok;
 }
 
-static void
-_midievent_get_status(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_midievent_get_status(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
 
   if(fts_midievent_is_channel_message(this))
-    fts_return_int(fts_midievent_channel_message_get_status_byte(this));
+    fts_set_int(ret, fts_midievent_channel_message_get_status_byte(this));
   else if(fts_midievent_is_song_position_pointer(this))
-    fts_return_int(fts_midievent_song_position_pointer_status_byte);
+    fts_set_int(ret, fts_midievent_song_position_pointer_status_byte);
   else if(fts_midievent_is_song_select(this))
-    fts_return_int(fts_midievent_song_select_status_byte);
+    fts_set_int(ret, fts_midievent_song_select_status_byte);
   else if(fts_midievent_is_real_time(this))
-    fts_return_int(fts_midievent_real_time_get_status_byte(this));
+    fts_set_int(ret, fts_midievent_real_time_get_status_byte(this));
+  
+  return fts_ok;
 }
 
 static void
@@ -620,20 +638,24 @@ midievent_description_function(fts_object_t *o, fts_array_t *array)
   midievent_array_function(o, array);
 }
 
-static void
-midievent_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+midievent_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0)
-    midievent_set(o, 0, 0, ac, at);
+    midievent_set(o, NULL, ac, at, fts_nix);
+  
+  return fts_ok;
 }
 
-static void
-midievent_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+midievent_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *this = (fts_midievent_t *)o;
   
   if(fts_midievent_is_system_exclusive(this))
     fts_array_destroy(&this->data.system_exclusive);
+  
+  return fts_ok;
 }
 
 static void

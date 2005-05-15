@@ -69,7 +69,7 @@ static void consolestream_flush( fts_bytestream_t *stream)
 {
 }
 
-static void consolestream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void consolestream_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   consolestream_t *this = (consolestream_t *) o;
 
@@ -83,12 +83,12 @@ static void consolestream_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_stack_init( &this->line_buffer, char);
 }
 
-static void consolestream_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void consolestream_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_set_default_console_stream( (fts_bytestream_t *)NULL);
 }
 
-static void consolestream_set_default( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void consolestream_set_default(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_set_default_console_stream( (fts_bytestream_t *)o);
 }

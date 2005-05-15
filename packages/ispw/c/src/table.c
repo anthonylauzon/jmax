@@ -45,7 +45,7 @@ typedef struct
 static int quantile(ivec_t *vec, int n);
 
 static void
-table_store_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_store_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *)o;
 
@@ -54,7 +54,7 @@ table_store_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
 /* set and get single elements */
 static void
-table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *)o;
   ivec_t *vec = this->vec;
@@ -76,18 +76,18 @@ table_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-table_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ((ac >= 2) && (fts_is_number(&at[1])))
-    table_store_value(o, winlet, s, 1, at + 1);
+    table_store_value(o, s, 1, at + 1, fts_nix);
 
   if ((ac >= 1) && (fts_is_number(&at[0])))
-    table_index(o, winlet, s, 1, at + 0);
+    table_index(o, s, 1, at + 0, fts_nix);
 }
 
 /* set by atom list */
 static void
-table_set_with_onset_from_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_set_with_onset_from_atoms(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
   int offset;
@@ -99,7 +99,7 @@ table_set_with_onset_from_atoms(fts_object_t *o, int winlet, fts_symbol_t s, int
 }
 
 static void
-table_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
 
@@ -107,7 +107,7 @@ table_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-table_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_const(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
 
@@ -120,7 +120,7 @@ table_const(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-table_inv(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_inv(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
   int value = fts_get_int(at);
@@ -138,7 +138,7 @@ table_inv(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-table_get_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_get_random(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
 
@@ -146,7 +146,7 @@ table_get_random(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-table_quantile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_quantile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
   int n = fts_get_int(at);
@@ -155,7 +155,7 @@ table_quantile(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-table_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_sum(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
 
@@ -163,11 +163,11 @@ table_sum(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ivec_t *vec = ((table_t *)o)->vec;
 
-  fts_send_message((fts_object_t *)vec, fts_s_size, ac, at);
+  fts_send_message((fts_object_t *)vec, fts_s_size, ac, at, fts_nix);
 }
 
 /*********************************************************************
@@ -177,7 +177,7 @@ table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-table_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *)o;
   
@@ -199,7 +199,7 @@ get_int_property( fts_object_t *object, fts_symbol_t property_name, int def)
 
 #define MAX_ATOMS_PER_LINE 16
 
-static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void table_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *) o;
   FILE *file;
@@ -272,7 +272,7 @@ static void table_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
  */
 
 static void
-table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *)o;
   fts_atom_t a;
@@ -325,7 +325,7 @@ table_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *)o;
 
@@ -336,7 +336,7 @@ table_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-table_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+table_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   table_t *this = (table_t *)o;
   fts_atom_t a;

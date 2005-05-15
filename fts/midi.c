@@ -130,7 +130,7 @@ fts_midififo_poll(fts_midififo_t *fifo)
       fts_timebase_add_call(fts_get_timebase(), entry->port, fts_midiport_input, &a, delay);
     } 
     else
-      fts_midiport_input(entry->port, 0, 0, 1, &a);
+      fts_midiport_input(entry->port, 0, 1, &a, fts_nix);
       
     fts_object_release(entry->event);
       
@@ -247,7 +247,7 @@ fts_midiport_remove_listener(fts_midiport_t *port, enum midi_type type, int chan
 }
 
 void
-fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_midiport_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiport_t *port = (fts_midiport_t *)o;
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
@@ -266,7 +266,7 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     l = type_list[onset + channel];
     while(l)
     {
-      l->callback(l->listener, 0, 0, 1, at);
+      l->callback(l->listener, 0, 1, at, fts_nix);
       l = l->next;
     }
 
@@ -274,7 +274,7 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     l = type_list[onset];
     while(l)
     {
-      l->callback(l->listener, 0, 0, 1, at);
+      l->callback(l->listener, 0, 1, at, fts_nix);
       l = l->next;
     }
   }
@@ -285,7 +285,7 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     l = type_list[channel];
     while(l)
     {
-      l->callback(l->listener, 0, 0, 1, at);
+      l->callback(l->listener, 0, 1, at, fts_nix);
       l = l->next;
     }
   }
@@ -294,7 +294,7 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   l = type_list[0];
   while(l)
   {
-    l->callback(l->listener, 0, 0, 1, at);
+    l->callback(l->listener, 0, 1, at, fts_nix);
     l = l->next;
   }
 
@@ -302,7 +302,7 @@ fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   l = *(port->listeners[0]);
   while(l)
   {
-    l->callback(l->listener, 0, 0, 1, at);
+    l->callback(l->listener, 0, 1, at, fts_nix);
     l = l->next;
   }
 }
@@ -445,11 +445,11 @@ midibus_output(fts_object_t *o, fts_midievent_t *event, double time)
   fts_atom_t a;
 
   fts_set_object(&a, event);
-  fts_midiport_input(o, 0, 0, 1, &a);
+  fts_midiport_input(o, 0, 1, &a, fts_nix);
 }
 
 static void
-midibus_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midibus_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 
@@ -459,7 +459,7 @@ midibus_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-midibus_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midibus_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 
@@ -485,7 +485,7 @@ midinull_output(fts_object_t *o, fts_midievent_t *event, double time)
 }
 
 static void
-midinull_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midinull_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 
@@ -495,7 +495,7 @@ midinull_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-midinull_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midinull_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiport_t *this = (fts_midiport_t *)o;
 
@@ -623,7 +623,7 @@ midimanagers_get_input(fts_symbol_t device_name, fts_symbol_t label_name)
     fts_set_symbol(args + 2, label_name);
       
     for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
-      fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_input, 3, args);
+      fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_input, 3, args, fts_nix);
   }
 
   return port;      
@@ -644,7 +644,7 @@ midimanagers_get_output(fts_symbol_t device_name, fts_symbol_t label_name)
     fts_set_symbol(args + 2, label_name);
       
     for(mm = midimanagers; mm != NULL && port == NULL; mm = mm->next)
-      fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_output, 3, args);
+      fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_output, 3, args, fts_nix);
   }
       
   return port;
@@ -659,12 +659,12 @@ midimanagers_get_device_names(void)
   fts_set_pointer(&arg, &midiconfig_inputs);
   
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_midimanager_s_append_input_names, 1, &arg);
+    fts_send_message((fts_object_t *)mm, fts_midimanager_s_append_input_names, 1, &arg, fts_nix);
 
   fts_set_pointer(&arg, &midiconfig_outputs);
   
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_midimanager_s_append_output_names, 1, &arg);
+    fts_send_message((fts_object_t *)mm, fts_midimanager_s_append_output_names, 1, &arg, fts_nix);
 }
 
 static fts_symbol_t
@@ -677,7 +677,7 @@ midimanagers_get_default_input(void)
   fts_set_pointer(&arg, &name);
 
   for(mm = midimanagers; mm != NULL && name == NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_default_input, 1, &arg);
+    fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_default_input, 1, &arg, fts_nix);
 
   return name;
 }
@@ -692,7 +692,7 @@ midimanagers_get_default_output(void)
   fts_set_pointer(&arg, &name);
 
   for(mm = midimanagers; mm != NULL && name == NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_default_output, 1, &arg); 
+    fts_send_message((fts_object_t *)mm, fts_midimanager_s_get_default_output, 1, &arg, fts_nix);
 
   return name;
 }
@@ -1099,7 +1099,7 @@ fts_midiconfig_remove_listener(fts_object_t *obj)
 fts_class_t *fts_midiconfig_class;
 
 static void
-midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
 
@@ -1111,7 +1111,7 @@ midiconfig_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-midiconfig_restore_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_restore_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   fts_symbol_t name = fts_get_symbol(at);
@@ -1143,7 +1143,7 @@ midiconfig_restore_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-midiconfig_insert_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_insert_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   int index = fts_get_int(at);
@@ -1157,7 +1157,7 @@ midiconfig_insert_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-midiconfig_remove_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_remove_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   int index = fts_get_int(at);
@@ -1170,7 +1170,7 @@ midiconfig_remove_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-midiconfig_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   int index = fts_get_int(at);
@@ -1184,7 +1184,7 @@ midiconfig_input( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-midiconfig_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   int index = fts_get_int(at);
@@ -1198,7 +1198,7 @@ midiconfig_output( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-midiconfig_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   fts_midilabel_t *label = this->labels;
@@ -1250,17 +1250,17 @@ fts_midiconfig_dump( fts_midiconfig_t *this, fts_bmax_file_t *f)
 }
 
 static void
-midiconfig_set_to_defaults( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_set_to_defaults(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  midiconfig_clear( o, winlet, fts_s_clear, 0, 0);
+  midiconfig_clear( o, fts_s_clear, 0, 0, fts_nix);
   /* this->file_name = NULL; */
-  midiconfig_upload( o, winlet, fts_s_upload, 0, 0); 
+  midiconfig_upload( o, fts_s_upload, 0, 0, fts_nix); 
   
   fts_config_set_dirty( (fts_config_t *)fts_config_get(), 0);
 }
 
 static void
-midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   fts_midilabel_t *label = this->labels;
@@ -1276,11 +1276,11 @@ midiconfig_print( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
   /* redirect to MIDI managers */
   for(mm = midimanagers; mm != NULL; mm = mm->next)
-    fts_send_message((fts_object_t *)mm, fts_s_print, ac, at);
+    fts_send_message((fts_object_t *)mm, fts_s_print, ac, at, fts_nix);
 }
 
 static void
-midiconfig_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
   fts_atom_t a;
@@ -1294,7 +1294,7 @@ midiconfig_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-midiconfig_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiconfig_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midiconfig_t *this = (fts_midiconfig_t *)o;
 

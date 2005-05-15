@@ -121,7 +121,7 @@ static void fts_socketstream_flush(fts_bytestream_t *stream)
 }
 
 /* Argument: <INT> socket */
-static void fts_socketstream_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_socketstream_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_socketstream_t *this = (fts_socketstream_t *) o;
 
@@ -145,7 +145,7 @@ static void fts_socketstream_init( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_sched_add( (fts_object_t *)this, FTS_SCHED_READ, this->socket);
 }
 
-static void fts_socketstream_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_socketstream_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_socketstream_t *this = (fts_socketstream_t *) o;
 
@@ -160,7 +160,7 @@ static void fts_socketstream_delete( fts_object_t *o, int winlet, fts_symbol_t s
   fts_bytestream_destroy((fts_bytestream_t *) this);
 }
 
-static void fts_socketstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_socketstream_receive(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 #define NN 1024
   fts_socketstream_t *this = (fts_socketstream_t *) o;
@@ -252,7 +252,7 @@ int fts_udpstream_get_output_port(fts_udpstream_t* stream)
    udpstream <input> <output> : can receive and send
    udpstream <->     <output> : can send  
 */
-static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void fts_udpstream_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_udpstream_t* self = (fts_udpstream_t*)o;
   struct sockaddr_in addr;
@@ -351,7 +351,7 @@ static void fts_udpstream_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
   fts_log( "[udpstream]: created with port %d \n", self->in_port);
 }
 
-static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void fts_udpstream_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_udpstream_t* self = (fts_udpstream_t*)o;
   
@@ -368,7 +368,7 @@ static void fts_udpstream_delete(fts_object_t* o, int winlet, fts_symbol_t s, in
   fts_bytestream_destroy((fts_bytestream_t*)self);
 }
 
-static void fts_udpstream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_udpstream_receive(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 #define NN 1024
   fts_socketstream_t* self = (fts_socketstream_t *) o;

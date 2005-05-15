@@ -24,7 +24,7 @@
 #include <fts/fts.h>
 
 static void
-loadbang_load_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loadbang_load_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang(o, 0);
 }

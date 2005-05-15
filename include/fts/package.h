@@ -136,6 +136,9 @@ FTS_API void fts_package_get_class_names(fts_package_t* pkg, fts_iterator_t* ite
  * @ingroup package */
 FTS_API fts_class_t* fts_package_get_class(fts_package_t* pkg, fts_symbol_t name);
 
+FTS_API void fts_package_set_state(fts_package_t* pkg, fts_package_state_t s);
+FTS_API void fts_package_get_classes(fts_package_t* pkg, fts_iterator_t *iter);
+
 /**
  * Get a class by its name.
  * Search order:
@@ -167,6 +170,12 @@ FTS_API fts_class_t *fts_get_class_by_name(fts_symbol_t name);
  */
 FTS_API fts_fun_t fts_get_function_by_name(fts_symbol_t name);
 
-
-
+/**
+* Returns the system package. The system package defines the
+ * system-wide classes such as: require, patcher, inlet, outlet, ...
+ *
+ * @fn fts_package_t* fts_get_system_package(void)
+ * @return a pointer to the system package
+ * @ingroup package */
+FTS_API fts_package_t* fts_get_system_package(void);
 

@@ -78,9 +78,11 @@ outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
         int winlet = fts_connection_get_inlet(conn);
         fts_class_t *cl = fts_object_get_class(dst);
         fts_method_t handler = fts_class_get_input_handler(fts_object_get_class(dst));
-        
+
+        fts_object_set_message_inlet(dst, winlet);
+
         if(handler != NULL)
-          (*handler)(dst, winlet, NULL, !fts_is_void(at), at);
+          (*handler)(dst, NULL, !fts_is_void(at), at, fts_nix);
         else
         {
           fts_method_t method = fts_message_cache_get_method(&conn->cache);
@@ -103,7 +105,7 @@ outlet_atom(fts_object_t *o, int woutlet, const fts_atom_t *at)
             }
           }
           
-          INVOKE(method, dst, winlet, NULL, !fts_is_void(at), at);
+          INVOKE(method, dst, NULL, !fts_is_void(at), at, fts_nix);
         }
         
         conn = fts_connection_get_next_of_same_source(conn);
@@ -131,8 +133,10 @@ outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
         fts_class_t *cl = fts_object_get_class(dst);
         fts_method_t handler = fts_class_get_input_handler(fts_object_get_class(dst));
         
+        fts_object_set_message_inlet(dst, winlet);
+        
         if(handler != NULL)
-          (*handler)(dst, winlet, NULL, ac, at);
+          (*handler)(dst, NULL, ac, at, fts_nix);
         else
         {
           fts_symbol_t selector = fts_message_cache_get_selector(&conn->cache);
@@ -158,7 +162,7 @@ outlet_varargs(fts_object_t *o, int woutlet, int ac, const fts_atom_t *at)
             }
           }
           
-          INVOKE(method, dst, winlet, NULL, ac, at);
+          INVOKE(method, dst, NULL, ac, at, fts_nix);
         }
         
         conn = fts_connection_get_next_of_same_source(conn);
@@ -257,10 +261,13 @@ fts_outlet_message(fts_object_t *o, int woutlet, fts_symbol_t s, int ac, const f
       {
         fts_object_t *dst = fts_connection_get_destination(conn);
         fts_method_t handler = fts_class_get_input_handler(fts_object_get_class(dst));
+        int winlet = fts_connection_get_inlet(conn);
+        
+        fts_object_set_message_inlet(dst, winlet);
         
         if(handler != NULL)
-          (*handler)(dst, fts_connection_get_inlet(conn), s, ac, at);
-        else if(fts_send_message_cached(dst, s, ac, at, &conn->cache) == NULL)
+          (*handler)(dst, s, ac, at, fts_nix);
+        else if(fts_send_message_cached(dst, s, ac, at, fts_nix, &conn->cache) == NULL)
           fts_object_error(dst, "no method for message %s with given argument(s)", s);
         
         conn = fts_connection_get_next_of_same_source(conn);

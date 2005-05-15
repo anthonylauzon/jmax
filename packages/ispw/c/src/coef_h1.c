@@ -52,10 +52,10 @@
 #define MAX_GAIN 120.0f
 
 static void
-sigcoef_hlshelf1_in3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+sigcoef_hlshelf1_in3(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 static void
-sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+sigcoef_hlshelf1_in4(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 typedef struct
 {
@@ -71,7 +71,7 @@ typedef struct
 } sigcoef_hlshelf1_t;
 
 static void
-sigcoef_hlshelf1_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t a;
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
@@ -81,14 +81,14 @@ sigcoef_hlshelf1_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   this->s_rate = fts_dsp_get_input_srate(dsp, 0);
 
   fts_set_float(&a, this->s_ltransfq);
-  sigcoef_hlshelf1_in3(o, 3, s, 1, &a);
+  sigcoef_hlshelf1_in3(o, s, 1, &a, fts_nix);
 
   fts_set_float(&a, this->s_htransfq);
-  sigcoef_hlshelf1_in4(o, 4, s, 1, &a);
+  sigcoef_hlshelf1_in4(o, s, 1, &a, fts_nix);
 }
 
 static void
-sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   fts_atom_t a;
@@ -129,16 +129,16 @@ sigcoef_hlshelf1_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
   this->s_htransfq = MAXSRATE/2;
 
   fts_set_float(&a, f1);
-  sigcoef_hlshelf1_in3(o, 3, s, 1, &a);
+  sigcoef_hlshelf1_in3(o, s, 1, &a, fts_nix);
 
   fts_set_float(&a, f2);
-  sigcoef_hlshelf1_in4(o, 4, s, 1, &a);
+  sigcoef_hlshelf1_in4(o, s, 1, &a, fts_nix);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-sigcoef_hlshelf1_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   float c0, c1, c2, d0, d1, d2;	/* output coefs */
@@ -202,7 +202,7 @@ sigcoef_hlshelf1_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-sigcoef_hlshelf1_in0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_in0(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -215,7 +215,7 @@ sigcoef_hlshelf1_in0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-sigcoef_hlshelf1_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_in1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -227,7 +227,7 @@ sigcoef_hlshelf1_in1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-sigcoef_hlshelf1_in2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_in2(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -239,7 +239,7 @@ sigcoef_hlshelf1_in2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-sigcoef_hlshelf1_in3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_in3(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   float n = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -251,7 +251,7 @@ sigcoef_hlshelf1_in3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_in4(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_hlshelf1_t* this = (sigcoef_hlshelf1_t *)o;
   float n = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -263,7 +263,7 @@ sigcoef_hlshelf1_in4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-sigcoef_hlshelf1_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_hlshelf1_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

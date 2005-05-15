@@ -58,8 +58,8 @@ fts_message_set_from_atoms(fts_message_t *mess, int ac, const fts_atom_t *at)
   }
 }
 
-static void
-message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+message_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_message_t *this = (fts_message_t *)o;
 
@@ -79,14 +79,18 @@ message_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     else
       fts_object_error(o, "first argument must be symbol");
   }
+  
+  return fts_ok;
 }
 
-static void
-message_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+message_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_message_t *this = (fts_message_t *)o;
 
   fts_array_destroy(&this->args);
+  
+  return fts_ok;
 }
 
 static void
@@ -131,13 +135,13 @@ fts_dumper_message_send(fts_dumper_t *dumper, fts_message_t *message)
   int ac = fts_message_get_ac(message);
   const fts_atom_t *at = fts_message_get_at(message);
 
-  dumper->send((fts_object_t *)dumper, 0, s, ac, at);
+  dumper->send((fts_object_t *)dumper, s, ac, at, fts_nix);
 }
 
 void
 fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
-  dumper->send((fts_object_t *)dumper, 0, s, ac, at);  
+  dumper->send((fts_object_t *)dumper, s, ac, at, fts_nix);  
 }
 
 /*****************************************************************
@@ -182,13 +186,13 @@ fts_message_cache_free(fts_message_cache_t *cache)
  *
  */
 void
-fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at)
+fts_invoke_method(fts_method_t method, fts_object_t *o, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  (*method)(o, 0, NULL, ac, at);
+  (*method)(o, NULL, ac, at, ret);
 }
 
 fts_method_t
-fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_class_t *cl = fts_object_get_class(o);
   fts_method_t method = NULL;
@@ -211,13 +215,13 @@ fts_send_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
   method = fts_class_get_method(cl, s, type);
   
   if(method != NULL)
-    (*method)(o, fts_system_inlet, s, ac, at);
+    (*method)(o, s, ac, at, ret);
   
   return method;
 }
 
 fts_method_t
-fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_message_cache_t *cache)
+fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret, fts_message_cache_t *cache)
 {
   fts_class_t *cl = fts_object_get_class(o);
   fts_method_t method = NULL;
@@ -249,48 +253,9 @@ fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
   }
   
   if(method != NULL)
-    (*method)(o, fts_system_inlet, s, ac, at);
+    (*method)(o, s, ac, at, ret);
   
   return method;
-}
-
-/***********************************************************************
- *
- *  return mechanism for methods/functions
- *
- */
-static fts_atom_t fts_return_value;
-
-void fts_return( fts_atom_t *p)
-{
-  fts_return_value = *p;
-}
-
-void fts_return_int(int x)
-{
-  fts_set_int(&fts_return_value, x);
-}
-
-/* although the fts functions are called fts_<blabla>_float, the values
-   passed and stored in fts_atom_t are double! */
-void fts_return_float(double x)
-{
-  fts_set_float(&fts_return_value, x);
-}
-
-void fts_return_symbol(fts_symbol_t x)
-{
-  fts_set_symbol(&fts_return_value, x);
-}
-
-void fts_return_object(fts_object_t *x)
-{
-  fts_set_object(&fts_return_value, x);
-}
-
-fts_atom_t *fts_get_return_value( void)
-{
-  return &fts_return_value;
 }
 
 /***********************************************************************

@@ -255,13 +255,13 @@ play_reset_next(play_t *self)
 
 
 static void 
-play_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_bang_at_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang((fts_object_t *)o, 1);
 }
 
 static void 
-play_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_set_begin(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
   
@@ -269,7 +269,7 @@ play_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-play_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_set_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -277,7 +277,7 @@ play_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-play_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_set_speed(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -285,7 +285,7 @@ play_set_speed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-play_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -293,7 +293,7 @@ play_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-play_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_play(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -304,7 +304,7 @@ play_play(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-play_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -316,7 +316,7 @@ play_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void 
-play_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_loop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -324,7 +324,7 @@ play_loop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-play_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_jump(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
   
@@ -337,7 +337,7 @@ play_jump(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-play_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_pause(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -346,7 +346,7 @@ play_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-play_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_segment(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -357,7 +357,7 @@ play_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-play_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -365,7 +365,7 @@ play_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void 
-play_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_next(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
 
@@ -387,7 +387,7 @@ play_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  */
 
 static void
-play_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   play_t *self = (play_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -547,7 +547,7 @@ play_ftl(fts_word_t *argv)
  */
 
 static void
-play_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   play_t *self = (play_t *)o;
 
@@ -566,7 +566,7 @@ play_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-play_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+play_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

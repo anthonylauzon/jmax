@@ -30,7 +30,7 @@ typedef struct _fts_finder_t
 } fts_finder_t;
 
 
-static void fts_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_finder_find(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_object_t *scope = fts_get_object(at+1);
@@ -47,7 +47,7 @@ static void fts_finder_find( fts_object_t *o, int winlet, fts_symbol_t s, int ac
   fts_send_message_varargs(scope, fts_s_find, ac-1, a);
 }
 
-static void fts_finder_find_friends( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_finder_find_friends(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_objectset_t *set = (fts_objectset_t *)fts_get_object(at);
   fts_object_t *target = fts_get_object(at+1);

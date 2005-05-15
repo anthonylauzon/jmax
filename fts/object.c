@@ -68,7 +68,7 @@ fts_object_reset(fts_object_t *obj)
 
   /* call deconstructor */
   if(fts_class_get_deconstructor(cl))
-    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, fts_s_delete, 0, 0);
+    fts_class_get_deconstructor(cl)(obj, fts_s_delete, 0, 0, fts_nix);
   
   /* release all client components */
   fts_object_reset_client(obj);
@@ -100,12 +100,12 @@ fts_object_create(fts_class_t *cl, int ac, const fts_atom_t *at)
   fts_object_t *obj = fts_object_alloc(cl);
   
   /* call constructor */
-  fts_class_get_constructor(cl)(obj, fts_system_inlet, NULL, ac, at);
+  fts_class_get_constructor(cl)(obj, NULL, ac, at, fts_nix);
   
   if(fts_object_get_status(obj) == FTS_OBJECT_STATUS_INVALID)
   {
     /* destroy invalid object */
-    fts_class_get_deconstructor(cl)(obj, fts_system_inlet, NULL, 0, 0);
+    fts_class_get_deconstructor(cl)(obj, NULL, 0, 0, fts_nix);
     fts_object_free(obj);
     
     return NULL;
@@ -146,7 +146,7 @@ fts_object_upload(fts_object_t *obj)
       fts_client_register_object(obj, -1);
       
       fts_set_object(&a, obj);
-      fts_send_message(container, fts_s_member_upload, 1, &a);
+      fts_send_message(container, fts_s_member_upload, 1, &a, fts_nix);
     }
   }
 }
@@ -156,7 +156,7 @@ fts_object_reset_client(fts_object_t *obj)
 {
   if(fts_object_has_client(obj))
   {
-    fts_send_message(obj, fts_s_closeEditor, 0, 0);
+    fts_send_message(obj, fts_s_closeEditor, 0, 0, fts_nix);
     fts_client_release_object(obj);
   }
 }
@@ -177,7 +177,7 @@ fts_object_set_name(fts_object_t *obj, fts_symbol_t name)
     
     fts_set_object(a, obj);
     fts_set_symbol(a + 1, name);
-    fts_send_message(container, fts_s_member_name, 2, a);
+    fts_send_message(container, fts_s_member_name, 2, a, fts_nix);
   }
 }
 
@@ -192,7 +192,7 @@ fts_object_set_persistence(fts_object_t *obj, int persistence)
     
     fts_set_object(a, obj);
     fts_set_int(a + 1, persistence);
-    fts_send_message(container, fts_s_member_persistence, 2, a);
+    fts_send_message(container, fts_s_member_persistence, 2, a, fts_nix);
   }
 }
 
@@ -206,7 +206,7 @@ fts_object_set_dirty(fts_object_t *obj)
     fts_atom_t a;
     
     fts_set_object(&a, obj);
-    fts_send_message(container, fts_s_member_dirty, 1, &a);
+    fts_send_message(container, fts_s_member_dirty, 1, &a, fts_nix);
   }
 }
 
@@ -221,12 +221,12 @@ fts_object_set_state_dirty(fts_object_t *obj)
     
     fts_set_object(a, obj);
     fts_set_symbol(a + 1, fts_s_state);
-    fts_send_message(container, fts_s_member_dirty, 2, a);
+    fts_send_message(container, fts_s_member_dirty, 2, a, fts_nix);
   }
 }
 
-void
-fts_object_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+fts_object_name(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_t *container = (fts_object_t *)fts_object_get_container(o);
   
@@ -240,15 +240,19 @@ fts_object_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     if(ac > 1)
       a[2] = at[1];
 
-    fts_send_message(container, fts_s_member_name, 2 + (ac > 1), a);
+    fts_send_message(container, fts_s_member_name, 2 + (ac > 1), a, fts_nix);
   }
+
+  return fts_ok;
 }
 
-void
-fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+fts_object_persistence(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_number(at))
     fts_object_set_persistence(o, fts_get_number_int(at));
+  
+  return fts_ok;
 }
 
 /*****************************************************************************
@@ -354,7 +358,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
       if(fts_hashtable_get(hash, &k, &v))
       {        
         fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
-        (*meth)(o, 0, suffix, ac, at);
+        (*meth)(o, suffix, ac, at, fts_nix);
       }
       else if(suffix != fts_s_default)
       {
@@ -362,7 +366,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
         if(fts_hashtable_get(hash, &k, &v))
         {        
           fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
-          (*meth)(o, 0, fts_s_default, ac, at);
+          (*meth)(o, fts_s_default, ac, at, fts_nix);
         }
         else
           fts_object_error(o, "cannot %s %s data as %s", fts_symbol_name(mode), fts_symbol_name(fts_class_get_name(cl)), fts_symbol_name(suffix));
@@ -373,20 +377,24 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
   }
 }
 
-void 
-fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t 
+fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   object_imexport(o, fts_s_default, ac, at, fts_s_import);
+  
+  return fts_ok;
 }
 
-void 
-fts_object_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t 
+fts_object_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   object_imexport(o, fts_s_default, ac, at, fts_s_export);
+  
+  return fts_ok;
 }
 
-void
-fts_object_import_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+fts_object_import_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_symbol(at))
   {
@@ -396,10 +404,12 @@ fts_object_import_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
   else
     fts_object_error(o, "importas: type argument missing");
+  
+  return fts_ok;
 }
 
-void
-fts_object_export_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+fts_object_export_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_symbol(at))
   {
@@ -409,4 +419,6 @@ fts_object_export_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
   }
   else
     fts_object_error(o, "exportas: type argument missing");
+  
+  return fts_ok;
 }

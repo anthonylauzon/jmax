@@ -123,7 +123,7 @@ delayline_destroy(delayline_t *this)
 }
 
 static void
-delayline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delayline_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delayline_t *this = (delayline_t *)o;
   int n_tick = fts_dsp_edge_get_n_tick(this->edge);
@@ -160,7 +160,7 @@ delayline_ftl(fts_word_t *argv)
 }
 
 static void
-delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delayline_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delayline_t *this = (delayline_t *)o;
 
@@ -189,7 +189,7 @@ delayline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-delayline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delayline_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delayline_t *this = (delayline_t *)o;
 
@@ -222,7 +222,7 @@ typedef struct
 } delay_t;
 
 static void
-delay_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -286,7 +286,7 @@ delay_ftl(fts_word_t *argv)
 }
 
 static void
-delay_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_set_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   double time = fts_get_number_float(at);
@@ -319,7 +319,7 @@ delay_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-delay_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_set_line(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   delayline_t *delayline = (delayline_t *)fts_get_object(at);
@@ -341,7 +341,7 @@ delay_set_line(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   ftl_data_t line = ftl_data_alloc(sizeof(delayline_t *));
@@ -363,7 +363,7 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   if(ac > 0 && fts_is_number(at))
   {
     (*lptr)->delay_length = fts_get_number_float(at);
-    delay_set_time(o, 0, 0, 1, at);
+    delay_set_time(o, 0, 1, at, fts_nix);
   }
   else
   {
@@ -373,7 +373,7 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-delay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   delayline_t *delayline = *((delayline_t **)ftl_data_get_ptr(this->line));
@@ -404,7 +404,7 @@ delay_instantiate(fts_class_t *cl)
 */
 
 static void
-tapin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tapin_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -460,7 +460,7 @@ tapin_ftl(fts_word_t *argv)
 }
 
 static void
-tapout_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tapout_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -507,7 +507,7 @@ tapout_ftl(fts_word_t *argv)
 }
 
 static void
-tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tapin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   ftl_data_t line = ftl_data_alloc(sizeof(delayline_t *));
@@ -525,7 +525,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   /* get delayline argument  */
   if(ac > 0 && fts_is_a(at, delayline_class))
-    delay_set_line(o, 0, 0, 1, at);
+    delay_set_line(o, 0, 1, at, fts_nix);
   else
   {
     fts_object_error(o, "first argument must be a delay line");
@@ -535,7 +535,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   /* get time argument */
   if(ac > 1 && fts_is_number(at + 1))
   {
-    delay_set_time(o, 0, 0, 1, at + 1);
+    delay_set_time(o, 0, 1, at + 1, fts_nix);
   }
   else
   {
@@ -547,7 +547,7 @@ tapin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tapout_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   ftl_data_t line = ftl_data_alloc(sizeof(delayline_t *));
@@ -565,7 +565,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   /* get delayline argument */
   if(ac > 0 && fts_is_a(at, delayline_class))
-    delay_set_line(o, 0, 0, 1, at);
+    delay_set_line(o, 0, 1, at, fts_nix);
   else
   {
     fts_object_error(o, "first argument must be a delay line");
@@ -575,7 +575,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   /* get time argument */
   if(ac > 1 && fts_is_number(at + 1))
   {
-    delay_set_time(o, 0, 0, 1, at + 1);
+    delay_set_time(o, 0, 1, at + 1, fts_nix);
   }
   else
   {
@@ -587,7 +587,7 @@ tapout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-tap_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tap_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
 
@@ -645,7 +645,7 @@ tapout_instantiate(fts_class_t *cl)
 */
 
 static void
-retap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+retap_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -701,7 +701,7 @@ retap_ftl(fts_word_t *argv)
 }
 
 static void
-retap_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+retap_set_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   double time = fts_get_number_float(at);
@@ -719,7 +719,7 @@ retap_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+retap_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   ftl_data_t line = ftl_data_alloc(sizeof(delayline_t *));
@@ -739,7 +739,7 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   /* get delayline argument */
   if(ac > 0 && fts_is_a(at, delayline_class))
-    delay_set_line(o, 0, 0, 1, at);
+    delay_set_line(o, 0, 1, at, fts_nix);
   else
   {
     fts_object_error(o, "first argument must be a delay line");
@@ -748,7 +748,7 @@ retap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
   /* get time argument */
   if(ac > 1 && fts_is_number(at + 1))
-    retap_set_time(o, 0, 0, 1, at + 1);
+    retap_set_time(o, 0, 1, at + 1, fts_nix);
 
   fts_dsp_after_edge(o, delayline_get_edge(*lptr));
 }
@@ -774,7 +774,7 @@ retap_instantiate(fts_class_t *cl)
 */
 
 static void
-vtap_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vtap_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -859,7 +859,7 @@ vtap_ftl(fts_word_t *argv)
 }
 
 static void
-vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vtap_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   ftl_data_t line = ftl_data_alloc(sizeof(delayline_t *));
@@ -876,7 +876,7 @@ vtap_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
   /* get delayline argument */
   if(ac > 0 && fts_is_a(at, delayline_class))
-    delay_set_line(o, 0, 0, 1, at);
+    delay_set_line(o, 0, 1, at, fts_nix);
   else
   {
     fts_object_error(o, "first argument must be a delay line");

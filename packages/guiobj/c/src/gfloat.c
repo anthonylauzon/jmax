@@ -31,7 +31,7 @@ typedef struct
 
 
 static void
-gfloat_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gfloat_t *this = (gfloat_t *)o;
   fts_atom_t a;
@@ -51,7 +51,7 @@ gfloat_update(gfloat_t *this, double f)
 }
 
 static void
-gfloat_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gfloat_t *this = (gfloat_t *)o;
 
@@ -59,7 +59,7 @@ gfloat_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-gfloat_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gfloat_t *this = (gfloat_t *)o;
   double f = fts_get_number_float(at);
@@ -69,14 +69,14 @@ gfloat_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-gfloat_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (ac && fts_is_number(at))
-    gfloat_number(o, 0, 0, 1, at);
+    gfloat_number(o, 0, 1, at, fts_nix);
 }
 
 static void
-gfloat_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_incr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gfloat_t *this = (gfloat_t *)o;
   double f;
@@ -91,7 +91,7 @@ gfloat_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-gfloat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gfloat_t *this = (gfloat_t *)o;
   double f = fts_get_number_float(at);
@@ -100,7 +100,7 @@ gfloat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-gfloat_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gfloat_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   FILE *file;
   int x, y, w, font_index;

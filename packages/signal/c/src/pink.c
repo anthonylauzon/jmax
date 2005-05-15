@@ -48,7 +48,7 @@ typedef struct
 static fts_symbol_t pink_ftl_sym = 0;
 
 void
-pink_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pink_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pink_t *this = (pink_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -155,7 +155,7 @@ pink_ftl(fts_word_t *argv)
  */
 
 static void
-pink_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pink_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   pink_t *this = (pink_t *)o;
   pink_data_t *data;
@@ -175,7 +175,7 @@ pink_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pink_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pink_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   pink_t *this = (pink_t *)o;
 

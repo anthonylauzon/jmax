@@ -44,7 +44,7 @@ in_input(fts_object_t *this, int n, const unsigned char *c)
  */
 
 static void
-in_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+in_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   in_t *this = (in_t *)o;
 
@@ -71,7 +71,7 @@ in_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void 
-in_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+in_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   in_t *this = (in_t *)o;
 

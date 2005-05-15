@@ -31,7 +31,7 @@ typedef struct
 } guilistener_t;
 
 static void
-guilistener_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+guilistener_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_send( o, 0, 0, ac, at);
 }
@@ -43,7 +43,7 @@ guilistener_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
  */
 
 static void
-guilistener_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+guilistener_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   guilistener_t *this = (guilistener_t *)o;
 
@@ -64,7 +64,7 @@ guilistener_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-guilistener_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+guilistener_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   guilistener_t *this = (guilistener_t *)o;
 

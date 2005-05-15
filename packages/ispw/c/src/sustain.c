@@ -42,7 +42,7 @@ typedef struct sustain
 
 
 static void
-sustain_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sustain_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sustain_t *this = (sustain_t *)o;
   long n = fts_get_int_arg(ac, at, 0, 0);
@@ -64,7 +64,7 @@ sustain_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-sustain_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sustain_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sustain_t *this = (sustain_t *)o;
 
@@ -72,7 +72,7 @@ sustain_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sustain_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sustain_number_2(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sustain_t *this = (sustain_t *)o;
 
@@ -95,25 +95,25 @@ sustain_number_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sustain_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sustain_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sustain_t *this = (sustain_t *)o;
 
   if ((ac >= 3) && fts_is_number(&at[2]))
-    sustain_number_2(o, winlet, s, 1, at+2);
+    sustain_number_2(o, s, 1, at+2, fts_nix);
 
   if ((ac >= 2) && fts_is_number(&at[1]))
     this->vel = (long) fts_get_int_arg(ac, at, 1, 0);
 
   if ((ac >= 1) && fts_is_number(&at[0]))
-    sustain_number(o, winlet, s, 1, at);
+    sustain_number(o, s, 1, at, fts_nix);
 }
 
 
 /* The clear method is also installed for the $delete message */
 
 static void
-sustain_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sustain_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sustain_t *this = (sustain_t *)o;
   struct slink *s1, *s2;
@@ -129,7 +129,7 @@ sustain_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static void
-sustain_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sustain_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sustain_t *this = (sustain_t *)o;
 

@@ -40,7 +40,7 @@ typedef struct{
 } samppeek_t;
 
 static void
-samppeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samppeek_t *obj = (samppeek_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -61,7 +61,7 @@ samppeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  */
  
 static void
-samppeek_mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_mess_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samppeek_t *obj = (samppeek_t *)o;
 
@@ -69,7 +69,7 @@ samppeek_mess_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-samppeek_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+samppeek_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samppeek_t *obj = (samppeek_t *)o;
   float f = fts_get_float(at);
@@ -107,15 +107,15 @@ samppeek_float(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_a
 }
 
 static void
-samppeek_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t a;
   fts_set_float(&a, (float)fts_get_int(at));
-  samppeek_float(o, winlet, s, 1, &a);
+  samppeek_float(o, s, 1, &a, fts_nix);
 }
 
 static void
-samppeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samppeek_t *obj = (samppeek_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -127,14 +127,14 @@ samppeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-samppeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samppeek_set_by_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   char buf[64];
   fts_atom_t a;
 
   gensampname(buf, "sample", fts_get_int_arg(ac, at, 0, 0));
   fts_set_symbol(&a, fts_new_symbol(buf));
-  samppeek_set(o, winlet, s, 1, &a);
+  samppeek_set(o, s, 1, &a, fts_nix);
 }
 
 /******************************************************************

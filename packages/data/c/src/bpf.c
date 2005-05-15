@@ -378,8 +378,8 @@ bpf_set_client(bpf_t *bpf)
 *
 */
 
-static void
-_bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_append(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
@@ -420,12 +420,14 @@ _bpf_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     bpf_set_client(this);
     fts_object_set_state_dirty(o);
     
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
+
+  return fts_ok;
 }
 
-static void
-_bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
@@ -474,11 +476,13 @@ _bpf_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   bpf_set_client(this);
   fts_object_set_state_dirty(o);
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-_bpf_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_insert(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
@@ -496,12 +500,14 @@ _bpf_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     
     bpf_set_client(this);
     fts_object_set_state_dirty(o);
-    fts_return_object(o);
+    fts_set_object(ret, o);
   }
+  
+  return fts_ok;
 }
 
-static void
-_bpf_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
@@ -513,11 +519,13 @@ _bpf_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   bpf_set_client(this);
   fts_object_set_state_dirty(o);
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-_bpf_set_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_set_from_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   bpf_t *in = (bpf_t *)fts_get_object(at);
@@ -527,11 +535,13 @@ _bpf_set_from_bpf(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   bpf_set_client(this);
   fts_object_set_state_dirty(o);
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-_bpf_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_set_from_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   fmat_t *fmat = (fmat_t *)fts_get_object(at);
@@ -576,28 +586,34 @@ _bpf_set_from_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   bpf_set_client(this);
   fts_object_set_state_dirty(o);
   
-  fts_return_object(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
 }
 
-static void
-_bpf_get_interpolated(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_get_interpolated(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   double time = fts_get_number_float(at);
   
-  fts_return_float(bpf_get_interpolated(this, time));
+  fts_set_float(ret, bpf_get_interpolated(this, time));
+  
+  return fts_ok;
 }
 
-static void
-_bpf_get_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_get_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
-  fts_return_float((float)bpf_get_duration(this));  
+  fts_set_float(ret, (float)bpf_get_duration(this));  
+  
+  return fts_ok;
 }
 
-static void
-_bpf_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   double new = fts_get_number_float(at);
@@ -614,18 +630,22 @@ _bpf_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
   
   bpf_set_client(this);
   fts_object_set_state_dirty(o);
+  
+  return fts_ok;
 }
 
-static void
-_bpf_get_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_get_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
-  fts_return_int((float)bpf_get_size(this));
+  fts_set_int(ret, bpf_get_size(this));
+  
+  return fts_ok;
 }
 
-static void
-_bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_bpf_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   int size = this->size;
@@ -650,6 +670,8 @@ _bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
     
     fts_spost(stream, "}\n");
   }
+  
+  return fts_ok;
 }
 
 /************************************************************
@@ -658,8 +680,8 @@ _bpf_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 *
 */
 
-static void
-bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_add_point_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   double time = fts_get_float(at + 1);
@@ -669,10 +691,12 @@ bpf_add_point_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_client_send_message(o, sym_addPoint, ac, at);
   
   fts_object_set_state_dirty(o);
+  
+  return fts_ok;
 }
 
-static void
-bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_remove_points_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   int index = fts_get_int(at + 0);
@@ -682,10 +706,12 @@ bpf_remove_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s,
   fts_client_send_message(o, sym_removePoints, ac, at);
   
   fts_object_set_state_dirty(o);
+  
+  return fts_ok;
 }
 
-static void
-bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_set_points_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   int index = fts_get_int(at);
@@ -703,10 +729,12 @@ bpf_set_points_by_client_request(fts_object_t *o, int winlet, fts_symbol_t s, in
   fts_client_send_message(o, sym_setPoints, ac, at);
   
   fts_object_set_state_dirty(o);
+  
+  return fts_ok;
 }
 
-static void
-bpf_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
@@ -714,10 +742,12 @@ bpf_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
   
   bpf_set_client(this);
+  
+  return fts_ok;
 }
 
-static void 
-bpf_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t 
+bpf_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *) o;
   
@@ -726,14 +756,18 @@ bpf_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     bpf_set_editor_close(this);
     fts_client_send_message((fts_object_t *)this, fts_s_closeEditor, 0, 0);  
   }
+  
+  return fts_ok;
 }
 
-static void
-bpf_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   
   bpf_set_editor_close(this);
+  
+  return fts_ok;
 }
 
 /************************************************************
@@ -742,8 +776,8 @@ bpf_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 *
 */
 
-static void
-bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bpf_t *this = (bpf_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -761,6 +795,8 @@ bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   }
   
   fts_dumper_message_send(dumper, mess);
+  
+  return fts_ok;
 }
 
 /************************************************************
@@ -769,8 +805,8 @@ bpf_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 *
 */
 
-static void
-bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   bpf_t *this = (bpf_t *)o;
   
@@ -780,7 +816,7 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->opened = 0;
   
   if(ac > 0)
-    _bpf_set(o, 0, 0, ac, at);
+    _bpf_set(o, NULL, ac, at, fts_nix);
   else
   {
     set_size(this, 1);
@@ -788,10 +824,12 @@ bpf_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     this->points[0].time = 0.0;
     this->points[0].value = 0.0;
   }
+  
+  return fts_ok;
 }
 
-static void
-bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+bpf_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   bpf_t *this = (bpf_t *)o;
   
@@ -799,6 +837,8 @@ bpf_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   if(this->points)
     fts_free(this->points);
+  
+  return fts_ok;
 }
 
 static void

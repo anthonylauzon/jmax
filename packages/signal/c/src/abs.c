@@ -25,7 +25,7 @@
 static fts_symbol_t sym_abs_tilda = 0;
 
 static void
-abs_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t argv[3];
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -54,14 +54,14 @@ ftl_abs(fts_word_t *argv)
 }
 
 static void
-abs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_init((fts_dsp_object_t *)o); 
 }
 
 
 static void
-abs_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

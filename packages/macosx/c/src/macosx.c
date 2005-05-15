@@ -23,12 +23,10 @@
 extern void macosxaudioport_config( void);
 extern void macosxmidiport_config( void);
 extern void macosxmidi_config( void);
-extern void qtfile_config(void);
 
 void macosx_config(void)
 {
   macosxaudioport_config();
   macosxmidiport_config();
   macosxmidi_config();
-  qtfile_config();
 }

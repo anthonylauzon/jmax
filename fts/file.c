@@ -140,7 +140,7 @@ fts_basename (const char *name)
 const char *
 fts_extension (const char *name)
 {
-  char *base = fts_basename(name);
+  const char *base = fts_basename(name);
   char *end  = strrchr(base, fts_ext_separator);
 
   if (end != NULL)

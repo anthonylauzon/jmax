@@ -181,8 +181,8 @@ FTS_API event_t *track_highlight_and_next(track_t *track, event_t *event);
 
 /** @}	end of doc group highlighting */
 
-FTS_API void track_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void track_add_event_from_file(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void track_event_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_status_t track_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+FTS_API fts_method_status_t track_add_event_from_file(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+FTS_API fts_method_status_t track_event_dump_mess(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 #endif  /* _SEQUENCE_TRACK_H_ */

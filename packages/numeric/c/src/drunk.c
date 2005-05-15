@@ -35,7 +35,7 @@ typedef struct
 
 /* output a value  */
 static void
-drunk_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   drunk_t *this = (drunk_t *)o;
   int value;
@@ -62,7 +62,7 @@ drunk_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-drunk_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   drunk_t *this = (drunk_t *)o;
   int n = fts_get_number_int(at);
@@ -78,7 +78,7 @@ drunk_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-drunk_set_correlation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_set_correlation(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   drunk_t *this = (drunk_t *)o;
   int n = fts_get_number_int(at);
@@ -90,7 +90,7 @@ drunk_set_correlation(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-drunk_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   drunk_t *this = (drunk_t *)o;
   int n = fts_get_number_int(at);
@@ -105,7 +105,7 @@ drunk_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-drunk_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   drunk_t *this = (drunk_t *)o;
 
@@ -114,10 +114,10 @@ drunk_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     default:
     case 3:
       if(fts_is_number(at + 2))
-	drunk_set_correlation(o, 0, 0, 1, at + 2);
+	drunk_set_correlation(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	drunk_set_range(o, 0, 0, 1, at + 1);
+	drunk_set_range(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
 	{
@@ -135,27 +135,27 @@ drunk_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 
 static void
-drunk_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 3:
       if(fts_is_number(at + 2))
-	drunk_set_correlation(o, 0, 0, 1, at + 2);
+	drunk_set_correlation(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	drunk_set_range(o, 0, 0, 1, at + 1);
+	drunk_set_range(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
-	drunk_number(o, 0, 0, 1, at);
+	drunk_number(o, 0, 1, at, fts_nix);
     case 0:
       break;
     }
 }
 
 static void
-drunk_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+drunk_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   drunk_t *this = (drunk_t *)o;
   
@@ -164,10 +164,10 @@ drunk_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->scaler = (double)1.0 / (double)DRUNK_MAX;
 
   if(ac > 0 && fts_is_number(at))
-    drunk_set_range(o, 0, 0, 1, at);
+    drunk_set_range(o, 0, 1, at, fts_nix);
 
   if(ac > 1 && fts_is_number(at + 1))
-    drunk_set_correlation(o, 0, 0, 1, at + 1);
+    drunk_set_correlation(o, 0, 1, at + 1, fts_nix);
 }
 
 

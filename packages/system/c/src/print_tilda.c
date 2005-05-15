@@ -35,7 +35,7 @@ typedef struct print_tilda_t
 } print_tilda_t;
 
 static void
-print_tilda_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_post(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_tilda_t *this = (print_tilda_t *)o;
 
@@ -74,7 +74,7 @@ print_tilda_post(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-print_tilda_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_tilda_t *this = (print_tilda_t *)o;
   int size = fts_get_number_int(at);
@@ -92,7 +92,7 @@ print_tilda_set_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-print_tilda_set_cols(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_set_cols(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_tilda_t *this = (print_tilda_t *)o;
   int cols = fts_get_number_int(at);
@@ -104,28 +104,28 @@ print_tilda_set_cols(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-print_tilda_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 2:
       if(fts_is_number(at + 1))
-	print_tilda_set_cols(o, 0, 0, 1, at + 1);
+	print_tilda_set_cols(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at))
-	print_tilda_set_size(o, 0, 0, 1, at);
+	print_tilda_set_size(o, 0, 1, at, fts_nix);
     case 0:
       break;
     }
 }
 
 static void
-print_tilda_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_tilda_t *this = ((print_tilda_t *)o);
 
-  print_tilda_set(o, 0, 0, ac, at);
+  print_tilda_set(o, 0, ac, at, fts_nix);
   this->index = 0;
 }
 
@@ -158,7 +158,7 @@ ftl_print_tilda(fts_word_t *argv)
 }
 
 static void
-print_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
   int n_tick = fts_dsp_get_input_size(dsp, 0);
@@ -171,7 +171,7 @@ print_tilda_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-print_tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_tilda_t *this = ((print_tilda_t *)o);
   int size = fts_dsp_get_tick_size();
@@ -192,13 +192,13 @@ print_tilda_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
       at++;
     }
 
-  print_tilda_set(o, 0, 0, ac, at);
+  print_tilda_set(o, 0, ac, at, fts_nix);
     
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-print_tilda_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+print_tilda_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   print_tilda_t *this = ((print_tilda_t *)o);
 

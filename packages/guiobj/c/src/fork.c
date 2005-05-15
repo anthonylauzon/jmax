@@ -25,7 +25,7 @@
 static fts_symbol_t sym_fork = 0;
 
 static void
-fork_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fork_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int n = fts_object_get_outlets_number(o);
 
@@ -34,7 +34,7 @@ fork_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-fork_set_outlets(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fork_set_outlets(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int n = fts_get_int(at);
   fts_atom_t a[2];
@@ -47,7 +47,7 @@ fork_set_outlets(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-fork_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fork_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int n = 2;
 

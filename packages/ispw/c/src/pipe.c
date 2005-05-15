@@ -33,7 +33,7 @@ typedef struct _pipe_
 } pipe_t;
 
 static void
-pipe_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
   fts_atom_t *atoms = (fts_atom_t *)fts_get_pointer(at);
@@ -73,7 +73,7 @@ pipe_delay_list(pipe_t *self)
 }
 
 static void
-pipe_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
 
@@ -81,7 +81,7 @@ pipe_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pipe_atom_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_atom_trigger(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
 
@@ -90,7 +90,7 @@ pipe_atom_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-pipe_atom_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_atom_delay(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
 
@@ -108,18 +108,19 @@ pipe_atom_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-pipe_atom_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_atom_right(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(winlet == self->ac)
-    pipe_atom_delay(o, 0, 0, 1, at);
+    pipe_atom_delay(o, 0, 1, at, fts_nix);
   else
     fts_atom_assign(self->at + winlet, at);
 }
 
 static void
-pipe_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
   int n = ac;
@@ -134,19 +135,19 @@ pipe_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_atom_assign(self->at + i, at + i);
 
   if(ac > self->ac)
-    pipe_atom_delay(o, 0, 0, 1, at + self->ac);
+    pipe_atom_delay(o, 0, 1, at + self->ac, fts_nix);
   
   pipe_delay_list(self);
 }
 
 static void
-pipe_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
 static void
-pipe_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
@@ -158,7 +159,7 @@ pipe_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pipe_t *self = (pipe_t *)o;
 
@@ -177,7 +178,7 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       fts_atom_assign(self->at + i, at + i);
     }
       
-    pipe_atom_delay(o, 0, 0, 1, at + self->ac);
+    pipe_atom_delay(o, 0, 1, at + self->ac, fts_nix);
 
     fts_object_set_inlets_number(o, n + 1);
     fts_object_set_outlets_number(o, n);
@@ -191,17 +192,17 @@ pipe_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     fts_set_int(self->at, 0);
       
     if(ac > 0)
-      pipe_atom_delay(o, 0, 0, 1, at);
+      pipe_atom_delay(o, 0, 1, at, fts_nix);
   }
 }
 
 static void
-pipe_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pipe_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {  
   pipe_t *self = (pipe_t *)o;
   int i;
 
-  pipe_clear(o, 0, 0, 0, 0);
+  pipe_clear(o, 0, 0, 0, fts_nix);
   
   for(i=0; i<self->ac; i++)
     fts_atom_void(self->at + i);

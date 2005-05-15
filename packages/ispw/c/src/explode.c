@@ -581,7 +581,7 @@ explode_fnoteoff(explode_t *this, long int n)
  */
 
 static void
-explode_append_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_append_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   int i0 = 0;
@@ -617,7 +617,7 @@ explode_append_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 
 static void
-explode_stop_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_stop_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -626,7 +626,7 @@ explode_stop_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 static void
-explode_start_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_start_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -649,7 +649,7 @@ explode_start_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
 
 static void
-explode_record_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_record_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -660,7 +660,7 @@ explode_record_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_follow_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   long int n = fts_get_int_arg(ac, at, 0, 0);
@@ -682,7 +682,7 @@ explode_follow_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 
 static void
-explode_followat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_followat_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   int i0 = 0;
@@ -721,7 +721,7 @@ explode_followat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-explode_startat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_startat_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   int i0 = 0;
@@ -758,7 +758,7 @@ explode_startat_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 
 static void
-explode_nth_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_nth_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   long int n = fts_get_int_arg(ac, at, 0, 0);
@@ -775,7 +775,7 @@ explode_nth_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-explode_params_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_params_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -797,7 +797,7 @@ explode_params_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-explode_clear_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_clear_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -805,7 +805,7 @@ explode_clear_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-explode_next_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_next_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   
@@ -831,7 +831,7 @@ explode_next_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 
 static void
-explode_number_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_number_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   long int n = fts_get_number_int(at);
@@ -902,7 +902,7 @@ explode_number_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-explode_number_1_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_number_1_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -911,7 +911,7 @@ explode_number_1_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-explode_number_2_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_number_2_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -920,7 +920,7 @@ explode_number_2_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-explode_number_3_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_number_3_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -929,7 +929,7 @@ explode_number_3_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-explode_number_4_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_number_4_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -937,26 +937,26 @@ explode_number_4_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-explode_list_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_list_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (ac >= 5 && fts_is_number(&at[4]))
-    explode_number_4_mth(o, winlet, s, 1, at + 4);
+    explode_number_4_mth(o, s, 1, at + 4, fts_nix);
 
   if (ac >= 4 && fts_is_number(&at[3]))
-    explode_number_3_mth(o, winlet, s, 1, at + 3);
+    explode_number_3_mth(o, s, 1, at + 3, fts_nix);
 
   if (ac >= 3 && fts_is_number(&at[2]))
-    explode_number_2_mth(o, winlet, s, 1, at + 2);
+    explode_number_2_mth(o, s, 1, at + 2, fts_nix);
 
   if (ac >= 2 && fts_is_number(&at[1]))
-    explode_number_1_mth(o, winlet, s, 1, at + 1);
+    explode_number_1_mth(o, s, 1, at + 1, fts_nix);
 
   if (ac >= 1 && fts_is_number(&at[0]))
-    explode_number_mth(o, winlet, s, 1, at);
+    explode_number_mth(o, s, 1, at, fts_nix);
 }
 
 static void
-explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -983,7 +983,7 @@ explode_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_init_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -1024,7 +1024,7 @@ explode_init_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_delete_mth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -1036,7 +1036,7 @@ explode_delete_mth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-explode_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_set_name(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -1064,7 +1064,7 @@ explode_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-explode_append_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_append_event(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   evt_t *cur = this->current;
@@ -1095,7 +1095,7 @@ explode_append_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 
 
 static void
-explode_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -1109,7 +1109,7 @@ explode_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   for (e = this->data.evt ; e ; e = e->next)
     {
       /* get new dumper message */
-      mess = fts_dumper_message_new(dumper, fts_s_append);
+      mess = fts_dumper_message_get(dumper, fts_s_append);
 
       /* put event */
       fts_message_append_int(mess, e->time);
@@ -1126,7 +1126,7 @@ explode_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   fts_dumper_send(dumper, fts_s_stop, 0, 0);
 }
 
-static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void explode_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *) o;
   FILE *file;
@@ -1172,7 +1172,7 @@ static void explode_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int
 }
 
 static void
-explode_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
 
@@ -1182,13 +1182,13 @@ explode_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-explode_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   explode_set_editor_close(this);
 }
 static void
-explode_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   if(explode_editor_is_open(this))
@@ -1204,7 +1204,7 @@ explode_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  */
 
 static void
-explode_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* Only argument, the zero based index of the event to suppress */
   explode_t *this = (explode_t *)o;
@@ -1226,7 +1226,7 @@ explode_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-explode_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_add(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* Arguments: 
    * the zero based index
@@ -1267,7 +1267,7 @@ explode_add(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-explode_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_change(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* Arguments: 
    * the zero based index
@@ -1305,7 +1305,7 @@ explode_change(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-explode_change_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_change_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* Arguments: 
    * the zero based index
@@ -1349,7 +1349,7 @@ explode_change_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-explode_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explode_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explode_t *this = (explode_t *)o;
   evt_t *e;

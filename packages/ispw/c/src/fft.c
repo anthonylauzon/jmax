@@ -59,7 +59,7 @@ enum
  */
 
 void
-fft_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fft_output_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang((fts_object_t *)o, ((fft_t *)o)->bang_out);
 }
@@ -133,7 +133,7 @@ buffers_init(fft_t *x, fts_symbol_t type, fts_symbol_t real_spec, int ac, const 
 }  
 
 static void
-fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fft_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
   fts_symbol_t type = 0;
@@ -175,7 +175,7 @@ fft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-ifft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ifft_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
   fts_symbol_t type = 0;
@@ -218,7 +218,7 @@ ifft_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fft_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
 
@@ -238,7 +238,7 @@ fft_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-fft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fft_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -346,7 +346,7 @@ fft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-ifft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ifft_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -461,7 +461,7 @@ ifft_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  */
 
 static void
-fft_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fft_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
   x->ctl.in_idx = 0;
@@ -470,7 +470,7 @@ fft_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-fft_setphase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fft_setphase(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fft_t *x = (fft_t *)o;
   long phase = fts_get_int_arg(ac, at, 0, 0);

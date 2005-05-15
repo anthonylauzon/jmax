@@ -404,7 +404,7 @@ static void end_message_action( unsigned char input, client_t *client)
 
   /* Client messages are sent to the system inlet */
   if (target)
-    fts_send_message( target, selector, argc, argv);
+    fts_send_message( target, selector, argc, argv, fts_nix);
 
 skipped:
   fts_stack_clear( &client->input_args);
@@ -606,7 +606,7 @@ static void client_receive( fts_object_t *o, int size, const unsigned char* buff
   }
 }
 
-static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_new_object(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
   int id;
@@ -636,7 +636,7 @@ static void client_new_object( fts_object_t *o, int winlet, fts_symbol_t s, int 
   client_register_object( this, newobj);
 }
 
-static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_set_object_property(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ((ac == 3) &&
       fts_is_object(&at[0]) &&
@@ -655,7 +655,7 @@ static void client_set_object_property( fts_object_t *o, int winlet, fts_symbol_
     fts_log("[client]: System Error set_object_property: bad args\n");
 }
 
-static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_connect_object(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_t *src, *dst;
   int src_outlet, dst_inlet;
@@ -677,7 +677,7 @@ static void client_connect_object( fts_object_t *o, int winlet, fts_symbol_t s, 
    a configuration...
    But it is too complicated on the client side yet, so I give up..
 */
-static void client_open_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_open_file(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
   fts_object_t *object;
@@ -707,20 +707,20 @@ static void client_open_file( fts_object_t *o, int winlet, fts_symbol_t s, int a
 
   /* Inform the object that it has been loaded from a file and tell it the file name */
   fts_set_symbol( a, file_name);
-  fts_send_message( object, fts_s_loaded, 1, a);
+  fts_send_message( object, fts_s_loaded, 1, a, fts_nix);
 
   /* upload the object to the client */
   client_register_object( this, object);
 
-  fts_send_message( object, fts_s_upload, 0, 0);
+  fts_send_message( object, fts_s_upload, 0, 0, fts_nix);
 
   /* open the editor */
-  fts_send_message( object, fts_new_symbol("openEditor"), 0, 0);
+  fts_send_message( object, fts_new_symbol("openEditor"), 0, 0, fts_nix);
 }
 #endif
 
 
-static void client_load_patcher_file( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_load_patcher_file(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
   fts_client_load_patcher( fts_get_symbol( at), this->client_id);
@@ -769,7 +769,7 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_patcher_set_file_name(patcher, file_name);
 
   /* activate the post-load init, like loadbangs */   
-  fts_send_message( (fts_object_t *)patcher, fts_new_symbol("load_init"), 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_new_symbol("load_init"), 0, 0, fts_nix);
 
   fts_set_int(a, fts_object_get_id((fts_object_t *)patcher));
   fts_set_symbol(a+1, file_name);
@@ -777,18 +777,18 @@ fts_client_load_patcher(fts_symbol_t file_name, int client_id)
   fts_client_send_message( (fts_object_t *)client, fts_new_symbol( "patcher_loaded"), 3, a);
 
   /* upload the patcher to the client */
-  fts_send_message( (fts_object_t *)patcher, fts_s_upload, 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_s_upload, 0, 0, fts_nix);
 
   fts_patcher_set_dirty( patcher, 0);
 
-  fts_send_message( (fts_object_t *)patcher, fts_s_openEditor, 0, 0);
+  fts_send_message( (fts_object_t *)patcher, fts_s_openEditor, 0, 0, fts_nix);
 
   fts_log("[patcher]: Finished loading patcher %s\n", file_name);
 
   return patcher;
 }
 
-static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_load_project(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
   fts_package_t* project;
@@ -814,11 +814,11 @@ static void client_load_project( fts_object_t *o, int winlet, fts_symbol_t s, in
     fts_set_int(a, fts_object_get_id( (fts_object_t *)project));
     fts_client_send_message(o, fts_s_project, 1, a);
       
-    fts_send_message( (fts_object_t *)project, fts_s_upload, 0, 0);
+    fts_send_message( (fts_object_t *)project, fts_s_upload, 0, 0, fts_nix);
   }
 }
 
-static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_load_package(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
   fts_package_t* package;
@@ -844,13 +844,13 @@ static void client_load_package( fts_object_t *o, int winlet, fts_symbol_t s, in
 
       fts_set_int(a, fts_object_get_id( (fts_object_t *)package));
       fts_client_send_message(o, fts_s_package, 1, a);    
-      fts_send_message( (fts_object_t *)package, fts_s_upload, 0, 0);
+      fts_send_message( (fts_object_t *)package, fts_s_upload, 0, 0, fts_nix);
     }
-    fts_send_message( (fts_object_t *)package, fts_s_openEditor, 0, 0);
+    fts_send_message( (fts_object_t *)package, fts_s_openEditor, 0, 0, fts_nix);
   }
 }
 
-static void client_load_summary( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_load_summary(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;  
   fts_symbol_t file_name = fts_get_symbol( at);
@@ -862,7 +862,7 @@ static void client_load_summary( fts_object_t *o, int winlet, fts_symbol_t s, in
     fts_client_load_patcher( file_name, this->client_id);
 }
 
-static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_get_project(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t a[1];
   fts_object_t *project = (fts_object_t *)fts_project_get();
@@ -873,10 +873,10 @@ static void client_get_project( fts_object_t *o, int winlet, fts_symbol_t s, int
   fts_set_int(a, fts_object_get_id( project));
   fts_client_send_message(o, fts_s_project, 1, a);
   
-  fts_send_message( project, fts_s_upload, 0, 0);
+  fts_send_message( project, fts_s_upload, 0, 0, fts_nix);
 }
 
-static void client_get_config( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_get_config(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_t *config = fts_config_get();
   
@@ -890,11 +890,11 @@ static void client_get_config( fts_object_t *o, int winlet, fts_symbol_t s, int 
     fts_set_int(&a, fts_object_get_id(config));
     fts_client_send_message(o, fts_s_config, 1, &a);
     
-    fts_send_message(config, fts_s_upload, 0, 0);
+    fts_send_message(config, fts_s_upload, 0, 0, fts_nix);
   }
 }
 
-static void client_shutdown( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_shutdown(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_sched_halt();
 }
@@ -924,7 +924,7 @@ static void client_predefine_objects( client_t *this)
   client_register_object( this, (fts_object_t *)this);
 }
 
-static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
 
@@ -961,7 +961,7 @@ static void client_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_log( "[client]: Accepted client connection\n");
 }
 
-static void client_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void client_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   client_t *this = (client_t *)o;
 
@@ -1335,7 +1335,7 @@ fts_client_create_object(fts_object_t *obj, int client_id)
     fts_client_send_message(client, fts_s_register_object, ac, at);      
     fts_array_destroy(&array);
     
-    fts_send_message(obj, fts_s_update_gui, 0, 0);
+    fts_send_message(obj, fts_s_update_gui, 0, 0, fts_nix);
   }
 }
 

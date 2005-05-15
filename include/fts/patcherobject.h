@@ -56,6 +56,8 @@ typedef struct fts_object_patcher_data {
   /* properties */
   fts_plist_cell_t *properties;
   
+  int winlet; /* inlet of currently sent item */
+  
 } fts_object_patcher_data_t;
 
 /**
@@ -120,6 +122,11 @@ FTS_API void fts_patcher_object_set_state_persistence(fts_object_t *obj, int per
 FTS_API void fts_patcher_object_set_state_dirty(fts_object_t *obj);
 FTS_API void fts_patcher_object_set_dirty(fts_object_t *obj);
 FTS_API int fts_patcher_object_is_persistent(fts_object_t *obj);
+
+#define fts_object_get_message_inlet(o) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->winlet): 0)
+#define fts_object_set_message_inlet(o, i) (((o)->context != NULL)? ((((fts_object_patcher_data_t *)(o)->context)->winlet) = (i)): 0)
+
+FTS_API char *fts_object_get_identifier_string(fts_object_t *obj, char *str, int len);
 
 #endif
 

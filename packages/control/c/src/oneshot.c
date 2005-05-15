@@ -35,7 +35,7 @@ typedef struct
 } oneshot_t;
 
 static void
-oneshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   oneshot_t *this = (oneshot_t *)o;
   
@@ -58,9 +58,10 @@ oneshot_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-oneshot_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   oneshot_t *this = (oneshot_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(winlet == 0)
     {
@@ -82,7 +83,7 @@ oneshot_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-oneshot_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+oneshot_dummy(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 

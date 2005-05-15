@@ -40,7 +40,7 @@ typedef struct
 } bag_t;
 
 static void
-bag_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bag_t *x = (bag_t *)o;
   long n   = (long) fts_get_int_arg(ac, at, 0, 0);
@@ -87,7 +87,7 @@ bag_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-bag_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_cut(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bag_t *x = (bag_t *)o;
   struct blink *b;
@@ -116,7 +116,7 @@ bag_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-bag_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bag_t *x = (bag_t *)o;
 
@@ -126,18 +126,18 @@ bag_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 /* list method */
 
 static void
-bag_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ((ac >= 2) && (fts_is_number(&at[1])))
-    bag_number_1(o, winlet, s, 1, at + 1);
+    bag_number_1(o, s, 1, at + 1, fts_nix);
 
   if ((ac >= 1) && (fts_is_number(&at[0])))
-    bag_number(o, winlet, s, 1, at + 0);
+    bag_number(o, s, 1, at + 0, fts_nix);
 }
 
 
 static void
-bag_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bag_t *x = (bag_t *)o;
   struct blink *b;
@@ -149,7 +149,7 @@ bag_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 /* Also installed for $delete */
 
 static void
-bag_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bag_t *x = (bag_t *)o;
   struct blink *b, *b2;
@@ -166,7 +166,7 @@ bag_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 /* Symbol optional */
 
 static void
-bag_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bag_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bag_t *x = (bag_t *)o;
   fts_symbol_t s_arg = fts_get_symbol_arg(ac, at, 0, 0);

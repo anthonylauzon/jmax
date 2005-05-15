@@ -30,9 +30,10 @@ typedef struct
 } nbangs_t;
 
 static void
-nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+nbangs_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   nbangs_t *this = (nbangs_t *) o;
+  int winlet = fts_object_get_message_inlet(o);
   
   if(winlet == 0)
     {
@@ -52,12 +53,12 @@ nbangs_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-nbangs_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+nbangs_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 
 static void
-nbangs_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+nbangs_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   nbangs_t *this = (nbangs_t *) o;
   

@@ -127,7 +127,7 @@ sigcoef_bpass2_verify_bw(sigcoef_bpass2_t *this)
 /* reevaluate and output coeficents  */
 
 static void
-sigcoef_bpass2_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
   float c0,c1,c2,d0,d1,d2;	/* output coefs */
@@ -179,7 +179,7 @@ sigcoef_bpass2_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 /* K0:  filter low shelf output gain  (db) */
 
 static void
-sigcoef_bpass2_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
 
@@ -191,7 +191,7 @@ sigcoef_bpass2_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 /*  F: center fq. <hz> */
 
 static void
-sigcoef_bpass2_float_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_float_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
 
@@ -202,7 +202,7 @@ sigcoef_bpass2_float_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 /*  W: bandwidth <octaves> */
 
 static void
-sigcoef_bpass2_float_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_float_2(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
 
@@ -218,7 +218,7 @@ sigcoef_bpass2_float_2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 /* note:  f1 and f2 constrained: f1<f2  */
 
 static void
-sigcoef_bpass2_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -232,7 +232,7 @@ sigcoef_bpass2_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 /* takes 3 optional floating point numbers: gain<db>  centerFq<hz> bandwidth <octaves> */
 
 static void
-sigcoef_bpass2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigcoef_bpass2_t *this = (sigcoef_bpass2_t *)o;
   float g = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -257,7 +257,7 @@ sigcoef_bpass2_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 
 
 static void
-sigcoef_bpass2_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigcoef_bpass2_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

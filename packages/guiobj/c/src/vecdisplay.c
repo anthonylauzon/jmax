@@ -47,7 +47,7 @@ static fts_symbol_t sym_scroll = 0;
 static fts_symbol_t sym_bounds = 0;
 
 static void 
-vecdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+vecdisplay_called(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /************************************************************
  *
@@ -55,7 +55,7 @@ vecdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  *
  */
 static void
-vecdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
@@ -94,7 +94,7 @@ vecdisplay_deliver(vecdisplay_t *this)
 }
 
 static void 
-vecdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_called(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_update_request(o);
 }
@@ -105,7 +105,7 @@ vecdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  *
  */
 static void
-vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
@@ -142,7 +142,7 @@ vecdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-vecdisplay_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   int size = this->size;
@@ -191,7 +191,7 @@ vecdisplay_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_ivec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   int size = this->size;
@@ -234,7 +234,7 @@ vecdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-vecdisplay_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
   int size = this->size;
@@ -279,7 +279,7 @@ vecdisplay_vector(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-vecdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 
@@ -290,7 +290,7 @@ vecdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-vecdisplay_set_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_set_size_by_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   
@@ -298,7 +298,7 @@ vecdisplay_set_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int a
 }
 
 static void
-vecdisplay_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_set_range_by_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   
@@ -306,7 +306,7 @@ vecdisplay_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
 }
 
 static void
-vecdisplay_set_bounds(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_set_bounds(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
   
@@ -336,7 +336,7 @@ vecdisplay_set_bounds(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-vecdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
   fts_atom_t a[2];
@@ -347,13 +347,13 @@ vecdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
-vecdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_send( o, 0, 0, 0, 0);
 }
 
 static void 
-vecdisplay_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t *this = (vecdisplay_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -370,7 +370,7 @@ vecdisplay_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
  *
  */
 static void
-vecdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vecdisplay_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vecdisplay_t * this = (vecdisplay_t *)o;
 

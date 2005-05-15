@@ -25,8 +25,6 @@
 
 extern fts_class_t *patcher_class;
 
-extern fts_patcher_t *fts_patcher_get_scope(fts_patcher_t *patcher);
-
 #define fts_object_is_patcher(o) (fts_object_get_class(o) == patcher_class)
 
 #define fts_patcher_get_definitions(p) ((p)->definitions)

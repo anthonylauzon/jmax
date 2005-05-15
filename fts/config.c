@@ -46,21 +46,21 @@ fts_class_t* fts_config_class = NULL;
 static fts_config_t *config;
 
 static void
-config_clear(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
   /* send message clear to audio config and mid config */
-  fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at);
-  fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
+  fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at, fts_nix);
+  fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at, fts_nix);
 }
 
 static void
-config_restore_labels(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_restore_labels(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
   /* send message restore_labels to audio config and midi config */
-  fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at);
-  fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at);
+  fts_send_message((fts_object_t*)self->audio_config, fts_s_clear, ac, at, fts_nix);
+  fts_send_message((fts_object_t*)self->midi_config, fts_s_clear, ac, at, fts_nix);
 }
 
 
@@ -86,7 +86,7 @@ fts_config_open(fts_symbol_t file_name)
 }
 
 static void
-config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_load(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
   fts_symbol_t file_name = fts_get_symbol(at);
@@ -98,11 +98,11 @@ config_load(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
   /* @@@@@ upload config @@@@@ */
   self->uploaded = 0;
-  fts_send_message(o, fts_s_openEditor,0, NULL);
+  fts_send_message(o, fts_s_openEditor,0, NULL, fts_nix);
 }
 
 static void
-config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_save(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* this = (fts_config_t*)o;
   fts_symbol_t file_name = fts_get_symbol(at);
@@ -134,28 +134,28 @@ config_save(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-config_save_as_default(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_save_as_default(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t a[1];
   
   fts_set_symbol(a, fts_get_user_configuration());
-  config_save(o, 0, s, 1, a);
+  config_save(o, s, 1, a, fts_nix);
 }
 
 static void
-config_midi_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_midi_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* this = (fts_config_t*)o;
   fts_symbol_t selector = fts_get_symbol( at);
-  fts_send_message( ((fts_object_t *)this->midi_config), selector, ac - 1, at + 1);
+  fts_send_message( ((fts_object_t *)this->midi_config), selector, ac - 1, at + 1, fts_nix);
 }
 
 static void
-config_audio_message(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_audio_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* this = (fts_config_t*)o;
   fts_symbol_t selector = fts_get_symbol( at);
-  fts_send_message( ((fts_object_t *)this->audio_config), selector, ac - 1, at + 1);
+  fts_send_message( ((fts_object_t *)this->audio_config), selector, ac - 1, at + 1, fts_nix);
 }
 
 /* set config as dirty or as saved.
@@ -175,17 +175,17 @@ void fts_config_set_dirty(fts_config_t *this, int is_dirty)
 }
 
 static void
-config_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
     
   /* send message print to audio config and mid config */
-  fts_send_message((fts_object_t*)self->audio_config, fts_s_print, ac, at);
-  fts_send_message((fts_object_t*)self->midi_config, fts_s_print, ac, at);
+  fts_send_message((fts_object_t*)self->audio_config, fts_s_print, ac, at, fts_nix);
+  fts_send_message((fts_object_t*)self->midi_config, fts_s_print, ac, at, fts_nix);
 }
 
 static void
-config_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+config_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t *this = (fts_config_t *)o;
 
@@ -197,7 +197,7 @@ config_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+config_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t *this = (fts_config_t *)o;
   fts_atom_t a;
@@ -208,14 +208,14 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_set_int( &a, fts_object_get_id( ((fts_object_t *)this->audio_config)));
   fts_client_send_message( o, fts_s_audio_config, 1, &a);
       
-  fts_send_message( ((fts_object_t *)this->audio_config), fts_s_upload, 0, 0);
+  fts_send_message( ((fts_object_t *)this->audio_config), fts_s_upload, 0, 0, fts_nix);
 
   if (fts_object_has_client( ((fts_object_t *)this->midi_config)) == 0)
     fts_client_register_object( ((fts_object_t *)this->midi_config), fts_object_get_client_id( o));
 
   fts_set_int( &a, fts_object_get_id( ((fts_object_t *)this->midi_config)));
   fts_client_send_message( o, fts_s_midi_config, 1, &a);
-  fts_send_message( ((fts_object_t *)this->midi_config), fts_s_upload, 0, 0);
+  fts_send_message( ((fts_object_t *)this->midi_config), fts_s_upload, 0, 0, fts_nix);
 
   if( this->file_name != NULL)
     { 
@@ -227,7 +227,7 @@ config_upload( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-config_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+config_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t *this = (fts_config_t *)o;
 
@@ -241,7 +241,7 @@ config_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-config_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
   /*   fts_object_release( o); */
@@ -250,7 +250,7 @@ config_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
   fts_atom_t a;
@@ -277,7 +277,7 @@ config_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-config_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+config_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_config_t* self = (fts_config_t*)o;
   
@@ -342,7 +342,7 @@ fts_config_set( fts_config_t *new_config)
       fts_set_int(&a, fts_object_get_id( (fts_object_t *)new_config));
       fts_client_send_message(  (fts_object_t *) object_get_client( (fts_object_t *)new_config), fts_s_config, 1, &a);
       
-      fts_send_message( (fts_object_t *)new_config, fts_s_upload, 0, 0);
+      fts_send_message( (fts_object_t *)new_config, fts_s_upload, 0, 0, fts_nix);
     }
   }
   

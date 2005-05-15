@@ -30,14 +30,14 @@ typedef struct
 } makenote_t;
 
 static void
-makenote_send_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_send_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_int(o, 1, 0);
   fts_outlet_int(o, 0, fts_get_int(at));
 }
 
 static void
-makenote_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_pitch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   makenote_t *this = (makenote_t *)o;
 
@@ -52,7 +52,7 @@ makenote_pitch(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-makenote_set_velocity(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_set_velocity(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   makenote_t *this = (makenote_t *)o;
 
@@ -60,7 +60,7 @@ makenote_set_velocity(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-makenote_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_set_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   makenote_t *this = (makenote_t *)o;
   double duration = fts_get_number_float(at);
@@ -72,47 +72,47 @@ makenote_set_duration(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-makenote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 3:
       if(fts_is_number(at + 2))
-	makenote_set_duration(o, 0, 0, 1, at + 2);
+	makenote_set_duration(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	makenote_set_velocity(o, 0, 0, 1, at + 1);
+	makenote_set_velocity(o, 0, 1, at + 1, fts_nix);
     case 1:
-      makenote_pitch(o, winlet, s, 1, at);
+      makenote_pitch(o, s, 1, at, fts_nix);
     case 0:
       break;
     }      
 }
 
 static void
-makenote_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_timebase_flush_object(fts_get_timebase(), o);
 }
 
 static void
-makenote_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_timebase_remove_object(fts_get_timebase(), o);
 }
 
 
 static void
-makenote_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+makenote_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch(ac)
     {
     default:
     case 2:
-      makenote_set_duration(o, 0, 0, 1, at + 1);
+      makenote_set_duration(o, 0, 1, at + 1, fts_nix);
     case 1:
-      makenote_set_velocity(o, 0, 0, 1, at + 0);
+      makenote_set_velocity(o, 0, 1, at + 0, fts_nix);
     case 0:
       break;
     }

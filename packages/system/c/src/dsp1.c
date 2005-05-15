@@ -30,7 +30,7 @@ typedef struct
 
 
 static void 
-dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int active = fts_get_int(at);
 
@@ -38,7 +38,7 @@ dsp_active(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-dsp_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(fts_dsp_is_active())
     fts_dsp_desactivate();
@@ -47,13 +47,13 @@ dsp_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-dsp_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_desactivate();
 }
 
 static void
-dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_on_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int active = fts_get_number_int(at);
 
@@ -64,7 +64,7 @@ dsp_on_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-dsp_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (!fts_dsp_is_active())
   {
@@ -78,7 +78,7 @@ dsp_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_save(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   FILE *f;
   
@@ -98,20 +98,20 @@ dsp_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-dsp_print_signals(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_print_signals(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     dsp_chain_post_signals();
 }
 
 
 static void
-dsp_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_active_add_listener(o, dsp_active);
 }
 
 static void
-dsp_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_active_remove_listener(o);
 }

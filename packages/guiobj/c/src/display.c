@@ -43,7 +43,7 @@ typedef struct
 static fts_symbol_t sym_display = 0;
 
 static void 
-display_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+display_called(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /************************************************************
  *
@@ -51,7 +51,7 @@ display_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  *
  */
 static void
-display_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   display_t * this = (display_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
@@ -122,20 +122,20 @@ display_deliver(display_t *this)
 }
 
 static void 
-display_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_called(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(fts_object_get_patcher(o) != NULL)  
     fts_update_request(o);
 }
 
 static void 
-display_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   display_send( o, 0, 0, 0, 0);
 }
 
 static void
-display_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   display_t *this = (display_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -182,7 +182,7 @@ display_ftl(fts_word_t *argv)
 }
 
 static void
-display_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   display_t * this = (display_t *)o;
 
@@ -218,7 +218,7 @@ display_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
  *
  */
 static void
-display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   display_t * this = (display_t *)o;
 
@@ -235,7 +235,7 @@ display_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-display_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+display_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   display_t * this = (display_t *)o;
 

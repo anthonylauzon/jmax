@@ -48,7 +48,7 @@ typedef struct _filestream_
 } filestream_t;
 
 static void
-filestream_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_read(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   filestream_t *this = (filestream_t *)o;
   int size = this->in_size;
@@ -180,7 +180,7 @@ filestream_flush(fts_bytestream_t *stream)
  */
 
 static void
-filestream_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   filestream_t *this = (filestream_t *)o;
 
@@ -189,7 +189,7 @@ filestream_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-filestream_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   filestream_t *this = (filestream_t *)o;
 
@@ -205,7 +205,7 @@ filestream_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
       
 static void
-filestream_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   filestream_t *this = (filestream_t *)o;
 
@@ -262,7 +262,7 @@ filestream_start(filestream_t *this)
 }
   
 static void
-filestream_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   filestream_t *this = (filestream_t *)o;
 
@@ -294,7 +294,7 @@ filestream_open(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-filestream_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   filestream_t *this = (filestream_t *)o;
 
@@ -313,7 +313,7 @@ filestream_close(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   filestream_t *this = (filestream_t *)o;
 
@@ -339,14 +339,14 @@ filestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
       else
 	this->in_size = this->out_size = 1;
       
-      filestream_open(o, 0, 0, ac, at);
+      filestream_open(o, 0, ac, at, fts_nix);
     }
 }
 
 static void 
-filestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+filestream_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
-  filestream_close(o, 0, 0, 0, 0);
+  filestream_close(o, 0, 0, 0, fts_nix);
 }
 
 /************************************************************

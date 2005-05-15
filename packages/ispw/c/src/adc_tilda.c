@@ -27,7 +27,7 @@ typedef struct {
   fts_audioport_t *port;
 } adc_tilda_t;
 
-static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void adc_tilda_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   adc_tilda_t *this = (adc_tilda_t *)o;
   int outlets;
@@ -60,7 +60,7 @@ static void adc_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     }
 }
 
-static void adc_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void adc_tilda_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   adc_tilda_t *this = (adc_tilda_t *)o;
 
@@ -72,12 +72,12 @@ static void adc_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int a
     }
 }
 
-static void adc_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void adc_tilda_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_activate();
 }
 
-static void adc_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void adc_tilda_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_desactivate();
 }

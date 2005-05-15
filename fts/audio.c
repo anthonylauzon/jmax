@@ -155,7 +155,7 @@ fts_audioport_add_label( fts_audioport_t *port, int direction, fts_audiolabel_t 
       fts_atom_t a[1];
 
       fts_set_symbol( a, fts_audiolabel_get_name( label));
-      fts_send_message( (fts_object_t *)port, selector, 1, a);
+      fts_send_message( (fts_object_t *)port, selector, 1, a, fts_nix);
     }
 
   port->inout[direction].used++;
@@ -173,7 +173,7 @@ fts_audioport_remove_label( fts_audioport_t *port, int direction, fts_audiolabel
 
   /* Call "close" method when removing last label */
   if ( !port->inout[direction].used)
-    fts_send_message( (fts_object_t *)port, selector, 0, 0);
+    fts_send_message( (fts_object_t *)port, selector, 0, 0, fts_nix);
 
   fts_audioport_set_channel_unused( port, direction, fts_audiolabel_get_channel( label, direction));
 }
@@ -272,7 +272,7 @@ audiolabel_fire_added( fts_symbol_t label_name)
 
   fts_set_symbol( a, label_name);
   for ( p = audiolabel_listeners; p; p = p->next)
-    (*p->label_added)( p->listener, -1, NULL, 1, a);
+    (*p->label_added)( p->listener, NULL, 1, a, fts_nix);
 }
 
 static void
@@ -283,7 +283,7 @@ audiolabel_fire_removed( fts_symbol_t label_name)
 
   fts_set_symbol( a, label_name);
   for ( p = audiolabel_listeners; p; p = p->next)
-    (*p->label_removed)( p->listener, -1, NULL, 1, a);
+    (*p->label_removed)( p->listener, NULL, 1, a, fts_nix);
 }
 
 fts_audiolabel_t *
@@ -378,7 +378,7 @@ audiolabel_set_channel( fts_audiolabel_t *label, int direction, int channel)
 }
 
 static void
-audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_symbol_t port_name = fts_get_symbol(at);
@@ -399,7 +399,7 @@ audiolabel_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_symbol_t port_name = fts_get_symbol(at);
@@ -420,7 +420,7 @@ audiolabel_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-audiolabel_input_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_input_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   int channel = fts_get_int(at);
@@ -434,7 +434,7 @@ audiolabel_input_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 
 
 static void
-audiolabel_output_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_output_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   int channel = fts_get_int(at);
@@ -447,7 +447,7 @@ audiolabel_output_channel(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-audiolabel_change_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_change_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
   fts_audioconfig_t *aconfig = (fts_audioconfig_t *)fts_audioconfig_get();
@@ -468,7 +468,7 @@ audiolabel_change_label(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
 
@@ -491,7 +491,7 @@ audiolabel_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-audiolabel_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+audiolabel_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audiolabel_t *self = (fts_audiolabel_t *)o;
 
@@ -677,7 +677,7 @@ fts_symbol_t *fts_audiomanager_get_output_names(void)
  */
 
 static void 
-audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+audio_sched_run(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioport_t *port;
   int channel, tick_size, at_least_one_io_fun_called;
@@ -736,13 +736,13 @@ audio_sched_run( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-audio_sched_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+audio_sched_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_sched_add( o, FTS_SCHED_ALWAYS);
 }
 
 static void
-audio_sched_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+audio_sched_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_sched_remove( o);
 }
@@ -762,15 +762,18 @@ audio_sched_instantiate(fts_class_t *cl)
  *
  */
 
-static void nullaudioport_open(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void 
+nullaudioport_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 
-static void nullaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void 
+nullaudioport_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 
-static void nullaudioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void 
+nullaudioport_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioport_t* self = (fts_audioport_t*)o;
   
@@ -783,7 +786,8 @@ static void nullaudioport_init(fts_object_t* o, int winlet, fts_symbol_t s, int 
   
 }
 
-static void nullaudioport_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void 
+nullaudioport_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_audioport_t* self = (fts_audioport_t*)o;
   

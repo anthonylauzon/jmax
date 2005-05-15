@@ -23,7 +23,7 @@
 #include <fts/fts.h>
 
 static void
-bangbang_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bangbang_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int i;
 
@@ -32,7 +32,7 @@ bangbang_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-bangbang_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bangbang_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int noutlets;
 

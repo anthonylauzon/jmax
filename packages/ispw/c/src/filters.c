@@ -69,7 +69,7 @@ compute_biquad(float *x, float *y, biquad_state_t *state, biquad_coefs_t *coefs,
  *
  */
 
-static void sig2p2z_state_clear(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at);
+static void sig2p2z_state_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 static fts_symbol_t sym_sig2p2z = 0;
 static fts_symbol_t sym_sig2p2z_64 = 0;
@@ -95,7 +95,7 @@ typedef struct
 } sig2p2z_t;
 
 static void
-sig2p2z_state_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_state_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   const float zero = 0.0;
@@ -209,7 +209,7 @@ ftl_64_1ops_2p2z(fts_word_t *argv)
 
 
 static void
-sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   fts_atom_t argv[4];
@@ -244,7 +244,7 @@ sig2p2z_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-sig2p2z_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f;
@@ -269,7 +269,7 @@ sig2p2z_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-sig2p2z_gain_c0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_gain_c0(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -278,7 +278,7 @@ sig2p2z_gain_c0(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-sig2p2z_fbcoef1_c1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_fbcoef1_c1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f =  fts_get_float_arg(ac, at, 0, 0.0f);
@@ -287,7 +287,7 @@ sig2p2z_fbcoef1_c1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sig2p2z_fbcoef2_c2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_fbcoef2_c2(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f =  fts_get_float_arg(ac, at, 0, 0.0f);
@@ -296,7 +296,7 @@ sig2p2z_fbcoef2_c2(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sig2p2z_ffcoef0_c3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_ffcoef0_c3(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -305,7 +305,7 @@ sig2p2z_ffcoef0_c3(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sig2p2z_ffcoef1_c4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_ffcoef1_c4(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -314,7 +314,7 @@ sig2p2z_ffcoef1_c4(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sig2p2z_ffcoef2_c5(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_ffcoef2_c5(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -323,19 +323,19 @@ sig2p2z_ffcoef2_c5(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sig2p2z_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
 
   this->ftl_data = ftl_data_new(ctlf2p2z_t);
 
-  sig2p2z_set(o, winlet, s, ac, at);
+  sig2p2z_set(o, s, ac, at, fts_nix);
 
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-sig2p2z_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig2p2z_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sig2p2z_t *this = (sig2p2z_t *)o;
 

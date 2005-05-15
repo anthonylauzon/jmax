@@ -45,7 +45,7 @@ typedef struct _matrix
 */
 
 static void
-matrix_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -184,7 +184,7 @@ ftl_matrix_copy_in(fts_word_t *a)
 */
 
 static void
-matrix_set_fade(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_set_fade(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   float fade = fts_get_number_float(at);
@@ -196,7 +196,7 @@ matrix_set_fade(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-matrix_node(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_node(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
@@ -208,7 +208,7 @@ matrix_node(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at
   {
     default:
       if(fts_is_number(at + 3))
-        matrix_set_fade(o, 0, 0, 1, at + 3);
+        matrix_set_fade(o, 0, 1, at + 3, fts_nix);
 
     case 3:
       if(fts_is_number(at + 2))
@@ -238,7 +238,7 @@ matrix_node(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at
 }
 
 static void
-matrix_in(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_in(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
@@ -250,7 +250,7 @@ matrix_in(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
   {
     default:
       if(fts_is_number(at + 2))
-        matrix_set_fade(o, 0, 0, 1, at + 2);
+        matrix_set_fade(o, 0, 1, at + 2, fts_nix);
 
     case 2:
       if(fts_is_number(at + 1))
@@ -274,7 +274,7 @@ matrix_in(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 }
 
 static void
-matrix_out(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_out(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   fts_ramp_t *ramps = (fts_ramp_t *)ftl_data_get_ptr(this->ramps);
@@ -286,7 +286,7 @@ matrix_out(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
   {
     default:
       if(fts_is_number(at + 2))
-        matrix_set_fade(o, 0, 0, 1, at + 2);
+        matrix_set_fade(o, 0, 1, at + 2, fts_nix);
 
     case 2:
       if(fts_is_number(at + 1))
@@ -310,7 +310,7 @@ matrix_out(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 }
 
 static void
-matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_all(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   float value = fts_get_number_float(at + 0);
@@ -330,7 +330,7 @@ matrix_all(fts_object_t *o, int i, fts_symbol_t s, int ac, const fts_atom_t *at)
 */
 
 static void
-matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
   int n_ins = 0;
@@ -392,7 +392,7 @@ matrix_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-matrix_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matrix_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matrix_t *this = (matrix_t *)o;
 

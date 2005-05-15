@@ -23,6 +23,7 @@
  *
  */
 #include <string.h>
+#include <stdio.h>
 #include <fts/fts.h>
 #include <ftsconfig.h>
 #ifdef WIN32
@@ -30,7 +31,12 @@
 #else
 #include <alloca.h>
 #endif
+
 #include <sndfile.h>
+
+#ifndef TRUE
+#define TRUE 1
+#endif
 
 /* sample formats */
 fts_symbol_t fts_s_int8;

@@ -34,7 +34,7 @@ typedef struct
 
 
 static void
-sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigobj_t *this = (sigobj_t *)o;
   int down = fts_get_int_arg(ac, at, 1, 0);
@@ -51,7 +51,7 @@ sig_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 
 
 static void
-sig_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigobj_t *this = (sigobj_t *)o;
 
@@ -89,7 +89,7 @@ static void ftl_sig_64(fts_word_t *argv)
 
 
 static void
-sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig_put_dsp_function(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigobj_t *this = (sigobj_t *)o;
   fts_atom_t argv[3];
@@ -118,7 +118,7 @@ sig_put_dsp_function(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  */
  
 static void
-sig_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sig_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigobj_t *this = (sigobj_t *)o;
   float value = (float) fts_get_number_float(at);

@@ -91,7 +91,7 @@ typedef struct{
 } pitch_t;
 
 static void 
-pitch_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
 
@@ -334,7 +334,7 @@ analysis(pitch_t *x)
  */
  
 static void 
-pitch_vibrato(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_vibrato(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 0);
@@ -351,7 +351,7 @@ pitch_vibrato(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-pitch_max_error(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_max_error(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0);
@@ -365,7 +365,7 @@ pitch_max_error(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-pitch_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_reattack(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
   float f = (float) fts_get_float_arg(ac, at, 0, 0);
@@ -378,7 +378,7 @@ pitch_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-pitch_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 1);
@@ -399,7 +399,7 @@ pitch_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void 
-pitch_loud(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_loud(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {  
   ((pitch_t *)o)->ctl.loud = fts_get_int_arg(ac, at, 0, 0);
 }
@@ -410,7 +410,7 @@ pitch_loud(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void 
-pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -420,11 +420,11 @@ pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   
   fts_set_int(a, x->ctl.vib_time);
   fts_set_float(a+1, x->ctl.vib_depth);
-  pitch_vibrato(o, 0, 0, 2, a);
+  pitch_vibrato(o, 0, 2, a, fts_nix);
   
   fts_set_float(a, x->ctl.reattack_thresh);
   fts_set_int(a+1, x->ctl.reattack_time);
-  pitch_reattack(o, 0, 0, 2, a);
+  pitch_reattack(o, 0, 2, a, fts_nix);
   
   fts_set_pointer(a, (void *)o);
   fts_set_pointer(a+1, analysis);
@@ -434,7 +434,7 @@ pitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void 
-pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
   int pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
@@ -489,7 +489,7 @@ pitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-pitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pitch_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pitch_t *x = (pitch_t *)o;
 

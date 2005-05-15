@@ -54,7 +54,7 @@ call_ftl_subr_cond( fts_word_t *argv)
 }
 
 static void
-sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigswitch_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigswitch_t *this = (sigswitch_t *)o;
   fts_atom_t argv[3];
@@ -79,7 +79,7 @@ sigswitch_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-sigswitch_put_after(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigswitch_put_after(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigswitch_t *this = (sigswitch_t *)o;
 
@@ -88,7 +88,7 @@ sigswitch_put_after(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-sigswitch_switch(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigswitch_switch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigswitch_t *this = (sigswitch_t *)o;
   int state = fts_get_int(at);
@@ -97,7 +97,7 @@ sigswitch_switch(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts
 }
 
 static void
-sigswitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigswitch_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigswitch_t *this = (sigswitch_t *)o;
   int state = fts_get_int_arg(ac, at, 0, 0);
@@ -109,7 +109,7 @@ sigswitch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-sigswitch_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigswitch_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigswitch_t *this = (sigswitch_t *)o;
 

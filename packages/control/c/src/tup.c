@@ -34,7 +34,7 @@
  */
 
 static void
-tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tuple_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
@@ -42,7 +42,7 @@ tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tuple_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
@@ -50,7 +50,7 @@ tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-tuple_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tuple_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
@@ -93,7 +93,7 @@ typedef struct _tup_
 } tup_t;
 
 static void
-tup_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   fts_atom_t *atoms = fts_tuple_get_atoms(&this->tuple);
@@ -112,9 +112,10 @@ tup_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-tup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
   unsigned int bit = 1 << winlet;
   fts_atom_t *atoms = fts_tuple_get_atoms(&this->tuple);
 
@@ -171,7 +172,7 @@ tup_set_bits(unsigned int *bits, int n, const fts_atom_t *at, int sign)
 }
 
 static void
-tup_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set_trigger(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   int n = fts_tuple_get_size(&this->tuple);
@@ -180,7 +181,7 @@ tup_set_trigger(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-tup_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set_require(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   unsigned int once = 0;
@@ -194,7 +195,7 @@ tup_set_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-tup_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set_mode(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   int n = fts_tuple_get_size(&this->tuple);
@@ -231,7 +232,7 @@ tup_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-tup_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set_mode_any(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   int n = fts_tuple_get_size(&this->tuple);
@@ -242,7 +243,7 @@ tup_set_mode_any(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   this->wait = 0;
 }
 static void
-tup_set_mode_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_set_mode_all(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   int n = fts_tuple_get_size(&this->tuple);
@@ -251,7 +252,7 @@ tup_set_mode_all(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-tup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tup_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tup_t *this = (tup_t *)o;
   int i, n;
@@ -341,13 +342,13 @@ typedef struct _untup_
 } untup_t;
 
 static void
-untup_primitive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+untup_primitive(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_atom(o, 0, at);
 }
 
 static void
-untup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+untup_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   untup_t *this = (untup_t *)o;
   int n = this->n;
@@ -366,7 +367,7 @@ untup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-untup_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+untup_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   untup_t *this = (untup_t *)o;
   int n = 0;
@@ -400,7 +401,7 @@ untup_instantiate(fts_class_t *cl)
  */
 
 static void
-cotup_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cotup_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
@@ -408,7 +409,7 @@ cotup_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-cotup_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cotup_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
   
@@ -417,7 +418,7 @@ cotup_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-cotup_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cotup_append(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
@@ -455,13 +456,13 @@ cotup_instantiate(fts_class_t *cl)
  */
 
 static void
-detup_primitive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+detup_primitive(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_atom(o, 0, at);
 }
 
 static void
-detup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+detup_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int i;
 
@@ -491,7 +492,7 @@ detup_instantiate(fts_class_t *cl)
  */
 
 static void
-getup_object(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+getup_object(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(fts_is_object(at))
   {
@@ -537,7 +538,7 @@ getup_instantiate(fts_class_t *cl)
  */ 
 
 static void
-messtup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtup_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 /*BUG: tuple input not split into atoms any more */
 
@@ -548,7 +549,7 @@ messtup_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-messtup_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtup_message(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
 
@@ -558,12 +559,12 @@ messtup_message(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-messtup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+messtup_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *this = (fts_tuple_t *)o;
   
   if(s == 0)
-    fts_invoke_method(messtup_varargs, o, ac, at);
+    fts_invoke_method(messtup_varargs, o, ac, at, fts_nix);
   else
   {
     /* set tuple to selector */
@@ -571,7 +572,7 @@ messtup_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     fts_tuple_append_symbol(this, s);
 
     /* append the arguments  */
-    fts_invoke_method(messtup_message, o, ac, at);
+    fts_invoke_method(messtup_message, o, ac, at, fts_nix);
   }
 }
 

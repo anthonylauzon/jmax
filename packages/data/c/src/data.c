@@ -44,10 +44,12 @@ extern void getrange_config(void);
 
 extern void dumpfile_config(void);
 
-void
-data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+data_object_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_object(o, 0, o);
+  
+  return fts_ok;
 }
 
 /***********************************************************************
@@ -58,8 +60,8 @@ data_object_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 static fts_symbol_t sym_expr = NULL;
 fts_class_t *expr_class = NULL;
 
-static void
-expr_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+expr_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   expr_t *self = (expr_t *) o;
   fts_symbol_t sym = fts_get_symbol(at);
@@ -92,24 +94,22 @@ expr_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   }
   
   self->status = fts_ok;  
+  
+  return fts_ok;
 }
 
 static fts_status_t
 expr_method_callback(int ac, const fts_atom_t *at, void *o)
 {
-  if(ac > 1)
-  {
-    fts_object_t *tup = fts_object_create(fts_tuple_class, ac, at);
-    fts_return_object(tup);
-  }
-  else if(ac > 0)
-    fts_return((fts_atom_t *)at);
+  expr_t *self = (expr_t *)o;
+  
+  fts_array_set(&self->descr, ac, at);
   
   return fts_ok;
 }
 
-static void
-_expr_evaluate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_expr_evaluate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   expr_t *self = (expr_t *)o;
   fts_hashtable_t *locals = NULL;
@@ -125,13 +125,26 @@ _expr_evaluate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   
   if(self->expression != NULL)
   {
-    fts_status_t status = fts_expression_evaluate(self->expression, locals, fts_get_global_definitions(), ac, at, expr_method_callback, NULL);
+    fts_status_t status = fts_expression_evaluate(self->expression, locals, fts_get_global_definitions(), ac, at, expr_method_callback, self);
+    int ret_ac = fts_array_get_size(&self->descr);
+    fts_atom_t *ret_at = fts_array_get_atoms(&self->descr);
     
     if(status != fts_ok)
       fts_object_error(o, fts_status_get_description(status));
     
     self->status = status;
+    
+    if(ret_ac > 1)
+    {
+      fts_object_t *tup = fts_object_create(fts_tuple_class, ret_ac, ret_at);
+      fts_set_object(ret, tup);
+    }
+    else if(ret_ac > 0)
+      *ret = *ret_at;
+    
   }
+  
+  return fts_ok;
 }
 
 static fts_status_t
@@ -150,7 +163,7 @@ expr_function_callback(int ac, const fts_atom_t *at, void *o)
   return fts_ok;
 }
 
-void
+fts_method_status_t
 expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(scope == NULL)
@@ -165,9 +178,11 @@ expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_ato
     
     self->status = status;
   }
+  
+  return fts_ok;
 }
 
-void
+fts_method_status_t
 expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(self->expression != NULL)
@@ -179,6 +194,8 @@ expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *a
     
     self->status = status;
   }
+  
+  return fts_ok;
 }
 
 static void
@@ -190,8 +207,8 @@ expr_description_function(fts_object_t *o, fts_array_t *array)
   fts_array_append_symbol(array, self->symbol);
 }
 
-static void
-expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+expr_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   expr_t *self = (expr_t *)o;
   
@@ -202,14 +219,16 @@ expr_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   if(ac > 0 && fts_is_symbol(at))
   {
     fts_expression_new(0, 0, &self->expression);
-    expr_set(o, 0, 0, ac, at);
+    expr_set(o, NULL, ac, at, fts_nix);
   }
   else
     fts_object_error(o, "expression argument required");
+  
+  return fts_ok;
 }
 
-static void
-expr_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+expr_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   expr_t *self = (expr_t *)o;
   
@@ -217,6 +236,8 @@ expr_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   
   if(self->expression != NULL)
     fts_expression_delete(self->expression);
+  
+  return fts_ok;
 }
 
 static void
@@ -407,13 +428,15 @@ propobj_set_float_property_by_name(propobj_t *self, fts_symbol_t name, const fts
     propobj_set_property_by_index(self, prop->index, value);
 }
 
-void
-propobj_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+propobj_remove_property(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_t *self = (propobj_t *)o;
   fts_symbol_t name = fts_get_symbol(at);
   
   propobj_set_property_by_name(self, name, fts_null);
+  
+  return fts_ok;
 }
 
 void
@@ -452,8 +475,8 @@ propobj_post_properties(propobj_t *self, fts_bytestream_t *stream)
   }
 }
 
-void
-propobj_dump_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_method_status_t
+propobj_dump_properties(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_t *self = (propobj_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -468,6 +491,8 @@ propobj_dump_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     if(!fts_is_void(atoms + i))
       fts_dumper_send(dumper, descr->array[i].name, 1, atoms + i);
   }
+  
+  return fts_ok;
 }
 
 void 
@@ -562,36 +587,44 @@ propobj_get_descritption(propobj_t *self)
   return (propobj_class_description_t *)fts_object_get_context((fts_object_t *)cl);
 }
 
-static void
-_default_set_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_default_set_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_t *self = (propobj_t *)o;
   
   propobj_set_property_by_name(self, s, at);
+  
+  return fts_ok;
 }
 
-static void
-_default_set_int_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_default_set_int_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_t *self = (propobj_t *)o;
 
   propobj_set_int_property_by_name(self, s, at);
+  
+  return fts_ok;
 }
 
-static void
-_default_set_float_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_default_set_float_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_t *self = (propobj_t *)o;
 
   propobj_set_float_property_by_name(self, s, at);
+  
+  return fts_ok;
 }
 
-static void
-_default_get_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_default_get_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_t *self = (propobj_t *)o;
   
-  propobj_get_property_by_name(self, s, fts_get_return_value());
+  propobj_get_property_by_name(self, s, ret);
+  
+  return fts_ok;
 }
 
 static propobj_property_t * 

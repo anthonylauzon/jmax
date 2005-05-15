@@ -42,7 +42,7 @@ midiout_send_event(midiout_t *this, fts_midievent_t *event, double time)
 }
 
 static void
-midiout_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_set_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
   int channel = fts_get_number_int(at);
@@ -56,7 +56,7 @@ midiout_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-midiout_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_set_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
   int number = fts_get_number_int(at);
@@ -70,7 +70,7 @@ midiout_set_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-midiout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
@@ -79,7 +79,7 @@ midiout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-midiout_panic(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_panic(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiout_t *this = (midiout_t *)o;
   int i;
@@ -89,7 +89,7 @@ midiout_panic(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-midiout_general_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_general_midi(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiout_t *this = (midiout_t *)o;
 
@@ -97,7 +97,7 @@ midiout_general_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-noteout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -106,10 +106,10 @@ noteout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     default:
     case 3:
       if(fts_is_number(at + 2))
-	midiout_set_channel(o, 0, 0, 1, at + 2);
+	midiout_set_channel(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_number(o, 0, 0, 1, at + 1);
+	midiout_set_number(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
 	{
@@ -128,7 +128,7 @@ noteout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-noteout_all_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+noteout_all_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiout_t *this = (midiout_t *)o;
   int channel = -1;
@@ -148,13 +148,13 @@ noteout_all_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     }
   else
     {
-      midiout_set_channel(o, 0, 0, 1, at);
+      midiout_set_channel(o, 0, 1, at, fts_nix);
       midiout_send_event(this, fts_midievent_control_change_new(channel, 123, 0), 0.0);
     }    
 }
 
 static void
-polyout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+polyout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -163,10 +163,10 @@ polyout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     default:
     case 3:
       if(fts_is_number(at + 2))
-	midiout_set_channel(o, 0, 0, 1, at + 2);
+	midiout_set_channel(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_number(o, 0, 0, 1, at + 1);
+	midiout_set_number(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
 	{
@@ -185,7 +185,7 @@ polyout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-ctlout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ctlout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -194,10 +194,10 @@ ctlout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     default:
     case 3:
       if(fts_is_number(at + 2))
-	midiout_set_channel(o, 0, 0, 1, at + 2);
+	midiout_set_channel(o, 0, 1, at + 2, fts_nix);
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_number(o, 0, 0, 1, at + 1);
+	midiout_set_number(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
 	{
@@ -216,7 +216,7 @@ ctlout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-pgmout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pgmout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -225,7 +225,7 @@ pgmout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     default:
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_channel(o, 0, 0, 1, at + 1);
+	midiout_set_channel(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
 	{
@@ -244,7 +244,7 @@ pgmout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-touchout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+touchout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -253,7 +253,7 @@ touchout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     default:
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_channel(o, 0, 0, 1, at + 1);
+	midiout_set_channel(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
 	{
@@ -272,7 +272,7 @@ touchout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-bendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bendout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -281,7 +281,7 @@ bendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
     default:
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_channel(o, 0, 0, 1, at + 1);
+	midiout_set_channel(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at))
 	{
@@ -300,7 +300,7 @@ bendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-xbendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xbendout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
 
@@ -309,7 +309,7 @@ xbendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     default:
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_channel(o, 0, 0, 1, at + 1);
+	midiout_set_channel(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at))
 	{
@@ -328,7 +328,7 @@ xbendout_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-bendout_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bendout_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
   int range = 2;
@@ -338,7 +338,7 @@ bendout_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     default:
     case 2:
       if(fts_is_number(at + 1))
-	midiout_set_channel(o, 0, 0, 1, at + 1);
+	midiout_set_channel(o, 0, 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at))
 	{
@@ -369,7 +369,7 @@ midiout_get_number_and_channel(fts_object_t *o, int ac, const fts_atom_t *at)
 { 
   if(ac >= 2 && fts_is_number(at)) 
     {
-      midiout_set_number(o, 0, 0, 1, at);
+      midiout_set_number(o, 0, 1, at, fts_nix);
       
       /* skip number argument */
       ac--;
@@ -377,11 +377,11 @@ midiout_get_number_and_channel(fts_object_t *o, int ac, const fts_atom_t *at)
     }
   
   if(ac >= 1 && fts_is_number(at)) 
-    midiout_set_channel(o, 0, 0, 1, at);
+    midiout_set_channel(o, 0, 1, at, fts_nix);
 }
 
 static void
-midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiout_t *this = (midiout_t *)o;
 
@@ -401,7 +401,7 @@ midiout_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-midiout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiout_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiout_t *this = (midiout_t *)o;
   

@@ -30,19 +30,19 @@
 #define abs(x) ((x) > 0 ? (x) : -(x))
 
 static void
-abs_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_int(o, 0, abs(fts_get_int(at)));
 }
 
 static void
-abs_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_float(o, 0, abs(fts_get_float(at)));
 }
 
 static void
-abs_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+abs_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t *out = alloca(ac * sizeof(fts_atom_t));
   int i;

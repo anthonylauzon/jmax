@@ -35,7 +35,7 @@ typedef struct _out_
 } out_t;
 
 static void
-out_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_t *this = (out_t *)o;
 
@@ -43,7 +43,7 @@ out_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-out_number_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_number_and_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_t *this = (out_t *)o;
   
@@ -52,7 +52,7 @@ out_number_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-out_varargs_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_varargs_and_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_t *this = (out_t *)o;
   int i;
@@ -65,7 +65,7 @@ out_varargs_and_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-out_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_t *this = (out_t *)o;
   
@@ -73,7 +73,7 @@ out_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-out_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_t *this = (out_t *)o;
   int i;
@@ -90,7 +90,7 @@ out_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-out_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   out_t *this = (out_t *)o;
 
@@ -116,7 +116,7 @@ out_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-out_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+out_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_t *this = (out_t *)o;
 

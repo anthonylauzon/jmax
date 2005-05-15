@@ -186,7 +186,7 @@ typedef struct {
   protoencode_t encoder;
 } udpsend_t;
 
-static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpsend_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udpsend_t *self = (udpsend_t *)o;
   fts_bytestream_t* udp_stream;
@@ -222,7 +222,7 @@ static void udpsend_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   protoencode_init( &self->encoder);
 }
 
-static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpsend_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udpsend_t *self = (udpsend_t *)o;
 
@@ -234,7 +234,7 @@ static void udpsend_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   protoencode_destroy( &self->encoder);
 }
 
-static void udpsend_anything(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void udpsend_anything(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int size;
   udpsend_t *self = (udpsend_t *)o;

@@ -73,7 +73,7 @@ static void update_group_table_add( update_group_t *update_group, int id)
  *
  */
 
-static void update_group_timebase( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void update_group_timebase(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   update_group_t *this = (update_group_t *)o;
 
@@ -99,7 +99,7 @@ static void update_group_timebase( fts_object_t *o, int winlet, fts_symbol_t s, 
   fts_timebase_add_call( fts_get_timebase(), (fts_object_t *)this, update_group_timebase, 0, this->period);
 }
 
-static void update_group_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void update_group_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   update_group_t *this = (update_group_t *)o;
 
@@ -109,7 +109,7 @@ static void update_group_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   this->object_count = 0;
 }
 
-static void update_group_start( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void update_group_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   update_group_table_add( (update_group_t *)o, fts_object_get_client_id( o));
 }

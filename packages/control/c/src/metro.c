@@ -31,7 +31,7 @@ typedef struct
 
 
 static void
-metro_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_tick(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   metro_t *this = (metro_t *)o;
 
@@ -43,7 +43,7 @@ metro_tick(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-metro_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   metro_t *this = (metro_t *)o;
 
@@ -57,7 +57,7 @@ metro_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   metro_t *this = (metro_t *)o;
 
@@ -68,7 +68,7 @@ metro_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int active = fts_get_number_int(at);
 
@@ -79,7 +79,7 @@ metro_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-metro_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_set_period(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   metro_t *this = (metro_t *)o;
   double period = fts_get_number_float(at);
@@ -91,7 +91,7 @@ metro_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   metro_t *this = (metro_t *)o;
 
@@ -99,11 +99,11 @@ metro_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->active = 0;
 
   if(ac > 0 && fts_is_number(at))
-    metro_set_period(o, 0, 0, 1, at);
+    metro_set_period(o, 0, 1, at, fts_nix);
 }
 
 static void
-metro_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+metro_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   metro_stop(o, 0, 0, 0, 0);
 }

@@ -88,7 +88,7 @@ fifo_reinit( fts_fifo_t *fifo, void *buffer, int size)
 }
 
 static void
-fifo_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fifo_t *this = (fifo_t *)o;
 
@@ -118,7 +118,7 @@ fifo_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-fifo_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_next(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fifo_t *this = (fifo_t *)o;
   int n = 1;
@@ -144,7 +144,7 @@ fifo_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fifo_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fifo_t *this = (fifo_t *)o;
 
@@ -160,7 +160,7 @@ fifo_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-fifo_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fifo_t *this = (fifo_t *)o;
 
@@ -177,7 +177,7 @@ fifo_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  *
  */
 static void
-fifo_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fifo_t *this = (fifo_t *)o;
   int size = 0;
@@ -204,7 +204,7 @@ fifo_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-fifo_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fifo_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fifo_t *this = (fifo_t *)o;
 

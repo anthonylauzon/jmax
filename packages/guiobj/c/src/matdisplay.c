@@ -55,7 +55,7 @@ static fts_symbol_t sym_color = 0;
 static fts_symbol_t sym_size = 0;
 
 static void 
-matdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+matdisplay_called(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /************************************************************
  *
@@ -63,7 +63,7 @@ matdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  *
  */
 static void
-matdisplay_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   fts_patcher_t *patcher = fts_object_get_patcher(o);
@@ -109,7 +109,7 @@ matdisplay_deliver(matdisplay_t *this)
 }
 
 static void 
-matdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_called(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_update_request(o);
 }
@@ -120,19 +120,19 @@ matdisplay_called(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
  *
  */
 static void
-matdisplay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* todo:  a column per number, intensity is function of (number - min)/range */
 }
 
 static void 
-matdisplay_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* todo: same as matdisplay_fvec */
 }
 
 static void 
-matdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_ivec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   ivec_t * vec = (ivec_t *)fts_get_object(at);
@@ -179,7 +179,7 @@ matdisplay_ivec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-matdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   float min = this->min;
@@ -228,7 +228,7 @@ matdisplay_fvec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-matdisplay_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t *this = (matdisplay_t *)o;
   fmat_t *mat = (fmat_t *)fts_get_object(at);
@@ -284,7 +284,7 @@ matdisplay_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-matdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
 
@@ -293,7 +293,7 @@ matdisplay_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-matdisplay_set_zoom_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_set_zoom_by_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   
@@ -321,7 +321,7 @@ matdisplay_set_zoom_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int a
 }
 
 static void
-matdisplay_set_window_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_set_window_size_by_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   fts_atom_t a[2];
@@ -335,7 +335,7 @@ matdisplay_set_window_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s
 }
 
 static void
-matdisplay_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   
@@ -363,7 +363,7 @@ matdisplay_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-matdisplay_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_set_color(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   
@@ -391,7 +391,7 @@ matdisplay_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void 
-matdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t *this = (matdisplay_t *)o;
   fts_atom_t a[2];  
@@ -410,7 +410,7 @@ matdisplay_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
-matdisplay_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t *this = (matdisplay_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -430,7 +430,7 @@ matdisplay_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void 
-matdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_send( o, 0, 0, 0, 0);
 }
@@ -441,7 +441,7 @@ matdisplay_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
  *
  */
 static void
-matdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
   
@@ -466,7 +466,7 @@ matdisplay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-matdisplay_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+matdisplay_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   matdisplay_t * this = (matdisplay_t *)o;
 

@@ -67,7 +67,7 @@ access_set_channel(access_t *this, bus_t *bus, int index)
 }
 
 static void
-access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+access_set_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   int index = fts_get_number_int(at);
@@ -85,10 +85,11 @@ access_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  */
 
 static void
-throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+throw_set_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   int index = this->index;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(ac > 1 && fts_is_number(at + 1))
     {
@@ -113,30 +114,34 @@ throw_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-throw_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+throw_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
   
   if(winlet == 0)
-    fts_channel_send(bus_get_channel(this->bus, this->index), 0, s, ac, at);
+    fts_channel_send(bus_get_channel(this->bus, this->index), winlet, s, ac, at);
   else if(s == 0 && ac > 0)
-     throw_set_channel(o, 1, NULL, ac, at);
+  {
+    fts_object_set_message_inlet(o, 1);
+    throw_set_channel(o, NULL, ac, at, fts_nix);
+  }
   else
     fts_object_error(o, "bad input at inlet 1");
 }
 
 static void
-throw_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+throw_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
 
   this->bus = NULL;
 
-  throw_set_channel(o, fts_system_inlet, 0, ac, at);
+  throw_set_channel(o, 0, ac, at, fts_nix);
 }	
 
 static void
-throw_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+throw_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
 
@@ -163,10 +168,11 @@ throw_instantiate(fts_class_t *cl)
  */
 
 static void
-catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+catch_set_channel(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
   int index = this->index;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(ac > 1 && fts_is_number(at + 1))
     {
@@ -193,7 +199,7 @@ catch_set_channel(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-catch_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+catch_set_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
 
@@ -211,13 +217,13 @@ catch_set_index(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-catch_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+catch_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  catch_set_channel(o, fts_system_inlet, 0, ac, at);
+  catch_set_channel(o, 0, ac, at, fts_nix);
 }	
 
 static void
-catch_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+catch_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   access_t *this = (access_t *)o;
 
@@ -247,7 +253,7 @@ catch_instantiate(fts_class_t *cl)
  */
 
 static void
-bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+bus_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bus_t *this = (bus_t *)o;
   int n_channels = 0;
@@ -269,7 +275,7 @@ bus_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t 
 }
 
 static void
-bus_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+bus_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   bus_t *this = (bus_t *)o;
   

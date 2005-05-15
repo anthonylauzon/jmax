@@ -36,7 +36,7 @@ typedef struct
 } demux_t;
 
 static void
-demux_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+demux_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   demux_t *this = (demux_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 0);
@@ -55,7 +55,7 @@ demux_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-demux_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+demux_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 
@@ -66,7 +66,7 @@ demux_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+demux_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   demux_t *this = (demux_t *)o;
   int i = fts_get_number_int(at);
@@ -77,14 +77,15 @@ demux_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-demux_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+demux_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   demux_t *this = (demux_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(winlet == 0)
     fts_outlet_send(o, this->out, s, ac, at);
   else if(s == NULL && ac > 0 && fts_is_number(at))
-    demux_set(o, winlet, 0, 1, at);
+    demux_set(o, 0, 1, at, fts_nix);
 }
 
 /************************************************************

@@ -31,7 +31,7 @@ typedef struct
 } stripnote_t;
 
 static void
-stripnote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stripnote_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   stripnote_t *x = (stripnote_t *)o;
 
@@ -43,7 +43,7 @@ stripnote_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-stripnote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stripnote_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   stripnote_t *x = (stripnote_t *)o;
 
@@ -52,13 +52,13 @@ stripnote_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 
 
 static void
-stripnote_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stripnote_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (ac > 1 && fts_is_number(at + 1))
-    stripnote_number_1(o, winlet, s, 1, at + 1);
+    stripnote_number_1(o, s, 1, at + 1, fts_nix);
 
   if (ac > 0 && fts_is_number(at))
-    stripnote_number(o, winlet, s, 1, at);
+    stripnote_number(o, s, 1, at, fts_nix);
 }
 
 static void

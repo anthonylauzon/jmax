@@ -81,7 +81,7 @@ static void fts_atom_list_cell_free( fts_atom_list_cell_t *cell)
 /*                                                                              */
 /********************************************************************************/
 
-static void fts_atom_list_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_atom_list_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -96,14 +96,14 @@ static void fts_atom_list_init(fts_object_t *o, int winlet, fts_symbol_t s, int 
   this->tail = 0;
 }
 
-static void fts_atom_list_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_atom_list_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
 
   fts_atom_list_clear(this);
 }
 
-static void fts_atom_list_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_atom_list_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
   fts_atom_list_iterator_t *iterator;
@@ -187,7 +187,7 @@ void fts_atom_list_set( fts_atom_list_t *list, int ac, const fts_atom_t *atom)
   fts_atom_list_append(list, ac, atom);
 }
 
-static void fts_atom_list_client_set( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_atom_list_client_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
 
@@ -195,14 +195,14 @@ static void fts_atom_list_client_set( fts_object_t *o, int winlet, fts_symbol_t 
   fts_atom_list_append(this, ac, at);
 }
 
-static void fts_atom_list_set_name( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_atom_list_set_name(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
   this->name = fts_get_symbol(at);
 }
 
 
-static void fts_atom_list_update( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_atom_list_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_list_t *this = (fts_atom_list_t *)o;
   fts_atom_list_iterator_t *iterator;
@@ -389,7 +389,7 @@ fts_atom_list_dump(fts_atom_list_t *list, fts_dumper_t *dumper, fts_object_t *ta
   fts_dumper_send(dumper, fts_s_clear, 0, 0);
 
   /* start new append message */
-  mess = fts_dumper_message_new(dumper, fts_s_append);
+  mess = fts_dumper_message_get(dumper, fts_s_append);
 
   /* iterate over atom list */
   iterator = fts_atom_list_iterator_new(list);
@@ -405,7 +405,7 @@ fts_atom_list_dump(fts_atom_list_t *list, fts_dumper_t *dumper, fts_object_t *ta
 	  fts_dumper_message_send(dumper, mess);
 
 	  /* start new append message */
-	  mess = fts_dumper_message_new(dumper, fts_s_append);
+	  mess = fts_dumper_message_get(dumper, fts_s_append);
 	}
 
       /* nest iteration */

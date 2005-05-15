@@ -29,15 +29,6 @@
  */
 
 /**
- * Returns the system package. The system package defines the
- * system-wide classes such as: require, patcher, inlet, outlet, ...
- *
- * @fn fts_package_t* fts_get_system_package(void)
- * @return a pointer to the system package
- * @ingroup package */
-fts_package_t* fts_get_system_package(void);
-
-/**
  * Returns the package on the top of the stack.
  *
  * @fn fts_package_t* fts_get_current_package(void)
@@ -337,16 +328,16 @@ extern void fts_package_set_dirty(fts_package_t *this, int is_dirty);
  */
 
 fts_status_t fts_require_instantiate(fts_class_t *cl);
-void fts_require_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+void fts_require_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 fts_status_t fts_template_instantiate(fts_class_t *cl);
-void fts_template_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+void fts_template_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 fts_status_t fts_template_path_instantiate(fts_class_t *cl);
-void fts_template_path_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+void fts_template_path_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 fts_status_t fts_data_path_instantiate(fts_class_t *cl);
-void fts_data_path_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+void fts_data_path_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 
 #endif /* _FTS_PRIVATE_PACKAGE_H_ */

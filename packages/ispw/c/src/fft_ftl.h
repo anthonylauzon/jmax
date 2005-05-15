@@ -74,4 +74,4 @@ extern void ftl_ifft_real_miller(fts_word_t *argv);
 extern void ftl_fft_tandem_miller(fts_word_t *argv);
 extern void ftl_ifft_tandem_miller(fts_word_t *argv);
 
-extern void fft_output_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+extern void fft_output_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);

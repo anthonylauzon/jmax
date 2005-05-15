@@ -57,6 +57,8 @@ struct fts_patcher
   int save_id;
 };    
 
+FTS_API fts_patcher_t *fts_patcher_get_scope(fts_patcher_t *patcher);
+
 #define fts_patcher_is_open(p)     ((p)->open)
 FTS_API void fts_patcher_set_dirty(fts_patcher_t *self, int is_dirty);
 

@@ -28,7 +28,7 @@ typedef struct {
   int *indexes;
 } dac_tilda_t;
 
-static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void dac_tilda_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dac_tilda_t *this = (dac_tilda_t *)o;
   int inlets, i;
@@ -60,24 +60,24 @@ static void dac_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     }
 }
 
-static void dac_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void dac_tilda_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dac_tilda_t *this = (dac_tilda_t *)o;
 
   fts_free( this->indexes);
 }
 
-static void dac_tilda_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void dac_tilda_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_activate();
 }
 
-static void dac_tilda_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void dac_tilda_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_desactivate();
 }
 
-static void dac_tilda_propagate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void dac_tilda_propagate_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dac_tilda_t *this  = (dac_tilda_t *)o;
   fts_propagate_fun_t propagate_fun = (fts_propagate_fun_t)fts_get_pointer(at + 0);

@@ -32,7 +32,7 @@ typedef struct
 } delay_t;
 
 static void
-delay_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
 
@@ -43,7 +43,7 @@ delay_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-delay_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
 
@@ -60,7 +60,7 @@ delay_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-delay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
 
@@ -71,7 +71,7 @@ delay_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-delay_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_set_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   double time = fts_get_number_float(at);
@@ -85,7 +85,7 @@ delay_set_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+delay_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   delay_t *this = (delay_t *)o;
   
@@ -93,7 +93,7 @@ delay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->active = 0;
 
   if(ac > 0 && fts_is_number(at))
-    delay_set_time(o, 0, 0, 1, at);
+    delay_set_time(o, 0, 1, at, fts_nix);
 }
 
 static void

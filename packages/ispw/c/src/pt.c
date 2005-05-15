@@ -65,7 +65,7 @@ typedef struct
 } pt_t;
 
 
-static void pt_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
 
@@ -180,13 +180,13 @@ static void analysis(fts_object_t *o)
  *  user methods
  */
 
-static void pt_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
   fts_outlet_float(o, 1, x->out.freq);
 }
 
-static void pt_gliss_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_gliss_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 0);
@@ -198,7 +198,7 @@ static void pt_gliss_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
     x->stat.gliss_frame = 0;
 }
 
-static void pt_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_reattack(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
   float f = fts_get_float_arg(ac, at, 0, 0.0f);
@@ -218,7 +218,7 @@ static void pt_reattack(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 }
 
-static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 1);
@@ -238,7 +238,7 @@ static void pt_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
  *
  */
 
-static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void dsp_fun_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -247,11 +247,11 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   pt_common_dsp_fun_put(&x->pt, dsp);
 
   fts_set_int(a, x->ctl.gliss_time);
-  pt_gliss_time(o, 0, 0, 1, a);
+  pt_gliss_time(o, 0, 1, a, fts_nix);
 
   fts_set_float(a, x->ctl.reattack_slope_thresh);
   fts_set_int(a+1, x->ctl.reattack_time);
-  pt_reattack(o, 0, 0, 2, a);
+  pt_reattack(o, 0, 2, a, fts_nix);
 	
   fts_set_pointer(a, (void *)o);
   fts_set_pointer(a+1, analysis);
@@ -260,7 +260,7 @@ static void dsp_fun_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_dsp_add_function(sym_pt_tilda, 4, a);
 }
 
-static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
   int pt_common_arg_0 = fts_get_int_arg(ac, at, 0, 0);
@@ -289,7 +289,7 @@ static void pt_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
-static void pt_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void pt_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pt_t *x = (pt_t *)o;
 

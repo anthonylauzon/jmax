@@ -111,7 +111,7 @@ static void ftl_line_64(fts_word_t *argv)
 }
 
 static void
-sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigline_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigline_t *this = (sigline_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -137,7 +137,7 @@ sigline_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-sigline_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigline_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigline_t *this = (sigline_t *)o;
   int down = fts_get_int_arg(ac, at, 0, 0);
@@ -192,7 +192,7 @@ sigline_set_target(sigline_t *this, float target)
 }
 
 static void
-sigline_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigline_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   float target = fts_get_number_float(at);
 
@@ -201,7 +201,7 @@ sigline_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-sigline_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigline_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigline_t *this = (sigline_t *)o;
 
@@ -209,17 +209,17 @@ sigline_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-sigline_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigline_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ((ac >= 2) && fts_is_number(&at[1]))
-    sigline_number_1(o, 0, 0, 1, at+1);
+    sigline_number_1(o, 0, 1, at+1, fts_nix);
 
   if ((ac >= 1) && fts_is_number(&at[0]))
     sigline_set_target((sigline_t *)o, fts_get_float_arg(ac, at, 0, 0.0f));
 }
 
 static void
-sigline_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigline_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigline_t *this = (sigline_t *)o;
 

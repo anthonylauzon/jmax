@@ -35,7 +35,7 @@ typedef struct
 } switch_t;
 
 static void
-switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+switch_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   switch_t *this = (switch_t *)o;
   
@@ -49,9 +49,10 @@ switch_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  */
 
 static void
-switch_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+switch_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch_t *this = (switch_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(winlet == 0)
     {
@@ -63,7 +64,7 @@ switch_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-switch_dummy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+switch_dummy(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 

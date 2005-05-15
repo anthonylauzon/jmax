@@ -42,7 +42,7 @@ typedef struct {
 
 
 static void
-xypad_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t * this = (xypad_t *)o;
   fts_atom_t a[1];
@@ -60,7 +60,7 @@ xypad_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_client_send_message(o, sym_setYMaxValue, 1, a);
 }
 
-static void xypad_set_couple(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void xypad_set_couple(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   int x = 0;
@@ -93,7 +93,7 @@ static void xypad_set_couple(fts_object_t *o, int winlet, fts_symbol_t s, int ac
 }
 
 static void
-xypad_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   fts_atom_t a[2];
@@ -104,7 +104,7 @@ xypad_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-xypad_set_xminvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_set_xminvalue(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   int v = fts_get_int(at);
@@ -117,7 +117,7 @@ xypad_set_xminvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-xypad_set_yminvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_set_yminvalue(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   int v = fts_get_int(at);
@@ -130,7 +130,7 @@ xypad_set_yminvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-xypad_set_xmaxvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_set_xmaxvalue(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   int v = fts_get_int(at);
@@ -143,7 +143,7 @@ xypad_set_xmaxvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-xypad_set_ymaxvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_set_ymaxvalue(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   int v = fts_get_int(at);
@@ -156,7 +156,7 @@ xypad_set_ymaxvalue(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-xypad_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *)o;
   int x = 0;
@@ -187,7 +187,7 @@ xypad_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }  
 
 static void
-xypad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t * this = (xypad_t *)o;
 
@@ -202,7 +202,7 @@ xypad_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void 
-xypad_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t *this = (xypad_t *) o;  
   fts_atom_t a[2];
@@ -213,7 +213,7 @@ xypad_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-xypad_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xypad_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   xypad_t * this = (xypad_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);

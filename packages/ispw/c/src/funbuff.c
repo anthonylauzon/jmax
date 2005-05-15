@@ -457,7 +457,7 @@ static struct zll *funbuff_global_clip = 0;	/*  GLOBAL funbuff clipboard   */
 /* select region x and width */
 /* method select, inlet 0 */
 static void
-funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_select(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   long sel_x, sel_width;
@@ -484,7 +484,7 @@ funbuff_select(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
    the difference value is the x of next event - n */ 
 /* method next, inlet 0 */
 static void
-funbuff_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_next(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   long delta_x, y;
@@ -558,7 +558,7 @@ funbuff_getElement(funbuff_t *this, long int index)
 
 /* method goto, inlet 0 */
 static void
-funbuff_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_goto(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   long int index = fts_get_int(at);
@@ -658,7 +658,7 @@ funbuff_write(funbuff_t *this, struct zll *list)
 
 /* method int/float, inlet 1 */
 static void
-funbuff_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
 
@@ -669,7 +669,7 @@ funbuff_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 /* sends nearest value (<=)  index  or lowest val in buffer  */
 /* method int/float, inlet 0 */
 static void
-funbuff_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   long int index = (long) fts_get_int_arg(ac, at, 0, 0);
@@ -697,7 +697,7 @@ funbuff_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 /* method interp, inlet 0 */
 static void
-funbuff_interp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_interp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   long int n = fts_get_int(at);
@@ -730,7 +730,7 @@ funbuff_interp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 /* method interptab, inlet 0 */
 static void
-funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_interptab(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   
@@ -795,7 +795,7 @@ funbuff_interptab(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 
 /* method set, inlet 0 */
 static void
-funbuff_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   struct zll *list, *overwrite;
@@ -823,7 +823,7 @@ funbuff_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 /* method find, inlet 0 */
 static void
-funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_find(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   long int yval   = fts_get_int(at);
@@ -844,7 +844,7 @@ funbuff_find(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 /*  returns *copy of selected region of list or 0  */
 /* method copy, inlet 0 */
 static void
-funbuff_copy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_copy(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   struct zll *copy;	
@@ -862,7 +862,7 @@ funbuff_copy(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 /* cuts zll in selected region returns cut zll or 0  */
 /* method cut, inlet 0 */
 static void
-funbuff_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_cut(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   struct zll *head;
@@ -887,7 +887,7 @@ funbuff_cut(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 /* method clear, inlet 0 */
 /* clears zll in selected region */
 static void
-funbuff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   struct zll *list;
@@ -900,7 +900,7 @@ funbuff_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 /* method reduce, inlet 0 */
 /* reduces zll in selected region */
 static void
-funbuff_reduce(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_reduce(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   float  factor = fts_get_float(at);
@@ -935,7 +935,7 @@ funbuff_reduce(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 /* method undo, inlet 0 */
 /* takes contents of global undo buffer and writes it into funbuff*/
 static void
-funbuff_undo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_undo(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   struct zll *relist;
@@ -951,7 +951,7 @@ funbuff_undo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 /* pastes a copy corresponding to my selected region from clipboard into myself */
 /* method paste, inlet 0 */
 static void
-funbuff_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_paste(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
   struct zll *list, *overwrite;
@@ -974,7 +974,7 @@ funbuff_paste(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 /* method bang inlet 0 */
 /*    DEBUG HERE +++++++++++++++++++++++++++++++++   */
 static void
-funbuff_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
 
@@ -1009,7 +1009,7 @@ funbuff_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 /* Method init, system inlet; args = optional symbol */
 /* should have a method delete !!! ??? !!! */
 static void
-funbuff_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+funbuff_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   funbuff_t *this = (funbuff_t *)o;
 

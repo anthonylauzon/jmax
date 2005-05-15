@@ -41,7 +41,7 @@ typedef struct
 } sigtab1_t;
 
 static void
-sigtab1_reload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigtab1_reload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtab1_t *this = (sigtab1_t *)o;
   if (this->wavetab)
@@ -49,7 +49,7 @@ sigtab1_reload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtab1_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t data, k;
   sigtab1_t *this = (sigtab1_t *)o;
@@ -77,7 +77,7 @@ sigtab1_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
 }
 
 static void
-sigtab1_delete(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+sigtab1_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigtab1_t *this = (sigtab1_t *)o;
 
@@ -115,7 +115,7 @@ typedef struct
 } osc_t;
 
 static void
-osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -147,7 +147,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 
 
 static void
-osc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   double phase;
@@ -158,7 +158,7 @@ osc_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 
 static void
-osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+osc_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
@@ -184,7 +184,7 @@ osc_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *
 }
 
 static void
-osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
@@ -196,7 +196,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
 
@@ -238,7 +238,7 @@ fts_symbol_t phasor_function = 0;
 fts_symbol_t phasor_inplace_function = 0;
 
 void
-phasor_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phasor_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   phasor_t *this = (phasor_t *)o;
   float phi = (float)fts_get_number_float(at);
@@ -247,7 +247,7 @@ phasor_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 void
-phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phasor_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   phasor_t *this = (phasor_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -279,7 +279,7 @@ phasor_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phasor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   phasor_t *this = (phasor_t *)o;
 
@@ -289,7 +289,7 @@ phasor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-phasor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phasor_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   phasor_t *this = (phasor_t *)o;
 

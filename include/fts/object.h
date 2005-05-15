@@ -85,8 +85,8 @@ FTS_API void fts_object_set_dirty(fts_object_t *obj);
 FTS_API void fts_object_set_state_dirty(fts_object_t *obj);
 
 /* standard name and persistence methods */
-FTS_API void fts_object_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void fts_object_persistence(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_status_t fts_object_name(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+FTS_API fts_method_status_t fts_object_persistence(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /* client */
 #define fts_object_get_id(o) ((o)->flag.id)
@@ -111,12 +111,12 @@ FTS_API void fts_object_call_listeners(fts_object_t *o);
 #define fts_object_changed fts_object_call_listeners
 
 /** try import handlers from class with the given arguments until one returns true */
-FTS_API void fts_object_import(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void fts_object_import_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_status_t fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+FTS_API fts_method_status_t fts_object_import_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /** try export handlers from class with the given arguments until one returns true */
-FTS_API void fts_object_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
-FTS_API void fts_object_export_as(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API fts_method_status_t fts_object_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+FTS_API fts_method_status_t fts_object_export_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /** try list of functions until one returns true (anything but void) */
 FTS_API int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at);

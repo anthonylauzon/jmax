@@ -44,12 +44,12 @@ typedef struct
 #define preset_dumper_set_index(d, i) ((d)->index = (i))
 
 static void
-preset_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dumper_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   preset_dumper_t *this = (preset_dumper_t *)o;
   fts_message_t *mess;
   
-  mess = fts_dumper_message_new(this->dumper, sym_dump_mess);
+  mess = fts_dumper_message_get(this->dumper, sym_dump_mess);
 
   fts_message_append_int(mess, this->index);
   fts_message_append_symbol(mess, s);
@@ -59,7 +59,7 @@ preset_dumper_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-preset_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dumper_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   preset_dumper_t *this = (preset_dumper_t *)o;
 
@@ -71,7 +71,7 @@ preset_dumper_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
   
 static void
-preset_dumper_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dumper_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   preset_dumper_t *this = (preset_dumper_t *)o;
   
@@ -170,7 +170,7 @@ preset_get_or_add(fts_preset_t *this, const fts_atom_t *key)
  */
 
 static void
-preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
@@ -204,7 +204,7 @@ preset_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_store(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
@@ -265,7 +265,7 @@ preset_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_recall(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
@@ -298,7 +298,7 @@ preset_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-preset_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_get_keys(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
   fts_tuple_t *tuple = (fts_tuple_t *)fts_object_create(fts_tuple_class, 0, 0);
@@ -314,11 +314,11 @@ preset_get_keys(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
     fts_tuple_append(tuple, 1, &key);
   }
 
-  fts_return_object((fts_object_t *)tuple);
+  fts_set_object(ret, (fts_object_t *)tuple);
 }
 
 static void
-preset_new_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_new_preset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
 
@@ -326,7 +326,7 @@ preset_new_preset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dump_mess(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
   int index = fts_get_int(at + 0);
@@ -343,7 +343,7 @@ preset_dump_mess(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-preset_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -390,7 +390,7 @@ preset_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-preset_redefine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_redefine(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
   fts_preset_t *old = (fts_preset_t *)fts_get_object(at);
@@ -442,7 +442,7 @@ preset_redefine(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
   int i;
@@ -487,7 +487,7 @@ preset_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-preset_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+preset_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_preset_t *this = (fts_preset_t *)o;
   int i;

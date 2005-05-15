@@ -70,7 +70,7 @@ gen_explode_name(char *buf, const char *base, long int n)
 }
 
 static void
-explay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
   explode_t *explode;
@@ -107,7 +107,7 @@ explay_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
 
@@ -152,7 +152,7 @@ explay_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_startat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
 
@@ -205,7 +205,7 @@ explay_startat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-explay_nth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_nth(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
   long n = fts_get_int_arg(ac, at, 0, 0);
@@ -238,7 +238,7 @@ explay_nth(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 
 static void
-explay_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
   
@@ -251,7 +251,7 @@ explay_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 
 static void
-explay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
   char buf[30];
@@ -263,7 +263,7 @@ explay_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 
 static void
-explay_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+explay_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   explay_t *this = (explay_t *)o;
 

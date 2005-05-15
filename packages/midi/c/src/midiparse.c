@@ -44,7 +44,7 @@ typedef struct _midiparse_
 } midiparse_t;
 
 static void
-midiparse_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiparse_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   midiparse_t *this = (midiparse_t *)o;
   int i;
@@ -67,14 +67,14 @@ midiparse_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-midiparse_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiparse_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiparse_t *this = (midiparse_t *)o;
   fts_midiparser_init(&this->parser);
 }
 
 static void 
-midiparse_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiparse_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiparse_t *this = (midiparse_t *)o;
 
@@ -102,7 +102,7 @@ midiparse_instantiate(fts_class_t *cl)
 #define STATUS_BYTE_SYSEX_END 0xf7
 
 static void
-midiunparse_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiunparse_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 

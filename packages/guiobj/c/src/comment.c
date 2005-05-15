@@ -42,7 +42,7 @@ static fts_memorystream_t *comment_get_memory_stream()
 }
 
 static void 
-comment_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t *this = (comment_t *)o;
   fts_atom_t a;
@@ -61,7 +61,7 @@ comment_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-comment_set_text(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_set_text(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t *this = (comment_t *)o;
   
@@ -69,7 +69,7 @@ comment_set_text(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-comment_set_text_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_set_text_from_array(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t *this = (comment_t *)o;  
   fts_memorystream_t *stream = comment_get_memory_stream();
@@ -82,7 +82,7 @@ comment_set_text_from_array(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-comment_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_set_color(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t *this = (comment_t *)o;
   fts_atom_t a;  
@@ -99,7 +99,7 @@ comment_set_color(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-comment_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t * this = (comment_t *)o;
 
@@ -108,7 +108,7 @@ comment_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-comment_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t * this = (comment_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -128,7 +128,7 @@ comment_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-comment_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+comment_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   comment_t * this = (comment_t *)o;
   FILE *file = (FILE *)fts_get_pointer(at);

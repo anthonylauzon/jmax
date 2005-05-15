@@ -334,7 +334,7 @@ pbank_send_message_to_label(pbank_t *this, int i, int ac, const fts_atom_t *at)
 }
 
 static void
-pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 0);
@@ -389,7 +389,7 @@ pbank_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-pbank_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
 
@@ -411,7 +411,7 @@ pbank_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-pbank_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   int j = fts_get_int_arg(ac, at, 0, 0);
@@ -447,7 +447,7 @@ pbank_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pbank_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   int j = fts_get_int_arg(ac, at, 0, 0);
@@ -472,7 +472,7 @@ pbank_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pbank_get_row_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_get_row_to_receives(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   int i = fts_get_int(at);
@@ -500,7 +500,7 @@ pbank_get_row_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-pbank_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_get_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
 
@@ -530,12 +530,12 @@ pbank_get_row(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       fts_outlet_varargs(o, 0, n, this->out_list);
     }
   else
-    pbank_get_row_to_receives(o, 0, 0, ac, at);
+    pbank_get_row_to_receives(o, 0, ac, at, fts_nix);
 }
 
 /* outputs row as single elements lead by their col index and copies row to buffer */
 static void
-pbank_recall_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_recall_to_receives(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   int i = fts_get_int_arg(ac, at, 0, 0);
@@ -564,7 +564,7 @@ pbank_recall_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 
 /* outputs row as single elements lead by their col index and copies row to buffer */
 static void
-pbank_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_recall(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
 
@@ -609,12 +609,12 @@ pbank_recall(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 	}
     }
   else
-    pbank_recall_to_receives(o, 0, 0, ac, at); 
+    pbank_recall_to_receives(o, 0, ac, at, fts_nix); 
 }
 
 /* copies buffer to matrix row */
 static void
-pbank_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_store(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   int i = fts_get_int_arg(ac, at, 0, 0);
@@ -638,7 +638,7 @@ pbank_store(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 /* store or recall single element to/from matrix */
 static void
-pbank_set_and_get_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_set_and_get_to_receives(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   fts_atom_t *atom;
@@ -673,7 +673,7 @@ pbank_set_and_get_to_receives(fts_object_t *o, int winlet, fts_symbol_t s, int a
 
 /* store or recall single element to/from matrix */
 static void
-pbank_set_and_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_set_and_get(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
 
@@ -726,11 +726,11 @@ pbank_set_and_get(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 	}
     }
   else
-    pbank_set_and_get_to_receives(o, 0, 0, ac, at); 
+    pbank_set_and_get_to_receives(o, 0, ac, at, fts_nix); 
 }
 
 static void
-pbank_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_read(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -740,7 +740,7 @@ pbank_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-pbank_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_write(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -750,7 +750,7 @@ pbank_write(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-pbank_export(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pbank_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pbank_t *this = (pbank_t *)o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);

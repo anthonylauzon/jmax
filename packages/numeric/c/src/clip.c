@@ -38,7 +38,7 @@ typedef struct
 
 
 static void
-clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
 
@@ -55,7 +55,7 @@ clip_set_min(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set_max(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
 
@@ -72,16 +72,16 @@ clip_set_max(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-clip_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0)
-    clip_set_min(o, 0, 0, 1, at);
+    clip_set_min(o, 0, 1, at, fts_nix);
   if(ac > 1)
-    clip_set_max(o, 0, 0, 1, at + 1);
+    clip_set_max(o, 0, 1, at + 1, fts_nix);
 }
 
 static void
-clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   
@@ -90,11 +90,11 @@ clip_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
   this->f_min = 0.;
   this->f_max = 0.;
 
-  clip_set(o, winlet, s, ac, at);
+  clip_set(o, s, ac, at, fts_nix);
 }
 
 static void
-clip_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_float(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   float f = fts_get_float(at);
@@ -108,7 +108,7 @@ clip_float(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int n = fts_get_int(at);
   clip_t *this = (clip_t *)o;
@@ -122,7 +122,7 @@ clip_int(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-clip_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+clip_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   clip_t *this = (clip_t *)o;
   fts_atom_t *out = alloca(ac * sizeof(fts_atom_t));

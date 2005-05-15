@@ -29,7 +29,7 @@ typedef struct
 } select_t;
 
 static void
-select_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   select_t *this = (select_t *)o;
   int n = fts_array_get_size(&this->compare);
@@ -49,10 +49,11 @@ select_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-select_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   select_t *this = (select_t *)o;
   fts_atom_t *a = fts_array_get_atoms(&this->compare);
+  int winlet = fts_object_get_message_inlet(o);
 
   fts_atom_assign(a + winlet - 1, at);
 }
@@ -64,7 +65,7 @@ select_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
  */
 
 static void
-select_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   select_t *this = (select_t *)o;
   int n = ac + 1;
@@ -85,7 +86,7 @@ select_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-select_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+select_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   select_t *this = (select_t *)o;
 

@@ -32,7 +32,7 @@ typedef struct
 } for_t;
 
 static void
-for_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_go(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   for_t *this = (for_t *)o;
 
@@ -75,7 +75,7 @@ for_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at
 }
 
 static void
-for_set_init_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_set_init_and_go(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   for_t *this = (for_t *)o;
 
@@ -84,7 +84,7 @@ for_set_init_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-for_set_limit(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_set_limit(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   for_t *this = (for_t *)o;
 
@@ -92,7 +92,7 @@ for_set_limit(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-for_set_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_set_incr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   for_t *this = (for_t *)o;
 
@@ -100,7 +100,7 @@ for_set_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-for_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   for_t *this = (for_t *)o;
   
@@ -116,10 +116,10 @@ for_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-for_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_set_and_go(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  for_set(o, 0, 0, ac, at);
-  for_go(o, 0, 0, 0, 0);
+  for_set(o, 0, ac, at, fts_nix);
+  for_go(o, 0, 0, 0, fts_nix);
 }
 
 /************************************************************
@@ -129,7 +129,7 @@ for_set_and_go(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-for_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+for_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   for_t *this = (for_t *)o;
   int is_int = 1;
@@ -143,7 +143,7 @@ for_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->limit = 0.0;
   this->incr = 1.0;
 
-  for_set(o, 0, 0, ac, at);
+  for_set(o, 0, ac, at, fts_nix);
 }
 
 static void

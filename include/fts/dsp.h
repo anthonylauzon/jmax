@@ -50,7 +50,7 @@
  *
  * @code
  * static void
- * my_dsp_object_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * my_dsp_object_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
  * { 
  *    my_dsp_object_t *this = (my_dsp_object_t *)o;
  *    fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);

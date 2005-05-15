@@ -197,7 +197,7 @@ serial_set_flag(serial_t *this, fts_symbol_t sym)
  */
 
 static void 
-serial_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_read(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   serial_t *this = (serial_t *)o;
   int size = this->size;
@@ -307,7 +307,7 @@ serial_flush(fts_bytestream_t *stream)
  *
  */
 static void 
-serial_number( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   serial_t *this = (serial_t *)o;
 
@@ -316,7 +316,7 @@ serial_number( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-serial_varargs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   serial_t *this = (serial_t *)o;
 
@@ -331,7 +331,7 @@ serial_varargs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void 
-serial_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   serial_t *this = (serial_t *)o;
 
@@ -344,7 +344,7 @@ serial_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  *
  */
 static void 
-serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   serial_t *this = (serial_t *)o;
 
@@ -431,7 +431,7 @@ serial_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-serial_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+serial_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   serial_t *this = (serial_t *)o;
 

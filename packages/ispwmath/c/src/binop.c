@@ -38,7 +38,7 @@ typedef struct
  */
 
 static void
-binop_number_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_number_set_right(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -49,7 +49,7 @@ binop_number_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-binop_number_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_number_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -73,7 +73,7 @@ binop_number_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 /* called from binop method */
 static void
-binop_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_number_left(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -81,7 +81,7 @@ binop_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     {
     default:
     case 2:
-      binop_number_set_right(o, 0, 0, 1, at + 1);
+      binop_number_set_right(o, 0, 1, at + 1, fts_nix);
     case 1:
       this->left = at[0];
     case 0:
@@ -90,7 +90,7 @@ binop_number_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-binop_number_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+binop_number_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -122,7 +122,7 @@ binop_number_instantiate(fts_class_t *cl, fts_method_t method)
 }
 
 static void
-binop_equal_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_equal_set_right(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -134,7 +134,7 @@ binop_equal_set_right(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-binop_equal_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_equal_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -181,7 +181,7 @@ binop_equal_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-binop_equal_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+binop_equal_left(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -189,7 +189,7 @@ binop_equal_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
     {
     default:
     case 2:
-      binop_equal_set_right(o, 0, 0, 1, at + 1);
+      binop_equal_set_right(o, 0, 1, at + 1, fts_nix);
     case 1:
       this->left = at[0];
     case 0:
@@ -198,7 +198,7 @@ binop_equal_left(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-binop_equal_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+binop_equal_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
@@ -243,11 +243,11 @@ binop_equal_instantiate(fts_class_t *cl, fts_method_t method)
  */
 
 static void
-add_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+add_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
   
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) + fts_get_number_int(&this->right));
@@ -256,11 +256,11 @@ add_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-sub_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sub_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) - fts_get_number_int(&this->right));
@@ -269,11 +269,11 @@ sub_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-mul_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mul_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) * fts_get_number_int(&this->right));
@@ -282,11 +282,11 @@ mul_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-div_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+div_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     {
@@ -309,11 +309,11 @@ div_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-bus_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bus_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->right) - fts_get_number_int(&this->left));
@@ -322,11 +322,11 @@ bus_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-vid_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vid_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     {
@@ -349,11 +349,11 @@ vid_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-ee_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ee_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_equal_left(o, 0, 0, ac, at);
+  binop_equal_left(o, 0, ac, at, fts_nix);
 
   switch(this->type)
     {
@@ -370,11 +370,11 @@ ee_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-ne_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ne_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_equal_left(o, 0, 0, ac, at);
+  binop_equal_left(o, 0, ac, at, fts_nix);
 
   switch(this->type)
     {
@@ -391,11 +391,11 @@ ne_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-ge_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ge_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) >= fts_get_number_int(&this->right));
@@ -404,11 +404,11 @@ ge_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-le_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+le_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) <= fts_get_number_int(&this->right));
@@ -417,11 +417,11 @@ le_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-gt_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gt_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) > fts_get_number_int(&this->right));
@@ -430,11 +430,11 @@ gt_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-lt_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+lt_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   if(this->type == binop_int)
     fts_outlet_int(o, 0, fts_get_number_int(&this->left) < fts_get_number_int(&this->right));
@@ -443,72 +443,72 @@ lt_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-band_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+band_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   fts_outlet_int(o, 0, fts_get_number_int(&this->left) & fts_get_number_int(&this->right));
 }
 
 static void
-bor_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bor_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   fts_outlet_int(o, 0, fts_get_number_int(&this->left) | fts_get_number_int(&this->right));
 }
 
 static void
-land_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+land_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   fts_outlet_int(o, 0, fts_get_number_int(&this->left) && fts_get_number_int(&this->right));
 }
 
 static void
-lor_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+lor_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   fts_outlet_int(o, 0, fts_get_number_int(&this->left) || fts_get_number_int(&this->right));
 }
 
 static void
-lshift_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+lshift_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   fts_outlet_int(o, 0, fts_get_number_int(&this->left) << fts_get_number_int(&this->right));
 }
 
 static void
-rshift_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rshift_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   fts_outlet_int(o, 0, fts_get_number_int(&this->left) >> fts_get_number_int(&this->right));
 }
 
 static void
-mod_method(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+mod_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   binop_t *this = (binop_t *)o;
   int right;
 
-  binop_number_left(o, 0, 0, ac, at);
+  binop_number_left(o, 0, ac, at, fts_nix);
 
   right = fts_get_number_int(&this->right);
 

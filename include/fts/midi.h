@@ -288,7 +288,7 @@ FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_t
  * For each incoming MIDI event a function is called by the object implementing an MIDI port, which calls all
  * listeners for a given MIDI channel and (if any) note or controller number.
  *
- * @fn void fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ * @fn void fts_midiport_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
  * @param o the MIDI port itself
  * @param winlet
  * @param s
@@ -298,7 +298,7 @@ FTS_API void fts_midiport_set_output(fts_midiport_t *port, fts_midiport_output_t
  * @ingroup midiport
  */
 
-FTS_API void fts_midiport_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+FTS_API void fts_midiport_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 /*@}*/ /* Handling incoming MIDI events */
 

@@ -962,7 +962,7 @@ fts_package_print_hashtable( fts_hashtable_t *ht, fts_symbol_t selector, void (*
  */
 
 static void 
-__fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_require(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
@@ -994,7 +994,7 @@ __fts_package_require(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void 
-__fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_template(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
@@ -1009,7 +1009,7 @@ __fts_package_template(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void 
-__fts_package_template_insert(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_template_insert(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
 
@@ -1024,7 +1024,7 @@ __fts_package_template_insert(fts_object_t *o, int winlet, fts_symbol_t s, int a
 }
 
 static void 
-__fts_package_template_remove(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_template_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
 
@@ -1037,7 +1037,7 @@ __fts_package_template_remove(fts_object_t *o, int winlet, fts_symbol_t s, int a
 }
 
 static void 
-__fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_template_path(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
@@ -1062,7 +1062,7 @@ __fts_package_template_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
 
 static void 
-__fts_package_package_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_package_path(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
@@ -1086,7 +1086,7 @@ __fts_package_package_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void 
-__fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_data_path(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
@@ -1110,7 +1110,7 @@ __fts_package_data_path(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void 
-__fts_package_save_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_save_windows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i; 
@@ -1131,7 +1131,7 @@ __fts_package_save_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void 
-__fts_package_open_windows(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_open_windows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i; 
@@ -1168,7 +1168,7 @@ fts_package_upload_windows( fts_package_t *this)
 }
 
 static void 
-__fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_help(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   int i;
@@ -1186,7 +1186,7 @@ __fts_package_help(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-__fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_save(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t *this = (fts_package_t *)o;
   fts_bmax_file_t f;
@@ -1295,7 +1295,7 @@ __fts_package_save(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-__fts_package_print(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t *this = (fts_package_t *)o;
 
@@ -1343,7 +1343,7 @@ fts_package_set_dirty(fts_package_t *this, int is_dirty)
  */
 
 void 
-__fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
 
@@ -1378,7 +1378,7 @@ __fts_package_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 void 
-__fts_package_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t* pkg = (fts_package_t *)o;
   if (pkg->packages != NULL)
@@ -1540,7 +1540,7 @@ fts_package_upload_templates( fts_package_t *this)
 }
 
 static void 
-__fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t *this = (fts_package_t *)o;
   fts_atom_t a[3]; 
@@ -1588,20 +1588,20 @@ __fts_package_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void 
-__fts_package_update(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  __fts_package_upload( o, winlet, s, 0, 0);
+  __fts_package_upload( o, s, 0, 0, fts_nix);
   fts_client_send_message( o, s_updateDone, 0, 0);  
 }
 
 static void
-__fts_package_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
 }
 
 static void
-__fts_package_set_as_current_project(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_set_as_current_project(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t *this = (fts_package_t *)o;
   fts_project_set( this);
@@ -1609,7 +1609,7 @@ __fts_package_set_as_current_project(fts_object_t *o, int winlet, fts_symbol_t s
 }
 
 static void
-__fts_package_save_as_default(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_save_as_default(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_atom_t a[1];
   fts_package_t* self = (fts_package_t*)o;
@@ -1617,11 +1617,11 @@ __fts_package_save_as_default(fts_object_t *o, int winlet, fts_symbol_t s, int a
   self->dirty = 1;
 
   fts_set_symbol( a, fts_get_user_project());
-  __fts_package_save( o, 0, s, 1, a);
+  __fts_package_save( o, s, 1, a, fts_nix);
 }
 
 static void
-__fts_package_loaded(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+__fts_package_loaded(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t *self = (fts_package_t *)o;
 
@@ -1713,13 +1713,25 @@ fts_package_set_state(fts_package_t* pkg, fts_package_state_t s)
   pkg->state = s;
 }
 
+void
+fts_package_get_classes(fts_package_t* pkg, fts_iterator_t *iter)
+{
+  return fts_hashtable_get_keys(pkg->classes, iter);
+}
+
+void
+fts_package_get_functions(fts_package_t* pkg, fts_iterator_t *iter)
+{
+  return fts_hashtable_get_keys(pkg->functions, iter);
+}
+
 /***************************************************
  *
  * Debug code to test saving a package
  *
  */
 
-static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void loader_load(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_t *obj;
   fts_atom_t a[1];
@@ -1734,7 +1746,7 @@ static void loader_load(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
     }
 
   /* Send a "print" message to the result */
-  fts_send_message( obj, fts_s_print, 0, 0);
+  fts_send_message( obj, fts_s_print, 0, 0, fts_nix);
 
   if (fts_object_get_class(obj) == fts_package_type)
     fts_post( "Loaded package\n");
@@ -1786,7 +1798,7 @@ fts_kernel_package_init(void)
   fts_system_package->object.flag.id = FTS_NO_ID;
   fts_system_package->object.refcnt = 0;
   
-  __fts_package_init((fts_object_t*) fts_system_package, 0, fts_s_init, 0, 0); 
+  __fts_package_init((fts_object_t*) fts_system_package, fts_s_init, 0, 0, fts_nix); 
   fts_package_set_state(fts_system_package, fts_package_loaded); 
 
   fts_set_symbol(&a, fts_new_symbol("builtin"));

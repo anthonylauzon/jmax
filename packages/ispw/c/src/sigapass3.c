@@ -37,7 +37,7 @@ typedef struct
 } sigapass3_t;
 
 static void
-sigapass3_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigapass3_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigapass3_t *this = (sigapass3_t *)o;
   fts_atom_t argv[8];
@@ -115,7 +115,7 @@ ftl_apass3(fts_word_t *argv)
 }		
 
 static void
-sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigapass3_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigapass3_t *this = (sigapass3_t *)o;
   biquad_coefs_t *data;
@@ -134,7 +134,7 @@ sigapass3_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-sigapass3_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigapass3_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigapass3_t *this = (sigapass3_t *)o;
 

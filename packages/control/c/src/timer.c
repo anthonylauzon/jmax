@@ -31,7 +31,7 @@ typedef struct
 } timer_t;
 
 static void
-timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   timer_t *this = (timer_t *)o;
 
@@ -43,7 +43,7 @@ timer_start(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-timer_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   timer_t *this = (timer_t *)o;
 
@@ -52,7 +52,7 @@ timer_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-timer_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   timer_t *this = (timer_t *)o;
 
@@ -61,7 +61,7 @@ timer_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-timer_send_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_send_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   timer_t *this = (timer_t *)o;
   double time = this->time;
@@ -73,7 +73,7 @@ timer_send_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-timer_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+timer_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   timer_t *this = (timer_t *)o;
 

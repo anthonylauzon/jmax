@@ -258,7 +258,7 @@ find_master_port( void)
 }
 
 static void 
-macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxaudioport_halt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
   OSStatus err;
@@ -303,7 +303,7 @@ macosxaudioport_halt(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxaudioport_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxaudioport_t* self = (macosxaudioport_t*)o;
   OSStatus err;
@@ -333,7 +333,7 @@ macosxaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-macosxaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+macosxaudioport_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
   OSStatus err;
@@ -484,7 +484,7 @@ get_channels( macosxaudioport_t *self, int direction)
 }
 
 static void 
-macosxaudioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+macosxaudioport_sched_listener(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {  
   int dummy = 0;
   
@@ -502,7 +502,7 @@ macosxaudioport_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int 
 }
 
 static void
-macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxaudioport_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
   int channels;
@@ -543,7 +543,7 @@ macosxaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-macosxaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+macosxaudioport_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   macosxaudioport_t *self = (macosxaudioport_t *)o;
   int i;

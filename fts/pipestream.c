@@ -57,7 +57,7 @@ typedef struct _fts_pipestream_t {
 } fts_pipestream_t;
 
 
-static void fts_pipestream_receive(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_pipestream_receive(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_pipestream_t *this = (fts_pipestream_t *) o;
 #define NN 1024
@@ -179,7 +179,7 @@ static int duplicate_std_in_out( fts_pipestream_t *this)
 #endif
 
 
-static void fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_pipestream_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_pipestream_t *this = (fts_pipestream_t *) o;
 
@@ -218,7 +218,7 @@ static void fts_pipestream_init(fts_object_t *o, int winlet, fts_symbol_t s, int
 #endif
 }
 
-static void fts_pipestream_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_pipestream_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_pipestream_t *this = (fts_pipestream_t *) o;
 

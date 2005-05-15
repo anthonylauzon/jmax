@@ -35,7 +35,7 @@ typedef struct
 } sigparam_t;
 
 static void
-sigparam_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigparam_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigparam_t *x = (sigparam_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -45,7 +45,7 @@ sigparam_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-sigparam_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigparam_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigparam_t *x = (sigparam_t *)o;
 
@@ -58,7 +58,7 @@ sigparam_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-sigsamplerate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigsamplerate_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigparam_t *x = (sigparam_t *)o;
 
@@ -69,7 +69,7 @@ sigsamplerate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sigvectorsize_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigvectorsize_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sigparam_t *x = (sigparam_t *)o;
 
@@ -80,7 +80,7 @@ sigvectorsize_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-sigparam_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sigparam_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

@@ -40,7 +40,7 @@ static fts_symbol_t dsp_symbol = 0;
  */
 
 static void
-tabpeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpeek_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpeek_t *this = (tabpeek_t *)o;
   fts_symbol_t tab_name = fts_get_symbol_arg(ac, at, 1, 0);
@@ -67,7 +67,7 @@ tabpeek_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-tabpeek_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpeek_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpeek_t *this = (tabpeek_t *)o;
 
@@ -86,7 +86,7 @@ tabpeek_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-tabpeek_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpeek_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpeek_t *this = (tabpeek_t *)o;
   fts_atom_t argv[4];
@@ -155,7 +155,7 @@ ftl_tabpeek(fts_word_t *argv)
  */
 
 static void
-tabpeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpeek_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpeek_t *this = (tabpeek_t *)o;
   
@@ -177,7 +177,7 @@ tabpeek_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-tabpeek_set_by_int(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+tabpeek_set_by_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpeek_t *this = (tabpeek_t *)o;
   char name_str[64];

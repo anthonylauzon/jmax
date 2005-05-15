@@ -39,7 +39,7 @@ typedef struct _seqstep_
  */
 
 static void 
-seqstep_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqstep_t *this = (seqstep_t *)o;
 
@@ -59,7 +59,7 @@ seqstep_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-seqstep_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_goto(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqstep_t *this = (seqstep_t *)o;
   event_t *event;
@@ -104,7 +104,7 @@ seqstep_goto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_next(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqstep_t *this = (seqstep_t *)o;
   event_t *event;
@@ -160,7 +160,7 @@ seqstep_next(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_prev(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqstep_t *this = (seqstep_t *)o;
   event_t *event;
@@ -215,7 +215,7 @@ seqstep_prev(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-seqstep_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_set_reference(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   seqstep_t *this = (seqstep_t *)o;
 
@@ -233,7 +233,7 @@ seqstep_set_reference(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
  */
 
 static void
-seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqstep_t *this = (seqstep_t *)o;
 
@@ -252,7 +252,7 @@ seqstep_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-seqstep_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+seqstep_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   seqstep_t *this = (seqstep_t *)o;
 

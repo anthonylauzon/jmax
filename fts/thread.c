@@ -111,7 +111,7 @@ int fts_thread_manager_cancel_thread(fts_thread_worker_t* thread_worker)
  * FOR DEBUGGING 
  */
 static void
-thread_manager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+thread_manager_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     fts_post("[thread_manager] debug info \n");
 }
@@ -124,7 +124,7 @@ thread_manager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const 
  * @return 
  */
 static void
-fts_thread_manager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+fts_thread_manager_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     thread_manager_t* self = (thread_manager_t*)o;
     int bytes = 0;
@@ -180,7 +180,7 @@ fts_thread_manager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
  * @return 
  */
 static void
-fts_thread_manager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+fts_thread_manager_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
     thread_manager_t* self = (thread_manager_t*)o;
 

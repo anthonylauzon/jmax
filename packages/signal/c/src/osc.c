@@ -35,7 +35,7 @@ struct osc_ftl_symbols phi_ftl_symbols = {0, 0, 0};
  */
 
 static void 
-osc_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_set_freq(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   float freq = fts_get_number_float(at);
@@ -46,7 +46,7 @@ osc_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-osc_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_set_phase(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   float phase = fts_get_number_float(at);
@@ -57,7 +57,7 @@ osc_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-osc_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_set_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   fmat_t *vec = (fmat_t *)fts_get_object(at);
@@ -83,7 +83,7 @@ osc_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -139,7 +139,7 @@ osc_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   osc_t *this = (osc_t *)o;
 
@@ -156,7 +156,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
     {
       /* cosine version */
       if(ac > 0)
-	osc_set_freq(o, 0, 0, 1, at);
+	osc_set_freq(o, 0, 1, at, fts_nix);
 
       osc_data_set_ptr(this->data, fts_fftab_get_cosine(OSC_TABLE_SIZE));
       fts_object_set_inlets_number(o, 1);
@@ -168,11 +168,11 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
       /* fmat version */
       if(ac > 1)
 	{
-	  osc_set_freq(o, 0, 0, 1, at);
-	  osc_set_fmat(o, 0, 0, 1, at + 1);
+	  osc_set_freq(o, 0, 1, at, fts_nix);
+	  osc_set_fmat(o, 0, 1, at + 1, fts_nix);
 	}
       else
-	osc_set_fmat(o, 0, 0, 1, at);
+	osc_set_fmat(o, 0, 1, at, fts_nix);
 
       this->fmat = 1;
     }
@@ -181,7 +181,7 @@ osc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-osc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+osc_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
 
@@ -220,7 +220,7 @@ osc_instantiate(fts_class_t *cl)
  */
 
 static void 
-phi_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phi_set_freq(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   float freq = fts_get_number_float(at);
@@ -231,7 +231,7 @@ phi_set_freq(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-phi_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phi_set_phase(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   float phase = fts_get_number_float(at);
@@ -242,7 +242,7 @@ phi_set_phase(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-phi_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phi_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -293,7 +293,7 @@ phi_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 static void
-phi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phi_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   osc_t *this = (osc_t *)o;
 
@@ -307,11 +307,11 @@ phi_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
   this->data = phi_data_new();
 
   if(ac == 1)
-    phi_set_freq(o, 0, 0, 1, at);
+    phi_set_freq(o, 0, 1, at, fts_nix);
 }
 
 static void
-phi_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+phi_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
 

@@ -554,7 +554,7 @@ fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       if(meth)
       {
         fts_set_object(&a, stream);      
-        meth(obj, 0, 0, 1, &a);
+        meth(obj, NULL, 1, &a, fts_nix);
         return;
       }
     }

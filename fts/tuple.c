@@ -73,7 +73,7 @@ tuple_equals_function(const fts_object_t *a, const fts_object_t *b)
   return 0;
 }
 
-void 
+static void 
 tuple_copy(fts_tuple_t *org, fts_tuple_t *copy)
 {
   int size = fts_tuple_get_size(org);
@@ -117,8 +117,8 @@ tuple_description_function(fts_object_t *o, fts_array_t *array)
   fts_array_append(array, size, atoms);
 }
 
-static void
-tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -131,69 +131,83 @@ tuple_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
   fts_dumper_message_send(dumper, mess);
 
   fts_object_release((fts_object_t *)mess);
+  
+  return fts_ok;
 }
 
-static void
-tuple_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *) o;
-  fts_atom_t ret;
   
-  fts_set_int(&ret, fts_tuple_get_size(self));
-  fts_return(&ret);
+  fts_set_int(ret, fts_tuple_get_size(self));
+  
+  return fts_ok;
 }
 
-static void
-tuple_element(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
   int index = fts_get_int_arg(ac, at, 0, -1);
   
   if (index >= 0 && index < fts_array_get_size( &self->args))
-    fts_return( fts_array_get_atoms( &self->args) + index);
+    *ret = fts_array_get_atoms( &self->args)[index];
+  
+  return fts_ok;
 }
 
-static void
-tuple_first(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_first(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *) o;
   
   if (fts_array_get_size( &self->args) > 0)
-    fts_return( fts_array_get_atoms( &self->args) + 0);
+    *ret = fts_array_get_atoms( &self->args)[0];
+  
+  return fts_ok;
 }
 
-static void
-tuple_second(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_second(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *) o;
   
   if (fts_array_get_size( &self->args) > 1)
-    fts_return( fts_array_get_atoms( &self->args) + 1);
+    *ret = fts_array_get_atoms( &self->args)[1];
+  
+  return fts_ok;
 }
 
-static void
-tuple_third(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_third(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *) o;
   
   if (fts_array_get_size( &self->args) > 2)
-    fts_return( fts_array_get_atoms( &self->args) + 2);
+    *ret = fts_array_get_atoms( &self->args)[2];
+  
+  return fts_ok;
 }
 
-static void
-tuple_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
   
   fts_array_init(&self->args, ac, at);
+  
+  return fts_ok;
 }
 
-static void
-tuple_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+tuple_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_tuple_t *self = (fts_tuple_t *)o;
   
   fts_array_destroy(&self->args);
+  
+  return fts_ok;
 }
 
 static void

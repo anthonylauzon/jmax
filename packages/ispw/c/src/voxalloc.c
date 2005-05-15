@@ -53,7 +53,7 @@ typedef struct
  */
 
 static void
-voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+voxalloc_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   voxalloc_t *this = (voxalloc_t *) o;
   fts_symbol_t name = fts_get_symbol_arg(ac, at, 0, 0);
@@ -99,7 +99,7 @@ voxalloc_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-voxalloc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+voxalloc_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   voxalloc_t *this = (voxalloc_t *) o;
 
@@ -116,7 +116,7 @@ voxalloc_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-voxalloc_used(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+voxalloc_used(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   voxalloc_t *this = (voxalloc_t *) o;
 
@@ -140,7 +140,7 @@ voxalloc_used(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-voxalloc_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+voxalloc_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   voxalloc_t *this = (voxalloc_t *) o;
 
@@ -148,7 +148,7 @@ voxalloc_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+voxalloc_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   voxalloc_t *this = (voxalloc_t *) o;
   fts_symbol_t *sym_receive = this->sym_receive;
@@ -200,9 +200,9 @@ voxalloc_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-voxalloc_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+voxalloc_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  voxalloc_list(o, winlet, 0, 0, 0);	
+  voxalloc_list(o, 0, 0, 0, fts_nix);	
 }
 
 

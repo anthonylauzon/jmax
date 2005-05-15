@@ -79,7 +79,7 @@ scope_reset(scope_ftl_t *data)
 }
 
 static void 
-scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_period(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -102,7 +102,7 @@ scope_set_period(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_threshold(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -140,7 +140,7 @@ scope_set_threshold(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void 
-scope_set_threshold_auto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_threshold_auto(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -150,7 +150,7 @@ scope_set_threshold_auto(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void 
-scope_set_threshold_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_threshold_off(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -160,7 +160,7 @@ scope_set_threshold_off(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void 
-scope_set_pre_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_pre_delay(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -176,7 +176,7 @@ scope_set_pre_delay(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-scope_set_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_size_by_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t * this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -191,7 +191,7 @@ scope_set_size_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-scope_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_set_range_by_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t * this = (scope_t *)o;
   
@@ -199,7 +199,7 @@ scope_set_range_by_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void 
-scope_data_changed(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_data_changed(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(fts_object_get_patcher(o) != NULL)
     fts_update_request(o);
@@ -270,7 +270,7 @@ scope_send_to_client(scope_t *this)
  */
 
 static void 
-scope_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -433,7 +433,7 @@ scope_ftl(fts_word_t *argv)
  */
 
 static void 
-scope_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -463,7 +463,7 @@ scope_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void 
-scope_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data = (scope_ftl_t *)ftl_data_get_ptr(this->data);
@@ -489,14 +489,14 @@ scope_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-scope_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   scope_send_to_client( this);
 }
 
 static void
-scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   scope_t *this = (scope_t *)o;
   scope_ftl_t *data;
@@ -525,7 +525,7 @@ scope_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-scope_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+scope_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scope_t *this = (scope_t *)o;
   

@@ -98,7 +98,6 @@ FTS_API void marker_track_clear(track_t *marker_track);
 FTS_API void marker_track_collapse_markers(track_t *marker_track, int ac, const fts_atom_t *at);
 
 /* import/export */
-void marker_track_import_labels_txt (fts_object_t *o, int w, fts_symbol_t s, 
-                                     int ac, const fts_atom_t *at);
+FTS_API fts_method_status_t marker_track_import_labels_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 #endif

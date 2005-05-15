@@ -91,7 +91,7 @@ exscale_compute_params(exscale_t *this)
 }
 
 static void
-exscale_set_inlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_set_inlow(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -102,7 +102,7 @@ exscale_set_inlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-exscale_set_inhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_set_inhigh(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -113,7 +113,7 @@ exscale_set_inhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-exscale_set_outlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_set_outlow(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -124,7 +124,7 @@ exscale_set_outlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-exscale_set_outhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_set_outhigh(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -135,7 +135,7 @@ exscale_set_outhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-exscale_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_set_base(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -146,7 +146,7 @@ exscale_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-exscale_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -176,7 +176,7 @@ exscale_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-exscale_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exscale_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
   double f = fts_get_number_float(at);
@@ -190,7 +190,7 @@ exscale_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-exscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+exscale_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   exscale_t *this = (exscale_t *)o;
 
@@ -200,7 +200,7 @@ exscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_ato
   this->outhigh = 0.0;
   this->base = 1.0;
 
-  exscale_set(o, 0, 0, ac, at);
+  exscale_set(o, 0, ac, at, fts_nix);
 }
 
 static void

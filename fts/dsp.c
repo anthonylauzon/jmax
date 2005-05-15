@@ -57,7 +57,7 @@ fts_class_t *fts_dsp_edge_class = 0;
 fts_class_t *fts_dsp_signal_class = 0;
 
 static void 
-fts_dsp_default_method( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+fts_dsp_default_method(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 }
 
@@ -79,7 +79,7 @@ fts_dsp_run_tick( void)
 }
 
 static void
-dsp_timebase_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_timebase_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_timebase_t *self = (fts_timebase_t *)o;
 
@@ -88,7 +88,7 @@ dsp_timebase_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-dsp_timebase_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_timebase_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_timebase_t *self = (fts_timebase_t *)o;
 
@@ -368,7 +368,7 @@ dsp_get_current_dsp_chain( void)
  */
 
 static void
-dsp_edge_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_edge_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_dsp_edge_t *self = (fts_dsp_edge_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer( at);
@@ -378,7 +378,7 @@ dsp_edge_put( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-dsp_edge_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_edge_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_dsp_edge_t *self = (fts_dsp_edge_t *)o;
 
@@ -389,7 +389,7 @@ dsp_edge_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-dsp_edge_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_edge_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_dsp_object_delete( (fts_dsp_object_t *)o);
 }
@@ -573,7 +573,7 @@ dsp_set_tick_size(void *listener, fts_symbol_t name, const fts_atom_t *value)
 }
 
 static void
-dsp_set_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dsp_set_sample_rate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (fts_is_number(at))
   {
@@ -588,7 +588,7 @@ dsp_set_sample_rate(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const f
 
 
 static void 
-dsp_active( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+dsp_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int active = 0;
 

@@ -217,7 +217,7 @@ define_set_expression(define_t *self, int ac, const fts_atom_t *at)
 }
 
 static void
-define_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_type(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *) o;
 
@@ -228,7 +228,7 @@ define_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-define_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_expression(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *)o;
 
@@ -238,7 +238,7 @@ define_expression(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-define_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *)o;
 
@@ -251,7 +251,7 @@ define_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-define_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_name(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *)o;
   fts_atom_t a;
@@ -281,11 +281,11 @@ define_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-define_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *) o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
-  fts_message_t *mess = fts_dumper_message_new(dumper, fts_s_set);
+  fts_message_t *mess = fts_dumper_message_get(dumper, fts_s_set);
   fts_atom_t a;
 
   fts_message_append_symbol(mess, self->type);
@@ -300,7 +300,7 @@ define_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *) o;
   fts_atom_t a;
@@ -329,7 +329,7 @@ define_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *)o;
 
@@ -348,7 +348,7 @@ define_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-define_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+define_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   define_t *self = (define_t *) o;
 

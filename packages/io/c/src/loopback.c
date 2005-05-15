@@ -75,7 +75,7 @@ loopback_output_char(fts_bytestream_t *stream, unsigned char c)
  *
  */
 static void
-loopback_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loopback_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_bytestream_t *stream = (fts_bytestream_t *)o;
   unsigned char c = fts_get_number_int(at);
@@ -86,7 +86,7 @@ loopback_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 #define LIST_SIZE 128
 
 static void
-loopback_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loopback_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_bytestream_t *stream = (fts_bytestream_t *)o;
 
@@ -117,7 +117,7 @@ loopback_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
  *
  */
 static void
-loopback_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loopback_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   loopback_t *this = (loopback_t *)o;
   fts_bytestream_t *stream = (fts_bytestream_t *)o;
@@ -130,7 +130,7 @@ loopback_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void 
-loopback_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+loopback_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
 }
 

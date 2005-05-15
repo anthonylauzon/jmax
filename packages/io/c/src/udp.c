@@ -48,7 +48,7 @@ udp_receive(fts_object_t* o, int size, const unsigned char* buffer)
 }
 
 static void
-udpout_symbol(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+udpout_symbol(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t* self = (udp_t*)o;
 
@@ -58,7 +58,7 @@ udpout_symbol(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-udpout_bang(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+udpout_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t* self = (udp_t*)o;
   fts_bytestream_output(self->udp_stream, strlen(fts_s_bang), fts_s_bang);
@@ -66,7 +66,7 @@ udpout_bang(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-udpout_send(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+udpout_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t* self = (udp_t*)o;
   fts_symbol_t mess_to_send;
@@ -83,7 +83,7 @@ udpout_send(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-udpin_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+udpin_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t* self = (udp_t*)o;
 
@@ -95,7 +95,7 @@ udpin_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-udpin_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+udpin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t *self = (udp_t *)o;
   fts_bytestream_t* udp_stream;
@@ -145,7 +145,7 @@ udpin_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-udpout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+udpout_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t *self = (udp_t *)o;
   if (self->udp_stream != NULL)
@@ -156,7 +156,7 @@ udpout_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static void
-udpout_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+udpout_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   udp_t *self = (udp_t *)o;
   fts_bytestream_t* udp_stream;

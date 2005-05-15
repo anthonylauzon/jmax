@@ -77,7 +77,7 @@ typedef struct
 
 
 static void
-pack_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pack_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int i;
   pack_t *x =  (pack_t *)o;
@@ -92,14 +92,14 @@ pack_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pack_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pack_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pack_t* self = (pack_t*)o;
   fts_outlet_varargs(o, 0, self->argc, self->argv);
 }
 
 static void
-pack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pack_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pack_t *x = (pack_t *)o;
 
@@ -110,21 +110,25 @@ pack_send(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pack_inlet(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pack_inlet(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
+  int winlet = fts_object_get_message_inlet(o);
+
   if (ac > 0)
     ((pack_t *)o)->argv[winlet] = at[0];
 }
 
 static void
-pack_error_inlet(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+pack_error_inlet(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
+  int winlet = fts_object_get_message_inlet(o);
+
   fts_post("pack object want number or symbol in inlet %d\n", winlet);
   fts_object_error(o, "pack object want number or symbol in inlet %d", winlet);
 }
 
 static void
-pack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pack_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pack_t *x = (pack_t *)o;
   int i;
@@ -169,7 +173,7 @@ pack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-pack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pack_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   pack_t *x = (pack_t *)o;
   int i;

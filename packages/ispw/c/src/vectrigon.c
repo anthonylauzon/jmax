@@ -166,55 +166,55 @@ vectrigon_put(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 }
 
 static void 
-sin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sin_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sin_symbol);
 }
 
 static void 
-cos_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cos_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), cos_symbol);
 }
 
 static void 
-tan_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tan_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), tan_symbol);
 }
 
 static void 
-asin_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+asin_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), asin_symbol);
 }
 
 static void 
-acos_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+acos_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), acos_symbol);
 }
 
 static void 
-atan_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+atan_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), atan_symbol);
 }
 
 static void 
-sinh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sinh_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), sinh_symbol);
 }
 
 static void 
-cosh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+cosh_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), cosh_symbol);
 }
 
 static void 
-tanh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tanh_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   vectrigon_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), tanh_symbol);
 }
@@ -226,13 +226,13 @@ tanh_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
  */
 
 static void
-vectrigon_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vectrigon_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_init((fts_dsp_object_t *)o);
 }
 
 static void
-vectrigon_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+vectrigon_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

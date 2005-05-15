@@ -40,7 +40,7 @@ typedef struct _midiin_
  */
 
 static void
-midiin_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiin_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
   
@@ -48,7 +48,7 @@ midiin_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-note_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+note_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
   
@@ -58,7 +58,7 @@ note_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-note_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+note_channel_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
   
@@ -67,7 +67,7 @@ note_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-note_channel_number_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+note_channel_number_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -75,7 +75,7 @@ note_channel_number_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void
-poly_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -85,7 +85,7 @@ poly_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-poly_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_channel_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -94,7 +94,7 @@ poly_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-poly_channel_number_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_channel_number_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -102,7 +102,7 @@ poly_channel_number_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 }
 
 static void
-value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -111,7 +111,7 @@ value_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-value_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+value_channel_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -119,7 +119,7 @@ value_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-bend_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bend_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -128,7 +128,7 @@ bend_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-bend_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bend_channel_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -136,7 +136,7 @@ bend_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-xbend_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xbend_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -145,7 +145,7 @@ xbend_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-xbend_channel_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xbend_channel_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -231,7 +231,7 @@ midiin_get_outlets(int ac, const fts_atom_t *at, int max)
 }
 
 static void
-midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
 
@@ -250,7 +250,7 @@ midiin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+notein_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
 
@@ -276,7 +276,7 @@ notein_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 
 
 static void
-polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+polyin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
   
@@ -301,7 +301,7 @@ polyin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+ctlin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
   
@@ -326,7 +326,7 @@ ctlin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+pgmin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
   
@@ -349,7 +349,7 @@ pgmin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+touchin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
   
@@ -372,7 +372,7 @@ touchin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+bendin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
   
@@ -395,7 +395,7 @@ bendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+xbendin_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
   
@@ -418,7 +418,7 @@ xbendin_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-midiin_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiin_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   midiin_t *this = (midiin_t *)o;
 

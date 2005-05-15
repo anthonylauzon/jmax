@@ -31,7 +31,7 @@ typedef struct random
 extern int rand (void);
 
 static void
-random_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+random_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   random_t *this = (random_t *)o;
   int n = (this->range * (rand() & 0x7fffL)) >> 15;
@@ -40,7 +40,7 @@ random_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-random_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+random_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   random_t *this = (random_t *)o;
   int n = fts_get_number_int(at);
@@ -52,10 +52,10 @@ random_set_range(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-random_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+random_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_number(at))
-    random_set_range(o, 0, 0, 1, at);
+    random_set_range(o, 0, 1, at, fts_nix);
 }
 
 static void

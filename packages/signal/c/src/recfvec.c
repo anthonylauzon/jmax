@@ -57,13 +57,13 @@ static fts_symbol_t sym_record = 0;
  */
 
 static void 
-rec_fmat_bang_at_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_bang_at_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_outlet_bang((fts_object_t *)o, 0);
 }
 
 static void
-rec_fmat_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_set_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
   fmat_t *fmat = (fmat_t *)fts_get_object(at);
@@ -77,7 +77,7 @@ rec_fmat_set_fmat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void 
-rec_fmat_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_set_begin(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
   int value = fts_get_number_float(at) * this->sr;
@@ -89,7 +89,7 @@ rec_fmat_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void 
-rec_fmat_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_set_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
   int value = fts_get_number_float(at) * this->sr;
@@ -101,17 +101,17 @@ rec_fmat_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-rec_fmat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   switch (ac)
     {
     default:
     case 3:
-      rec_fmat_set_end(o, 0, 0, 1, at + 2);
+      rec_fmat_set_end(o, 0, 1, at + 2, fts_nix);
     case 2:
-      rec_fmat_set_begin(o, 0, 0, 1, at + 1);
+      rec_fmat_set_begin(o, 0, 1, at + 1, fts_nix);
     case 1:
-      rec_fmat_set_fmat(o, 0, 0, 1, at);
+      rec_fmat_set_fmat(o, 0, 1, at, fts_nix);
       break;
     case 0:
       break;
@@ -119,18 +119,18 @@ rec_fmat_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void 
-rec_fmat_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
   
-  rec_fmat_set(o, 0, 0, ac, at);
+  rec_fmat_set(o, 0, ac, at, fts_nix);
 
   this->index = this->begin;
   this->mode = mode_rec;
 }
 
 static void 
-rec_fmat_rec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_rec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
 
@@ -146,7 +146,7 @@ rec_fmat_rec(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-rec_fmat_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_pause(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
 
@@ -154,7 +154,7 @@ rec_fmat_pause(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-rec_fmat_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
 
@@ -177,7 +177,7 @@ rec_fmat_reset(rec_fmat_t *this, int n_tick, double sr)
 }
 
 static void
-rec_fmat_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   rec_fmat_t *this = (rec_fmat_t *)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -271,7 +271,7 @@ rec_fmat_ftl(fts_word_t *argv)
  */
 
 static void
-rec_fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   rec_fmat_t *this = (rec_fmat_t *)o;
 
@@ -289,13 +289,13 @@ rec_fmat_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
   this->sp = 1000. / fts_dsp_get_sample_rate();
 
   if(ac > 0 && fts_is_a(at, fmat_class))
-    rec_fmat_set(o, 0, 0, ac, at);
+    rec_fmat_set(o, 0, ac, at, fts_nix);
   else
     fts_object_error(o, "first argument of fmat required");
 }
 
 static void
-rec_fmat_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+rec_fmat_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

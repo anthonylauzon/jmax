@@ -48,7 +48,7 @@ in_tilda_ftl(fts_word_t* argv)
 }
 
 static void
-in_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+in_tilda_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   in_tilda_t* self = (in_tilda_t*)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
@@ -68,7 +68,7 @@ in_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom
   fts_dsp_add_function(in_tilda_symbol, 3, argv);
 }
 
-static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void in_tilda_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   in_tilda_t *self = (in_tilda_t *)o;
   fts_symbol_t label_name;
@@ -100,7 +100,7 @@ static void in_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
 
 }
 
-static void in_tilda_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void in_tilda_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t*)o);
 }
@@ -138,7 +138,7 @@ out_tilda_ftl(fts_word_t* argv)
 }
 
 static void 
-out_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+out_tilda_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_tilda_t* self = (out_tilda_t*)o;
   fts_dsp_descr_t* dsp = (fts_dsp_descr_t*)fts_get_pointer(at);
@@ -158,7 +158,7 @@ out_tilda_put(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_ato
   fts_dsp_add_function(out_tilda_symbol, 3, argv);
 }
 
-static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void out_tilda_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   out_tilda_t *self = (out_tilda_t *)o;
   fts_symbol_t label_name;
@@ -189,7 +189,7 @@ static void out_tilda_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 
 }
 
-static void out_tilda_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void out_tilda_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t*)o);
 }

@@ -30,7 +30,7 @@ typedef struct
 } sysinfo_t;
 
 static void
-sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sysinfo_classes(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_package_t *pkg;
   fts_iterator_t pkg_iter;
@@ -90,7 +90,7 @@ sysinfo_classes(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sysinfo_audio(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
 /* #warning sysinfo_audio use fts_audioport_get_default, need to be changed */
 /*   fts_audioport_t *port = fts_audioport_get_default(o); */
@@ -99,7 +99,7 @@ sysinfo_audio(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-sysinfo_midi(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+sysinfo_midi(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_t *config = fts_midiconfig_get();
 

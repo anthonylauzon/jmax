@@ -52,7 +52,7 @@ typedef struct
 
 
 static void
-tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabcycle_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabcycle_t *this = (tabcycle_t *)o;
 
@@ -76,7 +76,7 @@ tabcycle_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static void
-tabcycle_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabcycle_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabcycle_t *this = (tabcycle_t *)o;
 
@@ -110,7 +110,7 @@ tabcycle_dsp_function(fts_word_t *argv)
 }
 
 static void
-tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabcycle_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabcycle_t *this = (tabcycle_t *)o;
   fts_atom_t argv[3];
@@ -161,7 +161,7 @@ tabcycle_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-tabcycle_bang(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+tabcycle_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabcycle_t *this = (tabcycle_t *)o;
   const int  l = 0;
@@ -170,7 +170,7 @@ tabcycle_bang(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
 }
 
 static void
-tabcycle_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+tabcycle_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabcycle_t *this = (tabcycle_t *)o;
 

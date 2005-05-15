@@ -35,13 +35,13 @@
 fts_class_t *fts_error_object_class = NULL;
 
 static void
-error_object_input_handler(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_input_handler(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* should we signal an error here? */
 }
 
 static void
-error_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_error_object_t *this = (fts_error_object_t *)o;
 
@@ -55,7 +55,7 @@ error_object_update_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-error_object_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_dump_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_error_object_t *this = (fts_error_object_t *)o;
 
@@ -70,7 +70,7 @@ error_object_dump_gui(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-error_object_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_set_name(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_error_object_t *this = (fts_error_object_t *)o;
 
@@ -85,7 +85,7 @@ error_object_set_name(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-error_object_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+error_object_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_error_object_t *this = (fts_error_object_t *)o;
 

@@ -225,10 +225,7 @@ FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
 /** add import handler to table of handlers to try 
 *
 *  An import handler is called with the object to import into, and
-*  the list of filename and arguments.  It should examine the object
-*  type (or subtype), and the file, to see if it can be imported.  If
-*  not, just return false (a void atom with fts_return) and don't
-*  make any fuss (don't print error messages).
+*  the list of filename and arguments.
 */
 FTS_API void fts_class_import_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth);
 #define fts_class_import_handler_default(c, m) fts_class_import_handler(c, fts_s_default, m)
@@ -236,10 +233,7 @@ FTS_API void fts_class_import_handler(fts_class_t *cl, fts_symbol_t suffix, fts_
 /** add export handler to table of handlers to try 
 *
 *  An export handler is called with the object to export from, and
-*  the list of filename and arguments.  It should examine the object
-*  type (or subtype), and the filename extension, to see if it can
-*  export to that type of file.  If not, just return a void atom and don't
-*  make any fuss (don't print error messages).
+*  the list of filename and arguments.
 */
 FTS_API void fts_class_export_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth);
 #define fts_class_export_handler_default(c, m) fts_class_export_handler(c, fts_s_default, m)

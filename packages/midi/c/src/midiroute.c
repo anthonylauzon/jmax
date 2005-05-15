@@ -31,7 +31,7 @@
 #endif
 
 static void
-midiroute_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiroute_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_midievent_t *event = (fts_midievent_t *)fts_get_object(at);
 
@@ -39,7 +39,7 @@ midiroute_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-midiroute_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+midiroute_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_object_set_outlets_number(o, n_midi_types);
 }

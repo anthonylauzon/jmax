@@ -60,7 +60,7 @@ ftl_zerocross(fts_word_t *argv)
 }
 
 static void
-zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+zerocross_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   zerocross_t *this = (zerocross_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -74,7 +74,7 @@ zerocross_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-zerocross_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+zerocross_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   zerocross_t *this = (zerocross_t *)o;
   zerocross_data_t *data = (zerocross_data_t *)ftl_data_get_ptr(this->data);
@@ -84,7 +84,7 @@ zerocross_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-zerocross_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+zerocross_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   zerocross_t *this = (zerocross_t *)o;
   zerocross_data_t *data;
@@ -100,7 +100,7 @@ zerocross_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-zerocross_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+zerocross_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

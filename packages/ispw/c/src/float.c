@@ -29,7 +29,7 @@ typedef struct
 } float_t;
 
 static void
-float_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+float_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   float_t *this = (float_t *) o;
 
@@ -37,7 +37,7 @@ float_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t *at)
+float_set(fts_object_t *o, fts_symbol_t s, int ac,  const fts_atom_t *at, fts_atom_t *ret)
 {
   float_t *this = (float_t *) o;
 
@@ -46,7 +46,7 @@ float_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac,  const fts_atom_t
 }
 
 static void
-float_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+float_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   float_t *this = (float_t *) o;
 
@@ -58,13 +58,13 @@ float_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-float_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+float_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  float_input(o, winlet, 0, 1, at);
+  float_input(o, 0, 1, at, fts_nix);
 }
 
 static void
-float_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+float_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   float_t *this = (float_t *) o;
   

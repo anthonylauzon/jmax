@@ -31,9 +31,10 @@ typedef struct
 } gate_t;
 
 static void 
-gate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gate_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gate_t *this = (gate_t *)o;
+  int winlet = fts_object_get_message_inlet(o);
 
   if(winlet == 1)
     {
@@ -47,7 +48,7 @@ gate_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-gate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gate_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gate_t *this = (gate_t *)o;
 

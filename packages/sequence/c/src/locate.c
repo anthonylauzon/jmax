@@ -40,7 +40,7 @@ typedef struct _locate_
  */
 
 static void
-locate_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_set_track(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   locate_t *this = (locate_t *)o;
   track_t *track = (track_t *)fts_get_object(at);
@@ -54,7 +54,7 @@ locate_set_track(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void 
-locate_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_locate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   locate_t *this = (locate_t *)o;
   track_t *track = this->track;
@@ -117,7 +117,7 @@ locate_locate(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
   
 static void
-locate_set_epsilon(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_set_epsilon(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   locate_t *this = (locate_t *)o;
   double epsilon = fts_get_number_float(at);
@@ -129,7 +129,7 @@ locate_set_epsilon(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-locate_set_mode_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_set_mode_event(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   locate_t *this = (locate_t *)o;
 
@@ -137,7 +137,7 @@ locate_set_mode_event(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-locate_set_mode_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_set_mode_segment(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   locate_t *this = (locate_t *)o;
 
@@ -151,7 +151,7 @@ locate_set_mode_segment(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
  */
 
 static void
-locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   locate_t *this = (locate_t *)o;
 
@@ -160,13 +160,13 @@ locate_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   this->mode = seqsym_segment;
 
   if(ac > 0 && fts_is_a(at, track_class))
-    locate_set_track(o, 0, 0, ac, at);
+    locate_set_track(o, 0, ac, at, fts_nix);
   else
     fts_object_error(o, "argument of track required");
 }
 
 static void 
-locate_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+locate_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   locate_t *this = (locate_t *)o;
 

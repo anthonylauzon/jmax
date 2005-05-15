@@ -35,7 +35,7 @@ typedef struct
  */
 
 static void
-stack_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   stack_t *this = (stack_t *)o;
   fts_atom_t a;
@@ -46,7 +46,7 @@ stack_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-stack_pop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_pop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   stack_t *this = (stack_t *)o;
   fts_atom_t *stack = fts_stack_base(&this->stack);
@@ -72,7 +72,7 @@ stack_pop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-stack_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   stack_t *this = (stack_t *)o;
   fts_atom_t *stack = fts_stack_base(&this->stack);
@@ -88,7 +88,7 @@ stack_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-stack_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   stack_t *this = (stack_t *)o;
   fts_atom_t *stack = fts_stack_base(&this->stack);
@@ -108,7 +108,7 @@ stack_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
  *
  */
 static void
-stack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   stack_t *this = (stack_t *)o;
   
@@ -116,7 +116,7 @@ stack_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-stack_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+stack_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   stack_t *this = (stack_t *)o;
 

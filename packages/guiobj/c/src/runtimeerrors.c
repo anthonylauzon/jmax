@@ -29,12 +29,12 @@ typedef struct _fts_runtime_errors_t
   fts_object_t ob;
 } fts_runtime_errors_t;
 
-static void fts_runtime_errors_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_runtime_errors_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_runtime_error_proxy_set(o);
 }
 
-static void fts_runtime_errors_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void fts_runtime_errors_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_runtime_error_proxy_remove(o);
 }

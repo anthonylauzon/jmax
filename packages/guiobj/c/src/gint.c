@@ -31,7 +31,7 @@ typedef struct
 
 
 static void
-gint_update_real_time(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_update_real_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gint_t *this = (gint_t *)o;
   fts_atom_t a;
@@ -51,7 +51,7 @@ gint_update(gint_t *this, int n)
 }
 
 static void
-gint_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gint_t *this = (gint_t *)o;
 
@@ -59,7 +59,7 @@ gint_bang(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-gint_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gint_t *this = (gint_t *)o;
   int n = fts_get_number_int(at);
@@ -69,14 +69,14 @@ gint_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-gint_varargs(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac && fts_is_number(at))
-    gint_number(o, 0, 0, 1, at);
+    gint_number(o, 0, 1, at, fts_nix);
 }
 
 static void
-gint_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_incr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gint_t *this = (gint_t *)o;
   int n;
@@ -91,7 +91,7 @@ gint_incr(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-gint_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   gint_t *this = (gint_t *)o;
   int n = fts_get_number_int(at);
@@ -100,7 +100,7 @@ gint_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void 
-gint_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+gint_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   FILE *file;
   int x, y, w, font_index;

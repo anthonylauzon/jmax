@@ -154,7 +154,7 @@ graph_iterator_step( graph_iterator_t *iter)
 	  fts_set_pointer(a + 0, graph_iterator_push);
 	  fts_set_pointer(a + 1, iter);
 	  fts_set_int(a + 2, iter->top->connection->winlet);
-	  propagate(dest, fts_system_inlet, fts_s_propagate_input, 3, a);
+	  propagate(dest, fts_s_propagate_input, 3, a, fts_nix);
 
 	  /* skip "thru" object */
 	  oldtop->connection_to_thru = oldtop->connection;

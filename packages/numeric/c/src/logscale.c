@@ -91,7 +91,7 @@ logscale_compute_params(logscale_t *this)
 }
 
 static void
-logscale_set_inlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set_inlow(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -102,7 +102,7 @@ logscale_set_inlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
 }
 
 static void
-logscale_set_inhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set_inhigh(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -113,7 +113,7 @@ logscale_set_inhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-logscale_set_outlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set_outlow(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -124,7 +124,7 @@ logscale_set_outlow(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 static void
-logscale_set_outhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set_outhigh(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -135,7 +135,7 @@ logscale_set_outhigh(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-logscale_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set_base(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -146,7 +146,7 @@ logscale_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-logscale_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -176,7 +176,7 @@ logscale_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-logscale_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+logscale_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
   double f = fts_get_number_float(at);
@@ -190,7 +190,7 @@ logscale_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-logscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+logscale_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   logscale_t *this = (logscale_t *)o;
 
@@ -200,7 +200,7 @@ logscale_init(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_at
   this->outhigh = 0.0;
   this->base = 1.0;
 
-  logscale_set(o, 0, 0, ac, at);
+  logscale_set(o, 0, ac, at, fts_nix);
 }
 
 static void

@@ -57,7 +57,7 @@ typedef struct _qlist_
 /* Method for message "rewind" inlet 0 */
 
 static void
-qlist_rewind(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_rewind(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -72,7 +72,7 @@ qlist_rewind(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 #define NATOM 256
 
 static void
-qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_t *at)
+qlist_next(fts_object_t *o, fts_symbol_t s, int aac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
   long drop = fts_get_int_arg(aac, at, 0, 0);
@@ -195,7 +195,7 @@ qlist_next(fts_object_t *o, int winlet, fts_symbol_t s, int aac, const fts_atom_
 /* Method for message "append" [<arg>*] inlet 0 */
 
 static void
-qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_append(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -210,7 +210,7 @@ qlist_append(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 /* Method for message "set" [<arg>*] inlet 0 */
 
 static void
-qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -225,7 +225,7 @@ qlist_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 /* Method for message "clear" inlet 0 */
 
 static void
-qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -241,7 +241,7 @@ qlist_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 /* code to flush a qlist up from CP to host */
 
 static void
-qlist_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_flush(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   /* Not Yet implemented (will it ever be ??) */
 }
@@ -249,7 +249,7 @@ qlist_flush(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 /* Method for message "read" <sym> inlet 0 */
 
 static void
-qlist_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_read(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_post("qlist_read not implemented (yet)\n");
 }
@@ -258,7 +258,7 @@ qlist_read(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 /* for the moment, the symbol name (optional second argument) is ignored (what it is, anyway ?) */
 
 static void
-qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
   fts_atom_t a[1];
@@ -281,7 +281,7 @@ qlist_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 
 static void
-qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -292,7 +292,7 @@ qlist_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
   fts_atom_t a[1];
@@ -307,7 +307,7 @@ qlist_upload(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 }
 
 static void
-qlist_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
   fts_dumper_t *dumper = (fts_dumper_t *)fts_get_object(at);
@@ -317,7 +317,7 @@ qlist_dump_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_
 
 #define MAX_ATOMS_PER_LINE 18
 
-static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void qlist_save_dotpat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *) o;
   FILE *file;
@@ -384,7 +384,7 @@ static void qlist_save_dotpat(fts_object_t *o, int winlet, fts_symbol_t s, int a
 }
 
 static void
-qlist_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -394,7 +394,7 @@ qlist_open_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-qlist_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *)o;
 
@@ -402,7 +402,7 @@ qlist_destroy_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void 
-qlist_close_editor(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+qlist_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   qlist_t *this = (qlist_t *) o;
 

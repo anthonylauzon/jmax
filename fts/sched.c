@@ -204,12 +204,12 @@ static void run_select( fts_sched_t *sched, int n_fd, fd_set *readfds, fd_set *w
     fts_set_int( &a, fd);
 
     if ( callback->error_mth && FD_ISSET( fd, exceptfds))
-      (*callback->error_mth)( callback->object, fts_system_inlet, fts_s_sched_error, 1, &a);
+      (*callback->error_mth)( callback->object, fts_s_sched_error, 1, &a, fts_nix);
     else
     {
       if ( (callback->flags == FTS_SCHED_READ && FD_ISSET( fd, readfds))
 	   || (callback->flags == FTS_SCHED_WRITE && FD_ISSET( fd, writefds)) )
-	(*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 1, &a);
+	(*callback->ready_mth)( callback->object, fts_s_sched_ready, 1, &a, fts_nix);
     }
   }
 }
@@ -227,7 +227,7 @@ static void run_always( fts_sched_t *sched)
     next = callback->next;
 
     if ( callback->flags == FTS_SCHED_ALWAYS)
-      (*callback->ready_mth)( callback->object, fts_system_inlet, fts_s_sched_ready, 0, 0);
+      (*callback->ready_mth)( callback->object, fts_s_sched_ready, 0, 0, fts_nix);
   }
 }
 

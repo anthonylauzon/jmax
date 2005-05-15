@@ -154,8 +154,8 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
  }
 
 
-static void
-track_editor_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_window(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 4)
@@ -175,10 +175,12 @@ track_editor_window(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }
+  
+  return fts_ok;
 }	
 
-static void
-track_editor_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 1 && fts_is_symbol(at))
@@ -191,10 +193,12 @@ track_editor_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }
+  
+  return fts_ok;
 }	
 
-static void
-track_editor_zoom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_zoom(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 1 && fts_is_float(at))
@@ -207,9 +211,11 @@ track_editor_zoom(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }	
+  
+  return fts_ok;
 }
-static void
-track_editor_transp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_transp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 1 && fts_is_int(at))
@@ -222,9 +228,11 @@ track_editor_transp(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }	
+  
+  return fts_ok;
 }	
-static void
-track_editor_view(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_view(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 1 && fts_is_int(at))
@@ -237,9 +245,11 @@ track_editor_view(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }	
+  
+  return fts_ok;
 }	
-static void
-track_editor_range_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_range_mode(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 1 && fts_is_int(at))
@@ -252,9 +262,11 @@ track_editor_range_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }	
+  
+  return fts_ok;
 }	
-static void
-track_editor_grid_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_grid_mode(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac == 1 && fts_is_int(at))
@@ -267,9 +279,11 @@ track_editor_grid_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }	
+  
+  return fts_ok;
 }	
-static void
-track_editor_set_table_columns(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_set_table_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
 	if(ac > 1 && fts_is_symbol(at))
@@ -279,10 +293,12 @@ track_editor_set_table_columns(fts_object_t *o, int winlet, fts_symbol_t s, int 
 		if(track_do_save_editor(this->track))
 			fts_object_set_dirty((fts_object_t *)this->track);
   }	
+  
+  return fts_ok;
 }	
 
-static void
-track_editor_set_properties_to_draw(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_set_properties_to_draw(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
 	  
@@ -293,10 +309,12 @@ track_editor_set_properties_to_draw(fts_object_t *o, int winlet, fts_symbol_t s,
 		if(track_do_save_editor(this->track))
 			fts_object_set_dirty((fts_object_t *)this->track);
   }	
+  
+  return fts_ok;
 }	
 
-static void
-track_editor_set_table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_set_table_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
 	if(ac == 2 && fts_is_int(at))
@@ -311,10 +329,12 @@ track_editor_set_table_size(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
         fts_object_set_dirty((fts_object_t *)this->track);
     }
   }	
+  
+  return fts_ok;
 }	
 
-static void
-track_editor_set_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_set_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
   if(ac >= 9)
@@ -346,6 +366,8 @@ track_editor_set_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
 				fts_object_set_dirty((fts_object_t *)this->track);
 		}
   }	
+  
+  return fts_ok;
 }
 
 /******************************************************
@@ -353,8 +375,8 @@ track_editor_set_state(fts_object_t *o, int winlet, fts_symbol_t s, int ac, cons
  *  class
  *
  */
-static void
-track_editor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
 	
@@ -385,15 +407,19 @@ track_editor_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
     else
       fts_object_error(o, "bad argument");
   }
+  
+  return fts_ok;
 }
 
-static void
-track_editor_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+track_editor_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
 	
 	fts_array_destroy(&this->columns);
   fts_array_destroy(&this->props_to_draw);
+  
+  return fts_ok;
 }
 
 static void

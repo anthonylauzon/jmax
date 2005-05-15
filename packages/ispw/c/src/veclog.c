@@ -102,19 +102,19 @@ veclog_put_scl(fts_object_t *o, fts_dsp_descr_t *dsp, fts_symbol_t name)
 }
 
 static void 
-exp_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+exp_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_pointer(at), exp_symbol);
 }
 
 static void 
-log_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+log_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_put_scl(o, (fts_dsp_descr_t *)fts_get_pointer(at), log_symbol);
 }
 
 static void 
-log10_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+log10_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_put(o, (fts_dsp_descr_t *)fts_get_pointer(at), log10_symbol);
 }
@@ -125,7 +125,7 @@ log10_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
  *
  */
 static void
-veclog_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+veclog_set_base(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_t *obj = (veclog_t *)o;
   float f = fts_get_number_float(at);
@@ -137,7 +137,7 @@ veclog_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-siglog_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+siglog_set_base(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_t *obj = (veclog_t *)o;
   float f = fts_get_number_float(at);
@@ -155,12 +155,12 @@ siglog_set_base(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
  */
 
 static void
-veclog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+veclog_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_t *obj = (veclog_t *)o;
 
   if(ac > 0 && fts_is_number(at))
-    veclog_set_base(o, 0, 0, 1, at);
+    veclog_set_base(o, 0, 1, at, fts_nix);
   else
     obj->scl = 1.0;
   
@@ -168,12 +168,12 @@ veclog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+siglog_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   veclog_t *obj = (veclog_t *)o;
 
   if(ac > 0 && fts_is_number(at))
-    siglog_set_base(o, 0, 0, 1, at);
+    siglog_set_base(o, 0, 1, at, fts_nix);
   else
     obj->scl = 1.0;
 
@@ -181,7 +181,7 @@ siglog_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-veclog_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+veclog_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_dsp_object_delete((fts_dsp_object_t *)o);
 }

@@ -70,7 +70,7 @@ ftl_samphold(fts_word_t *argv)
 
 
 static void
-samphold_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samphold_put(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samphold_t *this = (samphold_t *)o;
   fts_dsp_descr_t *dsp = (fts_dsp_descr_t *)fts_get_pointer(at);
@@ -86,7 +86,7 @@ samphold_put(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
 
 static void
-samphold_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samphold_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samphold_t *this = (samphold_t *)o;
   samphold_data_t *data = (samphold_data_t *)ftl_data_get_ptr(this->data);
@@ -96,7 +96,7 @@ samphold_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 
 
 static void
-samphold_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samphold_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samphold_t *this = (samphold_t *)o;
   samphold_data_t *data = (samphold_data_t *)ftl_data_get_ptr(this->data);
@@ -106,7 +106,7 @@ samphold_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-samphold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samphold_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   samphold_t *this = (samphold_t *)o;
   samphold_data_t *data;
@@ -121,7 +121,7 @@ samphold_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-samphold_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+samphold_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   samphold_t *this = (samphold_t *)o;
 

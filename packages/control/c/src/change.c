@@ -31,7 +31,7 @@ typedef struct
 
 
 static void 
-change_get(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+change_get(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   change_t* self = (change_t*)o;
   
@@ -39,7 +39,7 @@ change_get(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   change_t *self = (change_t *)o;
   fts_tuple_t* atup;
@@ -71,22 +71,23 @@ change_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 
 
 static void 
-change_anything(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+change_anything(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   change_t* self = (change_t*)o;
   fts_tuple_t* atup;
   fts_atom_t a;
-  
+  int winlet = fts_object_get_message_inlet(o);
+
   /* special case if we receive symbol set at inlet 1*/
   if (1 == winlet)
   {
     if (fts_s_set == s)
     {
-      change_set(o, winlet, s, ac, at);
+      change_set(o, s, ac, at, fts_nix);
     }
     if (fts_s_get == s)
     {
-      change_get(o, winlet, s, ac, at);
+      change_get(o, s, ac, at, fts_nix);
     }
   }
   else
@@ -184,7 +185,7 @@ change_anything(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   change_t *self = (change_t *)o;
 
@@ -194,11 +195,11 @@ change_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
   fts_set_void(&self->state);
 
   if(ac > 0)
-    fts_send_message(o, fts_s_set, ac, at);
+    fts_send_message(o, fts_s_set, ac, at, fts_nix);
 }
 
 static void
-change_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+change_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   change_t *self = (change_t *)o;
 

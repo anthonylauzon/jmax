@@ -47,7 +47,7 @@ typedef struct poly
 /* pitch or other unique index */
 
 static void
-poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x = (poly_t *)o;
   int n = (int) fts_get_int_arg(ac, at, 0, 0);
@@ -142,7 +142,7 @@ poly_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-poly_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_number_1(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x = (poly_t *)o;
   int n = (int) fts_get_int_arg(ac, at, 0, 0);
@@ -152,17 +152,17 @@ poly_number_1(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 
 
 static void
-poly_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ((ac > 1) && (fts_is_int(at+1) || fts_is_float(at+1)))
-    poly_number_1(o, 1, s, 1, at + 1);
+    poly_number_1(o, s, 1, at + 1, fts_nix);
 
   if ((ac > 0) && (fts_is_int(at) || fts_is_float(at)))
-    poly_number(o, 1, s, 1, at);
+    poly_number(o, s, 1, at, fts_nix);
 }
 
 static void
-poly_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x = (poly_t *)o;
   int i;
@@ -179,7 +179,7 @@ poly_stop(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 }
 
 static void
-poly_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x = (poly_t *)o;
   int i;
@@ -193,7 +193,7 @@ poly_clear(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-poly_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x = (poly_t *)o;
   int pit = fts_get_int_arg(ac, at, 0, 0);
@@ -218,7 +218,7 @@ poly_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 static void
-poly_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x  = (poly_t *)o;
   int n = fts_get_int_arg(ac, at, 0, 0);
@@ -242,7 +242,7 @@ poly_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
 
 
 static void
-poly_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+poly_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   poly_t *x = (poly_t *)o;
 

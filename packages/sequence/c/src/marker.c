@@ -364,8 +364,8 @@ scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den)
  */
 
 /* set or get type */
-static void
-_scomark_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_type(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *) o;
   
@@ -378,21 +378,25 @@ _scomark_type(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
     }
     else
     {
-      fts_return_symbol(self->type);
+      fts_set_symbol(ret, self->type);
     }
   }
+  
+  return fts_ok;
 }
 
-static void
-_scomark_set_tempo(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_set_tempo(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   double old_tempo = 0.0;
   scomark_set_tempo(self, fts_get_number_float(at), &old_tempo);
+  
+  return fts_ok;
 }
 
-/*static void
-_scomark_set_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+/*static fts_method_status_t
+_scomark_set_label(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   fts_symbol_t label = fts_get_symbol(at);
@@ -406,8 +410,8 @@ _scomark_set_label(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
   propobj_set_property_by_index((propobj_t *)self, scomark_propidx_label, &a);  
 }*/
 
-static void
-_scomark_set_tempo_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_set_tempo_from_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   double old_tempo = 0.0;
@@ -420,10 +424,12 @@ _scomark_set_tempo_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
   scomark_bar_get_meter(self, &meter);
 	if(meter != sym_meter_empty)
 		marker_track_tempo_changed(marker_track, self, old_tempo, tempo, 1);
+  
+  return fts_ok;
 }
 
-static void
-_scomark_set_meter_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_set_meter_from_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   if( scomark_is_bar(self) && ac==1 && fts_is_symbol(at))
@@ -436,9 +442,11 @@ _scomark_set_meter_from_client(fts_object_t *o, int winlet, fts_symbol_t s, int 
     
     marker_track_meter_changed(marker_track, self, old_meter, meter, 1);
   }
+  
+  return fts_ok;
 }
-static void
-_scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_remove_property(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   
@@ -447,11 +455,13 @@ _scomark_remove_property(fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 	else if( fts_get_symbol(at) == seqsym_meter)
     scomark_bar_unset_meter(self);
     
-  propobj_remove_property(o, 0, NULL, ac, at);
+  propobj_remove_property(o, NULL, ac, at, fts_nix);
+  
+  return fts_ok;
 }
 
-static void
-_scomark_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_get_property_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_array_t *array = fts_get_pointer(at);
   int n_types = enumeration_get_size(scomark_type_enumeration);
@@ -465,10 +475,12 @@ _scomark_get_property_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
     fts_array_append_symbol(array, enumeration_get_name(scomark_type_enumeration, i));      
     
   propobj_class_append_properties(scomark_class, array);
+  
+  return fts_ok;
 }
 
-static void
-_scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+_scomark_append_properties(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   fts_array_t *array = fts_get_pointer(at);
@@ -477,6 +489,8 @@ _scomark_append_properties(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   fts_array_append_symbol(array, self->type);
   
   propobj_append_properties((propobj_t *)self, array);
+  
+  return fts_ok;
 }
 
 static void 
@@ -524,8 +538,8 @@ scomark_set_properties(scomark_t *self, int ac, const fts_atom_t *at)
 }
 
 
-static void
-scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scomark_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   scomark_t *self = (scomark_t *)o;
   
@@ -534,12 +548,16 @@ scomark_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
 
   if(ac > 0)
     scomark_set_properties(self, ac, at);
+  
+  return fts_ok;
 }
 
-static void
-scomark_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+scomark_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   propobj_delete(o);
+  
+  return fts_ok;
 }
 
 
@@ -1555,9 +1573,8 @@ marker_track_append_bar(track_t *marker_track, event_t *start_evt)
 	   label text until newline
 */
 
-void
-marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s, 
-                                int ac, const fts_atom_t *at)
+fts_method_status_t
+marker_track_import_labels_txt (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_t *self = (track_t *) o;
 
@@ -1580,8 +1597,8 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
     { /* we were responsible for this file, but can't open it: 
          don't return void */
       fts_post("can't open label text file '%s'\n", fts_symbol_name(filename));
-      fts_return_object(o);     
-      return;
+      fts_set_object(ret, o);     
+      return fts_ok;
     }
 
     while (waitingfor != L_ERROR  &&  fts_atomfile_read(file, &a, &c))
@@ -1632,9 +1649,11 @@ marker_track_import_labels_txt (fts_object_t *o, int winlet, fts_symbol_t s,
 
     fts_object_release(memstream); 
     fts_atomfile_close(file);
-    fts_return_object((fts_object_t *) self);       
+    fts_set_object(ret, (fts_object_t *) self);       
   }
   /* else: no marker track or wrong args -> don't handle this file */
+
+return fts_ok;
 }
 
 

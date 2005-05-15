@@ -163,7 +163,7 @@ count_float_step(count_t *this)
 }
 
 static void
-count_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_step(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
   
@@ -174,7 +174,7 @@ count_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
 }
 
 static void
-count_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
 
@@ -183,7 +183,7 @@ count_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-count_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set_begin(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
 
@@ -191,7 +191,7 @@ count_set_begin(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-count_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set_end(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
 
@@ -199,7 +199,7 @@ count_set_end(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 }
 
 static void
-count_set_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set_step(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
   double step = fts_get_number_float(at);
@@ -211,7 +211,7 @@ count_set_step(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 }
 
 static void
-count_set_parameters(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set_parameters(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   count_t *this = (count_t *)o;
 
@@ -233,23 +233,23 @@ count_set_parameters(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const 
 }
 
 static void
-count_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   switch (ac)
     {
     default:
       if(fts_is_number(at + 1))
-	count_set_parameters(o, 0, 0, ac - 1, at + 1);
+	count_set_parameters(o, 0, ac - 1, at + 1, fts_nix);
     case 1:
       if(fts_is_number(at + 0))
-	count_set_value(o, 0, 0, 1, at + 0);
+	count_set_value(o, 0, 1, at + 0, fts_nix);
     case 0:
       break;
     }
 }
 
 static void
-count_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   count_t *this = (count_t *)o;
 
@@ -257,7 +257,7 @@ count_reset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 }
 
 static void
-count_mode_clip(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_mode_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
   double step = (this->begin < this->end)? this->step: -this->step;
@@ -271,7 +271,7 @@ count_mode_clip(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-count_mode_wrap(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_mode_wrap(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
   double step = (this->begin < this->end)? this->step: -this->step;
@@ -285,14 +285,14 @@ count_mode_wrap(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_a
 }
 
 static void
-count_mode_reverse(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_mode_reverse(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
   this->mode = mode_reverse;
 }
 
 static void
-count_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_set_mode(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   count_t *this = (count_t *)o;
   fts_symbol_t mode = fts_get_symbol(at);
@@ -312,7 +312,7 @@ count_set_mode(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
  */
 
 static void
-count_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+count_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 { 
   count_t *this = (count_t *)o;
   int is_int = 1;
@@ -330,8 +330,8 @@ count_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   this->reverse = 1.0;
   this->is_int = is_int;
 
-  count_set_parameters(o, 0, 0, ac, at);
-  count_reset(o, 0, 0, 0, 0);
+  count_set_parameters(o, 0, ac, at, fts_nix);
+  count_reset(o, 0, 0, 0, fts_nix);
 }
 
 static void

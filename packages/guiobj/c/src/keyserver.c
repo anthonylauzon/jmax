@@ -62,7 +62,7 @@ listener_t *key_listeners[n_codes];
 
 
 static void
-keyserver_key(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+keyserver_key(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int code = fts_get_int(at);
   listener_t *listener;
@@ -72,7 +72,7 @@ keyserver_key(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
       listener = key_listeners[code];
       while(listener)
 	{
-	  listener->meth(listener->obj, 0, 0, ac, at);
+	  listener->meth(listener->obj, 0, ac, at, fts_nix);
 	  listener = listener->next;
 	}
       
@@ -81,7 +81,7 @@ keyserver_key(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_ato
 	  listener = key_listeners[0];
 	  while(listener)
 	    {
-	      listener->meth(listener->obj, 0, 0, ac, at);
+	      listener->meth(listener->obj, 0, ac, at, fts_nix);
 	      listener = listener->next;
 	    }
 	}

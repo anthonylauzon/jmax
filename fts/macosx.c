@@ -340,7 +340,7 @@ void* thread_manager_run_thread(void* arg)
     {
 	if (0 == thread_func->is_dead)
 	{
-	    method(object, fts_system_inlet, symbol, ac, at);
+	    method(object, symbol, ac, at, fts_nix);
 	}
 	nanosleep(&time_req, &time_rem);
     }

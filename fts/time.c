@@ -290,7 +290,7 @@ fts_timebase_advance(fts_timebase_t *timebase)
       timebase->time = entry->time;
       
       /* call the function */
-      entry->method(entry->object, 0, 0, 1, &entry->atom);
+      entry->method(entry->object, 0, 1, &entry->atom, fts_nix);
       
       /* free entry */
       fts_timebase_entry_free(entry);
@@ -380,7 +380,7 @@ fts_timebase_flush_object(fts_timebase_t *timebase, fts_object_t *object)
 	  *p = (*p)->next;
 	  
 	  /* call the function */
-	  freeme->method(freeme->object, 0, 0, 1, &freeme->atom);
+	  freeme->method(freeme->object, 0, 1, &freeme->atom, fts_nix);
 
 	  /* free entry */
 	  fts_timebase_entry_free(freeme);

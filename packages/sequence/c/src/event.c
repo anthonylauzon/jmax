@@ -48,11 +48,13 @@ event_get_duration(event_t *event)
   }
   else if(fts_is_object(value))
   {
-    fts_set_void(fts_get_return_value());
-    fts_send_message((fts_object_t *)event, seqsym_duration, 0, NULL);
+    fts_atom_t ret;
     
-    if(fts_is_number(fts_get_return_value()))
-      duration = fts_get_number_float(fts_get_return_value());
+    fts_set_void(&ret);
+    fts_send_message((fts_object_t *)event, seqsym_duration, 0, NULL, &ret);
+    
+    if(fts_is_number(&ret))
+      duration = fts_get_number_float(&ret);
   }
   
   return duration;
@@ -74,7 +76,7 @@ event_set_duration(event_t *event, double duration)
     fts_atom_t a;
     
     fts_set_float(&a, duration);
-    fts_send_message((fts_object_t *)event, seqsym_duration, 1, &a);
+    fts_send_message((fts_object_t *)event, seqsym_duration, 1, &a, fts_nix);
   }
 }
 
@@ -86,7 +88,7 @@ void event_unset_property(event_t *event, fts_symbol_t prop)
     fts_atom_t a;
   
     fts_set_symbol(&a, prop);
-    propobj_remove_property( fts_get_object(value), 0, NULL, 1, &a);
+    propobj_remove_property(fts_get_object(value), NULL, 1, &a, fts_nix);
   
     /* poi mandare unset al cliente */
     fts_client_send_message((fts_object_t *)event, fts_s_unset, 1, &a);
@@ -119,7 +121,7 @@ event_set_at_client(event_t *this)
       
       fts_set_pointer(&a, &event_client_array);
       
-      (*method_append_properties)(obj, 0, 0, 1, &a);
+      (*method_append_properties)(obj, NULL, 1, &a, fts_nix);
     }
     else /* not a score object but other object as fmat */ 
     {
@@ -146,8 +148,8 @@ event_set_at_client(event_t *this)
   fts_object_set_state_dirty((fts_object_t *)event_get_track(this));
 }
 
-static void
-event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+event_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   event_t *this = (event_t *)o;
   
@@ -160,7 +162,7 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
       if(ac > i + 1 && fts_is_symbol(at + i))
       {
         fts_symbol_t property = fts_get_symbol(at + i);
-        fts_send_message(obj, property, 1, at + i + 1);
+        fts_send_message(obj, property, 1, at + i + 1, fts_nix);
       }
     }
   }
@@ -168,10 +170,12 @@ event_set(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t 
     this->value = at[1];
   
   event_set_at_client(this);
+  
+  return fts_ok;
 }
 
-static void
-event_unset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+event_unset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   event_t *this = (event_t *)o;
   
@@ -183,11 +187,13 @@ event_unset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
     for(i=0; i<ac; i++)
     {
       if(fts_is_symbol(at + i))
-        fts_send_message(obj, fts_s_remove, 1, at + i);
+        fts_send_message(obj, fts_s_remove, 1, at + i, fts_nix);
     }
   }
   
   event_set_at_client(this);
+  
+  return fts_ok;
 }
 
 /**************************************************************
@@ -195,8 +201,8 @@ event_unset(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_
 *  event class
 *
 */
-static void
-event_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+event_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   event_t *this = (event_t *)o;
   
@@ -209,14 +215,18 @@ event_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t
   
   if(ac > 0)
     fts_atom_assign(&this->value, at);
+  
+  return fts_ok;
 }
 
-static void
-event_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+event_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   event_t *this = (event_t *)o;
   
   fts_atom_void(&this->value);
+  
+  return fts_ok;
 }
 
 static void

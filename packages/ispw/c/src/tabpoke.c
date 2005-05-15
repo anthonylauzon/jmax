@@ -40,7 +40,7 @@ typedef struct
 
 
 static void
-tabpoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpoke_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpoke_t *this = (tabpoke_t *)o;
 
@@ -63,7 +63,7 @@ tabpoke_init(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom
  */
 
 static void
-tabpoke_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom_t *at)
+tabpoke_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpoke_t *this = (tabpoke_t *)o;
   char name_str[64];
@@ -84,7 +84,7 @@ tabpoke_set(fts_object_t *o, int winlet, fts_symbol_t is, int ac, const fts_atom
 }
 
 static void
-tabpoke_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpoke_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpoke_t *this = (tabpoke_t *)o;
   long n = fts_get_number_int(at);
@@ -113,7 +113,7 @@ tabpoke_number(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
 
 
 static void
-tabpoke_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpoke_set_value(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpoke_t *this = (tabpoke_t *)o;
 
@@ -122,17 +122,17 @@ tabpoke_set_value(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts
 }
 
 static void
-tabpoke_list(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpoke_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if ((ac >= 2) && fts_is_number(at+1))
-    tabpoke_set_value(o, winlet, s, ac, at+1);
+    tabpoke_set_value(o, s, ac, at+1, fts_nix);
 
   if ((ac >= 1) && fts_is_number(at))
-    tabpoke_number(o, winlet, s, ac, at);
+    tabpoke_number(o, s, ac, at, fts_nix);
 }
 
 static void
-tabpoke_center(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+tabpoke_center(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabpoke_t *this = (tabpoke_t *)o;
   long len = fts_get_number_int(at);

@@ -151,7 +151,7 @@ static void Calcul2( decrypt_t *x)
 /* Method bang                              				    */
 /*--------------------------------------------------------------------------*/
 
-static void decrypt_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void decrypt_bang(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   decrypt_t *this = (decrypt_t *)o;
 
@@ -163,7 +163,7 @@ static void decrypt_bang( fts_object_t *o, int winlet, fts_symbol_t s, int ac, c
 /* Method int                               				    */
 /*--------------------------------------------------------------------------*/
 
-static void decrypt_int( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void decrypt_int(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   decrypt_t *this = (decrypt_t *)o;
   int n = fts_get_int( &at[0]);
@@ -195,7 +195,7 @@ static void decrypt_int( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 /* Method format                            				    */
 /*--------------------------------------------------------------------------*/
 
-static void decrypt_format( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void decrypt_format(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   decrypt_t *this = (decrypt_t *)o;
   char n;
@@ -231,7 +231,7 @@ static void decrypt_format( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 /* Method enable                            				    */
 /*--------------------------------------------------------------------------*/
 
-static void decrypt_enable( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void decrypt_enable(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   decrypt_t *this = (decrypt_t *)o;
 
@@ -243,7 +243,7 @@ static void decrypt_enable( fts_object_t *o, int winlet, fts_symbol_t s, int ac,
 /* Method chn                                  				    */
 /*--------------------------------------------------------------------------*/
 
-static void decrypt_chn( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void decrypt_chn(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   Chanel2( (decrypt_t *)o, fts_get_int( &at[0]));
 }
@@ -253,7 +253,7 @@ static void decrypt_chn( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
 /* Method init                                                              */
 /*--------------------------------------------------------------------------*/
 
-static void decrypt_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void decrypt_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   decrypt_t *this = (decrypt_t *)o;
   int i;
