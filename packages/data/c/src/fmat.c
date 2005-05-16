@@ -57,6 +57,8 @@ static fts_symbol_t sym_delete_cols = 0;
 
 static fts_symbol_t sym_sr = 0;
 
+int fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride);
+
 /********************************************************
  *
  *  utility functions
@@ -269,7 +271,7 @@ fmat_set_const(fmat_t *mat, float c)
   int stride;
   int i;
 
-  if (fmat_or_slice_pointer(mat, &values, &size, &stride))
+  if (fmat_or_slice_pointer((fts_object_t*)mat, &values, &size, &stride))
   {
     size *= stride;     /* size is num. elements in slice! */
 
