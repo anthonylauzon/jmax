@@ -47,7 +47,7 @@
 
 typedef struct _fts_stack_t 
 {
-  void *buffer;
+  char *buffer;
   int size;
   int alloc;
   int element_size;
@@ -164,9 +164,9 @@ FTS_API int __fts_stack_append(fts_stack_t *stack, void *p, int n);
 FTS_API void fts_string_init(fts_stack_t *stack, char *str);
 #define fts_string_set(s, x) ((s)->size = 0, __fts_stack_append((s), (x), strlen(x) + 1))
 #define fts_string_append(s, x) ((s)->size--, __fts_stack_append((s), (x), strlen(x) + 1))
-#define fts_string_append_char(s,t,x) (((s)->size >= (s)->alloc)? (__fts_stack_realloc((s), 2 * (s)->alloc)): 0, (((char *)(s)->buffer))[(s)->size-1] = (x), (((char *)(s)->buffer))[(s)->size] = '\0')
+#define fts_string_append_char(s,t,x) (((s)->size >= (s)->alloc)? (__fts_stack_realloc((s), 2 * (s)->alloc)): 0, (s)->buffer[(s)->size-1] = (x), (s)->buffer[(s)->size] = '\0')
 #define fts_string_get_ptr(s) fts_stack_base(s)
 #define fts_string_get_size(s) (fts_stack_size(s) - 1)
-#define fts_string_clear(s) ((s)->size = 1, ((((char *)(s)->buffer))[0] = '\0'))
+#define fts_string_clear(s) ((s)->size = 1, (s)->buffer[0] = '\0')
 #define fts_string_destroy(s) fts_stack_destroy(s)
 

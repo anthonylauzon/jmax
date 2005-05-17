@@ -29,7 +29,7 @@ __fts_stack_init( fts_stack_t *s, int element_size)
 {
   s->alloc = FTS_STACK_BLOCK_SIZE;
   s->element_size = element_size;
-  s->buffer = fts_malloc( s->alloc * s->element_size);
+  s->buffer = (char *)fts_malloc( s->alloc * s->element_size);
   s->size = 0;
 }
 
@@ -44,7 +44,7 @@ __fts_stack_realloc( fts_stack_t *stack, int alloc)
 {
   if(alloc > stack->alloc)
   {
-    stack->buffer = fts_realloc( stack->buffer, alloc * stack->element_size);
+    stack->buffer = (char *)fts_realloc( stack->buffer, alloc * stack->element_size);
     stack->alloc = alloc;
     
     return 1;
@@ -88,6 +88,6 @@ fts_string_init(fts_stack_t *stack, char *str)
   else
   {
     stack->size = 1;
-    ((char *)stack->buffer)[0] = '\0';
+    stack->buffer[0] = '\0';
   }
 }
