@@ -574,7 +574,7 @@ informal_class(fts_class_t *cl)
         doc = fts_class_doc_get_next(doc);
       }
       
-      fts_post("  %s %s", fts_symbol_name(sel), has_doc? "": "... hidden\n");
+      fts_post("  %s %s\n", fts_symbol_name(sel), has_doc? "": "... hidden\n");
     }
     else
       fts_post("  inlet %d\n", fts_get_int(&a));
@@ -644,7 +644,7 @@ _function_info(int ac, const fts_atom_t *at, fts_atom_t *ret)
         if(cl != NULL)
           info_class(cl, outmat);
         else
-          fts_post("info: unknown class '%s'", class_name);        
+          fts_post("info: unknown class '%s'\n", fts_symbol_name(class_name));
       }
     }
     else if (what == fts_new_symbol("rmal"))
@@ -657,7 +657,7 @@ _function_info(int ac, const fts_atom_t *at, fts_atom_t *ret)
         if(cl != NULL)
           informal_class(cl);
         else
-          fts_post("info: unknown class '%s'", class_name);        
+          fts_post("info: unknown class '%s'\n", fts_symbol_name(class_name));        
       }
     }
     else if (what == fts_new_symbol("functions"))
