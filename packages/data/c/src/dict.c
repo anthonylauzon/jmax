@@ -608,56 +608,42 @@ dict_export_to_coll(dict_t *self, fts_symbol_t file_name)
 }
 
 static fts_method_status_t
-dict_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+_dict_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_coll);
-  int size = 0;
   
-  if(!file_name)    
-    return fts_ok;
-  
-  if(file_format == sym_coll)
-    size = dict_import_from_coll(self, file_name);    
-  else
+  if(ac > 0 && fts_is_symbol(at))
   {
-    fts_post("dict: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
-    return fts_ok;
+    fts_symbol_t file_name = fts_get_symbol(at);
+    int size = dict_import_from_coll(self, file_name);    
+
+    if(size > 0)
+    {
+      fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+      
+      if(dict_editor_is_open(self))
+        dict_upload(self);      
+    }
+    else
+      fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));
   }
-  
-  if(size <= 0)
-    fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));
-  
-  fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
-  
-  if(dict_editor_is_open(self))
-    dict_upload(self);
   
   return fts_ok;
 }
 
 static fts_method_status_t
-dict_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+_dict_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_coll);
-  int size = 0;
   
-  if(!file_name)
-    return fts_ok;
-  
-  if(file_format == sym_coll)
-    size = dict_export_to_coll(self, file_name);    
-  else
+  if(ac > 0 && fts_is_symbol(at))
   {
-    fts_post("dict: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
-    return fts_ok;
-  }
+    fts_symbol_t file_name = fts_get_symbol(at);
+    int size = dict_export_to_coll(self, file_name);    
   
-  if(size <= 0)
-    fts_post("dict: can't export to file \"%s\"\n", fts_symbol_name(file_name));  
+    if(size <= 0)
+      fts_post("dict: can't export to file \"%s\"\n", fts_symbol_name(file_name));  
+  }
   
   return fts_ok;
 }
@@ -830,9 +816,6 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_print, dict_print);
   
-  fts_class_message_varargs(cl, fts_s_import, dict_import);
-  fts_class_message_varargs(cl, fts_s_export, dict_export);
-  
   fts_class_message_void(cl, fts_s_clear, _dict_clear);
   
   fts_class_message_varargs(cl, fts_s_set, _dict_set);
@@ -841,6 +824,11 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_remove_entries, _dict_remove);
 
   fts_class_message_varargs(cl, fts_s_get_element, _dict_get_element);
+  
+  fts_atomfile_import_handler(cl, _dict_import_textfile);
+  fts_atomfile_export_handler(cl, _dict_export_textfile);
+  
+  fts_class_import_handler(cl, fts_new_symbol("coll"), _dict_import_textfile);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
   

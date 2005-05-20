@@ -328,7 +328,7 @@ object_imexport_dialog(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_a
 }
 
 static void
-object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *at, fts_symbol_t mode)
+object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *at, fts_atom_t *ret, fts_symbol_t mode)
 {
   fts_class_t *cl = fts_object_get_class(o);
   
@@ -358,7 +358,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
       if(fts_hashtable_get(hash, &k, &v))
       {        
         fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
-        (*meth)(o, suffix, ac, at, fts_nix);
+        (*meth)(o, suffix, ac, at, ret);
       }
       else if(suffix != fts_s_default)
       {
@@ -366,7 +366,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
         if(fts_hashtable_get(hash, &k, &v))
         {        
           fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
-          (*meth)(o, fts_s_default, ac, at, fts_nix);
+          (*meth)(o, fts_s_default, ac, at, ret);
         }
         else
           fts_object_error(o, "cannot %s %s data as %s", fts_symbol_name(mode), fts_symbol_name(fts_class_get_name(cl)), fts_symbol_name(suffix));
@@ -380,7 +380,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
 fts_method_status_t 
 fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  object_imexport(o, fts_s_default, ac, at, fts_s_import);
+  object_imexport(o, fts_s_default, ac, at, ret, fts_s_import);
   
   return fts_ok;
 }
@@ -388,7 +388,7 @@ fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
 fts_method_status_t 
 fts_object_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  object_imexport(o, fts_s_default, ac, at, fts_s_export);
+  object_imexport(o, fts_s_default, ac, at, ret, fts_s_export);
   
   return fts_ok;
 }
@@ -400,7 +400,7 @@ fts_object_import_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   {
     fts_symbol_t suffix = fts_get_symbol(at);
     
-    object_imexport(o, suffix, ac - 1, at + 1, fts_s_import);
+    object_imexport(o, suffix, ac - 1, at + 1, ret, fts_s_import);
   }
   else
     fts_object_error(o, "importas: type argument missing");
@@ -415,7 +415,7 @@ fts_object_export_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   {
     fts_symbol_t suffix = fts_get_symbol(at);
     
-    object_imexport(o, suffix, ac - 1, at + 1, fts_s_export);
+    object_imexport(o, suffix, ac - 1, at + 1, ret, fts_s_export);
   }
   else
     fts_object_error(o, "exportas: type argument missing");

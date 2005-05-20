@@ -574,7 +574,7 @@ informal_class(fts_class_t *cl)
         doc = fts_class_doc_get_next(doc);
       }
       
-      fts_post("  %s %s\n", fts_symbol_name(sel), has_doc? "": "... hidden\n");
+      fts_post("  %s %s\n", fts_symbol_name(sel), has_doc? "": "... hidden");
     }
     else
       fts_post("  inlet %d\n", fts_get_int(&a));

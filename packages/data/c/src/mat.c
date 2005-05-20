@@ -269,14 +269,14 @@ mat_read_atomfile_newline(mat_t *mat, fts_symbol_t file_name)
       mat->data[i * n + j] = a;
       j++;
       
-      if(c == '\n')
+      if(c == '\n' || c == '\r')
             {
               /* reset to beginning of next row */
               i++;
               j = 0;
             }
     }
-    else if(c == '\n')
+    else if(c == '\n' || c == '\r')
     {
       /* reset to beginning of next row */
       i++;

@@ -1623,7 +1623,7 @@ marker_track_import_labels_txt (fts_object_t *o, fts_symbol_t s, int ac, const f
         case L_TEXT:
           fts_spost_atoms((fts_bytestream_t *) memstream, 1, &a);
 
-          if (c == '\n')
+          if (c == '\n' || c == '\r')
           { /* end of label: create marker event, set label */
             event_t      *ev;
             scomark_t    *mrk;

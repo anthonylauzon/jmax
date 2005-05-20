@@ -3813,7 +3813,7 @@ fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
           
           j++;
           
-          if(c == '\n')
+          if(c == '\n' || c == '\r')
           {
             for(; j<n; j++)
               ptr[i * n + j] = 0.0;
@@ -3823,7 +3823,7 @@ fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
             j = 0;
           }
         }
-        else if(c == '\n')
+        else if(c == '\n' || c == '\r')
         {
           /* reset to beginning of next row */
           i++;

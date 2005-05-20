@@ -445,7 +445,7 @@ fts_atomfile_write(fts_atomfile_t *f, const fts_atom_t *at, char separator)
     
     while(*sym_str != '\0')
     {
-      if (IS_SEPARATOR(*sym_str) || IS_DIGIT(*sym_str) || IS_ATOM_CHAR(*sym_str))
+      if (IS_SEPARATOR(*sym_str) || IS_DIGIT(*sym_str))
         needs_double_quotes = 1;
       else if (IS_BACKSLASH_QUOTE(*sym_str) || IS_DOUBLE_QUOTE(*sym_str))
       {
