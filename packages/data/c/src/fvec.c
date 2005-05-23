@@ -50,8 +50,8 @@ static fts_symbol_t sym_refer = NULL;
 static fts_symbol_t fvec_type_names[fvec_n_types];
 
 
-/* fmat functions used here */
-fts_method_status_t fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+void fvec_config(void);
+
 
 static int
 fvec_get_type_from_symbol(fts_symbol_t sym)
@@ -203,7 +203,7 @@ fvec_upload_data(fvec_t *self)
   fvec_upload_from_index(self, 0, 0, fvec_get_m(self) * fvec_get_n(self));
 }
 
-void
+static void
 fvec_upload(fvec_t *self)
 {
   fvec_upload_size(self);
@@ -212,7 +212,7 @@ fvec_upload(fvec_t *self)
 
 #else
 
-void
+static void
 fvec_upload (fvec_t *self)
 {
   fts_post("UPLOAD DUMMY does nothing!\n");
@@ -289,7 +289,7 @@ fvec_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
  */
 
 /* if another object changed our data, do the necessary stuff */
-void fvec_changed(fvec_t *this)
+static void fvec_changed(fvec_t *this)
 {
     if (this->editor)
         tabeditor_send((tabeditor_t *) this->editor);

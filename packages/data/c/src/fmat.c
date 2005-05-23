@@ -35,9 +35,11 @@
 #include <alloca.h>
 #endif
 
+
 fmat_t *fmat_null = NULL;
 fts_class_t *fmat_class = NULL;
 fts_symbol_t fmat_symbol = NULL;
+
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_getcol = 0;
@@ -57,7 +59,12 @@ static fts_symbol_t sym_delete_cols = 0;
 
 static fts_symbol_t sym_sr = 0;
 
+
 int fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride);
+void fmat_config(void);
+
+
+
 
 /********************************************************
  *
@@ -89,6 +96,16 @@ fmat_realloc_values(fmat_t *self, size_t size)
     values = (float *) fts_malloc((size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
   else
     values = (float *) fts_realloc(values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+
+#if 0	/* don't do this, rather crash on such an exceptional occasion */
+  if (values == NULL)
+  { /* out of memory, at least don't make us crash but allocate valid (0, 0) fmat */
+    values      = (float *) fts_malloc((HEAD_POINTS + TAIL_POINTS) * sizeof(float));
+    size	= 0;
+    self->m 	= 0;
+    self->n 	= 0;
+  }
+#endif
   
   self->values = values + HEAD_POINTS;
   self->alloc  = size;
@@ -3769,6 +3786,7 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
   return fts_ok;
 }
 
+
 static fts_method_status_t
 fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -3813,7 +3831,7 @@ fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
           
           j++;
           
-          if(c == '\n' || c == '\r')
+          if(c == '\n'  ||  c == '\r')
           {
             for(; j<n; j++)
               ptr[i * n + j] = 0.0;
@@ -3823,7 +3841,7 @@ fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
             j = 0;
           }
         }
-        else if(c == '\n' || c == '\r')
+        else if (c == '\n'  ||  c == '\r')
         {
           /* reset to beginning of next row */
           i++;
@@ -3848,7 +3866,7 @@ fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
         fts_set_object(ret, o);
       }
       else
-        fts_object_error(o, "import: coudn't read any text data from file \"%s\"", fts_symbol_name(file_name));
+        fts_object_error(o, "import: couldn't read any text data from file \"%s\"", fts_symbol_name(file_name));
     }
     else
       fts_object_error(o, "import: cannot open text file \"%s\"", fts_symbol_name(file_name));
@@ -3856,6 +3874,7 @@ fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   
   return fts_ok;
 }
+
 
 static fts_method_status_t
 fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
