@@ -1174,7 +1174,7 @@ _fmat_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
       i = m - 1;
   
     if (j >= n)
-      i = n - 1;
+      j = n - 1;
   
     fts_set_float(ret, fmat_get_element(self, i, j));
   }
