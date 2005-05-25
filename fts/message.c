@@ -99,51 +99,6 @@ message_instantiate(fts_class_t *cl)
   fts_class_init(cl, sizeof(fts_message_t), message_init, message_delete);
 }
 
-/************************************************
- *
- *  message dumper
- *
- */
-
-void
-fts_dumper_init(fts_dumper_t *dumper, fts_method_t send)
-{
-  dumper->send = send;
-  dumper->message = (fts_message_t *)fts_object_create(fts_message_class, 0, 0);
-
-  fts_object_refer(dumper->message);
-}
-
-void
-fts_dumper_destroy(fts_dumper_t *dumper)
-{
-  fts_object_release(dumper->message);
-}
-
-fts_message_t *
-fts_dumper_message_get(fts_dumper_t *dumper, fts_symbol_t selector)
-{
-  fts_message_set(dumper->message, selector, 0, 0);
-
-  return dumper->message;
-}
-
-void
-fts_dumper_message_send(fts_dumper_t *dumper, fts_message_t *message)
-{
-  fts_symbol_t s = fts_message_get_selector(message);
-  int ac = fts_message_get_ac(message);
-  const fts_atom_t *at = fts_message_get_at(message);
-
-  dumper->send((fts_object_t *)dumper, s, ac, at, fts_nix);
-}
-
-void
-fts_dumper_send(fts_dumper_t *dumper, fts_symbol_t s, int ac, const fts_atom_t *at)
-{
-  dumper->send((fts_object_t *)dumper, s, ac, at, fts_nix);  
-}
-
 /*****************************************************************
  *
  *  message cache

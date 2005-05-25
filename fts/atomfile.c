@@ -64,6 +64,7 @@ fts_atomfile_open_read(fts_symbol_t name)
     {
       fts_atomfile_t *atomfile = (fts_atomfile_t *)fts_malloc(sizeof(fts_atomfile_t));
       
+      atomfile->filename = name;
       atomfile->file = file;
       atomfile->count = 0;
       atomfile->read = 0;
@@ -86,6 +87,7 @@ fts_atomfile_open_write(fts_symbol_t name)
   if(file != NULL)
   {
     fts_atomfile_t *atomfile = (fts_atomfile_t *)fts_malloc(sizeof(fts_atomfile_t));
+    atomfile->filename = name;
     atomfile->file = file;
     
     return atomfile;
@@ -430,7 +432,7 @@ fts_atomfile_write(fts_atomfile_t *f, const fts_atom_t *at, char separator)
     separator = ' ';
   
   if (fts_is_int(at))
-    sprintf(buf, "%d%c", fts_get_int(at), separator);
+    sprintf(buf, "%ld%c", fts_get_int(at), separator);
   else if (fts_is_float(at))
     sprintf(buf, "%#g%c", fts_get_float(at), separator);
   else if (fts_is_symbol(at))
@@ -492,3 +494,179 @@ fts_atomfile_export_handler(fts_class_t *cl, fts_method_t meth)
   fts_class_export_handler(cl, fts_new_symbol("txt"), meth);
 }
 
+/*******************************************************************************
+ *
+ *  atom file dumper
+ *
+ */
+typedef struct 
+{
+  fts_dumper_t head;
+  fts_atomfile_t *file;
+} fts_atomfile_dumper_t;
+
+fts_class_t *fts_atomfile_dumper_class = NULL;
+
+static fts_method_status_t
+atomfile_dumper_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_atomfile_dumper_t *self = (fts_atomfile_dumper_t *)o;
+  fts_atom_t a;
+  int i;
+  
+  fts_set_symbol(&a, s);
+  
+  if(ac > 0)
+  {
+    fts_atomfile_write(self->file, &a, ' ');
+    
+    for(i=0; i<ac-1; i++)
+      fts_atomfile_write(self->file, at + i, ' ');
+    
+    fts_atomfile_write(self->file, at + i, '\n');
+  }
+  else
+    fts_atomfile_write(self->file, &a, '\n');
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+atomfile_dumper_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_atomfile_dumper_t *self = (fts_atomfile_dumper_t *)o;
+  
+  fts_dumper_init((fts_dumper_t *)self, atomfile_dumper_send);
+  
+  self->file = NULL;
+  
+  if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    fts_atomfile_t *file = fts_atomfile_open_write(name);
+    
+    if(file != NULL)
+      self->file = file;
+    else
+      fts_object_error(o, "cannot open file '%s'", fts_symbol_name(name));
+  }
+  else
+    fts_object_error(o, "file name argument required");
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+atomfile_dumper_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_atomfile_dumper_t *self = (fts_atomfile_dumper_t *)o;
+  
+  if(self->file != NULL)
+    fts_atomfile_close(self->file);
+  
+  return fts_ok;
+}
+
+static void
+atomfile_dumper_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(fts_atomfile_dumper_t), atomfile_dumper_init, atomfile_dumper_delete);
+}
+
+/*******************************************************************************
+ *
+ *  atom file loader
+ *
+ */
+typedef struct 
+{
+  fts_loader_t head;
+  fts_atomfile_t *file;
+} fts_atomfile_loader_t;
+
+fts_class_t *fts_atomfile_loader_class = NULL;
+
+static fts_method_status_t
+atomfile_loader_load(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_atomfile_loader_t *self = (fts_atomfile_loader_t *)o;  
+  fts_atomfile_t *file = self->file;
+  fts_message_t *mess = NULL;
+  fts_atom_t a;
+  char c;
+  
+  while(fts_atomfile_read(file, &a, &c))
+  {
+    if(mess == NULL)
+    {
+      if(fts_is_symbol(&a))
+        mess = fts_loader_message_get((fts_loader_t *)self, fts_get_symbol(&a));
+    }
+    else
+    {
+      fts_message_append(mess, 1, &a);
+      
+      if(c == '\n' || c == '\r')
+      {
+        fts_loader_message_send((fts_loader_t *)self, mess);
+        mess = NULL;
+      }
+    }
+  }
+
+  return fts_ok;
+}
+
+static fts_method_status_t
+atomfile_loader_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_atomfile_loader_t *self = (fts_atomfile_loader_t *)o;  
+  
+  fts_loader_init((fts_loader_t *)self, atomfile_loader_load);
+  
+  self->file = NULL;
+  
+  if(ac > 0 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    fts_atomfile_t *file = fts_atomfile_open_read(name);
+    
+    if(file != NULL)
+      self->file = file;
+    else
+      fts_object_error(o, "cannot open file '%s'", fts_symbol_name(name));
+  }
+  else
+    fts_object_error(o, "file name argument required");
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+atomfile_loader_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_atomfile_loader_t *self = (fts_atomfile_loader_t *)o;
+  
+  if(self->file != NULL)
+    fts_atomfile_close(self->file);
+  
+  return fts_ok;
+}
+
+static void
+atomfile_loader_instantiate(fts_class_t *cl)
+{
+  fts_class_init(cl, sizeof(fts_atomfile_loader_t), atomfile_loader_init, atomfile_loader_delete);
+}
+
+/*******************************************************************************
+ *
+ *  kernel init
+ *
+ */
+void
+fts_kernel_atomfile_init(void)
+{
+  fts_atomfile_dumper_class = fts_class_install(NULL, atomfile_dumper_instantiate);
+  fts_atomfile_loader_class = fts_class_install(NULL, atomfile_loader_instantiate);
+}

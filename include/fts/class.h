@@ -141,7 +141,7 @@ FTS_API void fts_class_get_messages(const fts_class_t *cl, fts_iterator_t *i);
  * @fn void fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type)
  * @param cl the class
  * @param s message symbol
- * @param type class of argument (NULL for a single argument of any type, fts_void_class for a void method)
+ * @param type class of argument
  * @return the method or NULL if failed
  */
 FTS_API fts_method_t fts_class_get_method(fts_class_t *cl, fts_symbol_t s, fts_class_t *type);

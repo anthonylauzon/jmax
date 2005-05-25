@@ -549,7 +549,7 @@ fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       fts_atom_t a;
       
       if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "[%s] ", idstr);
+        fts_spost(stream, "[%s]", idstr);
       
       if(meth)
       {

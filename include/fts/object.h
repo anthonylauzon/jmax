@@ -118,7 +118,4 @@ FTS_API fts_method_status_t fts_object_import_as(fts_object_t *o, fts_symbol_t s
 FTS_API fts_method_status_t fts_object_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 FTS_API fts_method_status_t fts_object_export_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
-/** try list of functions until one returns true (anything but void) */
-FTS_API int fts_object_try_handlers (fts_list_t *handlers, fts_object_t *o, int w, fts_symbol_t s, int ac, const fts_atom_t *at);
-
 #endif  /* _FTS_OBJECT_H_ */
