@@ -167,12 +167,12 @@ id_to_symbol(int id)
 static int
 string_to_id(char *str)
 {
-  if(str[1]=='#' && str[2] > '0' && str[2] <= '9')
+  if(str[0]=='#' && str[1] > '0' && str[1] <= '9')
   {
     int id = 0;
     int i;
     
-    for(i=2; str[i] != '\0'; i++)
+    for(i=1; str[i] != '\0'; i++)
       id = id * 10 + (str[i] - '0');
     
     return id;
