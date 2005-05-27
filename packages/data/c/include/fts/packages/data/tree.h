@@ -23,8 +23,11 @@
 #ifndef _DATA_TREE_H_
 #define _DATA_TREE_H_
 
-#include <fts/packages/data/data.h>
+#include <fts/packages/data/fmat.h>
 
+
+#define MAX_VECT   200
+#define MAX_NODES  400
 
 typedef struct node
 {
@@ -42,6 +45,7 @@ typedef struct tree
 
     int ndim;
     int ndata;
+
     fmat_t *data[MAX_VECT];
 
     int nnodes;

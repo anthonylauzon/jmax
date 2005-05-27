@@ -22,9 +22,10 @@
 
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
+#include <fts/packages/data/tree.h>
 
 fts_symbol_t tree_symbol = 0;
-fts_class_t *tree_class = 0;
+fts_class_t *tree_class  = 0;
 
 
 /* for the search algorithm */
@@ -61,11 +62,13 @@ static int stack_pop (fts_stack_t *s, int *p, double *d)
 
 static double vec_dist (fmat_t *a, fmat_t *b)
 {
-    float *l = fmat_get_ptr(a);
-    float *r = fmat_get_ptr(b);
-    int size = m * n;
-    int i;
+    int    m 	= fmat_get_m(a);
+    int    n 	= fmat_get_n(a);
+    float *l 	= fmat_get_ptr(a);
+    float *r 	= fmat_get_ptr(b);
+    int    size = m * n;
     double dist = 0;
+    int    i;
     
     for (i = 0; i < size; i++)
 	dist += (l[i] - r[i]) * (l[i] - r[i]);
@@ -100,7 +103,7 @@ static fmat_t *tree_search (tree_t *tree, fmat_t *x)
 static fts_method_status_t _tree_add (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tree_t *self = (tree_t *) o;
-  fmat *x = (fmat *) fts_get_object(at);
+  fmat_t *x = (fmat_t *) fts_get_object(at);
 
   tree_add(self, x);
 
@@ -112,8 +115,8 @@ static fts_method_status_t _tree_add (fts_object_t *o, fts_symbol_t s, int ac, c
 static fts_method_status_t _tree_search (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tree_t *self = (tree_t *) o;
-  fmat *x = (fmat *) fts_get_object(at);
-  fmat *r = tree_search(self, x);
+  fmat_t *x = (fmat_t *) fts_get_object(at);
+  fmat_t *r = tree_search(self, x);
 
   fts_set_object(ret, r);
   fts_object_refer(r);
@@ -213,7 +216,7 @@ tree_instantiate(fts_class_t *cl)
 */
 
 
-  fts_class_message(cl, fmat_class, fts_s_add, _tree_add);
+  fts_class_message(cl, fmat_class, fts_new_symbol("add"), _tree_add);
 
   /* $tree[x] calls these methods, depending on the type of x */
   fts_class_message(cl, fmat_class, fts_s_get_element, _tree_search);
