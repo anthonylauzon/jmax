@@ -96,6 +96,7 @@ extern "C" {
 #include <fts/connection.h>
 #include <fts/outlet.h>
 #include <fts/patcher.h>
+#include <fts/dumper.h>
 #include <fts/errobj.h>
 #include <fts/label.h>
 #include <fts/param.h>

@@ -4364,6 +4364,7 @@
 		5C5426C305AB0B8A0042B7A2 = {
 			buildActionMask = 2147483647;
 			files = (
+				F458A3F608470CFB006AB8CF,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4931,6 +4932,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C54271505AB0B8B0042B7A2,
+				F458A3F408470CD3006AB8CF,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -12589,6 +12591,7 @@
 		};
 		5C74560B06098EFF00B69585 = {
 			children = (
+				F458A3F508470CFB006AB8CF,
 				5C74560D06098F4700B69585,
 				5C74560E06098F4700B69585,
 				5C74560F06098F4700B69585,
@@ -13685,6 +13688,46 @@
 //5C2
 //5C3
 //5C4
+//F40
+//F41
+//F42
+//F43
+//F44
+		F458A3F308470CD3006AB8CF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = dumper.c;
+			path = /Volumes/User/diemo/src/jmax/fts/dumper.c;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		F458A3F408470CD3006AB8CF = {
+			fileRef = F458A3F308470CD3006AB8CF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F458A3F508470CFB006AB8CF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = dumper.h;
+			path = /Volumes/User/diemo/src/jmax/include/fts/dumper.h;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		F458A3F608470CFB006AB8CF = {
+			fileRef = F458A3F508470CFB006AB8CF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//F40
+//F41
+//F42
+//F43
+//F44
 //F50
 //F51
 //F52
@@ -21216,6 +21259,7 @@
 		F880FCEC0282F7CE01664092 = {
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 3.8.6;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				ZERO_LINK = NO;
@@ -21432,6 +21476,7 @@
 		};
 		F880FD450282FA3901664092 = {
 			children = (
+				F458A3F308470CD3006AB8CF,
 				F57A660003D473F8016640F1,
 				F880FD470282FA3901664092,
 				F880FD480282FA3901664092,
