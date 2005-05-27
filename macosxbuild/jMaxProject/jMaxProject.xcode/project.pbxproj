@@ -4365,6 +4365,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F458A3F608470CFB006AB8CF,
+				F458A41908471D63006AB8CF,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5167,6 +5168,7 @@
 				5C54273C05AB0B8B0042B7A2,
 				5C54273F05AB0B8B0042B7A2,
 				5C54274005AB0B8B0042B7A2,
+				F458A41508471D3C006AB8CF,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -13491,6 +13493,7 @@
 				5CB1CE260651132400B5A90F,
 				5CB1CE270651132400B5A90F,
 				5CB1CE280651132400B5A90F,
+				F458A41808471D63006AB8CF,
 			);
 			isa = PBXGroup;
 			name = include;
@@ -13719,6 +13722,36 @@
 		};
 		F458A3F608470CFB006AB8CF = {
 			fileRef = F458A3F508470CFB006AB8CF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F458A41408471D3C006AB8CF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tree.c;
+			path = /Volumes/User/diemo/src/jmax/packages/data/c/src/tree.c;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		F458A41508471D3C006AB8CF = {
+			fileRef = F458A41408471D3C006AB8CF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F458A41808471D63006AB8CF = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tree.h;
+			path = /Volumes/User/diemo/src/jmax/packages/data/c/include/fts/packages/data/tree.h;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		F458A41908471D63006AB8CF = {
+			fileRef = F458A41808471D63006AB8CF;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -24731,6 +24764,7 @@
 				F560D89303D486B7016640F1,
 				F8B8E49B02867E1C01664092,
 				F8B8E49302867E1C01664092,
+				F458A41408471D3C006AB8CF,
 			);
 			isa = PBXGroup;
 			name = c;
