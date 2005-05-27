@@ -155,6 +155,7 @@ int propobj_equals(const propobj_t *a, const propobj_t *b);
 #include <fts/packages/data/fvec.h>
 #include <fts/packages/data/dict.h>
 #include <fts/packages/data/bpf.h>
+#include <fts/packages/data/tree.h>
 
 DATA_API void data_config(void);
 

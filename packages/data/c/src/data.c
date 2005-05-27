@@ -766,6 +766,7 @@ data_config(void)
   fvec_config();
   bpf_config();
   dict_config();
+  tree_config();
   tabeditor_config();
   
   getrange_config();  

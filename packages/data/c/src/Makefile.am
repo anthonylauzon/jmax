@@ -12,6 +12,7 @@ ivec.c \
 mat.c \
 dict.c \
 row.c \
+tree.c \
 tabeditor.c \
 vec.c \
 dumpfile.c
