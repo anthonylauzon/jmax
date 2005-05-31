@@ -105,7 +105,7 @@ static fts_method_status_t _tree_add (fts_object_t *o, fts_symbol_t s, int ac, c
   tree_t *self = (tree_t *) o;
   fmat_t *x = (fmat_t *) fts_get_object(at);
 
-  tree_add(self, x);
+  /* tree_add(self, x); */
 
   return fts_ok;
 }
