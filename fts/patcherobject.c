@@ -1101,7 +1101,7 @@ fts_object_get_package(fts_object_t *obj)
 *
 */
 void
-fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, int ac, const fts_atom_t *at)
+fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t type, int ac, const fts_atom_t *at)
 {
 	fts_atom_t a[2];
 	
@@ -1111,7 +1111,7 @@ fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prom
 }
 
 void
-fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t path, fts_symbol_t default_name, int ac, const fts_atom_t *at)
+fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t type, fts_symbol_t path, fts_symbol_t default_name, int ac, const fts_atom_t *at)
 {
 	fts_atom_t a[4];
 	

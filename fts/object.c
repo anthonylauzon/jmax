@@ -306,47 +306,59 @@ fts_object_call_listeners(fts_object_t *o)
  */
 
 static void
-object_imexport_dialog(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *at, fts_symbol_t mode)
+object_imexport_dialog(fts_object_t *o, fts_symbol_t mode, int ac, const fts_atom_t *at)
 {
-  char str[1024];
-
   if(mode == fts_s_import)
+    fts_object_open_dialog(o, mode, fts_new_symbol("Open file to import"), NULL, ac, at);
+  else if(mode == fts_s_importas)
   {
-    snprintf(str, 1023, "Open%s file to import", (suffix != fts_s_default)? fts_symbol_name(suffix): "");
-    fts_object_open_dialog(o, fts_s_import, fts_new_symbol(str), ac, at);
+    fts_symbol_t suffix = fts_get_symbol(at);
+    char str[1024];
+        
+    snprintf(str, 1023, "Open %s file to import", fts_symbol_name(suffix));
+    fts_object_open_dialog(o, mode, fts_new_symbol(str), suffix, ac - 1, at + 1);
   }
-  else
+  else if(mode == fts_s_export)
+    fts_object_save_dialog(o, mode, fts_new_symbol("Select file for export"), NULL, fts_project_get_dir(), fts_new_symbol("untitled.???"), ac, at);
+  else if(mode == fts_s_exportas)
   {
+    fts_symbol_t suffix = fts_get_symbol(at);
     fts_symbol_t default_name;
+    char str[1024];
     
-    snprintf(str, 1023, "untitled.%s", (suffix != fts_s_default)? fts_symbol_name(suffix): "???");
+    snprintf(str, 1023, "untitled.%s", fts_symbol_name(suffix));
     default_name = fts_new_symbol(str);
-
-    snprintf(str, 1023, "Select file for%s export", (suffix != fts_s_default)? fts_symbol_name(suffix): "");
-    fts_object_save_dialog(o, fts_s_export, fts_new_symbol(str), fts_project_get_dir(), default_name, ac, at);
+    
+    snprintf(str, 1023, "Select file for %s export", fts_symbol_name(suffix));
+    fts_object_save_dialog(o, mode, fts_new_symbol(str), suffix, fts_project_get_dir(), default_name, ac - 1, at + 1);
   }
 }
 
 static void
-object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *at, fts_atom_t *ret, fts_symbol_t mode)
+object_imexport(fts_object_t *o, fts_symbol_t mode, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fts_class_t *cl = fts_object_get_class(o);
+  fts_symbol_t suffix = fts_s_default;
+  int as = (mode == fts_s_importas || mode == fts_s_exportas);
+  int import = (mode == fts_s_import || mode == fts_s_importas);
   
   /* without name or "-" as name open file chooser */
-  if(ac == 0)
-    object_imexport_dialog(o, suffix, 0, NULL, mode);
-  else if(ac > 0 && fts_is_symbol(at))
+  if(ac == 0 || (as && ac == 1))
+    object_imexport_dialog(o, mode, ac, at);
+  else if(ac > 0 && fts_is_symbol(at + as))
   {
-    fts_symbol_t name = fts_get_symbol(at);
+    fts_symbol_t name = fts_get_symbol(at + as);
   
     if(name == fts_s_minus)
-      object_imexport_dialog(o, suffix, ac - 1, at + 1, mode);
+      object_imexport_dialog(o, mode, ac, at);
     else
     {
-      fts_hashtable_t *hash = (mode == fts_s_import)? fts_class_get_import_handlers(cl): fts_class_get_export_handlers(cl);
+      fts_hashtable_t *hash = (import)? fts_class_get_import_handlers(cl): fts_class_get_export_handlers(cl);
       fts_atom_t k, v;
       
-      if(suffix == fts_s_default)
+      if(as)
+        suffix = fts_get_symbol(at);
+      else
       {
         char *str = strrchr((char *)fts_symbol_name(name), '.');
         
@@ -358,7 +370,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
       if(fts_hashtable_get(hash, &k, &v))
       {        
         fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
-        (*meth)(o, suffix, ac, at, ret);
+        (*meth)(o, suffix, ac - as, at + as, ret);
       }
       else if(suffix != fts_s_default)
       {
@@ -366,13 +378,13 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
         if(fts_hashtable_get(hash, &k, &v))
         {        
           fts_method_t meth = (fts_method_t)fts_get_pointer(&v);
-          (*meth)(o, fts_s_default, ac, at, ret);
+          (*meth)(o, fts_s_default, ac - as, at + as, ret);
         }
         else
-          fts_object_error(o, "cannot %s %s data as %s", fts_symbol_name(mode), fts_symbol_name(fts_class_get_name(cl)), fts_symbol_name(suffix));
+          fts_object_error(o, "cannot %s %s data as %s", (import)? "import": "export", fts_symbol_name(fts_class_get_name(cl)), fts_symbol_name(suffix));
       }
       else
-        fts_object_error(o, "cannot %s %s data", fts_symbol_name(mode), fts_symbol_name(fts_class_get_name(cl)));
+        fts_object_error(o, "cannot %s %s data", (import)? "import": "export", fts_symbol_name(fts_class_get_name(cl)));
     }
   }
 }
@@ -380,7 +392,7 @@ object_imexport(fts_object_t *o, fts_symbol_t suffix, int ac, const fts_atom_t *
 fts_method_status_t 
 fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  object_imexport(o, fts_s_default, ac, at, ret, fts_s_import);
+  object_imexport(o, fts_s_import, ac, at, ret);
   
   return fts_ok;
 }
@@ -388,7 +400,7 @@ fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
 fts_method_status_t 
 fts_object_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  object_imexport(o, fts_s_default, ac, at, ret, fts_s_export);
+  object_imexport(o, fts_s_export, ac, at, ret);
   
   return fts_ok;
 }
@@ -397,11 +409,7 @@ fts_method_status_t
 fts_object_import_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t suffix = fts_get_symbol(at);
-    
-    object_imexport(o, suffix, ac - 1, at + 1, ret, fts_s_import);
-  }
+    object_imexport(o, fts_s_importas, ac, at, ret);
   else
     fts_object_error(o, "importas: type argument missing");
   
@@ -412,11 +420,7 @@ fts_method_status_t
 fts_object_export_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t suffix = fts_get_symbol(at);
-    
-    object_imexport(o, suffix, ac - 1, at + 1, ret, fts_s_export);
-  }
+    object_imexport(o, fts_s_exportas, ac, at, ret);
   else
     fts_object_error(o, "exportas: type argument missing");
   

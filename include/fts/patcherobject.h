@@ -103,8 +103,8 @@ FTS_API int fts_object_is_in_patcher(fts_object_t *obj, fts_patcher_t *patcher);
 #define fts_object_outlet_is_connected(o, i) (((o)->context != NULL)? (((fts_object_patcher_data_t *)(o)->context)->out_conn[(i)] != 0): 0)
 
 /* open/save Dialog */
-FTS_API void fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t path, fts_symbol_t default_name, int ac, const fts_atom_t *at);
-FTS_API void fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, int ac, const fts_atom_t *at);
+FTS_API void fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t type, fts_symbol_t path, fts_symbol_t default_name, int ac, const fts_atom_t *at);
+FTS_API void fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t type, int ac, const fts_atom_t *at);
 
 /* package */
 FTS_API fts_package_t *fts_object_get_package(fts_object_t *obj);

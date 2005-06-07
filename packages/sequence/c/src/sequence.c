@@ -354,7 +354,7 @@ sequence_import_midifile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom
 static fts_method_status_t
 sequence_import_midifile_dialog(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"), ac, at);
+	fts_object_open_dialog(o, seqsym_import_midifile, fts_new_symbol("Import standard MIDI file"), NULL, ac, at);
   
   return fts_ok;
 }
