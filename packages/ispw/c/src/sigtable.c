@@ -323,7 +323,7 @@ sigtable_load(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
       fts_post("table~: %s: can't load samples from file \"%s\"\n", this->name, file_name);      
   }
   else
-	fts_object_open_dialog(o, fts_s_load, fts_new_symbol("open file"), ac, at);
+	fts_object_open_dialog(o, fts_s_load, fts_new_symbol("open file"), NULL, ac, at);
 }
 
 static void

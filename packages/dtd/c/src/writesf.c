@@ -202,7 +202,7 @@ static void writesf_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom
     }
   }    
   else
-	fts_object_open_dialog(o, fts_s_open, s_open_file, ac, at);
+	fts_object_open_dialog(o, fts_s_open, s_open_file, NULL, ac, at);
 }
 
 static void writesf_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
