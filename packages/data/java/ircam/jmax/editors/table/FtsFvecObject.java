@@ -74,12 +74,6 @@ public class FtsFvecObject extends FtsObjectWithEditor
     if(getEditorFrame() == null)
       setEditorFrame( new Tabler(this, ftsEditor));
   }
-  public void openEditor(int argc, FtsAtom[] argv)
-  {
-    createEditor();
-    showEditor();
-    FtsObject.requestResetGui();
-  }
   
   public void destroyEditor()
   {

@@ -149,34 +149,34 @@ public class BpfPopupMenu extends JPopupMenu
 
     ///////////////////////////////////
     addPopupMenuListener(new PopupMenuListener(){
-	public void popupMenuWillBecomeVisible(PopupMenuEvent e){}
-	public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
-	{
-	  setRange();
-	}
-	public void popupMenuCanceled(PopupMenuEvent e){}
+      public void popupMenuWillBecomeVisible(PopupMenuEvent e){}
+      public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
+    {
+        setRange();
+    }
+      public void popupMenuCanceled(PopupMenuEvent e){}
       });
 
     validate();
     pack();
   }
-
-    public void setRange()
-    {
+  
+  public void setRange()
+  {
       try
-	{
-	  float min = Float.valueOf(minValueField.getText()).floatValue();
-	  float max = Float.valueOf(maxValueField.getText()).floatValue();
-	  target.getGraphicContext().getDataModel().setMinimumValue(min);
-	  target.getGraphicContext().getDataModel().setMaximumValue(max);
-	  target.getGraphicContext().getGraphicDestination().repaint();
-	}
-      catch (NumberFormatException e1)
-	{
-	  System.err.println("Error:  invalid number format!");
-	  return;
-	}
+    {
+      float min = Float.valueOf(minValueField.getText()).floatValue();
+      float max = Float.valueOf(maxValueField.getText()).floatValue();
+      target.getGraphicContext().getDataModel().setMinimumValue(min);
+      target.getGraphicContext().getDataModel().setMaximumValue(max);
+      target.getGraphicContext().getGraphicDestination().repaint();
     }
+      catch (NumberFormatException e1)
+    {
+        System.err.println("Error:  invalid number format!");
+        return;
+    }
+  }
 
   public void show(Component invoker, int x, int y)
   {

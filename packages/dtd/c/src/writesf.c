@@ -171,7 +171,6 @@ static void writesf_close(fts_object_t *o, fts_symbol_t s, int ac, const fts_ato
 static void writesf_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   writesf_t* self = (writesf_t*)o;
-  fts_audiofile_t* sf;
 
   /* if a file is already open we close the previous file */
   if (1 == self->is_open)
@@ -183,7 +182,7 @@ static void writesf_open(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom
   if (ac > 0 && fts_is_symbol(at))
   {
     self->filename = fts_get_symbol(at);	    
-    sf = fts_audiofile_open_write(self->filename, self->n_channels, (int)(fts_dsp_get_sample_rate()), NULL, fts_s_int16);
+    fts_audiofile_t* sf = fts_audiofile_open_write(self->filename, self->n_channels, (int)(fts_dsp_get_sample_rate()), NULL, fts_s_int16);
     
     if (sf != NULL)
     {		

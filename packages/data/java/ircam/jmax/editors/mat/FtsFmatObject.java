@@ -103,13 +103,6 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
       setEditorFrame( new MatWindow(this));
   }
 
-  public void openEditor(int argc, FtsAtom[] argv)
-  {
-    createEditor();  
-    showEditor();
-    FtsObject.requestResetGui();
-  }
-  
   public void destroyEditor()
   {
     disposeEditor();

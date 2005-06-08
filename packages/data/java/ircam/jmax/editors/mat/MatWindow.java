@@ -106,7 +106,6 @@ public class MatWindow extends JMaxEditor {
     getContentPane().validate();
     itsMatPanel.validate();
     validate();
-    pack();
   }
   
   private final void makeTitle()

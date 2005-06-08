@@ -117,18 +117,21 @@ public class TrackWindow extends JMaxEditor {
         setWindowName(name);
       }
 		});		
-    
-		if(trackData.editorObject != null && !trackData.editorObject.haveContent())
-			pack();
-		
+        
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
     else
       makeSimpleMenuBar();
 		
     validate();
-		if(trackData.editorObject != null && !trackData.editorObject.haveContent())
-			pack();
+    
+    if(trackData.editorObject != null && !trackData.editorObject.haveContent())
+    {
+      //pack();
+      Dimension size = trackPanel.getPreferredSize(); 
+      size.height+=(getJMenuBar().getPreferredSize().height + SequenceRuler.RULER_HEIGHT + 7);
+      setSize(size);
+    }
   }
 	
   private final void makeTitle(){

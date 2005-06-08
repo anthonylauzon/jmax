@@ -254,20 +254,16 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     trackPanel.remove(verticalGlue);
     TrackContainer trackContainer = new TrackContainer(track, teditor);
     trackContainer.setBorder(new EtchedBorder()); 
-		
     trackPanel.add(trackContainer);
     trackPanel.add(verticalGlue);
-    
     trackPanel.validate();
     scrollTracks.validate();
     scrollTracks.getVerticalScrollBar().setValue(scrollTracks.getVerticalScrollBar().getMaximum());
-		
     mutex.add(track);
     trackContainers.put(track, trackContainer);
-		
 		teditor.getSelection().addListSelectionListener(this);
 		track.setProperty("selected", Boolean.TRUE);
-			
+
 		track.getTrackDataModel().addListener(this);    
 		track.getTrackDataModel().addHighlightListener(ruler);    		
 		track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
@@ -291,23 +287,16 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 		
 		//resize the frame //////////////////////////////////////////////////////////////
 		int height;	
-    boolean toPack = false;
 		Dimension dim = itsContainer.getFrame().getSize();
 		if(dim.height < SequenceWindow.MAX_HEIGHT)
 		{
 			int tcHeight = trackContainer.getSize().height;
 			
 			if(sequenceData.trackCount() == 1)
-      {
 				itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + tcHeight);
-        toPack = true;
-			}
       else
 				if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
-        {
-					itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
-          toPack = true;
-        }
+   				itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
         else 
 				if(dim.height < SequenceWindow.MAX_HEIGHT)
 					itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
@@ -315,12 +304,11 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 			
 		///////////////////////////////////////////////////////////////////////////////////
 		//updates events in track
-		
 		for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 			teditor.updateNewObject((TrackEvent)e.nextElement());
-		
+
 		itsContainer.getFrame().validate();
-    if(toPack)
+    if(itsContainer.getFrame().isVisible())
       itsContainer.getFrame().pack();
   }
 	

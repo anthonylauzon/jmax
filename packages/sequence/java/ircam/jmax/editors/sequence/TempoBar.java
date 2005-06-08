@@ -568,7 +568,8 @@ public void restoreEditorState(FtsTrackEditorObject editorState)
         propertyToDraw(propName, true);
       }
       validate();
-      container.getEditorContainer().getFrame().pack();
+      if(container.getEditorContainer().getFrame().isVisible())
+        container.getEditorContainer().getFrame().pack();
       repaint();
     }  
     stateRestored = true;

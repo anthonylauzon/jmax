@@ -133,13 +133,6 @@ public void createEditor()
 		setEditorFrame( new SequenceWindow(this));
 }
 
-public void openEditor(int argc, FtsAtom[] argv)
-{
-  createEditor();
-	showEditor();
-  FtsObject.requestResetGui();
-}
-
 /**
 * Fts callback: destroy the editor associated with this FtsSequenceObject.
  */

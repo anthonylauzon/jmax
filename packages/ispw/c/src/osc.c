@@ -161,24 +161,24 @@ static void
 osc_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   osc_t *this = (osc_t *)o;
-  fts_symbol_t s = fts_get_symbol_arg(ac, at, 0, 0);
+  fts_symbol_t sym = fts_get_symbol_arg(ac, at, 0, 0);
   fts_atom_t data, k;
-
-  this->sym = s;
   
-  if (s)
+  this->sym = sym;
+  
+  if (sym)
+  {
+    fts_set_symbol( &k, sym);
+    
+    if (fts_hashtable_get(sigtab1_ht, &k, &data))
     {
-      fts_set_symbol( &k, s);
-
-      if (fts_hashtable_get(sigtab1_ht, &k, &data))
-	{
-	  wavetab_t *wavetab = (wavetab_t *) fts_get_pointer(&data);
-	  
-	  osc_ftl_data_set_table(this->ftl_data, (void *)wavetab->table);
-	}
-      else
-	fts_post("osc1~: set %s: can't find table\n", s);
+      wavetab_t *wavetab = (wavetab_t *) fts_get_pointer(&data);
+      
+      osc_ftl_data_set_table(this->ftl_data, (void *)wavetab->table);
     }
+    else
+      fts_post("osc1~: set %s: can't find table\n", sym);
+  }
   else
     osc_ftl_data_set_table(this->ftl_data, (void *)cos_table);
 }

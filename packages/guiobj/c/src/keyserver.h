@@ -47,7 +47,7 @@ enum key_codes {
   n_codes
 };
 
-extern fts_symbol_t sym_f1;
+/*extern fts_symbol_t sym_f1;
 extern fts_symbol_t sym_F1;
 extern fts_symbol_t sym_f2;
 extern fts_symbol_t sym_F2;
@@ -77,7 +77,7 @@ extern fts_symbol_t sym_escape;
 extern fts_symbol_t sym_shift;
 extern fts_symbol_t sym_alt;
 extern fts_symbol_t sym_ctrl;
-extern fts_symbol_t sym_space;
+extern fts_symbol_t sym_space;*/
 
 typedef struct _listener_
 {

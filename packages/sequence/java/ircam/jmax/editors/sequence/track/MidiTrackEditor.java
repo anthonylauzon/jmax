@@ -53,6 +53,15 @@ public class MidiTrackEditor extends TrackBaseEditor
       track.setProperty("minimumPitch", new Integer(SequenceDefaults.DEFAULT_MIN_PITCH));
 		
     viewMode = PIANOROLL_VIEW;
+    
+    if(!isInsequence)
+      addComponentListener( new ComponentAdapter() {
+        public void componentResized(ComponentEvent e)
+		    {
+          resizeToPreferredSize();
+        }
+        public void componentMoved(ComponentEvent e){}
+      });
   }
 
   public void reinit()
@@ -203,7 +212,8 @@ public class MidiTrackEditor extends TrackBaseEditor
     setSize(d.width, d.height);
     setPreferredSize(d);
     validate();
-    container.getEditorContainer().getFrame().pack();
+    if(container.getEditorContainer().getFrame().isVisible())
+      container.getEditorContainer().getFrame().pack();
   }
   
    //--- MidiTrackEditor fields

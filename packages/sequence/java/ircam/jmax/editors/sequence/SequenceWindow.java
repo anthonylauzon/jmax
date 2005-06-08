@@ -102,7 +102,7 @@ public class SequenceWindow extends JMaxEditor {
         setWindowName(name);
       }      
     });
-    pack();
+    //pack();
     
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
@@ -110,7 +110,7 @@ public class SequenceWindow extends JMaxEditor {
       makeSimpleMenuBar();
     
     validate();
-    pack();
+    //pack();
   }
   
   private final void makeTitle(){

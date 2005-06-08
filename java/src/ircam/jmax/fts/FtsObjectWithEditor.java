@@ -160,8 +160,14 @@ public void requestOpenEditor()
 }
 }
 
+public void openEditor(int argc, FtsAtom[] argv)
+{
+  createEditor();  
+  showEditor();
+  FtsObject.requestResetGui();
+}
+
 public abstract void createEditor();
-public abstract void openEditor(int argc, FtsAtom[] argv);
 public abstract void destroyEditor();
 
 private transient Frame editorFrame = null;

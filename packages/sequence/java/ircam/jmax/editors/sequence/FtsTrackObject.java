@@ -1711,12 +1711,6 @@ public void createEditor()
   if(getEditorFrame() == null)
     setEditorFrame( new TrackWindow(this));
 }
-public void openEditor(int argc, FtsAtom[] argv)
-{  
-  createEditor();
-  showEditor();
-  FtsObject.requestResetGui();
-}
 
 public void destroyEditor()
 {
