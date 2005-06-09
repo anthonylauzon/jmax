@@ -20,6 +20,9 @@
  *
  */
 
+/** @file data.c data object doc
+ */
+
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
 #include <string.h>
@@ -29,6 +32,12 @@
 #if HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
+
+
+/** @defgroup dataobj data object user messages
+ *
+ *  Messages that can be sent to or invoked on data objects.
+ */
 
 extern void ivec_config(void);
 extern void fvec_config(void);
@@ -52,11 +61,15 @@ data_object_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   return fts_ok;
 }
 
+
+
+
 /***********************************************************************
-*
-* expression class
-*
-*/
+ *
+ * expression class
+ *
+ */
+
 static fts_symbol_t sym_expr = NULL;
 fts_class_t *expr_class = NULL;
 
@@ -254,11 +267,16 @@ expr_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("eval"), "[<dict: local names>] [<any: arguments> ...]", "evaluate expression");
 }
 
+
+
+
 /***********************************************************************
-*
-*  enumeration type support
-*
-*/
+ *
+ *
+ *  enumeration type support
+ *
+ */
+
 fts_hashtable_t global_enumeration_table; 
 
 #define ENUMERATION_ALLOC_BLOCK 32
@@ -538,7 +556,7 @@ propobj_equals(const propobj_t *o, const propobj_t *p)
   return 1;
 }
 
-/************************************************************************************
+/******************************************************************************
 *
 *  propobj class
 *
@@ -750,10 +768,11 @@ propobj_class_append_properties(fts_class_t *cl, fts_array_t *array)
 }
 
 /***********************************************************************
-*
-*  config
-*
-*/
+ *
+ *  config
+ *
+ */
+
 void
 data_config(void)
 {

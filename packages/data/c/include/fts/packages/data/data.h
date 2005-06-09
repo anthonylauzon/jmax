@@ -18,8 +18,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
+
 #ifndef _DATA_H
 #define _DATA_H
+
+
+/** package with data classes (matrices, vectors, dictionaries, etc.).
+ *  @file     data.h
+ *  @defgroup data		data package
+ *
+ *  @{
+ */
 
 #include <fts/fts.h>
 #include <fts/packages/utils/utils.h>
@@ -38,11 +48,14 @@
 
 DATA_API fts_method_status_t data_object_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);  
 
-/******************************************************************* 
-*
-*  expression class
-*
-*/
+
+
+
+/******************************************************************************
+ *
+ *  @defgroup expression		expression class
+ */
+
 typedef struct
 {
   fts_object_t o;
@@ -57,11 +70,15 @@ DATA_API fts_class_t *expr_class;
 DATA_API fts_method_status_t expr_evaluate(expr_t *self, fts_hashtable_t *locals, int ac, const fts_atom_t *at, fts_atom_t *ret);
 DATA_API fts_method_status_t expr_evaluate_in_scope(expr_t *self, fts_patcher_t *scope, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
+
+
+
 /******************************************************************* 
-*
-*  enumeration type support
-*
-*/
+ *
+ *  @defgroup enumeration	enumeration type support
+ *
+ */
+
 typedef struct
 {
   fts_hashtable_t hash;
@@ -78,11 +95,15 @@ fts_symbol_t enumeration_add_name(enumeration_t *e, const fts_symbol_t name);
 int enumeration_get_index(enumeration_t *e, const fts_symbol_t name);
 fts_symbol_t enumeration_get_name(enumeration_t *e, int index);
 
+
+
+
 /******************************************************************* 
-*
-*  propobj, base class with properties
-*
-*/
+ *
+ *  @defgroup propobj	base class with properties
+ *
+ */
+
 typedef struct
 {
   int index;
@@ -144,11 +165,15 @@ void propobj_copy(propobj_t *org, propobj_t *copy);
 void propobj_copy_function(const fts_object_t *from, fts_object_t *to);
 int propobj_equals(const propobj_t *a, const propobj_t *b);
 
+
+
+
 /******************************************************************* 
  *
  *  data classes
  *
  */
+
 #include <fts/packages/data/mat.h>
 #include <fts/packages/data/ivec.h>
 #include <fts/packages/data/fmat.h>
@@ -158,5 +183,8 @@ int propobj_equals(const propobj_t *a, const propobj_t *b);
 #include <fts/packages/data/tree.h>
 
 DATA_API void data_config(void);
+
+
+/** @} end of package data */
 
 #endif /* _DATA_H */
