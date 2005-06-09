@@ -20,9 +20,13 @@
  * 
  */
 
+
+#include <stdio.h>
 #include <fts/fts.h>
 
+
 #define FTS_STACK_BLOCK_SIZE 256
+
 
 void 
 __fts_stack_init( fts_stack_t *s, int element_size)
