@@ -172,11 +172,15 @@ term: primitive
 ;
 
 /* original:
- reference: variable  TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR*/
+reference: variable  TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR*/
 reference: reference TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
 		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
-	| variable
+/* (expr)[index] DOES NOT work like this:
+	|  par       TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
+		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
+*/	|  variable
 ;
+
 
 variable: TK_DOLLAR TK_SYMBOL
 		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
