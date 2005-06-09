@@ -28,12 +28,12 @@ typedef struct
   int running;
   double start;
   double time;
-} timer_t;
+} control_timer_t;
 
 static void
 timer_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  timer_t *this = (timer_t *)o;
+  control_timer_t *this = (control_timer_t *)o;
 
   if(!this->running)
     {
@@ -45,7 +45,7 @@ timer_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 static void
 timer_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  timer_t *this = (timer_t *)o;
+  control_timer_t *this = (control_timer_t *)o;
 
   this->running = 0;
   this->time += (fts_get_time() - this->start);
@@ -54,7 +54,7 @@ timer_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
 static void
 timer_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  timer_t *this = (timer_t *)o;
+  control_timer_t *this = (control_timer_t *)o;
 
   this->time = 0.0;
   this->start = fts_get_time();
@@ -63,7 +63,7 @@ timer_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 static void
 timer_send_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  timer_t *this = (timer_t *)o;
+  control_timer_t *this = (control_timer_t *)o;
   double time = this->time;
 
   if(this->running)
@@ -75,7 +75,7 @@ timer_send_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 static void
 timer_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  timer_t *this = (timer_t *)o;
+  control_timer_t *this = (control_timer_t *)o;
 
   this->running = 0;
   this->start = fts_get_time();
@@ -85,7 +85,7 @@ timer_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
 static void
 timer_instantiate(fts_class_t *cl)
 {
-  fts_class_init(cl, sizeof(timer_t), timer_init, 0);
+  fts_class_init(cl, sizeof(control_timer_t), timer_init, 0);
 
   fts_class_message_varargs(cl, fts_new_symbol("reset"), timer_reset);
   fts_class_message_varargs(cl, fts_s_start, timer_start);
