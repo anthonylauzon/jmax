@@ -46,6 +46,10 @@
 #include <fts/fts.h>
 #include <ftsprivate/platform.h>
 
+
+/* #define HELP_PURIFY */
+
+
 /***********************************************************************
  *
  * Memory allocation 
@@ -92,7 +96,7 @@ void *fts_malloc(unsigned int size)
 	    }
 	}
       else
-	fts_log( "Out of memory");
+	fts_log("Out of memory trying to allocate %d bytes", size);
     }
 
   return p;
@@ -120,7 +124,7 @@ void *fts_realloc( void *p, unsigned int size)
 	    }
 	}
       else
-	fts_log( "Out of memory");
+	fts_log("Out of memory trying to realloc %d bytes", size);
     }
 
   return r;
