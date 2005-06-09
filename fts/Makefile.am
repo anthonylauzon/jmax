@@ -22,6 +22,7 @@ connection.c \
 define.c \
 dsp.c \
 dspgraph.c \
+dumper.c \
 errobj.c \
 expression.c \
 fifo.c \
@@ -76,13 +77,14 @@ noinst_HEADERS= parser.h
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
 fts_LDADD= @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
-libfts_la_LDFLAGS = -no-undefined -release @JMAX_VERSION@
+libfts_la_LDFLAGS = -no-undefined -release @JMAX_VERSION@ `pkg-config --libs sndfile`
 AM_YFLAGS=-d --verbose
 AM_LFLAGS=-olex.yy.c
 EXTRA_DIST=linux.c sgi.c macosx.c win32.c
 
-INCLUDES=-I$(top_srcdir)/include
-AM_CFLAGS=
+INCLUDES=-I$(top_srcdir)/include `pkg-config --cflags-only-I sndfile`
+AM_CFLAGS=`pkg-config --cflags-only-other sndfile`
+
 
 # explicit dependency between expression.c and parser.h 
 # for first checkout
