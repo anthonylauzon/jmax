@@ -44,7 +44,10 @@
 #include <ftsprivate/variable.h>
 #include <ftsprivate/package.h>
 
-/***********************************************************************
+
+
+
+/******************************************************************************
 *
 * error status
 *
@@ -70,6 +73,10 @@ static fts_status_description_t unknown_class_error_description = {
 };
 static fts_status_t unknown_class_error = &unknown_class_error_description;
 
+
+
+
+
 /***********************************************************************
  *
  *  FTS object id string
@@ -93,6 +100,8 @@ fts_object_get_identifier_string(fts_object_t *obj, char *str, int len)
   
   return NULL;
 }
+
+
 
 /******************************************************************************
  *
@@ -165,6 +174,9 @@ fts_object_set_patcher(fts_object_t *o, fts_patcher_t *patcher)
   data->patcher = patcher;
 }
 
+
+
+
 /******************************************************************************
 *
 * create an object from a class and arguments
@@ -194,6 +206,9 @@ fts_object_create_in_patcher(fts_class_t *cl, fts_patcher_t *patcher, int ac, co
 
   return obj;
 }
+
+
+
 
 /***********************************************************************
 *
@@ -314,6 +329,9 @@ object_or_template_create( fts_patcher_t *patcher, int ac, const fts_atom_t *at,
 
   return NULL;
 }
+
+
+
 
 /***********************************************************************
 *
@@ -443,6 +461,9 @@ fts_eval_object_description( fts_patcher_t *patcher, int ac, const fts_atom_t *a
   return obj;
 }
 
+
+
+
 /***********************************************************************
 *
 * object inlets/outlets
@@ -547,6 +568,9 @@ patcher_data_remove_inoutlets(fts_object_patcher_data_t *data)
   data->n_outlets = 0;
 }
 
+
+
+
 /*****************************************************************************
 *
 *  connection handling
@@ -648,7 +672,10 @@ fts_object_upload_connections(fts_object_t *obj)
   }
 }
 
-/*********************************************************************************
+
+
+
+/******************************************************************************
 *
 *  object description
 *
@@ -706,7 +733,10 @@ patcher_data_remove_description(fts_object_patcher_data_t *data)
   data->argv = NULL;
 }
 
-/*********************************************************************************
+
+
+
+/******************************************************************************
  *
  *  object name
  *
@@ -813,7 +843,10 @@ fts_patcher_object_is_global(fts_object_t *obj)
   return 0;
 }
 
-/*********************************************************************************
+
+
+
+/******************************************************************************
 *
 *  object reference bindings
 *
@@ -855,7 +888,10 @@ patcher_data_remove_bindings(fts_object_patcher_data_t *data, fts_object_t *obj)
   }
 }
 
-/*****************************************************************************
+
+
+
+/******************************************************************************
  *
  *  persistence
  *
@@ -903,7 +939,10 @@ fts_patcher_object_is_persistent(fts_object_t *obj)
   return 0;
 }
 
-/*****************************************************************************
+
+
+
+/******************************************************************************
 *
 *  basic property handling
 *
@@ -1081,11 +1120,15 @@ fts_object_remove_prop(fts_object_t *obj, fts_symbol_t property)
   }
 }
 
-/*************************************************************************************
+
+
+
+/******************************************************************************
 *
 *  package
 *
 */
+
 fts_package_t *
 fts_object_get_package(fts_object_t *obj)
 {
@@ -1095,11 +1138,15 @@ fts_object_get_package(fts_object_t *obj)
     return fts_class_get_package(fts_object_get_class(obj));
 }
 
-/*************************************************************************************
+
+
+
+/******************************************************************************
 *
 *  open/save Dialog
 *
 */
+
 void
 fts_object_open_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prompt, fts_symbol_t type, int ac, const fts_atom_t *at)
 {
@@ -1123,7 +1170,10 @@ fts_object_save_dialog(fts_object_t *o, fts_symbol_t callback, fts_symbol_t prom
 	fts_client_send_message(o, fts_s_openFileDialog, 4, a);
 }
 
-/*********************************************************************************
+
+
+
+/******************************************************************************
 *
 * object redefinition
 *
