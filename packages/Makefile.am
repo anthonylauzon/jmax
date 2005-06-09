@@ -14,11 +14,11 @@ else
 MIDISHARE_PKG_DIR=
 endif
 
-if COND_COMPILE_UNIXDTD
-UNIXDTD_DIR=unixdtd
-else
+#if COND_COMPILE_UNIXDTD
+#UNIXDTD_DIR=unixdtd
+#else
 UNIXDTD_DIR=
-endif
+#endif
 
 SUBDIRS= \
 $(JACK_PKG_DIR) \

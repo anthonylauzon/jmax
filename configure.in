@@ -727,9 +727,6 @@ packages/system/c/Makefile
 packages/system/c/src/Makefile
 packages/system/help/Makefile
 packages/system/winbuild/Makefile
-packages/unixdtd/Makefile
-packages/unixdtd/c/Makefile
-packages/unixdtd/c/src/Makefile
 packages/utils/Makefile
 packages/utils/c/Makefile
 packages/utils/c/include/Makefile
