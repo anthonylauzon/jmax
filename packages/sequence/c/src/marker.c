@@ -140,8 +140,9 @@ scomark_set_tempo(scomark_t *self, double tempo, double *old_tempo)
 {
   if(tempo > 0.0)
   {
-    fts_atom_t a;
-    track_t * marker_track = (track_t *)fts_object_get_context((fts_object_t *)fts_object_get_context((fts_object_t *)self));
+    fts_atom_t    a;
+    fts_object_t *event        = (fts_object_t *) fts_object_get_context((fts_object_t *) self);
+    track_t	 *marker_track = (track_t *)      fts_object_get_context(event);
     scomark_get_tempo(self, old_tempo);
     
     if(*old_tempo == 0.0)
@@ -1112,29 +1113,34 @@ marker_track_remove_events(track_t *marker_track, int ac, const fts_atom_t *at)
 		marker_track_renumber_bars(marker_track, NULL, FIRST_BAR_NUMBER, 1);
 }
 
+
 void 
 marker_track_clear(track_t *marker_track)
 {
-	track_t *track = (track_t *)fts_object_get_context((fts_object_t *)marker_track);
-	event_t *event = track_get_first(marker_track);
+  track_t *track = (track_t *) fts_object_get_context((fts_object_t *) marker_track);
+  event_t *event = track_get_first(marker_track);
   
-	while(event)
+  while (event)
   {
     event_t *next = event_get_next(event);
     
     event->next = event->prev = 0;
-		fts_object_release((fts_object_t *)event);
+    fts_object_release((fts_object_t *) event);
     
     event = next;
   }
 
-	marker_track->first = 0;
-	marker_track->last = 0;
-	marker_track->size = 0;
-	
-	if( track_editor_is_open(track))
-		fts_client_send_message((fts_object_t *)marker_track, fts_s_clear, 0, 0);
+  marker_track->first = 0;
+  marker_track->last = 0;
+  marker_track->size = 0;
+  
+  if (track  &&  fts_object_get_class((fts_object_t *) track) == track_class  
+             &&  track_editor_is_open(track))
+  {
+    fts_client_send_message((fts_object_t *) marker_track, fts_s_clear, 0, 0);
+  }
 }
+
 
 void 
 marker_track_collapse_markers( track_t *marker_track, int ac, const fts_atom_t *at)
@@ -1601,7 +1607,7 @@ marker_track_import_labels_txt (fts_object_t *o, fts_symbol_t s, int ac, const f
       return fts_ok;
     }
 
-    while (waitingfor != wERROR  &&  fts_atom_file_read(file, &a, &c))
+    while (waitingfor != wERROR  &&  fts_atomfile_read(file, &a, &c))
     {
       switch (waitingfor)
       {
@@ -1657,6 +1663,7 @@ marker_track_import_labels_txt (fts_object_t *o, fts_symbol_t s, int ac, const f
 
 return fts_ok;
 }
+
 
 
 
