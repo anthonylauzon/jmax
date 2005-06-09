@@ -10,7 +10,7 @@ JMAX_VERSION=${JMAX_MAJOR_VERSION}.${JMAX_MINOR_VERSION}.${JMAX_PATCH_VERSION}${
 VERSION=${JMAX_VERSION}
 PACKAGE=jmax
 
-AM_INIT_AUTOMAKE(jmax,${JMAX_VERSION})
+AM_INIT_AUTOMAKE(${PACKAGE},${JMAX_VERSION})
 AC_SUBST(JMAX_VERSION)
 
 AC_PREFIX_DEFAULT(/usr)
@@ -35,7 +35,7 @@ AC_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(m, sin)
-AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f fabsf atan2f sqrtf)
+AC_CHECK_FUNCS(sinf cosf tanf asinf acosf atanf expf logf log10f fabsf atan2f sqrtf qsort_r signbit)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -256,7 +256,7 @@ esac
 
 PLATFORM_PACKAGES="oss"
 
-AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="aflib $PLATFORM_PACKAGES"],[echo package aflib will not be build])
+# AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="aflib $PLATFORM_PACKAGES"],[echo package aflib will not be build])
 AM_PATH_ALSA(0.9.0,[
 	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
 	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"

@@ -581,7 +581,11 @@ start_it ()
 
     if [ _${NOFORK}_ = __ ]
     then
-	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD & )
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD &
+	  if [ ${VERBOSE} ]; then
+	      echo jmaxpid $!
+	  fi
+	)
     else
 	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD )
     fi

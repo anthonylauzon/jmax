@@ -1,12 +1,13 @@
 #!/bin/sh
 
+# unsetenv PERLLIB PERL5LIB
+
+# display versions
 echo "[auto-tools versions in your path on $HOST]"
-aclocal    --version | head -1
-automake   --version | head -1
-autom4te   --version | head -1
-autoconf   --version | head -1
-libtoolize --version | head -1
-libtool    --version | head -1
+for f in aclocal automake autoconf autoheader autom4te libtoolize libtool; do
+    $f --version | head -1
+    # ls -lFgG `which $f`
+done
 
 rm -rf aclocal.m4 config.* install-sh libtool ltconfig ltmain.sh missing mkinstalldirs autom4te.cache
 
