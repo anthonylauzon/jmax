@@ -34,9 +34,23 @@
 #include <ftsprivate/patcher.h>
 #include <ftsprivate/variable.h>
 
+
+#if DEBUG_SCOPE
+#define ASSERT_SCOPE(f, p) \
+	if (!fts_patcher_is_scope(p)) \
+	    fts_post(#f ": scope violation from patcher %p\n", p); \
+	else
+#else
+#define ASSERT_SCOPE(f, p) /* empty */
+#endif
+
+
 fts_heap_t *definition_heap = NULL;
 fts_heap_t *definition_listener_heap = NULL;
 
+
+
+ 
 /****************************************************************************
  *
  *  definitions (low level interface)
@@ -68,6 +82,8 @@ fts_definition_get(fts_patcher_t *scope, fts_symbol_t name)
   fts_hashtable_t *hash = fts_patcher_get_definitions(scope);
   fts_definition_t *def = NULL;
   fts_atom_t k, a;
+
+  ASSERT_SCOPE(fts_definition_get, scope);
 
   fts_set_symbol(&k, name);
 
