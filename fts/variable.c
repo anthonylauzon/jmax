@@ -55,6 +55,8 @@ fts_heap_t *definition_listener_heap = NULL;
  *
  *  definitions (low level interface)
  *
+ *  N.B.: low level functions must be called on patchers that are a scope,
+ *  i.e. the root patcher or file top level patchers
  */
 
 struct fts_definition_listener

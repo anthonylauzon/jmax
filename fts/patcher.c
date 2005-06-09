@@ -2155,6 +2155,8 @@ fts_patcher_get_objects(fts_patcher_t* patcher, fts_iterator_t* i)
 *
 */
 
+/* get variable-holding patcher: root patcher for globals, file's
+   toplevel patcher (that is a scope: fts_patcher_is_scope) */
 fts_patcher_t *
 fts_patcher_get_scope(fts_patcher_t *patcher)
 {
