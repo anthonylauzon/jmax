@@ -20,6 +20,9 @@
  *
  */
 
+/** @file fmat.c fmat data object doc
+ */
+
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
 #include "floatfuns.h"
@@ -612,9 +615,32 @@ fmat_upload(fmat_t *self)
 }
 
 /********************************************************************
+ ********************************************************************
+ ********************************************************************
+ ***
+ ***   U S E R   M E T H O D S
+ ***
+ ********************************************************************
+ ********************************************************************
+ ********************************************************************/
+
+
+/** @defgroup fmatobj fmat object messages
+ *  @ingroup  dataobj
  *
- *   user methods
+ *  Messages that can be sent to or invoked on an fmat object.
  *
+ *  @{
+ */
+
+
+/** set from fmat.
+ *
+ * @fn set(fmat matrix);
+ *
+ * set dimension and values from given fmat
+ *
+ * @param matrix fmat to be copied
  */
 static fts_method_status_t
 fmat_set_from_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -628,6 +654,7 @@ fmat_set_from_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   
   return fts_ok;
 }
+
 
 static fts_method_status_t
 fmat_set_from_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -4121,6 +4148,16 @@ fmat_initialize(fmat_t *self)
   self->opened = 0;
 }
 
+
+/** fmat constructor.
+ *
+ * @fn fmat(num nrow, num ncol, num init... );
+ *
+ * @param nrow (optional) number of rows    (default 0)
+ * @param ncol (optional) number of columns (default 1) 
+ * @param nrow (optional) initial values    (default zeros)
+ */
+
 static fts_method_status_t
 fmat_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -4171,6 +4208,13 @@ fmat_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   
   return fts_ok;
 }
+
+/** @} end of fmatmess */
+
+
+
+
+
 
 /*********************************************************
  *

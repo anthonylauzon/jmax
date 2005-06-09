@@ -6,7 +6,6 @@ help_DATA=\
  cvec.help.jmax \
  dict.help.jmax \
  fmat.help.jmax \
- fvec.help.jmax \
  getinter.help.jmax \
  getrange.help.jmax \
  getsize.help.jmax \
