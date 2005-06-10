@@ -97,6 +97,7 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 /* class */
 #define fts_object_get_class(o) ((o)->cl)
 #define fts_object_get_class_name(o) (fts_class_get_name((o)->cl))
+#define fts_object_is_a(o, c) ((o)->cl == (c))
 
 /* context & container*/
 #define fts_object_get_context(o) ((o)->context)

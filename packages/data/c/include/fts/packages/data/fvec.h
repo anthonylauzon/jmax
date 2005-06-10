@@ -52,7 +52,7 @@ typedef struct
 #define fvec_get_type(f) ((f)->type)
 #define fvec_get_index(f) ((f)->index)
 #define fvec_get_onset(f) ((f)->onset)
-#define fvec_get_size(f) ((f)->size)
+#define fvec_get_size(f) (((f)->size > fmat_get_m((f)->fmat))? fmat_get_m((f)->fmat): (f)->size)
 
 #define fvec_set_fmat(f, x) do{fts_object_release((fts_object_t *)(f)->fmat); (f)->fmat = (x); fts_object_refer((fts_object_t *)(x)); } while(0)
 #define fvec_set_type(f, x) ((f)->type = (x))
@@ -64,7 +64,6 @@ typedef struct
 #define fvec_set_editor_open(v) ((v)->opened = 1)
 #define fvec_set_editor_close(v) ((v)->opened = 0)
 #define fvec_editor_is_open(v) ((v)->opened)
-
 
 /* globals */
 DATA_API fts_symbol_t fvec_symbol;
