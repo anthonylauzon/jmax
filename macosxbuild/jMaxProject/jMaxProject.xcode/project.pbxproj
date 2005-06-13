@@ -56,6 +56,18 @@
 			settings = {
 			};
 		};
+		3B26BB16085DDE7D005AD945 = {
+			fileRef = F458A41808471D63006AB8CF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3B26BB46085DE318005AD945 = {
+			fileRef = F458A3F308470CD3006AB8CF;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		3B28F8AE06EF45CA009639A3 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -1466,6 +1478,8 @@
 		<string>JMaxWrapper</string>
 		<key>Properties</key>
 		<dict>
+			<key>apple.awt.brushMetalLook</key>
+			<string>true</string>
 			<key>apple.awt.textantialiasing</key>
 			<string>true</string>
 			<key>apple.laf.useScreenMenuBar</key>
@@ -4365,7 +4379,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F458A3F608470CFB006AB8CF,
-				F458A41908471D63006AB8CF,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4390,6 +4403,7 @@
 				5C5426D305AB0B8A0042B7A2,
 				5C5426D405AB0B8A0042B7A2,
 				5C5426D505AB0B8A0042B7A2,
+				3B26BB46085DE318005AD945,
 				5C5426D605AB0B8A0042B7A2,
 				5C5426D705AB0B8A0042B7A2,
 				5C5426D805AB0B8A0042B7A2,
@@ -4933,7 +4947,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C54271505AB0B8B0042B7A2,
-				F458A3F408470CD3006AB8CF,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5158,6 +5171,7 @@
 		5C54273205AB0B8B0042B7A2 = {
 			buildActionMask = 2147483647;
 			files = (
+				3B26BB16085DDE7D005AD945,
 				5C54273305AB0B8B0042B7A2,
 				5C54273605AB0B8B0042B7A2,
 				5C54273705AB0B8B0042B7A2,
@@ -13485,14 +13499,12 @@
 		5CB1CE1F065112B900B5A90F = {
 			children = (
 				5CB1CE200651132300B5A90F,
-				5CB1CE210651132300B5A90F,
 				5CB1CE220651132300B5A90F,
 				5CB1CE230651132400B5A90F,
 				5CB1CE240651132400B5A90F,
 				5CB1CE250651132400B5A90F,
 				5CB1CE260651132400B5A90F,
 				5CB1CE270651132400B5A90F,
-				5CB1CE280651132400B5A90F,
 				F458A41808471D63006AB8CF,
 			);
 			isa = PBXGroup;
@@ -13506,15 +13518,6 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = bpf.h;
 			path = ../../packages/data/c/include/fts/packages/data/bpf.h;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		5CB1CE210651132300B5A90F = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = cvec.h;
-			path = ../../packages/data/c/include/fts/packages/data/cvec.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -13569,15 +13572,6 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = mat.h;
 			path = ../../packages/data/c/include/fts/packages/data/mat.h;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		5CB1CE280651132400B5A90F = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = vec.h;
-			path = ../../packages/data/c/include/fts/packages/data/vec.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -13701,24 +13695,18 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = dumper.c;
-			path = /Volumes/User/diemo/src/jmax/fts/dumper.c;
-			refType = 0;
-			sourceTree = "<absolute>";
-		};
-		F458A3F408470CD3006AB8CF = {
-			fileRef = F458A3F308470CD3006AB8CF;
-			isa = PBXBuildFile;
-			settings = {
-			};
+			path = ../../fts/dumper.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		F458A3F508470CFB006AB8CF = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = dumper.h;
-			path = /Volumes/User/diemo/src/jmax/include/fts/dumper.h;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../include/fts/dumper.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		F458A3F608470CFB006AB8CF = {
 			fileRef = F458A3F508470CFB006AB8CF;
@@ -13731,9 +13719,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = tree.c;
-			path = /Volumes/User/diemo/src/jmax/packages/data/c/src/tree.c;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../packages/data/c/src/tree.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		F458A41508471D3C006AB8CF = {
 			fileRef = F458A41408471D3C006AB8CF;
@@ -13746,15 +13734,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = tree.h;
-			path = /Volumes/User/diemo/src/jmax/packages/data/c/include/fts/packages/data/tree.h;
-			refType = 0;
-			sourceTree = "<absolute>";
-		};
-		F458A41908471D63006AB8CF = {
-			fileRef = F458A41808471D63006AB8CF;
-			isa = PBXBuildFile;
-			settings = {
-			};
+			path = ../../packages/data/c/include/fts/packages/data/tree.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 //F40
 //F41
