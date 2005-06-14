@@ -514,20 +514,6 @@ AC_SUBST(MIDISHARE_CFLAGS)
 AC_SUBST(MIDISHARE_LDFLAGS)
 
 
-dnl ###########################################################################
-dnl unixdtd compilation
-dnl ###########################################################################
-with_unixdtd="no"
-AC_ARG_ENABLE(midishare, dnl newline and indentation:
-[ 
-  --enable-unixdtd[=value]	compile unixdtd package [default=no]],
-  with_unixdtd="$enableval",
-  with_unixdtd="no")
-
-dnl Add unixdtd in packages to compile
-AM_CONDITIONAL(COND_COMPILE_UNIXDTD, test "$with_unixdtd" = "yes")
-
-
 AC_SUBST(DEFAULT_CONFIG_FILE)
 
 dnl ###########################################################################
