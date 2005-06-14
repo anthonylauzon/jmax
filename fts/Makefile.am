@@ -76,7 +76,7 @@ noinst_HEADERS= parser.h
 
 bin_PROGRAMS=fts
 fts_SOURCES=main.c
-fts_LDADD= @DOT_LIBS@ -lfts @FTS_SYS_LIBS@ -lm
+fts_LDADD= @DOT_LIBS@ $(top_builddir)/fts/libfts.la @FTS_SYS_LIBS@ -lm
 libfts_la_LDFLAGS = -no-undefined -release @JMAX_VERSION@ `pkg-config --libs sndfile`
 AM_YFLAGS=-d --verbose
 AM_LFLAGS=-olex.yy.c
