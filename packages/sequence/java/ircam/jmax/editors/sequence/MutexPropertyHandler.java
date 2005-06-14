@@ -65,9 +65,9 @@ public class MutexPropertyHandler {
 		
 		ignore_callbacks = true;
 		
-		for (Enumeration enum = clients.keys(); enum.hasMoreElements();)
+		for (Enumeration anenum = clients.keys(); anenum.hasMoreElements();)
 		{
-		    temp = (Track) enum.nextElement();
+		    temp = (Track) anenum.nextElement();
 		    pcl = (PropertyChangeListener) clients.get(temp);
 		    
 		    if(pcl != this) 

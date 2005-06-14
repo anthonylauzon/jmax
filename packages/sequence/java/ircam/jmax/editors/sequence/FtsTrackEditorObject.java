@@ -364,13 +364,13 @@ public void setTableColumnOrder(int size, Enumeration colNames)
 	}
 }
 
-public void setPropertiesToDraw(Enumeration enum)
+public void setPropertiesToDraw(Enumeration anenum)
 {
   this.propsToDraw.removeAllElements();
 	args.clear();
 	
 	String name;
-	for(Enumeration e = enum; e.hasMoreElements(); )
+	for(Enumeration e = anenum; e.hasMoreElements(); )
 	{
 		name = (String)e.nextElement();
 		this.propsToDraw.add( name);
