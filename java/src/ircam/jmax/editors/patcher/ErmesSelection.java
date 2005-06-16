@@ -350,10 +350,10 @@ public class ErmesSelection implements Transferable
 		 m.sendToBackAction.setEnabled(numSelected > 0);
 
 		 boolean inspectable = false;
-		 Enumeration enum = objects.elements();
-		 while(enum.hasMoreElements())
+		 Enumeration anenum = objects.elements();
+		 while(anenum.hasMoreElements())
 		 {
-			GraphicObject o = (GraphicObject)enum.nextElement();
+			GraphicObject o = (GraphicObject)anenum.nextElement();
 			inspectable = inspectable || o.isInspectable();
 		 }
 		 m.inspectAction.setEnabled(inspectable);

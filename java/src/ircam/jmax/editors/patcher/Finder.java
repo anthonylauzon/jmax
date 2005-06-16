@@ -201,9 +201,9 @@ public class Finder extends JFrame implements FtsActionListener
 	
 	ftsObj = (FtsGraphicObject)finderTableModel.getListModel().getElementAt(selRow);
 	
-	for(Enumeration enum = ftsObj.getGenealogy(); enum.hasMoreElements(); )
+	for(Enumeration anenum = ftsObj.getGenealogy(); anenum.hasMoreElements(); )
 	  {
-	    ftsObj = (FtsGraphicObject)enum.nextElement();
+	    ftsObj = (FtsGraphicObject)anenum.nextElement();
 	    if(top==null)
 	      {
 		top = new FtsMutableTreeNode(ftsObj, (((FtsPatcherObject)ftsObj).getName()!=null) ? 
