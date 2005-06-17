@@ -141,7 +141,7 @@ public class JMaxMatTable extends JTable
         if(name != null && !name.equals(""))
           setText(description + " [" + name + "]");
         else
-          setText(description + " [#" + ((FtsGraphicObject)value).getObjectID() + "]");
+          setText(description);
       }
       else 
       {
