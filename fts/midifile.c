@@ -473,11 +473,12 @@ midifile_read_track(fts_midifile_t *midifile)
         
       case SYSTEM_EXCLUSIVE: /* start of system exclusive */
       {
-        int lookfor = midifile->bytes - readvarinum(midifile);
+        int n = readvarinum(midifile);
+        int i;
         
         midifile_system_exclusive_start(midifile);
         
-        while (midifile->bytes > lookfor)
+        for(i=0; i<n; i++)
 	      {
           byte = readbyte(midifile);
           midifile_system_exclusive_byte(midifile, byte);
@@ -489,170 +490,181 @@ midifile_read_track(fts_midifile_t *midifile)
           sysex_continue = 1; /* merge into next message */
         
         break;
+      }
+      case SYSTEM_EXCLUSIVE_CONTINUE: /* sysex continuation */
+      {
+        int n = readvarinum(midifile);
+        int i;
         
-        case SYSTEM_EXCLUSIVE_CONTINUE: /* sysex continuation */
-          
-          lookfor = midifile->bytes - readvarinum(midifile);
-          
-          if (!sysex_continue)
-            midifile_system_exclusive_start(midifile);
+        if (!sysex_continue)
+          midifile_system_exclusive_start(midifile);
+        
+        for(i=0; i<n; i++)
+        {
+          byte = readbyte(midifile);
+          midifile_system_exclusive_byte(midifile, byte);
+        }
+        
+        if (!sysex_continue)
+          midifile_system_exclusive_call(midifile); /* arbitrary message */
+        else if(byte == SYSTEM_EXCLUSIVE_END)
+        {
+          midifile_system_exclusive_call(midifile);
+          sysex_continue = 0;
+        }
+      }
+        break;
+        
+      case META_EVENT: /* meta event */
+      {
+        int meta = readbyte(midifile);
+        int n = readvarinum(midifile);
+        int i;
+        
+        switch(meta) 
+        {
+          case SEQUENCE_NUMBER:
+          {
+            int msb = readbyte(midifile);
+            int lsb = readbyte(midifile);
             
-            while (midifile->bytes > lookfor)
+            if (midifile->read->sequence_number)
+              (*midifile->read->sequence_number)(midifile, (msb << 8) + lsb);
+          }
+            break;
+            
+          case TEXT_EVENT:
+          case COPYRIGHT_NOTICE:
+          case SEQUENCE_NAME:
+          case INSTRUMENT_NAME:
+          case LYRIC:
+          case MARKER:
+          case CUE_POINT:
+          case 0x08:
+          case 0x09:
+          case 0x0a:
+          case 0x0b:
+          case 0x0c:
+          case 0x0d:
+          case 0x0e:
+          case 0x0f:
+            /* text events */
+            midifile_string_clear(midifile);
+            
+            for(i=0; i<n; i++)
             {
               byte = readbyte(midifile);
-              midifile_system_exclusive_byte(midifile, byte);
+              midifile_string_add_char(midifile, byte);
             }
               
-              if (!sysex_continue)
-                midifile_system_exclusive_call(midifile); /* arbitrary message */
-          else if(byte == SYSTEM_EXCLUSIVE_END)
+            if (midifile->read->text)
+              (*midifile->read->text)(midifile, meta, midifile->string_size, midifile->string);
+                
+              break;
+            
+          case END_OF_TRACK:
+            if (midifile->read->end_of_track)
+              (*midifile->read->end_of_track)(midifile);
+            
+            break;
+            
+          case SET_TEMPO:
           {
-            midifile_system_exclusive_call(midifile);
-            sysex_continue = 0;
+            int b0 = readbyte(midifile);
+            int b1 = readbyte(midifile);
+            int b2 = readbyte(midifile);
+            int tempo = (b0 << 16) + (b1 << 8) + b2;
+            
+            if(midifile->format == 1)
+              midifile_tempo_map_add_entry(midifile, midifile->ticks, tempo);
+            
+            if(midifile->division > 0)
+              midifile->time_conv = 0.001 * (double)tempo / (double)midifile->division;
+            
+            midifile->tempo = tempo;
+            
+            if (midifile->read->tempo)
+              (*midifile->read->tempo)(midifile, tempo);
           }
+            break;
+            
+          case SMPTE_OFFSET:
+          {
+            int byte = readbyte(midifile);
+            int type = (byte & 0x60) >> 5;
+            int hour = (byte & 0x1f);
+            int minute = readbyte(midifile);
+            int second = readbyte(midifile);
+            int frame = readbyte(midifile);
+            int frac = readbyte(midifile);
+            
+            if (midifile->read->smpte)
+              (*midifile->read->smpte)(midifile, type, hour, minute, second, frame, frac);
+          }
+            break;
+            
+          case TIME_SIGNATURE:
+          {
+            int numerator = readbyte(midifile);
+            int denominator = 1 << readbyte(midifile);
+            int clocks_per_metronome_click = readbyte(midifile);
+            int heals_per_quarter_note = readbyte(midifile); /* heals of 32nd notes per quarter note */
+            
+            if (midifile->read->time_signature)
+              (*midifile->read->time_signature)(midifile, numerator, denominator, clocks_per_metronome_click, heals_per_quarter_note);
+          }
+            break;
+            
+          case KEY_SIGNATURE:
+          {
+            int n_sharps_or_flats = readbyte(midifile);
+            int major_or_minor = readbyte(midifile);
+            
+            if (midifile->read->key_signature)
+              (*midifile->read->key_signature)(midifile, n_sharps_or_flats, major_or_minor);
+            break;
+          }
+            
+          case SEQUENCER_SPECIFIC:
+          {
+            /* sequencer specific data */
+            midifile_string_clear(midifile);
+            
+            for(i=0; i<n; i++)
+            {
+              byte = readbyte(midifile);
+              midifile_string_add_char(midifile, byte);
+            }
+            
+            /* ignore data */
+            
+            break;
+          }
+            
+          default:
+          {
+            /* unknown meta event */
+            midifile_string_clear(midifile);
+            
+            for(i=0; i<n; i++)
+            {
+              byte = readbyte(midifile);
+              midifile_string_add_char(midifile, byte);
+            }
+            
+            /* ignore data */
+            
+            break;
+          }
+        }
       }
         break;
           
-        case META_EVENT: /* meta event */
-        {
-          int meta = readbyte(midifile);
-          int lookfor = midifile->bytes - readvarinum(midifile);
+        default:
+          mferror(midifile, "found unexpected byte");
+          return;
           
-          switch(meta) 
-          {
-            case SEQUENCE_NUMBER:
-            {
-              int msb = readbyte(midifile);
-              int lsb = readbyte(midifile);
-              
-              if (midifile->read->sequence_number)
-                (*midifile->read->sequence_number)(midifile, (msb << 8) + lsb);
-            }
-              break;
-              
-            case TEXT_EVENT:
-            case COPYRIGHT_NOTICE:
-            case SEQUENCE_NAME:
-            case INSTRUMENT_NAME:
-            case LYRIC:
-            case MARKER:
-            case CUE_POINT:
-            case 0x08:
-            case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x0e:
-            case 0x0f:
-              /* text events */
-              midifile_string_clear(midifile);
-              
-              while (midifile->bytes > lookfor)
-                midifile_string_add_char(midifile, readbyte(midifile));
-                
-                if (midifile->read->text)
-                  (*midifile->read->text)(midifile, meta, midifile->string_size, midifile->string);
-                  
-                  break;
-              
-            case END_OF_TRACK:
-              if (midifile->read->end_of_track)
-                (*midifile->read->end_of_track)(midifile);
-              
-              break;
-              
-            case SET_TEMPO:
-            {
-              int b0 = readbyte(midifile);
-              int b1 = readbyte(midifile);
-              int b2 = readbyte(midifile);
-              int tempo = (b0 << 16) + (b1 << 8) + b2;
-              
-              if(midifile->format == 1)
-                midifile_tempo_map_add_entry(midifile, midifile->ticks, tempo);
-              
-              if(midifile->division > 0)
-                midifile->time_conv = 0.001 * (double)tempo / (double)midifile->division;
-              
-              midifile->tempo = tempo;
-              
-              if (midifile->read->tempo)
-                (*midifile->read->tempo)(midifile, tempo);
-            }
-              break;
-              
-            case SMPTE_OFFSET:
-            {
-              int byte = readbyte(midifile);
-              int type = (byte & 0x60) >> 5;
-              int hour = (byte & 0x1f);
-              int minute = readbyte(midifile);
-              int second = readbyte(midifile);
-              int frame = readbyte(midifile);
-              int frac = readbyte(midifile);
-              
-              if (midifile->read->smpte)
-                (*midifile->read->smpte)(midifile, type, hour, minute, second, frame, frac);
-            }
-              break;
-              
-            case TIME_SIGNATURE:
-            {
-              int numerator = readbyte(midifile);
-              int denominator = 1 << readbyte(midifile);
-              int clocks_per_metronome_click = readbyte(midifile);
-              int heals_per_quarter_note = readbyte(midifile); /* heals of 32nd notes per quarter note */
-              
-              if (midifile->read->time_signature)
-                (*midifile->read->time_signature)(midifile, numerator, denominator, clocks_per_metronome_click, heals_per_quarter_note);
-            }
-              break;
-              
-            case KEY_SIGNATURE:
-            {
-              int n_sharps_or_flats = readbyte(midifile);
-              int major_or_minor = readbyte(midifile);
-              
-              if (midifile->read->key_signature)
-                (*midifile->read->key_signature)(midifile, n_sharps_or_flats, major_or_minor);
-              break;
-            }
-              
-            case SEQUENCER_SPECIFIC:
-            {
-              /* sequencer specific data */
-              midifile_string_clear(midifile);
-              
-              while (midifile->bytes > lookfor)
-                midifile_string_add_char(midifile, readbyte(midifile));
-              
-              /* ignore data */
-              
-              break;
-            }
-              
-            default:
-            {
-              /* unknown meta event */
-              midifile_string_clear(midifile);
-              
-              while (midifile->bytes > lookfor)
-                midifile_string_add_char(midifile, readbyte(midifile));
-              
-              /* ignore data */
-              
-              break;
-            }
-          }
-        }
           break;
-            
-          default:
-            mferror(midifile, "found unexpected byte");
-            return;
-            
-            break;
     }
   }
   
@@ -1122,7 +1134,7 @@ fts_midifile_read(fts_midifile_t *midifile)
     else
       midifile_read_track(midifile);
     
-    if(midifile->error != 0)
+    if(midifile->error != NULL)
       break;
   }
   
