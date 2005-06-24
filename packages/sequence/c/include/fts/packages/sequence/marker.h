@@ -37,6 +37,7 @@
 typedef struct
 {
   propobj_t propobj;
+  track_t *marker_track;
   fts_symbol_t type;
   int bar_num;
   int cue;
@@ -70,6 +71,8 @@ FTS_API enumeration_t *scomark_type_enumeration;
 FTS_API int scomark_meter_symbol_get_quotient(fts_symbol_t sym, int *meter_num, int *meter_den);
 FTS_API fts_symbol_t scomark_meter_quotient_get_symbol(int meter_num, int meter_den);
 
+FTS_API void scomark_set_properties(scomark_t *self, int ac, const fts_atom_t *at);
+
 FTS_API void scomark_set_tempo(scomark_t *scomark, double tempo, double *old_tempo);
 FTS_API void scomark_get_tempo(scomark_t *scomark, double *tempo);
 FTS_API void scomark_unset_tempo(scomark_t *scomark);
@@ -84,6 +87,7 @@ FTS_API void scomark_bar_set_meter(scomark_t *scomark, fts_symbol_t meter_sym, f
 FTS_API void scomark_bar_get_meter(scomark_t *self, fts_symbol_t *meter);
 FTS_API void scomark_bar_set_meter_quotient(scomark_t *scomark, int meter_num, int meter_den);
 FTS_API void scomark_bar_get_meter_quotient(scomark_t *self, int *meter_num, int *meter_den);
+FTS_API void scomark_bar_unset_meter(scomark_t *self);
 
 FTS_API void scomark_spost(fts_object_t *o, fts_bytestream_t *stream);
 

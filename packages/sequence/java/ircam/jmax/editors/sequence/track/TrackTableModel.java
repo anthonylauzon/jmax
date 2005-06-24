@@ -80,9 +80,9 @@ public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex)
 	else
 		if( aValue == null || (aValue instanceof String && ((String)aValue).equals("")))
 			event.unsetProperty( getColumnName(columnIndex));
-	else 
-		event.setProperty( getColumnName(columnIndex), aValue);
-	
+    else 
+      event.setProperty( getColumnName(columnIndex), aValue);
+    
 	if (model instanceof UndoableData)
 		((UndoableData) model).endUpdate();
 }

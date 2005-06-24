@@ -76,13 +76,13 @@ struct _track_
 #define track_set_active(t) ((t)->active = 1)
 #define track_set_inactive(t) ((t)->active = 0)
 
-#define track_set_editor_open(t) ((t)->open = 1)
-#define track_set_editor_close(t) ((t)->open = 0)
-#define track_editor_is_open(t) ((t)->open != 0)
-
 #define track_set_markers(t, m) ((t)->markers = (m))
 #define track_get_markers(t) ((t)->markers)
 #define track_is_marker(t) (track_get_type(t) == scomark_class)
+
+#define track_set_editor_open(t) ((t)->open = 1)
+#define track_set_editor_close(t) ((t)->open = 0)
+#define track_editor_is_open(t) (track_is_marker(t) ? ((track_t *)fts_object_get_context((fts_object_t *)t))->open : (t)->open != 0)
 
 FTS_API void track_add_event(track_t *track, double time, event_t *event);
 FTS_API void track_add_event_after(track_t *track, double time, event_t *event, event_t *after);
