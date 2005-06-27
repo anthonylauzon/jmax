@@ -554,7 +554,7 @@ boolean stateRestored = false;
 public void restoreEditorState(FtsTrackEditorObject editorState)
 {
   if(!stateRestored)
-  {
+  {    
     Enumeration props = editorState.getPropertiesToDraw();
     if(props == null) return;
     else

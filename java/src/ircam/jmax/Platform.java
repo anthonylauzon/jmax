@@ -169,7 +169,8 @@ public class Platform
    
   static protected void setMacValues()
   {
-    System.setProperty( "com.apple.macos.useScreenMenuBar", "true");
+    /*System.setProperty( "com.apple.macos.useScreenMenuBar", "true");*/
+    /*System.setProperty( "apple.laf.useScreenMenuBar", "true");*/
     NEWLINE       = "\n";
     NEWLINECHAR   = '\n';
     DELETE_KEY    = 8;

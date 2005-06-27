@@ -151,7 +151,7 @@ audiofile_set_info(fts_audiofile_t *audiofile, int channels, int sample_rate, ft
   audiofile_set_format(audiofile, format);
   audiofile_set_sample_format(audiofile, sample_format);
   
-  return (sf_format_check(&audiofile->sfinfo) == TRUE);
+  return (sf_format_check(&audiofile->sfinfo) == SF_TRUE);
 }
 
 fts_audiofile_t *

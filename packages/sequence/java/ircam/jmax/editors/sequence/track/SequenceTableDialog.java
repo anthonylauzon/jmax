@@ -160,7 +160,7 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 		markersPanel = null;
 		SequenceTableDialog.this.hasMarkers = false;
 		validate();
-		pack();
+		pack();    
 	}
     /**
      * TrackDataListener interface

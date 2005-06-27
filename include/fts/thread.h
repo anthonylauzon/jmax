@@ -1,5 +1,6 @@
 #ifdef HAVE_PTHREAD_H
 #include <pthread.h>
+#include <errno.h>
 #endif
 #include <fts/fts.h>
 #include <ftsconfig.h>

@@ -1023,7 +1023,7 @@ fts_midifile_read_functions_init(fts_midifile_read_functions_t *read)
   read->smpte = 0;
   read->tempo = 0;
   read->time_signature = 0;
-  read->key_signature = 0;;
+  read->key_signature = 0;
   read->text = 0;
 }
 

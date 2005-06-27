@@ -231,11 +231,11 @@ tree_instantiate(fts_class_t *cl)
    * class doc
    */
 
-  fts_class_doc(cl, tree_symbol, "[<sym|int: key> <any: value> ...]", "treeionary");
+  /*fts_class_doc(cl, tree_symbol, "[<sym|int: key> <any: value> ...]", "treeionary");
   fts_class_doc(cl, fts_s_clear, NULL, "erase all entries");
   fts_class_doc(cl, fts_s_set, "<any: key> <any: value> ...", "set list of key-value pairs");
   fts_class_doc(cl, fts_s_remove, "<any: key> ...", "remove entries");
-  fts_class_doc(cl, fts_s_print, NULL, "print list of entries");
+  fts_class_doc(cl, fts_s_print, NULL, "print list of entries");*/
 }
 
 

@@ -64,27 +64,39 @@ public Class getColumnClass(int col)
 		return model.getPropertyType(col-1);
 }
 
+int editedRowIndex, editedColumnIndex;
+java.lang.Object editedValue;
+
 /**
 * SetValue method: invoked by the cellEditor, sets the given value
  * in the Explode. Row is the event number, column is the field to change. 
  * @see WholeNumberField*/
 public void setValueAt(java.lang.Object aValue, int rowIndex, int columnIndex) 
 {		
-	Event event = model.getEventAt(rowIndex);
-	
-	if (model instanceof UndoableData) //can't make assumptions...
-		((UndoableData) model).beginUpdate(); 
-	
-	if(columnIndex == 0)
-		event.move(((Double) aValue).doubleValue());
-	else
-		if( aValue == null || (aValue instanceof String && ((String)aValue).equals("")))
-			event.unsetProperty( getColumnName(columnIndex));
-    else 
-      event.setProperty( getColumnName(columnIndex), aValue);
-    
-	if (model instanceof UndoableData)
-		((UndoableData) model).endUpdate();
+  editedRowIndex = rowIndex;
+  editedColumnIndex = columnIndex;
+  editedValue = aValue;
+  
+  SwingUtilities.invokeLater(new Runnable() {
+    public void run()
+    { 
+      Event event = model.getEventAt(editedRowIndex);
+      
+      if (model instanceof UndoableData) //can't make assumptions...
+        ((UndoableData) model).beginUpdate(); 
+      
+      if(editedColumnIndex == 0)
+        event.move(((Double) editedValue).doubleValue());
+      else
+        if( editedValue == null || (editedValue instanceof String && ((String)editedValue).equals("")))
+          event.unsetProperty( getColumnName(editedColumnIndex));
+      else 
+        event.setProperty( getColumnName(editedColumnIndex), editedValue);
+      
+      if (model instanceof UndoableData)
+        ((UndoableData) model).endUpdate();
+    }
+  }); 
 }
 
 /**

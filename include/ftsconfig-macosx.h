@@ -51,7 +51,10 @@
 /* #undef HAVE_ATANF */
 
 /* Define if you have the cosf function.  */
-/* #undef HAVE_COSF */
+#define HAVE_COSF
+
+/* Define if you have the sqrtf function.  */
+#define HAVE_SQRTF
 
 /* Define if you have the expf function.  */
 /* #undef HAVE_EXPF */
@@ -69,7 +72,7 @@
 #define HAVE_SIGNAL 1
 
 /* Define if you have the sinf function.  */
-/* #undef HAVE_SINF */
+#define HAVE_SINF
 
 /* Define if you have the socket function.  */
 #define HAVE_SOCKET 1

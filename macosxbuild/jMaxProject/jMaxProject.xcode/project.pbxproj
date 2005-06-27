@@ -1478,11 +1478,7 @@
 		<string>JMaxWrapper</string>
 		<key>Properties</key>
 		<dict>
-			<key>apple.awt.brushMetalLook</key>
-			<string>true</string>
 			<key>apple.awt.textantialiasing</key>
-			<string>true</string>
-			<key>apple.laf.useScreenMenuBar</key>
 			<string>true</string>
 			<key>com.apple.hwaccel</key>
 			<string>false</string>

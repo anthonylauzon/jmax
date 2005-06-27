@@ -143,7 +143,7 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
   double doubleVal;
   
   if( nArgs == 1)
-		{
+  {
     newVal = args[0].getValue();
     if (itsTrackDataModel != null)
     {
@@ -154,7 +154,7 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
       value.setProperty( "value", newVal);
     
     itsTrackDataModel.changeEvent( this, "value", newVal);
-		}
+  }
   else
     for(int i = 0; i < nArgs-1; i+=2)
     {

@@ -903,7 +903,7 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
             {
               if(last_removed_meter != NULL)
                 scomark_bar_set_meter( stop_bar, last_removed_meter, &meter);
-                  else  
+              else  
                 scomark_bar_set_meter( stop_bar, old_meter, &meter);
                                                         
               event_set_at_client(stop_evt);

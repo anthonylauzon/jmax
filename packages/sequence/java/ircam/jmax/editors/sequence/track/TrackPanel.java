@@ -214,7 +214,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
           /*tempoBar.resetDisplayer();*/
           centerSection.validate();
           TrackPanel.this.validate();
-          getEditorContainer().getFrame().pack();
+          getEditorContainer().getFrame().pack();          
         }
     }
     });

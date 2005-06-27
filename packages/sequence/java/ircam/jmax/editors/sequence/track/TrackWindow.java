@@ -127,7 +127,6 @@ public class TrackWindow extends JMaxEditor {
     
     if(trackData.editorObject != null && !trackData.editorObject.haveContent())
     {
-      //pack();
       Dimension size = trackPanel.getPreferredSize(); 
       size.height+=(getJMenuBar().getPreferredSize().height + SequenceRuler.RULER_HEIGHT + 7);
       setSize(size);
