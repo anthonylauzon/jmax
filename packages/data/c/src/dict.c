@@ -30,9 +30,10 @@ static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
 static fts_symbol_t sym_remove_entries = 0;
 
+
 #define dict_set_editor_open(m) ((m)->opened = 1)
 #define dict_set_editor_close(m) ((m)->opened = 0)
-#define dict_editor_is_open(m) ((m)->opened)
+
 
 /* 
 *  data write access functions 
@@ -108,7 +109,7 @@ dict_remove(dict_t *dict, const fts_atom_t *key)
   }
 }
 
-static void
+void
 dict_remove_all(dict_t *dict)
 {
   fts_iterator_t key_iterator;

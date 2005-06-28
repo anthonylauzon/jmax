@@ -41,17 +41,22 @@ typedef struct dict
   int opened; /* non zero if editor open */
 } dict_t;
 
-#define dict_get_hashtable(d) (&(d)->hash)
 
 DATA_API fts_symbol_t dict_symbol;
 DATA_API fts_class_t *dict_type;
 
+
+#define dict_get_hashtable(d) (&(d)->hash)
+#define dict_editor_is_open(d) ((d)->opened)
+
+
 DATA_API void dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom);
 DATA_API void dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *at);
 DATA_API void dict_store_list(dict_t *dict, int ac, const fts_atom_t *at);
-DATA_API void dict_recall(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom);
 
 DATA_API void dict_get(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom);
+
+DATA_API void dict_remove_all(dict_t *self);
 
 DATA_API void dict_upload(dict_t *self);
 
