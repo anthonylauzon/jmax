@@ -148,7 +148,8 @@ public void setPropertyToDraw(String propName, boolean toDraw)
 	if(changeSize)
 	{
 		validate();		
-    container.getEditorContainer().getFrame().pack();
+    if(container.getEditorContainer().getFrame().isVisible())
+      container.getEditorContainer().getFrame().pack();
 
     if( !isInSequence && (((FtsTrackObject)ftsObj).editorObject != null))
 		  ((FtsTrackObject)ftsObj).editorObject.setPropertiesToDraw( getPropertyNamesToDraw());
@@ -571,7 +572,7 @@ public void restoreEditorState(FtsTrackEditorObject editorState)
       if(container.getEditorContainer().getFrame().isVisible())
         container.getEditorContainer().getFrame().pack();
       repaint();
-    }  
+    }
     stateRestored = true;
   }
 };
