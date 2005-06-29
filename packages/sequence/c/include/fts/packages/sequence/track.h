@@ -82,7 +82,6 @@ struct _track_
 
 #define track_set_editor_open(t) ((t)->open = 1)
 #define track_set_editor_close(t) ((t)->open = 0)
-#define track_editor_is_open(t) (track_is_marker(t) ? ((track_t *)fts_object_get_context((fts_object_t *)t))->open : (t)->open != 0)
 
 FTS_API void track_add_event(track_t *track, double time, event_t *event);
 FTS_API void track_add_event_after(track_t *track, double time, event_t *event, event_t *after);
@@ -93,6 +92,7 @@ FTS_API void track_merge(track_t *track, track_t *merge);
 FTS_API void track_clear(track_t *track);
 FTS_API void track_copy(track_t *org, track_t *copy);
 
+FTS_API int track_editor_is_open(track_t *track);
 
 FTS_API void track_add_event_and_upload(track_t *track, double time, event_t *event);
 FTS_API void track_add_event_after_and_upload(track_t *track, double time, event_t *event, event_t *after);

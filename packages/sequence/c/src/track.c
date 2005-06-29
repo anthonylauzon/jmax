@@ -768,6 +768,20 @@ track_copy(track_t *org, track_t *copy)
   }
 }
 
+int
+track_editor_is_open(track_t *self) 
+{
+  if(track_is_marker(self))
+  {
+    fts_object_t *context = fts_object_get_context((fts_object_t *)self);
+    if(context != NULL && fts_object_is_a(context, track_class))
+      return (((track_t *)context)->open != 0);
+    else
+      return 0;
+  }
+  else
+    return (self->open != 0);
+}
 
 static void
 track_copy_function(const fts_object_t *from, fts_object_t *to)
