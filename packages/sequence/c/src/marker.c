@@ -756,14 +756,13 @@ static event_t *
 marker_track_get_first_bar_event(track_t *marker_track)
 {
 	event_t *evt = track_get_first(marker_track);
-	if(evt != NULL)
-	{
-		scomark_t *scomark = (scomark_t *)fts_get_object( event_get_value(evt));
-		while(!scomark_is_bar(scomark))
-		{
-			evt = event_get_next(evt);
-			scomark = (scomark_t *)fts_get_object( event_get_value(evt));
-		}
+	scomark_t *scomark = NULL;
+  while(evt != NULL)
+  {
+    scomark = (scomark_t *)fts_get_object( event_get_value(evt));
+    if(scomark_is_bar(scomark))
+       break;
+    evt = event_get_next(evt);
 	}
 	return evt;
 }
