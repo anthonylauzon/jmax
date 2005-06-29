@@ -754,14 +754,16 @@ track_copy(track_t *org, track_t *copy)
   {
     double      time  = event_get_time(orgevent);
     fts_atom_t *value = event_get_value(orgevent);
-    fts_atom_t  a;
+    fts_atom_t  a[1];
     event_t    *eventcopy;
     
-    fts_set_void(&a);
-    fts_atom_copy(value, &a);
-    eventcopy = (event_t *) fts_object_create(event_class, 1, &a);
+    fts_set_void(a);
+    fts_atom_copy(value, a);
+    eventcopy = (event_t *) fts_object_create(event_class, 1, a);
     track_append_event(copy, time, eventcopy);
-    
+    fts_atom_release(a);  /* atom no longer needed, decrement reference count
+			     set by fts_atom_copy in case of an object */
+
     orgevent = event_get_next(orgevent);
   }
 }
@@ -2346,7 +2348,7 @@ track_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
     fts_message_set(mess, seqsym_markers, 0, 0);
     
     /* recursively save marker track */
-    fts_message_append_object(mess, (fts_object_t *)markers);
+    fts_message_append_object(mess, (fts_object_t *) markers);
     fts_dumper_message_send(dumper, mess);
   }
   
