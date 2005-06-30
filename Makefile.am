@@ -10,7 +10,28 @@ else
 JAVA_SRC_DIR= 
 endif
 
-SUBDIRS=client fts include $(JAVA_SRC_DIR) packages bin images tutorials config utils help doc winbuild macosxbuild
+if COND_COMPILE_CLIENT
+CLIENT_SRC_DIR= client
+else
+CLIENT_SRC_DIR=
+endif
+
+SUBDIRS=\
+	$(CLIENT_SRC_DIR) \
+	fts \
+	include \
+	$(JAVA_SRC_DIR) \
+	packages \
+	bin \
+	images \
+	tutorials \
+	config \
+	utils \
+	help \
+	doc \
+	winbuild \
+	macosxbuild
+
 EXTRA_DIST= AUTHORS ChangeLog JMAX-VERSION COPYING README LISEZMOI INSTALL.linux
 
 #
