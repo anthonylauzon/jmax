@@ -1,3 +1,8 @@
+2005-06-30  Patrice Tisserand  <p_tisserand@users.sourceforge.net>
+
+	* configure.in: added a configure flag
+	(--enable-client-compilation) to disable client library compilation.
+
 2005-02-22  Diemo Schwarz  <diemo>
 
 	* packages/control/c/src/tup.c:
