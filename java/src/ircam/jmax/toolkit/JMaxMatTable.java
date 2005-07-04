@@ -55,7 +55,7 @@ public class JMaxMatTable extends JTable
   {
     super(model);
     
-    ftsObjEditor = new FtsObjectCellEditor();
+    ftsObjEditor = new FtsObjectCellEditor( this);
     ftsObjRenderer = new FtsObjectCellRenderer();
     
     setGridColor( matGridColor);
@@ -91,12 +91,14 @@ public class JMaxMatTable extends JTable
     JButton button;
     protected static final String EDIT = "edit";
     FtsObject currentObject = null;
-    
-    public FtsObjectCellEditor() 
+    JMaxMatTable table;
+      
+    public FtsObjectCellEditor(JMaxMatTable table) 
     {
       button = new JButton();
       button.setActionCommand(EDIT);
       button.addActionListener(this);
+      this.table = table;
     }
       
     public void actionPerformed(ActionEvent e) 
@@ -106,7 +108,7 @@ public class JMaxMatTable extends JTable
         if(currentObject instanceof FtsObjectWithEditor)
           ((FtsObjectWithEditor)currentObject).requestOpenEditor();
   
-        fireEditingStopped();
+        //fireEditingStopped();
       }
     }
   
