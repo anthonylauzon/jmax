@@ -37,6 +37,9 @@
 #define fabsf fabs
 #endif
 
+#define ABS_MIN -3.40282347e+38F
+#define ABS_MAX 3.40282347e+38F
+
 fts_class_t *fvec_class = NULL;
 fts_symbol_t fvec_symbol = NULL;
 
@@ -1220,6 +1223,71 @@ fvec_vid_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
  *  misc math funs
  *
  */
+static fts_method_status_t
+fvec_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  float low = ABS_MIN;
+  float high = ABS_MAX;
+  float *ptr;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+  {
+    float f = ptr[i];
+    
+    if(f > high)
+      f = high;
+    else if(f < low)
+      f = low;
+  }
+  
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+fvec_normalize(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  float *ptr;
+  int size, stride;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  if(size > 0)
+  {
+    float max = ptr[0];
+    int i;
+    
+    /* find maximum */
+    for(i=0; i<size*stride; i+=stride)
+    {
+      float f = ptr[i];
+      
+      if(f > max)
+        max = f;
+      else if(f < -max)
+        max = -f;
+    }
+  
+    if(max != 0.0)
+    {
+      float scale = 1.0 / max;
+      
+      for(i=0; i<size*stride; i+=stride)
+        ptr[i] *= scale;
+    }
+  }
+
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
 
 static fts_method_status_t
 fvec_abs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -1835,6 +1903,15 @@ fvec_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, fts_s_size, NULL, "get size");
 
+  fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
+  fts_class_doc(cl, fts_new_symbol("mini"), NULL, "get index of minimum value");
+  fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
+  fts_class_doc(cl, fts_new_symbol("maxi"), NULL, "get index of maximum value");
+  fts_class_doc(cl, fts_new_symbol("absmax"), NULL, "get maximum absolute value");
+  fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
+  fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
+  fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");  
+  
   fts_class_doc(cl, fts_new_symbol("add"), "<num|fvec: operand>", "add given scalar, fvec (element by element) to current values");
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fvec: operand>", "substract given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("mul"), "<num|fvec: operand>", "multiply current values by given scalar, fvec (element by element)");
@@ -1849,15 +1926,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
 
-  fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
-  fts_class_doc(cl, fts_new_symbol("mini"), NULL, "get index of minimum value");
-  fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
-  fts_class_doc(cl, fts_new_symbol("maxi"), NULL, "get index of maximum value");
-  fts_class_doc(cl, fts_new_symbol("absmax"), NULL, "get maximum absolute value");
-  fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
-  fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
-  fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");  
-  
+  fts_class_doc(cl, fts_new_symbol("clip"), "[<lower limit>] <upper limit>", "clip values within given limits");
+  fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
+
   fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fvec|bpf: function>", "apply given function (by linear interpolation)");
   fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope");
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");

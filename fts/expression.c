@@ -461,7 +461,10 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
 
     if ((status = expression_eval_aux( tree->left, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok)
       return status;
-
+      
+    if ((status = expression_eval_aux( tree->right, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok)
+      return status;
+        
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
 
@@ -614,6 +617,22 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
 
     break;
 
+  case TK_EQUAL:
+    if(fts_is_symbol( &tree->value))
+    {
+      /* variable definition */
+      fts_atom_t *name = &tree->value;
+      fts_symbol_t sym = fts_get_symbol(name);      
+    }
+    else if(fts_is_int( &tree->value))
+    {
+      /* assign output ??? */
+    }
+    else
+      return invalid_environment_variable_error;
+        
+    break;
+    
   case TK_POWER:
     if ((status = expression_eval_aux( tree->left, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok)
       return status;

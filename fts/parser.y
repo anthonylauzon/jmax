@@ -40,6 +40,7 @@ typedef struct _parser_data {
   int ac;
   const fts_atom_t *at;
   int par_level;
+  enum {mode_infix, mode_prefix} mode[1024];
   fts_parsetree_t *tree;
 } parser_data_t;
 
@@ -70,6 +71,7 @@ static fts_atom_t a_times;
 %token TK_CLOSED_PAR
 %token TK_OPEN_CPAR
 %token TK_CLOSED_CPAR
+%token TK_OPEN_SQPAR
 %token TK_CLOSED_SQPAR
 
 /* Tokens that are used only to label nodes in the parse tree */
@@ -81,6 +83,7 @@ static fts_atom_t a_times;
 %left TK_COMMA
 %left TK_SEMI
 %left TK_SPACE
+%left TK_EQUAL
 %left TK_LOGICAL_OR
 %left TK_LOGICAL_AND
 %left TK_EQUAL_EQUAL TK_NOT_EQUAL
@@ -91,7 +94,7 @@ static fts_atom_t a_times;
 %right TK_UMINUS, TK_UPLUS
 %right TK_LOGICAL_NOT
 %left TK_POWER
-%left TK_OPEN_SQPAR
+/*%left TK_OPEN_SQPAR*/
 %right TK_DOLLAR
 
 
@@ -99,145 +102,89 @@ static fts_atom_t a_times;
  * Non-terminal types
  */
 %type <n> comma_expression_list
-%type <n> toplevel_term_list
-%type <n> toplevel_term
 %type <n> term_list
 %type <n> term
 %type <n> primitive
 %type <n> tuple
+%type <n> element
 %type <n> reference
-%type <n> variable
-%type <n> par
-%type <n> unary
+%type <n> expr
+%type <n> simple_term
+%type <n> infix_term
 %type <n> binary
 
 %%
-/* **********************************************************************
+/***********************************************************************
  *
- * Rules
+ *  rules
  *
  */
 
-toplevel: comma_expression_list
-		{ ((parser_data_t *)parm)->tree = fts_parsetree_new( TK_COMMA, 0, $1, 0); }
-  | comma_expression_list TK_SEMI
-    { ((parser_data_t *)parm)->tree = fts_parsetree_new( TK_SEMI, 0, $1, 0); }
-  | 
-    { ((parser_data_t *)parm)->tree = 0; }
+toplevel: comma_expression_list { ((parser_data_t *)parm)->tree = fts_parsetree_new( TK_COMMA, 0, $1, 0); }
+  | comma_expression_list TK_SEMI { ((parser_data_t *)parm)->tree = fts_parsetree_new( TK_SEMI, 0, $1, 0); }
+  | /* nix */ { ((parser_data_t *)parm)->tree = NULL; }
 ;
 
-comma_expression_list: comma_expression_list TK_COMMA toplevel_term_list
-    { $$ = fts_parsetree_new( TK_COMMA, 0, $1, $3); }
-  | comma_expression_list TK_SEMI toplevel_term_list
-    { $$ = fts_parsetree_new( TK_SEMI, 0, $1, $3); }
-  | toplevel_term_list
-    { $$ = $1; }
-  ;
- 
- toplevel_term_list: toplevel_term_list toplevel_term  /*---*/ %prec TK_SPACE
-    { $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
-	| toplevel_term
-    { $$ = fts_parsetree_new( TK_SPACE, 0, 0, $1); }
-  ; 
- 
-toplevel_term: primitive
-	| reference
-	| par
+comma_expression_list: comma_expression_list TK_COMMA term_list { $$ = fts_parsetree_new( TK_COMMA, 0, $1, $3); }
+  | comma_expression_list TK_SEMI term_list { $$ = fts_parsetree_new( TK_SEMI, 0, $1, $3); }
+  | term_list { $$ = $1; }
 ;
 
-primitive: TK_INT
-		{ $$ = fts_parsetree_new( TK_INT, &($1), 0, 0); }
-	| TK_FLOAT
-		{ $$ = fts_parsetree_new( TK_FLOAT, &($1), 0, 0); }
-	| TK_SYMBOL
-		{ $$ = fts_parsetree_new( TK_SYMBOL, &($1), 0, 0); }
-	| tuple
+term_list: term_list { ((parser_data_t *)parm)->mode[((parser_data_t *)parm)->par_level] = mode_prefix; } term /*%prec TK_SPACE*/ { $$ = fts_parsetree_new( TK_SPACE, 0, $1, $3); }
+  | term
 ;
 
-tuple: TK_OPEN_CPAR term_list TK_CLOSED_CPAR 
-		{ $$ = fts_parsetree_new( TK_TUPLE, 0, $2, 0); }
+term: simple_term
+  | tuple
 ;
 
-term_list: term_list term  /*---*/ %prec TK_SPACE
-		{ $$ = fts_parsetree_new( TK_SPACE, 0, $1, $2); }
-	|
-		{ $$ = 0; }
+simple_term: primitive
+  | reference
+  | element
+  | { ((parser_data_t *)parm)->mode[++(((parser_data_t *)parm)->par_level)] = mode_infix; } expr { ((parser_data_t *)parm)->par_level--; $$ = $2; }
 ;
 
-term: primitive
-	| reference
-	| par
-	| unary
-	| binary
+primitive: TK_INT { $$ = fts_parsetree_new( TK_INT, &($1), 0, 0); }
+  | TK_FLOAT { $$ = fts_parsetree_new( TK_FLOAT, &($1), 0, 0); }
+  | TK_SYMBOL { $$ = fts_parsetree_new( TK_SYMBOL, &($1), 0, 0); }
 ;
 
-/* original:
-reference: variable  TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR*/
-reference: reference TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
-		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
-/* (expr)[index] DOES NOT work like this:
-	|  par       TK_OPEN_SQPAR term_list TK_CLOSED_SQPAR
-		{ $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $3); }
-*/	|  variable
+tuple: TK_OPEN_CPAR { ((parser_data_t *)parm)->mode[++(((parser_data_t *)parm)->par_level)] = mode_prefix; } term_list { ((parser_data_t *)parm)->par_level--; } TK_CLOSED_CPAR { $$ = fts_parsetree_new( TK_TUPLE, 0, $3, 0); }
 ;
 
-
-variable: TK_DOLLAR TK_SYMBOL
-		{ $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
-  | TK_DOLLAR TK_INT
-    { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
-  | TK_DOLLAR TK_TIMES
-    { $$ = fts_parsetree_new( TK_DOLLAR, &a_times, 0, 0); }
+reference: TK_DOLLAR TK_SYMBOL { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
+  | TK_DOLLAR TK_INT { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
+  | TK_DOLLAR TK_TIMES { $$ = fts_parsetree_new( TK_DOLLAR, &a_times, 0, 0); }
 ;
 
-par: TK_OPEN_PAR 
-		{ ((parser_data_t *)parm)->par_level++; } 
-	term_list
-		{ ((parser_data_t *)parm)->par_level--; } 
-	TK_CLOSED_PAR
-		{ $$ = fts_parsetree_new( TK_PAR, 0, $3, 0); }
+element: term TK_OPEN_SQPAR { ((parser_data_t *)parm)->mode[++(((parser_data_t *)parm)->par_level)] = mode_prefix; } term_list { ((parser_data_t *)parm)->par_level--; } TK_CLOSED_SQPAR { $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $4); }
 ;
 
-unary: TK_PLUS term %prec TK_UPLUS
-		{ $$ = fts_parsetree_new( TK_UPLUS, 0, $2, 0); }
-	| TK_MINUS term %prec TK_UMINUS
-		{ $$ = fts_parsetree_new( TK_UMINUS, 0, $2, 0); }
-	| TK_LOGICAL_NOT term
-		{ $$ = fts_parsetree_new( TK_LOGICAL_NOT, 0, $2, 0); }
+expr: TK_OPEN_PAR term_list TK_CLOSED_PAR { $$ = fts_parsetree_new( TK_PAR, 0, $2, 0); }
+  | TK_OPEN_PAR binary TK_CLOSED_PAR { $$ = $2; }
 ;
 
-binary: term TK_PLUS term
-		{ $$ = fts_parsetree_new( TK_PLUS, 0, $1, $3); }
-	| term TK_MINUS term
-		{ $$ = fts_parsetree_new( TK_MINUS, 0, $1, $3); }
-	| term TK_TIMES term
-		{ $$ = fts_parsetree_new( TK_TIMES, 0, $1, $3); }
-	| term TK_DIV term
-		{ $$ = fts_parsetree_new( TK_DIV, 0, $1, $3); }
-	| term TK_POWER term
-		{ $$ = fts_parsetree_new( TK_POWER, 0, $1, $3); }
-	| term TK_PERCENT term
-		{ $$ = fts_parsetree_new( TK_PERCENT, 0, $1, $3); }
-	| term TK_SHIFT_LEFT term
-		{ $$ = fts_parsetree_new( TK_SHIFT_LEFT, 0, $1, $3); }
-	| term TK_SHIFT_RIGHT term
-		{ $$ = fts_parsetree_new( TK_SHIFT_RIGHT, 0, $1, $3); }
-	| term TK_LOGICAL_AND term
-		{ $$ = fts_parsetree_new( TK_LOGICAL_AND, 0, $1, $3); }
-	| term TK_LOGICAL_OR term
-		{ $$ = fts_parsetree_new( TK_LOGICAL_OR, 0, $1, $3); }
-	| term TK_EQUAL_EQUAL term
-		{ $$ = fts_parsetree_new( TK_EQUAL_EQUAL, 0, $1, $3); }
-	| term TK_NOT_EQUAL term
-		{ $$ = fts_parsetree_new( TK_NOT_EQUAL, 0, $1, $3); }
-	| term TK_GREATER term
-		{ $$ = fts_parsetree_new( TK_GREATER, 0, $1, $3); }
-	| term TK_GREATER_EQUAL term
-		{ $$ = fts_parsetree_new( TK_GREATER_EQUAL, 0, $1, $3); }
-	| term TK_SMALLER term
-		{ $$ = fts_parsetree_new( TK_SMALLER, 0, $1, $3); }
-	| term TK_SMALLER_EQUAL term
-		{ $$ = fts_parsetree_new( TK_SMALLER_EQUAL, 0, $1, $3); }
+infix_term: term
+  | binary
+;
+
+binary: infix_term TK_EQUAL infix_term { $$ = fts_parsetree_new( TK_EQUAL, 0, $1, $3); }
+  | infix_term TK_PLUS infix_term { $$ = fts_parsetree_new( TK_PLUS, 0, $1, $3); }
+  | infix_term TK_MINUS infix_term { $$ = fts_parsetree_new( TK_MINUS, 0, $1, $3); }
+	| infix_term TK_TIMES infix_term { $$ = fts_parsetree_new( TK_TIMES, 0, $1, $3); }
+	| infix_term TK_DIV infix_term { $$ = fts_parsetree_new( TK_DIV, 0, $1, $3); }
+	| infix_term TK_POWER infix_term { $$ = fts_parsetree_new( TK_POWER, 0, $1, $3); }
+	| infix_term TK_PERCENT infix_term { $$ = fts_parsetree_new( TK_PERCENT, 0, $1, $3); }
+	| infix_term TK_SHIFT_LEFT infix_term { $$ = fts_parsetree_new( TK_SHIFT_LEFT, 0, $1, $3); }
+	| infix_term TK_SHIFT_RIGHT infix_term { $$ = fts_parsetree_new( TK_SHIFT_RIGHT, 0, $1, $3); }
+	| infix_term TK_LOGICAL_AND infix_term { $$ = fts_parsetree_new( TK_LOGICAL_AND, 0, $1, $3); }
+	| infix_term TK_LOGICAL_OR infix_term { $$ = fts_parsetree_new( TK_LOGICAL_OR, 0, $1, $3); }
+	| infix_term TK_EQUAL_EQUAL infix_term { $$ = fts_parsetree_new( TK_EQUAL_EQUAL, 0, $1, $3); }
+	| infix_term TK_NOT_EQUAL infix_term { $$ = fts_parsetree_new( TK_NOT_EQUAL, 0, $1, $3); }
+	| infix_term TK_GREATER infix_term { $$ = fts_parsetree_new( TK_GREATER, 0, $1, $3); }
+	| infix_term TK_GREATER_EQUAL infix_term { $$ = fts_parsetree_new( TK_GREATER_EQUAL, 0, $1, $3); }
+	| infix_term TK_SMALLER infix_term { $$ = fts_parsetree_new( TK_SMALLER, 0, $1, $3); }
+	| infix_term TK_SMALLER_EQUAL infix_term { $$ = fts_parsetree_new( TK_SMALLER_EQUAL, 0, $1, $3); }
 ;
 
 %%
@@ -248,9 +195,9 @@ static int yyerror( const char *msg)
   return 0;
 }
 
-/* **********************************************************************
+/***********************************************************************
  *
- * Lexical analyser
+ *  lexical analyser
  *
  */
 
@@ -265,54 +212,54 @@ static int
 yylex( YYSTYPE *lvalp, parser_data_t *data)
 {
   int token = -1;
-
+  
   if (data->ac <= 0)
     return 0; /* end of file */
-
+  
   if ( fts_is_symbol(data->at))
+  {
+    fts_atom_t v;
+    struct token_definition *def;
+    
+    /* Is it a token symbol? */
+    if (fts_hashtable_get( &token_table, data->at, &v))
     {
-      fts_atom_t v;
-      struct token_definition *def;
-
-      /* Is it a token symbol? */
-      if (fts_hashtable_get( &token_table, data->at, &v))
-	{
-	  def = (struct token_definition *)fts_get_pointer( &v);
-
-	  if (def->operator)
+      def = (struct token_definition *)fts_get_pointer( &v);
+      
+      if (def->operator)
 	    {
-	      /* if operator, return it as token if inside parenthesis */
-	      if (data->par_level > 0)
-		token = def->token;
+	      /* if operator, return it as token in infix mode */
+	      if (data->par_level > 0 && data->mode[data->par_level] == mode_infix)
+          token = def->token;
 	      else
-		{
-		  token = TK_SYMBOL;
-		  lvalp->a = *data->at;
-		}
+        {
+          token = TK_SYMBOL;
+          lvalp->a = *data->at;
+        }
 	    }
-	  else 
-	    token = def->token;  /* not an operator: always return it as token */
-	}
-      else
-	{
-	  token = TK_SYMBOL;
-	  lvalp->a = *data->at;
-	}
+      else 
+        token = def->token;  /* not an operator: always return it as token */
     }
+    else
+    {
+      token = TK_SYMBOL;
+      lvalp->a = *data->at;
+    }
+  }
   else if (fts_is_int( data->at))
-    {
-      token = TK_INT;
-      lvalp->a = *data->at;
-    }
+  {
+    token = TK_INT;
+    lvalp->a = *data->at;
+  }
   else if (fts_is_float( data->at))
-    {
-      token = TK_FLOAT;
-      lvalp->a = *data->at;
-    }
-
+  {
+    token = TK_FLOAT;
+    lvalp->a = *data->at;
+  }
+  
   data->at++;
   data->ac--;
-
+  
   return token;
 }
 
@@ -348,6 +295,7 @@ token_table_init( void)
   token_table_put_entry( fts_s_closed_sqpar, TK_CLOSED_SQPAR, 0);
 
   /* recognized as operators only if inside parenthesis */
+  token_table_put_entry( fts_s_equal, TK_EQUAL, 1);
   token_table_put_entry( fts_s_plus, TK_PLUS, 1);
   token_table_put_entry( fts_s_minus, TK_MINUS, 1);
   token_table_put_entry( fts_s_times, TK_TIMES, 1);
@@ -367,9 +315,9 @@ token_table_init( void)
   token_table_put_entry( fts_s_smaller_equal, TK_SMALLER_EQUAL, 1);
 }
 
-/* **********************************************************************
+/***********************************************************************
  *
- * Parser abstract tree construction/destruction
+ *  parser abstract tree construction/destruction
  *
  */
 
@@ -399,10 +347,14 @@ fts_status_t
 fts_parsetree_parse( int ac, const fts_atom_t *at, fts_parsetree_t **ptree)
 {
   parser_data_t data;
+  int i;
 
   data.ac = ac;
   data.at = at;
   data.par_level = 0;
+  
+  for(i=0; i<1024; i++)
+    data.mode[i] = mode_infix;
 
   if (yyparse( &data))
     {

@@ -38,11 +38,12 @@
 #include <alloca.h>
 #endif
 
+#define ABS_MIN -3.40282347e+38F
+#define ABS_MAX 3.40282347e+38F
 
 fmat_t *fmat_null = NULL;
 fts_class_t *fmat_class = NULL;
 fts_symbol_t fmat_symbol = NULL;
-
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_getcol = 0;
@@ -62,12 +63,8 @@ static fts_symbol_t sym_delete_cols = 0;
 
 static fts_symbol_t sym_sr = 0;
 
-
 int fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride);
 void fmat_config(void);
-
-
-
 
 /********************************************************
  *
@@ -2534,10 +2531,10 @@ fmat_le_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
 
 
 /******************************************************************************
-*
-*  misc math funs
-*
-*/
+ *
+ *  misc math funs
+ *
+ */
 static fts_method_status_t
 fmat_abs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -2549,7 +2546,7 @@ fmat_abs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   
   for(i=0; i<m*n; i++)
     ptr[i] = fabsf(ptr[i]);
-
+  
   fts_object_changed(o);
   fts_set_object(ret, o);
   
@@ -3188,6 +3185,44 @@ fmat_get_dot(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
 *  misc
 *
 */
+
+static fts_method_status_t
+fmat_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float low = ABS_MIN;
+  float high = ABS_MAX;
+  int i;
+  
+  if(ac > 0 && fts_is_number(at))
+  {
+    if(ac > 1 && fts_is_number(at + 1))
+    {
+      low = fts_get_number_float(at);
+      high = fts_get_number_float(at + 1);
+    }
+    else
+      high = fts_get_number_float(at);
+  }
+  
+  for(i=0; i<m*n; i++)
+  {
+    float f = ptr[i];
+    
+    if(f > high)
+      f = high;
+    else if(f < low)
+      f = low;
+  }
+  
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
 
 static fts_method_status_t
 fmat_normalize(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -4106,18 +4141,19 @@ fmat_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   fts_message_append_int(mess, n);
   fts_dumper_message_send(dumper, mess);
 
-  for(i=0; i<m; i++)
+  for(i=0; i<m*n; i+=128)
   {
-    /* new row */
-    mess = fts_dumper_message_get(dumper, fts_s_row);
-    fts_message_append_int(mess, i);
+    int n_block = m * n - i;
+    
+    if(n_block > 128)
+      n_block = 128;
+    
+    mess = fts_dumper_message_get(dumper, fts_s_set);
+    fts_message_append_int(mess, i / n);
+    fts_message_append_int(mess, i % n);
 
-    for(j=0; j<n; j++)
-    {
-      float f = data[i * n + j];
-
-      fts_message_append_float(mess, f);
-    }
+    for(j=0; j<n_block; j++)
+      fts_message_append_float(mess, data[i * j]);
     
     fts_dumper_message_send(dumper, mess);
   }
@@ -4348,6 +4384,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("xmul"), fmat_class, fmat_xmul_fmat);
   fts_class_message(cl, fts_new_symbol("dot"), fmat_class, fmat_get_dot);
   
+  fts_class_message_varargs(cl, fts_new_symbol("clip"), fmat_clip);
   fts_class_message_void(cl, fts_new_symbol("normalize"), fmat_normalize);
   fts_class_message_void  (cl, fts_s_sort, fmat_sort);
   fts_class_message_number(cl, fts_s_sort, fmat_sort);
@@ -4457,6 +4494,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("xmul"), "<fmat: operand>", "calculate matrix multiplication of operand M with current matrix C so that C' = M x C");
   fts_class_doc(cl, fts_new_symbol("dot"), "<fmat: operand>", "get dot product of column vector with given vector");
   
+  fts_class_doc(cl, fts_new_symbol("clip"), "[<lower limit>] <upper limit>", "clip values within given limits");
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
   fts_class_doc(cl, fts_s_reverse, NULL, "reverse order of rows");
   fts_class_doc(cl, fts_new_symbol("rotate"), "[<num: # of elements (def 1)>]", "rotate by given number of rows");
