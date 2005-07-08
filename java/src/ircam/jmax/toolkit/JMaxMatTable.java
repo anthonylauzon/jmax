@@ -84,42 +84,78 @@ public class JMaxMatTable extends JTable
     if(isEditing() || !(e.getKeyText(e.getKeyCode()).equals("Command") && e.getKeyChar() == KeyEvent.CHAR_UNDEFINED))
       super.processKeyEvent(e);
   }
-  
+    
   /************************     FtsObject Table CellEditor ***********************************/
-  public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener 
+  public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor/*, ActionListener*/ 
   {
-    JButton button;
-    protected static final String EDIT = "edit";
     FtsObject currentObject = null;
     JMaxMatTable table;
-      
-    public FtsObjectCellEditor(JMaxMatTable table) 
+    JLabel editor;  
+    
+    public FtsObjectCellEditor(JMaxMatTable tab) 
     {
-      button = new JButton();
-      button.setActionCommand(EDIT);
-      button.addActionListener(this);
-      this.table = table;
+      this.table = tab;
+      editor = new JLabel();
+      editor.setBackground(Color.gray);
+      editor.setBorder(BorderFactory.createEtchedBorder());
+      editor.addMouseListener( new MouseAdapter(){
+        public void mousePressed(MouseEvent e) 
+        {
+           if(e.getClickCount() > 1) 
+          {
+            if(currentObject instanceof FtsObjectWithEditor)
+              ((FtsObjectWithEditor)currentObject).requestOpenEditor();
+             
+             stopCellEditing();
+             java.util.Timer timer = new java.util.Timer();
+             timer.schedule(new StopTask(timer, FtsObjectCellEditor.this), 600);
+          } 
+        }
+      });
     }
-      
-    public void actionPerformed(ActionEvent e) 
-    {
-      if (EDIT.equals(e.getActionCommand())) 
-      {  
-        if(currentObject instanceof FtsObjectWithEditor)
-          ((FtsObjectWithEditor)currentObject).requestOpenEditor();
-  
-        //fireEditingStopped();
+    
+    class StopTask extends TimerTask {
+      java.util.Timer timer;
+      FtsObjectCellEditor editor;
+      public StopTask(java.util.Timer timer, FtsObjectCellEditor editor)
+      {
+        this.timer = timer;
+        this.editor = editor;
       }
-    }
-  
+      public void run() {
+        editor.fireEditingStopped();
+        timer.cancel(); //Terminate the timer thread
+      }
+    }    
+    
     public Object getCellEditorValue() {
       return currentObject;
     }
-      
+    
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) 
     {
       currentObject = (FtsObject)value;
-      return button;
+      if(value instanceof FtsGraphicObject)
+      {
+        String name = ((FtsGraphicObject)value).getVariableName();
+        String description = ((FtsGraphicObject)value).getDescription();
+        
+        if(name != null && !name.equals(""))
+          editor.setText(description + " [" + name + "]");
+        else
+          editor.setText(description);
+      }
+      else 
+      {
+        String description = ((FtsObject)value).getDescription();
+        
+        if(description.charAt(0) != '{')
+          editor.setText(description + " [#" + ((FtsObject)value).getID() + "]");
+        else
+          editor.setText(description);
+      }
+      
+      return editor;
     }
   }
   
