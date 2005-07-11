@@ -9817,7 +9817,7 @@
 				INSTALL_PATH = "";
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = build/ftsclient.jar;
+				JAVA_CLASS_SEARCH_PATHS = " $BUILT_PRODUCTS_DIR/ftsclient.jar";
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
 				OTHER_LDFLAGS = "";
@@ -10196,7 +10196,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
+				JAVA_CLASS_SEARCH_PATHS = " $BUILT_PRODUCTS_DIR/jmax.jar  $BUILT_PRODUCTS_DIR/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
@@ -10691,7 +10691,7 @@
 				INSTALL_PATH = "";
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
+				JAVA_CLASS_SEARCH_PATHS = " $BUILT_PRODUCTS_DIR/ftsclient.jar  $BUILT_PRODUCTS_DIR/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
@@ -11530,7 +11530,7 @@
 				INSTALL_PATH = "";
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
+				JAVA_CLASS_SEARCH_PATHS = " $BUILT_PRODUCTS_DIR/jmax.jar  $BUILT_PRODUCTS_DIR/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
@@ -11783,7 +11783,7 @@
 				INSTALL_PATH = "";
 				JAVA_ARCHIVE_CLASSES = YES;
 				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
+				JAVA_CLASS_SEARCH_PATHS = " $BUILT_PRODUCTS_DIR/ftsclient.jar  $BUILT_PRODUCTS_DIR/jmax.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_SOURCE_SUBDIR = .;
 				LIBRARY_STYLE = STATIC;
@@ -12326,7 +12326,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				JAVA_ARCHIVE_CLASSES = NO;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
+				JAVA_CLASS_SEARCH_PATHS = " $BUILT_PRODUCTS_DIR/jmax.jar  $BUILT_PRODUCTS_DIR/ftsclient.jar";
 				JAVA_COMPILER = /usr/bin/javac;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
