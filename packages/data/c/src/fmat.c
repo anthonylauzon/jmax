@@ -4153,7 +4153,7 @@ fmat_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     fts_message_append_int(mess, i % n);
 
     for(j=0; j<n_block; j++)
-      fts_message_append_float(mess, data[i * j]);
+      fts_message_append_float(mess, data[i + j]);
     
     fts_dumper_message_send(dumper, mess);
   }

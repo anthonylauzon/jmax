@@ -456,7 +456,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       return status;
     break;
 
-  case TK_PAR:
+  case TK_PREFIX:
     expression_stack_push_frame( exp);
 
     if ((status = expression_eval_aux( tree->left, exp, locals, globals, env_ac, env_at, callback, data)) != fts_ok)
@@ -487,8 +487,8 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       
       if(!fts_is_void(&ret))
       {
-        expression_stack_push( exp, &ret);
         fts_atom_refer(&ret);
+        expression_stack_push( exp, &ret);
       }
       
       return status;
@@ -519,8 +519,8 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       if(!fts_is_void(&ret))
       {
         /* push return value */
-        expression_stack_push( exp, &ret);
         fts_atom_refer(&ret);
+        expression_stack_push( exp, &ret);
       }
       
       fts_object_release(obj);
@@ -531,9 +531,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       ret = at[0];
       
       fts_atom_refer(&ret);
-      
-      expression_stack_pop_frame( exp);
-      
+      expression_stack_pop_frame( exp);      
       expression_stack_push( exp, &ret);
     }
     else
@@ -849,7 +847,7 @@ static void expression_print_aux( fts_parsetree_t *tree, int indent)
   case TK_INT: fprintf( stderr, "INT %d\n", (int)fts_get_int( &tree->value)); break;
   case TK_FLOAT: fprintf( stderr, "FLOAT %g\n", fts_get_float( &tree->value)); break;
   case TK_SYMBOL: fprintf( stderr, "SYMBOL %s\n", fts_symbol_name(fts_get_symbol( &tree->value))); break;
-  case TK_PAR: fprintf( stderr, "()\n"); break;
+  case TK_PREFIX: fprintf( stderr, "()\n"); break;
   case TK_TUPLE: fprintf( stderr, "{}\n"); break;
   case TK_ELEMENT: fprintf( stderr, "[]\n"); break;
   case TK_DOLLAR: 

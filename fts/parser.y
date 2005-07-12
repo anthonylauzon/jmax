@@ -76,7 +76,7 @@ static fts_atom_t a_times;
 
 /* Tokens that are used only to label nodes in the parse tree */
 %token TK_TUPLE
-%token TK_PAR
+%token TK_PREFIX
 %token TK_ELEMENT
 
 /* Operators */
@@ -94,7 +94,6 @@ static fts_atom_t a_times;
 %right TK_UMINUS, TK_UPLUS
 %right TK_LOGICAL_NOT
 %left TK_POWER
-/*%left TK_OPEN_SQPAR*/
 %right TK_DOLLAR
 
 
@@ -160,8 +159,8 @@ reference: TK_DOLLAR TK_SYMBOL { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0)
 element: term TK_OPEN_SQPAR { ((parser_data_t *)parm)->mode[++(((parser_data_t *)parm)->par_level)] = mode_prefix; } term_list { ((parser_data_t *)parm)->par_level--; } TK_CLOSED_SQPAR { $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $4); }
 ;
 
-expr: TK_OPEN_PAR term_list TK_CLOSED_PAR { $$ = fts_parsetree_new( TK_PAR, 0, $2, 0); }
-  | TK_OPEN_PAR binary TK_CLOSED_PAR { $$ = $2; }
+expr: TK_OPEN_PAR binary TK_CLOSED_PAR { $$ = $2; }
+  | TK_OPEN_PAR term_list TK_CLOSED_PAR { $$ = fts_parsetree_new( TK_PREFIX, 0, $2, 0); }
 ;
 
 infix_term: term
