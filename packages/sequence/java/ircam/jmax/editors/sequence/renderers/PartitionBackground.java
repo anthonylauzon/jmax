@@ -148,7 +148,7 @@ public static boolean isPitchInGrayStaff(int p)
 }
 
 /* NOTE: draw always black staff after gray staff */
-private void drawBlackStaff(Graphics g, int startLine, int key)
+private void drawBlackStaff(Graphics g, int startLine, int key, int image_width)
 {
 	int transp = ((PartitionAdapter)gc.getAdapter()).getVerticalTransp();
 	Dimension d = gc.getGraphicDestination().getSize();
@@ -160,7 +160,7 @@ private void drawBlackStaff(Graphics g, int startLine, int key)
 	for (int i = 0; i < 5; i++)                       /*draw horiz lines*/                              
 	{
 		positionY = start-i*STEP;
-		g.drawLine(KEYX, positionY, d.width, positionY);
+		g.drawLine(KEYX, positionY, image_width /*d.width*/, positionY);
 	}
 	if(key == VIOLIN_KEY)                             /*draw key*/
 	{
@@ -177,7 +177,7 @@ private void drawBlackStaff(Graphics g, int startLine, int key)
 	g.drawLine(KEYEND, start, KEYEND, start-4*STEP);
 }
 
-private void drawGrayStaff(Graphics g, int startLine)
+private void drawGrayStaff(Graphics g, int startLine, int image_width)
 {
 	int transp = ((PartitionAdapter)gc.getAdapter()).getVerticalTransp();
 	Dimension d = gc.getGraphicDestination().getSize();
@@ -188,7 +188,7 @@ private void drawGrayStaff(Graphics g, int startLine)
 	for (int j = 0; j < 4; j++)
 	{
 		positionY = start-(j-1)*STEP;
-		g.drawLine(KEYX, positionY, d.width, positionY);
+		g.drawLine(KEYX, positionY, image_width, positionY);
 	}
 	g.setColor(Color.black);                           /*draw vertical lines*/
 	g.drawLine(KEYX, start+STEP, KEYX, start-2*STEP);
@@ -198,7 +198,7 @@ private void drawGrayStaff(Graphics g, int startLine)
 
 /** builds an horizontal grid in the given graphic port
 * using the destination size*/
-private void drawHorizontalGrid(Graphics g)
+private void drawHorizontalGrid(Graphics g, int image_width)
 {
 	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
 	int maxPitch = pa.getMaxPitch();
@@ -213,43 +213,43 @@ private void drawHorizontalGrid(Graphics g)
 		g.setColor(Color.white);
 	else
 		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-	g.fillRect(0, 0, d.width, d.height);
+	g.fillRect(0, 0, image_width, d.height);
 	/********* First Bass Line ***********************************************/
 	if(staffIsDrawable(2, maxPitch, minPitch))
-		drawGrayStaff( g, 5);
+		drawGrayStaff( g, 5, image_width);
 	if(staffIsDrawable(1, maxPitch, minPitch))
-		drawBlackStaff( g, 0, BASS_KEY);
+		drawBlackStaff( g, 0, BASS_KEY, image_width);
 	/********* Second Bass Line **********************************************/
 	if(staffIsDrawable(4, maxPitch, minPitch))
-		drawGrayStaff( g, 12);
+		drawGrayStaff( g, 12, image_width);
 	if(staffIsDrawable(3, maxPitch, minPitch))
-		drawBlackStaff( g, 7, BASS_KEY);
+		drawBlackStaff( g, 7, BASS_KEY, image_width);
 	/********* Third Bass Line ***********************************************/	
 	if(staffIsDrawable(6, maxPitch, minPitch))
 	{
 		g.setColor( ScoreRenderer.horizontalGridLinesColor); 
 		int positionY = SC_BOTTOM-19*STEP-transp;
-		g.drawLine(KEYX, positionY, d.width, positionY);
+		g.drawLine(KEYX, positionY, image_width, positionY);
 		g.setColor(Color.black);
 		g.drawLine(KEYX, positionY+STEP, KEYX, positionY-STEP);
 		g.setColor(Color.gray);
 		g.drawLine(KEYEND, positionY+STEP, KEYEND, positionY-STEP);
 	}
 	if(staffIsDrawable(5, maxPitch, minPitch))
-		drawBlackStaff( g, 14, BASS_KEY);
+		drawBlackStaff( g, 14, BASS_KEY, image_width);
 	/********* First Violin Line **********************************************/	
 	if(staffIsDrawable(8, maxPitch, minPitch))
-		drawGrayStaff( g, 25);	
+		drawGrayStaff( g, 25, image_width);	
 	if(staffIsDrawable(7, maxPitch, minPitch))
-		drawBlackStaff( g, 20, VIOLIN_KEY);
+		drawBlackStaff( g, 20, VIOLIN_KEY, image_width);
 	/********* Second Violin Line *********************************************/	
 	if(staffIsDrawable(10, maxPitch, minPitch))
-		drawGrayStaff( g, 32);
+		drawGrayStaff( g, 32, image_width);
 	if(staffIsDrawable(9, maxPitch, minPitch))
-		drawBlackStaff( g, 27, VIOLIN_KEY);
+		drawBlackStaff( g, 27, VIOLIN_KEY, image_width);
 	/********* Third Violin Line **********************************************/	
 	if(staffIsDrawable(11, maxPitch, minPitch))
-		drawBlackStaff( g, 34, VIOLIN_KEY);
+		drawBlackStaff( g, 34, VIOLIN_KEY, image_width);
 }
 
 //???????????????????????????????
@@ -257,6 +257,7 @@ static int currentPressedKey = -1;
 static public void pressKey(int key, GraphicContext sgc){}
 static public void releaseKey(GraphicContext sgc){}
 
+static int DEFAULT_IMAGE_WIDTH = 1500;
 /**
 * Layer interface. Draw the background */
 public void render( Graphics g, int order)
@@ -265,20 +266,20 @@ public void render( Graphics g, int order)
 	
 	if (itsImage == null) 
 	{
-		itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-		drawHorizontalGrid(itsImage.getGraphics());
-	}
-	else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
+		itsImage = gc.getGraphicDestination().createImage((d.width > DEFAULT_IMAGE_WIDTH) ? d.width : DEFAULT_IMAGE_WIDTH, d.height);
+		drawHorizontalGrid(itsImage.getGraphics(), itsImage.getWidth(gc.getGraphicDestination()));    
+  }
+	else if (itsImage.getHeight(gc.getGraphicDestination()) < d.height || itsImage.getWidth(gc.getGraphicDestination()) < d.width || toRepaintBack == true)
 	{
 		itsImage.flush();
 		itsImage = null;
 		System.gc();
 		RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
 		
-		itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-		drawHorizontalGrid(itsImage.getGraphics());
+		itsImage = gc.getGraphicDestination().createImage((d.width > DEFAULT_IMAGE_WIDTH) ? d.width : DEFAULT_IMAGE_WIDTH, d.height);
+		drawHorizontalGrid(itsImage.getGraphics(), itsImage.getWidth(gc.getGraphicDestination()));
 		rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
-		toRepaintBack = false;
+		toRepaintBack = false;        
 	} 
 	
 	g.drawImage(itsImage, 0, 0, gc.getGraphicDestination());
@@ -359,7 +360,7 @@ public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, in
 
 //--- Fields
 SequenceGraphicContext gc;
-Image itsImage;
+Image itsImage = null;
 boolean toRepaintBack = false;
 boolean locked = false;
 

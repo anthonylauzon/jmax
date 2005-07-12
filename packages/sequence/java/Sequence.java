@@ -53,7 +53,8 @@ public class Sequence implements JMaxPackage {
     }   
     }; 
     
-    JMaxClassMap.put( "sequence", sequenceCreator, null, null, "sequence", this);
+    //JMaxClassMap.put( "sequence", sequenceCreator, null, null, "sequence", this);
+    JMaxClassMap.put( "multitrack", sequenceCreator, null, null, "multitrack", this);
     JMaxClassMap.put( "track", trackCreator, null, null, "track", this);
     
 		/*SequenceImages.init();*/

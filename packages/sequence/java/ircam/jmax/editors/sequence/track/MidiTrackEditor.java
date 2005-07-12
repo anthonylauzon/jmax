@@ -58,7 +58,7 @@ public class MidiTrackEditor extends TrackBaseEditor
       addComponentListener( new ComponentAdapter() {
         public void componentResized(ComponentEvent e)
 		    {
-          resizeToPreferredSize();
+          resizeToPreferredSize( false);
         }
         public void componentMoved(ComponentEvent e){}
       });
@@ -140,7 +140,7 @@ public class MidiTrackEditor extends TrackBaseEditor
 		if(!gc.isInSequence())
 			((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
      
-    resizeToPreferredSize();
+    resizeToPreferredSize( true);
   }
 	
 	public void setGridMode(int gridMode)
@@ -178,7 +178,7 @@ public class MidiTrackEditor extends TrackBaseEditor
       if(!gc.isInSequence())
         ((FtsTrackObject)gc.getDataModel()).editorObject.setRangeMode(rangeMode);
       
-      resizeToPreferredSize();
+      resizeToPreferredSize( true);
     }
     else
       forceBackgroundRepaint();
@@ -205,15 +205,15 @@ public class MidiTrackEditor extends TrackBaseEditor
     return ((PartitionAdapter)gc.getAdapter()).getRangeHeight();
   }
 
-  public void resizeToPreferredSize()
+  public void resizeToPreferredSize(boolean toPack)
   {
     Dimension d = getSize();
     d.height = ((PartitionAdapter)gc.getAdapter()).getPreferredHeight();
     setSize(d.width, d.height);
     setPreferredSize(d);
     validate();
-    if(container.getEditorContainer().getFrame().isVisible())
-      container.getEditorContainer().getFrame().pack();
+    if(container.getEditorContainer().getFrame().isVisible() && toPack)
+      container.getEditorContainer().getFrame().pack();    
   }
   
    //--- MidiTrackEditor fields

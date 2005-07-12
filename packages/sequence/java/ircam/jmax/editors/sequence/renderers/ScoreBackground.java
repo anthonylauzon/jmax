@@ -110,7 +110,7 @@ public static int getMinPitchInStaff(int min)
 
 /** builds an horizontal grid in the given graphic port
 * using the destination size*/
-private void drawHorizontalGrid(Graphics g)
+private void drawHorizontalGrid(Graphics g, int image_width)
 {
 	PartitionAdapter pa = (PartitionAdapter)(gc.getAdapter());
 	int maxPitch = pa.getMaxPitch();
@@ -125,7 +125,7 @@ private void drawHorizontalGrid(Graphics g)
 		g.setColor(Color.white);
 	else
 		g.setColor(ScoreBackground.OUT_RANGE_COLOR);
-	g.fillRect(0, 0, d.width, d.height);
+	g.fillRect(0, 0, image_width, d.height);
 	
 	/********** Gray Lines ******************************************************/
 	int positionY;
@@ -135,20 +135,20 @@ private void drawHorizontalGrid(Graphics g)
 	for (int i = minGray+1; i <= maxGray; i++)
 	{
 		positionY = SC_BOTTOM-i*GRAY_STEP;
-		g.drawLine(KEYEND+1, positionY -transp, d.width, positionY -transp);
+		g.drawLine(KEYEND+1, positionY -transp, image_width, positionY -transp);
 	}
 	/********** Black Lines *****************************************************/
 	g.setColor(Color.black);
 	int maxBlack = (SC_BOTTOM - maxPitchY)/BLACK_STEP;
 	int minBlack = (SC_BOTTOM - minPitchY)/BLACK_STEP;
 	
-	g.drawLine(KEYEND+1, minPitchY+2-transp, d.width, minPitchY+2-transp);
+	g.drawLine(KEYEND+1, minPitchY+2-transp, image_width, minPitchY+2-transp);
 	for(int j = minBlack+1; j <= maxBlack; j++)
 	{
 		positionY = SC_BOTTOM-j*BLACK_STEP;
-		g.drawLine(KEYEND+1, positionY-transp, d.width, positionY-transp);
+		g.drawLine(KEYEND+1, positionY-transp, image_width, positionY-transp);
 	}	
-	g.drawLine(KEYEND+1, maxPitchY-2-transp, d.width, maxPitchY-2-transp);
+	g.drawLine(KEYEND+1, maxPitchY-2-transp, image_width, maxPitchY-2-transp);
 	/********** Numbers **********************************************************/
 	g.setColor(Color.gray);
 	g.setFont(ScoreRenderer.gridSubdivisionFont);
@@ -231,6 +231,8 @@ static public void releaseKey(SequenceGraphicContext sgc)
 	currentPressedKey = -1;
 }
 
+static int DEFAULT_IMAGE_WIDTH = 1500;
+
 /**
 * Layer interface. Draw the background */
 public void render( Graphics g, int order)
@@ -239,18 +241,18 @@ public void render( Graphics g, int order)
 	
 	if (itsImage == null) 
 	{
-		itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-		drawHorizontalGrid(itsImage.getGraphics());
+		itsImage = gc.getGraphicDestination().createImage((d.width > DEFAULT_IMAGE_WIDTH) ? d.width : DEFAULT_IMAGE_WIDTH, d.height);
+		drawHorizontalGrid(itsImage.getGraphics(), itsImage.getWidth(gc.getGraphicDestination()));
 	}
-	else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
+	else if (itsImage.getHeight(gc.getGraphicDestination()) < d.height || itsImage.getWidth(gc.getGraphicDestination()) < d.width || toRepaintBack == true)
 	{
 		itsImage.flush();
 		itsImage = null;
 		System.gc();
 		RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
 		
-		itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-		drawHorizontalGrid(itsImage.getGraphics());
+		itsImage = gc.getGraphicDestination().createImage((d.width > DEFAULT_IMAGE_WIDTH) ? d.width : DEFAULT_IMAGE_WIDTH, d.height);
+		drawHorizontalGrid(itsImage.getGraphics(), itsImage.getWidth(gc.getGraphicDestination()));
 		rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
 		toRepaintBack = false;
 	} 

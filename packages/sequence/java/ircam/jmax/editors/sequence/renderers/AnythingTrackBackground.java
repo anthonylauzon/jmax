@@ -70,33 +70,36 @@ public class AnythingTrackBackground implements Layer, ImageObserver{
     fm = gc.getGraphicDestination().getFontMetrics(ToggleBar.toggleBarFont);
 }
 
+static int DEFAULT_IMAGE_WIDTH = 1500;
+
 /**
 * Layer interface. Draw the background */
 public void render( Graphics g, int order)
 {
   Dimension d = gc.getGraphicDestination().getSize();
+  int image_width = (d.width > DEFAULT_IMAGE_WIDTH) ? d.width : DEFAULT_IMAGE_WIDTH;
   
   if (itsImage == null) 
   {
-    itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-    drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
+    itsImage = gc.getGraphicDestination().createImage(image_width, d.height);
+    drawHorizontalLine(itsImage.getGraphics(), image_width, d.height);
   }
-  else if (itsImage.getHeight(gc.getGraphicDestination()) != d.height || itsImage.getWidth(gc.getGraphicDestination()) != d.width || toRepaintBack == true)
+  else if (itsImage.getHeight(gc.getGraphicDestination()) < d.height || itsImage.getWidth(gc.getGraphicDestination()) < d.width || toRepaintBack == true)
   {
     itsImage.flush();
     itsImage = null;
     System.gc();
     RepaintManager rp = RepaintManager.currentManager((JComponent)gc.getGraphicDestination());
     
-    itsImage = gc.getGraphicDestination().createImage(d.width, d.height);
-    drawHorizontalLine(itsImage.getGraphics(), d.width, d.height);
+    itsImage = gc.getGraphicDestination().createImage(image_width, d.height);
+    drawHorizontalLine(itsImage.getGraphics(), image_width, d.height);
     rp.markCompletelyDirty((JComponent)gc.getGraphicDestination());
     toRepaintBack = false;
   } 
   
   g.drawImage(itsImage, 0, 0, gc.getGraphicDestination());
   
-  drawVerticalGrid(g, d.width, d.height);
+  drawVerticalGrid(g, image_width, d.height);
 }
 
 private void drawHorizontalLine(Graphics g, int w, int h)
