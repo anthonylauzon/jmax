@@ -1554,7 +1554,7 @@ fmat_append_row_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   return fts_ok;
 }
 
-/** insert @p num rows of atoms at row @p pos
+/** insert @p num rows of zeros at row @p pos
  *  may insert num rows behind last row m --> append num rows
  *
  * @method insert
@@ -1609,7 +1609,7 @@ fmat_insert_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   return fts_ok;
 }
 
-/** insert @p num rows of atoms at row @p pos
+/** insert @p num columns of zeros at row @p pos
 *  may insert num rows behind last row m --> append num rows
 *
 * @method insert
@@ -4439,9 +4439,17 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
   fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row and $col)");
   fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
+
   fts_class_doc(cl, fts_s_append, "[<num: value> ...]", "append row with given values");
   fts_class_doc(cl, fts_s_append, "<fvec: row values>", "append row with values from fvec");
   fts_class_doc(cl, fts_s_append, "<fmat: row values>", "append rows with values from fmat");
+
+  fts_class_doc(cl, fts_s_insert,    "[<num: index (def 0)> [<num: number (def 1)>]]", "insert <number> empty rows at given index");
+  fts_class_doc(cl, sym_insert_cols, "[<num: index (def 0)> [<num: number (def 1)>]]", "insert <number> empty columns at given index");
+
+  fts_class_doc(cl, fts_s_delete,    "[<num: index (def 0)> [<num: number (def 1)>]]", "delete <number> rows from given index");
+  fts_class_doc(cl, sym_delete_cols, "[<num: index (def 0)> [<num: number (def 1)>]]", "delete <number> columns from given index");
+
 
   fts_class_doc(cl, fts_s_set, "<fmat: matrix>", "set dimension and values from given fmat");
   fts_class_doc(cl, fts_s_set, "<num: row index> <num: column index> [<num:value> ...]", "set values starting from indicated element (row by row)");
