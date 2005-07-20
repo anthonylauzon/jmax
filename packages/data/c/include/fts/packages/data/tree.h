@@ -26,6 +26,7 @@
 #include <fts/packages/data/fmat.h>
 
 
+
 #define MAX_VECT   200
 #define MAX_NODES  400
 
@@ -45,8 +46,13 @@ typedef struct tree
 
     int ndim;
     int ndata;
+	int height;
 
     fmat_t *data[MAX_VECT];
+	
+	//Vector index list
+	int listind[MAX_VECT];
+
 
     int nnodes;
     node_t nodes[MAX_NODES];
