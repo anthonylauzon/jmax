@@ -20,10 +20,15 @@
  * 
  */
 
+
+#include <alloca.h>
+#include <math.h>
+
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
 #include <fts/packages/data/tree.h>
-#include <math.h>
+
+
 #define HEIGHT 3
 #define MAX_FLOAT 0x7FFFFFFF
 
@@ -215,7 +220,12 @@ tree_build (tree_t *t)
 }
 
 
-static fmat_t *tree_search (tree_t *tree, fmat_t *x)
+/*
+  @return number of vectors found n, n <= k
+	  list of n indices in result
+*/
+
+static int tree_search (tree_t *tree, fmat_t *x, int k, int *result)
 {
     fts_stack_t stack;
 
@@ -226,44 +236,12 @@ static fmat_t *tree_search (tree_t *tree, fmat_t *x)
     /* one element access */
 /*     fmat_get_element(x, 0, i); */
 
+    /* testing: */
+    result[0] = 0;
+    return 1;
 }   
 
 
-
-static fts_method_status_t _tree_add (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  tree_t *self = (tree_t *) o;
-  fmat_t *x = (fmat_t *) fts_get_object(at);
-
-  /* tree_add(self, x); */
-
-  return fts_ok;
-}
-
-
-
-static fts_method_status_t _tree_search (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  tree_t *self = (tree_t *) o;
-  fmat_t *x = (fmat_t *) fts_get_object(at);
-  fmat_t *r = tree_search(self, x);
-
-  fts_set_object(ret, r);
-  fts_object_refer(r);
-
-  return fts_ok;
-}
-
-
-static fts_method_status_t _tree_get (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  tree_t *self = (tree_t *) o;
-  int i = fts_get_int(at);
-
-  /* access tree content by index */
-
-  return fts_ok;
-}
 
 /* For debuging */
 static void 
@@ -286,7 +264,7 @@ tree_display(tree_t* t)
 	fts_post("\nTree Display:\n");
 	fts_post("*************\n\n");
 	
-	if(t->height == 0 || t->ndata == 0) printf("Empty Tree\n");
+	if(t->height == 0 || t->ndata == 0) fts_post("Empty Tree\n");
 	for(l = 0; l < t->height; l++) {
 		fts_post("Level #%i ", l);
 		for(n = (int)pow(2, l) - 1; n < (int)pow(2, l+1) - 1; n++) {
@@ -328,6 +306,117 @@ data_display(tree_t *t, int v)
 }
 
 
+
+/******************************************************************************
+ *
+ * user methods
+ *
+ */
+
+static fts_method_status_t _tree_set (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tree_t *self = (tree_t *) o;
+
+  /* tree_clear and rebuild: */
+  /* tree_clear(self);
+     tree_set(self, ac, at);
+     tree_build(self); 
+  */
+
+  fts_set_object(ret, self);
+  fts_object_refer(self);
+
+  return fts_ok;
+}
+
+
+static fts_method_status_t _tree_add (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tree_t *self = (tree_t *) o;
+
+  /* rebuild */
+  /* tree_set(self, ac, at); 
+     tree_build(self);
+  */
+
+  fts_set_object(ret, self);
+  fts_object_refer(self);
+
+  return fts_ok;
+}
+
+
+
+static fts_method_status_t _tree_getknn (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tree_t *self = (tree_t *) o;
+  fmat_t *x;	/* search vector */
+  int     k = 1, n;
+  int     *result;
+
+  if (ac  &&  fts_is_a(at, fmat_class))
+      x = (fmat_t *) fts_get_object(at);
+
+  if (ac > 1  &&  fts_is_number(at+1))
+      k = fts_get_number_int(at+1);
+
+  result = alloca(sizeof(int) * k);
+
+  n = tree_search(self, x, k, result);
+
+  if (s == fts_s_get)
+  {   /* return one fmat */
+      fts_set_object(ret, self->data[result[0]]);
+      fts_object_refer(self->data[result[0]]);
+  }
+  else
+  {   /* return n-tuple */
+      fts_tuple_t *tup = (fts_tuple_t *) fts_object_create(fts_tuple_class, 0, NULL);
+      fts_atom_t  *at;
+      int i;
+
+      fts_tuple_set_size(tup, n);
+      at = fts_tuple_get_atoms(tup); 
+      
+      for (i = 0; i < n; i++)
+      {
+	  fts_set_object(at + i, self->data[result[i]]);
+	  fts_object_refer(self->data[result[i]]);
+      }
+
+      fts_set_object(ret, tup);
+      fts_object_refer(tup);
+  }
+
+  return fts_ok;
+}
+
+
+static fts_method_status_t _tree_get_element (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tree_t *self = (tree_t *) o;
+  int i = fts_get_int(at);
+
+  /* access tree content by index */
+
+  return fts_ok;
+}
+
+
+static fts_method_status_t _tree_print (fts_object_t *o, fts_symbol_t s, 
+					int ac, const fts_atom_t *at, 
+					fts_atom_t *ret)
+{
+  tree_t *self = (tree_t *) o;
+
+  tree_info_display(self);
+  tree_display(self);
+
+  return fts_ok;
+}
+
+
+
 /**********************************************************
 *
 *  class
@@ -354,7 +443,7 @@ tree_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
 
   /* make space for max. ac vectors */
 
-
+/* todo: move to tree_set */
   while (ac)
   {
       if (fts_is_a(at, fmat_class))
@@ -363,11 +452,15 @@ tree_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
 
 	  /* check dimensions */
 	  if (self->ndim == 0)
+	  {
 	      self->ndim = fmat_get_n(x);
+	      fts_post("set dimension to %d\n", self->ndim);
+	  }
 	  else;
 
 	  self->data[self->ndata++] = x;
 	  fts_object_refer(x);
+	  fts_post("add %d\n", self->ndata);
       }
 
       ac--;
@@ -391,7 +484,24 @@ static fts_method_status_t
 tree_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tree_t *self = (tree_t *) o;
+  int i;
   
+/* todo: move to tree_clear */
+  /* free nodes */
+  for (i = 0; i < self->nnodes; i++)
+  {
+      fts_object_release(self->nodes[i].mean);
+      fts_object_release(self->nodes[i].splitplane);
+  }
+
+  /* free data */
+  for (i = 0; i < self->ndata; i++)
+  {
+      fts_object_release(self->data[i]);	/* free stored vectors */
+  }
+
+  /* todo: free structure */
+
   return fts_ok;
 }
 
@@ -407,8 +517,9 @@ tree_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
 /*  fts_class_message_varargs(cl, fts_s_dump_state, tree_dump_state); */
   
+  fts_class_message_varargs(cl, fts_s_print, _tree_print);
+
 /*  fts_class_message_varargs(cl, fts_s_set_from_instance, _tree_set_from_tree);
-  fts_class_message_varargs(cl, fts_s_print, tree_print);
   
   fts_class_message_void(cl, fts_s_clear, _tree_clear);
   
@@ -418,16 +529,20 @@ tree_instantiate(fts_class_t *cl)
 */
 
 
+  fts_class_message_varargs(cl, fts_s_set, _tree_set);
   fts_class_message(cl, fmat_class, fts_new_symbol("add"), _tree_add);
 
+  fts_class_message_varargs(cl, fts_s_get,		  _tree_getknn);
+  fts_class_message_varargs(cl, fts_new_symbol("getknn"), _tree_getknn);
+
   /* $tree[x] calls these methods, depending on the type of x */
-  fts_class_message(cl, fmat_class, fts_s_get_element, _tree_search);
-  fts_class_message_int(cl, fts_s_get_element, _tree_get);
+  fts_class_message_int(cl, fts_s_get_element, _tree_get_element);
 
 
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
 
+  fts_post("tree instantiate finished\n");
 
   /*
    * class doc
