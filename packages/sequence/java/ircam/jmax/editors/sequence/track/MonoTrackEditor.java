@@ -111,7 +111,7 @@ public int getDefaultHeight()
 
 public void objectAdded(Object whichObject, int index) 
 {
-  if( !uploading)
+  if( !track.getFtsTrack().isUploading())
   {
     updateNewObject(whichObject);
     updateRange(whichObject);

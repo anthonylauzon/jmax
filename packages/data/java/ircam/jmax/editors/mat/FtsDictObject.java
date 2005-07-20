@@ -102,7 +102,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
       for(int j = 0; j < n_cols; j++)
         values[i][j] = null;
     
-    notifyClear();
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      { 
+        notifyClear();
+      }});
   }
 
   public void set(int nArgs , FtsAtom args[])
@@ -123,7 +127,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
         values[m][n++] = args[i].getValue();
       }
       
-      notifyDataChanged();
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+       { 
+          notifyDataChanged();
+       }});
     }
   }
 
@@ -135,7 +143,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
       n_cols = n;
       values = new Object[n_rows][n_cols];
       
-      notifySizeChanged(n_rows, n_cols);
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+       { 
+          notifySizeChanged(n_rows, n_cols);
+       }});
     }
   }
   
@@ -151,7 +163,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     values = temp;
     n_rows++;
     
-    notifySizeChanged(n_rows, n_cols);
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      { 
+        notifySizeChanged(n_rows, n_cols);
+      }});
   }
   
   public void nameChanged( String name)

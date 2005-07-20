@@ -1149,6 +1149,16 @@ private void notifyEndPaste()
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
     ((TrackDataListener) e.nextElement()).endPaste();
 }
+private void notifyStartUndoRedo()
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+    ((TrackDataListener) e.nextElement()).startUndoRedo();
+}
+private void notifyEndUndoRedo()
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+    ((TrackDataListener) e.nextElement()).endUndoRedo();
+}
 private void notifyObjectMoved(Object spec, int oldIndex, int newIndex, boolean fromClient)
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
@@ -1730,7 +1740,7 @@ public void restoreEditorState()
 /********************************************************/
 
 void startUpload( int size)
-{
+{  
   uploading = true;
   notifyUploadStart( size);
 }
@@ -1741,6 +1751,11 @@ void endUpload()
 	if( saveEditor)
 		restoreEditorState();
   notifyUploadEnd();
+}
+
+public boolean isUploading()
+{
+  return uploading;
 }
 
 // Paste
@@ -1755,6 +1770,56 @@ void endPaste()
 {
   pasting = false;
   notifyEndPaste();
+}
+
+public void requestUndo()
+{
+  notifyStartUndoRedo();  
+  try 
+  {
+    ((UndoableData) this).undo();
+  } catch (CannotUndoException e1) {
+    System.out.println("Can't undo");
+  }
+  SwingUtilities.invokeLater(new Runnable() {
+    public void run()
+    { 
+      requestPing("undo");
+    }
+  });
+}
+
+public void requestRedo()
+{
+  startUndoRedo();
+  try 
+  {
+    ((UndoableData) this).redo();
+  } catch (CannotRedoException e1) {
+    System.out.println("Can't redo");
+  }
+  SwingUtilities.invokeLater(new Runnable() {
+    public void run()
+    { 
+      requestPing("redo");
+    }
+  });
+}
+
+public void startUndoRedo()
+{
+  notifyStartUndoRedo();
+}
+
+public void endUndoRedo()
+{
+  notifyEndUndoRedo();
+}
+
+public void ping( String ping)
+{
+  if(ping.equals("undo") || ping.equals("redo"))
+    endUndoRedo();
 }
 
 //---  AbstractSequence fields

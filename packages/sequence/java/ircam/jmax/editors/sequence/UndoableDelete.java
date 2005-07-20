@@ -25,6 +25,7 @@ import ircam.jmax.editors.sequence.track.Event;
 import java.awt.*;
 import java.util.*;
 
+import javax.swing.*;
 import javax.swing.undo.*;
 
 
@@ -35,7 +36,7 @@ class UndoableDelete extends AbstractUndoableEdit {
   FtsTrackObject trkObj;
 
   public UndoableDelete(TrackEvent theDeletedEvent)
-  {
+  {    
     try {
       itsEvent = theDeletedEvent.duplicate();
     } catch (Exception ex) {
@@ -60,23 +61,32 @@ class UndoableDelete extends AbstractUndoableEdit {
   {
     //since a redo can only occur after a corresponding undo,
     // there's no need to copy-construct the deleted event.
-    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
-    if(evt!=null)
-      trkObj.deleteEvent(evt);
-    else
-      die();
-  }  
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      {    
+        TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+        if(evt!=null)
+          trkObj.deleteEvent(evt);
+        else
+          die();
+      }  
+    });
+  }
   
   public void undo()
   {
-    SequenceSelection.getCurrent().deselectAll();
-    trkObj.requestEventCreation((float)itsEvent.getTime(), 
-																itsEvent.getValue().getValueInfo().getName(), 
-																itsEvent.getValue().getDefinedPropertyCount()*2, 
-																itsEvent.getValue().getDefinedPropertyNamesAndValues());
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      {         
+        SequenceSelection.getCurrent().deselectAll();
+        trkObj.requestEventCreation((float)itsEvent.getTime(), 
+                                    itsEvent.getValue().getValueInfo().getName(), 
+                                    itsEvent.getValue().getDefinedPropertyCount()*2, 
+                                    itsEvent.getValue().getDefinedPropertyNamesAndValues());
+      }
+    });
   }
+
 }
-
-
 
 

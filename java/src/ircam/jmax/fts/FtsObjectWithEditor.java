@@ -108,17 +108,21 @@ public void disposeEditor()
 }
 public void showEditor()
 {
-  if(editorFrame!=null)
-    if (! editorFrame.isVisible())
+  if(editorFrame != null)
+  {
+    if(!editorFrame.isVisible())
     {
       editorFrame.setVisible(true);
       MaxWindowManager.getWindowManager().addWindow(editorFrame);
-    }   
-      
-      if(editorFrame.getState()==Frame.ICONIFIED) editorFrame.setState(Frame.NORMAL);
-  editorFrame.toFront();
+    }
+    else
+    {
+      if(editorFrame.getState()==Frame.ICONIFIED) 
+        editorFrame.setState(Frame.NORMAL);
+      editorFrame.toFront();
+    }
+  }
 }
-
 public void hideEditor()
 {
   editorFrame.setVisible(false);

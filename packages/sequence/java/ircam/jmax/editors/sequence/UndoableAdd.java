@@ -25,6 +25,7 @@ import ircam.jmax.editors.sequence.track.Event;
 import java.awt.*;
 import java.util.*;
 
+import javax.swing.*;
 import javax.swing.undo.*;
 
 
@@ -60,23 +61,31 @@ class UndoableAdd extends AbstractUndoableEdit {
   
   public void redo()
   {
-    SequenceSelection.getCurrent().deselectAll();
-    if(isMarker)
-			trkObj.appendBar(null);
-		else
-			trkObj.requestEventCreation((float)itsEvent.getTime(), 
-																itsEvent.getValue().getValueInfo().getName(), 
-																itsEvent.getValue().getDefinedPropertyCount()*2,
-																itsEvent.getValue().getDefinedPropertyNamesAndValues());
-  }  
-  
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      { 
+        SequenceSelection.getCurrent().deselectAll();
+        if(isMarker)
+          trkObj.appendBar(null);
+        else
+          trkObj.requestEventCreation((float)itsEvent.getTime(), 
+                                      itsEvent.getValue().getValueInfo().getName(), 
+                                      itsEvent.getValue().getDefinedPropertyCount()*2,
+                                      itsEvent.getValue().getDefinedPropertyNamesAndValues());
+      }  
+    });
+  }
   public void undo()
   { 
-    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
-    if(evt!=null)
-      trkObj.deleteEvent(evt);
-    else
-      die();
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      { 
+        TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+        if(evt!=null)
+          trkObj.deleteEvent(evt);
+        else
+          die();
+      }
+    });
   }
 }
-

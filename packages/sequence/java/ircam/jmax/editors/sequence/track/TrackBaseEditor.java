@@ -209,6 +209,8 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 			public void endTrackUpload( TrackDataModel track){}
 			public void startPaste(){}
 			public void endPaste(){}
+      public void startUndoRedo(){}
+      public void endUndoRedo(){}
 		};
 		
 		if( isInSequence && gc.getMarkersTrack() != null)
@@ -315,7 +317,7 @@ public void objectChanged(Object spec, String propName, Object propValue)
 
 public void objectAdded(Object spec, int index) 
 {
-	if( !uploading)
+	if( !track.getFtsTrack().isUploading())
 		repaint();
 }
 
@@ -340,11 +342,13 @@ public void startTrackUpload( TrackDataModel track, int size)
 public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
-	setRangeMode(getRangeMode(), false);
+  setRangeMode(getRangeMode(), false);
   uploadEnd();
 }
 public void startPaste(){}
 public void endPaste(){}
+public void startUndoRedo(){}
+public void endUndoRedo(){}
 
 public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient) 
 {

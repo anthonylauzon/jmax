@@ -57,6 +57,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   private transient MaxVector pastedObjects = new MaxVector();
 	
   boolean pasting = false;
+  boolean undoRedoing = false;
 	
   // Implementation notes: 
   // The ListSelectionModel, and then the SequenceSelection, 
@@ -287,9 +288,9 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   public void objectAdded(Object spec, int index) 
   {
     int i;
-		
+		    
     /* during upload don't select */
-    if( !uploading)
+    if( !((FtsTrackObject)itsModel).isUploading())
 		{    
 			/* shift to right already selected indexes */
 			if ( index <= getMaxSelectionIndex())
@@ -304,10 +305,12 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
 	      }
 			}
 			
-			select(spec);    
-			
-			if( pasting)
+      if( pasting)
 				pastedObjects.addElement( spec);
+      else if(!undoRedoing)
+        deselectAll();
+      
+			select(spec);    			
 		}
   }
   public void objectsAdded(int maxTime) {}
@@ -406,6 +409,14 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
     select( pastedObjects.elements());
     pastedObjects.removeAllElements();
   }	
+  public void startUndoRedo() 
+  {
+    undoRedoing = true;
+  }
+  public void endUndoRedo() 
+  {
+    undoRedoing = false;
+  }
   /** Transferable interface */
   public Object getTransferData(DataFlavor flavor) 
   {

@@ -78,6 +78,18 @@ static
 			((FtsSequenceObject)obj).setName(args.getSymbol( 0).toString());
 	}
 	});
+  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+    {
+      ((FtsSequenceObject)obj).startUpload();
+    }
+  });
+  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+  {
+      ((FtsSequenceObject)obj).endUpload();
+  }
+  });
 }
 
 /**
@@ -215,6 +227,22 @@ public void nameChanged( String name)
 public String getFtsName()
 {
   return super.getVariableName();
+}
+
+boolean uploading = false;
+void startUpload()
+{  
+  uploading = true;
+}
+
+void endUpload()
+{
+  uploading = false;
+}
+
+public boolean isUploading()
+{
+  return uploading;
 }
 
 /**

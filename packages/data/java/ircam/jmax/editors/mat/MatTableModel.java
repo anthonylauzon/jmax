@@ -41,31 +41,42 @@ class MatTableModel extends AbstractTableModel
  }
 
   public int getColumnCount() 
-  { 
+{ 
     return model.getColumns();
-  }
+}
 
+int editedRowIndex, editedColumnIndex;
+java.lang.Object editedValue = null;
+  
 public void setValueAt(Object aValue, int rowIndex, int columnIndex) 
-{	    
-  if( aValue != null && !(aValue instanceof FtsObject))
-  {
-    Object obj;
-    try{
-      obj = Integer.valueOf((String)aValue);
-    }
-    catch(NumberFormatException e)
-    {
-      try{
-        obj = Double.valueOf((String)aValue);
+{	 
+  editedRowIndex = rowIndex;
+  editedColumnIndex = columnIndex;
+  editedValue = aValue;
+  
+  SwingUtilities.invokeLater(new Runnable() {
+    public void run()
+    { 
+      if( editedValue != null && !(editedValue instanceof FtsObject))
+      {
+        Object obj;
+        try{
+          obj = Integer.valueOf((String)editedValue);
+        }
+        catch(NumberFormatException e)
+        {
+          try{
+            obj = Double.valueOf((String)editedValue);
+          }
+          catch(NumberFormatException e1)
+          {
+            obj = editedValue;
+          }
+        } 
+        model.requestSetValue( obj, editedRowIndex, editedColumnIndex);
       }
-      catch(NumberFormatException e1)
-    {
-        obj = aValue;
     }
-    } 
-    
-    model.requestSetValue( obj, rowIndex, columnIndex);
-  }
+  });
 }
 
 public boolean isCellEditable(int row, int col)

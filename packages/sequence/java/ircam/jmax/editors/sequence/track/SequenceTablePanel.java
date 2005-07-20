@@ -129,6 +129,8 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
 			}
 			public void startPaste(){}
 			public void endPaste(){}
+      public void startUndoRedo(){}
+      public void endUndoRedo(){}
     });
 		
 		table.getColumnModel().addColumnModelListener(new TableColumnModelListener(){

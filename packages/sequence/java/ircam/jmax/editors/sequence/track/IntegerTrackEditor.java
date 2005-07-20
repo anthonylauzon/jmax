@@ -65,7 +65,7 @@ public class IntegerTrackEditor extends MonoTrackEditor
   }
 
   void updateRange(Object obj)
-  {
+  {    
     int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
     int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
     Object val = ((TrackEvent)obj).getProperty("value");

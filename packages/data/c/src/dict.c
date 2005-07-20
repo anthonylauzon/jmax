@@ -277,6 +277,8 @@ dict_upload_data(dict_t *self)
     sent += n;
     data_size -= n;
   }
+  
+  fts_array_destroy(&array);
 }
 
 void

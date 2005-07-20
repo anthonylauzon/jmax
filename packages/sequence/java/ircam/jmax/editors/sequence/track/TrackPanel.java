@@ -311,6 +311,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   }
   public void startPaste(){}
   public void endPaste(){}
+  public void startUndoRedo(){}
+  public void endUndoRedo(){}
   public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient)
   {
@@ -397,22 +399,12 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 	
   public void undo()
   {
-    try 
-	{
-		((UndoableData) trackData).undo();
-	} catch (CannotUndoException e1) {
-		System.out.println("Can't undo");
-	}
+    ftsTrackObject.requestUndo();
   }
-	
+                               
   public void redo()
   {
-    try 
-  {
-    ((UndoableData) trackData).redo();
-  } catch (CannotRedoException e1) {
-    System.out.println("Can't redo");
-  }
+    ftsTrackObject.requestRedo();
   }
   
   public void selectAll()

@@ -455,14 +455,14 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	
   public void Undo()
   {
-		try 
-	{
-		((UndoableData) gc.getFtsObject()).undo();
-	} catch (CannotUndoException e1) {
-		System.out.println("can't undo");	
-	}
-  }
-	
+    try 
+    {
+      ((UndoableData) gc.getFtsObject()).undo();
+    } catch (CannotUndoException e1) {
+      System.out.println("can't undo");	
+    }
+  } 
+
   public void Redo()
   {
     try 

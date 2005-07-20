@@ -45,5 +45,7 @@ public interface TrackDataListener {
   abstract public void endTrackUpload( TrackDataModel track);
   abstract public void startPaste();
   abstract public void endPaste();
+  abstract public void startUndoRedo();
+  abstract public void endUndoRedo();
 }
 

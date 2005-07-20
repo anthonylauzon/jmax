@@ -124,6 +124,14 @@ fts_object_destroy(fts_object_t *obj)
   fts_object_free(obj);
 }
 
+#ifdef DEBUG_REF_COUNT
+void fts_object_refer(fts_object_t *obj)
+{
+  obj->refcnt++;
+  if(fts_object_get_class_name(obj) != NULL)
+    post("fts_object_refer %p type %s refcount = %d", obj, fts_symbol_name( fts_object_get_class_name(obj)), obj->refcnt);
+}
+#endif
 /*****************************************************************************
  *
  *  client

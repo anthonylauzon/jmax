@@ -405,12 +405,12 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
   public void objectChanged(Object spec, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
-    if( !uploading)
+    if( !ftsSequenceObject.isUploading())
       resizePanelToEventTime((TrackEvent)spec);	
   }
   public void objectsAdded(int maxTime) 
   {
-    if( !uploading)
+    if( !ftsSequenceObject.isUploading())
       resizePanelToTime(maxTime);	
   }
   public void objectDeleted(Object whichObject, int index){}
@@ -419,14 +419,29 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
   {
     uploading = true;
   }
+  TrackDataModel lastUploadedTrackModel = null;
   public void endTrackUpload(TrackDataModel track)
   {
     uploading = false;
 		if( track.length() > 0)
-			resizePanelToEventTimeWithoutScroll( track.getLastEvent());
-	}
+    {
+      lastUploadedTrackModel = track;
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+	      { 
+          if(lastUploadedTrackModel != null && lastUploadedTrackModel.length() > 0)
+          {
+            resizePanelToEventTimeWithoutScroll( lastUploadedTrackModel.getLastEvent());
+            lastUploadedTrackModel = null;
+          }
+        }
+      });
+    }
+  }
   public void startPaste(){}
   public void endPaste(){}
+  public void startUndoRedo(){}
+  public void endUndoRedo(){}
   public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient)
   {
@@ -597,25 +612,15 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
   public void undo()
   {
     Track track = mutex.getCurrent();
-    if(track!=null)
-      try 
-			{
-				((UndoableData) track.getTrackDataModel()).undo();
-			} catch (CannotUndoException e1) {
-				System.out.println("Can't undo");
-			}
+    if(track != null)
+      track.getFtsTrack().requestUndo();
   }
 	
   public void redo()
   {
     Track track = mutex.getCurrent();
-    if(track!=null)
-      try 
-			{
-				((UndoableData) track.getTrackDataModel()).redo();
-			} catch (CannotRedoException e1) {
-				System.out.println("Can't redo");
-			}
+    if(track != null)
+      track.getFtsTrack().requestRedo();
   }
 	
   public void selectAll()

@@ -4238,7 +4238,7 @@ static fts_method_status_t
 fmat_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
-
+  
   if(self->values != NULL)
     fts_free(self->values - HEAD_POINTS);
   

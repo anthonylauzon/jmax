@@ -147,6 +147,12 @@ public class FtsGraphicObject extends FtsObject {
 	  ((FtsGraphicObject)obj).openFileDialog( args.getLength(), args.getAtoms());
 	}
       });
+    FtsObject.registerMessageHandler( FtsGraphicObject.class, FtsSymbol.get( "ping"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+      {
+        ((FtsGraphicObject)obj).ping( args.getSymbol( 0).toString());
+      }
+    });
   }
   
   protected transient FtsArgs args = new FtsArgs();
@@ -562,8 +568,8 @@ public class FtsGraphicObject extends FtsObject {
     }
     catch(IOException e)
       {
-	System.err.println("FtsGraphicObject: I/O Error sending setComment Message!");
-	e.printStackTrace(); 
+      System.err.println("FtsGraphicObject: I/O Error sending setComment Message!");
+      e.printStackTrace(); 
       } 
     this.comment = comment;
   }
@@ -647,10 +653,27 @@ public class FtsGraphicObject extends FtsObject {
     }
     catch(IOException e)
       {
-	System.err.println("FtsGraphicObject: I/O Error sending double_click Message!");
-	e.printStackTrace(); 
+      System.err.println("FtsGraphicObject: I/O Error sending double_click Message!");
+      e.printStackTrace(); 
       }
   }
+  
+  public void requestPing( String ping)
+  {
+    args.clear();
+    args.addSymbol( FtsSymbol.get(ping));
+    
+    try{
+      send(FtsSymbol.get("ping"), args);
+    }
+    catch(IOException e)
+  {
+      System.err.println("FtsGraphicObject: I/O Error sending ping Message!");
+      e.printStackTrace(); 
+  }
+  }
+  
+  public void ping( String ping){}
   /********************************************************************************/
     
   protected transient Object listener;

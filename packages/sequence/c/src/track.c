@@ -1292,7 +1292,7 @@ track_add_event_from_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_a
   track_t *self = (track_t *)o;
   double time = fts_get_float(at + 0);
   event_t *event = track_event_create(ac - 1, at + 1);
-        
+          
   if(event)
     track_add_event_and_upload( self, time, event);
   
@@ -1534,6 +1534,14 @@ track_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
 }
 
 static fts_method_status_t
+track_ping(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_client_send_message( o, fts_s_ping, 1, at);
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
 _track_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_t *self = (track_t *)o;
@@ -1677,11 +1685,12 @@ _track_shift(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   }
   
   track_segment_get(self, begin, end, &first, &after);
+  
   if(first != NULL)
   {
     track_segment_shift(self, first, after, begin, end, shift);
     track_move_events_at_client(self, first, after);
-    fts_object_set_dirty(o);
+    fts_object_set_state_dirty(o);
   }
   
   return fts_ok;
@@ -2538,6 +2547,8 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_insert, _track_insert);  
   fts_class_message_varargs(cl, fts_s_append, _track_append);
   fts_class_message_varargs(cl, seqsym_remove, _track_remove);
+  
+  fts_class_message_varargs(cl, fts_s_ping, track_ping);
 
   /* fts_class_message_number(cl, fts_s_get_element, track_get_element); */
   

@@ -232,13 +232,23 @@ sequence_member_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
   return fts_ok;
 }
 
+static fts_method_status_t
+sequence_member_dirty(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fts_object_set_state_dirty(o);
+
+  return fts_ok;
+}
+
 /* move track by client request */
 static fts_method_status_t
 sequence_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = sequence_get_first_track(this);
-
+  
+  fts_client_send_message( o, fts_s_start_upload, 0, 0);
+  
   while(track)
   {
     /* add track at client and upload events */
@@ -249,6 +259,8 @@ sequence_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     /* next track */
     track = sequence_track_get_next(track);
   }
+
+  fts_client_send_message( o, fts_s_end_upload, 0, 0);
   
   return fts_ok;
 }
@@ -680,6 +692,7 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_dump_state, sequence_dump_state);
 
   fts_class_message_varargs(cl, fts_s_member_upload, sequence_member_upload);
+  fts_class_message_varargs(cl, fts_s_member_dirty, sequence_member_dirty);
   fts_class_message_varargs(cl, fts_s_upload, sequence_upload);
 
   fts_class_message_varargs(cl, seqsym_add_track, sequence_add_track_and_update);

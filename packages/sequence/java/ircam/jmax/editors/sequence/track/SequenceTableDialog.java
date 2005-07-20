@@ -95,6 +95,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 			}
 			public void startPaste(){}
 			public void endPaste(){}
+      public void startUndoRedo(){}
+      public void endUndoRedo(){}
     });
 		
     setLocation(200, 200);
@@ -208,6 +210,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
   }    
   public void startPaste(){}    
   public void endPaste(){}    
+  public void startUndoRedo(){}
+  public void endUndoRedo(){}
   public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
   public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){}
 
