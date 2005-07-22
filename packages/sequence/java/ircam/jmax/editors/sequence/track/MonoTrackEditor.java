@@ -115,14 +115,17 @@ public void objectAdded(Object whichObject, int index)
   {
     updateNewObject(whichObject);
     updateRange(whichObject);
-    super.objectAdded(whichObject, index);
   }
+  super.objectAdded(whichObject, index);
 }
-public void objectChanged(Object whichObject, String propName, Object propValue) 
+public void objectChanged(Object whichObject, int index, String propName, Object propValue) 
 {
-  updateEventProperties(whichObject, propName, propValue);
-  updateRange(whichObject);
-  super.objectChanged(whichObject, propName, propValue);
+  if(propName != null)
+  {
+    updateEventProperties(whichObject, propName, propValue);
+    updateRange(whichObject);
+  }
+  super.objectChanged(whichObject, index, propName, propValue);
 }
 
 static int MONODIMENSIONAL_TRACK_OFFSET = 0;

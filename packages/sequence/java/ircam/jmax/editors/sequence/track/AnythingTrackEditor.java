@@ -104,13 +104,15 @@ public class AnythingTrackEditor extends TrackBaseEditor
     repaint();
     selection.deselectAll();
   }
-  public void objectChanged(Object whichObject, String propName, Object propValue) 
+  public void objectChanged(Object whichObject, int index, String propName, Object propValue) 
   {
-    updateEventProperties(whichObject, propName, propValue);
-    updateRange(whichObject);
-    repaint();
+    if(propName != null)
+    {
+      updateEventProperties(whichObject, propName, propValue);
+      updateRange(whichObject);
+    }
+    super.objectChanged(whichObject, index, propName, propValue);
   }
-  
   void createListDialog()
   {
     super.createListDialog();

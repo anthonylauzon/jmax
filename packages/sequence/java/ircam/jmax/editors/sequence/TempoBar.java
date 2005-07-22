@@ -478,9 +478,9 @@ public void mouseEntered(MouseEvent e)
 public void mouseExited(MouseEvent e){}
 //=================== TrackDataListener interface ========================
 
-public void objectChanged(Object spec, String propName, Object propValue)
+public void objectChanged(Object spec, int index, String propName, Object propValue)
 {
-	if(propName.equals("type"))
+	if(propName != null && propName.equals("type"))
 		if((propValue.toString()).equals("bar"))
 			setLastBar((TrackEvent)spec);
 

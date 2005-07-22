@@ -198,7 +198,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 		});
 		
 		markerTrackListener = new TrackDataListener() {
-			public void objectChanged(Object spec, String propName, Object propValue){repaint();}
+			public void objectChanged(Object spec, int index, String propName, Object propValue){repaint();}
 			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
 			public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){repaint();}
 			public void objectAdded(Object whichObject, int index){repaint();}
@@ -310,17 +310,39 @@ public void toolChanged(ToolChangeEvent e){}
 ******************************************************************************/
 
 boolean uploading  = false;
-public void objectChanged(Object spec, String propName, Object propValue) 
-{
-	repaint();
+public void objectChanged(Object spec, int index, String propName, Object propValue) 
+{  
+  lastIndexAdded = index;  
+  if( track.getFtsTrack().isUploading())
+  {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      { 
+        incrementProgressBar();
+      }
+    });
+  }
+  else
+    repaint();
 }
 
+int lastIndexAdded = 0;
+int lastPercent = 0;
 public void objectAdded(Object spec, int index) 
 {
-	if( !track.getFtsTrack().isUploading())
-		repaint();
+  lastIndexAdded = index;  
+  if( track.getFtsTrack().isUploading())
+  {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      { 
+        incrementProgressBar();
+      }
+    });
+  }
+  else
+    repaint();
 }
-
 public void objectsAdded(int maxTime) 
 {
 	repaint();
@@ -335,15 +357,52 @@ public void trackCleared()
 {
 	repaint();
 }
+
+void incrementProgressBar()
+{
+  getProgressBar().setValue( lastIndexAdded);
+  int size = track.getFtsTrack().getUploadingSize();
+  if(size > 0)
+  {
+    float percent = lastIndexAdded * 100 / (float)size;
+    if(((int)percent) > lastPercent || percent > 99.0)
+    {
+      lastPercent = (int)percent;
+      repaint();
+    }
+  }
+}
+
+transient JProgressBar progressBar = null;
+public JProgressBar getProgressBar()
+{
+  if(progressBar == null)
+  {
+    progressBar = new JProgressBar( 0, 100);
+    progressBar.setPreferredSize(new Dimension(500, 40));
+    progressBar.setSize( 500, 40);
+    progressBar.setStringPainted( true);
+    progressBar.setValue( 0);
+    progressBar.setVisible( false);    
+    progressBar.setMaximum(track.getFtsTrack().getUploadingSize());
+  }
+  return progressBar;
+}
+
 public void startTrackUpload( TrackDataModel track, int size)
 {
 	uploading  = true;
+  getProgressBar().setMaximum( size);
+  getProgressBar().setValue( 0);
+  repaint();
 }
 public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
+  lastPercent = 0;
   setRangeMode(getRangeMode(), false);
   uploadEnd();
+  repaint();
 }
 public void startPaste(){}
 public void endPaste(){}
@@ -484,10 +543,12 @@ public void processKeyEvent(KeyEvent e)
 
 public void paintComponent(Graphics g) 
 {
-	Rectangle r = g.getClipBounds();
-	renderer.render(g, r);
+  Rectangle r = g.getClipBounds();  
+  if( !track.getFtsTrack().isUploading())
+    renderer.render(g, r);
+  else
+    SwingUtilities.paintComponent(g, getProgressBar(), this, r.x+50, r.y+r.height/2-10, r.width-100, 20);
 }
-
 public void forceBackgroundRepaint()
 {
   Object obj = getTrack().getProperty("repaint");

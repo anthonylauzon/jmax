@@ -107,7 +107,7 @@ public class ToggleBar extends ircam.jmax.toolkit.PopupToolbarPanel implements P
     validate();
     
     track.getTrackDataModel().addListener(new TrackDataListener(){
-      public void objectChanged(Object spec, String propName, Object propValue) {}
+      public void objectChanged(Object spec, int index, String propName, Object propValue) {}
       public void objectAdded(Object spec, int index){}
       public void objectsAdded(int maxTime){}
       public void objectDeleted(Object whichObject, int index){}

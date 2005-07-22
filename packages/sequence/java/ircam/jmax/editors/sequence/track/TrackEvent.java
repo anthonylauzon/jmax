@@ -141,7 +141,7 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
   String name;
   Object newVal, oldVal;
   double doubleVal;
-  
+    
   if( nArgs == 1)
   {
     newVal = args[0].getValue();
@@ -187,7 +187,9 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
             value.setProperty(name, newVal); //unknow not-Integer property, delegate it to the value object					
         }
         itsTrackDataModel.changeEvent(this, name, newVal);
-      }    
+      }
+      else
+        itsTrackDataModel.changeEvent(this, null, null);
     }
       
       //((UndoableData) itsTrackDataModel).endUpdate();

@@ -69,7 +69,6 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   transient SequenceToolManager manager;
   transient TrackBase track;
   transient TrackEditor trackEditor;
-  transient JProgressBar progressBar;
 	
   public final int INITIAL_ZOOM = 20;
   public static final int MINIMUM_TIME = 10000;
@@ -274,12 +273,11 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
    */
   boolean uploading = false;
 	
-  public void objectChanged(Object spec, String propName, Object propValue) {}
+  public void objectChanged(Object spec, int index, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
     if( !uploading)
       resizePanelToEventTime((TrackEvent)spec);	
-    /*progressBar.setValue( index);*/
   }
   public void objectsAdded(int maxTime) 
   {
@@ -290,24 +288,12 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void startTrackUpload( TrackDataModel track, int size)
   {
     uploading = true;
-    /*progressBar.setMaximum( size);
-		progressBar.setValue( 0);
-		SwingUtilities.invokeLater( new Runnable(){
-      public void run(){
-				progressBar.setVisible( true);
-      }
-		});*/
   }
   public void endTrackUpload( TrackDataModel track)
   {
     uploading = false;
     if( track.length() > 0)
       resizePanelToEventTimeWithoutScroll( track.getLastEvent());
-    /*SwingUtilities.invokeLater( new Runnable(){
-      public void run(){
-				progressBar.setVisible( false);
-      }
-		});*/
   }
   public void startPaste(){}
   public void endPaste(){}

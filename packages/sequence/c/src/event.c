@@ -103,7 +103,7 @@ void event_unset_property(event_t *event, fts_symbol_t prop)
 static fts_array_t event_client_array;
 
 void 
-event_set_at_client(event_t *this)
+event_set_at_client(event_t *this, int uploading)
 {
   if(fts_is_object(&this->value))
   {
@@ -116,7 +116,7 @@ event_set_at_client(event_t *this)
     
     /* get array of properties and types from class */
     if(method_append_properties)
-    {
+    {      
       fts_atom_t a;
       
       fts_set_pointer(&a, &event_client_array);
@@ -145,7 +145,8 @@ event_set_at_client(event_t *this)
   else
     fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->value);
   
-  fts_object_set_state_dirty((fts_object_t *)event_get_track(this));
+  if(!uploading)
+    fts_object_set_state_dirty((fts_object_t *)event_get_track(this));
 }
 
 static fts_method_status_t
@@ -169,7 +170,7 @@ event_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   else if(ac > 1 && fts_is_symbol(at) && fts_atom_same_type(&this->value, at+1))
     this->value = at[1];
   
-  event_set_at_client(this);
+  event_set_at_client(this, 0);
   
   return fts_ok;
 }
@@ -191,7 +192,7 @@ event_unset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
     }
   }
   
-  event_set_at_client(this);
+  event_set_at_client(this, 0);
   
   return fts_ok;
 }

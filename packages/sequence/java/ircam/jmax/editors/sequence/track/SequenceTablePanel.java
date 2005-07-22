@@ -93,7 +93,7 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener {
     // make this panel a listener of the Sequence data base: changing
     // of the content will result in the right repaint()
     trackObj.addListener( new TrackDataListener() {
-			public void objectChanged(Object spec, String propName, Object propValue){
+			public void objectChanged(Object spec, int index, String propName, Object propValue){
 				repaint();
 		  }
 			public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient){

@@ -988,7 +988,7 @@ public void changeEvent(TrackEvent event, String propName, Object propValue)
   if (index == NO_SUCH_EVENT || index == EMPTY_COLLECTION)
     return;
 
-  notifyObjectChanged(event, propName, propValue);
+  notifyObjectChanged(event, index, propName, propValue);
 }
 
 /**
@@ -1114,10 +1114,10 @@ private void notifyObjectDeleted(Object spec, int oldIndex)
     ((TrackDataListener) e.nextElement()).objectDeleted(spec, oldIndex);
 }
 
-private void notifyObjectChanged(Object spec, String propName, Object propValue)
+private void notifyObjectChanged(Object spec, int index, String propName, Object propValue)
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
-    ((TrackDataListener) e.nextElement()).objectChanged(spec, propName, propValue);
+    ((TrackDataListener) e.nextElement()).objectChanged(spec, index, propName, propValue);
 }
 void notifyFtsNameChanged(String name)
 {
@@ -1740,14 +1740,16 @@ public void restoreEditorState()
 /********************************************************/
 
 void startUpload( int size)
-{  
+{    
   uploading = true;
+  uploadingSize = size;
   notifyUploadStart( size);
 }
 
 void endUpload()
 {
   uploading = false;
+  uploadingSize = 0;
 	if( saveEditor)
 		restoreEditorState();
   notifyUploadEnd();
@@ -1756,6 +1758,11 @@ void endUpload()
 public boolean isUploading()
 {
   return uploading;
+}
+
+public int getUploadingSize()
+{
+  return uploadingSize;
 }
 
 // Paste
@@ -1828,6 +1835,7 @@ ValueInfo info;
 boolean pasting  = false;
 boolean uploading  = false;
 boolean locked = false;
+int uploadingSize = 0; /* number of events that will be uploaded during track upload (for progressBar) */
 public boolean saveEditor = false;
 int events_size   = 256;	//
 int events_fill_p  = 0;	// next available position

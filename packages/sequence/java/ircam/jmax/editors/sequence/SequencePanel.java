@@ -402,7 +402,7 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 		* called when the database is changed: DataTrackListener interface
    */
   boolean uploading = false;
-  public void objectChanged(Object spec, String propName, Object propValue) {}
+  public void objectChanged(Object spec, int index, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
     if( !ftsSequenceObject.isUploading())

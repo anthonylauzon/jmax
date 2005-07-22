@@ -783,7 +783,7 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
       if(meter == NULL) 
       {
         scomark_bar_set_meter( next_bar, old_meter, &meter);
-        event_set_at_client(next_evt);
+        event_set_at_client(next_evt, 0);
       }              
     }
     else
@@ -841,13 +841,13 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
           if(meter == NULL) 
           {
             scomark_bar_set_meter( next_bar, old_meter, &meter);
-            event_set_at_client( next_evt);
+            event_set_at_client( next_evt, 0);
           }        
           /* last bar (if not == to next_bar) will have free metrics */
           if(next_time > next_bar_time + MARKERS_BAR_TOLERANCE)
           {            
             scomark_bar_set_meter( new_bar, sym_meter_empty, &old_meter);
-            event_set_at_client(new_event);
+            event_set_at_client(new_event, 0);
           }          
         }
         else /* SECOND CASE: new_bar is after next_bar */
@@ -906,7 +906,7 @@ marker_track_meter_changed(track_t * marker_track, scomark_t *scomark, fts_symbo
               else  
                 scomark_bar_set_meter( stop_bar, old_meter, &meter);
                                                         
-              event_set_at_client(stop_evt);
+              event_set_at_client(stop_evt, 0);
             }   
           }
         }
@@ -1393,7 +1393,7 @@ marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num,
     if(marker->type == seqsym_bar)
     {
       scomark_bar_set_number(marker, num++);
-      if(upload) event_set_at_client(event);
+      if(upload) event_set_at_client(event, upload);
     }
     event = event_get_next(event);
   }  

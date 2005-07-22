@@ -37,7 +37,7 @@ public interface TrackDataListener {
   abstract public void objectDeleted(Object whichObject, int oldIndex);
   abstract public void objectAdded(Object whichObject, int index);
   abstract public void objectsAdded(int maxTime);
-  abstract public void objectChanged(Object whichObject, String propertyName, Object propertyValue);
+  abstract public void objectChanged(Object whichObject, int index, String propertyName, Object propertyValue);
   abstract public void objectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient);
   abstract public void lastObjectMoved(Object whichObject, int oldIndex, int newIndex, boolean fromClient);
   abstract public void trackCleared();

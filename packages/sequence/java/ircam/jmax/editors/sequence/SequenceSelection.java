@@ -281,7 +281,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   /** TrackDataListener interface*/
 	
   
-  public void objectChanged(Object spec, String propName, Object propValue) 
+  public void objectChanged(Object spec, int index, String propName, Object propValue) 
   {
   }
 	
