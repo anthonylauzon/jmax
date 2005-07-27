@@ -2693,7 +2693,7 @@ fmat_convert_polar(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
       float re = ptr[i];
       float im = ptr[i + 1];
       
-      ptr[i] = sqrtf(re * re + im * im);
+      ptr[i] = hypotf(re, im);
       ptr[i + 1] = atan2f(im, re);
     }
     
@@ -2995,7 +2995,7 @@ fmat_fft(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
     float *fft_ptr;
     int i;
     
-    fmat_reshape(self, fft_size/2, 2);
+    fmat_reshape(self, fft_size/2 + 1, 2);
     
     fft_ptr = fmat_get_ptr(self);
     
@@ -3004,6 +3004,8 @@ fmat_fft(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
       fft_ptr[i] = 0.0;
     
     fts_rfft_inplc(fft_ptr, fft_size);
+    fft_ptr[fft_size] = fft_ptr[1];
+    fft_ptr[fft_size + 1] = fft_ptr[1] = 0.0;
     
     fts_object_changed(o);
     fts_set_object(ret, o);
@@ -3071,8 +3073,13 @@ fmat_rifft(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
   
   if(n == 2)
   {
-    int fft_size = fts_get_fft_size(2 * m);
+    int fft_size = fts_get_fft_size(2 * (m - 1));
     int i;
+    
+    if(m > fft_size / 2)
+      ptr[1] = ptr[fft_size];
+    else
+      ptr[1] = 0.0;
     
     /* zero padding */      
     for(i=2*m; i<fft_size; i++)
@@ -3213,9 +3220,9 @@ fmat_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     float f = ptr[i];
     
     if(f > high)
-      f = high;
+      ptr[i] = high;
     else if(f < low)
-      f = low;
+      ptr[i] = low;
   }
   
   fts_object_changed(o);

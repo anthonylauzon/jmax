@@ -842,8 +842,6 @@ _fvec_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   fts_set_object(ret, o);
   
   return fts_ok;
-  
-  return fts_ok;
 }
 
 static fts_method_status_t
@@ -1232,6 +1230,17 @@ fvec_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   float *ptr;
   int size, stride;
   int i;
+  
+  if(ac > 0 && fts_is_number(at))
+  {
+    if(ac > 1 && fts_is_number(at + 1))
+    {
+      low = fts_get_number_float(at);
+      high = fts_get_number_float(at + 1);
+    }
+    else
+      high = fts_get_number_float(at);
+  }
   
   fvec_get_vector(self, &ptr, &size, &stride);
   
@@ -1855,6 +1864,9 @@ fvec_instantiate(fts_class_t *cl)
   fvec_message(cl, fts_new_symbol("div"), fvec_div_fvec, fvec_div_number);
   fvec_message(cl, fts_new_symbol("bus"), fvec_bus_fvec, fvec_bus_number);
   fvec_message(cl, fts_new_symbol("vid"), fvec_vid_fvec, fvec_vid_number);
+
+  fts_class_message_varargs(cl, fts_new_symbol("clip"), fvec_clip);
+  fts_class_message_void(cl, fts_new_symbol("normalize"), fvec_normalize);
 
   fts_class_message_void(cl, fts_new_symbol("abs"), fvec_abs);
   fts_class_message_void(cl, fts_new_symbol("logabs"), fvec_logabs);

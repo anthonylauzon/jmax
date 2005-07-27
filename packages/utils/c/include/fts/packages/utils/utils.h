@@ -402,6 +402,16 @@ UTILS_API void fts_cifft(complex *in, complex *out, unsigned int size);
 UTILS_API void fts_rfft(float *in, complex *out, unsigned int size);
 UTILS_API void fts_rifft(complex *in, float *out, unsigned int size);
 
+typedef struct fts_fft fts_fft_t;
+
+UTILS_API fts_fft_t *fts_fft_new(unsigned int size);
+UTILS_API void fts_fft_delete(fts_fft_t *fft);
+UTILS_API unsigned int fts_fft_get_size(fts_fft_t *fft);
+UTILS_API void fts_fft_set_size(fts_fft_t *fft, unsigned int size);
+UTILS_API void fts_fft_complex(fts_fft_t *fft, float *in, unsigned int size, unsigned int stride, float *out, float scale);
+UTILS_API void fts_fft_inverse_complex(fts_fft_t *fft, float *in, unsigned int size, unsigned int stride, float *out, float scale);
+UTILS_API void fts_fft_real(fts_fft_t *fft, float *in, unsigned int size, unsigned int stride, float *out, float scale, float *ny);
+UTILS_API void fts_fft_inverse_real(fts_fft_t *fft, float *in, unsigned int size, unsigned int stride, float *out, float scale, float *ny);
 
 /*********************************************************************************
  *
