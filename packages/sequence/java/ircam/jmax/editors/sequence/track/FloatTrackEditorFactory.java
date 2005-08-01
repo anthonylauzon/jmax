@@ -31,7 +31,7 @@ public class FloatTrackEditorFactory implements TrackEditorFactory {
     
     public TrackEditor newEditor(Track track, Geometry geometry, boolean isInsequence)
     {
-	return new FloatTrackEditor(geometry, track, isInsequence);
+      return new FloatTrackEditor(geometry, track, isInsequence);
     }
 
     public int getWeight()

@@ -113,6 +113,7 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     scrollTracks = new JScrollPane(trackPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 																	 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     
+    
     trackPanel.add(verticalGlue);
 		
     setLayout(new BorderLayout());
@@ -154,6 +155,7 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 				if(lastEvent!=null)
 					resizePanelToTimeWithoutScroll((int)(lastEvent.getTime()+
 																							 ((Double)lastEvent.getProperty("duration")).intValue()));
+        //ftsSequenceObject.setZoom(zoom);
 			}
 		});
 		
@@ -189,7 +191,8 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 			
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				int currentTime = e.getValue();	    
-				geometry.setXTransposition(-currentTime);	    
+				geometry.setXTransposition(-currentTime);	   
+        //ftsSequenceObject.setTransposition(-currentTime);
 			}
     });
 		
@@ -238,10 +241,105 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 		popup = new EmptySequencePopupMenu(this);
 	}
 	
-	/**
-		* Callback from the model. This is called when a new track is added, but also
-	 * as a result of a merge */
-  public void trackAdded(Track track)
+  class TrackAddedRunnable implements Runnable
+  {
+    Track track;
+    TrackEditor teditor;
+    boolean isUploading;
+    TrackAddedRunnable(Track trk, TrackEditor ted, boolean isUploading)
+    {
+      super();
+      track = trk;
+      teditor = ted;
+      this.isUploading = isUploading;
+    }
+    public void run(){
+      insertTrackEditor(track, teditor, isUploading);
+    }
+  }
+  
+  public void insertTrackEditor(Track track, TrackEditor teditor, boolean isUploading)
+  {
+    trackPanel.remove(verticalGlue);
+    TrackContainer trackContainer = new TrackContainer(track, teditor);
+    trackContainer.setBorder(new EtchedBorder()); 
+    trackPanel.add(trackContainer);
+    trackPanel.add(verticalGlue);
+    trackPanel.validate();
+    scrollTracks.validate();
+    scrollTracks.getVerticalScrollBar().setValue(scrollTracks.getVerticalScrollBar().getMaximum());
+    mutex.add(track);
+    trackContainers.put(track, trackContainer);
+		teditor.getSelection().addListSelectionListener(this);
+		track.setProperty("selected", Boolean.TRUE);
+    
+		//resize the frame //////////////////////////////////////////////////////////////
+    if(!isUploading)
+    {
+      int height;	
+      Dimension dim = itsContainer.getFrame().getSize();
+      if(dim.height < SequenceWindow.MAX_HEIGHT)
+      {
+        int tcHeight = trackContainer.getSize().height;
+        
+      if(sequenceData.trackCount() == 1)
+        itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT + tcHeight);
+        else
+          if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
+            itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
+        else 
+          if(dim.height < SequenceWindow.MAX_HEIGHT)
+            itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
+      }
+    }
+    ///////////////////////////////////////////////////////////////////////////////////
+    //updates events in track
+    for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
+      teditor.updateNewObject((TrackEvent)e.nextElement());
+    
+		itsContainer.getFrame().validate();
+    if(itsContainer.getFrame().isVisible() && !isUploading)
+      itsContainer.getFrame().pack();
+  }
+
+	 public void trackAdded(Track track, boolean isUploading)
+  {    
+     TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry, true);
+     teditor.getGraphicContext().setToolManager(manager);
+     teditor.getGraphicContext().setFrame(itsContainer.getFrame());
+     teditor.getGraphicContext().setScrollManager(this);
+     teditor.setContainer(this);
+     
+     manager.addContextSwitcher(new ComponentContextSwitcher(teditor.getComponent(), teditor.getGraphicContext()));
+     
+     track.getTrackDataModel().addListener(this);    
+     track.getTrackDataModel().addHighlightListener(ruler);    		
+     track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
+       public void lock(boolean lock){}
+       public void active(boolean active){}
+       public void restoreEditorState(FtsTrackEditorObject editorState){};
+       public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+       {
+         currentMarkersSelection = markersSelection;
+         currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+       }
+       public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+       {				
+         currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
+         currentMarkersSelection = markersSelection;
+         if( currentMarkersSelection != null)
+           currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+       }
+       public void ftsNameChanged(String name){}
+     });		
+
+     if(isUploading)
+       insertTrackEditor(track, teditor, isUploading);
+     else
+       SwingUtilities.invokeLater(new TrackAddedRunnable( track, teditor, isUploading));
+  }  
+  
+  /*public void trackAdded(Track track, boolean isUploading)
   {    
     TrackEditor teditor = TrackEditorFactoryTable.newEditor(track, geometry, true);
     teditor.getGraphicContext().setToolManager(manager);
@@ -263,27 +361,27 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     trackContainers.put(track, trackContainer);
 		teditor.getSelection().addListSelectionListener(this);
 		track.setProperty("selected", Boolean.TRUE);
-
+    
 		track.getTrackDataModel().addListener(this);    
 		track.getTrackDataModel().addHighlightListener(ruler);    		
 		track.getTrackDataModel().addTrackStateListener(new TrackStateListener(){
-				public void lock(boolean lock){}
-				public void active(boolean active){}
-				public void restoreEditorState(FtsTrackEditorObject editorState){};
-				public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
-				{
-					currentMarkersSelection = markersSelection;
-					currentMarkersSelection.addListSelectionListener( markersSelectionListener);
-				}
-				public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
-				{				
-					currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
-					currentMarkersSelection = markersSelection;
-					if( currentMarkersSelection != null)
-						currentMarkersSelection.addListSelectionListener( markersSelectionListener);
-				}
-        public void ftsNameChanged(String name){}
-			});		
+      public void lock(boolean lock){}
+      public void active(boolean active){}
+      public void restoreEditorState(FtsTrackEditorObject editorState){};
+      public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+      {
+        currentMarkersSelection = markersSelection;
+        currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+      }
+      public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
+      {				
+        currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
+        currentMarkersSelection = markersSelection;
+        if( currentMarkersSelection != null)
+          currentMarkersSelection.addListSelectionListener( markersSelectionListener);
+      }
+      public void ftsNameChanged(String name){}
+    });		
 		
 		//resize the frame //////////////////////////////////////////////////////////////
 		int height;	
@@ -297,21 +395,21 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
       else
 				if(dim.height + tcHeight <= SequenceWindow.MAX_HEIGHT)
    				itsContainer.getFrame().setSize(dim.width, dim.height + tcHeight);
-        else 
+      else 
 				if(dim.height < SequenceWindow.MAX_HEIGHT)
 					itsContainer.getFrame().setSize(dim.width, SequenceWindow.MAX_HEIGHT);
 		}
-			
+    
 		///////////////////////////////////////////////////////////////////////////////////
 		//updates events in track
 		for(Enumeration e = track.getTrackDataModel().getEvents(); e.hasMoreElements();)
 			teditor.updateNewObject((TrackEvent)e.nextElement());
-
+    
 		itsContainer.getFrame().validate();
-    if(itsContainer.getFrame().isVisible())
-      itsContainer.getFrame().pack();
-  }
-	
+    //if(itsContainer.getFrame().isVisible())
+      //itsContainer.getFrame().pack();
+  } */
+  
   public void tracksAdded(int maxTime)
   {
     if(maxTime>0)
@@ -350,22 +448,39 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     resetTrackIndexs();
   }
 	
+  
   /**
 		* Callback from the model. It can be called when a track changed */
   public void trackChanged(Track track)
   {
     TrackContainer trackContainer = (TrackContainer) trackContainers.get(track);
-    trackContainer.validate();
-    trackPanel.validate();
-    scrollTracks.validate();
+    if(trackContainer != null)
+    {      
+      trackContainer.validate();
+      trackPanel.validate();
+      scrollTracks.validate();
+    }
   }
-  
   public void trackMoved(Track track, int oldPosition, int newPosition)
   {
     resetTrackIndexs();
   }
   public void ftsNameChanged(String name){}
-	
+  
+  boolean sequenceUploading = false;
+  public void sequenceStartUpload(){ sequenceUploading = true;}
+  public void sequenceEndUpload(){ 
+    sequenceUploading = false;
+    
+    /*if(ftsSequenceObject.editorUploaded())
+    {
+      geometry.setXZoomFactor(ftsSequenceObject.getZoom());
+      scrollToValue(-ftsSequenceObject.getTransposition());
+    }
+    if(itsContainer.getFrame().isVisible())
+      itsContainer.getFrame().pack();*/
+  } 
+  
   void resetTrackIndexs()
   {
     Component[] comp = trackPanel.getComponents();  

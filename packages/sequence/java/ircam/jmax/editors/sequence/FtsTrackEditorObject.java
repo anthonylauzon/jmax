@@ -62,7 +62,13 @@ public class FtsTrackEditorObject extends FtsObject
 				((FtsTrackEditorObject)obj).restoreGridMode(args.getLength(), args.getAtoms());		  
 		  }
 		});
-		FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("tableSize"), new FtsMessageHandler(){
+		FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("range"), new FtsMessageHandler(){
+			public void invoke( FtsObject obj, FtsArgs args)
+		  {
+				((FtsTrackEditorObject)obj).restoreRange(args.getInt(0), args.getInt(1));		  
+		  }
+		});
+    FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("tableSize"), new FtsMessageHandler(){
 			public void invoke( FtsObject obj, FtsArgs args)
 		  {
 				((FtsTrackEditorObject)obj).restoreTableSize(args.getLength(), args.getAtoms());		  
@@ -89,11 +95,15 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 		trackObj = (FtsTrackObject)parent;		
 		columnNames = new Vector();
     propsToDraw = new Vector();
+    rangeMin = 0;
+    rangeMax = 1;
 }
 
 public void setEditorState( int nArgs, FtsAtom args[])
 {
-		int x = args[0].intValue;
+  if( !trackObj.isInSequence())
+  {
+    int x = args[0].intValue;
 		int y = args[1].intValue;
 		int w = args[2].intValue;
 		int h = args[3].intValue;
@@ -101,17 +111,49 @@ public void setEditorState( int nArgs, FtsAtom args[])
 		float zoom = (float)args[5].doubleValue;
 		int transp = args[6].intValue;
 		int view = args[7].intValue;
-		int rangeMode = args[8].intValue;
-				
+		int rMode = args[8].intValue;
+		int rMin = 0;
+    int rMax = 1;
+    if(nArgs > 8)
+    {
+      rMin = args[9].intValue;
+      rMax = args[10].intValue;
+    }
+    
 		if( x!= this.wx || y!=this.wy || w!=this.ww || h!=this.wh || 
 				!label.equals(this.label) || zoom != this.zoom || 
-				transp != this.transp || view != this.view || rangeMode != this.rangeMode) 
+				transp != this.transp || view != this.view || rMode != this.rangeMode ||
+        rMin != this.rangeMin || rMax != this.rangeMax) 
 		{	
 			this.wx = x; this.wy = y; this.ww = w; this.wh = h; 
 			this.label = label; this.zoom = zoom; this.transp = transp; 
-			this.view = view; this.rangeMode = rangeMode;
+			this.view = view; this.rangeMode = rMode;
+      this.rangeMin = rMin; this.rangeMax = rMax;
 			trackObj.restoreEditorState();   
-		}
+ 		}
+  }
+  else
+  {
+    String label = args[0].symbolValue.toString();
+    int view = args[1].intValue;
+		int rMode = args[2].intValue;
+    int rMin = 0;
+    int rMax = 1;
+    if(nArgs > 3)
+    {
+      rMin = args[3].intValue;
+      rMax = args[4].intValue;
+    }
+    
+    if(!label.equals(this.label) || view != this.view || rMode != this.rangeMode ||
+       rMin != this.rangeMin || rMax != this.rangeMax) 
+		{	
+			this.label = label; 
+			this.view = view; this.rangeMode = rMode;
+      this.rangeMin = rMin; this.rangeMax = rMax;
+      trackObj.restoreEditorState();   		
+    }
+  }
 }
 
 public void restoreTableColumns( int nArgs, FtsAtom args[])
@@ -143,6 +185,11 @@ public void restoreGridMode( int nArgs, FtsAtom args[])
 		this.gridMode = args[0].intValue;
 }
 
+public void restoreRange(int min, int max)
+{
+  this.rangeMin = min;
+  this.rangeMax = max;
+}
 
 public Enumeration getTableColumns()
 {
@@ -160,7 +207,9 @@ public Enumeration getPropertiesToDraw()
 
 public void requestSetWindow()
 {	
-	if(wx == -1 || wy == -1 || ww == -1 || wh == -1)
+  if( !trackObj.isInSequence())
+	{
+    if(wx == -1 || wy == -1 || ww == -1 || wh == -1)
 			return;
 
 		args.clear();
@@ -177,28 +226,33 @@ public void requestSetWindow()
 			System.err.println("FtsTrackEditorObject: I/O Error sending window Message!");
 			e.printStackTrace(); 
 		}
+  }
 }
 
 public void setLocation(int x, int y)
 {	
+  if( !trackObj.isInSequence())
+	{
 		if(this.wx != x || this.wy != y)
 		{			
 			this.wx = x;
 			this.wy = y;
 			requestSetWindow();
 		}
-}
-
-public void setSize(int w, int h)
-{		  
-  if(this.ww != w || this.wh != h)
-  {			
-    this.ww = w;
-    this.wh = h;
-    requestSetWindow();
   }
 }
-
+public void setSize(int w, int h)
+{		  
+  if( !trackObj.isInSequence())
+	{
+    if(this.ww != w || this.wh != h)
+    {			
+      this.ww = w;
+      this.wh = h;
+      requestSetWindow();
+    }
+  }
+}
 public void setLabel(String lab)
 {
 		if(!this.label.equals(lab))
@@ -220,6 +274,8 @@ public void setLabel(String lab)
 
 public void setZoom(float zoom)
 {
+  if( !trackObj.isInSequence() && !trackObj.isUploading() && !trackObj.isSequenceUploading())
+	{
 		if(this.zoom != zoom)
 		{
 			this.zoom = zoom;
@@ -235,10 +291,12 @@ public void setZoom(float zoom)
 				e.printStackTrace(); 
 			}		
 		}
+  }
 }
-
 public void setTransposition(int transp)
 {	
+  if( !trackObj.isInSequence()  && !trackObj.isUploading() && !trackObj.isSequenceUploading())
+	{
 		if(this.transp != transp)
 		{
 			this.transp = transp;
@@ -254,11 +312,11 @@ public void setTransposition(int transp)
 				e.printStackTrace(); 
 			}
 		}
+  }
 }
-
 public void setViewMode(int view)
 {		
-		if(this.view != view)
+		if(this.view != view  && !trackObj.isUploading() && !trackObj.isSequenceUploading())
 		{    
 			this.view = view;
 			args.clear();
@@ -275,14 +333,13 @@ public void setViewMode(int view)
 		}
 }
 
-public void setRangeMode(int rangeMode)
+public void setRangeMode(int rMode)
 {	
-		if(this.rangeMode != rangeMode)
-		{     
-			this.rangeMode = rangeMode;
+		if(this.rangeMode != rMode  && !trackObj.isUploading() && !trackObj.isSequenceUploading())
+		{     			
+      this.rangeMode = rMode;
 			args.clear();
 			args.addInt( rangeMode);
-			
 			try{
 				send( FtsSymbol.get("range_mode"), args);
 			}
@@ -294,9 +351,31 @@ public void setRangeMode(int rangeMode)
 		}
 }
 
+public void setRange(int min, int max)
+{	
+		if((this.rangeMin != min ||  this.rangeMax != max) && !trackObj.isUploading() && !trackObj.isSequenceUploading())
+		{     
+			this.rangeMin = min;
+			this.rangeMax = max;
+			args.clear();
+			args.addInt( rangeMin);
+			args.addInt( rangeMax);
+			
+			try{
+				send( FtsSymbol.get("range"), args);
+			}
+			catch(IOException e)
+			{
+				System.err.println("FtsTrackEditorObject: I/O Error sending range Message!");
+				e.printStackTrace(); 
+			}
+		}
+}
+
+
 public void setGridMode(int gridMode)
 {	
-		if(this.gridMode != gridMode)
+		if(this.gridMode != gridMode  && !trackObj.isUploading() && !trackObj.isSequenceUploading())
 		{     
 			this.gridMode = gridMode;
 			args.clear();
@@ -366,72 +445,94 @@ public void setTableColumnOrder(int size, Enumeration colNames)
 
 public void setPropertiesToDraw(Enumeration anenum)
 {
-  this.propsToDraw.removeAllElements();
-	args.clear();
-	
-	String name;
-	for(Enumeration e = anenum; e.hasMoreElements(); )
+  if( !trackObj.isInSequence())
 	{
-		name = (String)e.nextElement();
-		this.propsToDraw.add( name);
-		args.addSymbol( FtsSymbol.get(name));
-	}
+    this.propsToDraw.removeAllElements();
+    args.clear();
 	
-	if( args.getLength() > 0)
-	{
-		try{
-			send( FtsSymbol.get("props_to_draw"), args);
-		}
-		catch(IOException e)
-  {
-			System.err.println("FtsTrackEditorObject: I/O Error sending prop_to_draw Message!");
-			e.printStackTrace(); 
-		}
-	}  
+    String name;
+    for(Enumeration e = anenum; e.hasMoreElements(); )
+    {
+      name = (String)e.nextElement();
+      this.propsToDraw.add( name);
+      args.addSymbol( FtsSymbol.get(name));
+    }
+    
+    if( args.getLength() > 0)
+    {
+      try{
+        send( FtsSymbol.get("props_to_draw"), args);
+      }
+      catch(IOException e)
+      {
+        System.err.println("FtsTrackEditorObject: I/O Error sending prop_to_draw Message!");
+        e.printStackTrace(); 
+      }
+    }  
+  }
 }
-
 public void requestSetEditorState(Rectangle bounds)
 {	
-	if(wx == -1)
-		wx = bounds.x;
-	if(wy == -1)
-		wy = bounds.y;
-	if(ww == -1)
-		ww = bounds.width;
-	if(wh == -1)
-		wh = bounds.height;
-	
-	if(wx == -1 || wy == -1 || ww == -1 || wh == -1)
-		return;
-	
-	args.clear();
-	args.addInt( wx);
-	args.addInt( wy);
-	args.addInt( ww);
-	args.addInt( wh);
-	args.addSymbol( FtsSymbol.get(label));
-	args.addFloat( zoom);
-	args.addInt( transp);
-	args.addInt( view);
-	args.addInt( rangeMode);
-	try{
-		send( FtsSymbol.get("editor_state"), args);
-	}
-	catch(IOException e)
+  if( !trackObj.isInSequence())
 	{
-			System.err.println("FtsTrackEditorObject: I/O Error sending state Message!");
-			e.printStackTrace(); 
-	}
+    if(wx == -1)
+      wx = bounds.x;
+    if(wy == -1)
+      wy = bounds.y;
+    if(ww == -1)
+      ww = bounds.width;
+    if(wh == -1)
+      wh = bounds.height;
+	
+    if(wx == -1 || wy == -1 || ww == -1 || wh == -1)
+      return;
+	
+    args.clear();
+    args.addInt( wx);
+    args.addInt( wy);
+    args.addInt( ww);
+    args.addInt( wh);
+    args.addSymbol( FtsSymbol.get(label));
+    args.addFloat( zoom);
+    args.addInt( transp);
+    args.addInt( view);
+    args.addInt( rangeMode);
+  }
+  else
+  {
+    args.clear();
+    args.addSymbol( FtsSymbol.get(label));
+    args.addInt( view);
+    args.addInt( rangeMode);    
+  }
+  if(rangeMin != 0 || rangeMax != 1)
+  {
+    args.addInt( rangeMin);
+    args.addInt( rangeMax);
+  }
+  
+  try{
+    send( FtsSymbol.get("editor_state"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTrackEditorObject: I/O Error sending state Message!");
+    e.printStackTrace(); 
+  } 
 }
 
 public boolean haveContent()
 {
+  if( !trackObj.isInSequence())
 		return ((ww != -1) && (wh != -1) && (wx != -1) && (wy != -1));
+  else
+    return (!label.equals("") || view != 0 || rangeMode != 0 || gridMode != 0 || rangeMin != 0 || rangeMax != 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////	
 
-public int wx, wy, ww, wh, transp, view, rangeMode, gridMode, tab_w, tab_h;
+public int wx, wy, ww, wh, transp, view, gridMode, tab_w, tab_h, rangeMin, rangeMax;
+public int rangeMode = 0;
 public String label;
 public float zoom;
 public Vector columnNames, propsToDraw;

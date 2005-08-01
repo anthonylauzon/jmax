@@ -192,6 +192,11 @@ public void setGridMode(int gm)
 		gridMode = gm;
 }
 
+public FtsTrackEditorObject getFtsTrackEditorObject()
+{
+  return ((FtsTrackObject)itsDataModel).getFtsTrackEditorObject();
+}
+
 public FtsTrackObject getMarkersTrack()
 {
 	if( !isInSequence())

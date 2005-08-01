@@ -601,7 +601,7 @@ public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 }
 public void ftsNameChanged(String name){}
 //===================== TrackListener interface =============================
-public void trackAdded(Track track)
+public void trackAdded(Track track, boolean isUploading)
 {
 	track.getTrackDataModel().addTrackStateListener(this);	
 };   
@@ -609,6 +609,8 @@ public void tracksAdded(int maxTime){};
 public void trackRemoved(Track track){};   
 public void trackChanged(Track track){};   
 public void trackMoved(Track track, int oldPosition, int newPosition){};   
+public void sequenceStartUpload(){};
+public void sequenceEndUpload(){}; 
 
 //--- Ruler fields
 FontMetrics fm;

@@ -27,6 +27,11 @@
 
 #define SEQUENCE_ADD_BLOCK_SIZE 64
 
+fts_class_t *multitrack_class = 0;
+
+/*static void sequence_init_editor(sequence_t *self);
+static void sequence_upload_editor(sequence_t *self);*/
+
 /*********************************************************
 *
 *  get, add, remove and move tracks
@@ -246,8 +251,17 @@ sequence_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 {
   sequence_t *this = (sequence_t *)o;
   track_t *track = sequence_get_first_track(this);
+  fts_atom_t a;
   
   fts_client_send_message( o, fts_s_start_upload, 0, 0);
+  
+  /* upload editor stuff */
+  /*if(this->save_editor != 0)
+  {
+    fts_set_int(&a, this->save_editor); 
+    fts_client_send_message(o, seqsym_save_editor, 1, &a);
+    sequence_upload_editor(this);
+  }*/  
   
   while(track)
   {
@@ -259,7 +273,7 @@ sequence_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     /* next track */
     track = sequence_track_get_next(track);
   }
-
+  
   fts_client_send_message( o, fts_s_end_upload, 0, 0);
   
   return fts_ok;
@@ -269,7 +283,7 @@ static fts_method_status_t
 sequence_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
-	
+	  
   sequence_set_editor_open(this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
   sequence_upload(o, NULL, 0, NULL, fts_nix);
@@ -586,6 +600,25 @@ sequence_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
     
     track = sequence_track_get_next(track);
   }
+ 
+  /*if(this->save_editor == 1)
+  {
+    fts_atom_t a[4];
+    fts_set_int(a, this->save_editor);
+    fts_dumper_send(dumper, seqsym_save_editor, 1, a);
+
+    fts_set_int(a, this->win_x);
+    fts_set_int(a + 1, this->win_y);
+    fts_set_int(a + 2, this->win_w);
+    fts_set_int(a + 3, this->win_h);
+    fts_dumper_send(dumper, seqsym_window, 4, a);
+      
+    fts_set_float(a, this->zoom);
+    fts_dumper_send(dumper, seqsym_zoom, 1, a);
+    
+    fts_set_int(a, this->transp);
+    fts_dumper_send(dumper, seqsym_transp, 1, a);
+  }*/
   
   fts_object_release((fts_object_t *)mess);  
   
@@ -604,6 +637,103 @@ sequence_append_event_at_last_loaded_track(fts_object_t *o, fts_symbol_t s, int 
   return fts_ok;
 }
 
+/*static fts_method_status_t
+sequence_set_save_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  sequence_t *this = (sequence_t *)o;
+  if(ac == 1) 
+  {
+    this->save_editor = fts_get_int(at);
+    
+    if(sequence_editor_is_open(this))
+      fts_client_send_message(o, seqsym_save_editor, 1, at);
+    
+    fts_object_set_dirty(o);
+  }
+  
+  return fts_ok;
+}*/
+
+/***
+ * sequence editor
+ ***/
+
+/*static void 
+sequence_upload_editor(sequence_t *self)
+{
+  fts_atom_t a[6];
+  fts_set_int(a, self->win_x);
+  fts_set_int(a+1, self->win_y);
+  fts_set_int(a+2, self->win_w);
+  fts_set_int(a+3, self->win_h);
+  fts_set_int(a+4, self->zoom);
+  fts_set_int(a+5, self->transp);
+  
+  fts_client_send_message((fts_object_t *)self, seqsym_editor, 6, a);
+}
+
+static fts_method_status_t
+sequence_editor_window(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  sequence_t *this = (sequence_t *)o;
+  if(ac == 4)
+  {
+    int x = fts_get_int(at);
+    int y = fts_get_int(at+1);
+    int w = fts_get_int(at+2);
+    int h = fts_get_int(at+3);
+    if(this->win_x!=x || this->win_y != y || this->win_w!=w || this->win_h != h)
+    {
+      this->win_x = x;
+      this->win_y = y;
+      this->win_w = w;
+      this->win_h = h;
+      
+      if(track_do_save_editor(this->track))
+        fts_object_set_dirty((fts_object_t *)this->track);
+    }
+  }
+  
+  return fts_ok;
+}	
+
+static fts_method_status_t
+sequence_editor_zoom(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  sequence_t *this = (sequence_t *)o;
+  if(ac == 1 && fts_is_float(at))
+  {
+    float zoom = fts_get_float(at);
+    if(this->zoom != zoom)
+    {
+      this->zoom = zoom;
+      if(track_do_save_editor(this->track))
+        fts_object_set_dirty((fts_object_t *)this->track);
+    }
+  }	
+  
+  return fts_ok;
+}
+static fts_method_status_t
+sequence_editor_transp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  sequence_t *this = (sequence_t *)o;
+  if(ac == 1 && fts_is_int(at))
+  {
+    int transp = fts_get_int(at);
+    if(this->transp != transp)
+    {
+      this->transp = transp;
+      if(track_do_save_editor(this->track))
+        fts_object_set_dirty((fts_object_t *)this->track);
+    }
+  }	
+  
+  return fts_ok;
+}	*/
+
+
+
 /******************************************************
 *
 *  class
@@ -620,6 +750,15 @@ sequence_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   this->open = 0;
   
   this->last_loaded_track = NULL;/* hack to fix loading */
+  
+  /* editor*/ 
+  this->save_editor = 0;
+  this->win_x = -1; 
+  this->win_y = -1;
+  this->win_w = -1;
+  this->win_h = -1;
+  this->zoom = 0.2; 
+  this->transp = 0;  
   
   if(ac == 1 && fts_is_number(at))
   {
@@ -689,6 +828,7 @@ sequence_instantiate(fts_class_t *cl)
 
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  /*fts_class_message_varargs(cl, seqsym_save_editor, sequence_set_save_editor);*/
   fts_class_message_varargs(cl, fts_s_dump_state, sequence_dump_state);
 
   fts_class_message_varargs(cl, fts_s_member_upload, sequence_member_upload);
@@ -704,6 +844,10 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, sequence_print);
 
   fts_class_message_varargs(cl, fts_s_get_element, sequence_get_element);
+  /* sequence editor */
+  /*fts_class_message_varargs(cl, seqsym_window, sequence_editor_window);
+  fts_class_message_varargs(cl, seqsym_zoom, sequence_editor_zoom);
+  fts_class_message_varargs(cl, seqsym_transp, sequence_editor_transp);*/
 
   /* MIDI files */
   fts_class_message_varargs(cl, seqsym_import_midifile_dialog, sequence_import_midifile_dialog);
@@ -723,6 +867,6 @@ sequence_instantiate(fts_class_t *cl)
 void
 sequence_class_config(void)
 {
-  fts_class_t *multitrack_class = fts_class_install(seqsym_multitrack, sequence_instantiate);
+  multitrack_class = fts_class_install(seqsym_multitrack, sequence_instantiate);
   fts_class_alias(multitrack_class, seqsym_sequence);
 }

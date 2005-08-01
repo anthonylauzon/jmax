@@ -38,7 +38,6 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
     super(geometry, gc, constant);
     
     YMapper = IntegerMapper.getMapper();
-    viewMode = MonoTrackEditor.PEAKS_VIEW;
 }
 
 public String getType( Event e)
@@ -102,7 +101,7 @@ public int getInvY(int y)
  */
 public int getLenght(Event e) 
 {
-	if(viewMode == MonoTrackEditor.PEAKS_VIEW)
+	if(getViewMode() == MonoTrackEditor.PEAKS_VIEW)
     return IntegerEventRenderer.INTEGER_WIDTH;
 	else
   {//STEP_VIEW
@@ -165,6 +164,14 @@ public boolean isDrawable()
 {
 	return true;
 }
+
+public int getViewMode()
+{
+  if(viewMode == -1)
+    initViewMode(MonoTrackEditor.PEAKS_VIEW);
+  return viewMode;
+}
+
 ////////////////// PropertyChangeListener interface
 public void propertyChange(PropertyChangeEvent e)
 {

@@ -67,11 +67,11 @@ public class ClosedTrackPopupMenu extends JPopupMenu
     
     item = new JMenuItem("Remove Track");
     item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  ((FtsSequenceObject)ClosedTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
-	    removeTrack(ClosedTrackPopupMenu.getPopupTarget().getTrack());
-	}
+      public void actionPerformed(ActionEvent e)
+      {
+        ((FtsSequenceObject)ClosedTrackPopupMenu.getPopupTarget().getGraphicContext().getFtsObject()).
+        removeTrack(ClosedTrackPopupMenu.getPopupTarget().getTrack());
+      }
     });
     add(item);
 

@@ -102,14 +102,18 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		  }
 			public void restoreEditorState(FtsTrackEditorObject editorState)
-		  {				
-				geometry.setXZoomFactor(editorState.zoom);
-				gc.getScrollManager().scrollToValue(-editorState.transp);
-				if(!editorState.label.equals(""))
+		  {	        
+        if(!gc.isInSequence())
+        {
+          geometry.setXZoomFactor(editorState.zoom);
+          gc.getScrollManager().scrollToValue(-editorState.transp);
+				}
+        if(!editorState.label.equals(""))
 					setLabelType(editorState.label);
 				setViewMode(editorState.view);				
 				setRangeMode(editorState.rangeMode, true);
         setGridMode(editorState.gridMode);
+        setRange(editorState.rangeMin, editorState.rangeMax);
 			};
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
 		  {
@@ -131,11 +135,11 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				repaint();
 			}
       public void ftsNameChanged(String name){}
-		});
+    });
 		
     track.getTrackDataModel().addHighlightListener(new HighlightListener(){
 			public void highlight(Enumeration elements, double time)
-		{
+		  {
 				TrackEvent temp;
 				boolean first = true;
 				
@@ -174,7 +178,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 					temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
 					oldElements.addElement(temp);			    
 				}
-		}
+      }
 		});
     
     addMouseListener(new MouseListener(){
@@ -263,6 +267,8 @@ void initGridMode()
 		gc.setGridMode( ((Integer)prop).intValue());
 }
 public void setGridMode(int gridMode){}
+
+public abstract int getDefaultViewMode();
 
 void listenToMarkers( FtsTrackObject markers, SequenceSelection markSel)
 {
@@ -469,18 +475,29 @@ public Track getTrack()
 public void updateNewObject(Object obj){};
 
 public void setViewMode(int viewType)
-{
+{  
 	if(viewMode!=viewType)
 	{
 		viewMode=viewType;
 		track.setProperty("viewMode", new Integer(viewType));
 		repaint();
-	}    
+	}  
 }
 public int getViewMode()
 {
-	return viewMode;
+  if(viewMode == -1)
+    initViewMode();
+  return viewMode;
 }
+
+public void initViewMode()
+{
+  FtsTrackEditorObject editor = track.getFtsTrack().getFtsTrackEditorObject(); 
+  if(editor != null && editor.haveContent())
+    viewMode = editor.view;
+  else
+    viewMode = getDefaultViewMode();
+} 
 
 public void setRangeMode(int rangeMode, boolean changed)
 {
@@ -490,7 +507,41 @@ public int getRangeMode()
 {
 	return this.rangeMode;
 }
+public void setRange(int min, int max)
+{
+  if(min != rangeMin)
+  {
+    rangeMin = min;
+    track.setProperty("minimumValue", new Integer(min)); 
+  }
+  if(max != rangeMax)
+  {
+    rangeMax = max;
+    track.setProperty("maximumValue", new Integer(max)); 
+  }
+}
 
+int rangeMin = 0;
+public void setMinimunValue(int value)
+{
+  if(value != rangeMin)
+  {
+    rangeMin = value;
+    track.setProperty("minimumValue", new Integer(value));  
+    track.getFtsTrack().editorObject.setRange(value, rangeMax);
+  }
+}
+
+int rangeMax = 1;
+public void setMaximumValue(int value)
+{
+  if(value != rangeMax)
+  {
+    rangeMax = value;
+    track.setProperty("maximumValue", new Integer(value));  
+    track.getFtsTrack().editorObject.setRange(rangeMin, value);
+  }
+} 
 public void showListDialog()
 {
 	if(listDialog==null) 
@@ -582,7 +633,8 @@ transient SequenceSelection currentSelMarkers = null;
 transient TrackDataListener markerTrackListener = null;
 
 public int DEFAULT_HEIGHT = 430;
-public int viewMode, rangeMode;
+public int viewMode = -1;
+public int rangeMode = -1;
 TrackBasePopupMenu popup = null;
 JLabel displayLabel;
 

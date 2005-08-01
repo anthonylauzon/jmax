@@ -44,23 +44,26 @@ import javax.swing.event.*;
 public class MonoTrackEditor extends TrackBaseEditor
 {
   public MonoTrackEditor(Geometry g, Track trk, boolean isInsequence)
-{
+  {
     super(g, trk, isInsequence);
-    
-    viewMode = PEAKS_VIEW;
-}
+  }
 
-public int getInitialHeight()
-{
-  return getDefaultHeight();
-}
+  public int getDefaultViewMode()
+  {
+    return PEAKS_VIEW;
+  }
+  
+  public int getInitialHeight()
+  {
+    return getDefaultHeight();
+  }
 
-public void reinit(){}
+  public void reinit(){}
 
-void createPopupMenu()
-{
-  popup = new MonoTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
-}
+  void createPopupMenu()
+  { 
+    popup = new MonoTrackPopupMenu( this, gc.getFtsObject() instanceof FtsSequenceObject);
+  }
 
 SequenceGraphicContext createGraphicContext(Geometry geometry, Track track)
 {
@@ -90,8 +93,8 @@ public void setAdapter(MonoDimensionalAdapter adapter)
 public void setViewMode(int viewType)
 {
 	super.setViewMode(viewType);
-	if(!gc.isInSequence())
-		((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
+	/*if(!gc.isInSequence())*/
+  ((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(getViewMode());
 }
 
 public void setRenderer(MonoTrackRenderer renderer)
@@ -114,7 +117,7 @@ public void objectAdded(Object whichObject, int index)
   if( !track.getFtsTrack().isUploading())
   {
     updateNewObject(whichObject);
-    updateRange(whichObject);
+    /*updateRange(whichObject);*/
   }
   super.objectAdded(whichObject, index);
 }
@@ -123,7 +126,7 @@ public void objectChanged(Object whichObject, int index, String propName, Object
   if(propName != null)
   {
     updateEventProperties(whichObject, propName, propValue);
-    updateRange(whichObject);
+    /*updateRange(whichObject);*/
   }
   super.objectChanged(whichObject, index, propName, propValue);
 }

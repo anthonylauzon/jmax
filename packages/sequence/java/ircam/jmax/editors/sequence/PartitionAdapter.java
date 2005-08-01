@@ -356,9 +356,12 @@ public void setViewMode(int mode)
 	setMaxScoreY();
 	setMinScoreY();
 }
+
 public int getViewMode()
 {
-	return viewMode;
+  if(viewMode == -1)
+    initViewMode(MidiTrackEditor.PIANOROLL_VIEW);
+  return viewMode;
 }
 
 public void setRangeMode(int rangeMode)
@@ -375,7 +378,7 @@ public int getRangeMode()
 
 public int getRangeHeight()
 {
-	 if(viewMode==MidiTrackEditor.PIANOROLL_VIEW)
+	 if(getViewMode()==MidiTrackEditor.PIANOROLL_VIEW)
 		 return (getY(minPitch)-getY(maxPitch) + 2*ScoreBackground.SC_TOP);
 	else
 		return (getY(minPitch)-getY(maxPitch) + 2*PartitionBackground.SC_TOP);
@@ -498,9 +501,18 @@ public void propertyChange(PropertyChangeEvent e)
 		setRangeMode(((Integer)e.getNewValue()).intValue() );
 }
 
+public void initViewMode(int defMode)
+{
+  FtsTrackEditorObject editor = gc.getFtsTrackEditorObject();
+  if(editor != null && editor.haveContent())
+    viewMode = editor.view;
+  else
+    viewMode = defMode;
+}
+
 //------------- Fields
 public static final int NOTE_DEFAULT_HEIGTH = 3;
-int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
+int viewMode = -1;
 int maxPitch = 127;
 int minPitch = 0;
 int rangeMode = 0;

@@ -73,7 +73,14 @@ public class SequenceWindow extends JMaxEditor {
     setSize(new Dimension(DEFAULT_WIDTH + TrackContainer.BUTTON_WIDTH, EMPTY_HEIGHT));
     
     addWindowListener(new WindowListener(){
-      public void windowOpened(WindowEvent e){}
+      public void windowOpened(WindowEvent e)
+      {
+        /*if(!sequenceData.isUploading())
+        {
+          Rectangle bounds = SequenceWindow.this.getBounds();
+          sequenceData.setSize(bounds.width, bounds.height);
+        }*/
+      }
       public void windowClosed(WindowEvent e){}
       public void windowClosing(WindowEvent e)
       {
@@ -91,8 +98,27 @@ public class SequenceWindow extends JMaxEditor {
       public void windowDeactivated(WindowEvent e){}
     });
     
+    addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e)
+		  {
+        /*if(!sequenceData.isUploading())
+        {
+          Rectangle bounds = SequenceWindow.this.getBounds();
+          sequenceData.setSize(bounds.width, bounds.height);
+        }*/
+      }
+			public void componentMoved(ComponentEvent e)
+		  {
+        /*if(!sequenceData.isUploading())
+        {
+          Rectangle bounds = SequenceWindow.this.getBounds();
+          sequenceData.setLocation(bounds.x, bounds.y);
+        }*/
+      }
+		});
+    
     sequenceData.addTrackListener( new TrackListener(){
-      public void trackAdded(Track track){}
+      public void trackAdded(Track track, boolean isUploading){}
       public void tracksAdded(int maxTime){}
       public void trackRemoved(Track track){}
       public void trackChanged(Track track){}
@@ -101,8 +127,9 @@ public class SequenceWindow extends JMaxEditor {
       {
         setWindowName(name);
       }      
+      public void sequenceStartUpload(){};
+      public void sequenceEndUpload(){}; 
     });
-    //pack();
     
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();
@@ -110,7 +137,6 @@ public class SequenceWindow extends JMaxEditor {
       makeSimpleMenuBar();
     
     validate();
-    //pack();
   }
   
   private final void makeTitle(){

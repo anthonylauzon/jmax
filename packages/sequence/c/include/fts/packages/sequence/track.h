@@ -94,6 +94,8 @@ FTS_API void track_copy(track_t *org, track_t *copy);
 
 FTS_API int track_editor_is_open(track_t *track);
 
+FTS_API int track_is_in_multitrack(track_t *track);
+
 FTS_API void track_add_event_and_upload(track_t *track, double time, event_t *event);
 FTS_API void track_add_event_after_and_upload(track_t *track, double time, event_t *event, event_t *after);
 FTS_API void track_move_event_and_upload(track_t *track, event_t *event, double time);

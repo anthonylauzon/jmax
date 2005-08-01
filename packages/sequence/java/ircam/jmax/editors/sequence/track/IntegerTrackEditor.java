@@ -54,7 +54,7 @@ public class IntegerTrackEditor extends MonoTrackEditor
     ((MonoDimensionalAdapter)gc.getAdapter()).LabelMapper.setLabelType("value");
     setRenderer(new IntegerTrackRenderer(gc));
 
-    super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
+    super.setAdapter(new IntegerAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));    
   }
     
   public void reinit()
@@ -77,7 +77,12 @@ public class IntegerTrackEditor extends MonoTrackEditor
     }
   }
   
-  int viewMode = PEAKS_VIEW;
+  public int getDeafultViewMode()
+  {
+    return PEAKS_VIEW;
+  }   
+  
+  int viewMode = -1;
   static public final int PEAKS_VIEW = 2;
   static public final int STEPS_VIEW = 3;
   static public final int BREAK_POINTS_VIEW = 4;

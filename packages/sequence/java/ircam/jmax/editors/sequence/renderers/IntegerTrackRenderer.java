@@ -61,14 +61,14 @@ public class IntegerTrackRenderer extends MonoTrackRenderer{
       double time = gc.getAdapter().getInvX(x);
 
       if(((MonoDimensionalAdapter)gc.getAdapter()).getViewMode() == MonoTrackEditor.STEPS_VIEW)
-	  {
+      {
 	      aTrackEvent = gc.getDataModel().getPreviousEvent(time);
 	      if(aTrackEvent!=null)
-		  if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
-		      last = aTrackEvent;
-	  }
+          if (aTrackEvent.getRenderer().contains(aTrackEvent, x, y, gc))
+            last = aTrackEvent;
+      }
       else last = (TrackEvent)super.firstObjectContaining(x, y);
-
+      
       return last;
   }
 }

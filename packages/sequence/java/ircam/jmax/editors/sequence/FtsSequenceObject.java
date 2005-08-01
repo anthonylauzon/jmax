@@ -40,19 +40,21 @@ import javax.swing.*;
 public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDataModel
 {
   class TrackAddedRunnable implements Runnable
-{
-	TrackBase track;
-	TrackAddedRunnable(TrackBase trk)
-	{
-		super();
-		track = trk;
-	}
-	public void run(){
-		notifyTrackAdded(track);
-	}
-}
-
-static
+  {
+    TrackBase track;
+    boolean isUploading;
+    TrackAddedRunnable(TrackBase trk, boolean isUploading)
+    {
+      super();
+      track = trk;
+      this.isUploading = isUploading;
+    }
+    public void run(){
+      notifyTrackAdded(track, isUploading);
+    }
+  }
+  
+  static
 {
 	FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("addTracks"), new FtsMessageHandler(){
 		public void invoke( FtsObject obj, FtsArgs args)
@@ -80,9 +82,9 @@ static
 	});
   FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
-    {
+  {
       ((FtsSequenceObject)obj).startUpload();
-    }
+  }
   });
   FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
@@ -90,6 +92,18 @@ static
       ((FtsSequenceObject)obj).endUpload();
   }
   });
+  /*FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("editor"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+    {
+      ((FtsSequenceObject)obj).setEditorState(args.getLength(), args.getAtoms());
+    }
+  });
+  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("save_editor"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+    {
+      ((FtsSequenceObject)obj).setSaveEditor( args.getInt(0) == 1);
+    }
+  });*/
 }
 
 /**
@@ -120,7 +134,7 @@ public SequenceSelection getMarkersSelection()
   if( trackCount() > 0)
 		return getTrackAt(0).getFtsTrack().getMarkersSelection();
 	return null;	
-
+  
 }
 
 void notifyUpdateMarkers()
@@ -145,6 +159,150 @@ public void createEditor()
 		setEditorFrame( new SequenceWindow(this));
 }
 
+/*boolean saveEditor = false;
+public void setSaveEditor(boolean save)
+{
+  saveEditor = save;
+}
+
+int editor_wx = -1;
+int editor_wy = -1;
+int editor_ww = -1;
+int editor_wh = -1;
+float editor_zoom = (float)0.2;
+int editor_transp = 0;
+boolean editorUploaded = false;
+
+public float getZoom()
+{
+  return editor_zoom;
+}
+public int getTransposition()
+{
+  return editor_transp;
+}
+
+public boolean editorUploaded()
+{
+  return editorUploaded;
+}
+
+public void setEditorState( int nArgs, FtsAtom args[])
+{
+  int x = args[0].intValue;
+  int y = args[1].intValue;
+  int w = args[2].intValue;
+  int h = args[3].intValue;
+  float zoom = (float)args[4].doubleValue;
+  int transp = args[5].intValue;
+
+  if( x!= this.editor_wx || y!=this.editor_wy || w!=this.editor_ww || h!=this.editor_wh 
+      || zoom != this.editor_zoom || transp != this.editor_transp ) 
+  {	    
+    this.editor_wx = x; this.editor_wy = y; this.editor_ww = w; this.editor_wh = h; 
+    this.editor_zoom = zoom; this.editor_transp = transp; 
+    SwingUtilities.invokeLater(new Runnable(){
+      public void run()
+      {
+        getEditorFrame().setBounds(editor_wx, editor_wy, editor_ww, editor_wh);
+      } 
+    });
+    editorUploaded = true;
+  }
+}
+
+public void requestSetWindow()
+{	
+  if( saveEditor && !isUploading())
+	{
+    if(editor_wx == -1 || editor_wy == -1 || editor_ww == -1 || editor_wh == -1)
+			return;
+    
+		args.clear();
+		args.addInt( editor_wx);
+		args.addInt( editor_wy);
+		args.addInt( editor_ww);
+		args.addInt( editor_wh);
+		
+		try{
+			send( FtsSymbol.get("window"), args);
+		}
+		catch(IOException e)
+		{
+			System.err.println("FtsSequenceObject: I/O Error sending window Message!");
+			e.printStackTrace(); 
+		}
+  }
+}
+
+public void setLocation(int x, int y)
+{	
+  if( saveEditor && !isUploading())
+	{
+		if(this.editor_wx != x || this.editor_wy != y)
+		{			
+			this.editor_wx = x;
+			this.editor_wy = y;
+			requestSetWindow();
+		}
+  }
+}
+public void setSize(int w, int h)
+{		  
+  if( saveEditor && !isUploading())
+	{
+    if(this.editor_ww != w || this.editor_wh != h)
+    {			
+      this.editor_ww = w;
+      this.editor_wh = h;
+      requestSetWindow();
+    }
+  }
+}
+
+public void setZoom(float zoom)
+{
+  if( saveEditor && !isUploading())
+	{
+		if(this.editor_zoom != zoom)
+		{
+			this.editor_zoom = zoom;
+			args.clear();
+			args.addFloat( editor_zoom);
+			
+			try{
+				send( FtsSymbol.get("zoom"), args);
+			}
+			catch(IOException e)
+			{
+				System.err.println("FtsSequenceObject: I/O Error sending zoom Message!");
+				e.printStackTrace(); 
+			}		
+		}
+  }
+}
+public void setTransposition(int transp)
+{	
+  if( saveEditor && !isUploading())
+	{
+		if(this.editor_transp != transp)
+		{
+			this.editor_transp = transp;
+			args.clear();
+			args.addInt( editor_transp);
+			
+			try{
+				send( FtsSymbol.get("transp"), args);
+			}
+			catch(IOException e)
+			{
+				System.err.println("FtsSequenceObject: I/O Error sending transp Message!");
+				e.printStackTrace(); 
+			}
+		}
+  }
+}*/
+
 /**
 * Fts callback: destroy the editor associated with this FtsSequenceObject.
  */
@@ -165,7 +323,12 @@ public void addTracks(int nArgs , FtsAtom args[])
 	track = new TrackBase(trackObj);
 	tracks.addElement(track);
 	
-	SwingUtilities.invokeLater(new TrackAddedRunnable( track));
+  addTrackListener(trackObj);
+  
+  if(isUploading())
+    notifyTrackAdded(track, true);
+  else
+    SwingUtilities.invokeLater(new TrackAddedRunnable( track, false));
 }
 
 public void removeTracks(int nArgs , FtsAtom args[])
@@ -180,6 +343,7 @@ public void removeTracks(int nArgs , FtsAtom args[])
 		trackObj = (FtsTrackObject)(args[i].objectValue);
 		track = getTrack(trackObj);
 		tracks.removeElement(track);
+    removeTrackListener(trackObj);
 		notifyTrackRemoved(track);
 	}    
 }
@@ -233,11 +397,28 @@ boolean uploading = false;
 void startUpload()
 {  
   uploading = true;
+  notifySequenceStartUpload();
 }
 
 void endUpload()
 {
-  uploading = false;
+   SwingUtilities.invokeLater(new Runnable(){
+    public void run()
+    {
+      getEditorFrame().pack();
+      showEditor();
+      FtsObject.requestResetGui();
+      uploading = false;
+      notifySequenceEndUpload();
+    }
+  });
+}
+
+public void openEditor(int argc, FtsAtom[] argv)
+{  
+  createEditor();/* rest moved in endUpload */  
+  /*showEditor();
+  FtsObject.requestResetGui();*/
 }
 
 public boolean isUploading()
@@ -448,10 +629,10 @@ public void removeTrackListener(TrackListener theListener)
 	listeners.removeElement(theListener);
 }
 
-private void notifyTrackAdded(Track track)
+private void notifyTrackAdded(Track track, boolean isUploading)
 {
 	for (Enumeration e=listeners.elements(); e.hasMoreElements();)
-		((TrackListener)(e.nextElement())).trackAdded(track);
+		((TrackListener)(e.nextElement())).trackAdded(track, isUploading);
 }
 
 private void notifyTracksAdded(int maxTime)
@@ -482,6 +663,18 @@ void notifyFtsNameChanged(String name)
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
     ((TrackListener) e.nextElement()).ftsNameChanged(name);
+}
+
+void notifySequenceStartUpload()
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+    ((TrackListener) e.nextElement()).sequenceStartUpload();
+}
+
+void notifySequenceEndUpload()
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+    ((TrackListener) e.nextElement()).sequenceEndUpload();
 }
 
 transient Vector tracks = new Vector();

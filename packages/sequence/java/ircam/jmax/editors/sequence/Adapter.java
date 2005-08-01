@@ -173,7 +173,9 @@ abstract public class Adapter implements MappingListener{
       //asd.setVisible(true);
   }
 
-
+  public abstract void initViewMode(int mode);
+  public abstract int getViewMode();
+  
   /**
    * return the Adapter's name
    */

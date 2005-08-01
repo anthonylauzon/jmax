@@ -67,8 +67,19 @@ public class ScoreRenderer extends AbstractTrackRenderer{
     itsLayers.addElement(itsForegroundLayer);
 }
 
+public void initViewMode()
+{
+  FtsTrackEditorObject editor = gc.getFtsTrackEditorObject();
+  if(editor != null && editor.haveContent())
+    viewMode = editor.view;
+  else
+    viewMode = MidiTrackEditor.PIANOROLL_VIEW;
+}
+
 public int getViewMode()
 {
+  if(viewMode == -1)
+    initViewMode();
   return viewMode;
 }
 
@@ -167,7 +178,7 @@ public Enumeration objectsIntersecting(int x, int y, int w, int h)
 }
 
 //------------------  Fields
-int viewMode = MidiTrackEditor.PIANOROLL_VIEW;
+int viewMode = -1;
 
 TrackDataModel itsTrackDataModel;
 

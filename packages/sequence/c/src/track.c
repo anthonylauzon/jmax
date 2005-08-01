@@ -783,12 +783,18 @@ track_editor_is_open(track_t *self)
     return (self->open != 0);
 }
 
+int
+track_is_in_multitrack(track_t *track)
+{
+  fts_object_t *container = fts_object_get_container((fts_object_t *)track);
+  return (container != NULL && fts_object_is_a(container, multitrack_class));
+}
+
 static void
 track_copy_function(const fts_object_t *from, fts_object_t *to)
 {
   track_copy((track_t *)from, (track_t *)to);
 }
-
 
 static void
 track_description_function(fts_object_t *o,  fts_array_t *array)
@@ -2028,7 +2034,7 @@ track_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   }
   
   if(self->editor!=NULL)
-  {
+  {    
     if(fts_object_has_client((fts_object_t *)self->editor) == 0)
     {
       fts_atom_t a;
@@ -2222,7 +2228,7 @@ track_set_editor_at_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
     fts_client_register_object((fts_object_t *)self->editor, fts_object_get_client_id(o));  
   
   fts_set_int(&a, fts_object_get_id((fts_object_t *)self->editor));
-  fts_client_send_message(o, seqsym_editor, 1, &a);               
+  fts_client_send_message(o, seqsym_editor, 1, &a);        
   
   return fts_ok;
 }       

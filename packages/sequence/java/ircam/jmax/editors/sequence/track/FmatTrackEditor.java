@@ -56,7 +56,7 @@ public class FmatTrackEditor extends MonoTrackEditor
 			}
 		});
   }
-
+  
   void displayMousePosition(int x, int y)
   {
     double time = gc.getAdapter().getInvX( x);

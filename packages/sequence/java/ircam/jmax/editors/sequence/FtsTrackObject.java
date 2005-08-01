@@ -40,7 +40,7 @@ import javax.swing.*;
  * array.
  * @see ircam.jmax.editors.sequence.track.TrackDataModel*/
 
-public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataModel, ClipableData, ClipboardOwner {
+public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataModel, ClipableData, ClipboardOwner, TrackListener{
   static
 {
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("addEvent"), new FtsMessageHandler(){
@@ -192,7 +192,7 @@ public FtsTrackObject(FtsServer server, FtsObject parent, int objId, String clas
   /* prepare the flavors for the clipboard */
   if (flavors == null)
     flavors = new DataFlavor[1];
-  flavors[0] = sequenceFlavor;
+  flavors[0] = sequenceFlavor;  
 }
 
 public boolean isInSequence()
@@ -680,8 +680,8 @@ public void requestSetSaveEditor(boolean save)
       e.printStackTrace();
 		}
   }
-	if(save && editorObject != null) 
-		editorObject.requestSetEditorState( getEditorFrame().getBounds());
+	if(save && editorObject != null)
+    editorObject.requestSetEditorState( isInSequence() ? null : getEditorFrame().getBounds());
 }
 
 public void requestInsertMarker(double time)
@@ -1584,7 +1584,7 @@ public void mergeModel(TrackDataModel model)
     }
     catch(IOException e)
   {
-      System.err.println("FtsBpfObject: I/O Error sending upload Message!");
+      System.err.println("FtsTrackObject: I/O Error sending upload Message!");
       e.printStackTrace();
   }
   }
@@ -1661,7 +1661,13 @@ protected void addFlavor(DataFlavor flavor)
 
 public void setFtsTrackEditorObject(int id)
 {	
-  editorObject = new FtsTrackEditorObject( JMaxApplication.getFtsServer(), this, id);
+  if(editorObject == null || (editorObject==null && editorObject.getID()!=id))
+    editorObject = new FtsTrackEditorObject( JMaxApplication.getFtsServer(), this, id);
+}
+
+public FtsTrackEditorObject getFtsTrackEditorObject()
+{	
+  return editorObject;
 }
 
 public void setMarkersTrack(int nArgs , FtsAtom args[])
@@ -1729,10 +1735,11 @@ public void destroyEditor()
 }
 
 public void restoreEditorState()
-{
-  if( editorObject!=null && editorObject.haveContent() && getEditorFrame()!=null)
+{  
+  if( editorObject!=null && editorObject.haveContent())
   {
-    getEditorFrame().setBounds(editorObject.wx, editorObject.wy, editorObject.ww, editorObject.wh);
+    if(!isInSequence() && getEditorFrame()!=null)
+      getEditorFrame().setBounds(editorObject.wx, editorObject.wy, editorObject.ww, editorObject.wh);
     notifyRestoreEditorState(editorObject);
   }
 }
@@ -1751,7 +1758,7 @@ void endUpload()
   uploading = false;
   uploadingSize = 0;
 	if( saveEditor)
-		restoreEditorState();
+    restoreEditorState();
   notifyUploadEnd();
 }
 
@@ -1828,7 +1835,21 @@ public void ping( String ping)
   if(ping.equals("undo") || ping.equals("redo"))
     endUndoRedo();
 }
+//------ TrackListener interface
+public void trackAdded(Track track, boolean isUploading){}
+public void tracksAdded(int maxTime){}
+public void trackRemoved(Track track){}
+public void trackChanged(Track track){}
+public void trackMoved(Track track, int oldPosition, int newPosition){}   
+public void ftsNameChanged(String name){}      
+public void sequenceStartUpload(){ sequenceUploading = true;};
+public void sequenceEndUpload(){sequenceUploading = false;}; 
 
+boolean sequenceUploading = false;
+public boolean isSequenceUploading()
+{
+  return sequenceUploading;
+}
 //---  AbstractSequence fields
 ValueInfo info;
 

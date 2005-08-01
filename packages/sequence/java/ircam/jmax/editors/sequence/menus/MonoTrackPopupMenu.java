@@ -50,7 +50,7 @@ public class MonoTrackPopupMenu extends TrackBasePopupMenu
     item.addActionListener(new ActionListener(){
 	public void actionPerformed(ActionEvent e)
 	{
-	  ChangeRangeDialog.changeRange(target.getTrack(), target.getGraphicContext().getFrame(),
+	  ChangeRangeDialog.changeRange(target, target.getGraphicContext().getFrame(),
 					SwingUtilities.convertPoint(target, x, y, target.getGraphicContext().getFrame()));
 	}
       });

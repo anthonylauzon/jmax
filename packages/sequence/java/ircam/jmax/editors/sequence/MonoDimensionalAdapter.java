@@ -30,52 +30,51 @@ import ircam.jmax.editors.sequence.renderers.*;
 import java.beans.*;
 
 /**
- * An adapter that treats the y parameter as a constant*/
+* An adapter that treats the y parameter as a constant*/
 public class MonoDimensionalAdapter extends PartitionAdapter {
+  
+  public MonoDimensionalAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
+{
+    super(geometry, gc);
+    this.constant = constant;
+    
+    YMapper = IntegerMapper.getMapper();
+}
 
-    public MonoDimensionalAdapter(Geometry geometry, SequenceGraphicContext gc, int constant)
-    {
-			super(geometry, gc);
-			this.constant = constant;
-			
-			YMapper = IntegerMapper.getMapper();
-			viewMode = MonoTrackEditor.PEAKS_VIEW;
-    }
-
-    /**
-     * inherited from Adapter.
-     * it returns the Y value of the event,
-     * making the needed cordinate conversions.
-     */
-    public int getY(Event e) 
-    {  
-			int value = (int)YMapper.get(e) - minValue;
-			int height = gc.getGraphicDestination().getSize().height;
-			int range = getRange();
-			float step = (float)((float)height/(float)range);
+/**
+* inherited from Adapter.
+ * it returns the Y value of the event,
+ * making the needed cordinate conversions.
+ */
+public int getY(Event e) 
+{  
+  int value = (int)YMapper.get(e) - minValue;
+  int height = gc.getGraphicDestination().getSize().height;
+  int range = getRange();
+  float step = (float)((float)height/(float)range);
 	
-			return height - (int)(value*step);
-    }
+  return height - (int)(value*step);
+}
 
-    /**
-     * it returns the Y graphic value of the event from the y logic value,
-     * making the needed cordinate conversions.
-     */
-    public int getY(int y) 
-    {  
-			int value = y - minValue;
-			int height = gc.getGraphicDestination().getSize().height;
-			int range = getRange();
-			float step = (float)((float)height/(float)range);
-			return height - (int)(value*step);
-    }
+/**
+* it returns the Y graphic value of the event from the y logic value,
+ * making the needed cordinate conversions.
+ */
+public int getY(int y) 
+{  
+  int value = y - minValue;
+  int height = gc.getGraphicDestination().getSize().height;
+  int range = getRange();
+  float step = (float)((float)height/(float)range);
+  return height - (int)(value*step);
+}
 
-    /**
-     * inherited from Adapter.
-     * Returns the parameter associated with the value of an Y coordinate
-     */  
-    public int getInvY(int y) 
-    {
+/**
+* inherited from Adapter.
+ * Returns the parameter associated with the value of an Y coordinate
+ */  
+public int getInvY(int y) 
+{
 	int temp;
 	int height = gc.getGraphicDestination().getSize().height;
 	int range = getRange();
@@ -85,76 +84,83 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
 	
 	if(temp<minValue) temp = minValue;
 	else if(temp>maxValue) temp = maxValue;
-
+  
 	return temp;
-    }
+}
 
-    /**
-     * inherited from Adapter.
-     * returns the lenght value of the event,
-     * making the needed cordinate conversions (zooming).
-     */
-    public int getLenght(Event e) 
-    {
+/**
+* inherited from Adapter.
+ * returns the lenght value of the event,
+ * making the needed cordinate conversions (zooming).
+ */
+public int getLenght(Event e) 
+{
 	return super.getLenght(e);
-    }
+}
 
-  /**
-   * set the duration of the event associated with the graphic lenght l.
-   */
-    public void setLenght(Event e, int l){}
+/**
+* set the duration of the event associated with the graphic lenght l.
+ */
+public void setLenght(Event e, int l){}
 
-    /**
-     * returns the heigth of this event */
-    public int getHeigth(Event e) 
-    {
+/**
+* returns the heigth of this event */
+public int getHeigth(Event e) 
+{
 	int y = getY(e);
 	int y0 = getY(0);
 	/* for now return a height positive or negative*/
 	//if(y>y0)  return (y-y0);
 	/*else*/ return (y0-y);
-    }
+}
 
-    public int getRange()
-    {
+public int getRange()
+{
 	return (maxValue-minValue);
-    }
+}
 
-    public int getMaximumValue()
-    {
+public int getMaximumValue()
+{
 	return maxValue;
-    }
-    public int getMinimumValue()
-    {
+}
+public int getMinimumValue()
+{
 	return minValue;
-    }
+}
 
-	public int getMinScoreY()
-  { 
-	  return 0; 
-  }
+public int getMinScoreY()
+{ 
+  return 0; 
+}
 
-	public int getMaxScoreY()
-	{
+public int getMaxScoreY()
+{
 		return gc.getGraphicDestination().getSize().height; 
-	}
-	
-    ////////////////// PropertyChangeListener interface
-    public void propertyChange(PropertyChangeEvent e)
-    {
-	if(e.getPropertyName().equals("maximumValue"))
-	    maxValue = ((Integer)e.getNewValue()).intValue();
-	else if(e.getPropertyName().equals("minimumValue"))
-	    minValue = ((Integer)e.getNewValue()).intValue();
-	else 
-	    if(e.getPropertyName().equals("viewMode"))
-		setViewMode(((Integer)e.getNewValue()).intValue());
-    }
+}
 
-    //------------- Fields
-    int constant;    
-    int maxValue = 127;
-    int minValue = 0;
+public int getViewMode()
+{
+  if(viewMode == -1)
+    initViewMode(MonoTrackEditor.PEAKS_VIEW);
+  return viewMode;
+}
+
+////////////////// PropertyChangeListener interface
+public void propertyChange(PropertyChangeEvent e)
+{
+	if(e.getPropertyName().equals("maximumValue"))
+    maxValue = ((Integer)e.getNewValue()).intValue();
+	else if(e.getPropertyName().equals("minimumValue"))
+    minValue = ((Integer)e.getNewValue()).intValue();
+	else 
+    if(e.getPropertyName().equals("viewMode"))
+      setViewMode(((Integer)e.getNewValue()).intValue());
+}
+
+//------------- Fields
+int constant;    
+int maxValue = 127;
+int minValue = 0;
 }
 
 

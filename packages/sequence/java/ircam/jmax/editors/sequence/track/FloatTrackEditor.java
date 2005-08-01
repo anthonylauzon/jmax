@@ -52,10 +52,9 @@ public class FloatTrackEditor extends MonoTrackEditor
       track.setProperty("viewMode", new Integer(viewMode));
       
     setRenderer(new IntegerTrackRenderer(gc));
-
     super.setAdapter(new FloatAdapter(geometry, gc, MONODIMENSIONAL_TRACK_OFFSET));
   }
-
+  
   public void reinit()
   {
     track.setProperty("maximumValue", new Integer(FloatValue.DEFAULT_MAX_VALUE));
@@ -73,7 +72,12 @@ public class FloatTrackEditor extends MonoTrackEditor
     if(value<(float)min) track.setProperty("minimumValue", new Integer((int)value-1));
   }
 
-  int viewMode = PEAKS_VIEW;
+  public int getDeafultViewMode()
+  {
+    return PEAKS_VIEW;
+  }   
+  
+  int viewMode = -1;
   static public final int PEAKS_VIEW = 2;
   static public final int STEPS_VIEW = 3;
   static public final int BREAK_POINTS_VIEW = 4;

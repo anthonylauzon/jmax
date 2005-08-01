@@ -100,6 +100,7 @@ FTS_API fts_symbol_t seqsym_shift;
 FTS_API fts_symbol_t seqsym_stretch;
 FTS_API fts_symbol_t seqsym_quantize;
 FTS_API fts_symbol_t seqsym_props_to_draw;
+FTS_API fts_symbol_t seqsym_range;
 
 /* messages from/to client */
 FTS_API fts_symbol_t seqsym_addTracks;

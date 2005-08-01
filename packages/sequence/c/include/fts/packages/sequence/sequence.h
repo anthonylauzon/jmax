@@ -40,6 +40,18 @@ typedef struct _track_ track_t;
 typedef struct _track_editor track_editor_t;
 typedef struct _event_ event_t;
 
+FTS_API fts_class_t *multitrack_class;
+
+struct _multitrack_editor
+{ 
+  int win_x;           /* editor window's bounds */
+  int win_y;
+  int win_w;
+  int win_h;
+  float zoom;          /* editor zoom_factor */
+  int transp;          /* editor x_transposition */
+} sequence_editor_t;
+
 typedef struct _sequence_
 { 
   fts_object_t o;
@@ -47,6 +59,14 @@ typedef struct _sequence_
   int size; /* # of tracks */ 
   int open; /* flag: is 1 if sequence editor is open */
   track_t *last_loaded_track; /* hack to fix loading */
+  
+  int save_editor; /* flag: is 1 if want to save editor state */
+  int win_x;       /* editor window's bounds */
+  int win_y;
+  int win_w;
+  int win_h;
+  float zoom;      /* editor zoom_factor */
+  int transp;      /* editor x_transposition */
 } sequence_t;
 
 #include <fts/packages/sequence/seqsym.h>
@@ -72,7 +92,7 @@ typedef struct
   fts_symbol_t name; /* track name */
 } sequence_context_t;
 
-#define sequence_track_get_container(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->container)
+#define sequence_track_get_container(t) ((((fts_object_t *)t)->context != NULL)? ((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->container : NULL)
 #define sequence_track_set_container(t, s) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->container = (s))
 
 #define sequence_track_get_next(t) (((sequence_context_t *)fts_object_get_context((fts_object_t *)t))->next)
@@ -89,7 +109,5 @@ SEQUENCE_API track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbo
 SEQUENCE_API track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
 
 SEQUENCE_API void sequence_config(void);
-
-
 
 #endif

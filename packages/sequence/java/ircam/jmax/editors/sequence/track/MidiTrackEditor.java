@@ -51,8 +51,6 @@ public class MidiTrackEditor extends TrackBaseEditor
       track.setProperty("maximumPitch", new Integer(SequenceDefaults.DEFAULT_MAX_PITCH));
 		if(track.getProperty("minimumPitch")==null)
       track.setProperty("minimumPitch", new Integer(SequenceDefaults.DEFAULT_MIN_PITCH));
-		
-    viewMode = PIANOROLL_VIEW;
     
     if(!isInsequence)
       addComponentListener( new ComponentAdapter() {
@@ -63,13 +61,13 @@ public class MidiTrackEditor extends TrackBaseEditor
         public void componentMoved(ComponentEvent e){}
       });
   }
-
+   
   public void reinit()
   {
 		track.setProperty("rangeMode", new Integer(SequenceDefaults.DEFAULT_RANGE_MODE));
     track.setProperty("maximumPitch", new Integer(SequenceDefaults.DEFAULT_MAX_PITCH));
     track.setProperty("minimumPitch", new Integer(SequenceDefaults.DEFAULT_MIN_PITCH));
-    setViewMode(PIANOROLL_VIEW);		
+    setViewMode(PIANOROLL_VIEW);
   }
   
   void createPopupMenu()
@@ -104,7 +102,7 @@ public class MidiTrackEditor extends TrackBaseEditor
 			pitch = (int)((Double)((TrackEvent)e.nextElement()).getProperty("pitch")).doubleValue();
 			if(pitch > max) max = pitch;
 		}
-		if(viewMode == PIANOROLL_VIEW)
+		if(getViewMode() == PIANOROLL_VIEW)
 			return ScoreBackground.getMaxPitchInStaff(max);
 		else
 			return PartitionBackground.getMaxPitchInStaff(max);
@@ -119,7 +117,7 @@ public class MidiTrackEditor extends TrackBaseEditor
 			pitch = (int)((Double)((TrackEvent)e.nextElement()).getProperty("pitch")).doubleValue();
 			if(pitch < min) min = pitch;
 		}
-		if(viewMode == PIANOROLL_VIEW)
+		if(getViewMode() == PIANOROLL_VIEW)
 			return ScoreBackground.getMinPitchInStaff(min);
 		else
 			return PartitionBackground.getMinPitchInStaff(min);
@@ -137,18 +135,21 @@ public class MidiTrackEditor extends TrackBaseEditor
   {
     super.setViewMode(viewType);
     ((ScoreRenderer)renderer).setViewMode(viewMode);
-		if(!gc.isInSequence())
-			((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
+    ((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(viewMode);
      
     resizeToPreferredSize( true);
   }
 	
+  public int getDefaultViewMode()
+  {
+    return PIANOROLL_VIEW;
+  }  
+  
 	public void setGridMode(int gridMode)
   {
 		this.gridMode = gridMode;
 		geometry.setProperty("gridMode", new Integer(gridMode));
-    if(!gc.isInSequence())
-      ((FtsTrackObject)gc.getDataModel()).editorObject.setGridMode(gridMode);
+    ((FtsTrackObject)gc.getDataModel()).editorObject.setGridMode(gridMode);
 	}
 	
 	public void setRangeMode(int rangeMode, boolean changed)
@@ -175,8 +176,7 @@ public class MidiTrackEditor extends TrackBaseEditor
     if(changed)
     {
       getTrack().setProperty("rangeMode", new Integer(rangeMode));
-      if(!gc.isInSequence())
-        ((FtsTrackObject)gc.getDataModel()).editorObject.setRangeMode(rangeMode);
+      ((FtsTrackObject)gc.getDataModel()).editorObject.setRangeMode(rangeMode);
       
       resizeToPreferredSize( true);
     }
@@ -189,8 +189,7 @@ public class MidiTrackEditor extends TrackBaseEditor
   {
     labelType = type;
     gc.getAdapter().LabelMapper.setLabelType( type);
-		if(!gc.isInSequence())
-			((FtsTrackObject)gc.getDataModel()).editorObject.setLabel(labelType);
+    ((FtsTrackObject)gc.getDataModel()).editorObject.setLabel(labelType);
 		
     repaint();
   }
@@ -213,7 +212,7 @@ public class MidiTrackEditor extends TrackBaseEditor
     setPreferredSize(d);
     validate();
     if(container.getEditorContainer().getFrame().isVisible() && toPack)
-      container.getEditorContainer().getFrame().pack();    
+      container.getEditorContainer().getFrame().pack();
   }
   
    //--- MidiTrackEditor fields
