@@ -117,9 +117,14 @@ public void showEditor()
     }
     else
     {
-      if(editorFrame.getState()==Frame.ICONIFIED) 
-        editorFrame.setState(Frame.NORMAL);
-      editorFrame.toFront();
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+        { 
+          if(editorFrame.getState()==Frame.ICONIFIED) 
+            editorFrame.setState(Frame.NORMAL);
+          editorFrame.toFront();
+        }
+      });
     }
   }
 }

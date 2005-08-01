@@ -51,6 +51,38 @@ public class JMaxMatTable extends JTable
   boolean shiftPressed = false;
   boolean ctrlPressed = false;
   
+  class DeleteSelectionAction extends AbstractAction {
+    DeleteSelectionAction(JMaxMatTable table)
+	  {
+      super("Delete Selection");
+      this.table = table;
+    }
+    
+    public void actionPerformed(ActionEvent e)
+	  {
+      ListSelectionModel selection = table.getSelectionModel();
+      if(selection instanceof ircam.jmax.editors.sequence.SequenceSelection)
+        ((ircam.jmax.editors.sequence.SequenceSelection)selection).deleteAll();
+    }
+    JMaxMatTable table;
+  } 
+
+  class HideAction extends AbstractAction {
+    HideAction(JMaxMatTable table)
+    {
+      super("Hide");
+      this.table = table;
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+      Container cont = table.getTopLevelAncestor();
+      if(cont instanceof Window)
+        ((Window)cont).hide();
+    }
+    JMaxMatTable table;
+  } 
+  
   public JMaxMatTable(TableModel model)
   {
     super(model);
@@ -61,8 +93,14 @@ public class JMaxMatTable extends JTable
     setGridColor( matGridColor);
 		setShowGrid(true);
     setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+    
+    getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteSelection");
+    getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteSelection");
+    getActionMap().put("deleteSelection", new DeleteSelectionAction(this));
+    getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "hide");
+    getActionMap().put("hide", new HideAction(this));
   }
-  
+   
   public TableCellEditor getCellEditor(int row,int col)
   {
     if( getModel().getValueAt(row, col) instanceof FtsObject)
