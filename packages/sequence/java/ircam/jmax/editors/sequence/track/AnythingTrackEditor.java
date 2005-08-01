@@ -94,11 +94,6 @@ public class AnythingTrackEditor extends TrackBaseEditor
     return ANY_DEFAULT_HEIGHT;
   }
 
-  public int getDefaultViewMode()
-  {
-    return -1;
-  }
-  
   public int getInitialHeight()
   {
     return getDefaultHeight();

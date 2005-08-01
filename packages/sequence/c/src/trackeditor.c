@@ -42,8 +42,9 @@ track_editor_upload(track_editor_t *this)
 		int size = fts_array_get_size(&this->columns);
     fts_atom_t *props_atoms = fts_array_get_atoms(&this->props_to_draw);
 		int props_size = fts_array_get_size(&this->props_to_draw);
-    fts_atom_t a[9];
-    
+    fts_atom_t a[11];
+    int i = 0;
+ 
     if(!track_is_in_multitrack(this->track))
     {
       if(this->win_x!=-1 && this->win_y!=-1 && this->win_w!=-1 && this->win_h!=-1)
@@ -57,13 +58,18 @@ track_editor_upload(track_editor_t *this)
         fts_set_int(a+6, this->transp);
         fts_set_int(a+7, this->view);
         fts_set_int(a+8, this->range_mode);
-
-        fts_client_send_message((fts_object_t *)this, seqsym_editor, 9, a);
+        if(this->min_val!=0 || this->max_val!=1)
+        {
+          fts_set_int(a+9, this->min_val);
+          fts_set_int(a+10, this->max_val);
+          i = 2;
+        }        
+        
+        fts_client_send_message((fts_object_t *)this, seqsym_editor, 9+i, a);
       }
     }
     else
     {
-      int i = 0;
       fts_set_symbol(a, this->label);
       fts_set_int(a+1, this->view);
       fts_set_int(a+2, this->range_mode);
@@ -91,15 +97,7 @@ track_editor_upload(track_editor_t *this)
 			fts_client_send_message((fts_object_t *)this, seqsym_columns, size, atoms);
     
     if(props_size > 0)
-			fts_client_send_message((fts_object_t *)this, seqsym_props_to_draw, props_size, props_atoms);
-	
-    if(this->min_val!=0 || this->max_val!=1)
-		{
-			fts_atom_t b[2];
-			fts_set_int(b, this->min_val);
-			fts_set_int(b+1, this->max_val);
-			fts_client_send_message((fts_object_t *)this, seqsym_range, 2, b);
-		}
+			fts_client_send_message((fts_object_t *)this, seqsym_props_to_draw, props_size, props_atoms);	
   }
 }
 

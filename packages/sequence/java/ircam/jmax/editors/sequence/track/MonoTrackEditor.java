@@ -46,13 +46,9 @@ public class MonoTrackEditor extends TrackBaseEditor
   public MonoTrackEditor(Geometry g, Track trk, boolean isInsequence)
   {
     super(g, trk, isInsequence);
+    viewMode = PEAKS_VIEW;
   }
 
-  public int getDefaultViewMode()
-  {
-    return PEAKS_VIEW;
-  }
-  
   public int getInitialHeight()
   {
     return getDefaultHeight();
@@ -93,7 +89,6 @@ public void setAdapter(MonoDimensionalAdapter adapter)
 public void setViewMode(int viewType)
 {
 	super.setViewMode(viewType);
-	/*if(!gc.isInSequence())*/
   ((FtsTrackObject)gc.getDataModel()).editorObject.setViewMode(getViewMode());
 }
 

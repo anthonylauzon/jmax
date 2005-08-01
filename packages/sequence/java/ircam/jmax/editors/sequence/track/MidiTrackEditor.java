@@ -60,6 +60,8 @@ public class MidiTrackEditor extends TrackBaseEditor
         }
         public void componentMoved(ComponentEvent e){}
       });
+    
+    viewMode = PIANOROLL_VIEW;
   }
    
   public void reinit()
@@ -140,11 +142,6 @@ public class MidiTrackEditor extends TrackBaseEditor
     resizeToPreferredSize( true);
   }
 	
-  public int getDefaultViewMode()
-  {
-    return PIANOROLL_VIEW;
-  }  
-  
 	public void setGridMode(int gridMode)
   {
 		this.gridMode = gridMode;

@@ -417,8 +417,6 @@ void endUpload()
 public void openEditor(int argc, FtsAtom[] argv)
 {  
   createEditor();/* rest moved in endUpload */  
-  /*showEditor();
-  FtsObject.requestResetGui();*/
 }
 
 public boolean isUploading()

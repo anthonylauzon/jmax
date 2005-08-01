@@ -38,6 +38,7 @@ public class IntegerAdapter extends MonoDimensionalAdapter{
     super(geometry, gc, constant);
     
     YMapper = IntegerMapper.getMapper();
+    viewMode = MonoTrackEditor.PEAKS_VIEW;
 }
 
 public String getType( Event e)
@@ -167,8 +168,6 @@ public boolean isDrawable()
 
 public int getViewMode()
 {
-  if(viewMode == -1)
-    initViewMode(MonoTrackEditor.PEAKS_VIEW);
   return viewMode;
 }
 

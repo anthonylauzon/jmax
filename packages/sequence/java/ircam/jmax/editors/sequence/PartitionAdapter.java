@@ -49,6 +49,7 @@ public class PartitionAdapter extends Adapter implements PropertyChangeListener{
 		
     itsName = "Standard Adapter";
     this.gc = gc;
+    viewMode = MidiTrackEditor.PIANOROLL_VIEW;
 }
 
 
@@ -359,8 +360,6 @@ public void setViewMode(int mode)
 
 public int getViewMode()
 {
-  if(viewMode == -1)
-    initViewMode(MidiTrackEditor.PIANOROLL_VIEW);
   return viewMode;
 }
 
@@ -499,15 +498,6 @@ public void propertyChange(PropertyChangeEvent e)
 		setViewMode(((Integer)e.getNewValue()).intValue());
 	else if(e.getPropertyName().equals("rangeMode"))
 		setRangeMode(((Integer)e.getNewValue()).intValue() );
-}
-
-public void initViewMode(int defMode)
-{
-  FtsTrackEditorObject editor = gc.getFtsTrackEditorObject();
-  if(editor != null && editor.haveContent())
-    viewMode = editor.view;
-  else
-    viewMode = defMode;
 }
 
 //------------- Fields

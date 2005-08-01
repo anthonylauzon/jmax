@@ -72,12 +72,7 @@ public class FloatTrackEditor extends MonoTrackEditor
     if(value<(float)min) track.setProperty("minimumValue", new Integer((int)value-1));
   }
 
-  public int getDeafultViewMode()
-  {
-    return PEAKS_VIEW;
-  }   
-  
-  int viewMode = -1;
+  int viewMode = PEAKS_VIEW;
   static public final int PEAKS_VIEW = 2;
   static public final int STEPS_VIEW = 3;
   static public final int BREAK_POINTS_VIEW = 4;

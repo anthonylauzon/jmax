@@ -39,6 +39,7 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
     this.constant = constant;
     
     YMapper = IntegerMapper.getMapper();
+    viewMode = MonoTrackEditor.PEAKS_VIEW;
 }
 
 /**
@@ -140,8 +141,6 @@ public int getMaxScoreY()
 
 public int getViewMode()
 {
-  if(viewMode == -1)
-    initViewMode(MonoTrackEditor.PEAKS_VIEW);
   return viewMode;
 }
 

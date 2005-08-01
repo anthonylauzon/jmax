@@ -268,8 +268,6 @@ void initGridMode()
 }
 public void setGridMode(int gridMode){}
 
-public abstract int getDefaultViewMode();
-
 void listenToMarkers( FtsTrackObject markers, SequenceSelection markSel)
 {
 	currentMarkers = markers;
@@ -485,19 +483,8 @@ public void setViewMode(int viewType)
 }
 public int getViewMode()
 {
-  if(viewMode == -1)
-    initViewMode();
   return viewMode;
 }
-
-public void initViewMode()
-{
-  FtsTrackEditorObject editor = track.getFtsTrack().getFtsTrackEditorObject(); 
-  if(editor != null && editor.haveContent())
-    viewMode = editor.view;
-  else
-    viewMode = getDefaultViewMode();
-} 
 
 public void setRangeMode(int rangeMode, boolean changed)
 {
