@@ -28,9 +28,11 @@ MessageTrackEditorFactory.java \
 MessageValue.java \
 MidiTrackEditor.java \
 MidiTrackEditorFactory.java \
+MidiTrackInspector.java \
 MidiValue.java \
 MonoTrackEditor.java \
 MonoTrackEditorFactory.java \
+MonoTrackInspector.java \
 NullEditor.java \
 SequenceTableDialog.java \
 SequenceTablePanel.java \

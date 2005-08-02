@@ -36,15 +36,16 @@ import ircam.jmax.toolkit.*;
 * The panel containing the JTable representation of an Explode.
  * The editing of a generic entry is handled by a DefaultCellEditor object.
  * See the setUpIntegerEditor method in this class for details. */
-class SequenceTablePanel extends JPanel implements ListSelectionListener {
+class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTableListener {
 	
   SequenceTablePanel(TrackTableModel model, SequenceGraphicContext gc, SequenceSelection selection)
   {
     this.tmodel = model;
     this.gc = gc;
     this.trackObj = (FtsTrackObject)tmodel.getTrackDataModel();
+    this.selection = selection;
 
-    table = new JMaxMatTable(tmodel);
+    table = new JMaxMatTable(tmodel, this);
 		
     /************/
     if(trackObj.getType() == AmbitusValue.info || trackObj.getType() == MarkerValue.info)
@@ -249,9 +250,18 @@ public class ComboCellEditor extends DefaultCellEditor
 	}
 }
 
+/***
+ * JMaxTableListener interface
+ */
+public void deleteSelection()
+{
+   selection.deleteAll();
+}
+
 transient TrackTableModel tmodel;
 transient FtsTrackObject trackObj;
 transient SequenceGraphicContext gc;
+SequenceSelection selection;
 transient JScrollPane scrollPane; 
 transient JTable table;
 ComboCellEditor typeEditor;

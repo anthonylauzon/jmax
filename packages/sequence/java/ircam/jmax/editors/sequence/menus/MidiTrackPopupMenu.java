@@ -36,14 +36,7 @@ import ircam.jmax.editors.sequence.actions.*;
 import ircam.jmax.editors.sequence.track.*;
 
 public class MidiTrackPopupMenu extends TrackBasePopupMenu 
-{
-  JMenu labelTypesMenu;
-  private ButtonGroup labelTypesMenuGroup;
-	JRadioButtonMenuItem usedRangeItem, wholeRangeItem;
-  LabelTypesAction labelAction;
-  JRadioButtonMenuItem pianoItem, stavesItem;
-	JRadioButtonMenuItem timeItem, measuresItem;
-	
+{	
   public MidiTrackPopupMenu( MidiTrackEditor editor, boolean isInSequence)
   {
     super(editor, isInSequence);
@@ -90,165 +83,26 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
 		  }
 		});	
     add(item);
-    
-    addSeparator();
-		
-    labelTypesMenu = new JMenu("Labels");
-    add( labelTypesMenu);
-		
-    labelAction = new LabelTypesAction((MidiTrackEditor)target);
-		
     pack();
   }
 	
-  boolean addRangeMenu()
+  void addInspectorMenu()
   {
-		ButtonGroup rangeMenuGroup = new ButtonGroup();
-    
-    usedRangeItem = new JRadioButtonMenuItem("Used Range");
-    usedRangeItem.addActionListener( new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.USED_RANGE, true);
-		  }
-		});
-    rangeMenuGroup.add(usedRangeItem);
-    add(usedRangeItem);    
-    wholeRangeItem = new JRadioButtonMenuItem("Whole Range");
-    wholeRangeItem.addActionListener( new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				((MidiTrackEditor)target).setRangeMode( MidiTrackEditor.WHOLE_RANGE, true);
-		  }
-		});		
-    rangeMenuGroup.add(wholeRangeItem);
-    add(wholeRangeItem);
-    wholeRangeItem.setSelected(true);
-		
-    return true;				
-  }
-	
-  boolean addViewMenu()
-  {
-    ButtonGroup viewsMenuGroup = new ButtonGroup();
-    
-    pianoItem = new JRadioButtonMenuItem("Pianoroll");
-		pianoItem.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				target.setViewMode( MidiTrackEditor.PIANOROLL_VIEW);
-				if(((Integer)target.getTrack().getProperty("rangeMode")).intValue() == MidiTrackEditor.USED_RANGE)
-				{
-					target.getTrack().setProperty("maximumPitch", new Integer(((MidiTrackEditor)target).getMaximumPitchInTrack()));
-					target.getTrack().setProperty("minimumPitch", new Integer(((MidiTrackEditor)target).getMinimumPitchInTrack()));
-				}
-			}		
-		});		
-    viewsMenuGroup.add(pianoItem);
-    add(pianoItem);    
-    stavesItem = new JRadioButtonMenuItem("Staves");
-		stavesItem.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				target.setViewMode( MidiTrackEditor.NMS_VIEW);
-				if(((Integer)target.getTrack().getProperty("rangeMode")).intValue() == MidiTrackEditor.USED_RANGE)
-				{
-					target.getTrack().setProperty("maximumPitch", new Integer(((MidiTrackEditor)target).getMaximumPitchInTrack()));
-					target.getTrack().setProperty("minimumPitch", new Integer(((MidiTrackEditor)target).getMinimumPitchInTrack()));
-				}
-			}		
-		});		
-    viewsMenuGroup.add(stavesItem);
-    add(stavesItem);
-    pianoItem.setSelected(true);
-		
-		/************** Time or Measures Grid *******************/
-    ButtonGroup gridMenuGroup = new ButtonGroup();
-    
-    timeItem = new JRadioButtonMenuItem("Show Time Grid");
-		timeItem.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				((MidiTrackEditor)target).setGridMode( TrackEditor.TIME_GRID);
-			}		
-		});		
-    gridMenuGroup.add(timeItem);
-    add(timeItem);    
-    measuresItem = new JRadioButtonMenuItem("Show Markers");
-		measuresItem.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e)
-		  {
-				((MidiTrackEditor)target).setGridMode( TrackEditor.MEASURES_GRID);
-			}		
-		});		
-    gridMenuGroup.add(measuresItem);
-    add(measuresItem);
-    timeItem.setSelected(true);		
-
-    return true;
-  }
-	
+    JMenuItem item = new JMenuItem("Inspect ... ");
+    item.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e)
+    {
+        MidiTrackInspector.inspect(target, target.getGraphicContext().getFrame(), isInSequence,
+                                   SwingUtilities.convertPoint(target, x, y, target.getGraphicContext().getFrame()));
+    }
+    });
+    add(item);
+  }    
+  	
   public void update()
   {
-    updateRangeMenu();
-		
-    updateLabelTypesMenu();
-		
     super.update();
-  }
-	
-  void updateViewMenu()
-  {
-    switch( target.getViewMode())
-		{
-      case MidiTrackEditor.NMS_VIEW:
-				stavesItem.setSelected(true);
-				break;
-      case MidiTrackEditor.PIANOROLL_VIEW:
-      default:
-				pianoItem.setSelected(true);
-				break;
-		}
-  }
-	
-  void updateLabelTypesMenu()
-  {
-    labelTypesMenu.removeAll();
-    labelTypesMenuGroup = new ButtonGroup();
-    
-    String currentType = ((MidiTrackEditor)target).getLabelType();
-    String type;
-		
-    JRadioButtonMenuItem selectItem = null;
-    JRadioButtonMenuItem item =  new JRadioButtonMenuItem( "none"); 
-    item.addActionListener( labelAction);
-    labelTypesMenu.add( item);
-    labelTypesMenuGroup.add(item);
-    if( currentType.equals("none"))
-      selectItem = item;
-		
-    for (Enumeration e = target.getTrack().getFtsTrack().getPropertyNames() ; e.hasMoreElements();)
-		{
-			type = (String)e.nextElement();
-			item = new JRadioButtonMenuItem( type);
-			item.addActionListener( labelAction);
-			labelTypesMenu.add(item);
-			labelTypesMenuGroup.add(item);
-			if( currentType.equals(type)) selectItem = item;
-		}
-		
-    if( selectItem != null) selectItem.setSelected( true);
-  }
-	
-  void updateRangeMenu()
-  {
-		int rangeMode = ((Integer)target.getTrack().getProperty("rangeMode")).intValue();
-		if(rangeMode == MidiTrackEditor.USED_RANGE && !usedRangeItem.isSelected())
-			usedRangeItem.setSelected(true);
-		else
-			if(rangeMode == MidiTrackEditor.WHOLE_RANGE && !wholeRangeItem.isSelected()) 
-				wholeRangeItem.setSelected(true);
-  }
+  }	
 }
 
 

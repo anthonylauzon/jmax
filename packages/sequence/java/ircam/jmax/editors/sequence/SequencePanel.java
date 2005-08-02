@@ -325,7 +325,8 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
        }
        public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection)
        {				
-         currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
+         if( currentMarkersSelection != null)
+           currentMarkersSelection.removeListSelectionListener( markersSelectionListener);
          currentMarkersSelection = markersSelection;
          if( currentMarkersSelection != null)
            currentMarkersSelection.addListSelectionListener( markersSelectionListener);

@@ -44,61 +44,18 @@ public class MonoTrackPopupMenu extends TrackBasePopupMenu
     super(editor, isInSequence);
   }
 
-  boolean addRangeMenu()
+  void addInspectorMenu()
   {
-    JMenuItem item = new JMenuItem("Range");
+    JMenuItem item = new JMenuItem("Inspect ... ");
     item.addActionListener(new ActionListener(){
-	public void actionPerformed(ActionEvent e)
-	{
-	  ChangeRangeDialog.changeRange(target, target.getGraphicContext().getFrame(),
-					SwingUtilities.convertPoint(target, x, y, target.getGraphicContext().getFrame()));
-	}
-      });
-    add(item);
-  
-    return true;
-  }
-
-  boolean addViewMenu()
-  {
-    ButtonGroup viewsMenuGroup = new ButtonGroup();
-
-    peaksItem = new JRadioButtonMenuItem("Peaks view");
-    peaksItem.addActionListener(new SetViewAction(MonoTrackEditor.PEAKS_VIEW, target));
-    viewsMenuGroup.add(peaksItem);
-    add(peaksItem);    
-    
-    stepsItem = new JRadioButtonMenuItem("Steps view");
-    stepsItem.addActionListener(new SetViewAction(MonoTrackEditor.STEPS_VIEW, target));
-    viewsMenuGroup.add(stepsItem);
-    add(stepsItem);
-    
-    breaksItem= new JRadioButtonMenuItem("BreakPoints view");
-    breaksItem.addActionListener(new SetViewAction(MonoTrackEditor.BREAK_POINTS_VIEW, target));
-    viewsMenuGroup.add(breaksItem);
-    add(breaksItem);
-    
-    peaksItem.setSelected(true);
-    
-    return true;
-  }
-
-  void updateViewMenu()
-  {
-    switch( target.getViewMode())
+      public void actionPerformed(ActionEvent e)
       {
-      case MonoTrackEditor.STEPS_VIEW:
-	stepsItem.setSelected(true);
-	break;
-      case MonoTrackEditor.BREAK_POINTS_VIEW:
-	breaksItem.setSelected(true);
-	break;
-      case MonoTrackEditor.PEAKS_VIEW:
-      default:
-	peaksItem.setSelected(true);
-	break;
+        MonoTrackInspector.inspect(target, target.getGraphicContext().getFrame(), isInSequence,
+                                   SwingUtilities.convertPoint(target, x, y, target.getGraphicContext().getFrame()));
       }
-  }
+    });
+    add(item);
+  }  
 }
 
 

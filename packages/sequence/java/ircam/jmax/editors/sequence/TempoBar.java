@@ -587,8 +587,10 @@ public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelectio
 }
 public void updateMarkers(FtsTrackObject marks, SequenceSelection markSel)
 {
-	markersSelection.removeListSelectionListener(this);
-	markersTrack.removeListener(this);
+  if(markersSelection != null)
+    markersSelection.removeListSelectionListener(this);
+	if(markersTrack != null)
+    markersTrack.removeListener(this);
 	if(marks != null)
 		hasMarkers( marks, markSel);
 	else

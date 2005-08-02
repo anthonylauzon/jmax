@@ -43,6 +43,7 @@ public class JMaxMatTable extends JTable
 {    
   FtsObjectCellEditor ftsObjEditor;
   FtsObjectCellRenderer ftsObjRenderer;
+  JMaxTableListener listener;
   
   public static final Color matGridColor = new Color(220, 220, 220);
   public static final Color rowsIdColor = new Color(245, 245, 245);
@@ -60,9 +61,7 @@ public class JMaxMatTable extends JTable
     
     public void actionPerformed(ActionEvent e)
 	  {
-      ListSelectionModel selection = table.getSelectionModel();
-      if(selection instanceof ircam.jmax.editors.sequence.SequenceSelection)
-        ((ircam.jmax.editors.sequence.SequenceSelection)selection).deleteAll();
+      table.getListener().deleteSelection();
     }
     JMaxMatTable table;
   } 
@@ -83,9 +82,10 @@ public class JMaxMatTable extends JTable
     JMaxMatTable table;
   } 
   
-  public JMaxMatTable(TableModel model)
+  public JMaxMatTable(TableModel model, JMaxTableListener listener)
   {
     super(model);
+    this.listener = listener;
     
     ftsObjEditor = new FtsObjectCellEditor( this);
     ftsObjRenderer = new FtsObjectCellRenderer();
@@ -101,6 +101,11 @@ public class JMaxMatTable extends JTable
     getActionMap().put("hide", new HideAction(this));
   }
    
+  public JMaxTableListener getListener()
+  {
+    return listener;
+  }
+  
   public TableCellEditor getCellEditor(int row,int col)
   {
     if( getModel().getValueAt(row, col) instanceof FtsObject)

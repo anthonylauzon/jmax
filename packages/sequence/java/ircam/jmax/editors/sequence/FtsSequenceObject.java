@@ -142,11 +142,11 @@ void notifyUpdateMarkers()
 	Track track;
 	FtsTrackObject markers = getMarkersTrack();
 	SequenceSelection markSel = getMarkersSelection();
-	for(Enumeration e = tracks.elements(); e.hasMoreElements();)
-	{
-		track = (Track)e.nextElement();
-		track.getFtsTrack().notifyUpdateMarkers( markers, markSel);
-	}
+  for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+  {
+    track = (Track)e.nextElement();
+    track.getFtsTrack().notifyUpdateMarkers( markers, markSel);
+  }
 }
 /**
 * Fts callback: open the editor associated with this FtsSequenceObject.

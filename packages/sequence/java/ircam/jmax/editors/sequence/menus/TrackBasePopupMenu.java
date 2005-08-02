@@ -62,7 +62,7 @@ public class TrackBasePopupMenu extends JPopupMenu
     target = editor;
     this.isInSequence = isInSequence;
 		
-    addViewMenu();
+    addInspectorMenu();
 		
     item = new JMenuItem("View as list");
     item.addActionListener(new ActionListener(){
@@ -73,33 +73,7 @@ public class TrackBasePopupMenu extends JPopupMenu
 		});
     add(item);
 				
-    if( addRangeMenu())
-      addSeparator();
-		
-    if(isInSequence)
-		{    
-			moveToAction = new MoveTrackToAction(target);
-			moveMenu = new JMenu("Move to Position");
-			item = new JMenuItem(""+trackCount);
-			item.addActionListener( moveToAction);
-			moveMenu.add(item);
-			
-			add(moveMenu);
-			
-			addSeparator();
-						
-			removeItem = new JMenuItem("Remove Track");
-			removeItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e)
-	    {
-					((FtsSequenceObject)target.getGraphicContext().getFtsObject()).
-					removeTrack( target.getTrack());
-	    }
-			});
-			add(removeItem);
-     
-      addSeparator();
-		}
+    addSeparator(); 
     
     item = new JMenuItem("Export Track");
     item.addActionListener(new ActionListener(){
@@ -118,91 +92,31 @@ public class TrackBasePopupMenu extends JPopupMenu
     });
     add(item);
 		
-		/*if(!isInSequence)
-		{*/
-    saveItem = new JCheckBoxMenuItem("Save Editor State");
-    saveItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent e)
-      {
-        target.getTrack().getFtsTrack().requestSetSaveEditor(saveItem.getState());
-      }
-    });
-    add(saveItem);    
-		/*}*/
-    		
+    if(isInSequence)
+		{          
+			addSeparator();
+						
+			removeItem = new JMenuItem("Remove Track");
+			removeItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+	    {
+					((FtsSequenceObject)target.getGraphicContext().getFtsObject()).
+					removeTrack( target.getTrack());
+	    }
+			});
+			add(removeItem);      
+		}    
     pack();
   }
-  
-  boolean addRangeMenu()
-  {
-    return false;
-  }
-  boolean addViewMenu()
-  {
-    return false;
-  }
-  void updateViewMenu(){}
+    
+  void addInspectorMenu(){}
 	
   public TrackBaseEditor getPopupTarget(){
     return target;
   }
 	
-  public void update()
-  {
-    if(isInSequence)
-      updateMoveToMenu();
-			
-    updateViewMenu();
-			
-		/*if(!isInSequence)
-		{*/
-    boolean saveEditor = target.getTrack().getFtsTrack().saveEditor;
-    if(saveItem.getState() != saveEditor)
-      saveItem.setState(saveEditor);			
-		/*}*/		
-	}
-	
-  void updateMoveToMenu()
-  {
-    JMenuItem item;
-    int count =  target.trackCount()-1;
-    if(trackCount==count)
-      return;
-    else
-		{
-			int dif = count-trackCount;
-			
-			if(dif>0)
-				for(int i=1; i<=dif; i++)
-				{
-					item = new JMenuItem(""+(trackCount+i));
-					item.addActionListener( moveToAction);
-					moveMenu.add(item);			
-				}		
-					else
-						for(int i=0; i<-dif; i++)
-							moveMenu.remove(moveMenu.getItemCount()-1);
-			trackCount = count;
-		}
-  }
-	
-  class SetViewAction extends AbstractAction {
-    SetViewAction(int viewType, TrackBaseEditor editor)
-	{
-      super("Set View");
-      this.viewType = viewType;
-      this.editor = editor;
-	}
-    
-    public void actionPerformed(ActionEvent e)
-	{
-      editor.setViewMode(viewType);
-	}
+  public void update(){}
 		
-    int viewType;
-    TrackBaseEditor editor;
-  }  
-	
   public void show(Component invoker, int x, int y)
   {
     this.x = x;

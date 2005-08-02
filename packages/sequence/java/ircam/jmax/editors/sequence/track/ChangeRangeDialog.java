@@ -66,7 +66,6 @@ public class ChangeRangeDialog extends JDialog {
             System.err.println("Error:  invalid number format!");
             return;
 		      }
-		      /*track.setProperty("maximumValue", new Integer(value));*/
           trackEditor.setMaximumValue(value);
         }  
       }
@@ -96,7 +95,6 @@ public class ChangeRangeDialog extends JDialog {
             System.err.println("Error:  invalid number format!");
             return;
 		      }
-		      /*track.setProperty("minimumValue", new Integer(value));*/
           trackEditor.setMinimunValue(value);
         }  
       }

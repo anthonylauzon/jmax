@@ -39,7 +39,7 @@ import ircam.jmax.toolkit.*;
   /**
    * The graphic component containing the tracks of a Sequence.
    */
-public class MatPanel extends JPanel implements Editor, MatDataListener
+public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTableListener
 {    
   MatDataModel matData;
   EditorContainer itsContainer;
@@ -80,7 +80,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   void createTable()
   {
     setLayout(new BorderLayout());
-    table = new JMaxMatTable(tableModel);	
+    table = new JMaxMatTable(tableModel, this);	
     table.setPreferredScrollableViewportSize(matData.getDefaultSize());
     table.setRowHeight(ROW_HEIGHT);
     table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF);
@@ -220,6 +220,13 @@ public class MatPanel extends JPanel implements Editor, MatDataListener
   public void matSelectRow( int row_id)
   {
     table.getSelectionModel().setSelectionInterval(  row_id, row_id);
+  }
+  
+  //------------------- JMaxTableListener interface ---------------
+  
+  public void deleteSelection()
+  {
+    //
   }
   
   //------------------- Editor interface ---------------

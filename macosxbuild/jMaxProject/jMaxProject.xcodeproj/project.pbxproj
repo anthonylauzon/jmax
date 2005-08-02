@@ -352,6 +352,9 @@
 		3BB5F25D06A696CD00739298 /* MatTableModel.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BB5F25C06A696CD00739298 /* MatTableModel.java */; };
 		3BCA11930624183A008FC824 /* SequenceDefaults.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BCA11920624183A008FC824 /* SequenceDefaults.java */; };
 		3BD62EDD0621C07400C689DC /* SequenceFonts.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BD62EDC0621C07400C689DC /* SequenceFonts.java */; };
+		3BEAD512089FC89900DCF3CD /* MidiTrackInspector.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BEAD510089FC89900DCF3CD /* MidiTrackInspector.java */; };
+		3BEAD513089FC89900DCF3CD /* MonoTrackInspector.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BEAD511089FC89900DCF3CD /* MonoTrackInspector.java */; };
+		3BEAD542089FCFB800DCF3CD /* JMaxTableListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BEAD541089FCFB800DCF3CD /* JMaxTableListener.java */; };
 		3BFBB6F8066E20EB00C7446F /* AbstractTrackRenderer.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BFBB6F7066E20EB00C7446F /* AbstractTrackRenderer.java */; };
 		3BFD0F52066CC869009D9668 /* MarkerValue.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BFD0F51066CC869009D9668 /* MarkerValue.java */; };
 		3BFD0F5E066CC9C7009D9668 /* MarkerEventRenderer.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */; };
@@ -2567,6 +2570,9 @@
 		3BB5F25C06A696CD00739298 /* MatTableModel.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MatTableModel.java; path = ../../packages/data/java/ircam/jmax/editors/mat/MatTableModel.java; sourceTree = SOURCE_ROOT; };
 		3BCA11920624183A008FC824 /* SequenceDefaults.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = SequenceDefaults.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/SequenceDefaults.java; sourceTree = SOURCE_ROOT; };
 		3BD62EDC0621C07400C689DC /* SequenceFonts.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = SequenceFonts.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/SequenceFonts.java; sourceTree = SOURCE_ROOT; };
+		3BEAD510089FC89900DCF3CD /* MidiTrackInspector.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MidiTrackInspector.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/MidiTrackInspector.java; sourceTree = "<group>"; };
+		3BEAD511089FC89900DCF3CD /* MonoTrackInspector.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MonoTrackInspector.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/MonoTrackInspector.java; sourceTree = "<group>"; };
+		3BEAD541089FCFB800DCF3CD /* JMaxTableListener.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = JMaxTableListener.java; path = ../../java/src/ircam/jmax/toolkit/JMaxTableListener.java; sourceTree = "<group>"; };
 		3BFBB6F7066E20EB00C7446F /* AbstractTrackRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = AbstractTrackRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/AbstractTrackRenderer.java; sourceTree = SOURCE_ROOT; };
 		3BFD0F51066CC869009D9668 /* MarkerValue.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerValue.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java; sourceTree = SOURCE_ROOT; };
 		3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerEventRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java; sourceTree = SOURCE_ROOT; };
@@ -5250,9 +5256,11 @@
 				F851249A028BEBB201664092 /* MessageValue.java */,
 				F851249B028BEBB201664092 /* MidiTrackEditor.java */,
 				F851249C028BEBB201664092 /* MidiTrackEditorFactory.java */,
+				3BEAD510089FC89900DCF3CD /* MidiTrackInspector.java */,
 				F851249D028BEBB201664092 /* MidiValue.java */,
 				F851249E028BEBB201664092 /* MonoTrackEditor.java */,
 				F851249F028BEBB201664092 /* MonoTrackEditorFactory.java */,
+				3BEAD511089FC89900DCF3CD /* MonoTrackInspector.java */,
 				F85124A0028BEBB201664092 /* NullEditor.java */,
 				F85124A1028BEBB201664092 /* SequenceTableDialog.java */,
 				F85124A2028BEBB201664092 /* SequenceTablePanel.java */,
@@ -5913,6 +5921,7 @@
 				F880FE9E0283013E01664092 /* InteractionSemaphore.java */,
 				3B6D539406D11770004013FE /* JMaxEditor.java */,
 				3B28F8AE06EF45CA009639A3 /* JMaxMatTable.java */,
+				3BEAD541089FCFB800DCF3CD /* JMaxTableListener.java */,
 				F880FE9F0283013E01664092 /* Layer.java */,
 				F880FEA00283013E01664092 /* LockListener.java */,
 				F880FEA10283013E01664092 /* MouseDragTracker.java */,
@@ -8524,6 +8533,7 @@
 				3B02488106B94BDA002BEB0D /* JMaxObjectManager.java in Sources */,
 				3B6D539506D11770004013FE /* JMaxEditor.java in Sources */,
 				3B28F8AF06EF45CA009639A3 /* JMaxMatTable.java in Sources */,
+				3BEAD542089FCFB800DCF3CD /* JMaxTableListener.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8838,6 +8848,8 @@
 				3B02488006B94BDA002BEB0D /* JMaxObjectManager.java in Sources */,
 				3B8173DB06D2092900FA1F28 /* TrackSimpleMenu.java in Sources */,
 				3B04C62C06D26F9F004E63C5 /* SequenceSimpleMenu.java in Sources */,
+				3BEAD512089FC89900DCF3CD /* MidiTrackInspector.java in Sources */,
+				3BEAD513089FC89900DCF3CD /* MonoTrackInspector.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
