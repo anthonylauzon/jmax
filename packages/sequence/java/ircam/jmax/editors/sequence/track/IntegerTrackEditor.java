@@ -45,9 +45,9 @@ public class IntegerTrackEditor extends MonoTrackEditor
     super(g, trk, isInsequence);
 
     if(track.getProperty("maximumValue")==null)
-      track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
+      track.setProperty("maximumValue", new Float(IntegerValue.DEFAULT_MAX_VALUE));
     if(track.getProperty("minimumValue")==null)
-      track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+      track.setProperty("minimumValue", new Float(IntegerValue.DEFAULT_MIN_VALUE));
     if(track.getProperty("viewMode")==null)
       track.setProperty("viewMode", new Integer(viewMode));
 
@@ -59,21 +59,21 @@ public class IntegerTrackEditor extends MonoTrackEditor
     
   public void reinit()
   {
-    track.setProperty("maximumValue", new Integer(IntegerValue.DEFAULT_MAX_VALUE));
-    track.setProperty("minimumValue", new Integer(IntegerValue.DEFAULT_MIN_VALUE));
+    track.setProperty("maximumValue", new Float(IntegerValue.DEFAULT_MAX_VALUE));
+    track.setProperty("minimumValue", new Float(IntegerValue.DEFAULT_MIN_VALUE));
 		setViewMode(PEAKS_VIEW);
   }
 
   void updateRange(Object obj)
   {    
-    int max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
-    int min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
+    float max = ((IntegerAdapter)gc.getAdapter()).getMaximumValue();	
+    float min = ((IntegerAdapter)gc.getAdapter()).getMinimumValue();
     Object val = ((TrackEvent)obj).getProperty("value");
     if(val!=null)
     {
       int value = ((Integer)val).intValue();
-      if(value>max) track.setProperty("maximumValue", new Integer(value));
-      if(value<min) track.setProperty("minimumValue", new Integer(value));
+      if(value>max) track.setProperty("maximumValue", new Float(value));
+      if(value<min) track.setProperty("minimumValue", new Float(value));
     }
   }
   

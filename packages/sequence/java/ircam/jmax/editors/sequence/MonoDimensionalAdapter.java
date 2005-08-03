@@ -49,10 +49,10 @@ public class MonoDimensionalAdapter extends PartitionAdapter {
  */
 public int getY(Event e) 
 {  
-  int value = (int)YMapper.get(e) - minValue;
+  int value = (int)(YMapper.get(e) - minValue);
   int height = gc.getGraphicDestination().getSize().height;
-  int range = getRange();
-  float step = (float)((float)height/(float)range);
+  float range = getRange();
+  float step = (float)((float)height/range);
 	
   return height - (int)(value*step);
 }
@@ -63,10 +63,10 @@ public int getY(Event e)
  */
 public int getY(int y) 
 {  
-  int value = y - minValue;
+  int value = (int)(y - minValue);
   int height = gc.getGraphicDestination().getSize().height;
-  int range = getRange();
-  float step = (float)((float)height/(float)range);
+  float range = getRange();
+  float step = (float)((float)height/range);
   return height - (int)(value*step);
 }
 
@@ -78,13 +78,13 @@ public int getInvY(int y)
 {
 	int temp;
 	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)range/(float)height);
+	float range = getRange();
+	float step = (float)(range/(float)height);
 	
-	temp = (int)((height-y)*step) + minValue;
+	temp = (int)((height-y)*step + minValue);
 	
-	if(temp<minValue) temp = minValue;
-	else if(temp>maxValue) temp = maxValue;
+	if(temp<minValue) temp = (int)minValue;
+	else if(temp>maxValue) temp = (int)maxValue;
   
 	return temp;
 }
@@ -115,16 +115,16 @@ public int getHeigth(Event e)
 	/*else*/ return (y0-y);
 }
 
-public int getRange()
+public float getRange()
 {
 	return (maxValue-minValue);
 }
 
-public int getMaximumValue()
+public float getMaximumValue()
 {
 	return maxValue;
 }
-public int getMinimumValue()
+public float getMinimumValue()
 {
 	return minValue;
 }
@@ -148,9 +148,9 @@ public int getViewMode()
 public void propertyChange(PropertyChangeEvent e)
 {
 	if(e.getPropertyName().equals("maximumValue"))
-    maxValue = ((Integer)e.getNewValue()).intValue();
+    maxValue = ((Float)e.getNewValue()).floatValue();
 	else if(e.getPropertyName().equals("minimumValue"))
-    minValue = ((Integer)e.getNewValue()).intValue();
+    minValue = ((Float)e.getNewValue()).floatValue();
 	else 
     if(e.getPropertyName().equals("viewMode"))
       setViewMode(((Integer)e.getNewValue()).intValue());
@@ -158,8 +158,8 @@ public void propertyChange(PropertyChangeEvent e)
 
 //------------- Fields
 int constant;    
-int maxValue = 127;
-int minValue = 0;
+float maxValue = (float)127.0;
+float minValue = (float)0.0;
 }
 
 

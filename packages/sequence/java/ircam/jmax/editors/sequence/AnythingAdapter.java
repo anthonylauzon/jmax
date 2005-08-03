@@ -68,8 +68,8 @@ public class AnythingAdapter extends MonoDimensionalAdapter{
     {
 	int temp;
 	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)range/(float)height);
+	float range = getRange();
+	float step = (float)(range/(float)height);
 	
 	temp = (int)((height-y)*step) + minValue;
 	

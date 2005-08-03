@@ -494,38 +494,38 @@ public int getRangeMode()
 {
 	return this.rangeMode;
 }
-public void setRange(int min, int max)
+public void setRange(float min, float max)
 {
   if(min != rangeMin)
   {
     rangeMin = min;
-    track.setProperty("minimumValue", new Integer(min)); 
+    track.setProperty("minimumValue", new Float(min)); 
   }
   if(max != rangeMax)
   {
     rangeMax = max;
-    track.setProperty("maximumValue", new Integer(max)); 
+    track.setProperty("maximumValue", new Float(max)); 
   }
 }
 
-int rangeMin = 0;
-public void setMinimunValue(int value)
+float rangeMin = (float)0.0;
+public void setMinimunValue(float value)
 {
   if(value != rangeMin)
   {
     rangeMin = value;
-    track.setProperty("minimumValue", new Integer(value));  
+    track.setProperty("minimumValue", new Float(value));  
     track.getFtsTrack().editorObject.setRange(value, rangeMax);
   }
 }
 
-int rangeMax = 1;
-public void setMaximumValue(int value)
+float rangeMax = (float)1.0;
+public void setMaximumValue(float value)
 {
   if(value != rangeMax)
   {
     rangeMax = value;
-    track.setProperty("maximumValue", new Integer(value));  
+    track.setProperty("maximumValue", new Float(value));  
     track.getFtsTrack().editorObject.setRange(rangeMin, value);
   }
 } 

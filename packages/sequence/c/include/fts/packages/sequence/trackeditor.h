@@ -48,8 +48,8 @@ struct _track_editor
   int tab_h;           /* table editor height */
   fts_array_t columns; /* list of table column names */
   fts_array_t props_to_draw; /* list of property names to draw in tempo_bar */
-  int min_val;
-  int max_val;
+  float min_val;
+  float max_val;
 };
 
 FTS_API void track_editor_upload(track_editor_t *this);

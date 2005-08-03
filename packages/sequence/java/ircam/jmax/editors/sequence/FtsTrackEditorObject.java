@@ -65,7 +65,7 @@ public class FtsTrackEditorObject extends FtsObject
 		FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("range"), new FtsMessageHandler(){
 			public void invoke( FtsObject obj, FtsArgs args)
 		  {
-				((FtsTrackEditorObject)obj).restoreRange(args.getInt(0), args.getInt(1));		  
+				((FtsTrackEditorObject)obj).restoreRange((float)args.getDouble(0), (float)args.getDouble(1));		  
 		  }
 		});
     FtsObject.registerMessageHandler( FtsTrackEditorObject.class, FtsSymbol.get("tableSize"), new FtsMessageHandler(){
@@ -95,8 +95,8 @@ public FtsTrackEditorObject(FtsServer server, FtsObject parent, int objId)
 		trackObj = (FtsTrackObject)parent;		
 		columnNames = new Vector();
     propsToDraw = new Vector();
-    rangeMin = 0;
-    rangeMax = 1;
+    rangeMin = (float)0.0;
+    rangeMax = (float)1.0;
 }
 
 public void setEditorState( int nArgs, FtsAtom args[])
@@ -112,12 +112,12 @@ public void setEditorState( int nArgs, FtsAtom args[])
 		int transp = args[6].intValue;
 		int view = args[7].intValue;
 		int rMode = args[8].intValue;
-		int rMin = 0;
-    int rMax = 1;
+		float rMin = (float)0.0;
+    float rMax = (float)1.0;
     if(nArgs > 8)
     {
-      rMin = args[9].intValue;
-      rMax = args[10].intValue;
+      rMin = (float)args[9].doubleValue;
+      rMax = (float)args[10].doubleValue;
     }
     
 		if( x!= this.wx || y!=this.wy || w!=this.ww || h!=this.wh || 
@@ -137,12 +137,12 @@ public void setEditorState( int nArgs, FtsAtom args[])
     String label = args[0].symbolValue.toString();
     int view = args[1].intValue;
 		int rMode = args[2].intValue;
-    int rMin = 0;
-    int rMax = 1;
+    float rMin = (float)0.0;
+    float rMax = (float)1.0;
     if(nArgs > 3)
     {
-      rMin = args[3].intValue;
-      rMax = args[4].intValue;
+      rMin = (float)args[3].doubleValue;
+      rMax = (float)args[4].doubleValue;
     }
     
     if(!label.equals(this.label) || view != this.view || rMode != this.rangeMode ||
@@ -185,7 +185,7 @@ public void restoreGridMode( int nArgs, FtsAtom args[])
 		this.gridMode = args[0].intValue;
 }
 
-public void restoreRange(int min, int max)
+public void restoreRange(float min, float max)
 {
   this.rangeMin = min;
   this.rangeMax = max;
@@ -280,7 +280,7 @@ public void setZoom(float zoom)
 		{
 			this.zoom = zoom;
 			args.clear();
-			args.addFloat( zoom);
+			args.addDouble( (double)zoom);
 			
 			try{
 				send( FtsSymbol.get("zoom"), args);
@@ -351,15 +351,15 @@ public void setRangeMode(int rMode)
 		}
 }
 
-public void setRange(int min, int max)
+public void setRange(float min, float max)
 {	
 		if((this.rangeMin != min ||  this.rangeMax != max) && !trackObj.isUploading() && !trackObj.isSequenceUploading())
 		{     
 			this.rangeMin = min;
 			this.rangeMax = max;
 			args.clear();
-			args.addInt( rangeMin);
-			args.addInt( rangeMax);
+			args.addDouble( (double)rangeMin);
+			args.addDouble( (double)rangeMax);
 			
 			try{
 				send( FtsSymbol.get("range"), args);
@@ -493,7 +493,7 @@ public void requestSetEditorState(Rectangle bounds)
     args.addInt( ww);
     args.addInt( wh);
     args.addSymbol( FtsSymbol.get(label));
-    args.addFloat( zoom);
+    args.addDouble( (double)zoom);
     args.addInt( transp);
     args.addInt( view);
     args.addInt( rangeMode);
@@ -505,10 +505,10 @@ public void requestSetEditorState(Rectangle bounds)
     args.addInt( view);
     args.addInt( rangeMode);    
   }
-  if(rangeMin != 0 || rangeMax != 1)
+  if(rangeMin != 0.0 || rangeMax != 1.0)
   {
-    args.addInt( rangeMin);
-    args.addInt( rangeMax);
+    args.addDouble( (double)rangeMin);
+    args.addDouble( (double)rangeMax);
   }
   
   try{
@@ -526,15 +526,15 @@ public boolean haveContent()
   if( !trackObj.isInSequence())
 		return ((ww != -1) && (wh != -1) && (wx != -1) && (wy != -1));
   else
-    return (!label.equals("") || view != 0 || rangeMode != 0 || gridMode != 0 || rangeMin != 0 || rangeMax != 1);
+    return (!label.equals("") || view != 0 || rangeMode != 0 || gridMode != 0 || rangeMin != 0.0 || rangeMax != 1.0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////	
 
-public int wx, wy, ww, wh, transp, view, gridMode, tab_w, tab_h, rangeMin, rangeMax;
+public int wx, wy, ww, wh, transp, view, gridMode, tab_w, tab_h; 
 public int rangeMode = 0;
 public String label;
-public float zoom;
+public float zoom, rangeMin, rangeMax;
 public Vector columnNames, propsToDraw;
 FtsTrackObject trackObj;
 protected transient FtsArgs args = new FtsArgs();

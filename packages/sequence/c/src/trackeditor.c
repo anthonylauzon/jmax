@@ -58,10 +58,10 @@ track_editor_upload(track_editor_t *this)
         fts_set_int(a+6, this->transp);
         fts_set_int(a+7, this->view);
         fts_set_int(a+8, this->range_mode);
-        if(this->min_val!=0 || this->max_val!=1)
+        if(this->min_val != 0.0 || this->max_val != 1.0)
         {
-          fts_set_int(a+9, this->min_val);
-          fts_set_int(a+10, this->max_val);
+          fts_set_float(a+9, this->min_val);
+          fts_set_float(a+10, this->max_val);
           i = 2;
         }        
         
@@ -73,10 +73,10 @@ track_editor_upload(track_editor_t *this)
       fts_set_symbol(a, this->label);
       fts_set_int(a+1, this->view);
       fts_set_int(a+2, this->range_mode);
-      if(this->min_val!=0 || this->max_val!=1)
+      if(this->min_val != 0.0 || this->max_val != 1.0)
       {
-        fts_set_int(a+3, this->min_val);
-        fts_set_int(a+4, this->max_val);
+        fts_set_float(a+3, this->min_val);
+        fts_set_float(a+4, this->max_val);
         i = 2;
       }      
       fts_client_send_message((fts_object_t *)this, seqsym_editor, 3+i, a);
@@ -177,11 +177,11 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
       fts_dumper_send(dumper, seqsym_editor, n_props + 1, b);
     }  
     
-    if(this->min_val != 0 || this->max_val != 1)
+    if(this->min_val != 0.0 || this->max_val != 1.0)
     {
       fts_set_symbol(a, seqsym_range);
-      fts_set_int(a + 1, this->min_val);
-      fts_set_int(a + 2, this->max_val);
+      fts_set_float(a + 1, this->min_val);
+      fts_set_float(a + 2, this->max_val);
       fts_dumper_send(dumper, seqsym_editor, 3, a);
     }
   }
@@ -210,11 +210,11 @@ track_editor_dump_gui(track_editor_t *this, fts_dumper_t *dumper)
       fts_set_int(a + 2, this->tab_h);
       fts_dumper_send(dumper, seqsym_editor, 3, a);
     }    
-    if(this->min_val != 0 || this->max_val != 1)
+    if(this->min_val != 0.0 || this->max_val != 1.0)
     {
       fts_set_symbol(a, seqsym_range);
-      fts_set_int(a + 1, this->min_val);
-      fts_set_int(a + 2, this->max_val);
+      fts_set_float(a + 1, this->min_val);
+      fts_set_float(a + 2, this->max_val);
       fts_dumper_send(dumper, seqsym_editor, 3, a);
     }    
   }
@@ -337,10 +337,10 @@ static fts_method_status_t
 track_editor_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_editor_t *this = (track_editor_t *)o;
-	if(ac == 2 && fts_is_int(at) && fts_is_int(at+1))
+	if(ac == 2 && fts_is_float(at) && fts_is_float(at+1))
 	{
-		int min_val = fts_get_int(at);
-		int max_val =  fts_get_int(at+1);
+		float min_val = fts_get_float(at);
+		float max_val =  fts_get_float(at+1);
     if(this->min_val != min_val || this->max_val != max_val)
     {
       this->min_val = min_val;
@@ -439,12 +439,12 @@ track_editor_set_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
       int transp = fts_get_int(at+6);
       int view = fts_get_int(at+7);
       int range_mode = fts_get_int(at+8);
-      int min = 0;
-      int max = 1;
+      float min = 0.0;
+      float max = 1.0;
       if(ac >= 11)
       {
-        min = fts_get_int(at+9);
-        max = fts_get_int(at+10);
+        min = fts_get_float(at+9);
+        max = fts_get_float(at+10);
       }
       if(this->win_x!=x || this->win_y != y || 
          this->win_w!=w || this->win_h != h || 
@@ -473,12 +473,12 @@ track_editor_set_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
     fts_symbol_t label = fts_get_symbol(at);
     int view = fts_get_int(at+1);
     int range_mode = fts_get_int(at+2);
-    int min = 0;
-    int max = 1;
+    float min = 0;
+    float max = 1;
     if(ac >= 4)
     {
-      min = fts_get_int(at+3);
-      max = fts_get_int(at+4);
+      min = fts_get_float(at+3);
+      max = fts_get_float(at+4);
     }
     if( this->label != label || this->view != view || this->range_mode != range_mode ||
         this->min_val != min || this->max_val != max)
@@ -526,8 +526,8 @@ track_editor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   
   this->track = 0;
   
-  this->min_val = 0;
-  this->max_val = 1;
+  this->min_val = 0.0;
+  this->max_val = 1.0;
 	
   if(ac > 0)
   {

@@ -119,7 +119,11 @@ private void drawHorizontalLine(Graphics g, int w, int h)
 	
 	g.setColor(Color.lightGray);
 	
-	int y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
+	int y0; 
+  if(gc.getAdapter() instanceof FloatAdapter)
+		y0 = ((FloatAdapter)gc.getAdapter()).getY((float)0.0); 
+	else
+		y0 = ((MonoDimensionalAdapter)gc.getAdapter()).getY(0); 
 	g.drawLine(0, y0, w, y0);
 	
 	//vertical line at time 0

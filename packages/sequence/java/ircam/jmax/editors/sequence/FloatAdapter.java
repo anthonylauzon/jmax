@@ -50,8 +50,8 @@ public class FloatAdapter extends IntegerAdapter implements VerticalZoomable, Ve
   {  
     float value = (FloatMapper.getMapper().get(e)+yTransposition)*yZoomFactor - (float)minValue;
     int height = gc.getGraphicDestination().getSize().height;
-    int range = getRange();
-    float step = (float)((float)height/(float)range);
+    float range = getRange();
+    float step = (float)((float)height/range);
     
     return height - (int)(value*step);
   }
@@ -64,8 +64,8 @@ public class FloatAdapter extends IntegerAdapter implements VerticalZoomable, Ve
   {  
     float value = (y+yTransposition)*yZoomFactor - (float)minValue;
     int height = gc.getGraphicDestination().getSize().height;
-    int range = getRange();
-    float step = (float)((float)height/(float)range);
+    float range = getRange();
+    float step = (float)((float)height/range);
     return height - (int)(value*step);
   }
 
@@ -121,8 +121,8 @@ public class FloatAdapter extends IntegerAdapter implements VerticalZoomable, Ve
     {
 	float temp;
 	int height = gc.getGraphicDestination().getSize().height;
-	int range = getRange();
-	float step = (float)((float)range/(float)height);
+	float range = getRange();
+	float step = (float)(range/(float)height);
 	
 	temp = (((height-y)*step) + (float)minValue)/yZoomFactor-yTransposition;
 

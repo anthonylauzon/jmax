@@ -136,11 +136,11 @@ public class MonoTrackInspector extends JDialog
     maximumField.setMaximumSize(new Dimension(120, 28));
     maximumField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
-	      int value;
+	      float value;
 	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
         {
 		      try { 
-            value = Integer.valueOf(maximumField.getText()).intValue(); // parse int
+            value = Float.valueOf(maximumField.getText()).floatValue(); // parse int
 		      } catch (NumberFormatException exc) {
             System.err.println("Error:  invalid number format!");
             return;
@@ -168,11 +168,11 @@ public class MonoTrackInspector extends JDialog
     minimumField.setMaximumSize(new Dimension(120, 28));
     minimumField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
-	      int value;
+	      float value;
 	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
         {
 		      try { 
-            value = Integer.valueOf(minimumField.getText()).intValue(); // parse int
+            value = Float.valueOf(minimumField.getText()).floatValue(); // parse float
 		      } catch (NumberFormatException exc) {
             System.err.println("Error:  invalid number format!");
             return;
@@ -242,8 +242,8 @@ public class MonoTrackInspector extends JDialog
     }    
     
     /* update range */
-    maximumField.setText(""+((Integer)track.getProperty("maximumValue")).intValue());
-    minimumField.setText(""+((Integer)track.getProperty("minimumValue")).intValue());    
+    maximumField.setText(""+((Float)track.getProperty("maximumValue")).floatValue());
+    minimumField.setText(""+((Float)track.getProperty("minimumValue")).floatValue());    
   
     /* update moveTo combo */
     if(isInSequence)
