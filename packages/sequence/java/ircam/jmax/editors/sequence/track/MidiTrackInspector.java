@@ -72,28 +72,25 @@ public class MidiTrackInspector extends JDialog
     rootPanel.add(saveStatePanel);
     
     /* show markers panel */
-    if(!isInSequence)
-    {
-      JPanel showMarkersPanel = new JPanel();
-      showMarkersPanel.setLayout(new BoxLayout(showMarkersPanel, BoxLayout.X_AXIS));
+    JPanel showMarkersPanel = new JPanel();
+    showMarkersPanel.setLayout(new BoxLayout(showMarkersPanel, BoxLayout.X_AXIS));
     
-      showMarkersCheckBox = new JCheckBox("Show Markers");
-      showMarkersCheckBox.addItemListener( new ItemListener(){
-        public void itemStateChanged(ItemEvent e)
+    showMarkersCheckBox = new JCheckBox("Show Markers");
+    showMarkersCheckBox.addItemListener( new ItemListener(){
+      public void itemStateChanged(ItemEvent e)
+      {
+        if(!updating)
         {
-          if(!updating)
-          {
-            if(e.getStateChange() == ItemEvent.SELECTED)
-              ((MidiTrackEditor)trackEditor).setGridMode( TrackEditor.MEASURES_GRID);
-            else
-              ((MidiTrackEditor)trackEditor).setGridMode( TrackEditor.TIME_GRID);
-          }
-        };
-      });
-      showMarkersPanel.add(showMarkersCheckBox);
-      showMarkersPanel.add(Box.createHorizontalGlue());
-      rootPanel.add(showMarkersPanel);    
-    }
+          if(e.getStateChange() == ItemEvent.SELECTED)
+            ((MidiTrackEditor)trackEditor).setGridMode( TrackEditor.MEASURES_GRID);
+          else
+            ((MidiTrackEditor)trackEditor).setGridMode( TrackEditor.TIME_GRID);
+        }
+      };
+    });
+    showMarkersPanel.add(showMarkersCheckBox);
+    showMarkersPanel.add(Box.createHorizontalGlue());
+    rootPanel.add(showMarkersPanel);    
     
     /* centrer panel*/
     JPanel centerPanel = new JPanel();
@@ -240,8 +237,7 @@ public class MidiTrackInspector extends JDialog
     saveStateCheckBox.setSelected(track.getFtsTrack().saveEditor);			
     
     /* update showMarkers checkbox */
-    if(!isInSequence)
-      showMarkersCheckBox.setSelected(((MidiTrackEditor)trackEditor).getGridMode() == TrackEditor.MEASURES_GRID);			
+    showMarkersCheckBox.setSelected(((MidiTrackEditor)trackEditor).getGridMode() == TrackEditor.MEASURES_GRID);			
     
     /* update viewMode */
     switch( trackEditor.getViewMode())
