@@ -6,7 +6,6 @@ AmbitusValue.java \
 AnythingTrackEditor.java\
 AnythingValue.java\
 ArrayEnumeration.java \
-ChangeRangeDialog.java \
 Drawable.java \
 Editable.java \
 Event.java \
