@@ -1733,7 +1733,7 @@ _track_stretch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   {
     track_segment_stretch(self, first, after, begin, end, stretch);
     track_move_events_at_client(self, first, NULL);
-    fts_object_set_dirty(o);
+    fts_object_set_state_dirty(o);
   }
   
   return fts_ok;
@@ -1770,7 +1770,7 @@ _track_quantize(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   {
     track_segment_quantize(self, first, after, begin, end, quantize);
     track_move_events_at_client(self, first, after);
-    fts_object_set_dirty(o);
+    fts_object_set_state_dirty(o);
   }
   
   return fts_ok;
@@ -2315,7 +2315,10 @@ track_set_save_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     if(track_editor_is_open(self))
       fts_client_send_message(o, seqsym_save_editor, 1, at);
     
-    fts_object_set_dirty(o);
+    if( track_is_in_multitrack(self))
+      fts_object_set_dirty(fts_object_get_container(o));
+    else
+      fts_object_set_dirty(o);
   }
   
   return fts_ok;
