@@ -58,13 +58,13 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
         ((FtsFmatObject)obj).setSize( args.getInt(0), args.getInt(1));
     }
     });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
     {
         ((FtsFmatObject)obj).startUpload();
     }
     });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("end_upload"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
     {
         ((FtsFmatObject)obj).endUpload();
@@ -101,6 +101,11 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
   {
     if(getEditorFrame() == null)
       setEditorFrame( new MatWindow(this));
+  }
+  
+  public void openEditor(int argc, FtsAtom[] argv)
+  {  
+    createEditor();/* rest moved in endUpload */  
   }
 
   public void destroyEditor()
@@ -166,10 +171,18 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
     uploading = true;
     notifyUpload(true);
   }
+  
   public void endUpload()
   {
-    uploading = false;
-    notifyUpload(false);
+    SwingUtilities.invokeLater(new Runnable(){
+      public void run()
+      {
+        showEditor();
+        FtsObject.requestResetGui();
+        uploading = false;
+        notifyUpload(false);
+      } 
+    });    
   } 
   
   public void nameChanged( String name)

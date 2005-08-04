@@ -146,9 +146,13 @@ public class JMaxMatTable extends JTable
         {
            if(e.getClickCount() > 1) 
           {
-            if(currentObject instanceof FtsObjectWithEditor)
-              ((FtsObjectWithEditor)currentObject).requestOpenEditor();
-             
+             SwingUtilities.invokeLater(new Runnable() {
+               public void run()
+               { 
+                 if(currentObject instanceof FtsObjectWithEditor)
+                   ((FtsObjectWithEditor)currentObject).requestOpenEditor();
+               }
+             });
              stopCellEditing();
              java.util.Timer timer = new java.util.Timer();
              timer.schedule(new StopTask(timer, FtsObjectCellEditor.this), 600);
