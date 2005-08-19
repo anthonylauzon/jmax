@@ -1020,7 +1020,7 @@ fmat_fill_random(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
       upper = 0.0;
       
       if(fts_is_number(at))
-        upper = fts_is_number(at);
+        upper = fts_get_number_float(at);
       break;
       
     default:
@@ -1839,6 +1839,25 @@ fmat_get_sum(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   
   return fts_ok;
 }
+
+
+static fts_method_status_t
+fmat_get_prod (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  const fmat_t *self = (fmat_t *) o;
+  const int     size = fmat_get_m(self) * fmat_get_n(self);
+  const float  *p    = fmat_get_ptr(self);
+  double        prod = 0.0;
+  int	        i;
+  
+  for (i = 0; i < size; i++)
+    prod *= p[i];
+  
+  fts_set_float(ret, prod);
+  
+  return fts_ok;
+}
+
 
 static fts_method_status_t
 fmat_get_mean(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -4469,7 +4488,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
   fts_class_doc(cl, fts_new_symbol("absmax"), NULL, "get maximum absolute value");
-  fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
+  fts_class_doc(cl, fts_new_symbol("sum"),  NULL, "get sum of all values");
+  fts_class_doc(cl, fts_new_symbol("prod"), NULL, "get product of all values");
   fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
   fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");
   
