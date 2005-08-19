@@ -666,16 +666,16 @@ static void log_init( void)
   FILE *log;
 
 #ifdef WIN32
-  log_file_name = "c:\\fts_log.txt";
+  log_file_name = "c:\\fts-log.txt";
 #else
   char buf[1024];
   if (getenv("HOME"))
     {
-      snprintf( buf, sizeof( buf), "%s/.fts_log", getenv("HOME"));
+      snprintf( buf, sizeof( buf), "%s/.fts-log", getenv("HOME"));
       log_file_name = strdup( buf);
     }
   else
-    log_file_name = "/tmp/fts_log";
+    log_file_name = "/tmp/fts-log";
 #endif
 
   /* truncate the file */

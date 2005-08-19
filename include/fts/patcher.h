@@ -73,3 +73,9 @@ FTS_API fts_patcher_t *fts_get_root_patcher(void);
 * @param i the iterator
 */
 FTS_API void fts_patcher_get_objects(fts_patcher_t* patcher, fts_iterator_t* i);
+
+/**
+ * get scope (that bears variable definitions) for this patcher
+ * is either the top level patcher or the root patcher for global variables 
+ */
+FTS_API fts_patcher_t *fts_patcher_get_scope(fts_patcher_t *patcher);

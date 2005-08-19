@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * 
  */
+
 #include <sndfile.h>
 
 /* file formats */
@@ -62,6 +63,8 @@ enum audiofile_format
   audiofile_aiff,
   audiofile_wave,
   audiofile_snd,
+  audiofile_au,
+  audiofile_ircam,
   n_audiofile_file_formats
 };
 
@@ -80,6 +83,7 @@ typedef struct
 #define fts_audiofile_get_num_channels(_f) ((_f)->sfinfo.channels)
 #define fts_audiofile_get_num_frames(_f) ((_f)->sfinfo.frames)
 
+
 FTS_API fts_audiofile_t *fts_audiofile_open_read(fts_symbol_t filename);
 FTS_API fts_audiofile_t *fts_audiofile_open_read_format(fts_symbol_t name, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format);
 FTS_API fts_audiofile_t *fts_audiofile_open_write(fts_symbol_t filename, int channels, int sr, fts_symbol_t format, fts_symbol_t sample_format);
@@ -91,5 +95,6 @@ FTS_API int fts_audiofile_write_interleaved(fts_audiofile_t *audiofile, float *b
 FTS_API int fts_audiofile_read_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int buflen);
 FTS_API int fts_audiofile_seek(fts_audiofile_t *audiofile, int offset);
 
-FTS_API void fts_audiofile_import_handler(fts_class_t *cl, fts_method_t meth);
-FTS_API void fts_audiofile_export_handler(fts_class_t *cl, fts_method_t meth);
+FTS_API void fts_audiofile_import_handler (fts_class_t *cl, fts_method_t meth);
+FTS_API void fts_audiofile_export_handler (fts_class_t *cl, fts_method_t meth);
+
