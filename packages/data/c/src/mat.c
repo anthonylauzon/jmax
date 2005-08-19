@@ -597,8 +597,12 @@ mat_set_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
       
       fts_object_set_state_dirty(o);
     }
+
+    /* return ourselves */
+    fts_object_changed(o);
+    fts_set_object(ret, o);
   }
-  
+
   return fts_ok;
 }
 
@@ -630,8 +634,12 @@ mat_set_row_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
       
       fts_object_set_state_dirty(o);
     }
-  }
   
+    /* return ourselves */
+    fts_object_changed(o);
+    fts_set_object(ret, o);
+  }
+
   return fts_ok;
 }
 
@@ -981,14 +989,35 @@ static fts_method_status_t
 mat_return_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mat_t *self = (mat_t *) o;
+  int	  m   = mat_get_m(self);
+  int	  n   = mat_get_n(self);
+  int	  i   = 0;
+  int	  j   = 0;
   
-  if(ac == 2 && fts_is_number(at) && fts_is_number(at + 1))
+  if (m == 0  ||  n == 0)
+    fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
+  else
   {
-    int i = fts_get_number_int(at);
-    int j = fts_get_number_int(at + 1);
-    
-    if (i >= 0  &&  i < mat_get_m(self)  &&  j >= 0  &&  j < mat_get_n(self))
-      *ret = *(mat_get_element(self, i, j));
+    if (ac > 0  &&  fts_is_number(at))
+      i = fts_get_number_int(at);
+
+    if (ac > 1  &&  fts_is_number(at + 1))
+      j = fts_get_number_int(at  + 1);
+  
+    /* handle wraparound/clipping */
+    while (i < 0)
+      i += m;
+  
+    while (j < 0)
+      j += n;
+  
+    if (i >= m)
+      i = m - 1;
+  
+    if (j >= n)
+      j = n - 1;
+ 
+    *ret = *(mat_get_element(self, i, j));
   }
   
   return fts_ok;
@@ -1453,12 +1482,12 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_insert_cols, mat_insert_columns);
   fts_class_message_varargs(cl, sym_delete_cols, mat_delete_columns);
 
-  fts_class_message_void (cl, fts_s_sort, mat_sort);
-  fts_class_message_number (cl, fts_s_sort, mat_sort);
-  fts_class_message_void (cl, fts_s_sortrev, mat_sort);
+  fts_class_message_void   (cl, fts_s_sort,    mat_sort);
+  fts_class_message_number (cl, fts_s_sort,    mat_sort);
+  fts_class_message_void   (cl, fts_s_sortrev, mat_sort);
   fts_class_message_number (cl, fts_s_sortrev, mat_sort);
-  fts_class_message_void (cl, fts_s_unique, mat_unique);
-  fts_class_message_number (cl, fts_s_unique, mat_unique);
+  fts_class_message_void   (cl, fts_s_unique,  mat_unique);
+  fts_class_message_number (cl, fts_s_unique,  mat_unique);
   
   fts_class_message_varargs(cl, fts_s_import, mat_import); 
   fts_class_message_varargs(cl, fts_s_export, mat_export);
