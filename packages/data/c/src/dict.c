@@ -305,6 +305,10 @@ _dict_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   if(dict_editor_is_open(self))
     dict_upload(self);
   
+  /* return ourselves */
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+
   return fts_ok;
 }
 
@@ -323,6 +327,10 @@ _dict_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   if(dict_editor_is_open(self))
     dict_upload(self);
   
+  /* return ourselves */
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+
   return fts_ok;
 }
 
@@ -340,6 +348,10 @@ _dict_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   if(dict_editor_is_open(self))
     dict_upload(self);
   
+  /* return ourselves */
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+
   return fts_ok;
 }
 
