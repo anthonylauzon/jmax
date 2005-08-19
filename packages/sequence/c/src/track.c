@@ -234,6 +234,11 @@ track_get_next_by_time_after(track_t *track, double time, event_t *here)
     return NULL;
 }
 
+
+/* get event before or at <time>, 
+   search in descending time order starts at event <here>, if not NULL 
+   (N.B.: if time is before first event, the first event is returned(?))
+*/
 event_t *
 track_get_left_by_time_from(track_t *track, double time, event_t *here)
 {
@@ -262,6 +267,8 @@ track_get_left_by_time_from(track_t *track, double time, event_t *here)
   
   return event;
 }
+
+
 
 /*********************************************************
 *
