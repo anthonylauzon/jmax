@@ -278,6 +278,7 @@ vecdisplay_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   }
 }
 
+
 static void 
 vecdisplay_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {

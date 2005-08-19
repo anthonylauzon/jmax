@@ -131,6 +131,7 @@ matdisplay_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   /* todo: same as matdisplay_fvec */
 }
 
+
 static void 
 matdisplay_ivec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {

@@ -344,7 +344,7 @@ dsaudioport_enum_callback(LPGUID lpGuid, LPCSTR lpcstrDescription,
 }
 
 static void
-dsaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dsaudioport_open_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   dsaudioport_t* dev = (dsaudioport_t*)o;
   HRESULT hr;
@@ -357,7 +357,7 @@ dsaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-dsaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dsaudioport_open_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   dsaudioport_t* dev = (dsaudioport_t*)o;
   HRESULT hr;
@@ -377,7 +377,7 @@ dsaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-dsaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dsaudioport_close_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   dsaudioport_t* dev = (dsaudioport_t*)o;
   /* do something when you want to close input */
@@ -387,7 +387,7 @@ dsaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, con
 }
 
 static void
-dsaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+dsaudioport_close_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   dsaudioport_t* dev = (dsaudioport_t*)o;
   short* buf1;

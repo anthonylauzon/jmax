@@ -160,7 +160,7 @@ alsaseqmidi_get_default_io(alsaseqmidi_t* this, fts_hashtable_t* ht)
 }
 
 static void
-alsaseqmidi_get_default_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_get_default_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
   fts_symbol_t* name = (fts_symbol_t*)fts_get_pointer(at);
@@ -171,7 +171,7 @@ alsaseqmidi_get_default_input(fts_object_t* o, int winlet, fts_symbol_t s, int a
 
 
 static void
-alsaseqmidi_get_default_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_get_default_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
   fts_symbol_t* name = (fts_symbol_t*)fts_get_pointer(at);
@@ -208,7 +208,7 @@ alsaseqmidi_append_io(alsaseqmidi_t* this, fts_array_t* array, fts_hashtable_t* 
 }
 
 static void
-alsaseqmidi_append_inputs(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_append_inputs (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
   fts_array_t* inputs = (fts_array_t*)fts_get_pointer(at);
@@ -219,7 +219,7 @@ alsaseqmidi_append_inputs(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 
 
 static void
-alsaseqmidi_append_outputs(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_append_outputs (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
   fts_array_t* outputs = (fts_array_t*)fts_get_pointer(at);
@@ -312,7 +312,7 @@ alsaseqmidi_get_io(alsaseqmidi_t* this, fts_class_t* alsaseqmidiport_type, const
 
 
 static void
-alsaseqmidi_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_get_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
 
@@ -322,7 +322,7 @@ alsaseqmidi_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 
 
 static void
-alsaseqmidi_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_get_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
 
@@ -332,7 +332,7 @@ alsaseqmidi_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 
 
 static void
-alsaseqmidi_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*) o;
   int err;
@@ -364,7 +364,7 @@ alsaseqmidi_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_
 }
 
 static void
-alsaseqmidi_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidi_delete (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidi_t* this = (alsaseqmidi_t*)o;
 

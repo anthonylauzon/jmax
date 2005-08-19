@@ -209,7 +209,7 @@ static void ossaudioport_debug( int fd)
 
 
 
-static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void ossaudioport_open (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ossaudioport_t* self = (ossaudioport_t*)o;
   int sample_rate, p_sample_rate, fragparam, fragment_size, channels, p_channels, flags, format, wanted_format, i;
@@ -311,7 +311,7 @@ static void ossaudioport_open( fts_object_t *o, int winlet, fts_symbol_t s, int 
   fts_log("[ossaudioport] oss audioport is open \n");
 }
 
-static void ossaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void ossaudioport_close (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   ossaudioport_t* self = (ossaudioport_t*)o;
 
@@ -320,7 +320,7 @@ static void ossaudioport_close(fts_object_t* o, int winlet, fts_symbol_t s, int 
 
 }
 
-static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void ossaudioport_init (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ossaudioport_t *self = (ossaudioport_t *)o;
   int channels = 2;
@@ -351,7 +351,7 @@ static void ossaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int 
   self->fd = -1;
 }
 
-static void ossaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static void ossaudioport_delete (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   ossaudioport_t *self = (ossaudioport_t *)o;
 
@@ -366,7 +366,7 @@ static void ossaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( ossaudioport_t), ossaudioport_init, ossaudioport_delete);
 
-  fts_class_message_varargs( cl, fts_s_open_input, ossaudioport_open);
+  fts_class_message_varargs( cl, fts_s_open_input,  ossaudioport_open);
   fts_class_message_varargs( cl, fts_s_open_output, ossaudioport_open);
 }
 

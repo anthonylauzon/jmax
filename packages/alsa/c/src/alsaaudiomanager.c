@@ -264,7 +264,9 @@ alsaaudiomanager_get_channels_max(const char* device_name, int stream_mode)
   int max_channels;
 
   snd_pcm_hw_params_alloca(&hwparams);
-  
+
+  /* fprintf(stderr, "alsaaudiomanager: snd_pcm_open(%p, '%s', %d, %d)\n", 
+		&handle, device_name, stream_mode, SND_PCM_NONBLOCK); */
   err = snd_pcm_open(&handle, device_name, stream_mode, SND_PCM_NONBLOCK);
   if (err < 0)
   {

@@ -90,7 +90,7 @@ midishare_reference_hash(fts_symbol_t name)
 
 
 static void
-midishare_reference_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_reference_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   int number;
   midishare_reference_t *ref = (midishare_reference_t*)o;
@@ -601,7 +601,7 @@ midishare_manager_update_outputs()
 }
 
 static void
-midishare_manager_get_default_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_get_default_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
@@ -618,7 +618,7 @@ midishare_manager_get_default_input(fts_object_t* o, int winlet, fts_symbol_t s,
 }
 
 static void
-midishare_manager_get_default_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_get_default_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
@@ -635,7 +635,7 @@ midishare_manager_get_default_output(fts_object_t* o, int winlet, fts_symbol_t s
 }
 
 static void
-midishare_manager_append_inputs(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_append_inputs (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   fts_array_t* inputs = (fts_array_t*)fts_get_pointer(at);
@@ -650,7 +650,7 @@ midishare_manager_append_inputs(fts_object_t* o, int winlet, fts_symbol_t s, int
 }
 
 static void
-midishare_manager_append_outputs(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_append_outputs (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   fts_array_t* outputs = (fts_array_t*)fts_get_pointer(at);
@@ -666,7 +666,7 @@ midishare_manager_append_outputs(fts_object_t* o, int winlet, fts_symbol_t s, in
 }
 
 static void
-midishare_manager_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_get_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
@@ -683,7 +683,7 @@ midishare_manager_get_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-midishare_manager_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_get_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   fts_midiport_t** ptr = (fts_midiport_t**)fts_get_pointer(at + 0);
@@ -700,7 +700,7 @@ midishare_manager_get_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac
 }
 
 static void
-midishare_manager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   midishareport_t* port;
@@ -724,7 +724,7 @@ midishare_manager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-midishare_manager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+midishare_manager_delete (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   midishare_manager_t* self = (midishare_manager_t*)o;
   

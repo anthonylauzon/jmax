@@ -39,7 +39,7 @@ fts_class_t* alsaseqmidiport_output_type = NULL;
 
 /* callback for fts_s_sched_ready signal */
 static void 
-alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+alsaseqmidiport_select (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   alsaseqmidiport_t *this = (alsaseqmidiport_t *)o;
   
@@ -83,12 +83,12 @@ alsaseqmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
 	fts_midievent_t *event = fts_midiparser_byte( parser, this->buffer[i]);
 	if(event != NULL)
 	{
-	  fts_atom_t a;
+	  fts_atom_t a, ret;
 	      
 	  fts_set_object(&a, (fts_object_t *)event);
 
 	  fts_object_refer((fts_object_t *)event);
-	  fts_midiport_input(o, 0, 0, 1, &a);
+	  fts_midiport_input(o, 0, 1, &a, &ret);
 	  fts_object_release((fts_object_t *)event);
 	}
       }
@@ -395,7 +395,7 @@ alsaseqmidiport_io_init(alsaseqmidiport_t* this,
 }
 
 static void
-alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidiport_input_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
   alsaseqmidi_t* manager;
@@ -440,7 +440,7 @@ alsaseqmidiport_input_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, 
 	
 
 static void
-alsaseqmidiport_output_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidiport_output_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
   alsaseqmidi_t* manager;
@@ -515,7 +515,7 @@ alsaseqmidiport_io_delete(alsaseqmidiport_t* this, int port_type)
 }
 
 static void
-alsaseqmidiport_input_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidiport_input_delete (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
   alsaseqmidiport_io_delete(this, INPUT_TYPE);
@@ -523,7 +523,7 @@ alsaseqmidiport_input_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac
 }
 
 static void
-alsaseqmidiport_output_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaseqmidiport_output_delete (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaseqmidiport_t* this = (alsaseqmidiport_t*)o;
   alsaseqmidiport_io_delete(this, OUTPUT_TYPE);

@@ -79,7 +79,7 @@ jackaudioport_output_fun( fts_audioport_t* port, float** buffers, int buffsize)
 
 
 static void
-jackaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_open_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudioport_t* self = (jackaudioport_t*)o;
 
@@ -87,7 +87,7 @@ jackaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-jackaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_open_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudioport_t* self = (jackaudioport_t*)o;
 
@@ -95,7 +95,7 @@ jackaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 }
 
 static void
-jackaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_close_input (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   fts_audioport_t* port = (fts_audioport_t*)o;
   fts_symbol_t port_flag = fts_s_input;
@@ -107,7 +107,7 @@ jackaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
 
 
 static void
-jackaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudioport_close_output (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   fts_audioport_t* port = (fts_audioport_t*)o;
   fts_symbol_t port_flag = fts_s_output;

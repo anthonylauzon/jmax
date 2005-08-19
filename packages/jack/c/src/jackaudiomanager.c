@@ -340,7 +340,7 @@ jack_client_t* jackaudiomanager_get_jack_client()
 fts_class_t* jackaudiomanager_thread_type = NULL;
 
 static void
-jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_thread_run (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   static jackaudioport_t* port;
   static fts_symbol_t port_name;
@@ -629,7 +629,7 @@ jackaudiomanager_thread_run(fts_object_t* o, int winlet, fts_symbol_t s, int ac,
 }
 
 static void
-jackaudiomanager_thread_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_thread_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudiomanager_thread_t* self = (jackaudiomanager_thread_t*)o;
   int bytes = 0;
@@ -655,7 +655,7 @@ jackaudiomanager_thread_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac
 }
 
 static void
-jackaudiomanager_thread_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_thread_delete (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudiomanager_thread_t* self = (jackaudiomanager_thread_t*)o;
 
@@ -937,7 +937,7 @@ jackaudiomanager_close_port(fts_object_t* port, fts_symbol_t flag)
 }
 
 static void
-jackaudiomanager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_print (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudiomanager_t* self;
   fts_bytestream_t* bytestream = fts_post_get_stream(ac, at);
@@ -950,7 +950,7 @@ jackaudiomanager_print(fts_object_t* o, int winlet, fts_symbol_t s, int ac, cons
 }
 
 static void
-jackaudiomanager_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_sched_listener (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
   jackaudiomanager_thread_t* manager_object;
@@ -970,7 +970,7 @@ jackaudiomanager_sched_listener(fts_object_t* o, int winlet, fts_symbol_t s, int
 
 /* This function is used to remove object from scheduler and to activate JACK client */
 static void
-jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_halt (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   fd_set rfds;
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
@@ -1076,7 +1076,7 @@ jackaudiomanager_halt(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_init (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
 
@@ -1110,7 +1110,7 @@ jackaudiomanager_init(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const
 }
 
 static void
-jackaudiomanager_delete(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+jackaudiomanager_delete (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   jackaudiomanager_t* self = (jackaudiomanager_t*)o;
   jackaudiomanager_thread_t* manager_object;

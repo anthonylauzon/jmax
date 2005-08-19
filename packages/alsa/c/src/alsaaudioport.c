@@ -403,7 +403,7 @@ static int check_better_sample_format(snd_pcm_t* handle,
 
 
 static void
-alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaaudioport_sample_rate_change (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
   int err;
@@ -462,7 +462,7 @@ alsaaudioport_sample_rate_change(fts_object_t* o, int winlet, fts_symbol_t s, in
 
 
 static void
-alsaaudioport_buffer_size_change(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaaudioport_buffer_size_change (fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
   int err;
@@ -541,6 +541,8 @@ static int alsastream_open( alsastream_t *stream, const char *pcm_name, int whic
   /*
    * Open the PCM device
    */
+  /* fprintf(stderr, "alsaaudioport: snd_pcm_open(%p, '%s', %d, %d)\n", 
+		&stream->handle, pcm_name, which_stream, open_mode); */
   if ( (err = snd_pcm_open( &stream->handle, pcm_name, which_stream, open_mode)) < 0)
   {
     fts_log("[alsaaudioport] cannot open ALSA PCM device %s (%s)\n", pcm_name, snd_strerror(err));
@@ -1095,7 +1097,7 @@ static int alsaaudioport_xrun_function( fts_audioport_t *port)
 }
 
 static void
-alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaaudioport_open_input(fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
@@ -1140,7 +1142,7 @@ alsaaudioport_open_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, co
 }
 
 static void
-alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+alsaaudioport_open_output(fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
@@ -1181,7 +1183,7 @@ alsaaudioport_open_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, c
   fts_dsp_buffer_size_add_listener(o, alsaaudioport_buffer_size_change);
 }
 
-static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void alsaaudioport_close_input(fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
@@ -1197,7 +1199,7 @@ static void alsaaudioport_close_input(fts_object_t* o, int winlet, fts_symbol_t 
   fts_dsp_buffer_size_remove_listener(o);
 }
 
-static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t s, int ac, const fts_atom_t* at)
+static void alsaaudioport_close_output(fts_object_t* o, fts_symbol_t s, int ac, const fts_atom_t* at, fts_atom_t *ret)
 {
   alsaaudioport_t* self = (alsaaudioport_t*)o;
 
@@ -1213,7 +1215,9 @@ static void alsaaudioport_close_output(fts_object_t* o, int winlet, fts_symbol_t
   fts_dsp_buffer_size_remove_listener(o);
 }
 
-static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsaaudioport_init (fts_object_t *o, fts_symbol_t s, 
+		    int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   int sampling_rate, fifo_size, format, format_is_32, capture_channels, playback_channels, err;
   float sr;
@@ -1257,9 +1261,13 @@ static void alsaaudioport_init( fts_object_t *o, int winlet, fts_symbol_t s, int
   }
 
   self->to_output = 0;
+
+  return fts_ok;
 }
 
-static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsaaudioport_delete (fts_object_t *o, fts_symbol_t s, 
+		      int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   alsaaudioport_t *self = (alsaaudioport_t *)o;
 
@@ -1273,6 +1281,8 @@ static void alsaaudioport_delete(fts_object_t *o, int winlet, fts_symbol_t s, in
     snd_pcm_close(self->playback.handle);
 
   fts_audioport_delete((fts_audioport_t*)self);
+
+  return fts_ok;
 }
 
 static void
@@ -1335,10 +1345,10 @@ static void alsaaudioport_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof( alsaaudioport_t), alsaaudioport_init, alsaaudioport_delete);
 
-  fts_class_message_varargs(cl, fts_s_open_input, alsaaudioport_open_input);
-  fts_class_message_varargs(cl, fts_s_open_output, alsaaudioport_open_output);
+  fts_class_message_varargs(cl, fts_s_open_input,   alsaaudioport_open_input);
+  fts_class_message_varargs(cl, fts_s_open_output,  alsaaudioport_open_output);
   
-  fts_class_message_varargs(cl, fts_s_close_input, alsaaudioport_close_input);
+  fts_class_message_varargs(cl, fts_s_close_input,  alsaaudioport_close_input);
   fts_class_message_varargs(cl, fts_s_close_output, alsaaudioport_close_output);
 }
 
