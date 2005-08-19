@@ -1569,6 +1569,27 @@ fvec_get_sum(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   return fts_ok;
 }
 
+
+static fts_method_status_t
+fvec_get_prod (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+  double  prod = 0.0;
+  float  *p;
+  int     size, stride;
+  int     i;
+  
+  fvec_get_vector(self, &p, &size, &stride);
+  
+  for (i = 0; i < size * stride; i += stride)
+    prod *= p[i];
+  
+  fts_set_float(ret, prod);
+  
+  return fts_ok;
+}
+
+
 static fts_method_status_t
 fvec_get_mean(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -1920,7 +1941,8 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
   fts_class_doc(cl, fts_new_symbol("maxi"), NULL, "get index of maximum value");
   fts_class_doc(cl, fts_new_symbol("absmax"), NULL, "get maximum absolute value");
-  fts_class_doc(cl, fts_new_symbol("sum"), NULL, "get sum of all values");
+  fts_class_doc(cl, fts_new_symbol("sum"),  NULL, "get sum of all values");
+  fts_class_doc(cl, fts_new_symbol("prod"), NULL, "get product of all values");
   fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
   fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");  
   
