@@ -671,6 +671,10 @@ mat_append_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   }
   fts_object_set_state_dirty(o);
   
+  /* return ourselves */
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+
   return fts_ok;
 }
 
@@ -1524,6 +1528,8 @@ mat_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, fts_s_fill, "<atom: value>", "fill matrix with given value");
   fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (default is 1)>]]", "get/set size");
+  fts_class_doc(cl, fts_s_rows, "<void>", "get # of rows");
+  fts_class_doc(cl, fts_s_cols, "<void>", "get # of columns");
   
   fts_class_doc(cl, fts_s_get_element, "<num: row index> <num: column index>", "get value at given index");
   
