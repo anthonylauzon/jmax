@@ -3416,8 +3416,8 @@ fmat_rotate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   return fts_ok;
 }
 
-static int 
-fmat_element_compare_ascending(const void *left, const void *right)
+int 
+_fmat_element_compare_ascending(const void *left, const void *right)
 {
   float l = ((const float *)left)[0];
   float r = ((const float *)right)[0];
@@ -3425,8 +3425,8 @@ fmat_element_compare_ascending(const void *left, const void *right)
   return (r < l) - (l < r);
 }
 
-static int 
-fmat_element_compare_descending(const void *left, const void *right)
+int 
+_fmat_element_compare_descending(const void *left, const void *right)
 {
   float l = ((const float *)left)[0];
   float r = ((const float *)right)[0];
@@ -3434,20 +3434,16 @@ fmat_element_compare_descending(const void *left, const void *right)
   return (l < r) - (r < l);
 }
 
-static fts_method_status_t
-fmat_sort(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
+
+void
+_fmat_sort (fmat_t *self, int col, int (*compare)(const void *left, const void *right))
+{  
   float *ptr = fmat_get_ptr(self);
   int m = fmat_get_m(self);
   int n = fmat_get_n(self); 
-  int col = 0;
-  
-  if(ac > 0)
-    col = fts_get_number_int(at);
 
-  if(col == 0)
-    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_ascending);
+  if (col == 0)
+    qsort((void *)ptr, m, n * sizeof(float), compare);
   else if(col > 0 && col < n)
   {
     int i;
@@ -3460,7 +3456,7 @@ fmat_sort(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       ptr[i + col] = f;
     }
     
-    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_ascending);
+    qsort((void *)ptr, m, n * sizeof(float), compare);
 
     for(i=0; i<m*n; i+=n)
     {
@@ -3470,55 +3466,44 @@ fmat_sort(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       ptr[i + col] = f;
     }    
   }
-  
-  fts_object_changed(o);
-  fts_set_object(ret, o);
-  
-  return fts_ok;
 }
+
 
 static fts_method_status_t
-fmat_tros(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+fmat_sort (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t *self = (fmat_t *)o;
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self); 
+  fmat_t *self = (fmat_t *) o;
   int col = 0;
   
-  if(ac > 0)
+  if (ac > 0)
     col = fts_get_number_int(at);
 
-  if(col == 0)
-    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_descending);
-  else if(col > 0 && col < n)
-  {
-    int i;
-    
-    for(i=0; i<m*n; i+=n)
-    {
-      float f = ptr[i];
-      
-      ptr[i] = ptr[i + col];
-      ptr[i + col] = f;
-    }
-    
-    qsort((void *)ptr, m, n * sizeof(float), fmat_element_compare_descending);
-
-    for(i=0; i<m*n; i+=n)
-    {
-      float f = ptr[i];
-      
-      ptr[i] = ptr[i + col];
-      ptr[i + col] = f;
-    }    
-  }
+  _fmat_sort(self, col, _fmat_element_compare_ascending);
   
   fts_object_changed(o);
   fts_set_object(ret, o);
   
   return fts_ok;
 }
+
+
+static fts_method_status_t
+fmat_tros (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *) o;
+  int col = 0;
+  
+  if (ac > 0)
+    col = fts_get_number_int(at);
+
+  _fmat_sort(self, col, _fmat_element_compare_descending);
+  
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
 
 static fts_method_status_t
 fmat_scramble(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)

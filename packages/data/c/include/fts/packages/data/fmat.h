@@ -141,6 +141,11 @@ DATA_API float fmat_get_max_abs_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_max_value_in_range(fmat_t *mat, int a, int b);
 DATA_API float fmat_get_min_value_in_range(fmat_t *mat, int a, int b);
 
+/* sort function */
+int  _fmat_element_compare_ascending  (const void *left, const void *right);
+int  _fmat_element_compare_descending (const void *left, const void *right);
+void _fmat_sort (fmat_t *self, int col, int (*compare)(const void *, const void *));
+
 DATA_API fmat_t *fmat_null;
 
 DATA_API void fmat_upload(fmat_t *mat);
