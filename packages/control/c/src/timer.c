@@ -33,41 +33,41 @@ typedef struct
 static void
 timer_start(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  control_timer_t *this = (control_timer_t *)o;
+  control_timer_t *self = (control_timer_t *) o;
 
-  if(!this->running)
-    {
-      this->running = 1;
-      this->start = fts_get_time();
-    }
+  if (!self->running)
+  {
+      self->running = 1;
+      self->start = fts_get_time();
+  }
 }
 
 static void
 timer_stop(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  control_timer_t *this = (control_timer_t *)o;
+  control_timer_t *self = (control_timer_t *) o;
 
-  this->running = 0;
-  this->time += (fts_get_time() - this->start);
+  self->running = 0;
+  self->time += (fts_get_time() - self->start);
 }
 
 static void
 timer_reset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  control_timer_t *this = (control_timer_t *)o;
+  control_timer_t *self = (control_timer_t *) o;
 
-  this->time = 0.0;
-  this->start = fts_get_time();
+  self->time = 0.0;
+  self->start = fts_get_time();
 }
 
 static void
 timer_send_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  control_timer_t *this = (control_timer_t *)o;
-  double time = this->time;
+  control_timer_t *self = (control_timer_t *) o;
+  double time = self->time;
 
-  if(this->running)
-    time += (fts_get_time() - this->start);
+  if(self->running)
+    time += (fts_get_time() - self->start);
 
   fts_outlet_float(o, 0, time);
 }
@@ -75,11 +75,11 @@ timer_send_time(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 static void
 timer_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  control_timer_t *this = (control_timer_t *)o;
+  control_timer_t *self = (control_timer_t *) o;
 
-  this->running = 0;
-  this->start = fts_get_time();
-  this->time = 0.0;
+  self->running = 0;
+  self->start = fts_get_time();
+  self->time = 0.0;
 }
 
 static void
