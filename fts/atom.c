@@ -201,7 +201,7 @@ static fts_class_t VAR =                                        \
   /* class structure */                                         \
   0, /* name */                                                 \
   TYPEID, /* type_id */                                         \
-  0, /* super class */                                          \
+  0, /* super class */						\
   0, /* hash_function */                                        \
   0, /* equals_function */                                      \
   0, /* description_function */                                 \

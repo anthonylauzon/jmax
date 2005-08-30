@@ -52,6 +52,8 @@ fts_symbol_t fts_s_aiff;
 fts_symbol_t fts_s_aif;
 fts_symbol_t fts_s_wav;
 fts_symbol_t fts_s_snd;
+fts_symbol_t fts_s_au;
+fts_symbol_t fts_s_sf;
 fts_symbol_t fts_s_raw;
 fts_symbol_t fts_s_sf;
 
@@ -202,7 +204,8 @@ fts_audiofile_open_read_format(fts_symbol_t name, int channels, int sample_rate,
 }
 
 fts_audiofile_t * 
-fts_audiofile_open_write(fts_symbol_t name, int channels, int sample_rate, fts_symbol_t format, fts_symbol_t sample_format)
+fts_audiofile_open_write (fts_symbol_t name, int channels, int sample_rate,
+			  fts_symbol_t format, fts_symbol_t sample_format)
 {
   char *filename = (char *)fts_symbol_name(name);
   char str[1024];
@@ -305,6 +308,7 @@ fts_audiofile_seek(fts_audiofile_t *audiofile, int offset)
   return -1;
 }
 
+
 void
 fts_audiofile_import_handler(fts_class_t *cl, fts_method_t meth)
 {
@@ -317,6 +321,7 @@ fts_audiofile_import_handler(fts_class_t *cl, fts_method_t meth)
   fts_class_import_handler(cl, fts_s_sf, meth);
 }
 
+
 void
 fts_audiofile_export_handler(fts_class_t *cl, fts_method_t meth)
 {
@@ -328,6 +333,7 @@ fts_audiofile_export_handler(fts_class_t *cl, fts_method_t meth)
   fts_class_export_handler(cl, fts_s_raw, meth);
   fts_class_export_handler(cl, fts_s_sf, meth);
 }
+
 
 void 
 fts_kernel_audiofile_init(void)

@@ -747,14 +747,17 @@ fts_expression_reduce( fts_expression_t *exp, fts_patcher_t *scope, int env_ac, 
 {
   fts_hashtable_t *locals = NULL;
   fts_hashtable_t *globals = fts_patcher_get_definitions(fts_get_root_patcher());
-  
+
 #ifdef EXPRESSION_DEBUG
   fts_expression_print( exp);
 #endif
 
   if(scope != NULL)
     locals = fts_patcher_get_definitions(scope);
-     
+/*
+  fts_post("fts_expression_reduce: scope %p  locals %p  globals %p\n", 
+	   scope, locals, globals);
+*/   
   if (exp->tree == NULL)
     return invalid_expression_error;
   
