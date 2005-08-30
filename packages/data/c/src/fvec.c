@@ -1367,6 +1367,7 @@ fvec_exp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   
   fts_set_object(ret, o);
   
+
   return fts_ok;
 }
 
@@ -1550,6 +1551,35 @@ fvec_get_max_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   return fts_ok;
 }
 
+
+static fts_method_status_t
+fvec_sort (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+
+  _fmat_sort(self->fmat, 0, _fmat_element_compare_ascending);
+  
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+fvec_sortrev (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+
+  _fmat_sort(self->fmat, 0, _fmat_element_compare_descending);
+  
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
 static fts_method_status_t
 fvec_get_sum(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -1657,20 +1687,33 @@ _fvec_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   int i = 0;
   
   fvec_get_vector(self, &ptr, &size, &stride);
-  
-  if(ac > 0  &&  fts_is_number(at))
-    i = fts_get_number_int(at);
 
-  if(i >= size)
-    i = size - 1;
+  if (ptr  &&  size == 0)
+    fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
+  else
+  {
+    if(ac > 0  &&  fts_is_number(at))
+      i = fts_get_number_int(at);
+
+    if(i >= size)
+      i = size - 1;
   
-  while(i < 0)
-    i += size;
+    while (i < 0)
+      i += size;
   
-  if (i >= 0  &&  i < size)
     fts_set_float(ret, ptr[i * stride]);
-  
+  }
+
   return fts_ok;
+}
+
+
+static fts_method_status_t
+_fvec_get_matrix (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+
+  fts_set_object(ret, self->fmat);
 }
 
 
@@ -1811,8 +1854,17 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       self->size = size;
       
       if(ac > 1)
-        fvec_set(o, NULL, ac - 1, at + 1, fts_nix);
+      {
+	fts_set_int(at, 0);
+        fvec_set(o, NULL, ac, at, fts_nix);
+      }
     }    
+  }
+  else
+  { /* no init args given: create empty column vector with own fmat */
+    self->fmat = fmat_create(0, 1);
+    self->type = fvec_type_vector;
+    self->size = 0;
   }
   
   fts_object_refer((fts_object_t *)self->fmat);
@@ -1862,6 +1914,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, fvec_print);
   fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fvec_get_element);
+  fts_class_message_void   (cl, fts_s_get, _fvec_get_matrix);
 
   fts_class_message_varargs(cl, fts_s_set, fvec_set);
   fts_class_message(cl, fts_s_set, fmat_class, fvec_set_from_fmat_or_fvec);
@@ -1904,6 +1957,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("sum"), fvec_get_sum);
   fts_class_message_void(cl, fts_new_symbol("mean"), fvec_get_mean);
   fts_class_message_void(cl, fts_new_symbol("zc"), fvec_get_zc);
+
+  fts_class_message_void(cl, fts_s_sort,    fvec_sort);
+  fts_class_message_void(cl, fts_s_sortrev, fvec_sortrev);
 
   /* fmat methods that work on fvec, too: */
   fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
