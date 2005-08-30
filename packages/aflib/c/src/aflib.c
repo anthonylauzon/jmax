@@ -216,6 +216,21 @@ aflib_loader_read(fts_audiofile_t* audiofile, float **buf, int n_buf, unsigned i
   return n_total;
 }
 
+
+static int 
+aflib_loader_read_interleaved (fts_audiofile_t* audiofile, float *buf, int n_channels, unsigned int size)
+{
+  aflib_handle_t *handle =
+    (aflib_handle_t *) fts_audiofile_get_handle(audiofile);
+
+  if (n_channels == fts_audiofile_get_num_channels(audiofile))
+    return afReadFrames(handle->af_file, AF_DEFAULT_TRACK, buf, 
+			size * n_channels) / n_channels;
+  else
+    return 0;
+}
+
+
 static int 
 aflib_loader_write(fts_audiofile_t* audiofile, float** buf, int n_buf, unsigned int buflen)
 {
@@ -259,6 +274,21 @@ aflib_loader_write(fts_audiofile_t* audiofile, float** buf, int n_buf, unsigned 
 
 }
 
+
+static int 
+aflib_loader_write_interleaved (fts_audiofile_t* audiofile, float* buf, int n_channels, unsigned int size)
+{
+  aflib_handle_t *handle =
+    (aflib_handle_t *) fts_audiofile_get_handle(audiofile);
+
+  if (n_channels == fts_audiofile_get_num_channels(audiofile))
+    return afWriteFrames(handle->af_file, AF_DEFAULT_TRACK, buf, 
+			 size * n_channels) / n_channels;
+  else
+    return 0;
+}
+
+
 /* seek to the wanted offset */
 static int 
 aflib_loader_seek(fts_audiofile_t* audiofile, unsigned int offset)
@@ -301,7 +331,9 @@ aflib_loader = {
   aflib_loader_open_read,
   aflib_loader_buffer_length,
   aflib_loader_write,
+  aflib_loader_write_interleaved,
   aflib_loader_read,
+  aflib_loader_read_interleaved,
   aflib_loader_seek,
   aflib_loader_close,
 };
