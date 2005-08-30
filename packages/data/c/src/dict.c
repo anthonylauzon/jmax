@@ -371,6 +371,18 @@ _dict_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   return fts_ok;
 }
 
+
+static fts_method_status_t
+_dict_get_size (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  dict_t *self = (dict_t *) o;
+  
+  fts_set_int(ret, fts_hashtable_get_size(&self->hash));
+  
+  return fts_ok;
+}
+
+
 static fts_method_status_t
 _dict_set_from_dict(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -831,14 +843,14 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_print, dict_print);
   
-  fts_class_message_void(cl, fts_s_clear, _dict_clear);
-  
+  fts_class_message_void   (cl, fts_s_clear, _dict_clear);
   fts_class_message_varargs(cl, fts_s_set, _dict_set);
   
   fts_class_message_varargs(cl, fts_s_remove, _dict_remove);
   fts_class_message_varargs(cl, sym_remove_entries, _dict_remove);
 
   fts_class_message_varargs(cl, fts_s_get_element, _dict_get_element);
+  fts_class_message_void   (cl, fts_s_size,        _dict_get_size);
   
   fts_atomfile_import_handler(cl, _dict_import_textfile);
   fts_atomfile_export_handler(cl, _dict_export_textfile);
