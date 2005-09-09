@@ -1883,7 +1883,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       
       if(ac > 1)
       {
-	fts_set_int(at, 0);
+	fts_set_int((fts_atom_t *)at, 0);
         fvec_set(o, NULL, ac, at, fts_nix);
       }
     }    
