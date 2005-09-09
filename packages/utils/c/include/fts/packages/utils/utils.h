@@ -147,6 +147,7 @@ UTILS_API fts_cubic_coefs_t *fts_cubic_table;
 #define fts_cubic_calc(x, p) \
   ((x)[-1] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[1] * (p)->p1 + (x)[2] * (p)->p2)
 
+
 #define fts_cubic_calc_stride(x, p, s) \
   ((x)[-(s)] * (p)->pm1 + (x)[0] * (p)->p0 + (x)[s] * (p)->p1 + (x)[2 * (s)] * (p)->p2)
 

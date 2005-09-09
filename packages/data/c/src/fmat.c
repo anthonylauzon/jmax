@@ -3962,12 +3962,19 @@ fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     int n = fmat_get_n(self);
     fts_audiofile_t *sf = NULL;
     double sr = fmat_get_sr(self);
+    fts_symbol_t sample_format = fts_s_int16;
     int size = 0;
     
-    if(sr == 1.0)
+    if(ac > 1 && fts_is_number(at + 1))
+      sr = fts_get_number_float(at + 1);
+    
+    if(ac > 2 && fts_is_symbol(at + 2))
+      sample_format = fts_get_symbol(at + 2);
+    
+    if(sr <= 1.0)
       sr = 44100.0;
     
-    sf = fts_audiofile_open_write(file_name, n, (int)sr, s, NULL);
+    sf = fts_audiofile_open_write(file_name, n, (int)sr, s, sample_format);
     
     if(sf != NULL)
     {

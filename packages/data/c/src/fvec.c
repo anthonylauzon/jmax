@@ -72,16 +72,16 @@ fvec_get_type_from_symbol(fts_symbol_t sym)
 }
 
 /********************************************************************
- *
- *  easy creators
- *
- */
+*
+*  easy creators
+*
+*/
 
 fvec_t *
 fvec_create_column(fmat_t *fmat)
 {
   fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-
+  
   fvec->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);
   fvec->type = fvec_type_column;
@@ -140,10 +140,10 @@ fvec_create_vector(int size)
 
 
 /********************************************************************
- *
- *   upload methods
- *
- */
+*
+*   upload methods
+*
+*/
 
 #if 0   /* copied from fmat.c */
 
@@ -227,10 +227,10 @@ fvec_upload (fvec_t *self)
 
 
 /*********************************************************
- *
- *  editor
- *
- */
+*
+*  editor
+*
+*/
 
 static void *fvec_editor = NULL;
 
@@ -286,18 +286,18 @@ fvec_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
 
 
 /********************************************************************
- *
- *  utilities
- *
- */
+*
+*  utilities
+*
+*/
 
 /* if another object changed our data, do the necessary stuff */
 static void fvec_changed(fvec_t *this)
 {
-    if (this->editor)
-        tabeditor_send((tabeditor_t *) this->editor);
-
-    /* ??? no longer in fmat.  data_object_set_dirty((fts_object_t *) this); */
+  if (this->editor)
+    tabeditor_send((tabeditor_t *) this->editor);
+  
+  /* ??? no longer in fmat.  data_object_set_dirty((fts_object_t *) this); */
 }
 
 
@@ -306,51 +306,51 @@ fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
 {
   switch(ac)
   {
-    default :
-    case 3:
-      if(fts_is_number(at + 2))
-      {
-        int size = fts_get_number_int(at + 2);
-        
-        if(size > 0)
-          fvec->size = size;
-        else
-          fvec->size = 0;
-      }
-    case 2:
-      if(fts_is_number(at + 1))
-      {
-        int onset = fts_get_number_int(at + 1);
-        
-        if(onset > 0)
-          fvec->onset = onset;
-        else
-          fvec->onset = 0;
-      }
-    case 1:
-      if(fts_is_number(at))
-        fvec->index = fts_get_number_int(at);
-    case 0:
-      break;
+default :
+case 3:
+  if(fts_is_number(at + 2))
+  {
+    int size = fts_get_number_int(at + 2);
+    
+    if(size > 0)
+      fvec->size = size;
+    else
+      fvec->size = 0;
+  }
+case 2:
+  if(fts_is_number(at + 1))
+  {
+    int onset = fts_get_number_int(at + 1);
+    
+    if(onset > 0)
+      fvec->onset = onset;
+    else
+      fvec->onset = 0;
+  }
+case 1:
+  if(fts_is_number(at))
+    fvec->index = fts_get_number_int(at);
+case 0:
+  break;
   }
 }
 
 
 /** get pointer, size, stride to access data in fmat 
- *  referenced by this fvec
- *
- *  fvec onset and size must be >= 0  (as checked by fvec_set_dimensions)
- */
+*  referenced by this fvec
+*
+*  fvec onset and size must be >= 0  (as checked by fvec_set_dimensions)
+*/
 void
 fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
 {
   /* clip x to be less or equal than upper limit u.
-     postcondition:  x <= u */
+postcondition:  x <= u */
 # define CLIP(x, u)      do { if ((x) > (u))  { (x) = (u); } } while (0)
 # define CLIP2(x, l, u)  do { if      ((x) < (l))  { (x) = (l); }       \
-                              else if ((x) > (u))  { (x) = (u); } } while (0)
-
-  fmat_t *fmat = fvec->fmat;
+  else if ((x) > (u))  { (x) = (u); } } while (0)
+    
+    fmat_t *fmat = fvec->fmat;
   float *fmat_ptr = fmat_get_ptr(fmat);
   int fmat_m = fmat_get_m(fmat);
   int fmat_n = fmat_get_n(fmat);
@@ -368,16 +368,16 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       while(fvec_index < 0)
         fvec_index += fmat_n;
         
-      if(fvec_onset > fmat_m)
-        fvec_onset = fmat_m;
+        if(fvec_onset > fmat_m)
+          fvec_onset = fmat_m;
           
-      if(fvec_onset + fvec_size > fmat_m)
-        fvec_size = fmat_m - fvec_onset;
+          if(fvec_onset + fvec_size > fmat_m)
+            fvec_size = fmat_m - fvec_onset;
             
-      *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
+            *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
       *size = fvec_size;
       *stride = fmat_n;
-    break;
+      break;
       
     case fvec_type_row:
       
@@ -387,26 +387,26 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       while(fvec_index < 0)
         fvec_index += fmat_m;
         
-      if(fvec_onset > fmat_n)
-        fvec_onset = fmat_n;
+        if(fvec_onset > fmat_n)
+          fvec_onset = fmat_n;
           
-      if(fvec_onset + fvec_size > fmat_n)
-        fvec_size = fmat_n - fvec_onset;
-          
-      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+          if(fvec_onset + fvec_size > fmat_n)
+            fvec_size = fmat_n - fvec_onset;
+            
+            *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
       *size = fvec_size;
       *stride = 1;
-    break;
+      break;
       
     case fvec_type_diagonal:
     {
       int i, j; /* diagonal start indices */
-
+      
       if (fvec_index >= 0)
       { /* superdiagonal: like col index */
         CLIP(fvec_onset, fmat_m);
         CLIP(fvec_onset, fmat_n - fvec_index);
-
+        
         i = fvec_onset;
         j = fvec_index + fvec_onset;
       }
@@ -414,50 +414,50 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
       { /* subdiagonal:   like row index */
         CLIP(fvec_onset, fmat_m + fvec_index);
         CLIP(fvec_onset, fmat_n);
-
+        
         i = -fvec_index + fvec_onset;
         j = fvec_onset;
       }
-
+      
       /* clip diagonal end indices to matrix size */
       CLIP(fvec_size, fmat_m - i);
       CLIP(fvec_size, fmat_n - j);
-
+      
       *ptr    = fmat_ptr + i * fmat_n + j;
       *size   = fvec_size;
       *stride = fmat_n + 1;
     }
-    break;
+break;
 
-    case fvec_type_unwrap:
+case fvec_type_unwrap:
+  
+  /* row onset */
+  if(fvec_index < 0)
+    fvec_index = 0;
+  else if(fvec_index > fmat_m)
+    fvec_index = fmat_m;
+    
+    /* column onset */
+    if(fvec_onset > fmat_n)
+      fvec_onset = fmat_n;
       
-      /* row onset */
-      if(fvec_index < 0)
-        fvec_index = 0;
-      else if(fvec_index > fmat_m)
-        fvec_index = fmat_m;
-      
-      /* column onset */
-      if(fvec_onset > fmat_n)
-        fvec_onset = fmat_n;
-        
       if(fvec_index * fmat_n + fvec_onset + fvec_size > fmat_m * fmat_n)
         fvec_size = fmat_m * fmat_n - fvec_index * fmat_n - fvec_onset;
-          
-      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
-      *size = fvec_size;
-      *stride = 1;
-    break;
-      
-    case fvec_type_vector:
-      
-      *ptr = fmat_ptr;
-      *size = fvec_size;
-      *stride = 1;
-      break;
-    
-    default:
-      break;
+        
+        *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+  *size = fvec_size;
+  *stride = 1;
+  break;
+  
+case fvec_type_vector:
+  
+  *ptr = fmat_ptr;
+  *size = fvec_size;
+  *stride = 1;
+  break;
+  
+default:
+  break;
   }
 }
 
@@ -469,7 +469,7 @@ fvec_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
     fvec_get_vector((fvec_t *)obj, ptr, size, stride);
     return 1;
   }
-
+  
   *ptr = NULL;
   *size = 0;
   *stride = 0;
@@ -509,7 +509,7 @@ fvec_array_function(fts_object_t *o, fts_array_t *array)
   float *values;
   int size, stride;
   int i, j;
-
+  
   fvec_get_vector(self, &values, &size, &stride);  
   
   fts_array_set_size(array, onset + size);
@@ -520,10 +520,10 @@ fvec_array_function(fts_object_t *o, fts_array_t *array)
 }
 
 /******************************************************************************
- *
- *  envelopes
- *
- */
+*
+*  envelopes
+*
+*/
 
 static fts_method_status_t
 fvec_lookup_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -586,7 +586,7 @@ fvec_lookup_bpf(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   
   return fts_ok;
 }
-    
+
 static fts_method_status_t
 fvec_env_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -731,8 +731,8 @@ fvec_set_element (fvec_t *self, int i, float value)
 
 
 /** set values in fvec
- *  @fn fvec_object set(int offset, number values...)
- */
+*  @fn fvec_object set(int offset, number values...)
+*/
 static fts_method_status_t
 fvec_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -746,21 +746,21 @@ fvec_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
     
     ac -= 1;
     at += 1;
-
+    
     fvec_get_vector(self, &ptr, &size, &stride);
-
+    
     if (onset + ac > size)
       ac = size - onset;
-  
+    
     for (i = 0, j = onset; i < ac; i++, j += stride) 
     {
       if (fts_is_number(at + i))
         ptr[j] = fts_get_number_float(at + i);
     }
-  
+    
     fts_object_changed(o);
   }
-
+  
   fts_set_object(ret, o);
   
   return fts_ok;
@@ -815,7 +815,7 @@ _fvec_set_fmat_and_dimensions(fts_object_t *o, fts_symbol_t s, int ac, const fts
   if(ac > 0 && fts_is_a(at, fmat_class))
   {
     _fvec_set_fmat(o, NULL, 1, at, fts_nix);
-      
+    
     if(ac > 1 && fts_is_symbol(at + 1))
     {
       fts_symbol_t sym = fts_get_symbol(at + 1);
@@ -928,17 +928,17 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
     fmat_set_m(self->fmat, size);
   
   fvec_set_size(self, size);
-    
+  
   fts_set_int(ret, size);
   
   return fts_ok;
 }
 
 /******************************************************************************
- *
- *  arithmetics
- *
- */
+*
+*  arithmetics
+*
+*/
 
 static fts_method_status_t
 fvec_add_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -958,7 +958,7 @@ fvec_add_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
     size = l_size;
   else
     size = r_size;
-    
+  
   for(i=0; i<size; i++)
     l[i * l_stride] += r[i * r_stride];
   
@@ -1217,10 +1217,10 @@ fvec_vid_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 }
 
 /******************************************************************************
- *
- *  misc math funs
- *
- */
+*
+*  misc math funs
+*
+*/
 static fts_method_status_t
 fvec_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -1283,7 +1283,7 @@ fvec_normalize(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
       else if(f < -max)
         max = -f;
     }
-  
+    
     if(max != 0.0)
     {
       float scale = 1.0 / max;
@@ -1292,7 +1292,7 @@ fvec_normalize(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
         ptr[i] *= scale;
     }
   }
-
+  
   fts_set_object(ret, o);
   
   return fts_ok;
@@ -1307,7 +1307,7 @@ fvec_abs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   int i;
   
   fvec_get_vector(self, &ptr, &size, &stride);
-    
+  
   for(i=0; i<size*stride; i+=stride)
     ptr[i] = fabsf(ptr[i]);
   
@@ -1325,7 +1325,7 @@ fvec_logabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   int i;
   
   fvec_get_vector(self, &ptr, &size, &stride);
-    
+  
   for(i=0; i<size*stride; i+=stride)
     ptr[i] = logf(fabsf(ptr[i]));
   
@@ -1361,13 +1361,13 @@ fvec_exp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   int i;
   
   fvec_get_vector(self, &ptr, &size, &stride);
-    
+  
   for(i=0; i<size*stride; i+=stride)
     ptr[i] = expf(ptr[i]);
   
   fts_set_object(ret, o);
   
-
+  
   return fts_ok;
 }
 
@@ -1380,7 +1380,7 @@ fvec_sqrabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   int i;
   
   fvec_get_vector(self, &ptr, &size, &stride);
-    
+  
   for(i=0; i<size*stride; i+=stride)
     ptr[i] *= ptr[i];
   
@@ -1408,10 +1408,10 @@ fvec_sqrt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
 }
 
 /******************************************************************************
- *
- *  min, max & co
- *
- */
+*
+*  min, max & co
+*
+*/
 
 static fts_method_status_t
 fvec_get_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -1421,7 +1421,7 @@ fvec_get_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   int size, stride;
   
   fvec_get_vector(self, &p, &size, &stride);
-
+  
   if(size > 0)
   {
     float min = p[0];
@@ -1433,7 +1433,7 @@ fvec_get_min(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
         min = p[i];
     }
     
-      fts_set_float(ret, min);
+    fts_set_float(ret, min);
   }
   
   return fts_ok;
@@ -1447,7 +1447,7 @@ fvec_get_max(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   int size, stride;
   
   fvec_get_vector(self, &p, &size, &stride);
-
+  
   if(size > 0)
   {
     float max = p[0]; /* start with first element */
@@ -1473,7 +1473,7 @@ fvec_get_absmax(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   int size, stride;
   
   fvec_get_vector(self, &p, &size, &stride);
-
+  
   if(size > 0)
   {
     float max = fabsf(p[0]); /* start with first element */
@@ -1499,7 +1499,7 @@ fvec_get_min_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   int size, stride;
   
   fvec_get_vector(self, &p, &size, &stride);
-
+  
   if(size > 0)
   {
     float min = p[0];
@@ -1529,7 +1529,7 @@ fvec_get_max_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   int size, stride;
   
   fvec_get_vector(self, &p, &size, &stride);
-
+  
   if(size > 0)
   {
     float max = p[0];
@@ -1556,7 +1556,7 @@ static fts_method_status_t
 fvec_sort (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
-
+  
   _fmat_sort(self->fmat, 0, _fmat_element_compare_ascending);
   
   fts_object_changed(o);
@@ -1570,7 +1570,7 @@ static fts_method_status_t
 fvec_sortrev (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *)o;
-
+  
   _fmat_sort(self->fmat, 0, _fmat_element_compare_descending);
   
   fts_object_changed(o);
@@ -1630,7 +1630,7 @@ fvec_get_mean(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   int i;
   
   fvec_get_vector(self, &p, &size, &stride);
-    
+  
   for(i=0; i<size*stride; i+=stride)
     sum += p[i];
   
@@ -1651,16 +1651,16 @@ fvec_get_variance (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   int     i;
   
   fvec_get_vector(self, &p, &size, &stride);
-    
+  
   for (i = 0; i < size * stride; i += stride)
   {
     sum  += p[i];
     sum2 += p[i] * p[i];
   }
-
+  
   mean = sum  / (double) size;
   var  = sum2 / (double) size - mean * mean;
-
+  
   fts_set_float(ret, var);
   
   return fts_ok;
@@ -1675,7 +1675,7 @@ fvec_get_zc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   int size, stride;
   
   fvec_get_vector(self, &p, &size, &stride);
-
+  
   if(size > 0)
   {
     float prev = p[0];
@@ -1692,7 +1692,7 @@ fvec_get_zc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
         prev = f;
       }
     }
-  
+    
     fts_set_int(ret, zc);
   }
   
@@ -1700,10 +1700,10 @@ fvec_get_zc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 }
 
 /****************************************************************************
- *
- *  system mehods
- *
- */
+*
+*  system mehods
+*
+*/
 
 /* called by get element message */
 static fts_method_status_t
@@ -1715,35 +1715,35 @@ _fvec_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   int i = 0;
   
   fvec_get_vector(self, &ptr, &size, &stride);
-
+  
   if (ptr  &&  size == 0)
     fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
   else
   {
     if(ac > 0  &&  fts_is_number(at))
       i = fts_get_number_int(at);
-
+    
     if(i >= size)
       i = size - 1;
-  
+    
     while (i < 0)
       i += size;
-  
+    
     fts_set_float(ret, ptr[i * stride]);
   }
-
+  
   return fts_ok;
 }
-
 
 static fts_method_status_t
 _fvec_get_matrix (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
-
+  
   fts_set_object(ret, self->fmat);
+  
+  return fts_ok;
 }
-
 
 static fts_method_status_t
 fvec_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -1779,10 +1779,10 @@ fvec_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 
 
 /****************************************************************************
- *
- *  post and print
- *
- */
+*
+*  post and print
+*
+*/
 
 static fts_method_status_t
 fvec_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -1841,10 +1841,10 @@ fvec_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
 }
 
 /******************************************************************************
- *
- *  class
- *
- */
+*
+*  class
+*
+*/
 static fts_method_status_t
 fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -1855,7 +1855,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   self->index = 0;
   self->onset = 0;
   self->size = INT_MAX >> 2;
-
+  
   self->editor = 0;
   
   if(ac > 0)
@@ -1883,21 +1883,21 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       
       if(ac > 1)
       {
-	fts_set_int((fts_atom_t *)at, 0);
+        fts_set_int((fts_atom_t *)at, 0);
         fvec_set(o, NULL, ac, at, fts_nix);
       }
     }    
   }
   else
-  { /* no init args given: create empty column vector with own fmat */
+  {
+    /* no init args given: create empty column vector with own fmat */
     self->fmat = fmat_create(0, 1);
     self->type = fvec_type_vector;
-    self->size = 0;
   }
-  
-  fts_object_refer((fts_object_t *)self->fmat);
-  
-  return fts_ok;
+
+fts_object_refer((fts_object_t *)self->fmat);
+
+return fts_ok;
 }
 
 static fts_method_status_t
@@ -1913,9 +1913,9 @@ fvec_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 static void
 fvec_message(fts_class_t *cl, fts_symbol_t s, fts_method_t slice_method, fts_method_t scalar_method)
 {       
-        fts_class_message(cl, s, fmat_class, slice_method);
-        fts_class_message(cl, s, fvec_class, slice_method);
-        fts_class_message_number(cl, s, scalar_method);   
+  fts_class_message(cl, s, fmat_class, slice_method);
+  fts_class_message(cl, s, fvec_class, slice_method);
+  fts_class_message_number(cl, s, scalar_method);   
 }
 
 static void
@@ -1927,27 +1927,27 @@ fvec_instantiate(fts_class_t *cl)
   
   /* standard functions */
   fts_class_set_array_function(cl, fvec_array_function);
-
+  
   /* standard methods for naming, persistence, and dump */
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, fvec_dump_state);
-
+  
   /* graphical editor */
   fts_class_message_varargs(cl, fts_s_openEditor,    fvec_open_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor,   fvec_close_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, fvec_destroy_editor);
-
+  
   /* access methods */
   fts_class_message_varargs(cl, fts_s_print, fvec_print);
   fts_class_message_varargs(cl, fts_s_get_element, _fvec_get_element);
   fts_class_message_varargs(cl, fts_s_get, _fvec_get_element);
   fts_class_message_void   (cl, fts_s_get, _fvec_get_matrix);
-
+  
   fts_class_message_varargs(cl, fts_s_set, fvec_set);
   fts_class_message(cl, fts_s_set, fmat_class, fvec_set_from_fmat_or_fvec);
   fts_class_message(cl, fts_s_set, fvec_class, fvec_set_from_fmat_or_fvec);
-
+  
   fts_class_message(cl, sym_refer, fmat_class, _fvec_set_fmat);
   fts_class_message_varargs(cl, sym_refer, _fvec_set_fmat_and_dimensions);
   fts_class_message_varargs(cl, sym_col, _fvec_set_col);
@@ -1958,7 +1958,7 @@ fvec_instantiate(fts_class_t *cl)
   
   fts_class_message_void(cl, fts_s_size, _fvec_get_size);
   fts_class_message_number(cl, fts_s_size, _fvec_set_size);
-
+  
   /* arithmetics (on fvec or fmat!) */
   fvec_message(cl, fts_new_symbol("add"), fvec_add_fvec, fvec_add_number);
   fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);
@@ -1966,17 +1966,17 @@ fvec_instantiate(fts_class_t *cl)
   fvec_message(cl, fts_new_symbol("div"), fvec_div_fvec, fvec_div_number);
   fvec_message(cl, fts_new_symbol("bus"), fvec_bus_fvec, fvec_bus_number);
   fvec_message(cl, fts_new_symbol("vid"), fvec_vid_fvec, fvec_vid_number);
-
+  
   fts_class_message_varargs(cl, fts_new_symbol("clip"), fvec_clip);
   fts_class_message_void(cl, fts_new_symbol("normalize"), fvec_normalize);
-
+  
   fts_class_message_void(cl, fts_new_symbol("abs"), fvec_abs);
   fts_class_message_void(cl, fts_new_symbol("logabs"), fvec_logabs);
   fts_class_message_void(cl, fts_new_symbol("log"), fvec_log);
   fts_class_message_void(cl, fts_new_symbol("exp"), fvec_exp);
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fvec_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("sqrt"), fvec_sqrt);
-
+  
   fts_class_message_void(cl, fts_new_symbol("min"), fvec_get_min);
   fts_class_message_void(cl, fts_new_symbol("max"), fvec_get_max);
   fts_class_message_void(cl, fts_new_symbol("mini"), fvec_get_min_index);
@@ -1987,13 +1987,13 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("mean"), fvec_get_mean);
   fts_class_message_void(cl, fts_new_symbol("variance"), fvec_get_variance);
   fts_class_message_void(cl, fts_new_symbol("zc"), fvec_get_zc);
-
+  
   fts_class_message_void(cl, fts_s_sort,    fvec_sort);
   fts_class_message_void(cl, fts_s_sortrev, fvec_sortrev);
-
+  
   /* fmat methods that work on fvec, too: */
   fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
-
+  
   fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fvec_lookup_bpf);
@@ -2001,16 +2001,16 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("env"), fmat_class, fvec_env_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("env"), fvec_class, fvec_env_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("env"), bpf_type, fvec_env_bpf);
-
+  
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fvec_apply_expr);
-
+  
   /* let's have standard in/outlets */
   fts_class_inlet_bang(cl, 0, data_object_output);
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
   
-
-
+  
+  
   /*
    * fvec class documentation
    */
@@ -2019,9 +2019,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fvec_symbol, "<'diag'> <num: row onset> [<num: column onset> [<num: size>]]", "vector reference to matrix diagonal");
   fts_class_doc(cl, fvec_symbol, "<'unwrap'> <num: row onset> [<num: column onset> [<num: size>]]", "vector reference to unwrapped matrix");
   fts_class_doc(cl, fvec_symbol, "<num: size>", "vector reference compatible float vector");
-
+  
   fts_class_doc(cl, fts_s_size, NULL, "get size");
-
+  
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("mini"), NULL, "get index of minimum value");
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
@@ -2039,17 +2039,17 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("div"), "<num|fvec: operand>", "divide current values by given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("bus"), "<num|fvec: operand>", "subtract current values from given scalar, fvec (element by element)");  
   fts_class_doc(cl, fts_new_symbol("vid"), "<num|fvec: operand>", "divide given scalar, fvec (element by element) by current values");
-
+  
   fts_class_doc(cl, fts_new_symbol("abs"), NULL, "calulate absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("logabs"), NULL, "calulate logarithm of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("log"), NULL, "calulate lograrithm of current values");
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
-
+  
   fts_class_doc(cl, fts_new_symbol("clip"), "[<lower limit>] <upper limit>", "clip values within given limits");
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
-
+  
   fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fvec|bpf: function>", "apply given function (by linear interpolation)");
   fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope");
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
@@ -2061,7 +2061,7 @@ void
 fvec_config(void)
 {
   fvec_symbol = fts_new_symbol("fvec");
-
+  
   sym_col = fts_new_symbol("col");
   sym_row = fts_new_symbol("row");
   sym_diag = fts_new_symbol("diag");
@@ -2079,8 +2079,8 @@ fvec_config(void)
 }
 
 /** EMACS **
- * Local variables:
- * mode: c
- * c-basic-offset:2
- * End:
- */
+* Local variables:
+* mode: c
+* c-basic-offset:2
+* End:
+*/
