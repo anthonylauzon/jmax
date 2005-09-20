@@ -364,6 +364,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
   fts_atom_t *at, *top;
   fts_status_t status = fts_ok;
   fts_object_t *obj;
+  fts_method_t method;
   fts_atom_t ret;
 
   if (!tree)
@@ -433,19 +434,41 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
     ac = expression_stack_frame_count( exp);
     at = expression_stack_frame( exp);
 
-    if (!fts_is_object(at))
+    if (fts_is_object(at))
+    {
+      fts_object_t *obj = fts_get_object( at);
+      fts_message_cache_t *message_cache;
+
+      if(fts_is_pointer(&tree->value))
+        message_cache = fts_get_pointer(&tree->value);
+      else
+      {
+        message_cache = fts_message_cache_new();
+        fts_set_pointer(&tree->value, message_cache);
+      }
+      
+      fts_set_void(&ret);
+      
+      if(fts_send_message_cached(obj, fts_s_get_element, ac - 1, at + 1, &ret, message_cache) == NULL)
+      {
+        fts_symbol_t clname = fts_object_get_class_name(obj);
+        
+        if(clname != NULL)
+          return fts_status_format("get element is not defined with given arguments for %s object", fts_symbol_name(clname));
+        else
+          return fts_status_format("get element not defined with given arguments");
+      }
+      
+      if(fts_is_void(&ret))
+        return fts_ignore;
+      
+      fts_atom_refer(&ret);
+      
+      expression_stack_pop_frame( exp);
+      expression_stack_push( exp, &ret);
+    }
+    else
       return operand_type_mismatch_error;
-      
-    /* clear return value */
-    fts_set_void(&ret);
-
-    if(fts_send_message(fts_get_object( at), fts_s_get_element, ac - 1, at + 1, &ret) == NULL || fts_is_void(&ret))
-      return fts_ignore;
-      
-    fts_atom_refer(&ret);
-
-    expression_stack_pop_frame( exp);
-    expression_stack_push( exp, &ret);
 
     break;
 
@@ -498,13 +521,22 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       /* it is a method invocation */
       fts_object_t *obj = fts_get_object(at);
       fts_symbol_t selector = fts_get_symbol(at + 1);
+      fts_message_cache_t *message_cache;
+      
+      if(fts_is_pointer(&tree->value))
+        message_cache = fts_get_pointer(&tree->value);
+      else
+      {
+        message_cache = fts_message_cache_new();
+        fts_set_pointer(&tree->value, message_cache);
+      }
       
       fts_object_refer(obj);
       
       /* clear return value */
       fts_set_void(&ret);
       
-      if(fts_send_message(obj, selector, ac - 2, at + 2, &ret) == NULL)
+      if(fts_send_message_cached(obj, selector, ac - 2, at + 2, &ret, message_cache) == NULL)
       {
         fts_symbol_t clname = fts_object_get_class_name(obj);
         

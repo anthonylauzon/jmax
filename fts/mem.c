@@ -181,42 +181,42 @@ static void fts_heap_grow(fts_heap_t *p)
 fts_heap_t *fts_heap_new(unsigned int block_size)
 {
   if (block_size > SHARED_HEAP_MAX_SIZE)
-    {
-      /* Unshared heap */
-
-      fts_heap_t *p;
-
-      p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
-      p->free_list = 0;
-      p->block_size = ( block_size > sizeof(char **) ? block_size : sizeof(char **));
-      p->current_block_group = 64;
-      p->reserved_blocks = 0;
-
-      return p;
-    }
+  {
+    /* Unshared heap */
+    
+    fts_heap_t *p;
+    
+    p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
+    p->free_list = 0;
+    p->block_size = ( block_size > sizeof(char **) ? block_size : sizeof(char **));
+    p->current_block_group = 64;
+    p->reserved_blocks = 0;
+    
+    return p;
+  }
   else
-    {
-      /* shared heap */
-
-      int idx;
-      idx = (block_size / sizeof(long)) /*- 1*/;/* removed -1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
-
+  {
+    /* shared heap */
+    
+    int idx;
+    idx = (block_size / sizeof(long)) /*- 1*/;/* removed -1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
+      
       if (fts_heaps[idx])
         return fts_heaps[idx];
-      else
-	{
-	  fts_heap_t *p;
-
-	  p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
-	  p->free_list = 0;
-	  p->block_size = (idx + 1) * sizeof(long);
-	  p->current_block_group = 64;
-	  fts_heaps[idx] = p;
-	  p->reserved_blocks = 0;
-
-	  return p;
-	}
+    else
+    {
+      fts_heap_t *p;
+      
+      p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
+      p->free_list = 0;
+      p->block_size = (idx + 1) * sizeof(long);
+      p->current_block_group = 64;
+      fts_heaps[idx] = p;
+      p->reserved_blocks = 0;
+      
+      return p;
     }
+  }
 }
 
 void *fts_heap_alloc( fts_heap_t *p)

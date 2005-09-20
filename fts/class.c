@@ -254,8 +254,6 @@ typedef struct
 } method_key_t;
 
 static fts_class_t *method_key_class;
-static method_key_t *method_key;
-static fts_atom_t method_key_atom;
 
 static unsigned int
 method_key_hash (const fts_atom_t * a)
@@ -283,15 +281,6 @@ method_key_instantiate (fts_class_t * cl)
   fts_class_set_equals_function (cl, method_key_equals);
 }
 
-static void
-method_key_init (void)
-{
-  method_key_class = fts_class_install (NULL, method_key_instantiate);
-  method_key = (method_key_t *) fts_object_create (method_key_class, 0, 0);
-  
-  fts_set_object (&method_key_atom, (fts_object_t *) method_key);
-}
-
 static method_key_t *
 method_key_new (fts_symbol_t selector, fts_class_t * type)
 {
@@ -306,15 +295,18 @@ method_key_new (fts_symbol_t selector, fts_class_t * type)
 static fts_method_t
 method_get (fts_class_t * cl, const void *selector, fts_class_t * type)
 {
-  fts_atom_t a;
+  fts_atom_t k, a;
   
   if(cl->methods)
   {
-    method_key->selector = selector;
-    method_key->type = type;
+    method_key_t *method_key = method_key_new((fts_symbol_t)selector, type);
     
-    if (fts_hashtable_get (cl->methods, &method_key_atom, &a))
+    fts_set_object(&k, (fts_object_t *) method_key);
+    
+    if(fts_hashtable_get (cl->methods, &k, &a))
       return (fts_method_t)fts_get_pointer(&a);
+    
+    fts_object_destroy((fts_object_t *)method_key);
   }
   
   return NULL;
@@ -350,7 +342,7 @@ class_message_iterator_next(fts_iterator_t *i, fts_atom_t *a)
   n = (int)key->selector;
   
   if(n > 64)
-    fts_set_symbol(a, key->selector);
+    fts_set_symbol(a, (fts_symbol_t)key->selector);
   else
     fts_set_int(a, n);
 }
@@ -786,5 +778,5 @@ fts_kernel_class_init (void)
   
   iterator_heap = fts_heap_new(sizeof(fts_iterator_t));
   
-  method_key_init ();
+  method_key_class = fts_class_install (NULL, method_key_instantiate);
 }

@@ -373,6 +373,13 @@ fts_parsetree_delete( fts_parsetree_t *tree)
 
   fts_parsetree_delete( tree->left);
   fts_parsetree_delete( tree->right);
+  
+  if(fts_is_pointer(&tree->value))
+  {
+    fts_message_cache_t *message_cache = fts_get_pointer(&tree->value);
+    fts_message_cache_free(message_cache);
+  }
+
   fts_heap_free( tree, parsetree_heap);
 }
 
