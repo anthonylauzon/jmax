@@ -20,8 +20,11 @@
  * 
  */
 
-
+#ifdef WIN32
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
 #include <math.h>
 
 #include <fts/fts.h>
@@ -94,6 +97,7 @@ compute_mean(tree_t *t, int node)
 	float *data_ptr; 
 	int    m;		
     int    n;
+	int n_nvector;
 
 	t->nodes[node].mean = fmat_create(1, t->ndim);
 	fts_object_refer(t->nodes[node].mean);
@@ -101,7 +105,7 @@ compute_mean(tree_t *t, int node)
 	mean_ptr = fmat_get_ptr(t->nodes[node].mean);
 	
 	// number of vectors from the processed node
-	int n_nvector = t->nodes[node].endind - t->nodes[node].startind + 1; 
+	n_nvector = t->nodes[node].endind - t->nodes[node].startind + 1; 
 	for(j = 0; j < t->ndim; j++) 
 	{
 		tmp = 0;

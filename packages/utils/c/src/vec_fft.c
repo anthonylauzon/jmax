@@ -235,7 +235,9 @@ fts_rifft(complex *in, float *out, unsigned int size)
  *  optimized static FFT routines (allowing for temporary buffers)
  *
  */
+#ifndef WIN32
 #define HAS_MACOSX_VECLIB
+#endif
 
 #if defined HAS_MACOSX_VECLIB
 

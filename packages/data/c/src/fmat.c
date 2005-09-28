@@ -32,6 +32,7 @@
 #include <float.h>
 #include <string.h>
 
+
 #ifdef WIN32
 #include <malloc.h>
 #else
@@ -2711,9 +2712,12 @@ fmat_convert_polar(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     {
       float re = ptr[i];
       float im = ptr[i + 1];
-      
-      ptr[i] = hypotf(re, im);
-      ptr[i + 1] = atan2f(im, re);
+#ifdef WIN32
+      ptr[i] = hypot((double)re, (double)im);
+#else
+	  ptr[i] = hypot(re, im);
+#endif
+	  ptr[i + 1] = atan2f(im, re);
     }
     
     fts_object_changed(o);
