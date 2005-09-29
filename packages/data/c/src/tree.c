@@ -546,7 +546,6 @@ tree_instantiate(fts_class_t *cl)
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
 
-  fts_post("tree instantiate finished\n");
 
   /*
    * class doc

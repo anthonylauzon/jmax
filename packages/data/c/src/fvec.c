@@ -39,6 +39,7 @@
 
 #define ABS_MIN -3.40282347e+38F
 #define ABS_MAX 3.40282347e+38F
+#define FVEC_DEFAULT_SIZE   (INT_MAX >> 2)
 
 fts_class_t *fvec_class = NULL;
 fts_symbol_t fvec_symbol = NULL;
@@ -78,62 +79,30 @@ fvec_get_type_from_symbol(fts_symbol_t sym)
 */
 
 fvec_t *
-fvec_create_column(fmat_t *fmat)
+fvec_create (fmat_t *fmat, fvec_type_t type, int ac, const fts_atom_t *at)
 {
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec->fmat = fmat;
-  fts_object_refer((fts_object_t *)fmat);
-  fvec->type = fvec_type_column;
-  
-  return fvec;
-}
+  fvec_t     *fvec;
+  fts_atom_t  a[1];
 
-fvec_t *
-fvec_create_row(fmat_t *fmat)
-{
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec->fmat = fmat;
-  fts_object_refer((fts_object_t *)fmat);  
-  fvec->type = fvec_type_row;
-  
-  return fvec;
-}
+  fts_set_object(a, fmat);
+  fvec = (fvec_t *) fts_object_create(fvec_class, 1, a);
 
-fvec_t *
-fvec_create_diagonal(fmat_t *fmat)
-{
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec->fmat = fmat;
-  fts_object_refer((fts_object_t *)fmat);  
-  fvec->type = fvec_type_diagonal;
-  
-  return fvec;
-}
+  fvec_set_type(fvec, type);
+  fvec_set_dimensions(fvec, ac, at);
 
-fvec_t *
-fvec_create_unwrap(fmat_t *fmat)
-{
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec->fmat = fmat;
-  fts_object_refer((fts_object_t *)fmat);  
-  fvec->type = fvec_type_unwrap;
-  
   return fvec;
 }
 
 fvec_t *
 fvec_create_vector(int size)
 {
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec->fmat = fmat_create(size, 1);
-  fts_object_refer((fts_object_t *) fvec->fmat);  
-  fvec->type = fvec_type_vector;
-  
+  fvec_t     *fvec;
+  fts_atom_t  a[1];
+
+  fts_set_object(a, fmat_create(size, 1));
+  fvec = (fvec_t *) fts_object_create(fvec_class, 1, a);
+  fvec_set_type(fvec, fvec_type_vector);
+
   return fvec;
 }
 
@@ -301,6 +270,8 @@ static void fvec_changed(fvec_t *this)
 }
 
 
+/** set index, onset, size from args (when given) 
+ */
 void
 fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at)
 {
@@ -368,11 +339,8 @@ postcondition:  x <= u */
       while(fvec_index < 0)
         fvec_index += fmat_n;
         
-        if(fvec_onset > fmat_m)
-          fvec_onset = fmat_m;
-          
-          if(fvec_onset + fvec_size > fmat_m)
-            fvec_size = fmat_m - fvec_onset;
+      CLIP(fvec_onset, fmat_m);
+      CLIP(fvec_size,  fmat_m - fvec_onset);
             
             *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
       *size = fvec_size;
@@ -387,13 +355,10 @@ postcondition:  x <= u */
       while(fvec_index < 0)
         fvec_index += fmat_m;
         
-        if(fvec_onset > fmat_n)
-          fvec_onset = fmat_n;
+      CLIP(fvec_onset, fmat_n);
+      CLIP(fvec_size,  fmat_n - fvec_onset);
           
-          if(fvec_onset + fvec_size > fmat_n)
-            fvec_size = fmat_n - fvec_onset;
-            
-            *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
       *size = fvec_size;
       *stride = 1;
       break;
@@ -887,7 +852,7 @@ static fts_method_status_t
 _fvec_set_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *)o;
-  int size = 0;
+  int     size = 0;
   
   if(ac > 0 && fts_is_number(at))
     size = fts_get_number_int(at);
@@ -911,7 +876,7 @@ static fts_method_status_t
 _fvec_get_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *)o;
-  int size = fvec_get_size(self);
+  int size = fvec_get_size(self); /* clips to matrix size */
   
   fts_set_int(ret, size);
   
@@ -933,6 +898,8 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   
   return fts_ok;
 }
+
+
 
 /******************************************************************************
 *
@@ -1854,14 +1821,14 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   self->type = fvec_type_column;
   self->index = 0;
   self->onset = 0;
-  self->size = INT_MAX >> 2;
-  
+  self->size  = FVEC_DEFAULT_SIZE;  /* will be clipped to matrix size 
+                                       in fvec_get_vector and fvec_get_size */
   self->editor = 0;
   
   if(ac > 0)
   {
     if(fts_is_a(at, fmat_class))
-    {
+    { /* create refering to given fmat */
       self->fmat = (fmat_t *)fts_get_object(at);
       
       if(ac > 1 && fts_is_symbol(at + 1))
@@ -1874,7 +1841,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
         fvec_set_dimensions(self, ac - 2, at + 2);
     }
     else if(fts_is_number(at))
-    {
+    { /* create fvec with own matrix of given size */
       int size = fts_get_number_int(at);
       
       self->fmat = fmat_create(size, 1);
@@ -1883,7 +1850,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       
       if(ac > 1)
       {
-        fts_set_int((fts_atom_t *)at, 0);
+        fts_set_int((fts_atom_t *) at, 0);
         fvec_set(o, NULL, ac, at, fts_nix);
       }
     }    
@@ -1893,6 +1860,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     /* no init args given: create empty column vector with own fmat */
     self->fmat = fmat_create(0, 1);
     self->type = fvec_type_vector;
+    /* size remains FVEC_DEFAULT_SIZE, to be clipped */
   }
 
 fts_object_refer((fts_object_t *)self->fmat);

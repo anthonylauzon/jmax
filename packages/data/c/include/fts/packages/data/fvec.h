@@ -33,12 +33,14 @@
  *  @{
  */
 
+typedef enum { fvec_type_column, fvec_type_row, fvec_type_diagonal, 
+	       fvec_type_unwrap, fvec_type_vector, fvec_n_types } fvec_type_t;
+
 /** fvec struct */
 typedef struct
 {
   fts_object_t o;
-  enum { fvec_type_column, fvec_type_row, fvec_type_diagonal, 
-	 fvec_type_unwrap, fvec_type_vector, fvec_n_types } type;
+  fvec_type_t  type;
   fmat_t *fmat; /* pointer to fmat */
   int index; /* index of column (col) or index of row (row)  or row onset (diag) */
   int onset; /* row onset (col) or column onset (row) or column onset (diag) */
@@ -70,6 +72,11 @@ DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
 
 
+/** quick create */
+DATA_API fvec_t *fvec_create (fmat_t *fmat, fvec_type_t type, 
+			      int ac, const fts_atom_t *at);
+DATA_API fvec_t *fvec_create_vector (int size);
+
 /** get element, no checks */
 DATA_API float fvec_get_element(fvec_t *self, int i);
 
@@ -87,12 +94,6 @@ DATA_API int  fvec_vector     (fts_object_t *obj,
 /** like fvec_vector, no checks */
 DATA_API void fvec_get_vector (fvec_t *fvec, 
 			       /*out*/ float **ptr, int *size, int *stride);
-
-DATA_API fvec_t *fvec_create_column(fmat_t *fmat);
-DATA_API fvec_t *fvec_create_row(fmat_t *fmat);
-DATA_API fvec_t *fvec_create_diagonal(fmat_t *fmat);
-DATA_API fvec_t *fvec_create_unwrap(fmat_t *fmat);
-DATA_API fvec_t *fvec_create_vector(int size);
 
 /** copy row or col from matrix reference to an fmat (1 column matrix) */
 DATA_API void fvec_copy_to_fmat(fvec_t *org, fmat_t *copy);

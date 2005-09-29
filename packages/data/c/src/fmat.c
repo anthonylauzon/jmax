@@ -1391,14 +1391,8 @@ fmat_pick_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
 static fts_method_status_t
 fmat_get_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t *self = (fmat_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec_set_type(fvec, fvec_type_column);
-  fvec_set_fmat(fvec, self);
-  
-  if(ac > 0)
-    fvec_set_dimensions(fvec, ac, at);
+  fmat_t *self = (fmat_t *) o;
+  fvec_t *fvec = fvec_create(self, fvec_type_column, ac, at);
   
   fts_set_object(ret, (fts_object_t *)fvec);
   
@@ -1410,14 +1404,8 @@ static fts_method_status_t
 fmat_get_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec_set_type(fvec, fvec_type_row);
-  fvec_set_fmat(fvec, self);
+  fvec_t *fvec = fvec_create(self, fvec_type_row, ac, at);
 
-  if(ac > 0)
-    fvec_set_dimensions(fvec, ac, at);
-  
   fts_set_object(ret, (fts_object_t *)fvec);
   
   return fts_ok;
@@ -1428,13 +1416,7 @@ static fts_method_status_t
 fmat_get_diag(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
-  fvec_t *fvec = (fvec_t *)fts_object_create(fvec_class, 0, 0);
-  
-  fvec_set_type(fvec, fvec_type_diagonal);
-  fvec_set_fmat(fvec, self);
-
-  if(ac > 0)
-    fvec_set_dimensions(fvec, ac, at);
+  fvec_t *fvec = fvec_create(self, fvec_type_diagonal, ac, at);
   
   fts_set_object(ret, (fts_object_t *)fvec);
   
