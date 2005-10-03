@@ -68,6 +68,9 @@ public interface MatDataModel {
     public abstract void requestInsertColumn(int index);
     public abstract void requestDeleteRows(int startIndex, int size);
     public abstract void requestDeleteCols(int startIndex, int size);
+    
+    public abstract void requestExport();
+    public abstract void requestImport();
 }
 
 

@@ -308,6 +308,31 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }    
   }
   
+  public void requestImport()
+  {
+    try{
+      send( FtsSymbol.get("import"));
+    }
+    catch(IOException e)
+  {
+      System.err.println("FtsMatObject: I/O Error sending import Message!");
+      e.printStackTrace(); 
+  }    
+  }  
+  
+  public void requestExport()
+  {
+    try{
+      send( FtsSymbol.get("export"));
+    }
+    catch(IOException e)
+  {
+      System.err.println("FtsMatObject: I/O Error sending export Message!");
+      e.printStackTrace(); 
+  }    
+  }    
+  
+  
   /************************************************************************************
   ** MatDataModel interface
   *************************************************************************************/

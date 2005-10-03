@@ -96,6 +96,20 @@ public class MatEditMenu extends EditorMenu implements ListSelectionListener
         }
       });
     }	    
+    
+    addSeparator();
+    add( new EditorAction("Export ...", "export", KeyEvent.VK_E, KeyEvent.VK_E, true){
+      public void doAction(EditorContainer container)
+      {
+          model.requestExport();
+      }
+    });
+    add( new EditorAction("Import ...", "import", KeyEvent.VK_I, KeyEvent.VK_I, true){
+      public void doAction(EditorContainer container)
+      {
+        model.requestImport();
+      }
+    });
   }
   
   /* ListSelectionListener interface */
