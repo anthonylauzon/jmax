@@ -69,10 +69,9 @@ public class MatWindow extends JMaxEditor {
       }
       public void matSizeChanged(int n_rows, int n_cols)
       {
-        /*getContentPane().validate();
-        itsMatPanel.validate();
-        validate();*/
-      }   
+        validate();
+        pack();
+      }
       public void uploading(boolean uploading){}
       public void matNameChanged(String name)
       {
