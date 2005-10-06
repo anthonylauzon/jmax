@@ -71,11 +71,11 @@ typedef struct
 DATA_API fts_symbol_t fvec_symbol;
 DATA_API fts_class_t *fvec_class;
 
-
 /** quick create */
-DATA_API fvec_t *fvec_create (fmat_t *fmat, fvec_type_t type, 
-			      int ac, const fts_atom_t *at);
+DATA_API fvec_t *fvec_create (fmat_t *fmat, fvec_type_t type, int ac, const fts_atom_t *at);
 DATA_API fvec_t *fvec_create_vector (int size);
+DATA_API fvec_t *fvec_create_column(fmat_t *fmat);
+DATA_API fvec_t *fvec_create_row(fmat_t *fmat);
 
 /** get element, no checks */
 DATA_API float fvec_get_element(fvec_t *self, int i);

@@ -78,16 +78,22 @@ fvec_get_type_from_symbol(fts_symbol_t sym)
 *
 */
 
-fvec_t *
-fvec_create (fmat_t *fmat, fvec_type_t type, int ac, const fts_atom_t *at)
+static fvec_t *
+make_fvec(fmat_t *fmat, fvec_type_t type)
 {
-  fvec_t     *fvec;
-  fts_atom_t  a[1];
-
+  fvec_t *fvec;
+  fts_atom_t a[1];
+  
   fts_set_object(a, fmat);
   fvec = (fvec_t *) fts_object_create(fvec_class, 1, a);
-
+  
   fvec_set_type(fvec, type);
+}
+
+fvec_t *
+fvec_create(fmat_t *fmat, fvec_type_t type, int ac, const fts_atom_t *at)
+{
+  fvec_t *fvec = make_fvec(fmat, type);
   fvec_set_dimensions(fvec, ac, at);
 
   return fvec;
@@ -96,17 +102,20 @@ fvec_create (fmat_t *fmat, fvec_type_t type, int ac, const fts_atom_t *at)
 fvec_t *
 fvec_create_vector(int size)
 {
-  fvec_t     *fvec;
-  fts_atom_t  a[1];
-
-  fts_set_object(a, fmat_create(size, 1));
-  fvec = (fvec_t *) fts_object_create(fvec_class, 1, a);
-  fvec_set_type(fvec, fvec_type_vector);
-
-  return fvec;
+  return make_fvec(fmat_create(size, 1), fvec_type_vector);
 }
 
+fvec_t *
+fvec_create_column(fmat_t *fmat)
+{
+  return make_fvec(fmat, fvec_type_column);
+}
 
+fvec_t *
+fvec_create_row(fmat_t *fmat)
+{
+  return make_fvec(fmat, fvec_type_row);
+}
 
 /********************************************************************
 *
