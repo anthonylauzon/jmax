@@ -190,7 +190,7 @@ static FILE *fts_abstraction_find_path_file(fts_symbol_t name)
 
       for ( k = 0; k < sizeof( extensions)/sizeof( char *); k++)
 	{
-	  sprintf(buf, "%s/%s%s", filename, name, extensions[k]);
+	  snprintf(buf, sizeof(buf), "%s/%s%s", filename, name, extensions[k]);
 
 	  /* If the file is there and it is a regular file and not a directory , open it */
 	  if ((stat(buf, &statbuf) == 0) && (statbuf.st_mode & S_IFREG))

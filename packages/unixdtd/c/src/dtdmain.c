@@ -65,7 +65,7 @@ static int _dbg( const char *format, ...)
   double now, elapsed;
 
   va_start( ap, format);
-  vsprintf( buf, format, ap);
+  vsnprintf(buf, sizeof(buf), format, ap);
   va_end( ap);
 
   get_current_milliseconds( &now, &elapsed);

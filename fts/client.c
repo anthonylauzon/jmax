@@ -801,7 +801,7 @@ static void client_load_project(fts_object_t *o, fts_symbol_t s, int ac, const f
 
   if(project == NULL || project->state == fts_package_corrupt) 
   {
-    sprintf(message, "Invalid project file: \n%s\n", project_file);
+    snprintf(message, sizeof(message), "Invalid project file: \n%s\n", project_file);
     fts_set_symbol( a, message);
     fts_client_send_message( o, s_show_message, 1, a);
   }  
@@ -832,7 +832,7 @@ static void client_load_package(fts_object_t *o, fts_symbol_t s, int ac, const f
 
   if(package == NULL || package->state == fts_package_corrupt) 
   {
-    sprintf(message, "Invalid package file: \n%s\n", package_file);
+    snprintf(message, sizeof(message), "Invalid package file: \n%s\n", package_file);
     fts_set_symbol( a, message);
     fts_client_send_message( o, s_show_message, 1, a);
   }  

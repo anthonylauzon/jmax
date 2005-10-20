@@ -1170,7 +1170,7 @@ fts_bmax_file_open( fts_bmax_file_t *f, const char *name, int dobackup, fts_symb
       char backup[1024];	/* should use the correct posix constant */
 
       /* Get the backup file name */
-      sprintf(backup, "%s.backup", name);
+      snprintf(backup, sizeof(backup), "%s.backup", name);
 
       /* if the file exists, rename the old file, to keep a backup; ignore the error,
 	 if we cannot autosave, we need anyway to try saving ! also, ignoring

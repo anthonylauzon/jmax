@@ -181,7 +181,7 @@ fts_set_error(const char *format, ...)
 
   /* make up the errdesc property  */
   va_start(ap, format);
-  vsprintf(buf, format, ap);
+  vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
 
   the_error = fts_new_symbol(buf);
@@ -251,7 +251,7 @@ fts_object_error(fts_object_t *obj, const char *format, ...)
 
   /* make up the errdesc property  */
   va_start(ap, format);
-  vsprintf(buf, format, ap);
+  vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
 
   error = fts_new_symbol(buf);

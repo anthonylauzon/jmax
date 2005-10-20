@@ -141,7 +141,7 @@ static fts_status_description_t load_library_error = { &error_description[0]};
 odbc_private_extern void undefined_symbol_handler( const char *symbolName) 
 {
   fts_log( "undefined symbol: %s)", symbolName);
-  sprintf( error_description, "undefined symbol: %s", symbolName);
+  snprintf(error_description, sizeof(error_description), "undefined symbol: %s", symbolName);
 } 
 
 odbc_private_extern NSModule multiple_symbol_handler( NSSymbol s, NSModule old, NSModule new) 
@@ -156,7 +156,7 @@ odbc_private_extern NSModule multiple_symbol_handler( NSSymbol s, NSModule old, 
 
   fts_log( "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
 
-  sprintf( error_description, "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
+  snprintf(error_description, sizeof(error_description), "multiply defined symbol: %s (old %s new %s)", NSNameOfSymbol(s), NSNameOfModule(old), NSNameOfModule(new)); 
 
   return new; 
 } 
@@ -165,7 +165,7 @@ odbc_private_extern void linkEdit_symbol_handler (NSLinkEditErrors c, int errorN
 { 
   fts_log( "errors during link edit for file %s : %s", fileName, errorString); 
 
-  sprintf( error_description, "errors during link edit for file %s : %s", fileName, errorString); 
+  snprintf(error_description, sizeof(error_description), "errors during link edit for file %s : %s", fileName, errorString); 
 } 
 
 fts_status_t fts_load_library( const char *filename, const char *symbol)
@@ -231,7 +231,7 @@ fts_status_t fts_load_library( const char *filename, const char *symbol)
 
   if ( !fun)
     {
-      sprintf( error_description, "symbol %s not found", full_sym_name);
+      snprintf(error_description, sizeof(error_description), "symbol %s not found", full_sym_name);
       return &load_library_error;
     }
 

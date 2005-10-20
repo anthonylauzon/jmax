@@ -140,7 +140,7 @@ void dtdserver_add_object( dtdserver_t *server, void *object)
       if ( !fifo)
 	return;
 
-      sprintf( buffer, "mmap %d %s", server->number_of_fifos, filename);
+      snprintf(buffer, sizeof(buffer), "mmap %d %s", server->number_of_fifos, filename);
       dtdserver_send_command( server, buffer);
 
       server->fifo_table[ server->number_of_fifos ] = fifo;
@@ -189,7 +189,7 @@ dtdfifo_t *dtdserver_open_read( dtdserver_t *server, const char *filename, int n
 
   if (fifo)
     {
-      sprintf( buffer, "openread %d %s %s %d", id, 
+      snprintf(buffer, sizeof(buffer), "openread %d %s %s %d", id, 
 	       filename, 
 	       fts_make_absolute_path(NULL,filename, path, 512), 
 	       n_channels);
@@ -213,7 +213,7 @@ dtdfifo_t *dtdserver_open_write( dtdserver_t *server, const char *filename, int 
 
       sr = (double)fts_dsp_get_sample_rate();
 
-      sprintf( buffer, "openwrite %d %s %s %f %d", id, filename, fts_project_get_dir(), sr, n_channels);
+      snprintf(buffer, sizeof(buffer), "openwrite %d %s %s %f %d", id, filename, fts_project_get_dir(), sr, n_channels);
       dtdserver_send_command( server, buffer);
     }
 

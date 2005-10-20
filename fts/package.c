@@ -230,7 +230,7 @@ fts_package_load(fts_symbol_t name)
     }
   
   /* load the definition file */
-  sprintf(filename, "%s%c%s.jpkg", path, fts_file_separator, name);
+  snprintf(filename, sizeof(filename), "%s%c%s.jpkg", path, fts_file_separator, name);
 
   if (fts_file_exists(filename))
     pkg = fts_package_load_from_file(name, filename);
@@ -346,37 +346,37 @@ static void fts_package_load_default_files(fts_package_t* pkg)
   fts_package_push(pkg);
 
   /* load the shared library */
-  sprintf(filename, "%s%c%s%c%s%s%s", 
-	  pkg->dir, fts_file_separator, 
-	  "c", fts_file_separator, 
-	  fts_lib_prefix, pkg->name, fts_lib_postfix);
+  snprintf(filename, sizeof(filename), "%s%c%s%c%s%s%s", 
+	   pkg->dir, fts_file_separator, 
+	   "c", fts_file_separator, 
+	   fts_lib_prefix, pkg->name, fts_lib_postfix);
 
   if(!fts_file_exists(filename)) 
     {
-      sprintf(filename, "%s%c%s%c%s%c%s%c%s%s%s", 
-	      pkg->dir, fts_file_separator, 
-	      "c", fts_file_separator,
-	      "src", fts_file_separator,
-	      ".libs", fts_file_separator,
-	      fts_lib_prefix, pkg->name, fts_lib_postfix);
+      snprintf(filename, sizeof(filename), "%s%c%s%c%s%c%s%c%s%s%s", 
+	       pkg->dir, fts_file_separator, 
+	       "c", fts_file_separator,
+	       "src", fts_file_separator,
+	       ".libs", fts_file_separator,
+	       fts_lib_prefix, pkg->name, fts_lib_postfix);
     }
 
   if(!fts_file_exists(filename)) 
     {
-      sprintf(filename, "%s%c%s%c%s%s%s", 
-	      pkg->dir, fts_file_separator, 
-	      "c", fts_file_separator, 
-	      fts_lib_prefix, pkg->name, fts_other_lib_postfix);
+      snprintf(filename, sizeof(filename), "%s%c%s%c%s%s%s", 
+	       pkg->dir, fts_file_separator, 
+	       "c", fts_file_separator, 
+	       fts_lib_prefix, pkg->name, fts_other_lib_postfix);
     }
 
   if(!fts_file_exists(filename)) 
     {
-      sprintf(filename, "%s%c%s%c%s%c%s%c%s%s%s", 
-	      pkg->dir, fts_file_separator, 
-	      "c", fts_file_separator, 
-	      "src", fts_file_separator,
-	      ".libs", fts_file_separator,
-	      fts_lib_prefix, pkg->name, fts_other_lib_postfix);
+      snprintf(filename, sizeof(filename), "%s%c%s%c%s%c%s%c%s%s%s", 
+	       pkg->dir, fts_file_separator, 
+	       "c", fts_file_separator, 
+	       "src", fts_file_separator,
+	       ".libs", fts_file_separator,
+	       fts_lib_prefix, pkg->name, fts_other_lib_postfix);
     }
 
   if (fts_file_exists(filename)) 

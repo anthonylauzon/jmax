@@ -84,7 +84,7 @@ voxalloc_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
 	
   for(i = 0; i < n_vox; i++)
     {
-      sprintf(rec_name,"%d-%s", i, name);
+      snprintf(rec_name, sizeof(rec_name), "%d-%s", i, name);
       rec_name[MAX_size_rec_name] = '\0';
       this->sym_receive[i] = fts_new_symbol(rec_name);
     }
