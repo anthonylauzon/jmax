@@ -235,11 +235,11 @@ fts_rifft(complex *in, float *out, unsigned int size)
  *  optimized static FFT routines (allowing for temporary buffers)
  *
  */
-#ifndef WIN32
+#if defined(__APPLE__) && defined(__MACH__) 
 #define HAS_MACOSX_VECLIB
 #endif
 
-#if defined HAS_MACOSX_VECLIB
+#ifdef HAS_MACOSX_VECLIB
 
 #include <veclib/vDSP.h>
 
