@@ -146,8 +146,8 @@ alsamidi_get_midiport(alsamidi_t *this, fts_symbol_t name)
   return port;
 }
 
-static void
-alsamidi_get_default_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_get_default_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
@@ -156,10 +156,13 @@ alsamidi_get_default_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, 
   
   if(fts_array_get_size(&this->inputs) > 0)
     *name = fts_get_symbol(fts_array_get_element(&this->inputs, 0));
+
+/*   /\* temporary return to avoid warning at compilation *\/ */
+/*   return fts_ok; */
 }
 
-static void
-alsamidi_get_default_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_get_default_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   fts_symbol_t *name = (fts_symbol_t *)fts_get_pointer(at);
@@ -170,8 +173,8 @@ alsamidi_get_default_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac,
     *name = fts_get_symbol(fts_array_get_element(&this->outputs, 0));
 }
 
-static void
-alsamidi_append_inputs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_append_inputs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   fts_array_t *inputs = (fts_array_t *)fts_get_pointer(at);
@@ -180,8 +183,8 @@ alsamidi_append_inputs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, con
   fts_array_append(inputs, fts_array_get_size(&this->inputs), fts_array_get_atoms(&this->inputs));
 }
 
-static void
-alsamidi_append_outputs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_append_outputs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   fts_array_t *outputs = (fts_array_t *)fts_get_pointer(at);
@@ -190,8 +193,8 @@ alsamidi_append_outputs( fts_object_t *o, int winlet, fts_symbol_t s, int ac, co
   fts_array_append(outputs, fts_array_get_size(&this->outputs), fts_array_get_atoms(&this->outputs));
 }
 
-static void
-alsamidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_get_input(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   fts_midiport_t **ptr = (fts_midiport_t **)fts_get_pointer(at + 0);
@@ -203,8 +206,8 @@ alsamidi_get_input(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const ft
     *ptr = port;
 }
 
-static void
-alsamidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_get_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
   fts_midiport_t **ptr = (fts_midiport_t **)fts_get_pointer(at + 0);
@@ -217,8 +220,8 @@ alsamidi_get_output(fts_object_t *o, int winlet, fts_symbol_t s, int ac, const f
 }
 
 
-static void
-alsamidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
 
@@ -227,8 +230,8 @@ alsamidi_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_at
   fts_hashtable_init(&this->devices, FTS_HASHTABLE_SMALL);
 }
 
-static void
-alsamidi_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
+static fts_method_status_t
+alsamidi_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
 {
   alsamidi_t *this = (alsamidi_t *)o;
 
