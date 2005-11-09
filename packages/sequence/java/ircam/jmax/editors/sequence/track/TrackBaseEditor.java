@@ -407,8 +407,8 @@ public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
   lastPercent = 0;
-  //if(((FtsTrackObject)track).saveEditor)
-  setRangeMode(getRangeMode(), false);
+  if(((FtsTrackObject)track).saveEditor)
+    setRangeMode(getRangeMode(), false);
   uploadEnd();
   repaint();
 }
@@ -586,7 +586,7 @@ public void processKeyEvent(KeyEvent e)
 public void paintComponent(Graphics g) 
 {
   Rectangle r = g.getClipBounds();  
-  if( !track.getFtsTrack().isUploading())
+  if( !track.getFtsTrack().isUploading() || (track.getFtsTrack().isUploading() && (track.getFtsTrack().getUploadingSize() <= 0)))
     renderer.render(g, r);
   else
     SwingUtilities.paintComponent(g, getProgressBar(), this, r.x+50, r.y+r.height/2-10, r.width-100, 20);

@@ -57,8 +57,13 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     item.addActionListener( new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 		  {
-				((MidiTrackEditor)target).getTrack().getFtsTrack().makeTrillFromSelection( target.getSelection().getSelected());
-		  }
+        SwingUtilities.invokeLater(new Runnable(){
+          public void run()
+          {
+            ((MidiTrackEditor)target).getTrack().getFtsTrack().makeTrillFromSelection( target.getSelection().getSelected());
+          }
+        });
+      }
 		});	
     add(item);
     
