@@ -701,7 +701,7 @@ public void requestInsertMarker(double time)
 
 public void makeTrillFromSelection( Enumeration events)
 {  
-  beginUpdate("addEvent");
+  beginUpdate("removeEvents");
   
   try{
     args.clear();
@@ -1660,7 +1660,7 @@ protected void addFlavor(DataFlavor flavor)
 ********************************************************/
 
 public void setFtsTrackEditorObject(int id)
-{	
+{	  
   if(editorObject == null || (editorObject==null && editorObject.getID()!=id))
     editorObject = new FtsTrackEditorObject( JMaxApplication.getFtsServer(), this, id);
 }

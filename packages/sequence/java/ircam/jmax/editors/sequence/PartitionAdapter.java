@@ -365,7 +365,7 @@ public int getViewMode()
 
 public void setRangeMode(int rangeMode)
 {
-	this.rangeMode = rangeMode;
+  this.rangeMode = rangeMode;
   setMinScoreY();
   setMaxScoreY();
 }
@@ -394,8 +394,8 @@ public int getVerticalTransp()
 }
 
 public void setMaxPitch(int max)
-{
-	maxPitch = max;
+{	
+  maxPitch = max;
 	setMinScoreY();
 }
 
@@ -407,7 +407,7 @@ public void setMinPitch(int min)
 
 public int getMaxPitch()
 {
-	return maxPitch;
+ 	return maxPitch;
 }
 public int getMinPitch()
 {

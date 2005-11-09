@@ -1186,13 +1186,9 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     }
     
     if(too_much_pitch == 0)
-    {
-      /* remove events */
-      for(i = 0/*1*/; i<ac ; i++)
-        track_remove_event(self, (event_t *)fts_get_object(at+i));
-      
-      /* remove events at client */
-      fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);
+    {      
+      fts_set_int(a, 0);
+      fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 1, &a);
       
       /* create new event and add to track */
       fts_set_symbol(a, seqsym_scoob);
@@ -1207,6 +1203,15 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
       evt = track_event_create( 9, a);
       if(evt)
         track_add_event_and_upload( self, start, evt);    
+    
+      /* remove events */
+      for(i = 0/*1*/; i<ac ; i++)
+        track_remove_event(self, (event_t *)fts_get_object(at+i));
+      
+      /* remove events at client */
+      fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);      
+      
+      fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
     }
     else
       fts_post("error: more than two pitches in selection, impossible to make a trill !\n");

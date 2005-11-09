@@ -62,6 +62,7 @@ public class MidiTrackEditor extends TrackBaseEditor
       });
     
     viewMode = PIANOROLL_VIEW;
+    rangeMode = WHOLE_RANGE;
   }
    
   public void reinit()

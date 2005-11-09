@@ -277,7 +277,7 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void objectAdded(Object spec, int index) 
   {
     if( !uploading)
-      resizePanelToEventTime((TrackEvent)spec);	
+      resizePanelToEventTime((TrackEvent)spec);
   }
   public void objectsAdded(int maxTime) 
   {

@@ -102,7 +102,7 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				getTrack().setProperty("active", (active) ? Boolean.TRUE : Boolean.FALSE);
 		  }
 			public void restoreEditorState(FtsTrackEditorObject editorState)
-		  {	        
+		  {	                
         if(!gc.isInSequence())
         {
           geometry.setXZoomFactor(editorState.zoom);
@@ -396,14 +396,18 @@ public JProgressBar getProgressBar()
 public void startTrackUpload( TrackDataModel track, int size)
 {
 	uploading  = true;
-  getProgressBar().setMaximum( size);
-  getProgressBar().setValue( 0);
-  repaint();
+  if(size > 0)
+  {
+    getProgressBar().setMaximum( size);
+    getProgressBar().setValue( 0);
+    repaint();
+  }
 }
 public void endTrackUpload( TrackDataModel track)
 {
 	uploading  = false;
   lastPercent = 0;
+  //if(((FtsTrackObject)track).saveEditor)
   setRangeMode(getRangeMode(), false);
   uploadEnd();
   repaint();
