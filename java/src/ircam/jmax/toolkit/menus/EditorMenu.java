@@ -161,6 +161,13 @@ public abstract class EditorMenu extends JMenu
   }
 
   public void updateMenu(){};
+
+  /* !!!! fix of menu show down when mouse passed on */
+  public void processMouseEvent(MouseEvent e)
+  {
+    if(e.getID() != MouseEvent.MOUSE_ENTERED)
+      super.processMouseEvent(e);
+  }
 }
 
 
