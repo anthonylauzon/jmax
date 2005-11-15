@@ -149,6 +149,17 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 			public void columnSelectionChanged(ListSelectionEvent e){};
 		});
 		
+    addMouseListener( new MouseAdapter() {
+			public void mouseEntered(MouseEvent e)
+      {
+        table.requestFocus();
+      }
+			public void mousePressed(MouseEvent e)
+      {
+        table.requestFocus();
+      }
+		});
+    
 		if( trackObj.editorObject!=null)
 			restoreColumnNames();
 }

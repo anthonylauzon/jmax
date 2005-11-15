@@ -115,8 +115,33 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 			{
 				Rectangle bounds = SequenceTableDialog.this.getBounds();
 				((FtsTrackObject)track.getTrackDataModel()).editorObject.setTableSize(bounds.width, bounds.height);
+        getPanel().table.requestFocus();
 			}
-			public void componentMoved(ComponentEvent e){}
+			public void componentMoved(ComponentEvent e)
+      {
+        getPanel().table.requestFocus();
+      }
+		});
+    
+    addWindowListener( new WindowAdapter() {
+			public void windowOpened(WindowEvent e)
+      {
+        getPanel().table.requestFocus();
+      }
+			public void windowActivated(WindowEvent e)
+      {
+        getPanel().table.requestFocus();
+      }
+		});
+    addMouseListener( new MouseAdapter() {
+			public void mouseEntered(MouseEvent e)
+      {
+        getPanel().table.requestFocus();
+      }
+			public void mousePressed(MouseEvent e)
+      {
+        getPanel().table.requestFocus();
+      }
 		});
   
 		int tab_w = ((FtsTrackObject)track.getTrackDataModel()).editorObject.tab_w;

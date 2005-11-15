@@ -39,13 +39,16 @@ public class LabelsMapper {
   public String get( Event e) 
   {
     if( display)
-      {
-	Object val = e.getProperty( labelType);
-	if( val != null)
-	  return (""+val);
-	else
-	  return "";
-      }
+    {
+      Object val = e.getProperty( labelType);
+      if( val != null)
+        if(val instanceof Double)
+          return(""+((Double)val).floatValue());          
+        else
+          return (""+val);
+      else
+        return "";
+    }
     else return "";
   }
 
