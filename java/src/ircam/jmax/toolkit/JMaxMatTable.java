@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import java.lang.*;
 
 import ircam.jmax.*;
 import ircam.jmax.fts.*;
@@ -44,6 +45,8 @@ public class JMaxMatTable extends JTable
   FtsObjectCellEditor ftsObjEditor;
   FtsObjectCellRenderer ftsObjRenderer;
   JMaxTableListener listener;
+  ComponentAdapter componentListener;
+  DefaultCellEditor textCellEditor;
   
   public static final Color matGridColor = new Color(220, 220, 220);
   public static final Color rowsIdColor = new Color(245, 245, 245);
@@ -99,6 +102,13 @@ public class JMaxMatTable extends JTable
     getActionMap().put("deleteSelection", new DeleteSelectionAction(this));
     getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "hide");
     getActionMap().put("hide", new HideAction(this));
+  
+    addMouseListener( new MouseAdapter() {
+			public void mouseEntered(MouseEvent e)
+      {
+        requestFocus();
+      }
+		});        
   }
    
   public JMaxTableListener getListener()
@@ -127,7 +137,46 @@ public class JMaxMatTable extends JTable
     if(isEditing() || !(e.getKeyText(e.getKeyCode()).equals("Command") && e.getKeyChar() == KeyEvent.CHAR_UNDEFINED))
       super.processKeyEvent(e);
   }
-    
+  
+  /* ???????????????????????????????????????????????????*/ 
+  /*public void changeSelection(int row, int column, boolean toggle, boolean extend)
+  {
+    super.changeSelection(row, column, toggle, extend);
+    if(editCellAt(row, column))
+      getEditorComponent().requestFocusInWindow();
+  }*/
+  public boolean editCellAt(int row, int column, EventObject e)
+  {
+    boolean result = super.editCellAt(row, column, e);
+    final Component editor = getEditorComponent();
+    if (editor != null && editor instanceof JTextField)
+    {
+      if (e == null)
+        ((JTextField)editor).selectAll();
+      else
+      {
+        SwingUtilities.invokeLater(new Runnable(){
+          public void run()
+          {
+            ((JTextField)editor).selectAll();
+          }
+        });
+      }
+    }
+    return result;
+  }
+  public Component prepareEditor(TableCellEditor editor, int row, int column)
+  {
+    Component c = super.prepareEditor(editor, row, column);
+    if (c instanceof JTextField)
+    {
+      ((JTextField)c).setSelectedTextColor(Color.red);
+      ((JTextField)c).selectAll();
+    }
+    return c;
+  }
+  /* ??????????????????????????????????????????????????????? */
+  
   /************************     FtsObject Table CellEditor ***********************************/
   public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor/*, ActionListener*/ 
   {
@@ -241,7 +290,7 @@ public class JMaxMatTable extends JTable
       setHorizontalTextPosition( SwingConstants.CENTER);
       return this;
     }
-  }    
+  }  
 }
 
 
