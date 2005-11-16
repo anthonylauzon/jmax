@@ -103,12 +103,12 @@ public class JMaxMatTable extends JTable
     getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "hide");
     getActionMap().put("hide", new HideAction(this));
   
-    addMouseListener( new MouseAdapter() {
+    /*addMouseListener( new MouseAdapter() {
 			public void mouseEntered(MouseEvent e)
       {
         requestFocus();
       }
-		});        
+		});*/        
   }
    
   public JMaxTableListener getListener()
@@ -152,13 +152,17 @@ public class JMaxMatTable extends JTable
     if (editor != null && editor instanceof JTextField)
     {
       if (e == null)
+      {
         ((JTextField)editor).selectAll();
+        editor.requestFocusInWindow();
+      }
       else
       {
         SwingUtilities.invokeLater(new Runnable(){
           public void run()
           {
             ((JTextField)editor).selectAll();
+            editor.requestFocusInWindow();
           }
         });
       }
@@ -169,10 +173,7 @@ public class JMaxMatTable extends JTable
   {
     Component c = super.prepareEditor(editor, row, column);
     if (c instanceof JTextField)
-    {
-      ((JTextField)c).setSelectedTextColor(Color.red);
       ((JTextField)c).selectAll();
-    }
     return c;
   }
   /* ??????????????????????????????????????????????????????? */
