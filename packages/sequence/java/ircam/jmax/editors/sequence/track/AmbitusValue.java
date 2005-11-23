@@ -159,7 +159,7 @@ public static AmbitusValueInfo info = new AmbitusValueInfo();
 static 
 {
 	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-	SCOOB_ICON = new ImageIcon(path+"note.gif");
+	SCOOB_ICON = new ImageIcon(path+"seq_note.gif");
 }
 }
 

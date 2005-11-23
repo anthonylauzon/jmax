@@ -280,6 +280,6 @@ public class MessageValue extends AbstractEventValue
   static 
   {
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-    MESSAGE_ICON = new ImageIcon(path+"message.gif");
+    MESSAGE_ICON = new ImageIcon(path+"seq_message.gif");
   }
 }

@@ -73,14 +73,16 @@ public class Tabler extends JMaxEditor{
       public void windowDeactivated(WindowEvent e){}
     });
     
-    pack();
+    //pack();
     
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();   
     else
       makeSimpleMenuBar();
     validate();
-    pack();
+    
+    setSize(itsPanel.getPreferredSize().width, itsPanel.getPreferredSize().height + 10);
+    //pack();
   }
 
   private final void makeTitle()

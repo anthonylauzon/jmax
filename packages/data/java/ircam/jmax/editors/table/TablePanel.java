@@ -76,7 +76,6 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     PANEL_HEIGHT = (ftsObj instanceof FtsIvecObject) ? IVEC_PANEL_HEIGHT : FVEC_PANEL_HEIGHT;
     size = new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
 		
-    setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setLayout(new BorderLayout());
 		
     prepareToolbarPanel();
@@ -112,21 +111,24 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
     addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
-		{
-				updateHorizontalScrollbar();
-				updateVerticalScrollbar();
-				gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-																									 ((TableAdapter)gc.getAdapter()).getXZoom(), 
-																									 gc.getVisiblePixelsSize());
-				if(gc.getAdapter().getXZoom() > 0.5)		    
-					gc.getFtsObject().requestGetValues();
-				else
-					gc.getFtsObject().requestGetPixels(0, 0);
-		}
+		  {
+        /*updateHorizontalScrollbar();
+        updateVerticalScrollbar();*/
+        gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+                                                   ((TableAdapter)gc.getAdapter()).getXZoom(), 
+                                                   gc.getVisiblePixelsSize());
+        if(gc.getAdapter().getXZoom() > 0.5)		    
+          gc.getFtsObject().requestGetValues();
+        else
+          gc.getFtsObject().requestGetPixels(0, 0);
+      }
 		});
     //470 is the default size of the TableDisplay .......
     gc.getFtsObject().requestSetVisibleWindow( 470, 0, (double)1.0, gc.getVisiblePixelsSize());
     gc.getFtsObject().requestGetValues();
+
+    setSize(PANEL_WIDTH, PANEL_HEIGHT);
+    setPreferredSize(size);
   }
   
   void frameAvailable()

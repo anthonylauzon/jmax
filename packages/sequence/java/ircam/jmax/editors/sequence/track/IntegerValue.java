@@ -129,7 +129,7 @@ public class IntegerValue extends AbstractEventValue
   static 
   {
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-    INTEGER_ICON = new ImageIcon(path+"integer.gif");
+    INTEGER_ICON = new ImageIcon(path+"seq_integer.gif");
   }
 }
 

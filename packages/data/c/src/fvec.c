@@ -202,8 +202,6 @@ fvec_upload (fvec_t *self)
 #endif
 
 
-
-
 /*********************************************************
 *
 *  editor
@@ -220,7 +218,39 @@ fvec_editor_callback (fts_object_t *o, void *e)
   fvec_upload(self); 
 }
 
-static fts_method_status_t
+ static fts_method_status_t 
+ fvec_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+ {
+   fvec_t *this = (fvec_t *)o;
+   fts_atom_t a;
+   
+   if(this->editor == NULL)
+   {
+     fts_set_object(&a, o);
+     this->editor = fts_object_create( tabeditor_type, 1, &a);
+     fts_object_refer( this->editor);
+   }
+   
+   if(fts_object_has_client( (fts_object_t *)this->editor) == 0)
+   {
+     fts_client_register_object( (fts_object_t *)this->editor, fts_object_get_client_id( o));
+     
+     fts_set_int(&a, fts_object_get_id( (fts_object_t *)this->editor));
+     fts_client_send_message( o, fts_s_editor, 1, &a);
+     
+     fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0, fts_nix);
+   }
+   
+   fvec_set_editor_open( this);
+   fts_client_send_message(o, fts_s_openEditor, 0, 0);
+
+   fts_object_add_listener(o, fvec_editor, fvec_editor_callback);
+   /*fvec_upload(self);   */
+   
+   return fts_ok;
+ }
+
+/*static fts_method_status_t
 fvec_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
@@ -233,7 +263,7 @@ fvec_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   fvec_upload(self);
   
   return fts_ok;
-}
+}*/
 
 static fts_method_status_t
 fvec_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -1883,6 +1913,12 @@ fvec_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   fvec_t *self = (fvec_t *)o;
   
   fts_object_release((fts_object_t *)self->fmat);
+
+  if(self->editor) 
+  {  
+    fts_client_send_message( (fts_object_t *)self->editor, fts_s_destroyEditor, 0, 0);
+    fts_object_destroy((fts_object_t *)self->editor);
+  }    
   
   return fts_ok;
 }
@@ -1985,8 +2021,6 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_inlet_bang(cl, 0, data_object_output);
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);
-  
-  
   
   /*
    * fvec class documentation

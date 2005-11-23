@@ -177,7 +177,7 @@ public static MarkerValueInfo info = new MarkerValueInfo();
 static 
 {
 	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-	SCOMARK_ICON = new ImageIcon(path+"note.gif");
+	SCOMARK_ICON = new ImageIcon(path+"seq_note.gif");
 }
 }
 

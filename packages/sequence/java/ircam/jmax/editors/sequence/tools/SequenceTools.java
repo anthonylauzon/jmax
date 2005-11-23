@@ -45,7 +45,7 @@ public class SequenceTools implements ToolProvider{
     
     tools = new Tool[1];
 
-    tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
+    tools[0] = new ArrowTool(new ImageIcon(path+"seq_arrow.gif"));
   }
 
   public Enumeration getTools()

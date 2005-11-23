@@ -81,7 +81,10 @@ public class MatWindow extends JMaxEditor {
     });
     
     addWindowListener(new WindowListener(){
-      public void windowOpened(WindowEvent e){}
+      public void windowOpened(WindowEvent e)
+      {
+        itsMatPanel.table.requestFocus();
+      }
       public void windowClosed(WindowEvent e){}
       public void windowClosing(WindowEvent e)
       {
@@ -90,7 +93,10 @@ public class MatWindow extends JMaxEditor {
       }
       public void windowDeiconified(WindowEvent e){}
       public void windowIconified(WindowEvent e){}
-      public void windowActivated(WindowEvent e){}
+      public void windowActivated(WindowEvent e)
+      {
+        itsMatPanel.table.requestFocus();
+      }
       public void windowDeactivated(WindowEvent e){}
     });
     

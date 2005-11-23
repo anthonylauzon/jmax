@@ -69,12 +69,12 @@ public class SequenceImages {
 	Toolkit.getDefaultToolkit().prepareImage(image, 23, 30, observer);
 	images.put("faClef", image);
 
-	imageIcons.put("opened_track", new ImageIcon(path+"opened_track_arrow.gif"));
-	imageIcons.put("closed_track", new ImageIcon(path+"closed_track_arrow.gif"));
-	imageIcons.put("unselected_track", new ImageIcon(path+"unselected_track.gif"));
-	imageIcons.put("selected_track", new ImageIcon(path+"selected_track.gif"));
-	imageIcons.put("unmute", new ImageIcon(path+"unmute.gif"));
-	imageIcons.put("mute", new ImageIcon(path+"mute.gif"));
+	imageIcons.put("opened_track", new ImageIcon(path+"seq_opened_track_arrow.gif"));
+	imageIcons.put("closed_track", new ImageIcon(path+"seq_closed_track_arrow.gif"));
+	imageIcons.put("unselected_track", new ImageIcon(path+"seq_unselected_track.gif"));
+	imageIcons.put("selected_track", new ImageIcon(path+"seq_selected_track.gif"));
+	imageIcons.put("unmute", new ImageIcon(path+"seq_unmute.gif"));
+	imageIcons.put("mute", new ImageIcon(path+"seq_mute.gif"));
     }
 
     public static Image getImage(String name)

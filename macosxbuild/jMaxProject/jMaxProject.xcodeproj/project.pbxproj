@@ -317,6 +317,28 @@
 		3B02488006B94BDA002BEB0D /* JMaxObjectManager.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B02487F06B94BDA002BEB0D /* JMaxObjectManager.java */; };
 		3B02488106B94BDA002BEB0D /* JMaxObjectManager.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B02487F06B94BDA002BEB0D /* JMaxObjectManager.java */; };
 		3B04C62C06D26F9F004E63C5 /* SequenceSimpleMenu.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B04C62B06D26F9F004E63C5 /* SequenceSimpleMenu.java */; };
+		3B131FE309348B40001F5860 /* seq_fmat.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE209348B40001F5860 /* seq_fmat.gif */; };
+		3B131FE609348B78001F5860 /* seq_anything.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE409348B78001F5860 /* seq_anything.gif */; };
+		3B131FE709348B78001F5860 /* seq_arrow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE509348B78001F5860 /* seq_arrow.gif */; };
+		3B131FEA09348BB0001F5860 /* seq_closed_track_arrow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE809348BB0001F5860 /* seq_closed_track_arrow.gif */; };
+		3B131FEB09348BB0001F5860 /* seq_comber.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE909348BB0001F5860 /* seq_comber.gif */; };
+		3B131FEF09348BD9001F5860 /* seq_delete.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FEC09348BD9001F5860 /* seq_delete.gif */; };
+		3B131FF009348BD9001F5860 /* seq_edit.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FED09348BD9001F5860 /* seq_edit.gif */; };
+		3B131FF109348BD9001F5860 /* seq_float.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FEE09348BD9001F5860 /* seq_float.gif */; };
+		3B131FF409348C05001F5860 /* seq_genericAdder.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF209348C05001F5860 /* seq_genericAdder.gif */; };
+		3B131FF509348C05001F5860 /* seq_hresize.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF309348C05001F5860 /* seq_hresize.gif */; };
+		3B131FF909348C2E001F5860 /* seq_integer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF609348C2E001F5860 /* seq_integer.gif */; };
+		3B131FFA09348C2E001F5860 /* seq_liner.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF709348C2E001F5860 /* seq_liner.gif */; };
+		3B131FFB09348C2E001F5860 /* seq_message.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF809348C2E001F5860 /* seq_message.gif */; };
+		3B131FFF09348C58001F5860 /* seq_midi.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FFC09348C58001F5860 /* seq_midi.gif */; };
+		3B13200009348C58001F5860 /* seq_mute.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FFD09348C58001F5860 /* seq_mute.gif */; };
+		3B13200109348C58001F5860 /* seq_note.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FFE09348C58001F5860 /* seq_note.gif */; };
+		3B13200409348C87001F5860 /* seq_opened_track_arrow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200209348C87001F5860 /* seq_opened_track_arrow.gif */; };
+		3B13200509348C87001F5860 /* seq_selected_track.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200309348C87001F5860 /* seq_selected_track.gif */; };
+		3B13200809348CAE001F5860 /* seq_unmute.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200609348CAE001F5860 /* seq_unmute.gif */; };
+		3B13200909348CAE001F5860 /* seq_unselected_track.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200709348CAE001F5860 /* seq_unselected_track.gif */; };
+		3B13200C09348CD0001F5860 /* seq_resizer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200A09348CD0001F5860 /* seq_resizer.gif */; };
+		3B13200D09348CD0001F5860 /* seq_zoomer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200B09348CD0001F5860 /* seq_zoomer.gif */; };
 		3B1A919406D352DF009882D6 /* MatSimpleMenu.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B1A919306D352DF009882D6 /* MatSimpleMenu.java */; };
 		3B26BB16085DDE7D005AD945 /* tree.h in Sources */ = {isa = PBXBuildFile; fileRef = F458A41808471D63006AB8CF /* tree.h */; };
 		3B26BB46085DE318005AD945 /* dumper.c in Sources */ = {isa = PBXBuildFile; fileRef = F458A3F308470CD3006AB8CF /* dumper.c */; };
@@ -341,8 +363,6 @@
 		3B8173DB06D2092900FA1F28 /* TrackSimpleMenu.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B8173DA06D2092900FA1F28 /* TrackSimpleMenu.java */; };
 		3B84FF2706AEAF6300862F13 /* MatRowIndex.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B84FF2606AEAF6300862F13 /* MatRowIndex.java */; };
 		3B8B4B8A06AFC7E90067B1E0 /* FtsFmatObject.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B8B4B8906AFC7E90067B1E0 /* FtsFmatObject.java */; };
-		3B972D2806BA54CD00DE9B8C /* fmat.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B972D2706BA54CD00DE9B8C /* fmat.gif */; };
-		3B972D4806BA551B00DE9B8C /* fmat.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B972D2706BA54CD00DE9B8C /* fmat.gif */; };
 		3B9E15190621AE7F00CDEBB6 /* MusiSync.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B9E150B0621AE1200CDEBB6 /* MusiSync.ttf */; };
 		3B9E151A0621AE7F00CDEBB6 /* MusiTone.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B9E150C0621AE1200CDEBB6 /* MusiTone.ttf */; };
 		3BA405E206A572AD0097A99B /* MatPanel.java in Sources */ = {isa = PBXBuildFile; fileRef = 3BA405E106A572AD0097A99B /* MatPanel.java */; };
@@ -629,27 +649,6 @@
 		5C54268A05AB0B8A0042B7A2 /* random.help.jmax in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8EE4B78031CE72A01664092 /* random.help.jmax */; };
 		5C54268B05AB0B8A0042B7A2 /* scale.help.jmax in CopyFiles */ = {isa = PBXBuildFile; fileRef = F76E4C2D043C720901664058 /* scale.help.jmax */; };
 		5C54268D05AB0B8A0042B7A2 /* numeric.jpkg in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85494F402D2508A01664092 /* numeric.jpkg */; };
-		5C54269305AB0B8A0042B7A2 /* anything.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F2028BEC7D01664092 /* anything.gif */; };
-		5C54269405AB0B8A0042B7A2 /* arrow.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F3028BEC7D01664092 /* arrow.gif */; };
-		5C54269505AB0B8A0042B7A2 /* closed_track_arrow.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F4028BEC7D01664092 /* closed_track_arrow.gif */; };
-		5C54269605AB0B8A0042B7A2 /* comber.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F5028BEC7D01664092 /* comber.gif */; };
-		5C54269705AB0B8A0042B7A2 /* delete.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F6028BEC7D01664092 /* delete.gif */; };
-		5C54269805AB0B8A0042B7A2 /* edit.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F7028BEC7D01664092 /* edit.gif */; };
-		5C54269A05AB0B8A0042B7A2 /* float.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124F9028BEC7D01664092 /* float.gif */; };
-		5C54269B05AB0B8A0042B7A2 /* genericAdder.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124FA028BEC7D01664092 /* genericAdder.gif */; };
-		5C54269C05AB0B8A0042B7A2 /* hresize.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124FB028BEC7D01664092 /* hresize.gif */; };
-		5C54269D05AB0B8A0042B7A2 /* integer.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124FC028BEC7D01664092 /* integer.gif */; };
-		5C54269E05AB0B8A0042B7A2 /* liner.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124FD028BEC7D01664092 /* liner.gif */; };
-		5C54269F05AB0B8A0042B7A2 /* message.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124FE028BEC7D01664092 /* message.gif */; };
-		5C5426A005AB0B8A0042B7A2 /* midi.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85124FF028BEC7D01664092 /* midi.gif */; };
-		5C5426A105AB0B8A0042B7A2 /* mute.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512500028BEC7D01664092 /* mute.gif */; };
-		5C5426A205AB0B8A0042B7A2 /* note.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512501028BEC7D01664092 /* note.gif */; };
-		5C5426A305AB0B8A0042B7A2 /* opened_track_arrow.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512502028BEC7D01664092 /* opened_track_arrow.gif */; };
-		5C5426A405AB0B8A0042B7A2 /* resizer.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F75BA0A4040AAC4F01664058 /* resizer.gif */; };
-		5C5426A505AB0B8A0042B7A2 /* selected_track.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512504028BEC7D01664092 /* selected_track.gif */; };
-		5C5426A605AB0B8A0042B7A2 /* unmute.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512505028BEC7D01664092 /* unmute.gif */; };
-		5C5426A705AB0B8A0042B7A2 /* unselected_track.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512506028BEC7D01664092 /* unselected_track.gif */; };
-		5C5426A905AB0B8A0042B7A2 /* zoomer.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = F8512509028BEC7D01664092 /* zoomer.gif */; };
 		5C5426AB05AB0B8A0042B7A2 /* sequence.help.jmax in CopyFiles */ = {isa = PBXBuildFile; fileRef = F851250E028BEC7D01664092 /* sequence.help.jmax */; };
 		5C5426AC05AB0B8A0042B7A2 /* sequence.summary.jmax in CopyFiles */ = {isa = PBXBuildFile; fileRef = F851250F028BEC7D01664092 /* sequence.summary.jmax */; };
 		5C5426AD05AB0B8A0042B7A2 /* find.help.jmax in CopyFiles */ = {isa = PBXBuildFile; fileRef = F5734E9503868CCA01664092 /* find.help.jmax */; };
@@ -1467,7 +1466,6 @@
 		5C542A9F05AB0B9C0042B7A2 /* AnythingTrackEditor.java in Sources */ = {isa = PBXBuildFile; fileRef = F8512488028BEBB201664092 /* AnythingTrackEditor.java */; };
 		5C542AA005AB0B9C0042B7A2 /* AnythingValue.java in Sources */ = {isa = PBXBuildFile; fileRef = F8512489028BEBB201664092 /* AnythingValue.java */; };
 		5C542AA105AB0B9C0042B7A2 /* ArrayEnumeration.java in Sources */ = {isa = PBXBuildFile; fileRef = F851248A028BEBB201664092 /* ArrayEnumeration.java */; };
-		5C542AA205AB0B9C0042B7A2 /* ChangeRangeDialog.java in Sources */ = {isa = PBXBuildFile; fileRef = F851248B028BEBB201664092 /* ChangeRangeDialog.java */; };
 		5C542AA405AB0B9C0042B7A2 /* Drawable.java in Sources */ = {isa = PBXBuildFile; fileRef = F851248D028BEBB201664092 /* Drawable.java */; };
 		5C542AA505AB0B9C0042B7A2 /* Editable.java in Sources */ = {isa = PBXBuildFile; fileRef = F851248E028BEBB201664092 /* Editable.java */; };
 		5C542AA605AB0B9C0042B7A2 /* Event.java in Sources */ = {isa = PBXBuildFile; fileRef = F851248F028BEBB201664092 /* Event.java */; };
@@ -2479,28 +2477,6 @@
 			dstPath = lib/jmax/packages/sequence/images;
 			dstSubfolderSpec = 7;
 			files = (
-				5C54269305AB0B8A0042B7A2 /* anything.gif in CopyFiles */,
-				5C54269405AB0B8A0042B7A2 /* arrow.gif in CopyFiles */,
-				5C54269505AB0B8A0042B7A2 /* closed_track_arrow.gif in CopyFiles */,
-				5C54269605AB0B8A0042B7A2 /* comber.gif in CopyFiles */,
-				5C54269705AB0B8A0042B7A2 /* delete.gif in CopyFiles */,
-				5C54269805AB0B8A0042B7A2 /* edit.gif in CopyFiles */,
-				5C54269A05AB0B8A0042B7A2 /* float.gif in CopyFiles */,
-				3B972D4806BA551B00DE9B8C /* fmat.gif in CopyFiles */,
-				5C54269B05AB0B8A0042B7A2 /* genericAdder.gif in CopyFiles */,
-				5C54269C05AB0B8A0042B7A2 /* hresize.gif in CopyFiles */,
-				5C54269D05AB0B8A0042B7A2 /* integer.gif in CopyFiles */,
-				5C54269E05AB0B8A0042B7A2 /* liner.gif in CopyFiles */,
-				5C54269F05AB0B8A0042B7A2 /* message.gif in CopyFiles */,
-				5C5426A005AB0B8A0042B7A2 /* midi.gif in CopyFiles */,
-				5C5426A105AB0B8A0042B7A2 /* mute.gif in CopyFiles */,
-				5C5426A205AB0B8A0042B7A2 /* note.gif in CopyFiles */,
-				5C5426A305AB0B8A0042B7A2 /* opened_track_arrow.gif in CopyFiles */,
-				5C5426A405AB0B8A0042B7A2 /* resizer.gif in CopyFiles */,
-				5C5426A505AB0B8A0042B7A2 /* selected_track.gif in CopyFiles */,
-				5C5426A605AB0B8A0042B7A2 /* unmute.gif in CopyFiles */,
-				5C5426A705AB0B8A0042B7A2 /* unselected_track.gif in CopyFiles */,
-				5C5426A905AB0B8A0042B7A2 /* zoomer.gif in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2535,6 +2511,28 @@
 /* Begin PBXFileReference section */
 		3B02487F06B94BDA002BEB0D /* JMaxObjectManager.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = JMaxObjectManager.java; path = ../../java/src/ircam/jmax/JMaxObjectManager.java; sourceTree = SOURCE_ROOT; };
 		3B04C62B06D26F9F004E63C5 /* SequenceSimpleMenu.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = SequenceSimpleMenu.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/SequenceSimpleMenu.java; sourceTree = SOURCE_ROOT; };
+		3B131FE209348B40001F5860 /* seq_fmat.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_fmat.gif; path = ../../packages/sequence/images/seq_fmat.gif; sourceTree = SOURCE_ROOT; };
+		3B131FE409348B78001F5860 /* seq_anything.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_anything.gif; path = ../../packages/sequence/images/seq_anything.gif; sourceTree = SOURCE_ROOT; };
+		3B131FE509348B78001F5860 /* seq_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_arrow.gif; path = ../../packages/sequence/images/seq_arrow.gif; sourceTree = SOURCE_ROOT; };
+		3B131FE809348BB0001F5860 /* seq_closed_track_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_closed_track_arrow.gif; path = ../../packages/sequence/images/seq_closed_track_arrow.gif; sourceTree = SOURCE_ROOT; };
+		3B131FE909348BB0001F5860 /* seq_comber.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_comber.gif; path = ../../packages/sequence/images/seq_comber.gif; sourceTree = SOURCE_ROOT; };
+		3B131FEC09348BD9001F5860 /* seq_delete.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_delete.gif; path = ../../packages/sequence/images/seq_delete.gif; sourceTree = SOURCE_ROOT; };
+		3B131FED09348BD9001F5860 /* seq_edit.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_edit.gif; path = ../../packages/sequence/images/seq_edit.gif; sourceTree = SOURCE_ROOT; };
+		3B131FEE09348BD9001F5860 /* seq_float.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_float.gif; path = ../../packages/sequence/images/seq_float.gif; sourceTree = SOURCE_ROOT; };
+		3B131FF209348C05001F5860 /* seq_genericAdder.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_genericAdder.gif; path = ../../packages/sequence/images/seq_genericAdder.gif; sourceTree = SOURCE_ROOT; };
+		3B131FF309348C05001F5860 /* seq_hresize.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_hresize.gif; path = ../../packages/sequence/images/seq_hresize.gif; sourceTree = SOURCE_ROOT; };
+		3B131FF609348C2E001F5860 /* seq_integer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_integer.gif; path = ../../packages/sequence/images/seq_integer.gif; sourceTree = SOURCE_ROOT; };
+		3B131FF709348C2E001F5860 /* seq_liner.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_liner.gif; path = ../../packages/sequence/images/seq_liner.gif; sourceTree = SOURCE_ROOT; };
+		3B131FF809348C2E001F5860 /* seq_message.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_message.gif; path = ../../packages/sequence/images/seq_message.gif; sourceTree = SOURCE_ROOT; };
+		3B131FFC09348C58001F5860 /* seq_midi.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_midi.gif; path = ../../packages/sequence/images/seq_midi.gif; sourceTree = SOURCE_ROOT; };
+		3B131FFD09348C58001F5860 /* seq_mute.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_mute.gif; path = ../../packages/sequence/images/seq_mute.gif; sourceTree = SOURCE_ROOT; };
+		3B131FFE09348C58001F5860 /* seq_note.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_note.gif; path = ../../packages/sequence/images/seq_note.gif; sourceTree = SOURCE_ROOT; };
+		3B13200209348C87001F5860 /* seq_opened_track_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_opened_track_arrow.gif; path = ../../packages/sequence/images/seq_opened_track_arrow.gif; sourceTree = SOURCE_ROOT; };
+		3B13200309348C87001F5860 /* seq_selected_track.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_selected_track.gif; path = ../../packages/sequence/images/seq_selected_track.gif; sourceTree = SOURCE_ROOT; };
+		3B13200609348CAE001F5860 /* seq_unmute.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_unmute.gif; path = ../../packages/sequence/images/seq_unmute.gif; sourceTree = SOURCE_ROOT; };
+		3B13200709348CAE001F5860 /* seq_unselected_track.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_unselected_track.gif; path = ../../packages/sequence/images/seq_unselected_track.gif; sourceTree = SOURCE_ROOT; };
+		3B13200A09348CD0001F5860 /* seq_resizer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_resizer.gif; path = ../../packages/sequence/images/seq_resizer.gif; sourceTree = SOURCE_ROOT; };
+		3B13200B09348CD0001F5860 /* seq_zoomer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_zoomer.gif; path = ../../packages/sequence/images/seq_zoomer.gif; sourceTree = SOURCE_ROOT; };
 		3B1A919306D352DF009882D6 /* MatSimpleMenu.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MatSimpleMenu.java; path = ../../packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java; sourceTree = SOURCE_ROOT; };
 		3B28F8AE06EF45CA009639A3 /* JMaxMatTable.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = JMaxMatTable.java; path = ../../java/src/ircam/jmax/toolkit/JMaxMatTable.java; sourceTree = SOURCE_ROOT; };
 		3B51225F074CF53900C68D4D /* timebase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = timebase.h; path = ../../include/ftsprivate/timebase.h; sourceTree = SOURCE_ROOT; };
@@ -2560,7 +2558,6 @@
 		3B8173DA06D2092900FA1F28 /* TrackSimpleMenu.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TrackSimpleMenu.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/TrackSimpleMenu.java; sourceTree = SOURCE_ROOT; };
 		3B84FF2606AEAF6300862F13 /* MatRowIndex.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MatRowIndex.java; path = ../../packages/data/java/ircam/jmax/editors/mat/MatRowIndex.java; sourceTree = SOURCE_ROOT; };
 		3B8B4B8906AFC7E90067B1E0 /* FtsFmatObject.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = FtsFmatObject.java; path = ../../packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java; sourceTree = SOURCE_ROOT; };
-		3B972D2706BA54CD00DE9B8C /* fmat.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = fmat.gif; path = ../../packages/sequence/images/fmat.gif; sourceTree = SOURCE_ROOT; };
 		3B9E150B0621AE1200CDEBB6 /* MusiSync.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MusiSync.ttf; path = ../../packages/sequence/fonts/MusiSync.ttf; sourceTree = SOURCE_ROOT; };
 		3B9E150C0621AE1200CDEBB6 /* MusiTone.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MusiTone.ttf; path = ../../packages/sequence/fonts/MusiTone.ttf; sourceTree = SOURCE_ROOT; };
 		3BA405E106A572AD0097A99B /* MatPanel.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MatPanel.java; path = ../../packages/data/java/ircam/jmax/editors/mat/MatPanel.java; sourceTree = SOURCE_ROOT; };
@@ -2854,7 +2851,6 @@
 		F746F84803F429B301664058 /* default_config_macosx.jcfg */ = {isa = PBXFileReference; lastKnownFileType = file; name = default_config_macosx.jcfg; path = ../../config/default_config_macosx.jcfg; sourceTree = SOURCE_ROOT; };
 		F756D672040D3B8401664058 /* define.help.jmax */ = {isa = PBXFileReference; lastKnownFileType = file; name = define.help.jmax; path = ../../help/define.help.jmax; sourceTree = SOURCE_ROOT; };
 		F756D688040D5DF901664058 /* record~.help.jmax */ = {isa = PBXFileReference; lastKnownFileType = file; name = "record~.help.jmax"; path = "../../packages/signal/help/record~.help.jmax"; sourceTree = SOURCE_ROOT; };
-		F75BA0A4040AAC4F01664058 /* resizer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = resizer.gif; path = ../../packages/sequence/images/resizer.gif; sourceTree = SOURCE_ROOT; };
 		F76E4C2D043C720901664058 /* scale.help.jmax */ = {isa = PBXFileReference; lastKnownFileType = file; name = scale.help.jmax; path = ../../packages/numeric/help/scale.help.jmax; sourceTree = SOURCE_ROOT; };
 		F774414203F0114C01664058 /* Finder.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = Finder.java; path = ../../java/src/ircam/jmax/editors/patcher/Finder.java; sourceTree = SOURCE_ROOT; };
 		F77A695B03FA79FF01664058 /* DefineControlPanel.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = DefineControlPanel.java; path = ../../packages/guiobj/java/ircam/jmax/guiobj/DefineControlPanel.java; sourceTree = SOURCE_ROOT; };
@@ -3310,7 +3306,6 @@
 		F8512488028BEBB201664092 /* AnythingTrackEditor.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = AnythingTrackEditor.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/AnythingTrackEditor.java; sourceTree = SOURCE_ROOT; };
 		F8512489028BEBB201664092 /* AnythingValue.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = AnythingValue.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/AnythingValue.java; sourceTree = SOURCE_ROOT; };
 		F851248A028BEBB201664092 /* ArrayEnumeration.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = ArrayEnumeration.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ArrayEnumeration.java; sourceTree = SOURCE_ROOT; };
-		F851248B028BEBB201664092 /* ChangeRangeDialog.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = ChangeRangeDialog.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ChangeRangeDialog.java; sourceTree = SOURCE_ROOT; };
 		F851248D028BEBB201664092 /* Drawable.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = Drawable.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/Drawable.java; sourceTree = SOURCE_ROOT; };
 		F851248E028BEBB201664092 /* Editable.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = Editable.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/Editable.java; sourceTree = SOURCE_ROOT; };
 		F851248F028BEBB201664092 /* Event.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = Event.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/Event.java; sourceTree = SOURCE_ROOT; };
@@ -3353,26 +3348,6 @@
 		F85124B4028BEBB201664092 /* ValueEditor.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = ValueEditor.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ValueEditor.java; sourceTree = SOURCE_ROOT; };
 		F85124B5028BEBB201664092 /* ValueInfo.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = ValueInfo.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ValueInfo.java; sourceTree = SOURCE_ROOT; };
 		F85124B6028BEBB201664092 /* ValueInfoTable.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = ValueInfoTable.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/ValueInfoTable.java; sourceTree = SOURCE_ROOT; };
-		F85124F2028BEC7D01664092 /* anything.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = anything.gif; path = ../../packages/sequence/images/anything.gif; sourceTree = SOURCE_ROOT; };
-		F85124F3028BEC7D01664092 /* arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = arrow.gif; path = ../../packages/sequence/images/arrow.gif; sourceTree = SOURCE_ROOT; };
-		F85124F4028BEC7D01664092 /* closed_track_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = closed_track_arrow.gif; path = ../../packages/sequence/images/closed_track_arrow.gif; sourceTree = SOURCE_ROOT; };
-		F85124F5028BEC7D01664092 /* comber.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = comber.gif; path = ../../packages/sequence/images/comber.gif; sourceTree = SOURCE_ROOT; };
-		F85124F6028BEC7D01664092 /* delete.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = delete.gif; path = ../../packages/sequence/images/delete.gif; sourceTree = SOURCE_ROOT; };
-		F85124F7028BEC7D01664092 /* edit.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = edit.gif; path = ../../packages/sequence/images/edit.gif; sourceTree = SOURCE_ROOT; };
-		F85124F9028BEC7D01664092 /* float.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = float.gif; path = ../../packages/sequence/images/float.gif; sourceTree = SOURCE_ROOT; };
-		F85124FA028BEC7D01664092 /* genericAdder.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = genericAdder.gif; path = ../../packages/sequence/images/genericAdder.gif; sourceTree = SOURCE_ROOT; };
-		F85124FB028BEC7D01664092 /* hresize.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = hresize.gif; path = ../../packages/sequence/images/hresize.gif; sourceTree = SOURCE_ROOT; };
-		F85124FC028BEC7D01664092 /* integer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = integer.gif; path = ../../packages/sequence/images/integer.gif; sourceTree = SOURCE_ROOT; };
-		F85124FD028BEC7D01664092 /* liner.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = liner.gif; path = ../../packages/sequence/images/liner.gif; sourceTree = SOURCE_ROOT; };
-		F85124FE028BEC7D01664092 /* message.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = message.gif; path = ../../packages/sequence/images/message.gif; sourceTree = SOURCE_ROOT; };
-		F85124FF028BEC7D01664092 /* midi.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = midi.gif; path = ../../packages/sequence/images/midi.gif; sourceTree = SOURCE_ROOT; };
-		F8512500028BEC7D01664092 /* mute.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = mute.gif; path = ../../packages/sequence/images/mute.gif; sourceTree = SOURCE_ROOT; };
-		F8512501028BEC7D01664092 /* note.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = note.gif; path = ../../packages/sequence/images/note.gif; sourceTree = SOURCE_ROOT; };
-		F8512502028BEC7D01664092 /* opened_track_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = opened_track_arrow.gif; path = ../../packages/sequence/images/opened_track_arrow.gif; sourceTree = SOURCE_ROOT; };
-		F8512504028BEC7D01664092 /* selected_track.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = selected_track.gif; path = ../../packages/sequence/images/selected_track.gif; sourceTree = SOURCE_ROOT; };
-		F8512505028BEC7D01664092 /* unmute.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = unmute.gif; path = ../../packages/sequence/images/unmute.gif; sourceTree = SOURCE_ROOT; };
-		F8512506028BEC7D01664092 /* unselected_track.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = unselected_track.gif; path = ../../packages/sequence/images/unselected_track.gif; sourceTree = SOURCE_ROOT; };
-		F8512509028BEC7D01664092 /* zoomer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = zoomer.gif; path = ../../packages/sequence/images/zoomer.gif; sourceTree = SOURCE_ROOT; };
 		F851250E028BEC7D01664092 /* sequence.help.jmax */ = {isa = PBXFileReference; lastKnownFileType = file; name = sequence.help.jmax; path = ../../packages/sequence/help/sequence.help.jmax; sourceTree = SOURCE_ROOT; };
 		F851250F028BEC7D01664092 /* sequence.summary.jmax */ = {isa = PBXFileReference; lastKnownFileType = file; name = sequence.summary.jmax; path = ../../packages/sequence/help/sequence.summary.jmax; sourceTree = SOURCE_ROOT; };
 		F85494DE02D24EEB01664092 /* control.jpkg */ = {isa = PBXFileReference; lastKnownFileType = file; name = control.jpkg; path = ../../packages/control/control.jpkg; sourceTree = SOURCE_ROOT; };
@@ -5235,7 +5210,6 @@
 				F8512488028BEBB201664092 /* AnythingTrackEditor.java */,
 				F8512489028BEBB201664092 /* AnythingValue.java */,
 				F851248A028BEBB201664092 /* ArrayEnumeration.java */,
-				F851248B028BEBB201664092 /* ChangeRangeDialog.java */,
 				F851248D028BEBB201664092 /* Drawable.java */,
 				F851248E028BEBB201664092 /* Editable.java */,
 				F851248F028BEBB201664092 /* Event.java */,
@@ -5294,28 +5268,28 @@
 		F85124F1028BEC7D01664092 /* images */ = {
 			isa = PBXGroup;
 			children = (
-				3B972D2706BA54CD00DE9B8C /* fmat.gif */,
-				F85124F2028BEC7D01664092 /* anything.gif */,
-				F85124F3028BEC7D01664092 /* arrow.gif */,
-				F85124F4028BEC7D01664092 /* closed_track_arrow.gif */,
-				F85124F5028BEC7D01664092 /* comber.gif */,
-				F85124F6028BEC7D01664092 /* delete.gif */,
-				F85124F7028BEC7D01664092 /* edit.gif */,
-				F85124F9028BEC7D01664092 /* float.gif */,
-				F85124FA028BEC7D01664092 /* genericAdder.gif */,
-				F85124FB028BEC7D01664092 /* hresize.gif */,
-				F85124FC028BEC7D01664092 /* integer.gif */,
-				F85124FD028BEC7D01664092 /* liner.gif */,
-				F85124FE028BEC7D01664092 /* message.gif */,
-				F85124FF028BEC7D01664092 /* midi.gif */,
-				F8512500028BEC7D01664092 /* mute.gif */,
-				F8512501028BEC7D01664092 /* note.gif */,
-				F8512502028BEC7D01664092 /* opened_track_arrow.gif */,
-				F8512504028BEC7D01664092 /* selected_track.gif */,
-				F8512505028BEC7D01664092 /* unmute.gif */,
-				F8512506028BEC7D01664092 /* unselected_track.gif */,
-				F8512509028BEC7D01664092 /* zoomer.gif */,
-				F75BA0A4040AAC4F01664058 /* resizer.gif */,
+				3B131FE209348B40001F5860 /* seq_fmat.gif */,
+				3B131FE409348B78001F5860 /* seq_anything.gif */,
+				3B131FE509348B78001F5860 /* seq_arrow.gif */,
+				3B131FE809348BB0001F5860 /* seq_closed_track_arrow.gif */,
+				3B131FE909348BB0001F5860 /* seq_comber.gif */,
+				3B131FEC09348BD9001F5860 /* seq_delete.gif */,
+				3B131FED09348BD9001F5860 /* seq_edit.gif */,
+				3B131FEE09348BD9001F5860 /* seq_float.gif */,
+				3B131FF209348C05001F5860 /* seq_genericAdder.gif */,
+				3B131FF309348C05001F5860 /* seq_hresize.gif */,
+				3B131FF609348C2E001F5860 /* seq_integer.gif */,
+				3B131FF709348C2E001F5860 /* seq_liner.gif */,
+				3B131FF809348C2E001F5860 /* seq_message.gif */,
+				3B131FFC09348C58001F5860 /* seq_midi.gif */,
+				3B131FFD09348C58001F5860 /* seq_mute.gif */,
+				3B131FFE09348C58001F5860 /* seq_note.gif */,
+				3B13200209348C87001F5860 /* seq_opened_track_arrow.gif */,
+				3B13200A09348CD0001F5860 /* seq_resizer.gif */,
+				3B13200309348C87001F5860 /* seq_selected_track.gif */,
+				3B13200609348CAE001F5860 /* seq_unmute.gif */,
+				3B13200709348CAE001F5860 /* seq_unselected_track.gif */,
+				3B13200B09348CD0001F5860 /* seq_zoomer.gif */,
 			);
 			name = images;
 			sourceTree = "<group>";
@@ -7634,7 +7608,28 @@
 			files = (
 				5C54253E05AB0B8A0042B7A2 /* jmax_file.icns in Resources */,
 				5C54253F05AB0B8A0042B7A2 /* jmax.icns in Resources */,
-				3B972D2806BA54CD00DE9B8C /* fmat.gif in Resources */,
+				3B131FE309348B40001F5860 /* seq_fmat.gif in Resources */,
+				3B131FE609348B78001F5860 /* seq_anything.gif in Resources */,
+				3B131FE709348B78001F5860 /* seq_arrow.gif in Resources */,
+				3B131FEA09348BB0001F5860 /* seq_closed_track_arrow.gif in Resources */,
+				3B131FEB09348BB0001F5860 /* seq_comber.gif in Resources */,
+				3B131FEF09348BD9001F5860 /* seq_delete.gif in Resources */,
+				3B131FF009348BD9001F5860 /* seq_edit.gif in Resources */,
+				3B131FF109348BD9001F5860 /* seq_float.gif in Resources */,
+				3B131FF409348C05001F5860 /* seq_genericAdder.gif in Resources */,
+				3B131FF509348C05001F5860 /* seq_hresize.gif in Resources */,
+				3B131FF909348C2E001F5860 /* seq_integer.gif in Resources */,
+				3B131FFA09348C2E001F5860 /* seq_liner.gif in Resources */,
+				3B131FFB09348C2E001F5860 /* seq_message.gif in Resources */,
+				3B131FFF09348C58001F5860 /* seq_midi.gif in Resources */,
+				3B13200009348C58001F5860 /* seq_mute.gif in Resources */,
+				3B13200109348C58001F5860 /* seq_note.gif in Resources */,
+				3B13200409348C87001F5860 /* seq_opened_track_arrow.gif in Resources */,
+				3B13200509348C87001F5860 /* seq_selected_track.gif in Resources */,
+				3B13200809348CAE001F5860 /* seq_unmute.gif in Resources */,
+				3B13200909348CAE001F5860 /* seq_unselected_track.gif in Resources */,
+				3B13200C09348CD0001F5860 /* seq_resizer.gif in Resources */,
+				3B13200D09348CD0001F5860 /* seq_zoomer.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8775,7 +8770,6 @@
 				5C542A9F05AB0B9C0042B7A2 /* AnythingTrackEditor.java in Sources */,
 				5C542AA005AB0B9C0042B7A2 /* AnythingValue.java in Sources */,
 				5C542AA105AB0B9C0042B7A2 /* ArrayEnumeration.java in Sources */,
-				5C542AA205AB0B9C0042B7A2 /* ChangeRangeDialog.java in Sources */,
 				5C542AA405AB0B9C0042B7A2 /* Drawable.java in Sources */,
 				5C542AA505AB0B9C0042B7A2 /* Editable.java in Sources */,
 				5C542AA605AB0B9C0042B7A2 /* Event.java in Sources */,
@@ -9399,6 +9393,7 @@
 				INSTALL_PATH = "@executable_path/../lib";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = (
 					"-flat_namespace",
@@ -9442,6 +9437,7 @@
 				INSTALL_PATH = "@executable_path/../lib";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = (
 					"-flat_namespace",
@@ -9483,6 +9479,7 @@
 				INSTALL_PATH = "@executable_path/../lib";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				OPTIMIZATION_CFLAGS = "-g";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -9523,6 +9520,7 @@
 				INSTALL_PATH = "@executable_path/../lib";
 				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
 				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "-Wno-unused";
 				OTHER_LDFLAGS = (
 					"-flat_namespace",

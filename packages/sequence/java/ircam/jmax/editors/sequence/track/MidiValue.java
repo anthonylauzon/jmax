@@ -184,6 +184,6 @@ public class MidiValue extends AbstractEventValue
     static 
     {
       path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
-      MIDI_ICON = new ImageIcon(path+"midi.gif");
+      MIDI_ICON = new ImageIcon(path+"seq_midi.gif");
     }
 }

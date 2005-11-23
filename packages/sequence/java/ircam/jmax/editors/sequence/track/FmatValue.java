@@ -201,6 +201,6 @@ public class FmatValue extends AbstractEventValue
   static 
   {
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-    FMAT_ICON = new ImageIcon(path+"fmat.gif");
+    FMAT_ICON = new ImageIcon(path+"seq_fmat.gif");
   }
 }
