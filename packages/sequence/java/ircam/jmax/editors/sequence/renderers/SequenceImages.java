@@ -33,60 +33,44 @@ import ircam.jmax.*;
 
 import ircam.jmax.editors.sequence.*;
 /**
- * A class used to register ValueInfo and acces it by name*/
+* A class used to register ValueInfo and acces it by name*/
 
 public class SequenceImages {
-
-    public static void init()
+  
+  public static void init()
+  {
+    if(JMaxApplication.getProperty("ftm") == null)
     {
-	String path;
-	Image image;
-	String fs = File.separator;
-	ImageObserver observer =  new ImageObserver(){
-	    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height)
-	    {
-		return true;
-	    }
-	};
-	/*
-	  WARNING:
-	  Waiting for a method to get the packagePath from the package name
-	*/
-	//Create the backgrounds images????
-	/*try{
-	  path  = MaxApplication.getPackageHandler().locatePackage("sequence").getPath()+File.separator+"images"+File.separator;
-	  }
-	  catch(FileNotFoundException e){
-	  path = JMaxApplication.getProperty("sequencePackageDir")+File.separator+"images"+File.separator;
-	  }*/
-	path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????   
-	/*************************************************************/
-
-	image = Toolkit.getDefaultToolkit().getImage(path+"violinClef.gif");
-	Toolkit.getDefaultToolkit().prepareImage(image, 20, 51, observer);
-	images.put("violinClef", image);
-	image = Toolkit.getDefaultToolkit().getImage(path+"faClef.gif");
-	Toolkit.getDefaultToolkit().prepareImage(image, 23, 30, observer);
-	images.put("faClef", image);
-
-	imageIcons.put("opened_track", new ImageIcon(path+"seq_opened_track_arrow.gif"));
-	imageIcons.put("closed_track", new ImageIcon(path+"seq_closed_track_arrow.gif"));
-	imageIcons.put("unselected_track", new ImageIcon(path+"seq_unselected_track.gif"));
-	imageIcons.put("selected_track", new ImageIcon(path+"seq_selected_track.gif"));
-	imageIcons.put("unmute", new ImageIcon(path+"seq_unmute.gif"));
-	imageIcons.put("mute", new ImageIcon(path+"seq_mute.gif"));
+      String fs = File.separator;
+      String path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+      
+      imageIcons.put("opened_track", new ImageIcon(path+"seq_opened_track_arrow.gif"));
+      imageIcons.put("closed_track", new ImageIcon(path+"seq_closed_track_arrow.gif"));
+      imageIcons.put("unselected_track", new ImageIcon(path+"seq_unselected_track.gif"));
+      imageIcons.put("selected_track", new ImageIcon(path+"seq_selected_track.gif"));
+      imageIcons.put("unmute", new ImageIcon(path+"seq_unmute.gif"));
+      imageIcons.put("mute", new ImageIcon(path+"seq_mute.gif"));
     }
-
-    public static Image getImage(String name)
+    else
     {
+      imageIcons.put("opened_track", JMaxUtilities.loadIconFromResource("images/seq_opened_track_arrow.gif"));
+      imageIcons.put("closed_track", JMaxUtilities.loadIconFromResource("images/seq_closed_track_arrow.gif"));
+      imageIcons.put("unselected_track", JMaxUtilities.loadIconFromResource("images/seq_unselected_track.gif"));
+      imageIcons.put("selected_track", JMaxUtilities.loadIconFromResource("images/seq_selected_track.gif"));
+      imageIcons.put("unmute", JMaxUtilities.loadIconFromResource("images/seq_unmute.gif"));
+      imageIcons.put("mute", JMaxUtilities.loadIconFromResource("images/seq_mute.gif"));
+    }
+  }
+public static Image getImage(String name)
+{
 	return (Image)(images.get(name));
-    }
-    public static ImageIcon getImageIcon(String name)
-    {
+}
+public static ImageIcon getImageIcon(String name)
+{
 	return (ImageIcon)(imageIcons.get(name));
-    }
+}
 
-    //---
-    private static Hashtable images = new Hashtable();
-    private static Hashtable imageIcons = new Hashtable();
+//---
+private static Hashtable images = new Hashtable();
+private static Hashtable imageIcons = new Hashtable();
 }

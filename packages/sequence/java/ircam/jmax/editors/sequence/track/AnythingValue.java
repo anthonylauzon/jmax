@@ -142,8 +142,13 @@ public class AnythingValue extends AbstractEventValue
 
   static 
   {
-    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
-    ANYTHING_ICON = new ImageIcon(path+"seq_anything.gif");
+    if(JMaxApplication.getProperty("ftm") == null)
+    {
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;  
+      ANYTHING_ICON = new ImageIcon(path+"seq_anything.gif");
+    }
+    else
+      ANYTHING_ICON = JMaxUtilities.loadIconFromResource("images/seq_anything.gif");
   }
 }
 

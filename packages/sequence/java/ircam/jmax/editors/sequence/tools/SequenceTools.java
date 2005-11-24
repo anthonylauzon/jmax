@@ -38,16 +38,18 @@ public class SequenceTools implements ToolProvider{
 
   public SequenceTools()
   {
-    String path = null;
-    String fs = File.separator;
- 
-    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;//??????????????????	 
-    
     tools = new Tool[1];
-
-    tools[0] = new ArrowTool(new ImageIcon(path+"seq_arrow.gif"));
+    if(JMaxApplication.getProperty("ftm") == null)
+    {
+      String path = null;
+      String fs = File.separator;
+ 
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;	 
+      tools[0] = new ArrowTool(new ImageIcon(path+"seq_arrow.gif"));
+    }
+    else
+      tools[0] = new ArrowTool(JMaxUtilities.loadIconFromResource("images/seq_arrow.gif"));
   }
-
   public Enumeration getTools()
   {
     return new ToolEnumeration( this);

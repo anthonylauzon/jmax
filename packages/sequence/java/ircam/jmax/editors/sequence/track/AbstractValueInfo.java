@@ -114,8 +114,13 @@ public class AbstractValueInfo implements ValueInfo, Serializable
 
  static 
   {
-    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-    GENERIC_ICON = new ImageIcon(path+"seq_genericAdder.gif");
+    if(JMaxApplication.getProperty("ftm") == null)
+    {
+      path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+      GENERIC_ICON = new ImageIcon(path+"seq_genericAdder.gif");
+    }
+    else
+      GENERIC_ICON = JMaxUtilities.loadIconFromResource("images/seq_genericAdder.gif");
   }
 }
 

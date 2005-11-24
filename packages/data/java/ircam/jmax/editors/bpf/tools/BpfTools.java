@@ -42,8 +42,8 @@ public class BpfTools implements ToolProvider{
     String fs = File.separator;
     path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;	 
 
-    tools[0] = new ArrowTool(new ImageIcon(path+"arrow.gif"));
-    tools[1] = new ScrollZoomTool(new ImageIcon(path+"scroller.gif"));
+    tools[0] = new ArrowTool(new ImageIcon(path+"data_arrow.gif"));
+    tools[1] = new ScrollZoomTool(new ImageIcon(path+"data_scroller.gif"));
   }
 
   public Enumeration getTools()

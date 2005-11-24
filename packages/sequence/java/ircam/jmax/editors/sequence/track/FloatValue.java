@@ -131,8 +131,13 @@ public static final int DEFAULT_MIN_VALUE = 0;
 
 static 
 {
-  path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
-  FLOAT_ICON = new ImageIcon(path+"seq_float.gif");
+  if(JMaxApplication.getProperty("ftm") == null)
+  {
+    path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"sequence"+fs+"images"+fs;
+    FLOAT_ICON = new ImageIcon(path+"seq_float.gif");
+  }
+  else
+    FLOAT_ICON = JMaxUtilities.loadIconFromResource("images/seq_float.gif");
 }
 }
 

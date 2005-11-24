@@ -41,10 +41,10 @@ public class TableTools implements ToolProvider{
     String fs = File.separator;
     String path = JMaxApplication.getProperty("jmaxRoot")+fs+"packages"+fs+"data"+fs+"images"+fs;
 
-    tools[0] = new PencilTool(new ImageIcon(path+"edit.gif"));
-    tools[1] = new TableSelecter(new ImageIcon(path+"arrow.gif"));
-    tools[2] = new LinerTool(new ImageIcon(path+"liner.gif"));
-    tools[3] = new ZoomTool(new ImageIcon(path+"zoomer.gif"));
+    tools[0] = new PencilTool(new ImageIcon(path+"data_edit.gif"));
+    tools[1] = new TableSelecter(new ImageIcon(path+"data_arrow.gif"));
+    tools[2] = new LinerTool(new ImageIcon(path+"data_liner.gif"));
+    tools[3] = new ZoomTool(new ImageIcon(path+"data_zoomer.gif"));
   }
 
   public Enumeration getTools()
