@@ -1,11 +1,11 @@
 
 imgdir=$(pkglibdir)/packages/data/images
 img_DATA=\
- arrow.gif \
- delete.gif \
- edit.gif \
- liner.gif \
- scroller.gif \
- zoomer.gif 
+ data_arrow.gif \
+ data_delete.gif \
+ data_edit.gif \
+ data_liner.gif \
+ data_scroller.gif \
+ data_zoomer.gif 
 
 EXTRA_DIST= $(img_DATA)
