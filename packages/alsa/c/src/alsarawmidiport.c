@@ -25,8 +25,8 @@
 
 fts_class_t *alsarawmidiport_type = NULL;
 
-static fts_method_status_t
-alsarawmidiport_select(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
+static void 
+alsarawmidiport_select( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
   fts_midiparser_t *parser = &this->parser;
@@ -148,8 +148,8 @@ alsarawmidiport_output(fts_object_t *o, fts_midievent_t *event, double time)
     }
 }
 
-static fts_method_status_t
-alsarawmidiport_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
+static void 
+alsarawmidiport_init( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
   fts_midiparser_t *parser = &this->parser;
@@ -191,8 +191,8 @@ alsarawmidiport_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   this->sysex_head = 0;
 }
 
-static fts_method_status_t
-alsarawmidiport_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t* ret)
+static void
+alsarawmidiport_delete( fts_object_t *o, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   alsarawmidiport_t *this = (alsarawmidiport_t *)o;
   fts_midiparser_t *parser = &this->parser;

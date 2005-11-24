@@ -19,9 +19,6 @@
 /* Define to 1 if you have the `asinf' function. */
 #undef HAVE_ASINF
 
-/* Define to 1 if you have the `atan2f' function. */
-#undef HAVE_ATAN2F
-
 /* Define to 1 if you have the `atanf' function. */
 #undef HAVE_ATANF
 
@@ -36,9 +33,6 @@
 
 /* Define to 1 if you have the `expf' function. */
 #undef HAVE_EXPF
-
-/* Define to 1 if you have the `fabsf' function. */
-#undef HAVE_FABSF
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -70,26 +64,17 @@
 /* Define to 1 if you have the <pthread.h> header file. */
 #undef HAVE_PTHREAD_H
 
-/* Define to 1 if you have the `qsort_r' function. */
-#undef HAVE_QSORT_R
-
 /* Define to 1 if you have the `realpath' function. */
 #undef HAVE_REALPATH
 
 /* Define to 1 if you have the `signal' function. */
 #undef HAVE_SIGNAL
 
-/* Define to 1 if you have the `signbit' function. */
-#undef HAVE_SIGNBIT
-
 /* Define to 1 if you have the `sinf' function. */
 #undef HAVE_SINF
 
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
-
-/* Define to 1 if you have the `sqrtf' function. */
-#undef HAVE_SQRTF
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

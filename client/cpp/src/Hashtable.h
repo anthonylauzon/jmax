@@ -232,7 +232,7 @@ namespace client {
     {
       int minKeys = 38928392, maxKeys = 0, i;
 
-      os << "Hashtable: length = " << _length << " count = " << _count << " rehash = " << _rehashCount << std::endl;
+      os << "Hashtable: length = " << _length << " count = " << _count << " rehash = " << _rehashCount << endl;
 
       for ( i = 0; i < _length; i++)
 	{
@@ -254,10 +254,10 @@ namespace client {
 	      os << " " << c->_key;
 	    }
 
-	  os << std::endl;
+	  os << endl;
 	}
 
-      os << "minimum " << minKeys << " maximum " << maxKeys << std::endl;
+      os << "minimum " << minKeys << " maximum " << maxKeys << endl;
     }
 
 };
