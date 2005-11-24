@@ -37,31 +37,53 @@ public class SequenceFonts
 {
   public static void init()
   {
-    String root = JMaxApplication.getProperty("jmaxRoot");
-    String fontPath = root + "/packages/sequence/fonts/";
+    if(JMaxApplication.getProperty("ftm") == null)
+    {
+      String root = JMaxApplication.getProperty("jmaxRoot");
+      String fontPath = root + "/packages/sequence/fonts/";
 				
-    try
-		{
-			Font musicFont;
-			FileInputStream fileStream;
-			fileStream = new FileInputStream(fontPath+"MusiSync.ttf");
-			musicFont = Font.createFont(Font.TRUETYPE_FONT, fileStream);
-			originalFont = musicFont;
-			fileStream = new FileInputStream(fontPath+"MusiTone.ttf");
-			musicFont = Font.createFont(Font.TRUETYPE_FONT, fileStream);
-		}
-    catch(java.io.FileNotFoundException  e)
-		{
-			System.err.println("[Sequence]: no such font file "+fontPath);
-		}
-    catch(java.awt.FontFormatException e)
-		{
-			System.err.println("[Sequence]: bad font format of "+fontPath);
-		}
-    catch(IOException e)
-		{
-			System.err.println("[Sequence]: I/O error creating font "+fontPath);
-		}
+      try
+      {
+        Font musicFont;
+        FileInputStream fileStream;
+        fileStream = new FileInputStream(fontPath+"MusiSync.ttf");
+        musicFont = Font.createFont(Font.TRUETYPE_FONT, fileStream);
+        originalFont = musicFont;
+        fileStream = new FileInputStream(fontPath+"MusiTone.ttf");
+        musicFont = Font.createFont(Font.TRUETYPE_FONT, fileStream);
+      }
+      catch(java.io.FileNotFoundException  e)
+      {
+        System.err.println("[Sequence]: no such font file "+fontPath);
+      }
+      catch(java.awt.FontFormatException e)
+      {
+        System.err.println("[Sequence]: bad font format of "+fontPath);
+      }
+      catch(IOException e)
+      {
+        System.err.println("[Sequence]: I/O error creating font "+fontPath);
+      }
+    }
+    else
+    {
+      try
+      {
+        originalFont = JMaxUtilities.loadFontFromResource(Font.TRUETYPE_FONT, "fonts/MusiSync.ttf");
+      }
+      catch(java.io.FileNotFoundException  e)
+      {
+        System.err.println("[Sequence]: no font file MusiSync.ttf found");
+      }
+      catch(java.awt.FontFormatException e)
+      {
+        System.err.println("[Sequence]: bad font format of MusiSync.ttf");
+      }
+      catch(IOException e)
+      {
+        System.err.println("[Sequence]: I/O error creating font MusiSync.ttf");
+      }
+    }
   }
 
 	public static Font getFont(int size)

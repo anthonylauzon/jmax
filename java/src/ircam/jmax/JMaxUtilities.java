@@ -23,6 +23,7 @@ package ircam.jmax;
 
 import java.io.*;
 import java.util.*;
+import java.awt.*;
 
 // import javax.swing.*;
 import javax.swing.ImageIcon;
@@ -64,6 +65,11 @@ public class JMaxUtilities {
       }
 
     return new ImageIcon( buffer.toByteArray());
+  }
+  
+  public static Font loadFontFromResource(int fontType, String name) throws FontFormatException, IOException 
+  {
+    return Font.createFont(fontType, ClassLoader.getSystemResourceAsStream( name)); 
   }
 }
 
