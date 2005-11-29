@@ -645,8 +645,7 @@ fts_object_load(fts_object_t *obj, fts_loader_t *line_loader)
  *
  */
 
-void
-fts_kernel_dumper_init(void)
+FTS_MODULE_INIT(dumper)
 {
   object_dumper_class = fts_class_install(NULL, object_dumper_instantiate);
   object_loader_class = fts_class_install(NULL, object_loader_instantiate);

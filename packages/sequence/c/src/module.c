@@ -22,40 +22,22 @@
 
 #include "internal_sequence.h"
 
-extern void seqsym_config(void);
-
-extern void sequence_class_config(void);
-extern void track_config(void);
-extern void track_editor_config(void);
-extern void event_config(void);
-
-extern void scoob_config(void);
-extern void scomark_config(void);
-extern void seqmess_config(void);
-
-extern void seqfind_config(void);
-extern void seqstep_config(void);
-extern void seqplay_config(void);
-extern void seqrec_config(void);
-extern void locate_config(void);
-
-void
-sequence_config(void)
+FTS_MODULE_INIT(sequence)
 {
-  seqsym_config();
+  FTS_MODULE_INIT_CALL(seqsym);
 
-  sequence_class_config();
-  track_config();
-	track_editor_config();
-  event_config();
+  FTS_MODULE_INIT_CALL(sequence_class);
+  FTS_MODULE_INIT_CALL(track);
+	FTS_MODULE_INIT_CALL(track_editor);
+  FTS_MODULE_INIT_CALL(event);
 
-  scoob_config();
-  scomark_config();
-  seqmess_config();
+  FTS_MODULE_INIT_CALL(scoob);
+  FTS_MODULE_INIT_CALL(scomark);
+  FTS_MODULE_INIT_CALL(seqmess);
 
-  seqfind_config();
-  seqstep_config();
-  seqplay_config();
-  seqrec_config();
-  locate_config();
+  FTS_MODULE_INIT_CALL(seqfind);
+  FTS_MODULE_INIT_CALL(seqstep);
+  FTS_MODULE_INIT_CALL(seqplay);
+  FTS_MODULE_INIT_CALL(seqrec);
+  FTS_MODULE_INIT_CALL(locate);
 }

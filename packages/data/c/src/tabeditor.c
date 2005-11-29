@@ -690,8 +690,7 @@ tabeditor_instantiate(fts_class_t *cl)
 *
 */
 
-void 
-tabeditor_config(void)
+FTS_MODULE_INIT(tabeditor)
 {
   sym_text = fts_new_symbol("text");
   tabeditor_symbol = fts_new_symbol("tabeditor");

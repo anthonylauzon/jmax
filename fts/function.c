@@ -118,7 +118,7 @@ declare_functions( void)
 *
 */
 
-void fts_kernel_function_init( void)
+FTS_MODULE_INIT(function)
 {
   declare_functions();
 }

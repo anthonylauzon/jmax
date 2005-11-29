@@ -40,19 +40,6 @@ fts_list_t *fts_list_last(fts_list_t *list);
 
 /***********************************************************************
  *
- * Initialization
- *
- */
-
-void 
-fts_kernel_list_init(void)
-{
-  list_heap = fts_heap_new(sizeof(fts_list_t));
-}
-
-
-/***********************************************************************
- *
  * List
  *
  */
@@ -238,4 +225,16 @@ fts_list_get_size( const fts_list_t *list)
   
   return n;
 }
+
+/***********************************************************************
+*
+* Initialization
+*
+*/
+
+FTS_MODULE_INIT(list)
+{
+  list_heap = fts_heap_new(sizeof(fts_list_t));
+}
+
 

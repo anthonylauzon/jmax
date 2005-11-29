@@ -239,8 +239,7 @@ tuple_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_print, NULL, "print values");
 }
 
-void
-fts_kernel_tuple_init(void)
+FTS_MODULE_INIT(tuple)
 {
   fts_tuple_class = fts_class_install(fts_s_tuple, tuple_instantiate);
 }

@@ -69,6 +69,8 @@ extern "C" {
 #define FTS_API extern
 #endif
 
+#define FTS_KERNEL_INIT(m) void fts_##m##_parser_init( void); void fts_##m##_parser_init( void)
+
 /* *** The inclusion order is important *** */
 #include <fts/types.h>
 #include <fts/status.h>

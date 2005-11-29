@@ -163,8 +163,7 @@ fts_random_float(void)
 
 #endif
 
-void
-fts_random_init(void)
+FTS_MODULE_INIT(random)
 {
 #ifdef HAVE_SYS_TIME_H
   struct timeval tv;

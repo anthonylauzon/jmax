@@ -53,10 +53,6 @@ static fts_symbol_t sym_refer = NULL;
 
 static fts_symbol_t fvec_type_names[fvec_n_types];
 
-
-void fvec_config(void);
-
-
 static int
 fvec_get_type_from_symbol(fts_symbol_t sym)
 {
@@ -88,6 +84,8 @@ make_fvec(fmat_t *fmat, fvec_type_t type)
   fvec = (fvec_t *) fts_object_create(fvec_class, 1, a);
   
   fvec_set_type(fvec, type);
+  
+  return fvec;
 }
 
 fvec_t *
@@ -706,6 +704,15 @@ fvec_apply_expr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   fts_hashtable_destroy(&locals);
   
   fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+fvec_apply_expr_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if(ac > 0 && fts_is_a(at, expr_class))
+    fvec_apply_expr(o, s, ac, at, ret);
   
   return fts_ok;
 }
@@ -2016,6 +2023,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("env"), bpf_type, fvec_env_bpf);
   
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fvec_apply_expr);
+  fts_class_message_varargs(cl, fts_new_symbol("apply"), fvec_apply_expr_varargs);
   
   /* let's have standard in/outlets */
   fts_class_inlet_bang(cl, 0, data_object_output);
@@ -2068,8 +2076,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_set_super(cl, fvec_class);
 }
 
-void 
-fvec_config(void)
+FTS_MODULE_INIT(fvec)
 {
   fvec_symbol = fts_new_symbol("fvec");
   

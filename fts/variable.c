@@ -345,8 +345,7 @@ fts_name_get_unused(fts_patcher_t *patcher, fts_symbol_t name)
   return name;
 }
 
-void
-fts_kernel_variable_init(void)
+FTS_MODULE_INIT(variable)
 {
   definition_heap = fts_heap_new(sizeof(fts_definition_t));
   definition_listener_heap = fts_heap_new(sizeof(fts_definition_listener_t));

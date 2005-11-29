@@ -783,7 +783,7 @@ void fts_set_default_console_stream( fts_bytestream_t *stream)
  *
  */
 
-void fts_kernel_post_init( void)
+FTS_MODULE_INIT(post)
 {
   init_punctuation();
 }

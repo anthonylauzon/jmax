@@ -173,3 +173,7 @@ FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i
  */
 FTS_API void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i);
 
+FTS_API void fts_shared_set_table(fts_hashtable_t *set);
+FTS_API fts_hashtable_t *fts_shared_get_table(void);
+FTS_API void *fts_shared_get(fts_symbol_t name);
+FTS_API void fts_shared_set(fts_symbol_t name, void *pointer);

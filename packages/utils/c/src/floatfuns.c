@@ -195,8 +195,7 @@ static float sqrtf (float f)
 #endif
 
 
-void
-fts_ffuns_init( void)
+FTS_MODULE_INIT(ffuns)
 {
   fts_hashtable_init( &the_fts_ffun_hashtable, FTS_HASHTABLE_SMALL);
 
@@ -310,7 +309,7 @@ fftab_new( fts_ffun_t *ffun, int size, float min, float max)
   return fftab;
 }
 
-void
+static void
 fftab_delete( fts_fftab_t *fftab)
 {
   fts_free( fftab->values);

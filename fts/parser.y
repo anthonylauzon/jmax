@@ -389,8 +389,7 @@ fts_parsetree_delete( fts_parsetree_t *tree)
  *
  */
 
-void
-fts_kernel_parser_init( void)
+FTS_MODULE_INIT(parser)
 {
   parsetree_heap = fts_heap_new( sizeof( fts_parsetree_t));
 

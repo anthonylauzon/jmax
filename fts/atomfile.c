@@ -664,9 +664,8 @@ atomfile_loader_instantiate(fts_class_t *cl)
  *  kernel init
  *
  */
-void
-fts_kernel_atomfile_init(void)
+FTS_MODULE_INIT(atomfile)
 {
   fts_atomfile_dumper_class = fts_class_install(NULL, atomfile_dumper_instantiate);
-  fts_atomfile_loader_class = fts_class_install(NULL, atomfile_loader_instantiate);
+  fts_atomfile_loader_class = fts_class_install(NULL, atomfile_loader_instantiate);    
 }

@@ -231,11 +231,8 @@ void fts_memorystream_reset( fts_memorystream_t *stream)
  * Initialization
  *
  */
-
-void fts_kernel_bytestream_init( void)
+FTS_MODULE_INIT(bytestream)
 {
-  fts_s_bytestream = fts_new_symbol("bytestream");
-
   fts_memorystream_class = fts_class_install( fts_new_symbol("memorystream"), fts_memorystream_instantiate);
 }
 

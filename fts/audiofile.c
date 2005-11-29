@@ -335,8 +335,7 @@ fts_audiofile_export_handler(fts_class_t *cl, fts_method_t meth)
 }
 
 
-void 
-fts_kernel_audiofile_init(void)
+FTS_MODULE_INIT(audiofile)
 {
   fts_s_audio = fts_new_symbol("audio");
   fts_s_aiff = fts_new_symbol("aiff");

@@ -873,8 +873,7 @@ dict_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_print, NULL, "print list of entries");
 }
 
-void
-dict_config(void)
+FTS_MODULE_INIT(dict)
 {
   sym_text = fts_new_symbol("text");
   sym_coll = fts_new_symbol("coll");

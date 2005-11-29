@@ -864,8 +864,7 @@ sequence_instantiate(fts_class_t *cl)
   fts_class_inlet_thru(cl, 0);
 }
 
-void
-sequence_class_config(void)
+FTS_MODULE_INIT(sequence_class)
 {
   multitrack_class = fts_class_install(seqsym_multitrack, sequence_instantiate);
   fts_class_alias(multitrack_class, seqsym_sequence);

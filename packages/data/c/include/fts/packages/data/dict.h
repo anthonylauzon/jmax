@@ -60,7 +60,4 @@ DATA_API void dict_remove_all(dict_t *self);
 
 DATA_API void dict_upload(dict_t *self);
 
-/* class configuration */
-void dict_config(void);
-
 #endif

@@ -32,7 +32,7 @@ typedef struct fts_class_outlet fts_class_outlet_t;
 
 FTS_API void fts_class_instantiate(fts_class_t *cl);
 
-/* Predefined typeids */
+/* Predefined class ids */
 #define FTS_FIRST_OBJECT_TYPEID   16
 
 /**************************************************

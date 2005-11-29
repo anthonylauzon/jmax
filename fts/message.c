@@ -219,10 +219,9 @@ fts_send_message_cached(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
  *
  */
 
-void
-fts_kernel_message_init(void)
+FTS_MODULE_INIT(message)
 {
-  fts_message_class = fts_class_install(NULL, message_instantiate);
+  fts_message_class = fts_class_install(fts_s_message, message_instantiate);
 }
 
 /** EMACS **

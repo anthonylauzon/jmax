@@ -597,6 +597,4 @@ typedef union _fts_wrap_fudge
   (wrapper)->f - UNITBIT32 \
 )
 
-UTILS_API void utils_config(void);
-
 #endif

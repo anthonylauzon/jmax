@@ -431,8 +431,7 @@ scoob_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_remove, "<sym: property name>", "remove value of given additional property");
 }
 
-void
-scoob_config(void)
+FTS_MODULE_INIT(scoob)
 {
   scoob_type_enumeration = enumeration_new(fts_new_symbol("scoob_type"));
   

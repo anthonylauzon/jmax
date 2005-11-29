@@ -72,26 +72,34 @@ default_description_function(fts_object_t *obj, fts_array_t *array)
 fts_class_t *
 fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 {
-  fts_class_t *cl = (fts_class_t * )fts_object_create(fts_class_class, 0, 0);
+  fts_class_t *cl = NULL;
   
-  cl->name = name;
-  cl->instantiate_fun = instantiate_fun;
-  cl->type_id = type_id++;
-  cl->super_class = NULL;
+  if(name != NULL)
+    cl = fts_package_get_class(fts_get_current_package(), name);
   
-  fts_class_set_hash_function (cl, default_hash_function);
-  fts_class_set_equals_function (cl, default_equals_function);
-  fts_class_set_description_function (cl, default_description_function);
-  fts_class_set_copy_function (cl, NULL);
-  fts_class_set_array_function (cl, NULL);
-  
-  fts_hashtable_init(&cl->import_handlers, FTS_HASHTABLE_SMALL);
-  fts_hashtable_init(&cl->export_handlers, FTS_HASHTABLE_SMALL);
-
-  if (name != NULL)
+  if(cl == NULL)
   {
-    if (fts_package_add_class (fts_get_current_package (), cl, name) != fts_ok)
-      return NULL;
+    cl = (fts_class_t * )fts_object_create(fts_class_class, 0, 0);
+    
+    cl->name = name;
+    cl->instantiate_fun = instantiate_fun;
+    cl->type_id = type_id++;
+    cl->super_class = NULL;
+    
+    fts_class_set_hash_function (cl, default_hash_function);
+    fts_class_set_equals_function (cl, default_equals_function);
+    fts_class_set_description_function (cl, default_description_function);
+    fts_class_set_copy_function (cl, NULL);
+    fts_class_set_array_function (cl, NULL);
+    
+    fts_hashtable_init(&cl->import_handlers, FTS_HASHTABLE_SMALL);
+    fts_hashtable_init(&cl->export_handlers, FTS_HASHTABLE_SMALL);
+    
+    if(name != NULL)
+    {
+      if(fts_package_add_class(fts_get_current_package(), cl, name) != fts_ok)
+        return NULL;
+    }
   }
   
   return cl;
@@ -99,7 +107,7 @@ fts_class_install(fts_symbol_t name, fts_instantiate_fun_t instantiate_fun)
 
 
 void
-fts_class_instantiate (fts_class_t * cl)
+fts_class_instantiate(fts_class_t * cl)
 {
   if (!cl->size)
     (*cl->instantiate_fun) (cl);
@@ -107,9 +115,10 @@ fts_class_instantiate (fts_class_t * cl)
 
 /* for now just recreate the same class and add it to the current package */
 void
-fts_class_alias (fts_class_t * cl, fts_symbol_t alias)
+fts_class_alias(fts_class_t * cl, fts_symbol_t alias)
 {
-  fts_package_add_class (fts_get_current_package (), cl, alias);
+  if(fts_package_get_class(fts_get_current_package(), alias) == NULL)
+    fts_package_add_class(fts_get_current_package (), cl, alias);
 }
 
 /********************************************
@@ -754,29 +763,33 @@ class_class_instantiate (fts_class_t * cl)
 {
 }
 
-void
-fts_kernel_class_init (void)
-{
-  /* As the 'class' class is used to create a class, it cannot be created using standard ways. */
-  fts_heap_t *heap = fts_heap_new (sizeof (fts_class_t));
+FTS_MODULE_INIT(class)
+{  
+  fts_class_class = fts_shared_get(fts_s_class);
   
-  fts_class_class = (fts_class_t *) fts_heap_zalloc (heap);
-  
-  fts_class_class->head.cl = fts_class_class;
-  fts_class_class->name = NULL;
-  fts_class_class->instantiate_fun = class_class_instantiate;
-  fts_class_class->type_id = type_id++;
-  fts_class_class->super_class = NULL;
-  
-  fts_class_class->size = sizeof (fts_class_t);
-  fts_class_class->heap = heap;
-  fts_class_class->constructor = dummy_method;
-  fts_class_class->deconstructor = dummy_method;
-  fts_class_class->methods = fts_hashtable_new (FTS_HASHTABLE_MEDIUM);
-  
-  fts_class_set_name (fts_class_class, fts_s_class);
+  if(fts_class_class == NULL)
+  {
+    fts_heap_t *heap = fts_heap_new (sizeof (fts_class_t));
+    
+    fts_class_class = (fts_class_t *) fts_heap_zalloc (heap);
+    
+    fts_class_class->head.cl = fts_class_class;
+    fts_class_class->name = NULL;
+    fts_class_class->instantiate_fun = class_class_instantiate;
+    fts_class_class->type_id = type_id++;
+    fts_class_class->super_class = NULL;
+    
+    fts_class_class->size = sizeof (fts_class_t);
+    fts_class_class->heap = heap;
+    fts_class_class->constructor = dummy_method;
+    fts_class_class->deconstructor = dummy_method;
+    fts_class_class->methods = fts_hashtable_new (FTS_HASHTABLE_MEDIUM);
+    
+    fts_class_set_name (fts_class_class, fts_s_class);
+    
+    fts_shared_set(fts_s_class, fts_class_class);
+  }
   
   iterator_heap = fts_heap_new(sizeof(fts_iterator_t));
-  
   method_key_class = fts_class_install (NULL, method_key_instantiate);
 }

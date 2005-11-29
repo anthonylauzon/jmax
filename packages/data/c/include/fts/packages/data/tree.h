@@ -62,10 +62,6 @@ typedef struct tree
 DATA_API fts_symbol_t tree_symbol;
 DATA_API fts_class_t *tree_class;
 
-
 DATA_API void tree_get(tree_t *tree, const fts_atom_t *key, fts_atom_t *atom);
-
-/* class configuration */
-void tree_config(void);
 
 #endif

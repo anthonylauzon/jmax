@@ -266,7 +266,7 @@ ivec_grow(ivec_t *vec, int size)
   ivec_set_size(vec, alloc);
 }
 
-int 
+static int 
 ivec_read_atomfile(ivec_t *vec, fts_symbol_t file_name)
 {
   fts_atomfile_t *file = fts_atomfile_open_read(file_name);
@@ -297,7 +297,7 @@ ivec_read_atomfile(ivec_t *vec, fts_symbol_t file_name)
   return (n);
 }
 
-int
+static int
 ivec_write_atomfile(ivec_t *vec, fts_symbol_t file_name)
 {
   fts_atomfile_t *file;
@@ -930,8 +930,7 @@ ivec_instantiate(fts_class_t *cl)
  *
  */
 
-void 
-ivec_config(void)
+FTS_MODULE_INIT(ivec)
 {
   sym_text = fts_new_symbol("text");
   ivec_symbol = fts_new_symbol("ivec");

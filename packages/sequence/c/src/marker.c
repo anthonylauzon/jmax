@@ -611,8 +611,7 @@ scomark_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("meter_change"), _scomark_set_meter_from_client);
 }
 
-void
-scomark_config(void)
+FTS_MODULE_INIT(scomark)
 {
   scomark_type_enumeration = enumeration_new(fts_new_symbol("scomark_type"));
 

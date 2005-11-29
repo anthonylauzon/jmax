@@ -895,8 +895,7 @@ bpf_instantiate(fts_class_t *cl)
 	fts_class_doc(cl, fts_s_print, NULL, "print list of points");
 }
 
-void
-bpf_config(void)
+FTS_MODULE_INIT(bpf)
 {
   bpf_symbol = fts_new_symbol("bpf");
   

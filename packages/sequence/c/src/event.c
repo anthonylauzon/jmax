@@ -245,8 +245,7 @@ event_instantiate(fts_class_t *cl)
 *
 */
 
-void
-event_config(void)
+FTS_MODULE_INIT(event)
 {
   event_class = fts_class_install(seqsym_event, event_instantiate);
   fts_array_init(&event_client_array, 0, 0);

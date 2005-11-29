@@ -570,8 +570,7 @@ track_editor_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_range, track_editor_set_range);
 }
 
-void
-track_editor_config(void)
+FTS_MODULE_INIT(track_editor)
 {
   track_editor_class = fts_class_install(seqsym_track_editor, track_editor_instantiate);
 }

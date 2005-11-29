@@ -23,7 +23,6 @@
 #ifndef _DATA_H
 #define _DATA_H
 
-
 /** package with data classes (matrices, vectors, dictionaries, etc.).
  *  @file     data.h
  *  @defgroup data		data package
@@ -47,9 +46,6 @@
 #define data_float_equals(f, g) (fabs((f) - (g)) < 1.0e-7)
 
 DATA_API fts_method_status_t data_object_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);  
-
-
-
 
 /******************************************************************************
  *

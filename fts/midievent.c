@@ -1101,8 +1101,7 @@ fts_midiparser_byte(fts_midiparser_t *parser, unsigned char byte)
  * Initialization
  *
  */
-void
-fts_kernel_midievent_init(void)
+FTS_MODULE_INIT(midievent)
 {
   fts_atom_t a;
   int i;

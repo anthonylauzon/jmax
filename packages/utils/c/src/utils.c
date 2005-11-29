@@ -25,9 +25,9 @@
 extern void fts_ffuns_init(void);
 extern void fts_cubic_init(void);
 
-void 
-utils_config(void)
+FTS_MODULE_INIT(utils)
 {
-  fts_ffuns_init();
-  fts_cubic_init();
+  FTS_MODULE_INIT_CALL(ffuns);
+  FTS_MODULE_INIT_CALL(cubic);
+  FTS_MODULE_INIT_CALL(random);
 }

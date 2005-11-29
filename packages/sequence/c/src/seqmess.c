@@ -101,8 +101,7 @@ seqmess_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, seqmess_set);
 }
 
-void
-seqmess_config(void)
+FTS_MODULE_INIT(seqmess)
 {
   fts_class_install(seqsym_seqmess, seqmess_instantiate);
 }

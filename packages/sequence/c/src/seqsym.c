@@ -116,8 +116,7 @@ fts_symbol_t seqsym_highlightEventsAndTime = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 fts_symbol_t seqsym_endPaste = 0;
 
-void
-seqsym_config(void)
+FTS_MODULE_INIT(seqsym)
 {
   /* sequence components */
   seqsym_sequence = fts_new_symbol("sequence");

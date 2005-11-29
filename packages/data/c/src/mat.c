@@ -1537,9 +1537,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
 }
 
-
-void
-mat_config(void)
+FTS_MODULE_INIT(mat)
 {
   sym_text = fts_new_symbol("text");
   sym_comma = fts_new_symbol(",");

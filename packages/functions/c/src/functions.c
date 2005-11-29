@@ -41,10 +41,6 @@
 #include <time.h>
 #endif
 
-FUNCTIONS_API void
-functions_config(void);
-
-
 static fts_status_description_t wrong_args_error_description = {"wrong arguments"};
 static fts_status_t wrong_args_error = &wrong_args_error_description;
 
@@ -684,8 +680,7 @@ _function_info(int ac, const fts_atom_t *at, fts_atom_t *ret)
  *  functions setup
  *
  */
-void
-functions_config(void)
+FTS_MODULE_INIT(functions)
 {
 #undef FUN
 #define FUN INSTALL_FUN

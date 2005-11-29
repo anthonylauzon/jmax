@@ -559,8 +559,7 @@ tree_instantiate(fts_class_t *cl)
 }
 
 
-void
-tree_config(void)
+FTS_MODULE_INIT(tree)
 {
   tree_symbol = fts_new_symbol("tree");
   

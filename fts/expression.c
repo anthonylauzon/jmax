@@ -984,8 +984,7 @@ fts_expression_is_valid( fts_expression_t *exp)
  * Kernel initialization
  *
  */
-void
-fts_kernel_expression_init(void)
+FTS_MODULE_INIT(expression)
 {
   expression_heap = fts_heap_new( sizeof( fts_expression_t));
 }

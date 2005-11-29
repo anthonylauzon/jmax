@@ -53,7 +53,8 @@ static fts_heap_t *iterator_heap = 0;
 static unsigned int 
 hash( const fts_atom_t *p)
 {
-  switch( fts_class_get_typeid( fts_get_class( p)) ) {
+  switch(fts_get_class_id(p)) 
+  {
     case FTS_TYPEID_VOID:
       return 0;
     case FTS_TYPEID_INT:
@@ -90,21 +91,22 @@ equals( const fts_atom_t *p1, const fts_atom_t *p2)
   if ( !fts_atom_same_type( p1, p2))
     return 0;
 
-  switch( fts_class_get_typeid( fts_get_class( p1)) ) {
-  case FTS_TYPEID_VOID:
-    return fts_is_void( p2);
-  case FTS_TYPEID_INT:
-    return fts_get_int( p1) == fts_get_int( p2);
-  case FTS_TYPEID_FLOAT:
-    return fts_get_float( p1) == fts_get_float( p2);
-  case FTS_TYPEID_SYMBOL:
-    return fts_get_symbol( p1) == fts_get_symbol( p2);
-  case FTS_TYPEID_POINTER:
-    return fts_get_pointer( p1) == fts_get_pointer( p2);
-  case FTS_TYPEID_STRING :
-    return ! strcmp( fts_get_string( p1), fts_get_string( p2));
-  default:
-    return (*fts_class_get_equals_function( fts_get_class(p1)))(fts_get_object(p1), fts_get_object(p2));
+  switch( fts_get_class_id( p1) ) 
+  {
+    case FTS_TYPEID_VOID:
+      return fts_is_void( p2);
+    case FTS_TYPEID_INT:
+      return fts_get_int( p1) == fts_get_int( p2);
+    case FTS_TYPEID_FLOAT:
+      return fts_get_float( p1) == fts_get_float( p2);
+    case FTS_TYPEID_SYMBOL:
+      return fts_get_symbol( p1) == fts_get_symbol( p2);
+    case FTS_TYPEID_POINTER:
+      return fts_get_pointer( p1) == fts_get_pointer( p2);
+    case FTS_TYPEID_STRING :
+      return ! strcmp( fts_get_string( p1), fts_get_string( p2));
+    default:
+      return (*fts_class_get_equals_function( fts_get_class(p1)))(fts_get_object(p1), fts_get_object(p2));
   }
 
   return 0;
@@ -453,14 +455,59 @@ void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
 
 /***********************************************************************
  *
+ *  FTS shared values
+ *
+ */
+
+static fts_hashtable_t *shared = NULL;
+
+void
+fts_shared_set_table(fts_hashtable_t *set)
+{
+  shared = set;
+}
+
+fts_hashtable_t *
+fts_shared_get_table(void)
+{
+  return shared;
+}
+
+void *
+fts_shared_get(fts_symbol_t name)
+{
+  fts_atom_t a, k;
+  
+  fts_set_symbol(&k, name);
+  if(fts_hashtable_get(shared, &k, &a))
+    return fts_get_pointer(&a);
+  
+  return NULL;
+}
+
+void
+fts_shared_set(fts_symbol_t name, void *pointer)
+{
+  fts_atom_t a, k;
+  
+  fts_set_symbol(&k, name);
+  fts_set_pointer(&a, pointer);
+  fts_hashtable_put(shared, &k, &a);
+}
+
+/***********************************************************************
+ *
  * Initialization
  *
  */
 
-void fts_kernel_hashtable_init( void)
+FTS_MODULE_INIT(hashtable)
 {
   hashtable_heap = fts_heap_new(sizeof( fts_hashtable_t));
   cell_heap = fts_heap_new(sizeof( fts_hashtable_cell_t));
   iterator_heap = fts_heap_new(sizeof( fts_hashtable_iterator_t));
+  
+  /* create hashtable for shared value */
+  if(shared == NULL)
+    shared = fts_hashtable_new(FTS_HASHTABLE_MEDIUM);
 }
-

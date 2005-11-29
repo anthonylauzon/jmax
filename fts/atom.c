@@ -30,33 +30,32 @@
 #include <ftsprivate/message.h>
 
 static fts_atom_t __fts_null;
-const fts_atom_t *fts_null = &__fts_null;
+fts_atom_t *fts_null = NULL;
 
 static fts_atom_t __fts_nix;
-fts_atom_t *fts_nix = &__fts_nix;
-
-void fts_kernel_atom_init(void);
+fts_atom_t *fts_nix = NULL;
 
 int fts_atom_identical( const fts_atom_t *first, const fts_atom_t *second)
 {
-  if ( !fts_atom_same_type( first, second))
+  if (!fts_atom_same_type( first, second))
     return 0;
 
-  switch( fts_class_get_typeid( fts_get_class( first)) ) {
-  case FTS_TYPEID_VOID:
-    return fts_is_void( second);
-  case FTS_TYPEID_INT:
-    return fts_get_int( first) == fts_get_int( second);
-  case FTS_TYPEID_FLOAT:
-    return fts_get_float( first) == fts_get_float( second);
-  case FTS_TYPEID_SYMBOL:
-    return fts_get_symbol( first) == fts_get_symbol( second);
-  case FTS_TYPEID_POINTER:
-    return fts_get_pointer( first) == fts_get_pointer( second);
-  case FTS_TYPEID_STRING :
-    return ! strcmp( fts_get_string( first), fts_get_string( second));
-  default:
-    return fts_get_object( first) == fts_get_object( second);
+  switch(fts_get_class_id(first))
+  {
+    case FTS_TYPEID_VOID:
+      return fts_is_void( second);
+    case FTS_TYPEID_INT:
+      return fts_get_int( first) == fts_get_int( second);
+    case FTS_TYPEID_FLOAT:
+      return fts_get_float( first) == fts_get_float( second);
+    case FTS_TYPEID_SYMBOL:
+      return fts_get_symbol( first) == fts_get_symbol( second);
+    case FTS_TYPEID_POINTER:
+      return fts_get_pointer( first) == fts_get_pointer( second);
+    case FTS_TYPEID_STRING :
+      return ! strcmp( fts_get_string( first), fts_get_string( second));
+    default:
+      return fts_get_object( first) == fts_get_object( second);
   }
 
   return 0;
@@ -111,7 +110,7 @@ fts_atom_compare_classes (const fts_atom_t *a, const fts_atom_t *b)
         /* special case: numbers are comparable -> distance zero */
         return 0;
     else                
-        /* return arbitrary class distance (is typeid better?) */
+        /* return arbitrary class distance (is class id better?) */
         return (int) fts_get_class(a) - (int) fts_get_class(b);
 }
 
@@ -126,28 +125,28 @@ fts_atom_compare (const fts_atom_t *a, const fts_atom_t *b)
         return res;
 
     /* comparable classes */
-    switch (fts_class_get_typeid(fts_get_class(a))) 
+    switch (fts_get_class_id(a)) 
     {
-    case FTS_TYPEID_VOID:
+      case FTS_TYPEID_VOID:
         return 0;             /* two voids are always equal */
-
-    case FTS_TYPEID_INT:
-    case FTS_TYPEID_FLOAT:
+        
+      case FTS_TYPEID_INT:
+      case FTS_TYPEID_FLOAT:
         return fts_get_number_float(a) > fts_get_number_float(b)  ?   1  :
-               fts_get_number_float(a) < fts_get_number_float(b)  ?  -1  :  0;
-
-    case FTS_TYPEID_SYMBOL:
+        fts_get_number_float(a) < fts_get_number_float(b)  ?  -1  :  0;
+        
+      case FTS_TYPEID_SYMBOL:
         return strcmp(fts_symbol_name(fts_get_symbol(a)),
                       fts_symbol_name(fts_get_symbol(b)));
-
-    case FTS_TYPEID_STRING :
+        
+      case FTS_TYPEID_STRING :
         return strcmp(fts_get_string(a), fts_get_string(b));
-
-    case FTS_TYPEID_POINTER:
+        
+      case FTS_TYPEID_POINTER:
         return (int) fts_get_pointer(a) - (int) fts_get_pointer(b);
-
-    default:    /* for objects, return arbitrary pointer distance.
-		   TODO: call object comparison function */
+        
+      default:    /* for objects, return arbitrary pointer distance.
+        TODO: call object comparison function */
         return (int) fts_get_object(a) - (int) fts_get_object(b);
     }
 }
@@ -178,9 +177,6 @@ fts_atom_copy (const fts_atom_t *from_atom, fts_atom_t *to_atom)
   else /* binary atom copy for non-objects */
     *to_atom = *from_atom;
 }
-
-
-
 
 /***********************************************************************
  *
@@ -223,24 +219,55 @@ static fts_class_t VAR =                                        \
   0, /* heap */                                                 \
   0, /* doc */                                                  \
 };                                                              \
-fts_class_t *fts_##VAR = &VAR;
+fts_class_t *fts_##VAR = NULL;
 
-FTS_PRIMITIVE_CLASS(void_class,    FTS_TYPEID_VOID)
-FTS_PRIMITIVE_CLASS(int_class,     FTS_TYPEID_INT)
-FTS_PRIMITIVE_CLASS(float_class,   FTS_TYPEID_FLOAT)
-FTS_PRIMITIVE_CLASS(symbol_class,  FTS_TYPEID_SYMBOL)
+FTS_PRIMITIVE_CLASS(void_class, FTS_TYPEID_VOID)
+FTS_PRIMITIVE_CLASS(int_class, FTS_TYPEID_INT)
+FTS_PRIMITIVE_CLASS(float_class, FTS_TYPEID_FLOAT)
+FTS_PRIMITIVE_CLASS(symbol_class, FTS_TYPEID_SYMBOL)
 FTS_PRIMITIVE_CLASS(pointer_class, FTS_TYPEID_POINTER)
-FTS_PRIMITIVE_CLASS(string_class,  FTS_TYPEID_STRING)
+FTS_PRIMITIVE_CLASS(string_class, FTS_TYPEID_STRING)
 
-
-void fts_kernel_atom_init( void)
+FTS_MODULE_INIT(atom)
 {
-  fts_class_set_name( &int_class, fts_s_int);
-  fts_class_set_name( &float_class, fts_s_float);
-  fts_class_set_name( &symbol_class, fts_s_symbol);
-  fts_class_set_name( &pointer_class, fts_s_pointer);
-  fts_class_set_name( &string_class, fts_s_string);
+  fts_void_class = fts_shared_get(fts_s_void);
+  fts_int_class = fts_shared_get(fts_s_int);
+  fts_float_class = fts_shared_get(fts_s_float);
+  fts_symbol_class = fts_shared_get(fts_s_symbol);
+  fts_pointer_class = fts_shared_get(fts_s_pointer);
+  fts_string_class = fts_shared_get(fts_s_string);
+  fts_null = fts_shared_get(fts_s_null);
+  fts_nix = fts_shared_get(fts_s_nix);
+  
+  if(fts_int_class == NULL)
+  {
+    /* init primitive classes */
+    fts_void_class = &void_class;
+    fts_int_class = &int_class;
+    fts_float_class = &float_class;
+    fts_symbol_class = &symbol_class;
+    fts_pointer_class = &pointer_class;
+    fts_string_class = &string_class;
+    
+    fts_class_set_name( &void_class, fts_s_void);
+    fts_class_set_name( &int_class, fts_s_int);
+    fts_class_set_name( &float_class, fts_s_float);
+    fts_class_set_name( &symbol_class, fts_s_symbol);
+    fts_class_set_name( &pointer_class, fts_s_pointer);
+    fts_class_set_name( &string_class, fts_s_string);
 
-  fts_set_void( &__fts_null);
-  fts_set_void( &__fts_nix);
+    fts_null = &__fts_null;
+    fts_nix = &__fts_nix;
+    fts_set_void( &__fts_null);
+    fts_set_void( &__fts_nix);
+
+    fts_shared_set(fts_s_void, fts_void_class);
+    fts_shared_set(fts_s_int, fts_int_class);
+    fts_shared_set(fts_s_float, fts_float_class);
+    fts_shared_set(fts_s_symbol, fts_symbol_class);
+    fts_shared_set(fts_s_pointer, fts_pointer_class);
+    fts_shared_set(fts_s_string, fts_string_class);
+    fts_shared_set(fts_s_null, (void *)fts_null);
+    fts_shared_set(fts_s_nix, (void *)fts_nix);
+  }
 }

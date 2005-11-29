@@ -351,6 +351,9 @@ track_add_event(track_t *track, double time, event_t *event)
   
   insert_event_before(track, here, event);
   fts_object_refer(event);
+
+  if(time < 0.0)
+    time = 0.0;
   
   event_set_track(event, track);
   event_set_time(event, time);
@@ -375,6 +378,9 @@ track_add_event_after(track_t *track, double time, event_t *event, event_t *afte
   insert_event_before(track, here, event);
   fts_object_refer(event);
   
+  if(time < 0.0)
+    time = 0.0;
+  
   event_set_track(event, track);
   event_set_time(event, time);
 }
@@ -395,6 +401,9 @@ track_append_event(track_t *track, double time, event_t *event)
 {
   append_event(track, event);
   fts_object_refer(event);
+  
+  if(time < 0.0)
+    time = 0.0;
   
   event_set_track(event, track);
   event_set_time(event, time);
@@ -431,6 +440,9 @@ track_move_event(track_t *track, event_t *event, double time)
 {
   event_t *next = event_get_next(event);
   event_t *prev = event_get_prev(event);
+  
+  if(time < 0.0)
+    time = 0.0;
   
   if((next && time > next->time) || (prev && time < prev->time))
   {
@@ -780,9 +792,10 @@ track_editor_is_open(track_t *self)
 {
   if(track_is_marker(self))
   {
-    fts_object_t *context = fts_object_get_context((fts_object_t *)self);
-    if(context != NULL && fts_object_is_a(context, track_class))
-      return (((track_t *)context)->open != 0);
+    fts_object_t *container = fts_object_get_container((fts_object_t *)self);
+
+    if(container != NULL && fts_object_is_a(container, track_class))
+      return (((track_t *)container)->open != 0);
     else
       return 0;
   }
@@ -1188,7 +1201,7 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     if(too_much_pitch == 0)
     {      
       fts_set_int(a, 0);
-      fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 1, &a);
+      fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 1, a);
       
       /* create new event and add to track */
       fts_set_symbol(a, seqsym_scoob);
@@ -2620,8 +2633,7 @@ track_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_print, NULL, "print");
 }  
 
-void
-track_config(void)
+FTS_MODULE_INIT(track)
 {
   track_class = fts_class_install(seqsym_track, track_instantiate);
 }

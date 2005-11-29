@@ -39,20 +39,6 @@
  *  Messages that can be sent to or invoked on data objects.
  */
 
-extern void ivec_config(void);
-extern void fvec_config(void);
-extern void mat_config(void);
-extern void fmat_config(void);
-extern void col_config(void);
-extern void row_config(void);
-extern void bpf_config(void);
-extern void dict_config(void);
-extern void tabeditor_config(void);
-
-extern void getrange_config(void);
-
-extern void dumpfile_config(void);
-
 fts_method_status_t
 data_object_output(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -772,25 +758,22 @@ propobj_class_append_properties(fts_class_t *cl, fts_array_t *array)
  *  config
  *
  */
-
-void
-data_config(void)
+FTS_MODULE_INIT(data)
 {
   sym_expr = fts_new_symbol("expr");
   expr_class = fts_class_install(sym_expr, expr_instantiate);
   
-  ivec_config();
-  mat_config();
-  fmat_config();
-  fvec_config();
-  bpf_config();
-  dict_config();
-  tree_config();
-  tabeditor_config();
+  FTS_MODULE_INIT_CALL(ivec);
+  FTS_MODULE_INIT_CALL(mat);
+  FTS_MODULE_INIT_CALL(fmat);
+  FTS_MODULE_INIT_CALL(fvec);
+  FTS_MODULE_INIT_CALL(bpf);
+  FTS_MODULE_INIT_CALL(dict);
+  FTS_MODULE_INIT_CALL(tree);
+  FTS_MODULE_INIT_CALL(tabeditor);
   
-  getrange_config();  
-  
-  dumpfile_config();
+  FTS_MODULE_INIT_CALL(getrange);  
+  FTS_MODULE_INIT_CALL(dumpfile);
   
   fts_hashtable_init(&global_enumeration_table, FTS_HASHTABLE_MEDIUM);
 }

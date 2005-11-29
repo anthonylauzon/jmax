@@ -2631,7 +2631,7 @@
 		3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerEventRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java; sourceTree = SOURCE_ROOT; };
 		5C43B82F05AB304800E7FB5C /* libfunctions.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libfunctions.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C43B8F205ABFF6900E7FB5C /* libfunctions-info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; path = "libfunctions-info.plist"; sourceTree = SOURCE_ROOT; };
-		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426BB05AB0B8A0042B7A2 /* version-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "version-info.plist"; sourceTree = "<group>"; };
 		5C5426BC05AB0B8A0042B7A2 /* version.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = version.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426C005AB0B8A0042B7A2 /* parser-tokenizer-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "parser-tokenizer-info.plist"; sourceTree = "<group>"; };

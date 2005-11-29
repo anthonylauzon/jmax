@@ -46,9 +46,9 @@
 #include <fts/fts.h>
 #include <ftsprivate/platform.h>
 
-
 /* #define HELP_PURIFY */
 
+static fts_heap_t **fts_heaps = NULL;
 
 /***********************************************************************
  *
@@ -56,7 +56,8 @@
  *
  */
 
-void *fts_zalloc( unsigned int size)
+void *
+fts_zalloc( unsigned int size)
 {
   void *p;
 
@@ -72,61 +73,63 @@ void *fts_zalloc( unsigned int size)
 }
 
 
-void *fts_malloc(unsigned int size)
+void *
+fts_malloc(unsigned int size)
 {
   void *p;
-
+  
   if (size <= 0)
     return 0;
-
+  
   p = malloc(size);
-
+  
   if (p == 0)
+  {
+    if (fts_unlock_memory())
     {
-      if (fts_unlock_memory())
-	{
-	  p = malloc(size);
-	  
-	  if (p == 0)
-	    fts_log( "Out of virtual memory");
-	  else
+      p = malloc(size);
+      
+      if (p == 0)
+        fts_log( "Out of virtual memory");
+      else
 	    {
 	      fts_post("Cannot allocate more physical memory, switching to non real-time mode\n");
 	      fts_post("See your maxlkmem parameter (man systune)");
 	    }
-	}
-      else
-	fts_log("Out of memory trying to allocate %d bytes", size);
     }
-
+    else
+      fts_log("Out of memory trying to allocate %d bytes", size);
+  }
+  
   return p;
 }
 
 
-void *fts_realloc( void *p, unsigned int size)
+void *
+fts_realloc( void *p, unsigned int size)
 {
   void *r;
-
+  
   r = realloc(p, size);
-
+  
   if ( size != 0 && r == 0)
+  {
+    if (fts_unlock_memory())
     {
-      if (fts_unlock_memory())
-	{
-	  r = realloc(p, size);
-	  
-	  if (r == 0)
-	    fts_log( "Out of virtual memory");
-	  else
+      r = realloc(p, size);
+      
+      if (r == 0)
+        fts_log( "Out of virtual memory");
+      else
 	    {
 	      fts_post("Cannot allocate more physical memory, switching to non real-time mode\n");
 	      fts_post("See your maxlkmem parameter (man systune)");
 	    }
-	}
-      else
-	fts_log("Out of memory trying to realloc %d bytes", size);
     }
-
+    else
+      fts_log("Out of memory trying to realloc %d bytes", size);
+  }
+  
   return r;
 }
 
@@ -145,21 +148,11 @@ void fts_free(void *p)
 #define SHARED_HEAP_MAX_SIZE 256
 #define FREE_TO_USED_RATIO    5
 
-/*struct _fts_heap_t {
-  char *free_list;
-  unsigned int current_block_group;
-  unsigned int block_size;
-  unsigned int reserved_blocks;
-};*/
-
-static fts_heap_t *fts_heaps[SHARED_HEAP_MAX_SIZE / sizeof(long) + 1];/* added +1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
-
-static void fts_heap_grow(fts_heap_t *p)
+static void 
+fts_heap_grow(fts_heap_t *p)
 {
-  char *mem;
+  char *mem = fts_malloc(p->current_block_group * p->block_size);
   unsigned int i;
-
-  mem = fts_malloc(p->current_block_group * p->block_size);
   
   for (i = 0; i < (p->current_block_group - 1); i++)
     *((char **) (mem + i * p->block_size)) = mem + (i + 1) * p->block_size;
@@ -178,15 +171,13 @@ static void fts_heap_grow(fts_heap_t *p)
 }
 
 
-fts_heap_t *fts_heap_new(unsigned int block_size)
+fts_heap_t *
+fts_heap_new(unsigned int block_size)
 {
   if (block_size > SHARED_HEAP_MAX_SIZE)
   {
     /* Unshared heap */
-    
-    fts_heap_t *p;
-    
-    p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
+    fts_heap_t *p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
     p->free_list = 0;
     p->block_size = ( block_size > sizeof(char **) ? block_size : sizeof(char **));
     p->current_block_group = 64;
@@ -197,17 +188,15 @@ fts_heap_t *fts_heap_new(unsigned int block_size)
   else
   {
     /* shared heap */
-    
     int idx;
-    idx = (block_size / sizeof(long)) /*- 1*/;/* removed -1 : Max/MSP atom_t is NOT MULTIPLE of sizeof(long)*/
-      
-      if (fts_heaps[idx])
-        return fts_heaps[idx];
+    idx = (block_size / sizeof(long));
+    
+    if (fts_heaps[idx])
+      return fts_heaps[idx];
     else
     {
-      fts_heap_t *p;
+      fts_heap_t *p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
       
-      p = (fts_heap_t *) fts_malloc(sizeof(fts_heap_t));
       p->free_list = 0;
       p->block_size = (idx + 1) * sizeof(long);
       p->current_block_group = 64;
@@ -219,7 +208,8 @@ fts_heap_t *fts_heap_new(unsigned int block_size)
   }
 }
 
-void *fts_heap_alloc( fts_heap_t *p)
+void *
+fts_heap_alloc( fts_heap_t *p)
 {
 #ifdef HELP_PURIFY
   return fts_malloc( p->block_size);
@@ -237,7 +227,8 @@ void *fts_heap_alloc( fts_heap_t *p)
 #endif
 }
 
-void *fts_heap_zalloc( fts_heap_t *heap)
+void *
+fts_heap_zalloc( fts_heap_t *heap)
 {
 #ifdef HELP_PURIFY
   return fts_zalloc( heap->block_size);
@@ -254,7 +245,8 @@ void *fts_heap_zalloc( fts_heap_t *heap)
 }
 
 
-void fts_heap_free( void *p, fts_heap_t *heap)
+void 
+fts_heap_free( void *p, fts_heap_t *heap)
 {
 #ifdef HELP_PURIFY
   fts_free( p);
@@ -264,6 +256,31 @@ void fts_heap_free( void *p, fts_heap_t *heap)
 #endif
 }
 
+void
+fts_mem_set_heaps(fts_heap_t **heaps)
+{
+  fts_heaps = heaps;
+}
+
+fts_heap_t **
+fts_mem_get_heaps(void)
+{
+  return fts_heaps;
+}
+
+FTS_MODULE_INIT(mem)
+{
+  if(fts_heaps == NULL)
+  {
+    int n_heaps = SHARED_HEAP_MAX_SIZE / sizeof(long) + 1;
+    int i;
+    
+    fts_heaps = (fts_heap_t **)fts_malloc(sizeof(fts_heap_t *) * n_heaps);
+    
+    for(i=0; i<n_heaps; i++)
+      fts_heaps[i] = NULL;
+  }
+}
 
 /** EMACS **
  * Local variables:

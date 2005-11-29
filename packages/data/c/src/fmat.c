@@ -65,7 +65,6 @@ static fts_symbol_t sym_delete_cols = 0;
 static fts_symbol_t sym_sr = 0;
 
 int fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride);
-void fmat_config(void);
 
 /********************************************************
  *
@@ -1830,7 +1829,7 @@ fmat_get_prod (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   const fmat_t *self = (fmat_t *) o;
   const int     size = fmat_get_m(self) * fmat_get_n(self);
   const float  *p    = fmat_get_ptr(self);
-  double        prod = 0.0;
+  double        prod = 1.0;
   int	        i;
   
   for (i = 0; i < size; i++)
@@ -3800,6 +3799,15 @@ fmat_apply_expr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   return fts_ok;
 }
 
+static fts_method_status_t
+fmat_apply_expr_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if(ac > 0 && fts_is_a(at, expr_class))
+    fmat_apply_expr(o, s, ac, at, ret);
+      
+  return fts_ok;
+}
+
 /******************************************************************************
  *
  *  load, save, import, export
@@ -4408,6 +4416,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message(cl, fts_new_symbol("env"), bpf_type, fmat_env_bpf);
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
+  fts_class_message_varargs(cl, fts_new_symbol("apply"), fmat_apply_expr_varargs);
   
   fts_atomfile_import_handler(cl, fmat_import_textfile);
   fts_audiofile_import_handler(cl, fmat_import_audiofile);
@@ -4533,8 +4542,7 @@ fmat_instantiate(fts_class_t *cl)
   }
 }
 
-void
-fmat_config(void)
+FTS_MODULE_INIT(fmat)
 {
   fmat_symbol = fts_new_symbol("fmat");
 
