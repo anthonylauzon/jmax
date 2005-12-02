@@ -2464,6 +2464,115 @@ track_notify_gui_listeners(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
   return fts_ok;
 }
 
+
+
+
+/*******************************************************************************
+*
+*  foreign class methods
+*
+*/
+
+static fts_method_status_t
+_track_copy_to_mat (fts_object_t *o, fts_symbol_t s, int ac, 
+                    const fts_atom_t *at, fts_atom_t *ret)
+{
+    mat_t   *mat      = (mat_t *)   o;
+    track_t *track    = (track_t *) fts_get_object(at);
+    event_t *orgevent = track_get_first(track);
+    int      i        = 0;
+  
+    mat_set_size(mat, track_get_size(track), 2);
+  
+    while (orgevent != NULL)
+    {
+        double      time  = event_get_time(orgevent);
+        fts_atom_t *value = event_get_value(orgevent);
+        fts_atom_t  a[2];
+
+        fts_set_float(a, time);
+        fts_set_void (a+1);
+        fts_atom_copy(value, a+1);
+        mat_set_element(mat, i, 0, a);
+        mat_set_element(mat, i, 1, a+1);
+        fts_atom_release(a+1);  /* atom no longer needed, decrement reference count
+                                   set by fts_atom_copy in case of an object */
+        
+        orgevent = event_get_next(orgevent);
+        i++;
+    }
+
+    /* TODO: set column names */
+    fts_object_changed(o);
+    fts_set_object(ret, o);
+
+    return fts_ok;
+}
+
+
+static fts_method_status_t
+_track_copy_to_fmat (fts_object_t *o, fts_symbol_t s, int ac, 
+                     const fts_atom_t *at, fts_atom_t *ret)
+{
+    fmat_t  *fmat     = (fmat_t *)  o;
+    track_t *track    = (track_t *) fts_get_object(at);
+    event_t *orgevent = track_get_first(track);
+    int      i        = 0;
+  
+    fmat_set_size(fmat, track_get_size(track), 2);
+  
+    while (orgevent != NULL)
+    {
+        double      time  = event_get_time(orgevent);
+        fts_atom_t *value = event_get_value(orgevent);
+
+        fmat_set_element(fmat, i, 0, time);
+        fmat_set_element(fmat, i, 1, fts_get_float(value));
+        
+        orgevent = event_get_next(orgevent);
+        i++;
+    }
+
+    /* TODO: set column names */
+    fts_object_changed(o);
+    fts_set_object(ret, o);
+
+    return fts_ok;
+}
+
+
+
+static fts_method_status_t
+_track_copy_to_fvec (fts_object_t *o, fts_symbol_t s, int ac, 
+                     const fts_atom_t *at, fts_atom_t *ret)
+{
+    fvec_t  *fvec     = (fvec_t *)  o;
+    track_t *track    = (track_t *) fts_get_object(at);
+    event_t *orgevent = track_get_first(track);
+    float   *ptr;
+    int      size, stride;
+    int      i, j;
+  
+    fvec_get_vector(fvec, &ptr, &size, &stride);
+    
+    /* copy not more events than underlying matrix size
+       TBD: resize fvec if less events than size??? */
+    for (i = 0, j = 0; i < size  &&  orgevent != NULL; i++, j += stride)
+    {
+        ptr[j]  = fts_get_float(event_get_value(orgevent));
+
+        orgevent = event_get_next(orgevent);
+    }
+
+    fts_object_changed(o);
+    fts_set_object(ret, o);
+
+    return fts_ok;
+}
+
+
+
+
 /******************************************************
 *
 *  class
@@ -2631,7 +2740,27 @@ track_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_import, "[<sym: file name>]", "import from standard MIDI file");
   fts_class_doc(cl, fts_s_export, "[<sym: file name>]", "export to standard MIDI file");
   fts_class_doc(cl, fts_s_print, NULL, "print");
+
+
+  /*
+   *  add some methods to foreign classes from the data package
+   *  (do it here to avoid dependencies of data on sequence)
+   */
+
+  fts_class_instantiate(mat_class);
+  fts_class_instantiate(fmat_class);
+  fts_class_instantiate(fvec_class);
+
+  fts_class_message(mat_class,  fts_s_set, track_class, _track_copy_to_mat);
+  fts_class_message(fmat_class, fts_s_set, track_class, _track_copy_to_fmat);
+  fts_class_message(fvec_class, fts_s_set, track_class, _track_copy_to_fvec);
+
+  fts_class_doc(mat_class,  fts_s_set, "<track: src>", "copy track to mat with 2 columns (time, event)");
+  fts_class_doc(fmat_class, fts_s_set, "<track: src>", "copy float track to fmat with 2 columns (time, value)");
+  fts_class_doc(fvec_class, fts_s_set, "<track: src>", "copy float track values to fvec");
 }  
+
+
 
 FTS_MODULE_INIT(track)
 {
