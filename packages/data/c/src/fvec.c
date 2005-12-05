@@ -376,10 +376,10 @@ postcondition:  x <= u */
       while(fvec_index < 0)
         fvec_index += fmat_n;
         
-      CLIP(fvec_onset, fmat_m);
+        CLIP(fvec_onset, fmat_m);
       CLIP(fvec_size,  fmat_m - fvec_onset);
-            
-            *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
+      
+      *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
       *size = fvec_size;
       *stride = fmat_n;
       break;
@@ -392,9 +392,9 @@ postcondition:  x <= u */
       while(fvec_index < 0)
         fvec_index += fmat_m;
         
-      CLIP(fvec_onset, fmat_n);
+        CLIP(fvec_onset, fmat_n);
       CLIP(fvec_size,  fmat_n - fvec_onset);
-          
+      
       *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
       *size = fvec_size;
       *stride = 1;
@@ -453,6 +453,7 @@ case fvec_type_unwrap:
   
 case fvec_type_vector:
   
+  CLIP(fvec_size, fmat_m);  
   *ptr = fmat_ptr;
   *size = fvec_size;
   *stride = 1;
@@ -1906,7 +1907,6 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     /* no init args given: create empty column vector with own fmat */
     self->fmat = fmat_create(0, 1);
     self->type = fvec_type_vector;
-    /* size remains FVEC_DEFAULT_SIZE, to be clipped */
   }
 
 fts_object_refer((fts_object_t *)self->fmat);
