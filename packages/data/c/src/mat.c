@@ -1391,56 +1391,6 @@ mat_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
 *   class
 *
 */
-
-/*static fts_method_status_t
-mat_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  mat_t *self = (mat_t *) o;
-  
-  self->data = NULL;
-  self->m = 0;
-  self->n = 0;
-  self->alloc = 0;
-  self->opened = 0;
-  
-  if (ac == 0)
-    mat_set_size(self, 0, 0);
-  else if (ac == 1  &&  fts_is_int(at))
-    mat_set_size(self, fts_get_int(at), 1);
-  else if (ac == 2  &&  fts_is_int(at)  && fts_is_int(at + 1))
-    mat_set_size(self, fts_get_int(at), fts_get_int(at + 1));
-  else if (fts_is_tuple(at))
-  {
-    int m = 0;
-    int n = 0;
-    int i;
-    
-    // check n (longest row) and m 
-    for (i = 0; i < ac; i++)
-    {
-      if (fts_is_tuple(at + i))
-      {
-        fts_tuple_t *tup = (fts_tuple_t *)fts_get_object(at + i);
-        int size = fts_tuple_get_size(tup);
-              
-        if (size > n)
-          n = size;
-              
-        m++;
-      }
-      else
-        break;
-    }
-    
-    mat_set_size(self, m, n);
-    mat_set_from_tuples(self, ac, at);
-  }
-  else
-    fts_object_error(o, "bad arguments");
-  
-  return fts_ok;
-}*/
-
 static fts_method_status_t
 mat_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
