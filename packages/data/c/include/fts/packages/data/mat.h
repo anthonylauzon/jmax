@@ -34,9 +34,10 @@
  */
 
 
-DATA_API fts_class_t *mat_type;
+DATA_API fts_class_t *mat_class;
 DATA_API fts_symbol_t mat_symbol;
-#define mat_class mat_type
+#define  mat_type     mat_class
+
 
 typedef struct
 {

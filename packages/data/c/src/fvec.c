@@ -358,7 +358,7 @@ postcondition:  x <= u */
 # define CLIP2(x, l, u)  do { if      ((x) < (l))  { (x) = (l); }       \
   else if ((x) > (u))  { (x) = (u); } } while (0)
     
-    fmat_t *fmat = fvec->fmat;
+  fmat_t *fmat = fvec->fmat;
   float *fmat_ptr = fmat_get_ptr(fmat);
   int fmat_m = fmat_get_m(fmat);
   int fmat_n = fmat_get_n(fmat);
@@ -502,6 +502,19 @@ fvec_copy_to_fmat(fvec_t *org, fmat_t *copy)
   copy->domain = orgmat->domain;
   copy->sr = orgmat->sr;
 }
+
+
+static void
+fvec_copy_function (const fts_object_t *from, fts_object_t *to)
+{
+  fvec_t *dest = (fvec_t *) to;
+
+  *dest = *(fvec_t *) from;	/* just copy struct... */
+  fts_object_refer(dest->fmat); /* ...but increment refcount of matrix */
+
+  fts_object_changed(to);
+}
+
 
 static void
 fvec_array_function(fts_object_t *o, fts_array_t *array)
@@ -919,6 +932,37 @@ _fvec_set_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   return fts_ok;
 }
 
+
+static fts_method_status_t
+_fvec_get_onset (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
+		 fts_atom_t *ret)
+{
+  fvec_t *self  = (fvec_t *) o;
+  int     onset = fvec_get_onset(self);
+  
+  fts_set_int(ret, onset);
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+_fvec_set_onset (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
+		 fts_atom_t *ret)
+{
+  fvec_t *self  = (fvec_t *) o;
+  int     onset = fts_get_number_int(at);
+  
+  if (onset < 0)
+    onset = 0;
+  
+  fvec_set_onset(self, onset);
+  
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
 static fts_method_status_t
 _fvec_get_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -941,7 +985,38 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   
   fvec_set_size(self, size);
   
-  fts_set_int(ret, size);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+_fvec_get_sr (fts_object_t *o, fts_symbol_t s, 
+	      int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+  
+  fts_set_float(ret, fmat_get_sr(self->fmat));
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+_fvec_set_sr (fts_object_t *o, fts_symbol_t s, 
+	      int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+  double  sr   = fts_get_number_float(at);
+  
+  if (sr < 0.001)
+    sr = 0.001;
+
+  fmat_set_sr(self->fmat, sr);
+  
+  fts_object_changed((fts_object_t *) self->fmat);
+  fts_set_object(ret, o);
   
   return fts_ok;
 }
@@ -1946,6 +2021,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_instantiate(fmat_class);
   
   /* standard functions */
+  fts_class_set_copy_function (cl, fvec_copy_function);
   fts_class_set_array_function(cl, fvec_array_function);
   
   /* standard methods for naming, persistence, and dump */
@@ -1976,8 +2052,15 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, sym_unwrap, _fvec_set_unwrap);
   fts_class_message_varargs(cl, sym_vec, _fvec_set_vector);
   
+  fts_class_message_void  (cl, fts_new_symbol("onset"), _fvec_get_onset);
+  fts_class_message_number(cl, fts_new_symbol("onset"), _fvec_set_onset);
+
   fts_class_message_void(cl, fts_s_size, _fvec_get_size);
   fts_class_message_number(cl, fts_s_size, _fvec_set_size);
+
+  fts_class_message_void  (cl, fts_new_symbol("sr"), _fvec_get_sr);
+  fts_class_message_number(cl, fts_new_symbol("sr"), _fvec_set_sr);
+
   
   /* arithmetics (on fvec or fmat!) */
   fvec_message(cl, fts_new_symbol("add"), fvec_add_fvec, fvec_add_number);
@@ -2039,7 +2122,10 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fvec_symbol, "<'unwrap'> <num: row onset> [<num: column onset> [<num: size>]]", "vector reference to unwrapped matrix");
   fts_class_doc(cl, fvec_symbol, "<num: size>", "vector reference compatible float vector");
   
+  fts_class_doc(cl, fts_new_symbol("onset"), NULL, "get onset");
+  fts_class_doc(cl, fts_new_symbol("onset"), "<num: onset>", "set onset");
   fts_class_doc(cl, fts_s_size, NULL, "get size");
+  fts_class_doc(cl, fts_s_size, "<num: size>", "set size");
   
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("mini"), NULL, "get index of minimum value");

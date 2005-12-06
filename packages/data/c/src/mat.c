@@ -27,8 +27,8 @@
 #include <fts/packages/data/data.h>
 
 
-fts_symbol_t mat_symbol = 0;
-fts_class_t *mat_type = 0;
+fts_symbol_t mat_symbol = NULL;
+fts_class_t *mat_class  = NULL;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_comma = 0;
@@ -1487,7 +1487,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
-  fts_class_message (cl, fts_s_set, mat_type, mat_set_from_instance);
+  fts_class_message (cl, fts_s_set, mat_class, mat_set_from_instance);
   
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
@@ -1560,7 +1560,7 @@ FTS_MODULE_INIT(mat)
   sym_select_row = fts_new_symbol("select_row");
   mat_symbol = fts_new_symbol("mat");
   
-  mat_type = fts_class_install(mat_symbol, mat_instantiate);
+  mat_class = fts_class_install(mat_symbol, mat_instantiate);
 }
 
 
