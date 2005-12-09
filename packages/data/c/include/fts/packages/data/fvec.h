@@ -54,7 +54,6 @@ typedef struct
 #define fvec_get_type(f) ((f)->type)
 #define fvec_get_index(f) ((f)->index)
 #define fvec_get_onset(f) ((f)->onset)
-#define fvec_get_size(f) (((f)->size > fmat_get_m((f)->fmat))? fmat_get_m((f)->fmat): (f)->size)
 
 #define fvec_set_fmat(f, x) do{fts_object_release((fts_object_t *)(f)->fmat); (f)->fmat = (x); fts_object_refer((fts_object_t *)(x)); } while(0)
 #define fvec_set_type(f, x) ((f)->type = (x))
@@ -76,6 +75,8 @@ DATA_API fvec_t *fvec_create (fmat_t *fmat, fvec_type_t type, int ac, const fts_
 DATA_API fvec_t *fvec_create_vector (int size);
 DATA_API fvec_t *fvec_create_column(fmat_t *fmat);
 DATA_API fvec_t *fvec_create_row(fmat_t *fmat);
+
+DATA_API int   fvec_get_size (fvec_t *self);
 
 /** get element, no checks */
 DATA_API float fvec_get_element(fvec_t *self, int i);

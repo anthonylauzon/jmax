@@ -344,6 +344,92 @@ case 0:
 }
 
 
+/* helper macros:
+   clip x to be less or equal than upper limit u.
+   postcondition:  x <= u 
+*/
+# define CLIP(x, u)      do { if ((x) > (u))  { (x) = (u); } } while (0)
+# define CLIP2(x, l, u)  do { if      ((x) < (l))  { (x) = (l); }             \
+                              else if ((x) > (u))  { (x) = (u); } } while (0)
+    
+int
+fvec_get_size (fvec_t *fvec)
+{
+  fmat_t *fmat   = fvec->fmat;
+  int     fmat_m = fmat_get_m(fmat);
+  int     fmat_n = fmat_get_n(fmat);
+  int     onset  = fvec->onset;
+  int     size   = fvec->size;
+
+  switch(fvec->type)
+  {
+    case fvec_type_column:
+      CLIP(onset, fmat_m);
+      CLIP(size,  fmat_m - onset);
+    break;
+      
+    case fvec_type_row:
+      CLIP(onset, fmat_n);
+      CLIP(size,  fmat_n - onset);
+    break;
+      
+    case fvec_type_diagonal:
+    {
+      int index = fvec->index;
+      int onset = fvec->onset;
+      int i, j; /* diagonal start indices */
+      
+      if (index >= 0)
+      { /* superdiagonal: like col index */
+        CLIP(onset, fmat_m);
+        CLIP(onset, fmat_n - index);
+        
+        i = onset;
+        j = index + onset;
+      }
+      else
+      { /* subdiagonal:   like row index */
+        CLIP(onset, fmat_m + index);
+        CLIP(onset, fmat_n);
+        
+        i = -index + onset;
+        j =  onset;
+      }
+      
+      /* clip diagonal end indices to matrix size */
+      CLIP(size, fmat_m - i);
+      CLIP(size, fmat_n - j);
+    }
+    break;
+
+    case fvec_type_unwrap:
+    {
+      int index = fvec->index;
+      int onset = fvec->onset;
+ 
+      /* row onset */
+      CLIP2(index, 0, fmat_m);
+    
+      /* column onset */
+      CLIP(onset, fmat_n);
+      
+      if (index * fmat_n + onset + size > fmat_m * fmat_n)
+        size = fmat_m * fmat_n - index * fmat_n - onset;
+    }
+    break;
+  
+    case fvec_type_vector:
+      CLIP(size, fmat_m);  
+    break;
+
+    default:
+      break;  
+  }
+
+  return size;
+}
+
+
 /** get pointer, size, stride to access data in fmat 
 *  referenced by this fvec
 *
@@ -352,12 +438,6 @@ case 0:
 void
 fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
 {
-  /* clip x to be less or equal than upper limit u.
-postcondition:  x <= u */
-# define CLIP(x, u)      do { if ((x) > (u))  { (x) = (u); } } while (0)
-# define CLIP2(x, l, u)  do { if      ((x) < (l))  { (x) = (l); }       \
-  else if ((x) > (u))  { (x) = (u); } } while (0)
-    
   fmat_t *fmat = fvec->fmat;
   float *fmat_ptr = fmat_get_ptr(fmat);
   int fmat_m = fmat_get_m(fmat);
@@ -376,13 +456,13 @@ postcondition:  x <= u */
       while(fvec_index < 0)
         fvec_index += fmat_n;
         
-        CLIP(fvec_onset, fmat_m);
+      CLIP(fvec_onset, fmat_m);
       CLIP(fvec_size,  fmat_m - fvec_onset);
       
       *ptr = fmat_ptr + fvec_index + fvec_onset * fmat_n;
       *size = fvec_size;
       *stride = fmat_n;
-      break;
+    break;
       
     case fvec_type_row:
       
@@ -392,13 +472,13 @@ postcondition:  x <= u */
       while(fvec_index < 0)
         fvec_index += fmat_m;
         
-        CLIP(fvec_onset, fmat_n);
+      CLIP(fvec_onset, fmat_n);
       CLIP(fvec_size,  fmat_n - fvec_onset);
       
       *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
       *size = fvec_size;
       *stride = 1;
-      break;
+    break;
       
     case fvec_type_diagonal:
     {
@@ -429,40 +509,39 @@ postcondition:  x <= u */
       *size   = fvec_size;
       *stride = fmat_n + 1;
     }
-break;
+    break;
 
-case fvec_type_unwrap:
-  
-  /* row onset */
-  if(fvec_index < 0)
-    fvec_index = 0;
-  else if(fvec_index > fmat_m)
-    fvec_index = fmat_m;
+    case fvec_type_unwrap:
+      /* row onset */
+      if(fvec_index < 0)
+        fvec_index = 0;
+      else if(fvec_index > fmat_m)
+        fvec_index = fmat_m;
     
-    /* column onset */
-    if(fvec_onset > fmat_n)
-      fvec_onset = fmat_n;
+      /* column onset */
+      if(fvec_onset > fmat_n)
+        fvec_onset = fmat_n;
       
       if(fvec_index * fmat_n + fvec_onset + fvec_size > fmat_m * fmat_n)
         fvec_size = fmat_m * fmat_n - fvec_index * fmat_n - fvec_onset;
         
-        *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
-  *size = fvec_size;
-  *stride = 1;
-  break;
+      *ptr = fmat_ptr + fvec_index * fmat_n + fvec_onset;
+      *size = fvec_size;
+      *stride = 1;
+    break;
   
-case fvec_type_vector:
+    case fvec_type_vector:
+      CLIP(fvec_size, fmat_m);  
+      *ptr = fmat_ptr;
+      *size = fvec_size;
+      *stride = 1;
+    break;
   
-  CLIP(fvec_size, fmat_m);  
-  *ptr = fmat_ptr;
-  *size = fvec_size;
-  *stride = 1;
-  break;
-  
-default:
-  break;
+    default:
+      break;
   }
 }
+
 
 int
 fvec_vector(fts_object_t *obj, float **ptr, int *size, int *stride)
@@ -509,7 +588,7 @@ fvec_copy_function (const fts_object_t *from, fts_object_t *to)
 {
   fvec_t *dest = (fvec_t *) to;
 
-  *dest = *(fvec_t *) from;	/* just copy struct... */
+  *dest = *(fvec_t *) from;     /* just copy struct... */
   fts_object_refer(dest->fmat); /* ...but increment refcount of matrix */
 
   fts_object_changed(to);
@@ -935,7 +1014,7 @@ _fvec_set_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
 
 static fts_method_status_t
 _fvec_get_onset (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
-		 fts_atom_t *ret)
+                 fts_atom_t *ret)
 {
   fvec_t *self  = (fvec_t *) o;
   int     onset = fvec_get_onset(self);
@@ -947,7 +1026,7 @@ _fvec_get_onset (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
 
 static fts_method_status_t
 _fvec_set_onset (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
-		 fts_atom_t *ret)
+                 fts_atom_t *ret)
 {
   fvec_t *self  = (fvec_t *) o;
   int     onset = fts_get_number_int(at);
@@ -993,7 +1072,7 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
 
 static fts_method_status_t
 _fvec_get_sr (fts_object_t *o, fts_symbol_t s, 
-	      int ac, const fts_atom_t *at, fts_atom_t *ret)
+              int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
   
@@ -1005,7 +1084,7 @@ _fvec_get_sr (fts_object_t *o, fts_symbol_t s,
 
 static fts_method_status_t
 _fvec_set_sr (fts_object_t *o, fts_symbol_t s, 
-	      int ac, const fts_atom_t *at, fts_atom_t *ret)
+              int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
   double  sr   = fts_get_number_float(at);
