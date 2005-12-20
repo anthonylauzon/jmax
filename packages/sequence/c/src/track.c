@@ -805,7 +805,7 @@ track_segment_quantize(track_t *self, event_t *first, event_t *after, double beg
 int
 track_editor_is_open(track_t *self) 
 {
-  if(!track_is_marker(self))
+  if(track_is_marker(self))
   {
     fts_object_t *container = fts_object_get_container((fts_object_t *)self);
 
@@ -1545,10 +1545,10 @@ track_add_event_from_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_a
   track_t *self = (track_t *)o;
   double time = fts_get_float(at + 0);
   event_t *event = track_event_create(ac - 1, at + 1);
-  
+
   if(event)
     track_add_event_and_upload( self, time, event);
-  
+    
   return fts_ok;
 }
 
