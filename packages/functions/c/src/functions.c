@@ -457,8 +457,7 @@ info_class(fts_class_t *cl, mat_t *outmat)
   if(cl != NULL)
   {
     /* post class info */
-    if (!cl->size)
-      fts_class_instantiate(cl);
+    fts_class_instantiate(cl);
     
     if (!outmat)
       fts_class_doc_post(cl);
@@ -500,9 +499,7 @@ info_class(fts_class_t *cl, mat_t *outmat)
       cl_name = fts_get_symbol(&a);
       cl = fts_package_get_class(pkg, cl_name);
       
-      if (!cl->size)
-        fts_class_instantiate(cl);
-      
+      fts_class_instantiate(cl);
       doc = fts_class_get_doc(cl);
       
       if(doc != NULL)
@@ -625,7 +622,7 @@ _function_info(int ac, const fts_atom_t *at, fts_atom_t *ret)
     mat_t *outmat = NULL;
     
     /* check if last arg is mat, used to return list of doc */
-    if (ac > 1  &&  fts_is_a(&at[ac - 1], mat_type))
+    if (ac > 1  &&  fts_is_a(&at[ac - 1], mat_class))
       outmat = (mat_t *) fts_get_object(&at[ac - 1]);
     
     if (what == fts_new_symbol("classes"))

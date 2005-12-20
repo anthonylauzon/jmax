@@ -61,7 +61,8 @@ typedef struct _bpf_
 } bpf_t;
 
 DATA_API fts_symbol_t bpf_symbol;
-DATA_API fts_class_t *bpf_type;
+DATA_API fts_class_t *bpf_class;
+#define bpf_type bpf_class
 
 #define bpf_get_size(b) ((b)->size)
 

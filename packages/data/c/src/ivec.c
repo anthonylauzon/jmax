@@ -32,7 +32,7 @@
 static fts_symbol_t sym_text = 0;
 
 fts_symbol_t ivec_symbol = 0;
-fts_class_t *ivec_type = 0;
+fts_class_t *ivec_class = 0;
 
 /********************************************************
  *
@@ -245,82 +245,6 @@ ivec_array_function(fts_object_t *o, fts_array_t *array)
   
   for(i=0; i<size; i++)
     fts_set_int(atoms + i, values[i]);
-}
-
-/********************************************************
- *
- *  file utils
- *
- */
-
-#define IVEC_BLOCK_SIZE 256
-
-static void
-ivec_grow(ivec_t *vec, int size)
-{
-  int alloc = vec->alloc;
-
-  while(!alloc || size > alloc)
-    alloc += IVEC_BLOCK_SIZE;
-
-  ivec_set_size(vec, alloc);
-}
-
-static int 
-ivec_read_atomfile(ivec_t *vec, fts_symbol_t file_name)
-{
-  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
-  int n = 0;
-  fts_atom_t a;
-  char c;
-
-  if(!file)
-    return -1;
-  
-  while(fts_atomfile_read(file, &a, &c))
-    {
-      if(n >= vec->alloc)
-	ivec_grow(vec, n);
-
-      if(fts_is_number(&a))
-	ivec_set_element(vec, n, fts_get_number_int(&a));
-      else
-	ivec_set_element(vec, n, 0);
-	
-      n++;
-    }
-
-  ivec_set_size(vec, n);
-  
-  fts_atomfile_close(file);
-
-  return (n);
-}
-
-static int
-ivec_write_atomfile(ivec_t *vec, fts_symbol_t file_name)
-{
-  fts_atomfile_t *file;
-  int size = ivec_get_size(vec);
-  int i;
-
-  file = fts_atomfile_open_write(file_name);
-
-  if(!file)
-    return -1;
-
-  /* write the content of the vec */
-  for(i=0; i<size; i++)     
-    {
-      fts_atom_t a;
-      
-      fts_set_int(&a, ivec_get_element(vec, i));
-      fts_atomfile_write(file, &a, '\n');
-    }
-
-  fts_atomfile_close(file);
-
-  return (i);
 }
 
 /*********************************************************
@@ -658,59 +582,6 @@ ivec_change_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   return fts_ok;
 }
 
-/*********************************************************
-*
-*  files
-*
-*/
-static fts_method_status_t
-ivec_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  ivec_t *this = (ivec_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
-
-  if(!file_name)
-    return fts_ok;
-
-  if(file_format == sym_text)
-    {
-      int size = ivec_read_atomfile(this, file_name);
-    
-    if(size <= 0)
-      fts_post("ivec: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
-    else
-      fts_object_set_state_dirty( o);
-    }
-  else
-    fts_post("ivec: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
-  
-  return fts_ok;
-}
-
-static fts_method_status_t
-ivec_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  ivec_t *this = (ivec_t *)o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
-
-  if(!file_name)
-    return fts_ok;
-
-  if(file_format == sym_text)
-    {
-      int size = ivec_write_atomfile(this, file_name);
-      
-      if(size < 0)
-	fts_post("ivec: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
-    }
-  else
-    fts_post("ivec: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
-  
-  return fts_ok;
-}
-
 /********************************************************************
  *
  *  system functions
@@ -909,9 +780,6 @@ ivec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_fill, ivec_fill);
   fts_class_message_varargs(cl, fts_s_set, ivec_set_elements);
 
-  fts_class_message_varargs(cl, fts_s_import, ivec_import);
-  fts_class_message_varargs(cl, fts_s_export, ivec_export);
-
   fts_class_message_void(cl, fts_s_size, ivec_return_size);
   fts_class_message_number(cl, fts_s_size, ivec_change_size);
 
@@ -935,9 +803,8 @@ FTS_MODULE_INIT(ivec)
   sym_text = fts_new_symbol("text");
   ivec_symbol = fts_new_symbol("ivec");
 
-  ivec_type = fts_class_install(ivec_symbol, ivec_instantiate);
+  ivec_class = fts_class_install(ivec_symbol, ivec_instantiate);
 }
-
 
 
 

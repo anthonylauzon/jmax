@@ -43,12 +43,11 @@ typedef struct dict
 
 
 DATA_API fts_symbol_t dict_symbol;
-DATA_API fts_class_t *dict_type;
-
+DATA_API fts_class_t *dict_class;
+#define dict_type dict_class
 
 #define dict_get_hashtable(d) (&(d)->hash)
 #define dict_editor_is_open(d) ((d)->opened)
-
 
 DATA_API void dict_store(dict_t *dict, const fts_atom_t *key, const fts_atom_t *atom);
 DATA_API void dict_store_atoms(dict_t *dict, const fts_atom_t *key, int ac, const fts_atom_t *at);

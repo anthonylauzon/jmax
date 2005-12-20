@@ -358,98 +358,10 @@ sequence_read_track_end(fts_midifile_t *file)
 }
 
 /**************************************************************************
-*
-*  import MIDI files to track
-*
-*/
-int
-track_import_from_midifile(track_t *track, fts_midifile_t *file)
-{
-  fts_midifile_read_functions_t read;
-  seqmidi_read_data_t data;
-  
-  seqmidi_read_data_init(&data);
-  fts_midifile_set_user_data(file, &data);
-  fts_midifile_read_functions_init(&read);
-  fts_midifile_set_read_functions(file, &read);
-  
-  if(track_get_type(track) == fts_midievent_type || track_get_type(track) == NULL)
-  {
-    read.track_end = miditrack_read_track_end;
-    read.midi_event = miditrack_read_midievent;
-  }
-  else if(track_get_type(track) == scoob_class)
-  {
-    int i, j;
-    
-    /* set oll notes to off */
-    for(i=0; i<n_midi_channels; i++)
-    {
-      for(j=0; j<n_midi_notes; j++)
-      {
-        data.note_is_on[i][j] = NULL;
-        data.n_note_on[i][j] = 0;
-      }
-    }
-    
-    read.track_end = scoobtrack_read_track_end;
-    read.midi_event = scoobtrack_read_midievent;
-    read.tempo = scoobtrack_read_tempo;
-    read.time_signature = scoobtrack_read_time_signature;
-  }
-  else if(track_get_type(track) == fts_int_class)
-  {
-    read.track_end = miditrack_read_track_end;
-    read.midi_event = inttrack_read_midievent;
-  }
-  else
-    return 0;
-  
-  data.merge = track; /* merge all MIDI tracks */
-  
-  data.track = (track_t *)fts_object_create(track_class, 0, 0); /* read to temporary track */
-  fts_object_refer(data.track);
-  
-  fts_midifile_read(file);
-  
-  fts_object_release(data.track);
-  
-  return data.size;
-}
-
-int
-sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
-{
-  fts_midifile_read_functions_t read;
-  seqmidi_read_data_t data;
-  
-  seqmidi_read_data_init(&data);
-  fts_midifile_set_user_data(file, &data);
-  fts_midifile_read_functions_init(&read);
-  fts_midifile_set_read_functions(file, &read);
-  
-  data.sequence = sequence;
-  data.track_index = 0;
-  
-  read.midi_event = miditrack_read_midievent;
-  read.track_start = sequence_read_track_start;
-  read.track_end = sequence_read_track_end;
-  
-  fts_midifile_read(file);
-  
-  /* be sure that this is cleaned */
-  if(data.track)
-    fts_object_release(data.track);
-  
-  return data.size;
-}
-
-/**************************************************************************
-*
-*  writing MIDI files
-*
-*/
-
+ *
+ *  writing MIDI files
+ *
+ */
 typedef struct _seqmidi_write_data_
 {
   track_t *track;
@@ -562,7 +474,133 @@ seqmidi_write_note_offs(fts_midifile_t *file, double time)
   }
 }
 
-int
+/**************************************************************************
+ *
+ *  sequence MIDI import methods
+ *
+ */
+static int
+sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file)
+{
+  fts_midifile_read_functions_t read;
+  seqmidi_read_data_t data;
+  
+  seqmidi_read_data_init(&data);
+  fts_midifile_set_user_data(file, &data);
+  fts_midifile_read_functions_init(&read);
+  fts_midifile_set_read_functions(file, &read);
+  
+  data.sequence = sequence;
+  data.track_index = 0;
+  
+  read.midi_event = miditrack_read_midievent;
+  read.track_start = sequence_read_track_start;
+  read.track_end = sequence_read_track_end;
+  
+  fts_midifile_read(file);
+  
+  /* be sure that this is cleaned */
+  if(data.track)
+    fts_object_release(data.track);
+  
+  return data.size;
+}
+
+static fts_method_status_t
+sequence_import_midifile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  sequence_t *this = (sequence_t *)o;
+  
+  if(ac == 1 && fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    fts_midifile_t *file = fts_midifile_open_read(name);
+    
+    if(file)
+    {
+      int size = sequence_import_from_midifile(this, file);
+      char *error = fts_midifile_get_error(file);
+      
+      if(error)
+        fts_object_error(o, "import: read error in \"%s\" (%s)", fts_symbol_name(name), error);
+      else if(size <= 0)
+        fts_object_error(o, "import: couldn't get any data from \"%s\"", fts_symbol_name(fts_midifile_get_name(file)));
+      
+      fts_midifile_close(file);
+      
+      if(sequence_editor_is_open(this))
+        sequence_upload(this);
+      
+      /* fts_name_update(o); */
+    }
+    else
+      fts_object_error(o, "import: cannot open \"%s\"", fts_symbol_name(name));
+  }
+  
+  return fts_ok;
+}
+
+/******************************************************
+ *
+ *  track MIDI import/export
+ *
+ */
+static int
+track_import_from_midifile(track_t *track, fts_midifile_t *file)
+{
+  fts_midifile_read_functions_t read;
+  seqmidi_read_data_t data;
+  
+  seqmidi_read_data_init(&data);
+  fts_midifile_set_user_data(file, &data);
+  fts_midifile_read_functions_init(&read);
+  fts_midifile_set_read_functions(file, &read);
+  
+  if(track_get_type(track) == fts_midievent_type || track_get_type(track) == NULL)
+  {
+    read.track_end = miditrack_read_track_end;
+    read.midi_event = miditrack_read_midievent;
+  }
+  else if(track_get_type(track) == scoob_class)
+  {
+    int i, j;
+    
+    /* set oll notes to off */
+    for(i=0; i<n_midi_channels; i++)
+    {
+      for(j=0; j<n_midi_notes; j++)
+      {
+        data.note_is_on[i][j] = NULL;
+        data.n_note_on[i][j] = 0;
+      }
+    }
+    
+    read.track_end = scoobtrack_read_track_end;
+    read.midi_event = scoobtrack_read_midievent;
+    read.tempo = scoobtrack_read_tempo;
+    read.time_signature = scoobtrack_read_time_signature;
+  }
+  else if(track_get_type(track) == fts_int_class)
+  {
+    read.track_end = miditrack_read_track_end;
+    read.midi_event = inttrack_read_midievent;
+  }
+  else
+    return 0;
+  
+  data.merge = track; /* merge all MIDI tracks */
+  
+  data.track = (track_t *)fts_object_create(track_class, 0, 0); /* read to temporary track */
+  fts_object_refer(data.track);
+  
+  fts_midifile_read(file);
+  
+  fts_object_release(data.track);
+  
+  return data.size;
+}
+
+static int
 track_export_to_midifile(track_t *track, fts_midifile_t *file)
 {
   fts_class_t *track_type = track_get_type(track);
@@ -685,4 +723,229 @@ track_export_to_midifile(track_t *track, fts_midifile_t *file)
   }
   else
     return 0;
+}
+
+/* default import handler: midifile */
+static fts_method_status_t
+track_import_midifile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  track_t *self = (track_t *)o;
+  
+  if(ac > 0  &&  fts_is_symbol(at))
+  {
+    fts_symbol_t name = fts_get_symbol(at);
+    fts_midifile_t *file = fts_midifile_open_read(name);
+    fts_class_t *type = track_get_type(self);
+    
+    if (type == fts_midievent_type  ||  type == scoob_class  ||
+        type == fts_int_class       ||  type == NULL)
+    {
+      if (file != NULL)
+      {
+        int size;
+        char *error;
+        int i;
+        
+        /* clear track and markers(!) */
+        track_clear(self);
+        
+        /* get import options */
+        for(i=1; i<ac; i+=2)
+        {
+          if(fts_is_symbol(at + i) && fts_is_number(at + i + 1))
+          {
+            fts_symbol_t sym = fts_get_symbol(at + i);
+            
+            if(sym == seqsym_track)
+            {
+              int n = fts_get_number_int(at + i + 1);
+              
+              if(n >= 0)
+                fts_midifile_select_track(file, n);
+            }
+            else if(sym == seqsym_channel)
+            {
+              int n = fts_get_number_int(at + i + 1);
+              
+              if(n > 0)
+                fts_midifile_select_channel(file, n);
+            }
+          }
+        }
+        
+        size  = track_import_from_midifile(self, file);
+        error = fts_midifile_get_error(file);
+        
+        if (!error && size > 0)   /* set return value: sucess */
+        {
+          if (self->markers)
+            marker_track_renumber_bars(self->markers, 
+                                       track_get_first(self->markers), 
+                                       FIRST_BAR_NUMBER, 0);
+          
+          track_update_editor(self);
+          fts_set_object(ret, o);
+        }
+        else
+          fts_object_error(o, "import: coudn't read any MIDI data from file \"%s\"", fts_symbol_name(name));        
+        
+        fts_midifile_close(file);
+      }
+      else
+        fts_object_error(o, "import: cannot open MIDI file \"%s\"", fts_symbol_name(name));
+    }
+    else
+      fts_object_error(o, "cannot import MIDI file to %s track", fts_symbol_name(fts_class_get_name(type)));
+  }
+  else
+    fts_object_error(o, "import: file name argument missing");
+  
+  return fts_ok;
+}
+
+
+/* exporting */
+
+/* default export handler: midifile */
+static fts_method_status_t
+track_export_midifile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  track_t *self = (track_t *) o;
+  
+  if (ac > 0  &&  fts_is_symbol(at))
+  {
+    fts_symbol_t  sym  = fts_get_symbol(at);
+    const char   *name = fts_symbol_name(sym);
+    fts_midifile_t *file = fts_midifile_open_write(sym);
+    
+    if(file != NULL)
+    {
+      int size = track_export_to_midifile(self, file);
+      char *error = fts_midifile_get_error(file);
+      
+      if(error != NULL)
+        fts_object_error(o, "export: write error in file \"%s\" (%s)", name, error);
+      else if (size <= 0)
+        fts_object_error(o, "export: coudn't write any MIDI data to file \"%s\"", name);
+      else
+        fts_set_object(ret, o);
+      
+      fts_midifile_close(file);
+    }
+    else
+      fts_object_error(o, "export: cannot open MIDI file \"%s\"", name);    
+  }
+  else
+    fts_object_error(o, "export: file name argument missing");
+  
+  return fts_ok;
+}
+
+/******************************************************
+ *
+ *  marker track text file import
+ *
+ */
+/* (this is not MIDI - could be in another file such as "seqtext.c")
+import text label file as exported by audacity into marker track.
+format: lines of time [s] (no leading space!), tab or space, 
+label text until newline
+*/
+static fts_method_status_t
+marker_track_import_labels_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  track_t *self = (track_t *) o;
+  
+  if (track_is_marker(self)  &&  ac > 0  &&  fts_is_symbol(at))
+  {
+    fts_symbol_t      filename = fts_get_symbol(at);
+    fts_atomfile_t  *file;
+    fts_atom_t        a;
+    char              c;
+    double            time = 0.0;
+    fts_memorystream_t *memstream;
+    enum { wTIME, wTEXT, wERROR } waitingfor = wTIME;
+    
+    memstream = (fts_memorystream_t *) fts_object_create(fts_memorystream_class, 0, NULL);
+    fts_object_refer((fts_object_t *) memstream);
+    
+    /* check file name for .txt? */
+    
+    if (!(file = fts_atomfile_open_read(filename)))
+    { /* we were responsible for this file, but can't open it: 
+      don't return void */
+      fts_post("can't open label text file '%s'\n", fts_symbol_name(filename));
+      fts_set_object(ret, o);     
+      return fts_ok;
+    }
+    
+    while (waitingfor != wERROR  &&  fts_atomfile_read(file, &a, &c))
+    {
+      switch (waitingfor)
+      {
+        case wTIME:
+          if (fts_is_number(&a))
+          {
+            time = fts_get_number_float(&a) * 1000;  /* convert to millisec */
+            
+            /* prepare collection of label */
+            fts_memorystream_reset(memstream);
+            waitingfor = wTEXT;
+          }
+          else
+          {
+            waitingfor = wERROR;
+          }
+          break;
+          
+        case wTEXT:
+          fts_spost_atoms((fts_bytestream_t *) memstream, 1, &a);
+          
+          if (c == '\n' || c == '\r')
+          {
+            /* end of label: create marker event, set label */
+            event_t      *ev;
+            scomark_t    *mrk;
+            char         *lab;
+            
+            mrk = marker_track_insert_marker(self, time, seqsym_marker, &ev);
+            
+            /* get and zero-terminate label string (NOT KOSHER!) */
+            lab = (char *) fts_memorystream_get_bytes(memstream);
+            lab[fts_memorystream_get_size(memstream)] = 0;
+            
+            scomark_set_label(mrk, fts_new_symbol(lab));
+            
+            waitingfor = wTIME;
+          }
+            else
+              fts_spost((fts_bytestream_t *) memstream, "%c", c);
+          break;
+          
+        default:
+          waitingfor = wERROR;
+          break;
+      }
+    }
+    
+    fts_object_release(memstream); 
+    fts_atomfile_close(file);
+    fts_set_object(ret, (fts_object_t *) self);       
+  }
+  /* else: no marker track or wrong args -> don't handle this file */
+  
+  return fts_ok;
+}
+
+FTS_MODULE_INIT(seqfiles)
+{
+  /* track class MIDI file import/export (registered first, so it will be the last handler tried) */
+  fts_midifile_import_handler(track_class, track_import_midifile);
+  fts_midifile_export_handler(track_class, track_export_midifile);
+  
+  /* marker track import/export */
+  fts_class_import_handler(track_class, fts_new_symbol("labels"), marker_track_import_labels_txt);  
+
+  /* sequence class MIDI file import */
+  fts_midifile_import_handler(multitrack_class, sequence_import_midifile);
 }

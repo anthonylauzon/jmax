@@ -2097,8 +2097,6 @@ fvec_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fvec_t), fvec_init, fvec_delete);
   
-  fts_class_instantiate(fmat_class);
-  
   /* standard functions */
   fts_class_set_copy_function (cl, fvec_copy_function);
   fts_class_set_array_function(cl, fvec_array_function);
@@ -2178,11 +2176,11 @@ fvec_instantiate(fts_class_t *cl)
   
   fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fvec_lookup_bpf);
+  fts_class_message(cl, fts_new_symbol("lookup"), bpf_class, fvec_lookup_bpf);
   
   fts_class_message(cl, fts_new_symbol("env"), fmat_class, fvec_env_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("env"), fvec_class, fvec_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), bpf_type, fvec_env_bpf);
+  fts_class_message(cl, fts_new_symbol("env"), bpf_class, fvec_env_bpf);
   
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fvec_apply_expr);
   fts_class_message_varargs(cl, fts_new_symbol("apply"), fvec_apply_expr_varargs);

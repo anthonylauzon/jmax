@@ -349,7 +349,7 @@ tabeditor_copy_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const 
       this_size = ivec_get_size( (ivec_t *)this->vec);
       
       if(!this->copy)
-        this->copy = fts_object_create(ivec_type, 1, at + 1);
+        this->copy = fts_object_create(ivec_class, 1, at + 1);
       else
         ivec_set_size( (ivec_t *)this->copy, size);
       
@@ -642,7 +642,7 @@ tabeditor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   if(ac == 1 && fts_is_object(at))
   {
     this->vec = fts_get_object( at);
-    this->type = (fts_object_get_class(this->vec) == ivec_type);
+    this->type = (fts_object_get_class(this->vec) == ivec_class);
   }
   else
   {

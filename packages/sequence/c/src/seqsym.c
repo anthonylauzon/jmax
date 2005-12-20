@@ -64,10 +64,6 @@ fts_symbol_t seqsym_object = 0;
 /* messages */
 fts_symbol_t seqsym_insert = 0;
 fts_symbol_t seqsym_remove = 0;
-fts_symbol_t seqsym_export_midifile = 0;
-fts_symbol_t seqsym_export_midifile_dialog = 0;
-fts_symbol_t seqsym_import_midifile = 0;
-fts_symbol_t seqsym_import_midifile_dialog = 0;
 fts_symbol_t seqsym_add_track = 0;
 fts_symbol_t seqsym_make_track = 0;
 fts_symbol_t seqsym_remove_track = 0;
@@ -160,10 +156,6 @@ FTS_MODULE_INIT(seqsym)
   /* messages */
   seqsym_insert = fts_new_symbol("insert");
   seqsym_remove = fts_new_symbol("remove");
-  seqsym_export_midifile = fts_new_symbol("export_midifile");
-  seqsym_export_midifile_dialog = fts_new_symbol("export_midifile_dialog");
-  seqsym_import_midifile = fts_new_symbol("import_midifile");
-  seqsym_import_midifile_dialog = fts_new_symbol("import_midifile_dialog");
   seqsym_add_track = fts_new_symbol("add_track");
   seqsym_make_track = fts_new_symbol("make_track");
   seqsym_remove_track = fts_new_symbol("remove_track");

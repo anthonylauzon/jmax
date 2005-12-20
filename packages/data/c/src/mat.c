@@ -26,7 +26,6 @@
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
 
-
 fts_symbol_t mat_symbol = NULL;
 fts_class_t *mat_class  = NULL;
 
@@ -214,251 +213,11 @@ mat_copy(mat_t *org, mat_t *copy)
     fts_atom_assign(copy->data + i, org->data + i);
 }
 
-
-
-
-/********************************************************
+/********************************************************************
  *
- *  files
+ *   upload methods
  *
  */
-
-#define MAT_BLOCK_SIZE 256
-
-static void
-mat_grow(mat_t *mat, int size)
-{
-  int alloc = mat->alloc;
-  
-  while(size > alloc)
-    alloc += MAT_BLOCK_SIZE;
-  
-  mat_set_size(mat, alloc, 1);  /* initialises added atoms */
-}
-
-
-int 
-mat_read_atomfile_newline(mat_t *mat, fts_symbol_t file_name)
-{
-  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
-  int m = 0;
-  int n = 0;
-  int i = 0;
-  int j = 0;
-  fts_atom_t a;
-  char c;
-  
-  if(!file)
-    return -1;
-  
-  mat_set_size(mat, 0, 0);
-  
-  while(fts_atomfile_read(file, &a, &c))
-  {
-    m = i + 1;
-    
-    /* first row determines # of columns */    
-    if(i == 0)
-      n = j + 1;
-    
-    if(m * n > mat->alloc)
-      mat_grow(mat, m * n);
-    
-    if(j < n)
-    {
-      mat->data[i * n + j] = a;
-      j++;
-      
-      if(c == '\n' || c == '\r')
-            {
-              /* reset to beginning of next row */
-              i++;
-              j = 0;
-            }
-    }
-    else if(c == '\n' || c == '\r')
-    {
-      /* reset to beginning of next row */
-      i++;
-      j = 0;
-    }
-  }
-  
-  /* maybe empty rest of last line */
-  if(j > 0)
-  {
-    i++;
-    j = 0;
-  }
-  
-  mat->m = m;
-  mat->n = n;
-  
-  fts_atomfile_close(file);
-  
-  return(m * n);
-}
-
-int
-mat_write_atomfile_newline(mat_t *mat, fts_symbol_t file_name)
-{
-  fts_atomfile_t *file;
-  int m = mat->m;
-  int n = mat->n;
-  int i, j;
-  
-  file = fts_atomfile_open_write(file_name);
-  
-  if(!file)
-    return -1;
-  
-  /* write the content of the mat */
-  for(i=0; i<m; i++)     
-  {
-    fts_atom_t *row = mat->data + i * n;
-    
-    for(j=0; j<n-1; j++)        
-      fts_atomfile_write(file, row + j, ' ');
-    
-    fts_atomfile_write(file, row + n - 1, '\n');
-  }
-  
-  fts_atomfile_close(file);
-  return(m * n);
-}
-
-int 
-mat_read_atomfile_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator, int ac, const fts_atom_t *at)
-{
-  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
-  int m = 0;
-  int n = 0;
-  int i = 0;
-  int j = 0;
-  fts_atom_t a;
-  char c;
-  
-  if(!file)
-    return -1;
-  
-  if(!separator)
-    separator = sym_comma;
-  
-  mat_set_size(mat, 0, 0);
-  
-  while(fts_atomfile_read(file, &a, &c))
-  {
-    int skip = 0;
-    int k;
-    
-    /* filter atoms */
-    for(k=0; k<ac; k++)
-    {
-      /* ooops! */
-      if(fts_atom_same_type(&a, &at[k]) && fts_get_int(&a) == fts_get_int(&at[k]))
-            {
-              skip = 1;
-              break;
-            }
-    }
-    
-    if(!skip)
-    {
-      m = i + 1;
-      
-      if(fts_get_symbol(&a) == separator)
-            {
-              /* reset to beginning of next row */
-              i++;
-              j = 0;
-            }
-      else if(i == 0)
-            {
-              /* first row determines # of columns */    
-              n = j + 1;
-              
-              if(n > mat->alloc)
-          mat_grow(mat, n);
-              
-              mat->data[i * n + j] = a;
-              j++;
-            }
-      else if(j < n)
-            {
-              if(m * n > mat->alloc)
-          mat_grow(mat, m * n);
-              
-              mat->data[i * n + j] = a;
-              j++;
-            }
-    }
-  }
-  
-  /* maybe empty rest of last line */
-  if(j > 0)
-  {
-    i++;
-    j = 0;
-  }
-  
-  if(n > 0)
-  {
-    mat->m = m;
-    mat->n = n;
-  }
-  else
-  {
-    mat->m = 0;
-    mat->n = 0;      
-  }
-  
-  fts_atomfile_close(file);
-  
-  return(m * n);
-}
-
-int
-mat_write_atomfile_separator(mat_t *mat, fts_symbol_t file_name, fts_symbol_t separator)
-{
-  fts_atomfile_t *file;
-  int m = mat->m;
-  int n = mat->n;
-  fts_atom_t sep;
-  int i, j;
-  
-  file = fts_atomfile_open_write(file_name);
-  
-  if(!file)
-    return -1;
-  
-  fts_set_symbol(&sep, separator);
-  
-  /* write the content of the mat */
-  for(i=0; i<m; i++)     
-  {
-    fts_atom_t *row = mat->data + i * n;
-    
-    for(j=0; j<n; j++)  
-      fts_atomfile_write(file, row + j, ' ');
-    
-    fts_atomfile_write(file, &sep, '\n');
-  }
-  
-  fts_atomfile_close(file);
-  
-  return(m * n);
-}
-
-
-
-
-
-
-/********************************************************************
-*
-*   upload methods
-*
-*/
 #define MAT_CLIENT_BLOCK_SIZE 128
 
 static fts_memorystream_t *mat_memory_stream ;
@@ -1027,74 +786,6 @@ mat_return_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   return fts_ok;
 }
 
-
-static fts_method_status_t
-mat_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  mat_t *self = (mat_t *) o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
-  
-  if(!file_name)
-    return fts_ok;
-  
-  if(file_format == sym_text)
-  {
-    fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
-    int size = 0;
-    
-    if (separator)
-      size = mat_read_atomfile_separator(self, file_name, separator, ac - 3, at + 3);
-    else
-      size = mat_read_atomfile_newline(self, file_name);
-    
-    if(size <= 0)
-      fts_post("mat: can't import from text file \"%s\"\n", fts_symbol_name(file_name));
-    else
-    {
-      if(mat_editor_is_open(self))
-        mat_upload(self);
-      
-      fts_object_set_state_dirty(o);
-    }
-  }
-  else
-    fts_post("mat: unknown import file format \"%s\"\n", fts_symbol_name(file_format));
-  
-  return fts_ok;
-}
-
-
-static fts_method_status_t
-mat_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  mat_t *self = (mat_t *) o;
-  fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
-  fts_symbol_t file_format = fts_get_symbol_arg(ac, at, 1, sym_text);
-  
-  if(!file_name)
-    return fts_ok;
-  
-  if(file_format == sym_text)
-  {
-    fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
-    int size = 0;
-    
-    if (separator)
-      size = mat_write_atomfile_separator(self, file_name, separator);
-    else
-      size = mat_write_atomfile_newline(self, file_name);
-    
-    if(size < 0)
-      fts_post("mat: can't export to text file \"%s\"\n", fts_symbol_name(file_name));
-  }
-  else
-    fts_post("mat: unknown export file format \"%s\"\n", fts_symbol_name(file_format));
-  
-  return fts_ok;
-}
-
-
 static fts_method_status_t
 mat_set_from_instance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -1505,9 +1196,6 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_void   (cl, fts_s_unique,  mat_unique);
   fts_class_message_number (cl, fts_s_unique,  mat_unique);
   
-  fts_class_message_varargs(cl, fts_s_import, mat_import); 
-  fts_class_message_varargs(cl, fts_s_export, mat_export);
-  
   fts_class_message_void (cl, fts_s_size, mat_return_size);
   fts_class_message_void (cl, fts_s_rows, mat_return_size);
   fts_class_message_void (cl, fts_s_cols, mat_return_size);
@@ -1544,9 +1232,6 @@ mat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_cols, "<void>", "get # of columns");
   
   fts_class_doc(cl, fts_s_get_element, "<num: row index> <num: column index>", "get value at given index");
-  
-  fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
-  fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
 }
 
 FTS_MODULE_INIT(mat)

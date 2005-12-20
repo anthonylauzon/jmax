@@ -1160,34 +1160,16 @@ marker_track_remove_events(track_t *marker_track, int ac, const fts_atom_t *at)
 		marker_track_renumber_bars(marker_track, NULL, FIRST_BAR_NUMBER, 1);
 }
 
-
 void 
-marker_track_clear(track_t *marker_track)
+marker_track_clear_and_upload(track_t *marker_track)
 {
-  track_t *track = (track_t *) fts_object_get_context((fts_object_t *) marker_track);
-  event_t *event = track_get_first(marker_track);
+  track_t *container = (track_t *) fts_object_get_container((fts_object_t *) marker_track);
   
-  while (event)
-  {
-    event_t *next = event_get_next(event);
-    
-    event->next = event->prev = 0;
-    fts_object_release((fts_object_t *) event);
-    
-    event = next;
-  }
-
-  marker_track->first = 0;
-  marker_track->last = 0;
-  marker_track->size = 0;
+  track_erase_events(marker_track);
   
-  if (track  &&  fts_object_get_class((fts_object_t *) track) == track_class  
-             &&  track_editor_is_open(track))
-  {
-    fts_client_send_message((fts_object_t *) marker_track, fts_s_clear, 0, 0);
-  }
+  if(container != NULL && fts_object_get_class((fts_object_t *)container) == track_class &&  track_editor_is_open(container))
+    track_clear_at_client(marker_track);
 }
-
 
 void 
 marker_track_collapse_markers( track_t *marker_track, int ac, const fts_atom_t *at)
@@ -1608,105 +1590,6 @@ marker_track_append_bar(track_t *marker_track, event_t *start_evt)
 		}
 	}
 	return new_event;
-}
-
-
-
-
-/******************************************************
-*
-*  import/export
-*
-*/
-
-/* import text label file as exported by audacity into marker track.
-   format: lines of time [s] (no leading space!), tab or space, 
-	   label text until newline
-*/
-
-fts_method_status_t
-marker_track_import_labels_txt (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  track_t *self = (track_t *) o;
-
-  if (track_is_marker(self)  &&  ac > 0  &&  fts_is_symbol(at))
-  {
-    fts_symbol_t      filename = fts_get_symbol(at);
-    fts_atomfile_t  *file;
-    fts_atom_t        a;
-    char              c;
-    double            time = 0.0;
-    fts_memorystream_t *memstream;
-    enum { wTIME, wTEXT, wERROR } waitingfor = wTIME;
-
-    memstream = (fts_memorystream_t *) fts_object_create(fts_memorystream_class, 0, NULL);
-    fts_object_refer((fts_object_t *) memstream);
-
-    /* check file name for .txt? */
-
-    if (!(file = fts_atomfile_open_read(filename)))
-    { /* we were responsible for this file, but can't open it: 
-         don't return void */
-      fts_post("can't open label text file '%s'\n", fts_symbol_name(filename));
-      fts_set_object(ret, o);     
-      return fts_ok;
-    }
-
-    while (waitingfor != wERROR  &&  fts_atomfile_read(file, &a, &c))
-    {
-      switch (waitingfor)
-      {
-        case wTIME:
-          if (fts_is_number(&a))
-          {
-            time = fts_get_number_float(&a) * 1000;  /* convert to millisec */
-
-            /* prepare collection of label */
-            fts_memorystream_reset(memstream);
-            waitingfor = wTEXT;
-          }
-          else
-          {
-            waitingfor = wERROR;
-          }
-        break;
-
-        case wTEXT:
-          fts_spost_atoms((fts_bytestream_t *) memstream, 1, &a);
-
-          if (c == '\n' || c == '\r')
-          { /* end of label: create marker event, set label */
-            event_t      *ev;
-            scomark_t    *mrk;
-            char         *lab;
-            
-            mrk = marker_track_insert_marker(self, time, seqsym_marker, &ev);
-
-            /* get and zero-terminate label string (NOT KOSHER!) */
-            lab = (char *) fts_memorystream_get_bytes(memstream);
-            lab[fts_memorystream_get_size(memstream)] = 0;
-            
-            scomark_set_label(mrk, fts_new_symbol(lab));
-
-            waitingfor = wTIME;
-          }
-          else
-            fts_spost((fts_bytestream_t *) memstream, "%c", c);
-        break;
-	
-        default:
-	  waitingfor = wERROR;
-        break;
-      }
-    }
-
-    fts_object_release(memstream); 
-    fts_atomfile_close(file);
-    fts_set_object(ret, (fts_object_t *) self);       
-  }
-  /* else: no marker track or wrong args -> don't handle this file */
-
-  return fts_ok;
 }
 
 

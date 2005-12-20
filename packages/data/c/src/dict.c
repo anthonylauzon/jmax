@@ -24,7 +24,7 @@
 #include <fts/packages/data/data.h>
 
 fts_symbol_t dict_symbol = 0;
-fts_class_t *dict_type = 0;
+fts_class_t *dict_class = 0;
 
 static fts_symbol_t sym_text = 0;
 static fts_symbol_t sym_coll = 0;
@@ -430,251 +430,10 @@ dict_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 }
 
 /**********************************************************
-*
-*  files
-*
-*/
-#define DICT_ATOM_BUF_BLOCK_SIZE 64
-#define DICT_BLOCK_SIZE 64
-
-static fts_atom_t *
-dict_atom_buf_realloc(fts_atom_t *buf, int size)
-{
-  fts_atom_t *new_buf = (fts_atom_t *)fts_realloc(buf, sizeof(fts_atom_t) * size); /* double size */
-  
-  return new_buf;
-}
-
-static void
-dict_atom_buf_free(fts_atom_t *buf, int size)
-{
-  if(buf)
-    fts_free(buf);
-}
-
-static int 
-dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
-{
-  fts_atomfile_t *file = fts_atomfile_open_read(file_name);
-  int atoms_alloc = DICT_ATOM_BUF_BLOCK_SIZE;
-  fts_atom_t *atoms = 0;
-  enum {read_key, read_comma, read_argument} state = read_key;
-  char *error = 0;
-  int i = 0;
-  int n = 0;
-  fts_atom_t key;
-  fts_atom_t a;
-  char c;
-  
-  if(!file)
-    return 0;
-  
-  atoms = dict_atom_buf_realloc(atoms, atoms_alloc);
-  
-  dict_remove_all(self);
-  fts_set_void(&key);
-  
-  while(error == 0 && fts_atomfile_read(file, &a, &c))
-  {
-    switch(state)
-    {
-      case read_key:
-      {
-        key = a;
-        state = read_comma;
-      }
-        
-        break;
-        
-      case read_comma:
-      {
-        if(fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(",")))
-          state = read_argument;
-        else
-          error = "comma expected";
-      }
-        
-        break;
-        
-      case read_argument:
-      {
-        if(fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(";")))
-	      {
-          if(n > 0)
-          {
-            if(fts_is_symbol(atoms + 0))
-            {
-              fts_symbol_t selector = fts_get_symbol(atoms + 0);
-              
-              if(selector == fts_s_int || selector == fts_s_float || selector == fts_s_symbol || fts_s_list)
-                dict_store_atoms(self, &key, n - 1, atoms + 1);
-            }
-            else
-              dict_store_atoms(self, &key, n, atoms);
-            
-            i++;
-            n = 0;
-            
-            state = read_key;
-          }
-          else
-            fts_post("dict: empty message found in coll file %s (ignored)\n", fts_symbol_name(file_name));
-	      }
-        else
-	      {
-          /* read argument */
-          if(n >= atoms_alloc)
-          {
-            atoms_alloc += DICT_ATOM_BUF_BLOCK_SIZE;
-            atoms = dict_atom_buf_realloc(atoms, atoms_alloc);
-          }
-          
-          atoms[n] = a;
-          n++;
-	      }
-      }
-        
-        break;
-    }
-  }
-  
-  if(error != 0)
-    fts_post("dict: error reading coll file %s (%s)\n", fts_symbol_name(file_name), error);
-  else if(state != read_key)
-  {
-    if(n > 0)
-    {
-      dict_store_atoms(self, &key, n, atoms);
-      i++;
-    }
-    
-    fts_post("dict: found unexpected ending in coll file %s\n", fts_symbol_name(file_name));
-  }
-  
-  dict_atom_buf_free(atoms, atoms_alloc);
-  fts_atomfile_close(file);
-  
-  return i;
-}
-
-static int 
-dict_export_to_coll(dict_t *self, fts_symbol_t file_name)
-{
-  fts_atomfile_t *file = fts_atomfile_open_write(file_name);
-  fts_iterator_t key_iterator;
-  fts_iterator_t value_iterator;
-  int size = 0;
-  int i;
-  
-  if(!file)
-    return 0;
-  
-  fts_hashtable_get_keys(&self->hash, &key_iterator);
-  fts_hashtable_get_values(&self->hash, &value_iterator);
-  
-  while(fts_iterator_has_more(&key_iterator))
-  {
-    fts_atom_t key, value;
-    fts_symbol_t s = NULL;
-    int ac = 0;
-    const fts_atom_t *at = NULL;
-    fts_atom_t a;
-    
-    fts_iterator_next(&key_iterator, &key);
-    fts_iterator_next(&value_iterator, &value);
-    
-    if(fts_is_tuple(&value))
-    {
-      fts_tuple_t *tuple = (fts_tuple_t *)fts_get_object(&value);
-      
-      s = fts_s_list;
-      ac = fts_tuple_get_size(tuple);
-      at = fts_tuple_get_atoms(tuple);
-    }
-    else if(fts_is_symbol(&value))
-    {
-      s = fts_s_symbol;
-      ac = 1;
-      at = &value;
-    }
-    
-    else if(!fts_is_object(&value))
-    {
-      ac = 1;
-      at = &value;
-    }
-    
-    /* write key */
-    fts_atomfile_write(file, &key, ' ');
-    
-    /* write comma */
-    fts_set_symbol(&a, fts_s_comma);
-    fts_atomfile_write(file, &a, ' ');
-    
-    /* write selector (if any) */
-    if(s)
-    {
-      fts_set_symbol(&a, s);
-      fts_atomfile_write(file, &a, ' ');
-    }
-    
-    /* write arguments */
-    for(i=0; i<ac; i++)
-      fts_atomfile_write(file, at + i, ' ');
-    
-    /* write semicolon and new line */
-    fts_set_symbol(&a, fts_s_semi);
-    fts_atomfile_write(file, &a, '\n');
-    
-    size++;
-  }
-  
-  fts_atomfile_close(file);
-  
-  return size;
-}
-
-static fts_method_status_t
-_dict_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  dict_t *self = (dict_t *)o;
-  
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t file_name = fts_get_symbol(at);
-    int size = dict_import_from_coll(self, file_name);    
-
-    if(size > 0)
-    {
-      fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
-      
-      if(dict_editor_is_open(self))
-        dict_upload(self);      
-    }
-    else
-      fts_post("dict: can't import from file \"%s\"\n", fts_symbol_name(file_name));
-  }
-  
-  return fts_ok;
-}
-
-static fts_method_status_t
-_dict_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  dict_t *self = (dict_t *)o;
-  
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t file_name = fts_get_symbol(at);
-    int size = dict_export_to_coll(self, file_name);    
-  
-    if(size <= 0)
-      fts_post("dict: can't export to file \"%s\"\n", fts_symbol_name(file_name));  
-  }
-  
-  return fts_ok;
-}
-
+ *
+ *  methods
+ *
+ */
 static fts_method_status_t
 _dict_get_keys(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -784,11 +543,10 @@ dict_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
 }
 
 /**********************************************************
-*
-*  class
-*
-*/
-
+ *
+ *  class
+ *
+ */
 static fts_method_status_t
 dict_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -852,11 +610,6 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_get_element, _dict_get_element);
   fts_class_message_void   (cl, fts_s_size,        _dict_get_size);
   
-  fts_atomfile_import_handler(cl, _dict_import_textfile);
-  fts_atomfile_export_handler(cl, _dict_export_textfile);
-  
-  fts_class_import_handler(cl, fts_new_symbol("coll"), _dict_import_textfile);
-  
   fts_class_inlet_bang(cl, 0, data_object_output);
   
   fts_class_message_varargs(cl, fts_s_openEditor, dict_open_editor);
@@ -880,5 +633,5 @@ FTS_MODULE_INIT(dict)
   sym_remove_entries = fts_new_symbol("remove_entries");
   dict_symbol = fts_new_symbol("dict");
   
-  dict_type = fts_class_install(dict_symbol, dict_instantiate);
+  dict_class = fts_class_install(dict_symbol, dict_instantiate);
 }

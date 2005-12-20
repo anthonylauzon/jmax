@@ -98,10 +98,7 @@ FTS_API scomark_t *marker_track_insert_marker(track_t *marker_track, double time
 FTS_API void marker_track_renumber_bars(track_t *marker_track, event_t *start, int start_num, int upload);
 FTS_API event_t *marker_track_append_bar(track_t *marker_track, event_t *start_evt);
 FTS_API void marker_track_remove_events(track_t *marker_track, int ac, const fts_atom_t *at);
-FTS_API void marker_track_clear(track_t *marker_track);
+FTS_API void marker_track_clear_and_upload(track_t *marker_track);
 FTS_API void marker_track_collapse_markers(track_t *marker_track, int ac, const fts_atom_t *at);
-
-/* import/export */
-FTS_API fts_method_status_t marker_track_import_labels_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 #endif

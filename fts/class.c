@@ -387,7 +387,10 @@ fts_class_get_messages(const fts_class_t *cl, fts_iterator_t *i)
 void
 fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t method)
 {
-  fts_method_t declared = method_get(cl, (const void *)s, type);
+  fts_method_t declared = NULL;
+  
+  fts_class_instantiate(cl);
+  declared = method_get(cl, (const void *)s, type);
   
   if(declared != NULL)
   {
@@ -468,10 +471,10 @@ fts_class_input_handler(fts_class_t * cl, fts_method_t method)
 }
 
 /**************************************************
-*
-*  outlet types definition
-*
-*/
+ *
+ *  outlet types definition
+ *
+ */
 void
 fts_class_outlet(fts_class_t * cl, int woutlet, fts_class_t * class)
 {
@@ -488,10 +491,10 @@ fts_class_outlet(fts_class_t * cl, int woutlet, fts_class_t * class)
 }
 
 /**************************************************
-*
-*  request inlet/outlet methods and definitions
-*
-*/
+ *
+ *  request inlet/outlet methods and definitions
+ *
+ */
 fts_method_t
 fts_class_get_method(fts_class_t * cl, fts_symbol_t s, fts_class_t * type)
 {
@@ -532,8 +535,7 @@ fts_class_get_inlet_method(fts_class_t * cl, int winlet, fts_class_t * type)
 }
 
 int
-fts_class_outlet_get_declarations (fts_class_t * cl, int woutlet,
-                                   fts_iterator_t * iter)
+fts_class_outlet_get_declarations (fts_class_t * cl, int woutlet, fts_iterator_t * iter)
 {
   fts_class_outlet_t *out = class_get_outlet (cl, woutlet);
   
@@ -560,8 +562,7 @@ fts_class_outlet_has_type (fts_class_t * cl, int woutlet, fts_class_t * type)
 }
 
 int
-fts_class_outlet_has_message (fts_class_t * cl, int woutlet,
-                              fts_symbol_t selector)
+fts_class_outlet_has_message (fts_class_t * cl, int woutlet, fts_symbol_t selector)
 {
   fts_class_outlet_t *out = class_get_outlet (cl, woutlet);
   

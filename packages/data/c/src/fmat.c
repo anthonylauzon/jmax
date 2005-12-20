@@ -3808,233 +3808,6 @@ fmat_apply_expr_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
   return fts_ok;
 }
 
-/******************************************************************************
- *
- *  load, save, import, export
- *
- */
-
-static fts_method_status_t
-fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
-
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t file_name = fts_get_symbol(at);
-    fts_audiofile_t *sf = fts_audiofile_open_read(file_name);
-    
-    if(sf != NULL)
-    {
-      int m = fts_audiofile_get_num_frames(sf);
-      int n = fts_audiofile_get_num_channels(sf);
-      float *ptr;
-      
-      fmat_reshape(self, m, n);
-      ptr = fmat_get_ptr(self);
-      
-      m = fts_audiofile_read_interleaved(sf, ptr, n, m);
-      fmat_reshape(self, m, n);
-      
-      fts_audiofile_close(sf);      
-      
-      if(m > 0)
-      {
-        fts_object_changed(o);
-        fts_set_object(ret, o);
-      }
-      else
-        fts_object_error(o, "import: coudn't read any audio data from file \"%s\"", fts_symbol_name(file_name));
-    }
-    else
-      fts_object_error(o, "import: cannot open audio file \"%s\"", fts_symbol_name(file_name));
-  }
-  
-  return fts_ok;
-}
-
-
-static fts_method_status_t
-fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
-  
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t file_name = fts_get_symbol(at);
-    fts_atomfile_t *file = fts_atomfile_open_read(file_name);
-    float *ptr = fmat_get_ptr(self);
-    int m = 0;
-    int n = 0;
-    int i = 0;
-    int j = 0;
-    fts_atom_t a;
-    char c;
-    
-    if(file != NULL)
-    {
-      while(fts_atomfile_read(file, &a, &c))
-      {
-        int alloc = self->alloc;
-        m = i + 1;
-        
-        /* first row determines # of columns */
-        if(i == 0)
-          n = j + 1;
-        
-        /* grow matrix */
-        while(m * n > alloc)
-          alloc += 256;
-        
-        fmat_reshape(self, 1, alloc);
-        ptr = fmat_get_ptr(self);
-        
-        if(j < n)
-        {
-          if(fts_is_number(&a))
-            ptr[i * n + j] = (float)fts_get_number_float(&a);
-          else
-            ptr[i * n + j] = 0.0;
-          
-          j++;
-          
-          if(c == '\n'  ||  c == '\r')
-          {
-            for(; j<n; j++)
-              ptr[i * n + j] = 0.0;
-            
-            /* reset to beginning of next row */
-            i++;
-            j = 0;
-          }
-        }
-        else if (c == '\n'  ||  c == '\r')
-        {
-          /* reset to beginning of next row */
-          i++;
-          j = 0;
-        }
-      }
-      
-      /* maybe empty rest of last line */
-      if(j > 0)
-      {
-        i++;
-        j = 0;
-      }
-      
-      fmat_reshape(self, m, n);
-      
-      fts_atomfile_close(file);
-      
-      if(m * n > 0)
-      {
-        fts_object_changed(o);
-        fts_set_object(ret, o);
-      }
-      else
-        fts_object_error(o, "import: couldn't read any text data from file \"%s\"", fts_symbol_name(file_name));
-    }
-    else
-      fts_object_error(o, "import: cannot open text file \"%s\"", fts_symbol_name(file_name));
-  }
-  
-  return fts_ok;
-}
-
-
-static fts_method_status_t
-fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
-  
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t file_name = fts_get_symbol(at);
-    float *ptr = fmat_get_ptr(self);
-    int m = fmat_get_m(self);
-    int n = fmat_get_n(self);
-    fts_audiofile_t *sf = NULL;
-    double sr = fmat_get_sr(self);
-    fts_symbol_t sample_format = fts_s_int16;
-    int size = 0;
-    
-    if(ac > 1 && fts_is_number(at + 1))
-      sr = fts_get_number_float(at + 1);
-    
-    if(ac > 2 && fts_is_symbol(at + 2))
-      sample_format = fts_get_symbol(at + 2);
-    
-    if(sr <= 1.0)
-      sr = 44100.0;
-    
-    sf = fts_audiofile_open_write(file_name, n, (int)sr, s, sample_format);
-    
-    if(sf != NULL)
-    {
-      size = fts_audiofile_write_interleaved(sf, ptr, n, m);
-      fts_audiofile_close(sf);
-
-      if(size > 0)
-        fts_set_object(ret, o);
-      else
-        fts_object_error(o, "export: coudn't write any audio data to file \"%s\"", fts_symbol_name(file_name));
-    }
-    else
-      fts_object_error(o, "export: cannot create audio file \"%s\"", fts_symbol_name(file_name));
-  }
-  
-  return fts_ok;
-}
-
-static fts_method_status_t
-fmat_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
-  
-  if(ac > 0 && fts_is_symbol(at))
-  {
-    fts_symbol_t file_name = fts_get_symbol(at);
-    fts_atomfile_t *file;
-    float *ptr = fmat_get_ptr(self);
-    int m = fmat_get_m(self);
-    int n = fmat_get_n(self);
-    int i, j;
-    
-    file = fts_atomfile_open_write(file_name);
-    
-    if(file != NULL)
-    {
-      /* write the content of the fmat */
-      for(i=0; i<m; i++)
-      {
-        float *row = ptr + i * n;
-        fts_atom_t a;
-        
-        for(j=0; j<n-1; j++)
-        {
-          fts_set_float(&a, row[j]);
-          fts_atomfile_write(file, &a, ' ');
-        }
-        
-        fts_set_float(&a, row[n - 1]);
-        fts_atomfile_write(file, &a, '\n');
-      }
-      
-      fts_atomfile_close(file);
-      
-      if(m * n > 0)
-        fts_set_object(ret, o);
-      else
-        fts_object_error(o, "export: coudn't write any text data to file \"%s\"", fts_symbol_name(file_name));
-    }
-    else
-      fts_object_error(o, "export: cannot open audio file \"%s\"", fts_symbol_name(file_name));
-  }
-  
-  return fts_ok;
-}
-
 /*********************************************************
  *
  *  editor
@@ -4301,8 +4074,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, fmat_set_from_list);
   fts_class_message(cl, fts_s_set, cl, fmat_set_from_fmat);
   fts_class_message(cl, fts_s_set, fvec_class, fmat_set_from_fvec);
-  fts_class_message(cl, fts_s_set, bpf_type, fmat_set_from_bpf);
-  fts_class_message(cl, fts_s_set, ivec_type, fmat_set_from_ivec);
+  fts_class_message(cl, fts_s_set, bpf_class, fmat_set_from_bpf);
+  fts_class_message(cl, fts_s_set, ivec_class, fmat_set_from_ivec);
 
   fts_class_message_varargs(cl, fts_new_symbol("pick"), fmat_pick_fmat);
   
@@ -4409,23 +4182,15 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_message(cl, fts_new_symbol("lookup"), cl, fmat_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fmat_lookup_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("lookup"), bpf_type, fmat_lookup_bpf);
+  fts_class_message(cl, fts_new_symbol("lookup"), bpf_class, fmat_lookup_bpf);
   
   fts_class_message(cl, fts_new_symbol("env"), cl, fmat_env_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("env"), fvec_class, fmat_env_fmat_or_slice);
-  fts_class_message(cl, fts_new_symbol("env"), bpf_type, fmat_env_bpf);
+  fts_class_message(cl, fts_new_symbol("env"), bpf_class, fmat_env_bpf);
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
   fts_class_message_varargs(cl, fts_new_symbol("apply"), fmat_apply_expr_varargs);
   
-  fts_atomfile_import_handler(cl, fmat_import_textfile);
-  fts_audiofile_import_handler(cl, fmat_import_audiofile);
-  fts_class_import_handler_default(cl, fmat_import_audiofile);
-
-  fts_atomfile_export_handler(cl, fmat_export_textfile);
-  fts_audiofile_export_handler(cl, fmat_export_audiofile);
-  fts_class_export_handler_default(cl, fmat_export_audiofile);
-
   fts_class_inlet_bang(cl, 0, data_object_output);
 
   fts_class_message_varargs(cl, fts_s_openEditor, fmat_open_editor);
@@ -4531,9 +4296,6 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, sym_rect, NULL, "convert complex polar vector to complex rectangular vector (matrix of 2 columns)");
   fts_class_doc(cl, sym_polar, NULL, "convert complex rectangular vector to complex polar vector (matrix of 2 columns)");
-
-  fts_class_doc(cl, fts_s_import, "[<sym: file name]", "import data from file");
-  fts_class_doc(cl, fts_s_export, "[<sym: file name]", "export data to file");
   
   if(fmat_null == NULL)
   {

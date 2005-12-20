@@ -88,12 +88,12 @@ SEQUENCE_API void track_add_event_after(track_t *track, double time, event_t *ev
 SEQUENCE_API void track_append_event(track_t *track, double time, event_t *event);
 SEQUENCE_API void track_move_event(track_t *track, event_t *event, double time);
 SEQUENCE_API void track_remove_event(track_t *track, event_t *event);
-SEQUENCE_API void track_merge(track_t *track, track_t *merge);
-SEQUENCE_API void track_clear(track_t *track);
 SEQUENCE_API void track_copy(track_t *org, track_t *copy);
+SEQUENCE_API void track_merge(track_t *track, track_t *merge);
+SEQUENCE_API void track_erase_events(track_t *track);
+SEQUENCE_API void track_clear(track_t *track);
 
 SEQUENCE_API int track_editor_is_open(track_t *track);
-
 SEQUENCE_API int track_is_in_multitrack(track_t *track);
 
 SEQUENCE_API void track_add_event_and_upload(track_t *track, double time, event_t *event);
@@ -103,8 +103,9 @@ SEQUENCE_API void track_remove_event_and_upload(track_t *track, event_t *event);
 SEQUENCE_API void track_merge_and_upload(track_t *track, track_t *merge);
 SEQUENCE_API void track_clear_and_upload(track_t *track);
 
-SEQUENCE_API void track_update_editor (track_t *self);
+SEQUENCE_API void track_update_editor(track_t *self);
 SEQUENCE_API void track_upload_event(track_t *self, event_t *event);
+SEQUENCE_API void track_clear_at_client(track_t *self);
 
 SEQUENCE_API void track_set_dirty(track_t *track);
 
@@ -186,7 +187,5 @@ SEQUENCE_API event_t *track_highlight_and_next(track_t *track, event_t *event);
 SEQUENCE_API fts_method_status_t track_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 SEQUENCE_API fts_method_status_t track_add_event_from_file(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 SEQUENCE_API fts_method_status_t track_event_dump_mess(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
-
-SEQUENCE_API int sequence_import_from_midifile(sequence_t *sequence, fts_midifile_t *file);
 
 #endif  /* _SEQUENCE_TRACK_H_ */

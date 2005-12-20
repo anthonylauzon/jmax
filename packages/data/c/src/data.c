@@ -113,7 +113,7 @@ _expr_evaluate(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   expr_t *self = (expr_t *)o;
   fts_hashtable_t *locals = NULL;
   
-  if(fts_is_a(at, dict_type))
+  if(fts_is_a(at, dict_class))
   {
     dict_t *dict = (dict_t *)fts_get_object(at);
     locals = dict_get_hashtable(dict);
@@ -581,6 +581,8 @@ propobj_class_init(fts_class_t *cl)
 propobj_class_description_t *
 propobj_class_get_descritption(fts_class_t *cl)
 {
+  fts_class_instantiate(cl);
+  
   return (propobj_class_description_t *)fts_object_get_context((fts_object_t *)cl);
 }
 
@@ -659,10 +661,7 @@ propobj_class_insert_property(fts_class_t *cl, fts_symbol_t name, fts_symbol_t t
 propobj_property_t * 
 propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method)
 {
-  propobj_property_t *prop;
-  
-  fts_class_instantiate(cl);
-  prop = propobj_class_insert_property(cl, name, fts_s_int);
+  propobj_property_t *prop = propobj_class_insert_property(cl, name, fts_s_int);
   
   if(set_method != NULL)
     fts_class_message_number(cl, name, set_method);
@@ -677,10 +676,7 @@ propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name, fts_method_t 
 propobj_property_t * 
 propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method)
 {
-  propobj_property_t *prop;
-  
-  fts_class_instantiate(cl);
-  prop = propobj_class_insert_property(cl, name, fts_s_float);
+  propobj_property_t *prop = propobj_class_insert_property(cl, name, fts_s_float);
   
   if(set_method != NULL)
     fts_class_message_number(cl, name, set_method);
@@ -695,10 +691,7 @@ propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name, fts_method_
 propobj_property_t * 
 propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method)
 {
-  propobj_property_t *prop;
-  
-  fts_class_instantiate(cl);
-  prop = propobj_class_insert_property(cl, name, fts_s_symbol);
+  propobj_property_t *prop = propobj_class_insert_property(cl, name, fts_s_symbol);
   
   if(set_method != NULL)
     fts_class_message_symbol(cl, name, set_method);
@@ -713,11 +706,8 @@ propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, fts_method
 propobj_property_t *
 propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name)
 {
-  propobj_class_description_t *descr;
+  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
   fts_atom_t k, v;
-  
-  fts_class_instantiate(cl);
-  descr = propobj_class_get_descritption(cl);
   
   fts_set_symbol(&k, name);
   if(fts_hashtable_get(&descr->hash, &k, &v))
@@ -729,10 +719,7 @@ propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name)
 propobj_property_t *
 propobj_class_get_property_by_index(fts_class_t *cl, int index)
 {
-  propobj_class_description_t *descr;
-  
-  fts_class_instantiate(cl);
-  descr = propobj_class_get_descritption(cl);
+  propobj_class_description_t *descr = propobj_class_get_descritption(cl);
   
   if(index >= 0 && index < descr->n_properties)
     return descr->array + index;

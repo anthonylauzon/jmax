@@ -25,7 +25,7 @@
 #include <fts/packages/data/bpf.h>
 
 fts_symbol_t bpf_symbol = 0;
-fts_class_t *bpf_type = 0;
+fts_class_t *bpf_class = 0;
 
 static fts_symbol_t sym_addPoint = 0;
 static fts_symbol_t sym_removePoints = 0;
@@ -867,7 +867,7 @@ bpf_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_set, _bpf_set);
   fts_class_message_varargs(cl, fts_s_append, _bpf_append);
   fts_class_message_varargs(cl, fts_s_insert, _bpf_insert);
-  fts_class_message(cl, fts_s_set, bpf_type, _bpf_set_from_bpf);
+  fts_class_message(cl, fts_s_set, bpf_class, _bpf_set_from_bpf);
   fts_class_message(cl, fts_s_set, fmat_class, _bpf_set_from_fmat);
   
   fts_class_message_number(cl, fts_s_get_element, _bpf_get_interpolated);
@@ -903,7 +903,7 @@ FTS_MODULE_INIT(bpf)
   sym_removePoints = fts_new_symbol("removePoints");
   sym_setPoints = fts_new_symbol("setPoints");
   
-  bpf_type = fts_class_install(bpf_symbol, bpf_instantiate);
+  bpf_class = fts_class_install(bpf_symbol, bpf_instantiate);
 }
 
 /** EMACS **

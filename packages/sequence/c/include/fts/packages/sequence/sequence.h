@@ -105,10 +105,9 @@ SEQUENCE_API void sequence_add_track(sequence_t *sequence, track_t *track);
 SEQUENCE_API void sequence_remove_track(sequence_t *sequence, track_t *track);
 SEQUENCE_API void sequence_set_dirty(sequence_t *sequence);
 
+SEQUENCE_API void sequence_upload(sequence_t *self);
+
 SEQUENCE_API track_t *sequence_get_track_by_name(sequence_t *sequence, fts_symbol_t name);
 SEQUENCE_API track_t *sequence_get_track_by_index(sequence_t *sequence, int index);
-
-SEQUENCE_API int track_import_from_midifile(track_t *track, fts_midifile_t *file);
-SEQUENCE_API int track_export_to_midifile(track_t *track, fts_midifile_t *file);
 
 #endif

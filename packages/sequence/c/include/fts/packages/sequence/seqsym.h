@@ -67,10 +67,6 @@ FTS_API fts_symbol_t seqsym_object;
 /* messages */
 FTS_API fts_symbol_t seqsym_insert;
 FTS_API fts_symbol_t seqsym_remove;
-FTS_API fts_symbol_t seqsym_export_midifile;
-FTS_API fts_symbol_t seqsym_export_midifile_dialog;
-FTS_API fts_symbol_t seqsym_import_midifile;
-FTS_API fts_symbol_t seqsym_import_midifile_dialog;
 FTS_API fts_symbol_t seqsym_add_track;
 FTS_API fts_symbol_t seqsym_make_track;
 FTS_API fts_symbol_t seqsym_remove_track;
