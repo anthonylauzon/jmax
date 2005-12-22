@@ -738,8 +738,7 @@ audioconfig_instantiate(fts_class_t* cl)
  *
  */
 
-void
-fts_kernel_audioconfig_init(void)
+FTS_MODULE_INIT(audioconfig)
 {
   audioconfig_s_name = fts_new_symbol("__audioconfig");  
   audioconfig_s_unconnected = fts_new_symbol("-");

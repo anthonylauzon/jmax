@@ -745,7 +745,7 @@ propobj_class_append_properties(fts_class_t *cl, fts_array_t *array)
  *  config
  *
  */
-FTS_MODULE_INIT(data)
+FTS_PACKAGE_INIT(data)
 {
   sym_expr = fts_new_symbol("expr");
   expr_class = fts_class_install(sym_expr, expr_instantiate);

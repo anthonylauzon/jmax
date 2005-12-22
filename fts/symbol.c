@@ -73,7 +73,7 @@ static void fts_predefine_symbols(void)
  *
  */
 
-void fts_kernel_symbol_init(void)
+FTS_MODULE_INIT(symbol)
 {
   fts_hashtable_init( &symbol_table, FTS_HASHTABLE_BIG);
 

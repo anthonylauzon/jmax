@@ -69,7 +69,9 @@ extern "C" {
 #define FTS_API extern
 #endif
 
-#define FTS_KERNEL_INIT(m) void fts_##m##_parser_init( void); void fts_##m##_parser_init( void)
+#define FTS_MODULE_INIT(m) void fts_module_##m##_init(void); void fts_module_##m##_init(void)
+#define FTS_MODULE_INIT_CALL(m) { extern void fts_module_##m##_init(void); fts_module_##m##_init(); }
+#define FTS_PACKAGE_INIT(p) void p##_config(void); void p##_config(void)
 
 /* *** The inclusion order is important *** */
 #include <fts/types.h>

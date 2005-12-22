@@ -90,7 +90,7 @@ client_table_remove( int id)
 }
 
 static void 
-client_table_init( void)
+client_table_init(void)
 {
   fts_stack_init( &client_table, client_t *);
 
@@ -1358,8 +1358,7 @@ fts_client_upload_object(fts_object_t *obj, int client_id)
 *
 */
 
-void
-fts_kernel_client_init( void)
+FTS_MODULE_INIT(client)
 {
   client_table_init();
 

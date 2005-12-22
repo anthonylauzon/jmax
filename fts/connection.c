@@ -266,7 +266,7 @@ connection_instantiate(fts_class_t *cl)
  *
  */
 
-void fts_kernel_connection_init()
+FTS_MODULE_INIT(connection)
 {
   fts_connection_class = fts_class_install(fts_s_connection, connection_instantiate);
 

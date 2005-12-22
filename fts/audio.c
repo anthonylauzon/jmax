@@ -811,8 +811,7 @@ static void nullaudioport_instantiate(fts_class_t* cl)
  *
  */
 
-void
-fts_kernel_audio_init( void)
+FTS_MODULE_INIT(audio)
 {
   fts_class_t *audio_sched_class;
   fts_class_t* nullaudioport_class;

@@ -100,8 +100,7 @@ getrange_instantiate(fts_class_t *cl)
   fts_class_outlet_number(cl, 1);
 }
 
-void
-getrange_config(void)
+FTS_MODULE_INIT(getrange)
 {
   fts_class_install(fts_new_symbol("getrange"), getrange_instantiate);
 }

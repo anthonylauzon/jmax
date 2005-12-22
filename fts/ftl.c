@@ -1088,7 +1088,7 @@ fts_object_t *ftl_program_get_current_object( ftl_program_t *prog)
  *
  */
 
-void fts_kernel_ftl_init( void)
+FTS_MODULE_INIT(ftl)
 {
   fts_hashtable_init( &ftl_functions_table, FTS_HASHTABLE_MEDIUM);
 }

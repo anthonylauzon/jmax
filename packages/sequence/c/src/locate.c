@@ -191,8 +191,7 @@ locate_instantiate(fts_class_t *cl)
   fts_class_outlet_float(cl, 1);  
 }
 
-void
-locate_config(void)
+FTS_MODULE_INIT(locate)
 {
   /*fts_class_install(fts_new_symbol("locate"), locate_instantiate);*/
 }

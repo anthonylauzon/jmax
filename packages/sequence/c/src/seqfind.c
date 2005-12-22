@@ -216,8 +216,7 @@ seqfind_instantiate(fts_class_t *cl)
   fts_class_outlet_float(cl, 1);
 }
 
-void
-seqfind_config(void)
+FTS_MODULE_INIT(seqfind)
 {
   fts_class_install(fts_new_symbol("find"), seqfind_instantiate);
 }

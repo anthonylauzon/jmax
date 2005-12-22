@@ -256,60 +256,60 @@ fts_load_config( void)
  * these functions initializes the kernel structures
  */
 
-#define _K_DECNCALL(F) { extern void F(void); F(); }
-
-void fts_kernel_init( void)
+void
+fts_kernel_init(void)
 {
   /*
    * Attention !!! The order is important (at least for the first lines)
    */
-  _K_DECNCALL( fts_kernel_hashtable_init);
-  _K_DECNCALL( fts_kernel_symbol_init);
-  _K_DECNCALL( fts_kernel_class_init);
-  _K_DECNCALL( fts_kernel_atom_init);
-  _K_DECNCALL( fts_kernel_post_init);
-  _K_DECNCALL( fts_kernel_list_init);
-  _K_DECNCALL( fts_kernel_package_init);
-  _K_DECNCALL( fts_kernel_tuple_init);
-  _K_DECNCALL( fts_kernel_connection_init);
-  _K_DECNCALL( fts_kernel_variable_init);
-  _K_DECNCALL( fts_kernel_function_init);
-  _K_DECNCALL( fts_kernel_define_init);
-  _K_DECNCALL( fts_kernel_bytestream_init); /* Must be before patcher_init */
-  _K_DECNCALL( fts_kernel_pipestream_init); /* Must be before patcher_init */
-  _K_DECNCALL( fts_kernel_socketstream_init);
-  _K_DECNCALL( fts_kernel_patcher_init);
-  _K_DECNCALL( fts_kernel_parser_init);
-  _K_DECNCALL( fts_kernel_expression_init); /* Must be after parser_init */
-  _K_DECNCALL( fts_kernel_ftl_init);
-  _K_DECNCALL( fts_kernel_param_init);
-  _K_DECNCALL( fts_kernel_preset_init);
-  _K_DECNCALL( fts_kernel_dsp_graph_init);
-  _K_DECNCALL( fts_kernel_dsp_init);
-  _K_DECNCALL( fts_kernel_abstraction_init);
-  _K_DECNCALL( fts_kernel_template_init);
-  _K_DECNCALL( fts_kernel_autosave_init);
-  _K_DECNCALL( fts_kernel_patfile_init);
-  _K_DECNCALL( fts_kernel_time_init);
-  _K_DECNCALL( fts_kernel_sched_init);
-  _K_DECNCALL( fts_kernel_audiofile_init);
-  _K_DECNCALL( fts_kernel_error_object_init);
-  _K_DECNCALL( fts_kernel_message_init);
-  _K_DECNCALL( fts_kernel_audio_init);
-  _K_DECNCALL( fts_kernel_audioconfig_init);  
-  _K_DECNCALL( fts_kernel_client_init);
-  _K_DECNCALL( fts_kernel_client_manager_init);
-  _K_DECNCALL( fts_kernel_update_init);
-  _K_DECNCALL( fts_kernel_clipboard_init);
-  _K_DECNCALL( fts_kernel_label_init);
-  _K_DECNCALL( fts_kernel_midievent_init);
-  _K_DECNCALL( fts_kernel_midi_init);
-  _K_DECNCALL( fts_kernel_config_init);
-  _K_DECNCALL( fts_kernel_objectset_init);
-  _K_DECNCALL( fts_kernel_selection_init);
-  _K_DECNCALL( fts_kernel_saver_init);
-  _K_DECNCALL( fts_kernel_thread_manager_init);
-  _K_DECNCALL( fts_kernel_binary_protocol_init);
+  FTS_MODULE_INIT_CALL( mem);
+  FTS_MODULE_INIT_CALL( hashtable);
+  FTS_MODULE_INIT_CALL( symbol);
+  FTS_MODULE_INIT_CALL( class);
+  FTS_MODULE_INIT_CALL( atom);
+  FTS_MODULE_INIT_CALL( post);
+  FTS_MODULE_INIT_CALL( list);
+  FTS_MODULE_INIT_CALL( package);
+  FTS_MODULE_INIT_CALL( tuple);
+  FTS_MODULE_INIT_CALL( connection);
+  FTS_MODULE_INIT_CALL( variable);
+  FTS_MODULE_INIT_CALL( function);
+  FTS_MODULE_INIT_CALL( define);
+  FTS_MODULE_INIT_CALL( bytestream); /* Must be before patcher_init */
+  FTS_MODULE_INIT_CALL( pipestream); /* Must be before patcher_init */
+  FTS_MODULE_INIT_CALL( socketstream);
+  FTS_MODULE_INIT_CALL( patcher);
+  FTS_MODULE_INIT_CALL( parser);
+  FTS_MODULE_INIT_CALL( expression); /* Must be after parser_init */
+  FTS_MODULE_INIT_CALL( ftl);
+  FTS_MODULE_INIT_CALL( param);
+  FTS_MODULE_INIT_CALL( preset);
+  FTS_MODULE_INIT_CALL( dsp_graph);
+  FTS_MODULE_INIT_CALL( dsp);
+  FTS_MODULE_INIT_CALL( abstraction);
+  FTS_MODULE_INIT_CALL( template);
+  FTS_MODULE_INIT_CALL( autosave);
+  FTS_MODULE_INIT_CALL( patfile);
+  FTS_MODULE_INIT_CALL( time);
+  FTS_MODULE_INIT_CALL( sched);
+  FTS_MODULE_INIT_CALL( audiofile);
+  FTS_MODULE_INIT_CALL( error_object);
+  FTS_MODULE_INIT_CALL( message);
+  FTS_MODULE_INIT_CALL( audio);
+  FTS_MODULE_INIT_CALL( audioconfig);  
+  FTS_MODULE_INIT_CALL( client);
+  FTS_MODULE_INIT_CALL( client_manager);
+  FTS_MODULE_INIT_CALL( update);
+  FTS_MODULE_INIT_CALL( clipboard);
+  FTS_MODULE_INIT_CALL( label);
+  FTS_MODULE_INIT_CALL( midievent);
+  FTS_MODULE_INIT_CALL( midi);
+  FTS_MODULE_INIT_CALL( config);
+  FTS_MODULE_INIT_CALL( objectset);
+  FTS_MODULE_INIT_CALL( selection);
+  FTS_MODULE_INIT_CALL( saver);
+  FTS_MODULE_INIT_CALL( thread_manager);
+  FTS_MODULE_INIT_CALL( binary_protocol);
 }
 
 void fts_init( int argc, char **argv)
@@ -356,11 +356,9 @@ void fts_init( int argc, char **argv)
  *
  */
 
-void fts_kernel_patcher_shutdown(void);
-
-void fts_shutdown( void)
+void 
+fts_shutdown( void)
 {
-  fts_kernel_patcher_shutdown();
 }
 
 /** EMACS **

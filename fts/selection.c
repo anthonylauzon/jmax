@@ -183,8 +183,7 @@ selection_instantiate(fts_class_t *cl)
  *
  */
 
-void
-fts_kernel_selection_init( void)
+FTS_MODULE_INIT(selection)
 {
   fts_class_install(fts_new_symbol("__selection"), selection_instantiate);
 }

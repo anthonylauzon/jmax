@@ -289,8 +289,7 @@ param_instantiate(fts_class_t *cl)
  *
  */
 
-void
-fts_kernel_param_init(void)
+FTS_MODULE_INIT(param)
 {
   fts_s_param = fts_new_symbol("param");
 

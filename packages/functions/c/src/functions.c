@@ -677,7 +677,7 @@ _function_info(int ac, const fts_atom_t *at, fts_atom_t *ret)
  *  functions setup
  *
  */
-FTS_MODULE_INIT(functions)
+FTS_PACKAGE_INIT(functions)
 {
 #undef FUN
 #define FUN INSTALL_FUN

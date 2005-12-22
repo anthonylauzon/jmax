@@ -1764,8 +1764,7 @@ static void loader_instantiate(fts_class_t *cl)
  * Initialization
  *
  */
-void 
-fts_kernel_package_init(void)
+FTS_MODULE_INIT(package)
 {
   fts_symbol_t system_symbol;
   fts_atom_t a, p;

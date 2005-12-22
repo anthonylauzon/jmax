@@ -203,8 +203,7 @@ thread_manager_instantiate(fts_class_t* cl)
  * Initialization
  *
  */
-void 
-fts_kernel_thread_manager_init(void)
+FTS_MODULE_INIT(thread_manager)
 {
     thread_manager_s_name = fts_new_symbol("thread_manager");
     thread_manager_type = fts_class_install(thread_manager_s_name, thread_manager_instantiate);

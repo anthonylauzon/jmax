@@ -203,6 +203,7 @@ FTS_API void fts_dsp_timebase_configure(void);
  * @ingroup dsp
  */
 FTS_API double fts_dsp_get_sample_rate(void);
+#define fts_audio_get_sr() fts_dsp_get_sample_rate()
 
 /**
  * Set the global sample rate of the DSP subsystem
@@ -234,6 +235,7 @@ FTS_API double fts_dsp_set_sample_rate(double sample_rate);
  * @ingroup dsp
  */
 FTS_API int fts_dsp_get_tick_size(void);
+#define fts_audio_get_vs() fts_dsp_get_tick_size()
 
 /**
  * Get the buffer size used for audio device

@@ -377,7 +377,7 @@ fts_sleep(void)
  *
  */
 
-void fts_kernel_sched_init(void)
+FTS_MODULE_INIT(sched)
 {
   sleep_init();
 

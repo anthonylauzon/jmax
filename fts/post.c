@@ -661,7 +661,7 @@ static void log_date( FILE *log)
 #endif
 }
 
-static void log_init( void)
+static void log_init(void)
 {
   FILE *log;
 

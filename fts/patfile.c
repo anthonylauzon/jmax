@@ -1486,7 +1486,7 @@ fts_status_t fts_pat_file_load( fts_symbol_t filename, fts_object_t *parent, int
  *
  */
 
-void fts_kernel_patfile_init()
+FTS_MODULE_INIT(patfile)
 {
   patlex_sym_max = fts_new_symbol("max");
   patlex_sym_v2 = fts_new_symbol("v2");

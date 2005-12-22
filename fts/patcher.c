@@ -2182,7 +2182,7 @@ fts_patcher_get_scope(fts_patcher_t *patcher)
  *
  */
 
-void fts_kernel_patcher_init(void)
+FTS_MODULE_INIT(patcher)
 {
   sym_showObject = fts_new_symbol("showObject");
   sym_stopWaiting = fts_new_symbol("stopWaiting");
@@ -2222,11 +2222,6 @@ void fts_kernel_patcher_init(void)
   patcher_memory_stream = (fts_memorystream_t *)fts_object_create( fts_memorystream_class, 0, 0);
 
   fts_create_root_patcher();
-}
-
-void fts_kernel_patcher_shutdown(void)
-{
-  fts_delete_root_patcher();
 }
 
 /** EMACS **

@@ -579,7 +579,6 @@ fvec_copy_to_fmat(fvec_t *org, fmat_t *copy)
   
   copy->onset = orgmat->onset;
   copy->domain = orgmat->domain;
-  copy->sr = orgmat->sr;
 }
 
 
@@ -1068,39 +1067,6 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   
   return fts_ok;
 }
-
-
-static fts_method_status_t
-_fvec_get_sr (fts_object_t *o, fts_symbol_t s, 
-              int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fvec_t *self = (fvec_t *) o;
-  
-  fts_set_float(ret, fmat_get_sr(self->fmat));
-  
-  return fts_ok;
-}
-
-
-static fts_method_status_t
-_fvec_set_sr (fts_object_t *o, fts_symbol_t s, 
-              int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fvec_t *self = (fvec_t *) o;
-  double  sr   = fts_get_number_float(at);
-  
-  if (sr < 0.001)
-    sr = 0.001;
-
-  fmat_set_sr(self->fmat, sr);
-  
-  fts_object_changed((fts_object_t *) self->fmat);
-  fts_set_object(ret, o);
-  
-  return fts_ok;
-}
-
-
 
 /******************************************************************************
 *
@@ -2135,10 +2101,6 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_size, _fvec_get_size);
   fts_class_message_number(cl, fts_s_size, _fvec_set_size);
 
-  fts_class_message_void  (cl, fts_new_symbol("sr"), _fvec_get_sr);
-  fts_class_message_number(cl, fts_new_symbol("sr"), _fvec_set_sr);
-
-  
   /* arithmetics (on fvec or fmat!) */
   fvec_message(cl, fts_new_symbol("add"), fvec_add_fvec, fvec_add_number);
   fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);

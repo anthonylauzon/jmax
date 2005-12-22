@@ -98,7 +98,7 @@ static void autosave_signal_handler(int sig)
  *
  */
 
-void fts_kernel_autosave_init( void)
+FTS_MODULE_INIT(autosave)
 {
 #ifndef DEBUG
   /* Standard quit/int signals */

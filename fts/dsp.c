@@ -140,7 +140,7 @@ fts_dsp_set_sample_rate( double dsp_sample_rate)
 }
 
 double
-fts_dsp_get_sample_rate()
+fts_dsp_get_sample_rate(void)
 {
   fts_atom_t* value = fts_param_get_value( dsp_sample_rate_param);
   
@@ -607,7 +607,7 @@ dsp_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
  *
  */
 
-void fts_kernel_dsp_init(void)
+FTS_MODULE_INIT(dsp)
 {
   fts_class_t *dsp_timebase_class = 0;
 

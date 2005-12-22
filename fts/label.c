@@ -258,8 +258,7 @@ label_instantiate(fts_class_t *cl)
 *
 */
 
-void 
-fts_kernel_label_init(void)
+FTS_MODULE_INIT(label)
 {
   fts_label_class = fts_class_install( NULL, label_instantiate);
 }

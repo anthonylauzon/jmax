@@ -22,10 +22,7 @@
 
 #include <fts/packages/utils/utils.h>
 
-extern void fts_ffuns_init(void);
-extern void fts_cubic_init(void);
-
-FTS_MODULE_INIT(utils)
+FTS_PACKAGE_INIT(utils)
 {
   FTS_MODULE_INIT_CALL(ffuns);
   FTS_MODULE_INIT_CALL(cubic);

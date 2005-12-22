@@ -322,7 +322,7 @@ void fts_dsp_signal_print( fts_dsp_signal_t *s)
   fts_post( "dsp_signal *%p{ name=\"%s\" refcnt=%p vs=%d}\n", s, s->name, s->refcnt, s->length);
 }
 
-void fts_dsp_signal_init( void)
+void fts_dsp_signal_init(void)
 {
   fts_dsp_signal_list_t *current;
 
@@ -852,7 +852,7 @@ dsp_graph_builtin_add(fts_word_t *argv)
     out[i] = in1[i] + in2[i];
 }
 
-void fts_kernel_dsp_graph_init(void)
+FTS_MODULE_INIT(dsp_graph)
 {
   dsp_descr_heap = fts_heap_new(sizeof(fts_dsp_descr_t));
   fts_s_sig_zero = fts_new_symbol("_sig_0");

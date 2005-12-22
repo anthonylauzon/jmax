@@ -375,8 +375,7 @@ define_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_update_gui, define_update_gui);
 }
 
-void
-fts_kernel_define_init(void)
+FTS_MODULE_INIT(define)
 {
   sym_expression = fts_new_symbol("expression");
   sym_const = fts_new_symbol("const");

@@ -22,7 +22,7 @@
 
 #include "internal_sequence.h"
 
-FTS_MODULE_INIT(sequence)
+FTS_PACKAGE_INIT(sequence)
 {
   FTS_MODULE_INIT_CALL(seqsym);
 

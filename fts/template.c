@@ -206,7 +206,7 @@ fts_template_file_modified(fts_symbol_t filename)
  *
  */
 
-void fts_kernel_template_init()
+FTS_MODULE_INIT(template)
 {
   template_heap = fts_heap_new(sizeof(fts_template_t));
   fts_hashtable_init(&template_file_to_load, FTS_HASHTABLE_MEDIUM);

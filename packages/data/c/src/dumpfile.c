@@ -349,8 +349,7 @@ dumpfile_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("restore"), dumpfile_restore_object);
 }
 
-void
-dumpfile_config(void)
+FTS_MODULE_INIT(dumpfile)
 {
   sym_comment = fts_new_symbol("#");
 

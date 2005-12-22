@@ -1324,8 +1324,7 @@ midiconfig_instantiate(fts_class_t *cl)
  * Initialization
  *
  */
-void
-fts_kernel_midi_init(void)
+FTS_MODULE_INIT(midi)
 {
   midibus_type = fts_class_install(NULL, midibus_instantiate);
   midinull_type = fts_class_install(NULL, midinull_instantiate);

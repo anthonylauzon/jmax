@@ -251,7 +251,7 @@ static void fts_pipestream_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_sched_ready, fts_pipestream_receive);
 }
 
-void fts_kernel_pipestream_init( void)
+FTS_MODULE_INIT(pipestream)
 {
   fts_pipestream_class = fts_class_install( fts_new_symbol("pipestream"), fts_pipestream_instantiate);
 }

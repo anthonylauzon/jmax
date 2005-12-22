@@ -523,8 +523,7 @@ preset_instantiate(fts_class_t *cl)
   fts_class_outlet_int(cl, 0);
 }
 
-void
-fts_kernel_preset_init(void)
+FTS_MODULE_INIT(preset)
 {
   sym_new_preset = fts_new_symbol("new_preset");
   sym_dump_mess = fts_new_symbol("dump_mess");

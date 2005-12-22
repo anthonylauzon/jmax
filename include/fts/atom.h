@@ -45,6 +45,7 @@
  * @ingroup atom
  */
 #define fts_get_class(p) (p)->type
+#define fts_get_class_id(p) ((p)->type->type_id)
 
 /**
  * Get the name associated with the type of the atom.
@@ -469,6 +470,6 @@ FTS_API void fts_atom_copy (const fts_atom_t *from, fts_atom_t *to);
  * Constant representing a 'void' atom
  * @ingroup atom
  */
-FTS_API const fts_atom_t *fts_null;
+FTS_API fts_atom_t *fts_null;
 FTS_API fts_atom_t *fts_nix;
 

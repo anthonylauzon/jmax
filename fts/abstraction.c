@@ -282,7 +282,7 @@ static fts_symbol_t get_name_without_extension( fts_symbol_t name)
  *
  */
 
-void fts_kernel_abstraction_init()
+FTS_MODULE_INIT(abstraction)
 {
 /*    fts_hashtable_init(&abstraction_table, 0, FTS_HASHTABLE_MEDIUM); */
 

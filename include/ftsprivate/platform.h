@@ -35,7 +35,7 @@ extern fts_status_t fts_load_library( const char *filename, const char *symbol);
 
 extern int fts_unlock_memory( void);
 
-extern void fts_platform_init( void);
+extern void fts_platform_init(void);
 
 extern double fts_systime();
 

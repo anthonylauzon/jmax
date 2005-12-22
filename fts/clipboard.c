@@ -127,8 +127,7 @@ clipboard_instantiate(fts_class_t *cl)
  *
  */
 
-void
-fts_kernel_clipboard_init(void)
+FTS_MODULE_INIT(clipboard)
 {
   fts_class_install(fts_new_symbol("__clipboard"), clipboard_instantiate);
 }

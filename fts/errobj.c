@@ -273,8 +273,7 @@ fts_object_error(fts_object_t *obj, const char *format, ...)
 *
 */
 
-void 
-fts_kernel_error_object_init(void)
+FTS_MODULE_INIT(error_object)
 {
   fts_error_object_class = fts_class_install(NULL, error_object_instantiate);
 }

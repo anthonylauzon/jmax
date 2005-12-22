@@ -398,7 +398,7 @@ static void fts_udpstream_instantiate(fts_class_t* cl)
  *
  */
 
-void fts_kernel_socketstream_init(void)
+FTS_MODULE_INIT(socketstream)
 {
   fts_socketstream_class = fts_class_install( fts_new_symbol("socketstream"), fts_socketstream_instantiate);
   fts_udpstream_class = fts_class_install( fts_new_symbol("udpstream"), fts_udpstream_instantiate);

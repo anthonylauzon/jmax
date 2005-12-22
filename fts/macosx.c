@@ -277,7 +277,7 @@ int fts_unlock_memory( void)
 /*                                                                             */
 /* *************************************************************************** */
 
-void fts_platform_init( void)
+void fts_platform_init(void)
 {
   fts_post( "Mac OS X BETA version\n");
 

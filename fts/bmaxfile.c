@@ -2056,8 +2056,7 @@ saver_dumper_instantiate(fts_class_t *cl)
  * Initialization
  *
  */
-void
-fts_kernel_saver_init(void)
+FTS_MODULE_INIT(saver)
 {
   saver_dumper_type = fts_class_install(NULL, saver_dumper_instantiate);
   s_sequence = fts_new_symbol("sequence");

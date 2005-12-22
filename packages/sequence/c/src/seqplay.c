@@ -565,8 +565,7 @@ seqplay_instantiate(fts_class_t *cl)
   fts_class_outlet_bang(cl, 1);
 }
 
-void
-seqplay_config(void)
+FTS_MODULE_INIT(seqplay)
 {
   fts_class_install(fts_new_symbol("play"), seqplay_instantiate);
 }

@@ -62,8 +62,6 @@ static fts_symbol_t sym_arg = 0;
 static fts_symbol_t sym_insert_cols = 0;
 static fts_symbol_t sym_delete_cols = 0;
 
-static fts_symbol_t sym_sr = 0;
-
 int fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride);
 
 /********************************************************
@@ -357,7 +355,6 @@ fmat_copy(fmat_t *org, fmat_t *copy)
 
   copy->onset = org->onset;
   copy->domain = org->domain;
-  copy->sr = org->sr;
 }
 
 
@@ -1137,33 +1134,6 @@ _fmat_set_n(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
     fts_object_changed(o);
     fts_set_object(ret, o);
   }
-  
-  return fts_ok;
-}
-
-static fts_method_status_t
-_fmat_get_sr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
-  
-  fts_set_float(ret, fmat_get_sr(self));
-  
-  return fts_ok;
-}
-
-static fts_method_status_t
-_fmat_set_sr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fmat_t *self = (fmat_t *)o;
-  double sr = fts_get_number_float(at);
-  
-  if(sr < 0.001)
-    sr = 0.001;
-
-  fmat_set_sr(self, sr);
-  
-  fts_object_changed(o);
-  fts_set_object(ret, o);
   
   return fts_ok;
 }
@@ -3943,10 +3913,6 @@ fmat_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     fts_dumper_message_send(dumper, mess);
   }
 
-  mess = fts_dumper_message_get(dumper, sym_sr);
-  fts_message_append_float(mess, fmat_get_sr(self));
-  fts_dumper_message_send(dumper, mess);
-  
   return fts_ok;
 }
 
@@ -3965,7 +3931,6 @@ fmat_initialize(fmat_t *self)
   self->alloc = -1;
   self->onset = 0.0;
   self->domain = 0.0;
-  self->sr = 1.0;
   self->opened = 0;
 }
 
@@ -4119,9 +4084,6 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_cols, _fmat_get_n);
   fts_class_message_number(cl, fts_s_cols, _fmat_set_n);  
 
-  fts_class_message_number(cl, sym_sr, _fmat_set_sr);
-  fts_class_message_void(cl, sym_sr, _fmat_get_sr);
-  
   fts_class_message_void(cl, fts_new_symbol("min"), fmat_get_min);
   fts_class_message_void(cl, fts_new_symbol("max"), fmat_get_max);
   fts_class_message_void(cl, fts_new_symbol("absmax"), fmat_get_absmax);
@@ -4323,8 +4285,6 @@ FTS_MODULE_INIT(fmat)
 
   sym_insert_cols = fts_new_symbol("insert_cols");
   sym_delete_cols = fts_new_symbol("delete_cols");
-
-  sym_sr = fts_new_symbol("sr");
 
   fmat_class = fts_class_install(fmat_symbol, fmat_instantiate);
   fmat_null = NULL;

@@ -257,8 +257,7 @@ fts_client_manager_pipe_start( void)
 *
 */
 
-void
-fts_kernel_client_manager_init( void)
+FTS_MODULE_INIT(client_manager)
 {
   client_manager_class = fts_class_install( NULL, client_manager_instantiate);
 }

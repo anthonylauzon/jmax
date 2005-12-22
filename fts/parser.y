@@ -278,7 +278,7 @@ token_table_put_entry( fts_symbol_t s, int token, int operator)
 }
 
 static void
-token_table_init( void)
+token_table_init(void)
 {
   fts_hashtable_init( &token_table, FTS_HASHTABLE_MEDIUM);
 

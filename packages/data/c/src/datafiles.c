@@ -224,7 +224,7 @@ fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
     fts_audiofile_t *sf = NULL;
-    double sr = fmat_get_sr(self);
+    double sr = fts_audio_get_sr();
     fts_symbol_t sample_format = fts_s_int16;
     int size = 0;
     

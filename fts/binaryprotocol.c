@@ -594,8 +594,7 @@ binary_protocol_instantiate(fts_class_t* cl)
  * Initialization
  *
  */
-void
-fts_kernel_binary_protocol_init(void)
+FTS_MODULE_INIT(binary_protocol)
 {
   fts_binary_protocol_type = fts_class_install(NULL, binary_protocol_instantiate);
 }

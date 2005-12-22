@@ -50,7 +50,6 @@ typedef struct
   int m;
   int n;
   int alloc;
-  double sr; /* sample rate */
   double onset; /* fractional onset */
   double domain; /* fractional size (rows) */
   int opened;
@@ -115,9 +114,6 @@ DATA_API void fmat_set_n(fmat_t *fmat, int n);
  *  @fn float *fmat_set_element(fmat_t *x, int i, int j, float val)
  */
 #define fmat_set_element(m, i, j, x) ((m)->values[(i) * (m)->n + (j)] = (x))
-
-#define fmat_set_sr(fm, f) ((fm)->sr = (f))
-#define fmat_get_sr(fm) ((fm)->sr)
 
 #define fmat_set_onset(fm, f) ((fm)->onset = (f))
 #define fmat_get_onset(fm) ((fm)->onset)

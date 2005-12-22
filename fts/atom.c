@@ -219,27 +219,20 @@ static fts_class_t VAR =                                        \
   0, /* heap */                                                 \
   0, /* doc */                                                  \
 };                                                              \
-fts_class_t *fts_##VAR = NULL;
+fts_class_t *fts_##VAR = &(VAR)
 
-FTS_PRIMITIVE_CLASS(void_class, FTS_TYPEID_VOID)
-FTS_PRIMITIVE_CLASS(int_class, FTS_TYPEID_INT)
-FTS_PRIMITIVE_CLASS(float_class, FTS_TYPEID_FLOAT)
-FTS_PRIMITIVE_CLASS(symbol_class, FTS_TYPEID_SYMBOL)
-FTS_PRIMITIVE_CLASS(pointer_class, FTS_TYPEID_POINTER)
-FTS_PRIMITIVE_CLASS(string_class, FTS_TYPEID_STRING)
+FTS_PRIMITIVE_CLASS(void_class, FTS_TYPEID_VOID);
+FTS_PRIMITIVE_CLASS(int_class, FTS_TYPEID_INT);
+FTS_PRIMITIVE_CLASS(float_class, FTS_TYPEID_FLOAT);
+FTS_PRIMITIVE_CLASS(symbol_class, FTS_TYPEID_SYMBOL);
+FTS_PRIMITIVE_CLASS(pointer_class, FTS_TYPEID_POINTER);
+FTS_PRIMITIVE_CLASS(string_class, FTS_TYPEID_STRING);
 
 FTS_MODULE_INIT(atom)
 {
   fts_void_class = fts_shared_get(fts_s_void);
-  fts_int_class = fts_shared_get(fts_s_int);
-  fts_float_class = fts_shared_get(fts_s_float);
-  fts_symbol_class = fts_shared_get(fts_s_symbol);
-  fts_pointer_class = fts_shared_get(fts_s_pointer);
-  fts_string_class = fts_shared_get(fts_s_string);
-  fts_null = fts_shared_get(fts_s_null);
-  fts_nix = fts_shared_get(fts_s_nix);
   
-  if(fts_int_class == NULL)
+  if(fts_void_class == NULL)
   {
     /* init primitive classes */
     fts_void_class = &void_class;
@@ -269,5 +262,15 @@ FTS_MODULE_INIT(atom)
     fts_shared_set(fts_s_string, fts_string_class);
     fts_shared_set(fts_s_null, (void *)fts_null);
     fts_shared_set(fts_s_nix, (void *)fts_nix);
+  }
+  else
+  {
+    fts_int_class = fts_shared_get(fts_s_int);
+    fts_float_class = fts_shared_get(fts_s_float);
+    fts_symbol_class = fts_shared_get(fts_s_symbol);
+    fts_pointer_class = fts_shared_get(fts_s_pointer);
+    fts_string_class = fts_shared_get(fts_s_string);
+    fts_null = fts_shared_get(fts_s_null);
+    fts_nix = fts_shared_get(fts_s_nix);
   }
 }

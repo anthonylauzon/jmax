@@ -194,8 +194,7 @@ seqrec_instantiate(fts_class_t *cl)
   fts_class_inlet(cl, 1, track_class, seqrec_set_reference);
 }
 
-void
-seqrec_config(void)
+FTS_MODULE_INIT(seqrec)
 {
   fts_class_install(fts_new_symbol("record"), seqrec_instantiate);
 }

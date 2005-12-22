@@ -326,7 +326,6 @@
 		3B131FF009348BD9001F5860 /* seq_edit.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FED09348BD9001F5860 /* seq_edit.gif */; };
 		3B131FF109348BD9001F5860 /* seq_float.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FEE09348BD9001F5860 /* seq_float.gif */; };
 		3B131FF409348C05001F5860 /* seq_genericAdder.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF209348C05001F5860 /* seq_genericAdder.gif */; };
-		3B131FF509348C05001F5860 /* seq_hresize.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF309348C05001F5860 /* seq_hresize.gif */; };
 		3B131FF909348C2E001F5860 /* seq_integer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF609348C2E001F5860 /* seq_integer.gif */; };
 		3B131FFA09348C2E001F5860 /* seq_liner.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF709348C2E001F5860 /* seq_liner.gif */; };
 		3B131FFB09348C2E001F5860 /* seq_message.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FF809348C2E001F5860 /* seq_message.gif */; };
@@ -360,7 +359,6 @@
 		3B178D840935D26F00AEA7EC /* seq_edit.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FED09348BD9001F5860 /* seq_edit.gif */; };
 		3B178D850935D26F00AEA7EC /* seq_float.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FEE09348BD9001F5860 /* seq_float.gif */; };
 		3B178D860935D26F00AEA7EC /* seq_genericAdder.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FF209348C05001F5860 /* seq_genericAdder.gif */; };
-		3B178D870935D26F00AEA7EC /* seq_hresize.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FF309348C05001F5860 /* seq_hresize.gif */; };
 		3B178D880935D26F00AEA7EC /* seq_integer.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FF609348C2E001F5860 /* seq_integer.gif */; };
 		3B178D890935D26F00AEA7EC /* seq_liner.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FF709348C2E001F5860 /* seq_liner.gif */; };
 		3B178D8A0935D26F00AEA7EC /* seq_message.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B131FF809348C2E001F5860 /* seq_message.gif */; };
@@ -1633,6 +1631,7 @@
 		5C542C1205AB145F0042B7A2 /* print_tilda.c in Sources */ = {isa = PBXBuildFile; fileRef = F57835EF034B0BD201664092 /* print_tilda.c */; };
 		5C542C3805AB155D0042B7A2 /* functions.c in Sources */ = {isa = PBXBuildFile; fileRef = 5C542BF905AB12FC0042B7A2 /* functions.c */; };
 		5CAFE247083772C60031FF68 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CAFE246083772C60031FF68 /* libsndfile.a */; };
+		5CBF1918095A29F800492815 /* datafiles.c in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF1917095A29F800492815 /* datafiles.c */; };
 		F458A3F608470CFB006AB8CF /* dumper.h in Headers */ = {isa = PBXBuildFile; fileRef = F458A3F508470CFB006AB8CF /* dumper.h */; };
 		F458A41508471D3C006AB8CF /* tree.c in Sources */ = {isa = PBXBuildFile; fileRef = F458A41408471D3C006AB8CF /* tree.c */; };
 /* End PBXBuildFile section */
@@ -2514,7 +2513,6 @@
 				3B178D840935D26F00AEA7EC /* seq_edit.gif in CopyFiles */,
 				3B178D850935D26F00AEA7EC /* seq_float.gif in CopyFiles */,
 				3B178D860935D26F00AEA7EC /* seq_genericAdder.gif in CopyFiles */,
-				3B178D870935D26F00AEA7EC /* seq_hresize.gif in CopyFiles */,
 				3B178D880935D26F00AEA7EC /* seq_integer.gif in CopyFiles */,
 				3B178D890935D26F00AEA7EC /* seq_liner.gif in CopyFiles */,
 				3B178D8A0935D26F00AEA7EC /* seq_message.gif in CopyFiles */,
@@ -2631,7 +2629,7 @@
 		3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerEventRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java; sourceTree = SOURCE_ROOT; };
 		5C43B82F05AB304800E7FB5C /* libfunctions.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libfunctions.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C43B8F205ABFF6900E7FB5C /* libfunctions-info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; path = "libfunctions-info.plist"; sourceTree = SOURCE_ROOT; };
-		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426BB05AB0B8A0042B7A2 /* version-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "version-info.plist"; sourceTree = "<group>"; };
 		5C5426BC05AB0B8A0042B7A2 /* version.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = version.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426C005AB0B8A0042B7A2 /* parser-tokenizer-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "parser-tokenizer-info.plist"; sourceTree = "<group>"; };
@@ -2772,6 +2770,7 @@
 		5CB1CE250651132400B5A90F /* fvec.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fvec.h; path = ../../packages/data/c/include/fts/packages/data/fvec.h; sourceTree = SOURCE_ROOT; };
 		5CB1CE260651132400B5A90F /* ivec.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ivec.h; path = ../../packages/data/c/include/fts/packages/data/ivec.h; sourceTree = SOURCE_ROOT; };
 		5CB1CE270651132400B5A90F /* mat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mat.h; path = ../../packages/data/c/include/fts/packages/data/mat.h; sourceTree = SOURCE_ROOT; };
+		5CBF1917095A29F800492815 /* datafiles.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = datafiles.c; path = ../../packages/data/c/src/datafiles.c; sourceTree = SOURCE_ROOT; };
 		5CC83F4C056D14FA00EEF904 /* midievent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = midievent.c; path = ../../fts/midievent.c; sourceTree = SOURCE_ROOT; };
 		5CCF7F240662C6A4006958F9 /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = ../../packages/sequence/c/include/fts/packages/sequence/event.h; sourceTree = SOURCE_ROOT; };
 		5CCF7F250662C6A4006958F9 /* note.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = note.h; path = ../../packages/sequence/c/include/fts/packages/sequence/note.h; sourceTree = SOURCE_ROOT; };
@@ -6068,6 +6067,7 @@
 			children = (
 				F8B8E48A02867E1C01664092 /* bpf.c */,
 				F8B8E49102867E1C01664092 /* data.c */,
+				5CBF1917095A29F800492815 /* datafiles.c */,
 				F8B8E49502867E1C01664092 /* fmat.c */,
 				F8B8E49702867E1C01664092 /* fvec.c */,
 				F8B8E49E02867E1C01664092 /* ivec.c */,
@@ -7667,7 +7667,6 @@
 				3B131FF009348BD9001F5860 /* seq_edit.gif in Resources */,
 				3B131FF109348BD9001F5860 /* seq_float.gif in Resources */,
 				3B131FF409348C05001F5860 /* seq_genericAdder.gif in Resources */,
-				3B131FF509348C05001F5860 /* seq_hresize.gif in Resources */,
 				3B131FF909348C2E001F5860 /* seq_integer.gif in Resources */,
 				3B131FFA09348C2E001F5860 /* seq_liner.gif in Resources */,
 				3B131FFB09348C2E001F5860 /* seq_message.gif in Resources */,
@@ -7984,6 +7983,7 @@
 				5C54273F05AB0B8B0042B7A2 /* dict.c in Sources */,
 				5C54274005AB0B8B0042B7A2 /* tabeditor.c in Sources */,
 				F458A41508471D3C006AB8CF /* tree.c in Sources */,
+				5CBF1918095A29F800492815 /* datafiles.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

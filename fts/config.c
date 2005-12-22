@@ -363,8 +363,7 @@ fts_config_get(void)
  * Initialization
  *
  */
-void 
-fts_kernel_config_init(void)
+FTS_MODULE_INIT(config)
 {
   config_s_name = fts_new_symbol("__config");
 

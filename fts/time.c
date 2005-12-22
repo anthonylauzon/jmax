@@ -414,8 +414,7 @@ fts_get_time(void)
   return main_timebase->time;
 }
 
-void 
-fts_kernel_time_init(void)
+FTS_MODULE_INIT(time)
 {
   timebase_entry_heap = fts_heap_new(sizeof(fts_timebase_entry_t));
 }
