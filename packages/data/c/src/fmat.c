@@ -95,13 +95,13 @@ fmat_realloc_values(fmat_t *self, size_t size)
   else
     values = (float *) fts_realloc(values - HEAD_POINTS, (size + HEAD_POINTS + TAIL_POINTS) * sizeof(float));
 
-#if 0	/* don't do this, rather crash on such an exceptional occasion */
+#if 0  /* don't do this, rather crash on such an exceptional occasion */
   if (values == NULL)
   { /* out of memory, at least don't make us crash but allocate valid (0, 0) fmat */
     values      = (float *) fts_malloc((HEAD_POINTS + TAIL_POINTS) * sizeof(float));
-    size	= 0;
-    self->m 	= 0;
-    self->n 	= 0;
+    size        = 0;
+    self->m     = 0;
+    self->n     = 0;
   }
 #endif
   
@@ -1506,6 +1506,7 @@ fmat_append_row_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   return fts_ok;
 }
 
+
 /** insert @p num rows of zeros at row @p pos
  *  may insert num rows behind last row m --> append num rows
  *
@@ -1522,24 +1523,27 @@ fmat_append_row_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
 static fts_method_status_t
 fmat_insert_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t        *self = (fmat_t *) o;
+  fmat_t *self = (fmat_t *) o;
   float *newptr;
   int m = fmat_get_m(self);
-  int   n = fmat_get_n(self);
-  int   pos = 0;        // row position at which to insert 
-  int numrows = 1;      // number of rows to insert
+  int n = fmat_get_n(self);
+  int pos = 0;        // row position at which to insert 
+  int numrows = 1;    // number of rows to insert
   int num, tomove, i;
+
+  /* method returns this object in any case */
+  fts_set_object(ret, o);
 
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
 
-  if(pos < 0)   pos = 0;
-  else if(pos > m) pos = m;
+  if (pos < 0)        pos = 0;
+  else if (pos > m)   pos = m;
 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
-  if(numrows <= 0)
+  if (numrows <= 0)
     return fts_ok; 
 
   fmat_set_size(self, m + numrows, n);
@@ -1549,17 +1553,17 @@ fmat_insert_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   num    = n * numrows;         // atoms to insert 
   tomove = n * (m - pos);       // atoms to move 
 
-  if(pos < m)   
+  if (pos < m)   
     memmove(newptr + num, newptr, tomove * sizeof(float));
 
-  for(i = 0; i < num; i++)
+  for (i = 0; i < num; i++)
     self->values[n*pos + i] = 0.0;
 
   fts_object_changed(o);
-  fts_set_object(ret, o);
   
   return fts_ok;
 }
+
 
 /** insert @p num columns of zeros at row @p pos
 *  may insert num rows behind last row m --> append num rows
@@ -1577,13 +1581,16 @@ fmat_insert_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
 static fts_method_status_t
 fmat_insert_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t        *self = (fmat_t *) o;
+  fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
-  int   n = fmat_get_n(self);
-  int   pos = 0;        // col position at which to insert
-  int numcols = 1;      // number of rows to insert
+  int n = fmat_get_n(self);
+  int pos = 0;        // col position at which to insert
+  int numcols = 1;    // number of columns to insert
   int tomove, i, j, start, new_n;
   
+  /* method returns this object in any case */
+  fts_set_object(ret, o);
+
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
@@ -1612,21 +1619,24 @@ fmat_insert_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
   }
   
   fts_object_changed(o);
-  fts_set_object(ret, o);
   
   return fts_ok;
 }
 
+
 static fts_method_status_t
 fmat_delete_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t        *self = (fmat_t *) o;
+  fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
-  int   n = fmat_get_n(self);
-  int   pos = 0;        
-  int numcols = 1;      // number of rows to delete
+  int n = fmat_get_n(self);
+  int pos = 0;        
+  int numcols = 1;      // number of columns to delete
   int tomove, i, j, start;
   
+  /* method returns this object in any case */
+  fts_set_object(ret, o);
+
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
   
@@ -1652,10 +1662,10 @@ fmat_delete_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
   fmat_set_size(self, m, n - numcols);
   
   fts_object_changed(o);
-  fts_set_object(ret, o);
   
   return fts_ok;
 }
+
 
 /** delete @p num rows of atoms 
  * 
@@ -1673,7 +1683,10 @@ fmat_delete_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   int     pos = 0;
   int     numrows = 1;
   int     num, tomove;
-  
+
+  /* method returns this object in any case */
+  fts_set_object(ret, o);
+
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
     
@@ -1691,17 +1704,17 @@ fmat_delete_rows(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
     numrows = m - pos;
   
   killptr = fmat_get_ptr(self) + n * pos;
-  num     = n * numrows;        // number of atoms to insert
-  tomove  = n * (m - pos);      // number of atoms to move 
+  num     = n * numrows;        // number of elements to delete
+  tomove  = n * (m - pos);      // number of elements to move 
 
   memmove(killptr, killptr + num, tomove * sizeof(float));
   self->m -= numrows; 
 
   fts_object_changed(o);
-  fts_set_object(ret, o);
   
   return fts_ok;
 }
+
 
 /******************************************************************************
  *
@@ -1800,7 +1813,7 @@ fmat_get_prod (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   const int     size = fmat_get_m(self) * fmat_get_n(self);
   const float  *p    = fmat_get_ptr(self);
   double        prod = 1.0;
-  int	        i;
+  int           i;
   
   for (i = 0; i < size; i++)
     prod *= p[i];
@@ -2666,9 +2679,9 @@ fmat_convert_polar(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
 #ifdef WIN32
       ptr[i] = hypot((double)re, (double)im);
 #else
-	  ptr[i] = hypot(re, im);
+      ptr[i] = hypot(re, im);
 #endif
-	  ptr[i + 1] = atan2f(im, re);
+      ptr[i + 1] = atan2f(im, re);
     }
     
     fts_object_changed(o);
@@ -3778,11 +3791,15 @@ fmat_apply_expr_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
   return fts_ok;
 }
 
+
+
+
 /*********************************************************
  *
  *  editor
  *
  */
+
 static void *fmat_editor = NULL;
 
 static void
@@ -3915,6 +3932,9 @@ fmat_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
 
   return fts_ok;
 }
+
+
+
 
 /*********************************************************
  *
