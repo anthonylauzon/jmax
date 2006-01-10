@@ -39,7 +39,10 @@
 
 #define ABS_MIN -3.40282347e+38F
 #define ABS_MAX 3.40282347e+38F
-#define FVEC_DEFAULT_SIZE   (INT_MAX >> 2)
+#define LOG_MIN -103.28
+#define LOG_ARG_MIN (float)(1.4e-45)
+
+#define FVEC_DEFAULT_SIZE (INT_MAX >> 2)
 
 fts_class_t *fvec_class = NULL;
 fts_symbol_t fvec_symbol = NULL;
@@ -1461,7 +1464,14 @@ fvec_logabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   fvec_get_vector(self, &ptr, &size, &stride);
   
   for(i=0; i<size*stride; i+=stride)
-    ptr[i] = logf(fabsf(ptr[i]));
+  {
+    float abs = fabsf(ptr[i]);
+    
+    if(abs > LOG_ARG_MIN)
+      ptr[i] = logf(abs);
+    else
+      ptr[i] = LOG_MIN;
+  }
   
   fts_set_object(ret, o);
   
@@ -1479,7 +1489,14 @@ fvec_log(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   fvec_get_vector(self, &ptr, &size, &stride);
   
   for(i=0; i<size*stride; i+=stride)
-    ptr[i] = logf(ptr[i]);
+  {
+    float f = ptr[i];
+    
+    if(f > LOG_ARG_MIN)
+      ptr[i] = logf(f);
+    else
+      ptr[i] = LOG_MIN;
+  }
   
   fts_set_object(ret, o);
   
@@ -1988,8 +2005,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   self->type = fvec_type_column;
   self->index = 0;
   self->onset = 0;
-  self->size  = FVEC_DEFAULT_SIZE;  /* will be clipped to matrix size 
-                                       in fvec_get_vector and fvec_get_size */
+  self->size  = FVEC_DEFAULT_SIZE;  /* will be clipped to matrix size in fvec_get_vector and fvec_get_size */
   self->editor = 0;
   
   if(ac > 0)

@@ -32,7 +32,6 @@
 #include <float.h>
 #include <string.h>
 
-
 #ifdef WIN32
 #include <malloc.h>
 #else
@@ -41,6 +40,9 @@
 
 #define ABS_MIN -3.40282347e+38F
 #define ABS_MAX 3.40282347e+38F
+
+#define LOG_MIN -103.28
+#define LOG_ARG_MIN (float)(1.4e-45)
 
 fmat_t *fmat_null = NULL;
 fts_class_t *fmat_class = NULL;
@@ -2547,8 +2549,15 @@ fmat_logabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   int i;
   
   for(i=0; i<m*n; i++)
-    ptr[i] = logf(fabsf(ptr[i]));
-
+  {
+    float abs = fabsf(ptr[i]);
+    
+    if(abs > LOG_ARG_MIN)
+      ptr[i] = logf(abs);
+    else
+      ptr[i] = LOG_MIN;
+  }
+  
   fts_object_changed(o);
   fts_set_object(ret, o);
   
@@ -2565,7 +2574,14 @@ fmat_log(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   int i;
   
   for(i=0; i<m*n; i++)
-    ptr[i] = logf(ptr[i]);
+  {
+    float f = ptr[i];
+    
+    if(f > LOG_ARG_MIN)
+      ptr[i] = logf(f);
+    else
+      ptr[i] = LOG_MIN;
+  }
 
   fts_object_changed(o);
   fts_set_object(ret, o);
@@ -2887,8 +2903,12 @@ fmat_clogabs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
     {
       float re = ptr[j];
       float im = ptr[j + 1];
+      float abs2 = re * re + im * im;
       
-      ptr[i] = (float)(0.5 * logf(re * re + im * im));
+      if(abs2 > LOG_ARG_MIN)
+        ptr[i] = 0.5 * logf(abs2);
+      else
+        ptr[i] = 0.5 * LOG_MIN;
     }
     
     fmat_reshape(self, m, 1);
@@ -2918,8 +2938,13 @@ fmat_clog(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     {
       float re = ptr[i];
       float im = ptr[i + 1];
+      float abs2 = re * re + im * im;
       
-      ptr[i] = (float)(0.5 * log(re * re + im * im));
+      if(abs2 > LOG_ARG_MIN)
+        ptr[i] = 0.5 * logf(abs2);
+      else
+        ptr[i] = 0.5 * LOG_MIN;
+
       ptr[i + 1] = (float)atan2(im, re);
     }
 
@@ -3953,7 +3978,6 @@ fmat_initialize(fmat_t *self)
   self->domain = 0.0;
   self->opened = 0;
 }
-
 
 /** fmat constructor.
  *
