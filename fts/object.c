@@ -326,10 +326,14 @@ object_imexport_dialog(fts_object_t *o, fts_symbol_t mode, int ac, const fts_ato
     snprintf(str, 1023, "Open %s file to import", fts_symbol_name(suffix));
     fts_object_open_dialog(o, mode, fts_new_symbol(str), suffix, ac - 1, at + 1);
   }
-  else if(mode == fts_s_export)
-    fts_object_save_dialog(o, mode, fts_new_symbol("Select file for export"), NULL, fts_project_get_dir(), fts_new_symbol("untitled.???"), ac, at);
-  else if(mode == fts_s_exportas)
-  {
+  else if (mode == fts_s_export)
+  { /* export with unknown type */
+    fts_object_save_dialog(o, mode, fts_new_symbol("Select file for export"), 
+			   NULL, fts_project_get_dir(), 
+			   fts_new_symbol("untitled.???"), ac, at);
+  }
+  else if (mode == fts_s_exportas)
+  { /* export with type given as first argument */
     fts_symbol_t suffix = fts_get_symbol(at);
     fts_symbol_t default_name;
     char str[1024];
@@ -338,9 +342,11 @@ object_imexport_dialog(fts_object_t *o, fts_symbol_t mode, int ac, const fts_ato
     default_name = fts_new_symbol(str);
     
     snprintf(str, 1023, "Select file for %s export", fts_symbol_name(suffix));
-    fts_object_save_dialog(o, mode, fts_new_symbol(str), suffix, fts_project_get_dir(), default_name, ac - 1, at + 1);
+    fts_object_save_dialog(o, mode, fts_new_symbol(str), suffix, 
+			   fts_project_get_dir(), default_name, ac - 1, at + 1);
   }
 }
+
 
 static void
 object_imexport(fts_object_t *o, fts_symbol_t mode, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -351,14 +357,29 @@ object_imexport(fts_object_t *o, fts_symbol_t mode, int ac, const fts_atom_t *at
   int import = (mode == fts_s_import || mode == fts_s_importas);
   
   /* without name or "-" as name open file chooser */
-  if(ac == 0 || (as && ac == 1))
+  if (ac == 0  ||  (as  &&  ac == 1))
+  { /* no name given */ 
     object_imexport_dialog(o, mode, ac, at);
+  }
   else if(ac > 0 && fts_is_symbol(at + as))
   {
     fts_symbol_t name = fts_get_symbol(at + as);
   
-    if(name == fts_s_minus)
-      object_imexport_dialog(o, mode, ac, at);
+    if (name == fts_s_minus)
+    { /* name is "-", skip it */
+      if (as  &&  ac > 1)
+      { /*  keep type for im/exportas:
+	    at = "type - args...", copy to a = "type args..." */
+	fts_atom_t a[64];
+	
+	a[0] = at[0];
+	memcpy(a + 1, at + 2, (ac - 1) * sizeof(fts_atom_t));
+
+	object_imexport_dialog(o, mode, ac - 1, a);
+      }
+      else
+	object_imexport_dialog(o, mode, ac - 1, at + 1);
+    }
     else
     {
       fts_hashtable_t *hash = (import)? fts_class_get_import_handlers(cl): fts_class_get_export_handlers(cl);
