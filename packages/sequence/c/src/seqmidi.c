@@ -970,6 +970,10 @@ float_track_import_bpf_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
       return fts_ok;
     }
     
+    /* clear track */
+    track_clear_and_upload(self);
+
+    
     // do not stop on error, try to read anything readable:
     while (fts_atomfile_read(file, &a, &c))
     {
@@ -1026,25 +1030,214 @@ float_track_import_bpf_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
   return fts_ok;
 }
 
+
+
+// import_format helper functions
+static enum format_wait_t { wHEAD, wROW, wEOL, wERROR } format_wait;
+
+static int
+import_format_txt_init(const fts_object_t *o, int ac, const fts_atom_t *at, fts_atom_t *ret,
+                       const fts_symbol_t filename, fts_atomfile_t ** file,
+                       int * time_index, int * m_max_index)
+{
+  
+  fts_post("ac = %d (waiting for the fix)\n", ac);
+  
+  if (!(*file = fts_atomfile_open_read(filename)))
+  { /* we were responsible for this file, but can't open it: 
+    don't return void */
+    fts_post("can't open fmats text file '%s'\n", fts_symbol_name(filename));
+    fts_set_object(ret, o);     
+    return 0;
+  }
+  
+  if(ac > 3)
+  {
+    if (! (fts_is_number(at+3) && (*time_index = fts_get_number_int(at+3)) >= 0))
+    {
+      fts_post("bad time index (import argument number(2))\n");
+      fts_set_object(ret, o);     
+      return 0;        
+    }
+  }
+  
+  if(ac > 2)
+  {
+    if(!(fts_is_number(at+2) && (*m_max_index = fts_get_number_int(at+2)) >= 0))
+    {
+      fts_post("bad number of rows index (import argument number(1))\n");
+      fts_set_object(ret, o);     
+      return 0;        
+    }
+    else if(*time_index == *m_max_index)
+    {
+      fts_post("time index and number of rows index must differ: they are both set to %d\n",
+               *time_index);
+      fts_set_object(ret, o);     
+      return 0;        
+    }
+    
+  }
+    
+  return 1;
+}
+
+static void
+read_format_txt_header(const fts_atom_t * a, const char * c, double * time, int * n, int * m,
+                       const int * n_max, int * m_max, int * m_max_index, int * time_index, 
+                       fmat_t ** partials, enum format_wait_t * waitingfor)
+{        
+  ++ *n;
+  
+  if(fts_is_number(a))
+  {
+    if(*n == *m_max_index)
+    {
+      *m_max = fts_get_number_int(a);
+    }
+    else if(*n == *time_index)
+    {
+      *time = fts_get_number_float(a) * 1000.;  /* convert to millisec */
+    }
+  }          
+  
+  if (*c == '\n' || *c == '\r')
+  {
+    *n = -1;
+    
+    if(*m_max > 0)
+    {
+      *partials = fmat_create(*m_max, *n_max);
+      *m = 0;
+      *waitingfor = wROW;
+    }
+  }
+  return;
+}
+
+static void
+import_format_txt_header(track_t * self, int * n_head, int * n_head_max, fmat_t ** headerValues,
+                         const fts_atom_t * a, const char * c, double * time, int * n, int * m,
+                         const int * n_max, int * m_max, int * m_max_index, int * time_index, 
+                         fmat_t ** partials, enum format_wait_t * waitingfor)
+{        
+  fts_atom_t        value;
+  event_t         * currentEvent;
+    
+  ++ *n;
+  
+  if(fts_is_number(a))
+  {
+    if(*n == *m_max_index)
+    {
+      *m_max = fts_get_number_int(a);
+    }
+    else if(*n == *time_index)
+    {
+      *time = fts_get_number_float(a) * 1000.;  /* convert to millisec */
+    }
+    else // extraneous header value
+    {
+      if(++ *n_head >= *n_head_max)
+      {
+        *n_head_max = *n_head + 1;
+        fmat_reshape(*headerValues, 1, *n_head_max);
+      }
+      fmat_set_element(*headerValues, 0, *n_head, fts_get_number_float(a));
+    }     
+  }
+  
+  if (*c == '\n' || *c == '\r')
+  {
+    *n = -1;
+    *n_head = -1;
+    
+    fts_set_object(&value, *headerValues);
+    currentEvent = (event_t *)fts_object_create(event_class, 1, &value);
+    track_add_event_and_upload(self, *time, currentEvent);
+    
+    *headerValues = fmat_create(1, *n_head_max);    
+    
+    if(*m_max > 0)
+    {      
+      *partials = fmat_create(*m_max, *n_max);
+      *m = 0;
+      *waitingfor = wROW;
+    }
+  }
+  return;
+}
+
+
+static int
+import_format_txt_row(track_t * self, const fts_atom_t * a, const char * c, double * time, 
+                      int * n, int * m, int * n_max, const int * m_max, 
+                      fmat_t ** partials, enum format_wait_t * waitingfor)
+{
+  fts_atom_t        value;
+  event_t         * currentEvent;
+
+  if(fts_is_number(a))
+  {
+    ++ *n;
+    if(*n >= *n_max)
+    {
+      // the first row is used to determine the actual number of columns
+      if(*m == 0)              
+      {
+        *n_max = *n + 1;
+        fmat_reshape(*partials, *m_max, *n_max);
+      }
+      else // each row must have the same number of columns
+      {
+        return 0;            
+      }
+    }    
+    
+    fmat_set_element(*partials, *m, *n, fts_get_number_float(a));
+    
+    // last column
+    if (*c == '\n' || *c == '\r')
+    {
+      if(++ *m >= *m_max) // last row
+      {
+        fts_set_object(&value, *partials);
+        currentEvent = (event_t *)fts_object_create(event_class, 1, &value);
+        track_add_event_and_upload(self, *time, currentEvent);
+        *waitingfor = wHEAD;
+      }
+      *n = -1;
+    }
+    
+  }
+  else
+  {
+    return 0;
+  }
+  
+  return 1;
+}  
+
+
+
 /******************************************************
 *
-*  fmat track fmats text file import
+*  fmat track format text file import
 *
 */
 /* (this is not MIDI - could be in another file such as "seqtext.c")
 import text bpf file as exported by f0 into float track.
-format: lines of time [s] (no leading space!), tab or space, 
-float text, anything until newline
+format: time and number of rows, then one line by row (any number of float columns)
 */
 static fts_method_status_t
-fmat_track_import_fmats_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+fmat_track_import_format_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_t *self = (track_t *) o;
   
-  if((track_get_type(self) == fmat_class)  &&  ac > 0  &&  fts_is_symbol(at))
+  if((track_get_type(self) == fmat_class)  &&  ac > 0  &&  fts_is_symbol(at+0))
   {
-    fts_symbol_t      filename = fts_get_symbol(at);
-    fts_atomfile_t  * file; // input file
+    fts_symbol_t      filename = fts_get_symbol(at+0);
+    fts_atomfile_t  * file = NULL; // input file
     fts_atom_t        a; // current read element
     char              c; // separator
     double            time = -1.;
@@ -1052,110 +1245,142 @@ fmat_track_import_fmats_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_a
     int               n = -1; // current column
     int               m_max = 0; // current number of rows (read from header lines)
     int               n_max = 0; // current nuber of columns (first matrix decides)
-    enum { wM_MAX, wTIME, wEOHEAD, wROW, wEOL, wERROR } waitingfor = wM_MAX;
-    fmat_t          * currentFmat = NULL;
-    fts_atom_t        value;
-    event_t         * currentEvent;
+    int               m_max_index = 0; // default position for the m_max information
+    int               time_index = 1; // default position for the time information
+    enum format_wait_t waitingfor = wHEAD;
+    fmat_t          * partials = NULL;
     
-    if (!(file = fts_atomfile_open_read(filename)))
-    { /* we were responsible for this file, but can't open it: 
-      don't return void */
-      fts_post("can't open fmats text file '%s'\n", fts_symbol_name(filename));
-      fts_set_object(ret, o);     
+
+    if(import_format_txt_init(o, ac, at, ret, filename, &file, &time_index, &m_max_index) == 0)
+    {
+      // an error occured
       return fts_ok;
     }
-            
+        
+    /* clear track */
+    track_clear_and_upload(self);
+    
     // stop on error, do not risk a mess
     while (waitingfor != wERROR && fts_atomfile_read(file, &a, &c))
     {
       switch (waitingfor)
       {
-        case wM_MAX:
-          m = 0;
-          if(fts_is_number(&a) && (m_max = fts_get_number_int(&a)) > 0)
-          {
-            waitingfor = wTIME;
-            break;
-          }
-          else
-          {
-            waitingfor = wEOL;
-            break;
-          }
-            
-        case wTIME:
-          if(fts_is_number(&a))
-          {
-            time = fts_get_number_float(&a) * 1000.;  /* convert to millisec */
-            waitingfor = wEOHEAD;
-            // do not break, because EOHEAD can follow
-          }
-          else
-          {
-            waitingfor = wERROR;
-            break;
-          }
-          
-
-        case wEOHEAD:
-          if (c == '\n' || c == '\r')
-          {
-            currentFmat = fmat_create(m_max, n_max);
-            n = -1;
-            waitingfor = wROW;
-          }
-          // else: still waiting for EOHEAD
+        case wHEAD:
+          read_format_txt_header(&a, &c, &time, &n, &m, &n_max, &m_max,
+                                     &m_max_index, &time_index, &partials, &waitingfor);           
           break;
-        
+  
+          
         case wROW:
-          if(fts_is_number(&a))
+          if(import_format_txt_row(self, &a, &c, &time, &n, &m, &n_max, &m_max,
+                               &partials, &waitingfor) != 0)
           {
-            ++ n;
-            // the first row is used to determine the actual number of columns
-            if(n >= n_max && m == 0)              
-            {
-              n_max = n + 1;
-              fmat_reshape(currentFmat, m_max, n_max);
-              //// for a "format" file, this should happened only at the beginning
-              //// TODO? generalize?
-              // fts_post("%d columns at time %f\n", n_max, time * 0.001);              
-            }
-            
-            fmat_set_element(currentFmat, m, n, fts_get_number_float(&a));
+            break;
+          }
+          // else do not break, it is an error
 
-            // last column
-            if (c == '\n' || c == '\r')
-            {
-              if(++m >= m_max)
-              {
-                /// TODO? check correct syntax
-                fts_set_object(&value, currentFmat);
-                currentEvent = (event_t *)fts_object_create(event_class, 1, &value);
-                track_add_event_and_upload(self, time, currentEvent);
-                waitingfor = wM_MAX;
-              }
-              else
-              {
-                n = -1;
-              }
-            }
-            
-          }
-          else
-          {
-            waitingfor = wERROR;
-          }
-          break;            
-                     
- 
-        case wEOL:
-          if (c == '\n' || c == '\r')
-          {
-            waitingfor = wM_MAX;
-          }
-          // else: still waiting for EOROW
+        default:
+          waitingfor = wERROR;
+          // do not break, it is an error
+          
+        case wERROR:
+          fts_post("error while reading fmats text file '%s' at time %f\n",
+                   fts_symbol_name(filename), time * 0.001);
+          break;
+      }
+    }
+    
+    fts_atomfile_close(file);
+  }
+  // else: no fmat track or wrong args -> do not handle this file
+  fts_set_object(ret, (fts_object_t *) self);       
+  return fts_ok;
+}
+
+/******************************************************
+*
+*  sequence format text file import (for extended format text file)
+*
+*/
+/* (this is not MIDI - could be in another file such as "seqtext.c")
+import text bpf file as exported by f0 into float track.
+format: time, number of rows and extraneous floats, then one line by row (any number of float columns)
+*/
+static fts_method_status_t
+sequence_import_format_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  sequence_t *self = (sequence_t *) o;
+  
+  if(ac > 0  &&  fts_is_symbol(at+0))
+  {
+    track_t         * partialsTrack;
+    track_t         * headerTrack;
+    
+    int               n_head = -1;
+    int               n_head_max = 0;
+    fmat_t          * headerValues = fmat_create(1, 0);
+
+    fts_symbol_t      filename = fts_get_symbol(at+0);
+    fts_atomfile_t  * file = NULL; // input file
+    fts_atom_t        a; // current read element
+    char              c; // separator
+    double            time = -1.;
+    int               m = -1; // current row
+    int               n = -1; // current column
+    int               m_max = 0; // current number of rows (read from header lines)
+    int               n_max = 0; // current nuber of columns (first matrix decides)
+    int               m_max_index = 0; // default position for the m_max information
+    int               time_index = 2; // default position for the time information
+    enum format_wait_t waitingfor = wHEAD;
+    fmat_t          * partialsFrame = NULL;
+    
+    
+    if(import_format_txt_init(o, ac, at, ret, filename, &file, &time_index, &m_max_index) == 0)
+    {
+      // an error occured
+      return fts_ok;
+    }
+    
+    // clear sequence
+    while(sequence_get_size(self) > 0)
+    {
+      sequence_remove_track(self, sequence_get_first_track(self));
+    }
+
+    // create two tracks
+    partialsTrack = (track_t *) fts_object_create(track_class, 0, 0);
+    fts_object_refer((fts_object_t *) partialsTrack);
+    partialsTrack->type = fmat_class;
+    sequence_add_track(self, partialsTrack);
+
+    headerTrack = (track_t *) fts_object_create(track_class, 0, 0);
+    fts_object_refer((fts_object_t *) headerTrack);
+    sequence_add_track(self, headerTrack);
+    headerTrack->type = fmat_class;
+    
+    // TODO sequence_upload(self);
+    
+    // stop on error, do not risk a mess
+    while (waitingfor != wERROR && fts_atomfile_read(file, &a, &c))
+    {
+      switch (waitingfor)
+      {
+        case wHEAD:
+          import_format_txt_header(headerTrack, &n_head, &n_head_max, &headerValues,
+                                   &a, &c, &time, &n, &m, &n_max, &m_max,
+                                   &m_max_index, &time_index,
+                                   &partialsFrame, &waitingfor);           
           break;
           
+          
+        case wROW:
+          if(import_format_txt_row(partialsTrack, &a, &c,
+                                   &time, &n, &m, &n_max, &m_max,
+                                   &partialsFrame, &waitingfor) != 0)
+          {
+            break;
+          }
+          // else do not break, it is an error
           
         default:
           waitingfor = wERROR;
@@ -1164,111 +1389,16 @@ fmat_track_import_fmats_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_a
         case wERROR:
           fts_post("error while reading fmats text file '%s' at time %f\n",
                    fts_symbol_name(filename), time * 0.001);
-          fmat_reshape(currentFmat, 0, 0);
           break;
       }
     }
     
     fts_atomfile_close(file);
   }
-  /* else: no float track or wrong args -> don't handle this file */
-
+  // else: no fmat track or wrong args -> do not handle this file
   fts_set_object(ret, (fts_object_t *) self);       
   return fts_ok;
 }
-
-///******************************************************************************
-//*
-//*  fmat text file import/export
-//*
-//*/
-//static fts_method_status_t
-//fmat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-//{
-//  fmat_t *self = (fmat_t *)o;
-//  
-//  if(ac > 0 && fts_is_symbol(at))
-//  {
-//    fts_symbol_t file_name = fts_get_symbol(at);
-//    fts_atomfile_t *file = fts_atomfile_open_read(file_name);
-//    float *ptr = fmat_get_ptr(self);
-//    int m = 0;
-//    int n = 0;
-//    int i = 0;
-//    int j = 0;
-//    fts_atom_t a;
-//    char c;
-//    
-//    if(file != NULL)
-//    {
-//      while(fts_atomfile_read(file, &a, &c))
-//      {
-//        int alloc = self->alloc;
-//        m = i + 1;
-//        
-//        /* first row determines # of columns */
-//        if(i == 0)
-//          n = j + 1;
-//        
-//        /* grow matrix */
-//        while(m * n > alloc)
-//          alloc += 256;
-//        
-//        fmat_reshape(self, 1, alloc);
-//        ptr = fmat_get_ptr(self);
-//        
-//        if(j < n)
-//        {
-//          if(fts_is_number(&a))
-//            ptr[i * n + j] = (float)fts_get_number_float(&a);
-//          else
-//            ptr[i * n + j] = 0.0;
-//          
-//          j++;
-//          
-//          if(c == '\n'  ||  c == '\r')
-//          {
-//            for(; j<n; j++)
-//              ptr[i * n + j] = 0.0;
-//            
-//            /* reset to beginning of next row */
-//            i++;
-//            j = 0;
-//          }
-//        }
-//        else if (c == '\n'  ||  c == '\r')
-//        {
-//          /* reset to beginning of next row */
-//          i++;
-//          j = 0;
-//        }
-//      }
-//      
-//      /* maybe empty rest of last line */
-//      if(j > 0)
-//      {
-//        i++;
-//        j = 0;
-//      }
-//      
-//      fmat_reshape(self, m, n);
-//      
-//      fts_atomfile_close(file);
-//      
-//      if(m * n > 0)
-//      {
-//        fts_object_changed(o);
-//        fts_set_object(ret, o);
-//      }
-//      else
-//        fts_object_error(o, "import: couldn't read any text data from file \"%s\"", fts_symbol_name(file_name));
-//    }
-//    else
-//      fts_object_error(o, "import: cannot open text file \"%s\"", fts_symbol_name(file_name));
-//  }
-//  
-//  return fts_ok;
-//}
 
 
 FTS_MODULE_INIT(seqfiles)
@@ -1285,8 +1415,10 @@ FTS_MODULE_INIT(seqfiles)
   fts_class_import_handler(track_class, fts_new_symbol("f0"), float_track_import_bpf_txt);  
 
   /* fmat track text import */
-  fts_class_import_handler(track_class, fts_new_symbol("fmats"), fmat_track_import_fmats_txt);  
-  fts_class_import_handler(track_class, fts_new_symbol("format"), fmat_track_import_fmats_txt);  
+  fts_class_import_handler(track_class, fts_new_symbol("format"), fmat_track_import_format_txt);
+  
+  fts_class_import_handler(multitrack_class, fts_new_symbol("extformat"), sequence_import_format_txt);
+  fts_class_import_handler(multitrack_class, fts_new_symbol("format"), sequence_import_format_txt);
 
   
   /* sequence class MIDI file import */
