@@ -189,6 +189,16 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
       int n = fts_audiofile_get_num_channels(sf);
       float *ptr;
       
+      if (ac > 1  &&  fts_is_number(at + 1))
+      {
+        int wanted = fts_get_number_int(at + 1);
+
+        if (wanted > 0  &&  wanted < m)
+          m = wanted;
+
+        fts_post("importing only %d frames (%d wanted)\n", m, wanted);
+      }
+
       fmat_reshape(self, m, n);
       ptr = fmat_get_ptr(self);
       
