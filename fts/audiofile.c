@@ -34,6 +34,14 @@
 
 #include <sndfile.h>
 
+
+#ifdef DEBUG
+#define AUDIOFILE_DEBUG 1
+#else
+#define AUDIOFILE_DEBUG 0
+#endif
+
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -192,11 +200,19 @@ fts_audiofile_open_read_format(fts_symbol_t name, int channels, int sample_rate,
     if(audiofile_set_info(audiofile, channels, sample_rate, format, sample_format))
     {
       audiofile->sfhandle = sf_open(fullpath, SFM_READ, &audiofile->sfinfo);
-      
+
       if(audiofile->sfhandle != NULL)
         return audiofile;
     }
-    
+#if AUDIOFILE_DEBUG
+    else
+	fts_post("audiofile.c: error setting info for '%s' format %s\n", 
+		 fullpath, fts_symbol_name(sample_format));
+
+    if (!audiofile->sfhandle)
+	fts_post("audiofile.c: error opening '%s' for read\n", fullpath);
+#endif
+      
     fts_free(audiofile);
   }
   
@@ -301,11 +317,13 @@ fts_audiofile_write_interleaved(fts_audiofile_t *audiofile, float *buf, int n_ch
     return 0;
 }
 
+
+/** set read position to sample frame given in offset */
 int 
 fts_audiofile_seek(fts_audiofile_t *audiofile, int offset)
 {
-  /* not yet implemented */
-  return -1;
+    int status = sf_seek(audiofile->sfhandle, offset, SEEK_SET);
+    return status != -1;
 }
 
 
