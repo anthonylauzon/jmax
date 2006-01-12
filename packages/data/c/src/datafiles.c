@@ -168,11 +168,13 @@ fmat_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   return fts_ok;
 }
 
+
 /******************************************************************************
  *
  *  fmat audio file import/export
  *
  */
+
 static fts_method_status_t
 fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -187,28 +189,73 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     {
       int m = fts_audiofile_get_num_frames(sf);
       int n = fts_audiofile_get_num_channels(sf);
-      float *ptr;
+      int wanted;	/* number of sample frames to load */
+      int offset  = 0;
+      int channel = 0;
+      double  sr  = 0;	/* resample if not zero */
+      fmat_t *orig;
+      float  *ptr;
       
-      if (ac > 1  &&  fts_is_number(at + 1))
+      /* parse further import arguments <offset> <length> <channel> <sr>
+         no arg or 0 or string mean: all/as is */
+      switch (ac)
+      { /* fallthrough! */
+        default:
+        case 5:
+	  if (fts_is_number(at + 4))
+	    sr = fts_get_number_float(at + 4);
+
+        case 4: /* channel selection ignored so far */
+	  if (fts_is_number(at + 3))
+	    channel = fts_get_number_int(at + 3);
+
+        case 3:
+	  if (fts_is_number(at + 2))
+	    wanted = fts_get_number_int(at + 2);
+
+        case 2:
+	  if (fts_is_number(at + 1))
+	    offset = fts_get_number_int(at + 1);
+      }
+	
+      /* check args */
+      if (sr <= 0  ||  sr == fts_audiofile_get_sample_rate(sf))
+	sr = 0;
+
+      if (offset > 0  &&  offset < m)
+	m -= offset;
+	
+      if (wanted > 0  &&  wanted < m)
+	m = wanted;
+
+      if (sr == 0)
       {
-        int wanted = fts_get_number_int(at + 1);
-
-        if (wanted > 0  &&  wanted < m)
-          m = wanted;
-
-        fts_post("importing only %d frames (%d wanted)\n", m, wanted);
+	fmat_reshape(self, m, n);
+	ptr = fmat_get_ptr(self);
+      }
+      else  /* temp buffer to be resampled */
+      {
+	orig = fmat_create(m + 2, n);
+	ptr  = fmat_get_ptr(orig);
       }
 
-      fmat_reshape(self, m, n);
-      ptr = fmat_get_ptr(self);
-      
+      /* move to position and read samples */
+      if (offset)
+	fts_audiofile_seek(sf, offset);
+
       m = fts_audiofile_read_interleaved(sf, ptr, n, m);
       fmat_reshape(self, m, n);
       
       fts_audiofile_close(sf);      
       
-      if(m > 0)
+      if (m > 0)
       {
+	if (sr != 0)
+	{
+	  fmat_resample(self, orig, sr / fts_audiofile_get_sample_rate(sf));
+	  fts_object_destroy((fts_object_t *) orig);
+	}
+
         fts_object_changed(o);
         fts_set_object(ret, o);
       }
@@ -930,3 +977,11 @@ FTS_MODULE_INIT(datafiles)
   fts_atomfile_export_handler(dict_class, dict_export_textfile);
   fts_class_import_handler(dict_class, fts_new_symbol("coll"), dict_import_textfile);
 }
+
+
+/** EMACS **
+ * Local variables:
+ * mode: c
+ * c-basic-offset:2
+ * End:
+ */
