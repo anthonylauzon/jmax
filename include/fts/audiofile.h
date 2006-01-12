@@ -93,6 +93,8 @@ FTS_API int fts_audiofile_write(fts_audiofile_t *audiofile, float **buf, int n_b
 FTS_API int fts_audiofile_read(fts_audiofile_t *audiofile, float **buf, int n_buf, int buflen);
 FTS_API int fts_audiofile_write_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int buflen);
 FTS_API int fts_audiofile_read_interleaved(fts_audiofile_t *audiofile, float *buf, int n_channels, int buflen);
+
+/** set read position to sample frame given in offset */
 FTS_API int fts_audiofile_seek(fts_audiofile_t *audiofile, int offset);
 
 FTS_API void fts_audiofile_import_handler (fts_class_t *cl, fts_method_t meth);
