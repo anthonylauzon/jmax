@@ -2381,21 +2381,33 @@ track_notify_gui_listeners(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
 *
 */
 
+#define TRACK_ITER_BEGIN(track)				\
+{							\
+    event_t *orgevent = track_get_first(track);		\
+    int      i        = 0;				\
+							\
+    while (orgevent != NULL)				\
+    {							\
+	double      time  = event_get_time(orgevent);	\
+	fts_atom_t *value = event_get_value(orgevent);
+
+#define TRACK_ITER_END					\
+	orgevent = event_get_next(orgevent);		\
+	i++;						\
+    }							\
+}
+
+
 static fts_method_status_t
 _track_copy_to_mat (fts_object_t *o, fts_symbol_t s, int ac, 
                     const fts_atom_t *at, fts_atom_t *ret)
 {
     mat_t   *mat      = (mat_t *)   o;
     track_t *track    = (track_t *) fts_get_object(at);
-    event_t *orgevent = track_get_first(track);
-    int      i        = 0;
   
     mat_set_size(mat, track_get_size(track), 2);
   
-    while (orgevent != NULL)
-    {
-        double      time  = event_get_time(orgevent);
-        fts_atom_t *value = event_get_value(orgevent);
+    TRACK_ITER_BEGIN(track)
         fts_atom_t  a[2];
 
         fts_set_float(a, time);
@@ -2405,10 +2417,7 @@ _track_copy_to_mat (fts_object_t *o, fts_symbol_t s, int ac,
         mat_set_element(mat, i, 1, a+1);
         fts_atom_release(a+1);  /* atom no longer needed, decrement reference count
                                    set by fts_atom_copy in case of an object */
-        
-        orgevent = event_get_next(orgevent);
-        i++;
-    }
+    TRACK_ITER_END
 
     /* TODO: set column names */
     fts_object_changed(o);
@@ -2424,21 +2433,29 @@ _track_copy_to_fmat (fts_object_t *o, fts_symbol_t s, int ac,
 {
     fmat_t  *fmat     = (fmat_t *)  o;
     track_t *track    = (track_t *) fts_get_object(at);
-    event_t *orgevent = track_get_first(track);
-    int      i        = 0;
-  
-    fmat_set_size(fmat, track_get_size(track), 2);
-  
-    while (orgevent != NULL)
-    {
-        double      time  = event_get_time(orgevent);
-        fts_atom_t *value = event_get_value(orgevent);
 
-        fmat_set_element(fmat, i, 0, time);
-        fmat_set_element(fmat, i, 1, fts_get_float(value));
-        
-        orgevent = event_get_next(orgevent);
-        i++;
+    fmat_set_size(fmat, track_get_size(track), 2);
+
+    if (track_get_type(track) == fts_float_class)
+    {
+	TRACK_ITER_BEGIN(track)
+	    fmat_set_element(fmat, i, 0, time);
+	    fmat_set_element(fmat, i, 1, fts_get_float(value));
+	TRACK_ITER_END
+    }
+    else if (track_get_type(track) == fts_int_class)
+    {
+	TRACK_ITER_BEGIN(track)
+	    fmat_set_element(fmat, i, 0, time);
+	    fmat_set_element(fmat, i, 1, fts_get_int(value));
+	TRACK_ITER_END
+    }
+    else
+    {   /* do something which makes sense: get times */
+	TRACK_ITER_BEGIN(track)
+	    fmat_set_element(fmat, i, 0, time);
+	    fmat_set_element(fmat, i, 1, 0);
+	TRACK_ITER_END
     }
 
     /* TODO: set column names */
@@ -2447,7 +2464,6 @@ _track_copy_to_fmat (fts_object_t *o, fts_symbol_t s, int ac,
 
     return fts_ok;
 }
-
 
 
 static fts_method_status_t
@@ -2465,11 +2481,19 @@ _track_copy_to_fvec (fts_object_t *o, fts_symbol_t s, int ac,
     
     /* copy not more events than underlying matrix size
        TBD: resize fvec if less events than size??? */
-    for (i = 0, j = 0; i < size  &&  orgevent != NULL; i++, j += stride)
+    if (track_get_type(track) == fts_float_class  ||
+	track_get_type(track) == fts_int_class)
     {
-        ptr[j]  = fts_get_float(event_get_value(orgevent));
-
-        orgevent = event_get_next(orgevent);
+	for (i = 0, j = 0; i < size  &&  orgevent != NULL; i++, j += stride)
+	{
+	    ptr[j]  = fts_get_number_float(event_get_value(orgevent));
+	    
+	    orgevent = event_get_next(orgevent);
+	}
+    }
+    else
+    {
+	fmat_set_const((fmat_t *) fvec, 0);  /* yes, it works on fvec, too */
     }
 
     fts_object_changed(o);
