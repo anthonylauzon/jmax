@@ -32,6 +32,7 @@
 #include <float.h>
 #include <string.h>
 
+
 #ifdef WIN32
 #include <malloc.h>
 #else
@@ -129,6 +130,59 @@ fmat_reshape(fmat_t *self, int m, int n)
   self->m = m;
   self->n = n;
 }
+
+
+/** copy from fmat in with resampling by factor */
+void
+fmat_resample (fmat_t *self, fmat_t *in, double factor)
+{
+  int m = fmat_get_m(in);
+  int n = fmat_get_n(in);
+
+  if (m > 3)
+  {
+    double  	 inv = 1.0 / factor;
+    float	*ptr;
+    float  	*out_ptr;
+    int     	 out_m = (int) ceil((double) m * inv);
+    int     	 head  = (int) ceil(inv);
+    fts_idefix_t idefix;
+    fts_idefix_t incr;
+    int		 i, j;
+      
+    /* zero pad for interpolation */
+    fmat_set_m(in, m + 2);
+    fmat_set_m(in, m);
+    ptr = fmat_get_ptr(in);
+        
+    fmat_reshape(self, out_m, n);
+    out_ptr = fmat_get_ptr(self);
+      
+    fts_idefix_set_float(&incr, factor);
+      
+    for (j = 0; j < n; j++)
+    {
+      fts_idefix_set_zero(&idefix);
+        
+      /* copy first points without interpolation */
+      for (i = j; i < head * n; i += n)
+      {
+	out_ptr[i] = ptr[j];
+	fts_idefix_incr(&idefix, incr);
+      }
+        
+      /* interpolate */
+      for(; i < out_m * n; i += n)
+      {
+	fts_cubic_idefix_interpolate_stride(ptr + j, idefix, n, out_ptr + i);
+	fts_idefix_incr(&idefix, incr);
+      }
+    }
+  }
+  else
+    fmat_reshape(self, 0, 0);  
+}
+
 
 void
 fmat_set_m(fmat_t *self, int m)
@@ -3978,6 +4032,7 @@ fmat_initialize(fmat_t *self)
   self->domain = 0.0;
   self->opened = 0;
 }
+
 
 /** fmat constructor.
  *

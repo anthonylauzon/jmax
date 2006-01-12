@@ -1752,6 +1752,33 @@ fvec_get_sum(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
 
 
 static fts_method_status_t
+fvec_cumsum (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+  float  *p;
+  float   sum = 0.0;
+  int     size, stride, i;
+  
+  fvec_get_vector(self, &p, &size, &stride);
+
+  if (size > 0)
+  {
+    sum = p[0];
+
+    for (i = 1; i < size * stride; i += stride)
+    {
+      sum += p[i];
+      p[i] = sum;
+    }
+  }
+
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
 fvec_get_prod (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
@@ -2117,7 +2144,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_size, _fvec_get_size);
   fts_class_message_number(cl, fts_s_size, _fvec_set_size);
 
-  /* arithmetics (on fvec or fmat!) */
+  /* in-place arithmetics (on fvec or fmat!) */
   fvec_message(cl, fts_new_symbol("add"), fvec_add_fvec, fvec_add_number);
   fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);
   fvec_message(cl, fts_new_symbol("mul"), fvec_mul_fvec, fvec_mul_number);
@@ -2134,7 +2161,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("exp"), fvec_exp);
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fvec_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("sqrt"), fvec_sqrt);
-  
+  fts_class_message_void(cl, fts_new_symbol("cumsum"), fvec_cumsum);
+
+  /* return scalar */
   fts_class_message_void(cl, fts_new_symbol("min"), fvec_get_min);
   fts_class_message_void(cl, fts_new_symbol("max"), fvec_get_max);
   fts_class_message_void(cl, fts_new_symbol("mini"), fvec_get_min_index);
