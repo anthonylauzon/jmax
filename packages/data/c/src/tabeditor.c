@@ -60,13 +60,32 @@ static fts_symbol_t sym_insert_client = 0;
 *
 */
 static void
+fvec_get_min_max_in_range(float *ptr, int size, int stride, int i_min, int i_max, float *min, float *max)
+{
+  int i = i_min * stride;
+  
+  *min = *max = ptr[i];
+  i+=stride;
+  
+  for(; i<i_max*stride; i+=stride)
+  {
+    float f = ptr[i];
+    
+    if(f < *min)
+      *min = f;
+    
+    if(f > *max)
+      *max = f;
+  }
+}
+
+static void
 tabeditor_send_visibles(tabeditor_t *tabeditor)
 {
   int i;
   fts_atom_t a[CLIENT_BLOCK_SIZE];
   int vecsize = tabeditor_get_size( tabeditor);
   int n = (tabeditor->vindex + tabeditor->vsize <= vecsize)? (tabeditor->vindex + tabeditor->vsize) : vecsize;
-  
   int append = 0;
   int count = 0;
   int send = 0;
@@ -91,8 +110,17 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
       for(i = 0; ((i < send)&&( current+i < vecsize)); i++)
         fts_set_int(&a[i+veconset], ((ivec_t *)tabeditor->vec)->values[current+i]);
     else
-      for(i = 0; ((i < send)&&( current+i < vecsize)); i++)
-        fts_set_float(&a[i+veconset], ((fmat_t *)tabeditor->vec)->values[current+i]);
+    {
+      float *ptr;
+      int size;
+      int stride;
+      int i, j;
+      
+      fvec_vector(tabeditor->vec, &ptr, &size, &stride);
+      
+      for(i=0, j=0; i < send && current+i < size; i++, j+=stride)
+        fts_set_float(a + i + veconset, ptr[j]);
+    }
     
     if(!append)
     {
@@ -141,13 +169,25 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
         j++;
       }      
     else
-      for(i = 0; ((i < send-1)&&((int)(current+j*k)<vecsize)); i+=2)
+    {
+      float *ptr;
+      int size;
+      int stride;
+      
+      fvec_vector(tabeditor->vec, &ptr, &size, &stride);
+      
+      for(i = 0, j = 0; (i < send-1 && ((int)(current+j*k)<vecsize)); i+=2)
       {
-        fts_set_float(&a[i+1], fmat_get_max_value_in_range((fmat_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
-        fts_set_float(&a[i+2], fmat_get_min_value_in_range((fmat_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
+        float min, max;
+        
+        fvec_get_min_max_in_range(ptr, size, stride, (int)(current + k * j), (int)(current + k * (j + 1)), &min, &max);
+        
+        fts_set_float(a + i + 1, max);
+        fts_set_float(a + i + 2, min);
         j++;
       }
-            
+    }
+        
     if(!append)
     {
       fts_client_send_message((fts_object_t *)tabeditor, sym_set_pixels, send, a);
@@ -183,13 +223,25 @@ tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int size)
       j++;
     }  
   else
-    for(i = 0; ((i < send-1) && ((int)(current + j * k) < vecsize)); i+=2)
+  {
+    float *ptr;
+    int size;
+    int stride;
+    
+    fvec_vector(tabeditor->vec, &ptr, &size, &stride);
+    
+    for(i = 0, j = 0; (i < send-1 && ((int)(current + j * k) < size)); i+=2)
     {    
-      fts_set_float(&a[i+1], fmat_get_max_value_in_range((fmat_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
-      fts_set_float(&a[i+2], fmat_get_min_value_in_range((fmat_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
+      float min, max;
+      
+      fvec_get_min_max_in_range(ptr, size, stride, (int)(current + k * j), (int)(current + k * (j + 1)), &min, &max);
+      
+      fts_set_float(a + i + 1, max);
+      fts_set_float(a + i + 2, min);
       j++;
     }
-    fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send + 1, a);
+  }
+  fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send + 1, a);
 }
 
 static void
@@ -212,16 +264,23 @@ tabeditor_append_visibles(tabeditor_t *tabeditor, int first, int last)
       for(i = 0; i < send; i++)
         fts_set_int(&a[i+1], ((ivec_t *)tabeditor->vec)->values[current+i]);
     else
-      for(i = 0; i < send; i++)
-        fts_set_float(&a[i+1], ((fmat_t *)tabeditor->vec)->values[current+i]);
-    
+    {
+      float *ptr;
+      int size;
+      int stride;
+      int i, j;
+      
+      fvec_vector(tabeditor->vec, &ptr, &size, &stride);
+      
+      for(i=0, j= current * stride; i < send && current+i < size; i++, j+=stride)
+        fts_set_float(a + i + 1, ptr[j]);      
+    }
     fts_client_send_message((fts_object_t *)tabeditor, sym_append_visibles, send+1, a);
     
     current+=send;
     n -= send;
   }
 }
-
 
 static void
 tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
@@ -241,10 +300,10 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
     int send = (num_val > CLIENT_BLOCK_SIZE-1)? CLIENT_BLOCK_SIZE-1: num_val;
     
     fts_set_int(&a[0], start);
-    j = 0;
+    
     if( tabeditor_is_ivec( tabeditor))
-    {
-      for(i = 0; ((i < send-1)&&((int)(current+j*k) < vecsize)); i+=2)
+    {      
+      for(i = 0, j=0; ((i < send-1)&&((int)(current+j*k) < vecsize)); i+=2)
       {
         fts_set_int(&a[i+1], ivec_get_max_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
         fts_set_int(&a[i+2], ivec_get_min_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
@@ -253,10 +312,20 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
     }
     else
     {
-      for(i = 0; ((i < send-1)&&((int)(current+j*k) < vecsize)); i+=2)
-      {	  
-        fts_set_float(&a[i+1], fmat_get_max_value_in_range((fmat_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));	
-        fts_set_float(&a[i+2], fmat_get_min_value_in_range((fmat_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));	
+      float *ptr;
+      int size;
+      int stride;
+      
+      fvec_vector(tabeditor->vec, &ptr, &size, &stride);
+      
+      for(i = 0, j = 0; (i < send-1 && ((int)(current + j * k) < size)); i+=2)
+      {
+        float min, max;
+        
+        fvec_get_min_max_in_range(ptr, size, stride, (int)(current + k * j), (int)(current + k * (j + 1)), &min, &max);
+        
+        fts_set_float(a + i + 1, max);	
+        fts_set_float(a + i + 2, min);	
         j++;
       }
     }
@@ -331,6 +400,20 @@ tabeditor_set_visible_window(fts_object_t *o, fts_symbol_t s, int ac, const fts_
 }
 
 static fts_method_status_t
+tabeditor_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tabeditor_t *this = (tabeditor_t *)o;
+  
+  if(this->zoom > 0.5)
+    tabeditor_send_visibles(this);
+  else
+    tabeditor_send_pixels(this);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
 tabeditor_copy_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tabeditor_t *this = (tabeditor_t *)o;
@@ -366,14 +449,14 @@ tabeditor_copy_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const 
     {
       float *src, *dst;
       
-      this_size = fmat_get_m( (fmat_t *)this->vec);
+      this_size = fvec_get_size( (fvec_t *)this->vec);
       
       if(!this->copy)
         this->copy = fts_object_create(fmat_class, 1, at + 1);
       else
         fmat_set_m((fmat_t *)this->copy, size);
       
-      src = fmat_get_ptr( (fmat_t *)this->vec);
+      src = fmat_get_ptr( ((fvec_t *)this->vec)->fmat);
       dst = fmat_get_ptr( (fmat_t *)this->copy);
       
       if(start + size > this_size)
@@ -413,9 +496,11 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
   else
   {
     float *ptr;
+    int size;
+    int stride;
+    
+    fvec_vector(this->vec, &ptr, &size, &stride);    
     copy_size = fmat_get_m( (fmat_t *)this->copy);
-    size = fmat_get_m( (fmat_t *)this->vec);
-    ptr = fmat_get_ptr( (fmat_t *)this->vec);
     
     for(i = start; i < size-copy_size; i++)
       ptr[i] = ptr[i + copy_size];
@@ -581,11 +666,9 @@ tabeditor_set_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
 	    }
       else
 	    {
-        fmat_t *fmat = (fmat_t *)this->vec;
+        fvec_set_from_atoms((fvec_t *)this->vec, onset, ac - 1, at + 1);
         
-	      fmat_set_from_atoms(fmat, onset, fmat_get_n(fmat), ac - 1, at + 1);
-        
-	      if( fmat_editor_is_open( (fmat_t *)this->vec))
+	      if( fvec_editor_is_open( (fvec_t *)this->vec))
           tabeditor_insert_append( this, onset, ac, at);
 	    }
       
@@ -614,13 +697,10 @@ void tabeditor_send( tabeditor_t *tabeditor)
 
 int tabeditor_get_size( tabeditor_t *tabeditor)
 {
-  int size;
   if( tabeditor_is_ivec( tabeditor))
-    size = ivec_get_size( ((ivec_t *)tabeditor->vec));
+    return ivec_get_size((ivec_t *)tabeditor->vec);
   else
-    size = fmat_get_m( ((fmat_t *)tabeditor->vec));
-  
-  return size;
+    return fvec_get_size((fvec_t *)tabeditor->vec);
 }
 
 /*********************************************************
@@ -672,6 +752,8 @@ static void
 tabeditor_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(tabeditor_t), tabeditor_init, tabeditor_delete);
+  
+  fts_class_message_varargs(cl, fts_s_upload, tabeditor_upload);
   
   fts_class_message_varargs(cl, fts_new_symbol("set_from_client"), tabeditor_set_elements);
   fts_class_message_varargs(cl, fts_new_symbol("get_from_client"), tabeditor_get_to_client);

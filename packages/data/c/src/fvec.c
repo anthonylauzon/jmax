@@ -215,8 +215,18 @@ static void *fvec_editor = NULL;
 static void
 fvec_editor_callback (fts_object_t *o, void *e)
 {
-  fvec_t *self = (fvec_t *) o;
-  fvec_upload(self); 
+  if(fts_object_is_a(o, fvec_class))
+  {
+    fvec_t *self = (fvec_t *) o;
+    if(fvec_editor_is_open(self))
+      fts_send_message( (fts_object_t *)self->editor, fts_s_upload, 0, 0, fts_nix);
+  }
+  else if(fts_object_is_a(o, fmat_class))
+  {
+    fvec_t *self = (fvec_t *) e;
+    if(fvec_editor_is_open(self))
+      fts_send_message( (fts_object_t *)self->editor, fts_s_upload, 0, 0, fts_nix);
+  }
 }
 
  static fts_method_status_t 
@@ -233,19 +243,19 @@ fvec_editor_callback (fts_object_t *o, void *e)
    }
    
    if(fts_object_has_client( (fts_object_t *)this->editor) == 0)
-   {
+   { 
      fts_client_register_object( (fts_object_t *)this->editor, fts_object_get_client_id( o));
      
      fts_set_int(&a, fts_object_get_id( (fts_object_t *)this->editor));
      fts_client_send_message( o, fts_s_editor, 1, &a);
-     
-     fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0, fts_nix);
-   }
+   }     
+   fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0, fts_nix);
    
    fvec_set_editor_open( this);
    fts_client_send_message(o, fts_s_openEditor, 0, 0);
 
    fts_object_add_listener(o, fvec_editor, fvec_editor_callback);
+   fts_object_add_listener((fts_object_t *)this->fmat, this, fvec_editor_callback);
    /*fvec_upload(self);   */
    
    return fts_ok;
@@ -291,8 +301,6 @@ fvec_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   
   return fts_ok;
 }
-
-
 
 /********************************************************************
 *
@@ -872,6 +880,22 @@ fvec_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
   return fts_ok;
 }
 
+void
+fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at)
+{
+  float *ptr;
+  int size;
+  int stride;
+  int i, j;
+  
+  fvec_vector(vec, &ptr, &size, &stride);
+  
+  for(i=0, j=0; i < ac && i < size; i++, j+=stride)
+    if(fts_is_number(at + i))
+      ptr[j] = (float)fts_get_number_float(at + i);
+    else
+      ptr[j] = 0.0f;
+}
 
 static fts_method_status_t
 fvec_set_from_fmat_or_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -908,6 +932,8 @@ _fvec_set_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   self->fmat = fmat;
   fts_object_refer((fts_object_t *)fmat);
   
+  fts_object_changed(o);
+  
   fts_set_object(ret, o);
   
   return fts_ok;
@@ -931,6 +957,8 @@ _fvec_set_fmat_and_dimensions(fts_object_t *o, fts_symbol_t s, int ac, const fts
     if(ac > 2)
       fvec_set_dimensions(self, ac - 2, at + 2);
     
+    fts_object_changed(o);
+    
     fts_set_object(ret, o);
   }
   
@@ -945,6 +973,8 @@ _fvec_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   self->type = fvec_type_column;
   fvec_set_dimensions(self, ac, at);
   
+  fts_object_changed(o);
+  
   fts_set_object(ret, o);
   
   return fts_ok;
@@ -957,6 +987,8 @@ _fvec_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   
   self->type = fvec_type_row;
   fvec_set_dimensions(self, ac, at);
+  
+  fts_object_changed(o);
   
   fts_set_object(ret, o);
   
@@ -971,6 +1003,8 @@ _fvec_set_diag(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   self->type = fvec_type_diagonal;
   fvec_set_dimensions(self, ac, at);
   
+  fts_object_changed(o);
+  
   fts_set_object(ret, o);
   
   return fts_ok;
@@ -983,6 +1017,8 @@ _fvec_set_unwrap(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   
   self->type = fvec_type_unwrap;
   fvec_set_dimensions(self, ac, at);
+  
+  fts_object_changed(o);
   
   fts_set_object(ret, o);
   
@@ -1007,6 +1043,8 @@ _fvec_set_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   
   self->type = fvec_type_vector;
   self->size = size;
+  
+  fts_object_changed(o);
   
   fts_set_object(ret, o);
   
@@ -1065,6 +1103,8 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
     fmat_set_m(self->fmat, size);
   
   fvec_set_size(self, size);
+  
+  fts_object_changed(o);
   
   fts_set_object(ret, o);
   

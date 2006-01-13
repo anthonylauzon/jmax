@@ -258,7 +258,6 @@ fmat_set_n(fmat_t *self, int n)
   }
 }
 
-
 /* change matrix size, copying data around */
 void
 fmat_set_size(fmat_t *self, int m, int n)
@@ -561,8 +560,8 @@ fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride)
   {
     fmat_t *fmat = (fmat_t *) obj;
     
-    *ptr    = fmat_get_ptr(fmat);
-    *size   = fmat_get_m(fmat) * fmat_get_n(fmat);
+    *ptr = fmat_get_ptr(fmat);
+    *size = fmat_get_m(fmat) * fmat_get_n(fmat);
     *stride = 1;
     
     return 1;
@@ -3869,8 +3868,6 @@ fmat_apply_expr_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
       
   return fts_ok;
 }
-
-
 
 
 /*********************************************************

@@ -86,6 +86,8 @@ DATA_API void  fvec_set_element(fvec_t *self, int i, float value);
 
 DATA_API void fvec_set_dimensions(fvec_t *fvec, int ac, const fts_atom_t *at);
 
+DATA_API void fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at);
+
 /** get fvec access parameters, then use ptr[i * stride] if i < size 
     @return	true if obj is an fvec, 
 		false and size = stride = 0 otherwise */
