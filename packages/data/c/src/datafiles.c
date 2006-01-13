@@ -169,6 +169,7 @@ fmat_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
 }
 
 
+
 /******************************************************************************
  *
  *  fmat audio file import/export
@@ -189,7 +190,7 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     {
       int m = fts_audiofile_get_num_frames(sf);
       int n = fts_audiofile_get_num_channels(sf);
-      int wanted;	/* number of sample frames to load */
+      int wanted  = 0;	/* number of sample frames to load */
       int offset  = 0;
       int channel = 0;
       double  sr  = 0;	/* resample if not zero */
@@ -216,8 +217,12 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
         case 2:
 	  if (fts_is_number(at + 1))
 	    offset = fts_get_number_int(at + 1);
+
+        case 1:
+	  /* no additional arguments, filename already parsed, do nothing */
+	break;
       }
-	
+
       /* check args */
       if (sr <= 0  ||  sr == fts_audiofile_get_sample_rate(sf))
 	sr = 0;
