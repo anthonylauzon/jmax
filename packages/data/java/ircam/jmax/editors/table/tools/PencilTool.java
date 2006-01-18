@@ -86,15 +86,15 @@ public class PencilTool extends TableTool implements DynamicDragListener {
     int y2 = y;
 
     if (x1 > x2) //the line is given 'a l'inverse'
-      {
-	int temp;
-	temp = y1;
-	y1 = y2;
-	y2 = temp;
-	temp = x1;
-	x1 = x2;
-	x2 = temp;
-      }
+    {
+      int temp;
+      temp = y1;
+      y1 = y2;
+      y2 = temp;
+      temp = x1;
+      x1 = x2;
+      x2 = temp;
+    }
 
     int start = ta.getInvX(x1); 
     int end = ta.getInvX(x2);

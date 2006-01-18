@@ -887,10 +887,11 @@ fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at)
   int size;
   int stride;
   int i, j;
-  
+    
+  //fvec_set_onset(vec, onset);
   fvec_vector(vec, &ptr, &size, &stride);
   
-  for(i=0, j=0; i < ac && i < size; i++, j+=stride)
+  for(i=0, j=onset*stride; i < ac && i < size; i++, j+=stride)
     if(fts_is_number(at + i))
       ptr[j] = (float)fts_get_number_float(at + i);
     else
