@@ -888,7 +888,6 @@ fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at)
   int stride;
   int i, j;
     
-  //fvec_set_onset(vec, onset);
   fvec_vector(vec, &ptr, &size, &stride);
   
   for(i=0, j=onset*stride; i < ac && i < size; i++, j+=stride)
@@ -896,6 +895,8 @@ fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at)
       ptr[j] = (float)fts_get_number_float(at + i);
     else
       ptr[j] = 0.0f;
+
+  fts_send_message( (fts_object_t *)vec->fmat, fts_s_upload, 0, 0, fts_nix);
 }
 
 static fts_method_status_t

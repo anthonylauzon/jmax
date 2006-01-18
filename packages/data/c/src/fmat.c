@@ -3928,6 +3928,18 @@ fmat_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   return fts_ok;
 }
 
+/* move track by client request */
+static fts_method_status_t
+_fmat_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *) o;
+  
+  if(fmat_editor_is_open(self))
+    fmat_upload(self);
+  
+  return fts_ok;
+}
+
 /********************************************************************
  *
  *  system functions
@@ -4254,6 +4266,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor, fmat_open_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, fmat_close_editor); 
   fts_class_message_varargs(cl, fts_s_destroyEditor, fmat_destroy_editor);
+  
+  fts_class_message_varargs(cl, fts_s_upload, _fmat_upload);
   
   fts_class_inlet_thru(cl, 0);
   fts_class_outlet_thru(cl, 0);

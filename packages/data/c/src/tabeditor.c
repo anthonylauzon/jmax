@@ -118,7 +118,7 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
       
       fvec_vector(tabeditor->vec, &ptr, &size, &stride);
       
-      for(i=0, j=0; i < send && current+i < size; i++, j+=stride)
+      for(i=0, j=current*stride; i < send && current+i < size; i++, j+=stride)
         fts_set_float(a + i + veconset, ptr[j]);
     }
     
