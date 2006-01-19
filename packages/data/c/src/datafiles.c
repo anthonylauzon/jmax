@@ -666,11 +666,11 @@ mat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
   mat_t *self = (mat_t *) o;
   fts_symbol_t file_name = fts_get_symbol_arg(ac, at, 0, 0);
   fts_symbol_t separator = fts_get_symbol_arg(ac, at, 2, 0);
+  int size = 0;
   
   if(!file_name)
     return fts_ok;
   
-  int size = 0;
   
   if (separator)
     size = mat_read_atomfile_separator(self, file_name, separator, ac - 3, at + 3);
