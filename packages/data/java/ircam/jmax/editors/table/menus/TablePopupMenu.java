@@ -51,27 +51,37 @@ public class TablePopupMenu extends JPopupMenu
     super();
     
     target = editor;
-
-    /////////// Tools /////////////////////////////////////////
-    JMenuItem aMenuItem;
-    Tool tool;
-    ButtonGroup toolsMenuGroup = new ButtonGroup();
-    
-    for(Enumeration e = TableTools.instance.getTools(); e.hasMoreElements();)
+    JMenuItem item;
+    item = new JMenuItem("Inspect ... ");
+    item.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e)
       {
-	tool = (Tool)e.nextElement();
-	aMenuItem = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());
-	aMenuItem.addActionListener( target.getGraphicContext().getToolManager());
-	toolsMenuGroup.add(aMenuItem);
-	add(aMenuItem);
+        TableInspector.inspect(target, target.getFrame(), SwingUtilities.convertPoint(target, x, y, target.getFrame()));
       }
-    
-    ((JRadioButtonMenuItem)getComponent(0)).setSelected(true);
+    });
+    add(item);
     
     addSeparator();
+    
+    /////////// Tools /////////////////////////////////////////
+    Tool tool;
+    ButtonGroup toolsMenuGroup = new ButtonGroup();
+    JRadioButtonMenuItem aMenuItem;
+    for(Enumeration e = TableTools.instance.getTools(); e.hasMoreElements();)
+    {
+      tool = (Tool)e.nextElement();
+      aMenuItem = new JRadioButtonMenuItem(tool.getName(), tool.getIcon());
+      aMenuItem.addActionListener( target.getGraphicContext().getToolManager());
+      toolsMenuGroup.add(aMenuItem);
+      add(aMenuItem);
+    }
+    
+    ((JRadioButtonMenuItem)getComponent(2)).setSelected(true);
+    
+    //addSeparator();
 
     /////////////////////// View Menu /////////////////////////////
-    ButtonGroup viewGroup = new ButtonGroup();
+    /*ButtonGroup viewGroup = new ButtonGroup();
 
     filledItem = new JRadioButtonMenuItem( "Filled view");
     filledItem.addActionListener( new Actions.FilledViewAction());
@@ -88,16 +98,16 @@ public class TablePopupMenu extends JPopupMenu
     viewGroup.add( linesItem);
     add( linesItem);    
 
-    addSeparator();
+    addSeparator();*/
     
     /* Color */
-    JMenuItem item = new JMenuItem( "Background Color...");
+    /*item = new JMenuItem( "Background Color...");
     item.addActionListener( new Actions.BackColorAction());
     add( item);
     
     item = new JMenuItem( "Foreground Color...");
     item.addActionListener( new Actions.ForeColorAction());
-    add( item);
+    add( item);*/
 
     validate();
     pack();
@@ -112,18 +122,7 @@ public class TablePopupMenu extends JPopupMenu
     super.show(invoker, x, y);
   }
 
-  public void update()
-  {
-    int dm = target.getDisplayMode();
-    if( dm == TableRenderer.FILLED) 
-        filledItem.setSelected( true);
-    else 
-        if( dm == TableRenderer.POINTS) 
-            pointsItem.setSelected( true);    
-        else
-            linesItem.setSelected( true);    
-    revalidate();
-  }
+  public void update(){}
 }
 
 

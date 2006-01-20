@@ -218,7 +218,7 @@ public class TableAdapter {
   public float getXZoom()
   {
     return itsXZoom;
-  }
+  } 
 
   public void setXZoom(float zoom)
   {

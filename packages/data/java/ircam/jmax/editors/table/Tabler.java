@@ -58,7 +58,7 @@ public class Tabler extends JMaxEditor{
     getContentPane().add(itsPanel, BorderLayout.CENTER);
     itsPanel.frameAvailable(); 
 
-    makeControlBar();
+    //makeControlBar();
 
     addWindowListener( new WindowListener(){
       public void windowOpened(WindowEvent e){}
@@ -111,7 +111,7 @@ public class Tabler extends JMaxEditor{
     setJMenuBar(mb);
   }
 
-  JTextField maxValueField, minValueField;
+  /*JTextField maxValueField, minValueField;
   JPanel controlBar;
   JLabel displayMouseLabel, infoLabel;
   private void makeControlBar()
@@ -121,7 +121,7 @@ public class Tabler extends JMaxEditor{
     controlBar.setBorder( BorderFactory.createEtchedBorder());
     controlBar.setBounds(0, 0, getSize().width, CONTROLBAR_HEIGHT);
 
-    /* Mouse Display */
+    // Mouse Display 
     displayMouseLabel = new JLabel();
     displayMouseLabel.setFont( displayFont);
     displayMouseLabel.setPreferredSize(new Dimension(102, 15));
@@ -140,7 +140,7 @@ public class Tabler extends JMaxEditor{
 
     itsPanel.getGraphicContext().setDisplay( displayMouseLabel, infoLabel);
 
-    /* max Y */
+    // max Y 
     JLabel maxLabel = new JLabel("maxY", JLabel.CENTER);
     maxLabel.setFont( displayFont);
     maxValueField = new JTextField();
@@ -175,7 +175,7 @@ public class Tabler extends JMaxEditor{
     maxPanel.add( Box.createRigidArea( new Dimension( 5, 0)));
     maxPanel.add( maxValueField);
 
-     /* min Y*/
+    // min Y
     JLabel minLabel = new JLabel("minY", JLabel.CENTER);    
     minLabel.setFont( displayFont);
     minValueField = new JTextField();
@@ -186,22 +186,22 @@ public class Tabler extends JMaxEditor{
       ""+(int)(itsPanel.getGraphicContext().getVerticalMinimum()/100);
     minValueField.setText( minText);
     minValueField.addActionListener( new ActionListener(){
-	public void actionPerformed( ActionEvent e)
-	{
-	  try
-	    {
+  	public void actionPerformed( ActionEvent e)
+    {
+      try
+      {
 	      int min = Integer.valueOf( minValueField.getText()).intValue();
 	      if( itsPanel.getGraphicContext().getVerticalMinimum() != min)
-		itsPanel.setMinimumValue( min);
+          itsPanel.setMinimumValue( min);
 	      minValueField.transferFocus();
 	    }
-	  catch (NumberFormatException e1)
-	    {
+      catch (NumberFormatException e1)
+      {
 	      System.err.println("Error:  invalid number format!");
 	      return;
 	    }
-	}
-      });
+    }
+    });
     
     JPanel minPanel = new JPanel();
     minPanel.setPreferredSize(new Dimension(90, 15));
@@ -217,7 +217,7 @@ public class Tabler extends JMaxEditor{
 
     getContentPane().add(controlBar, BorderLayout.SOUTH);
     validate();
-  }
+  }*/
 
   // ------ JMaxEditor ---------------
   public Editor getEditor(){

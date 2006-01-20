@@ -16,6 +16,7 @@ TableDataModel.java \
 TableDisplay.java \
 TableDynamicDragListener.java \
 TableGraphicContext.java \
+TableInspector.java \
 TableInteractionModule.java \
 TableMouseDragTracker.java \
 TablePanel.java \

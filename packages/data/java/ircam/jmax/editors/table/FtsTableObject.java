@@ -412,7 +412,7 @@ public void requestEndEdit()
 
 private boolean firstTime = false;
 public void requestGetValues()
-{
+{  
   try{
     send( FtsSymbol.get("get_from_client"));
   }

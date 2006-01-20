@@ -115,6 +115,11 @@ public class TableDisplay extends PopupToolbarPanel
   {
     this.tr = tr;
   }
+  
+  public TableRenderer getRenderer()
+  {
+    return this.tr;
+  }
 
   public void setGraphicContext(TableGraphicContext tgc)
   {
@@ -136,6 +141,11 @@ public class TableDisplay extends PopupToolbarPanel
   public int getDisplayMode()
   {
     return tr.getMode();
+  }
+  
+  public Frame getFrame()
+  {
+    return panel.getEditorContainer().getFrame();
   }
   
   //--- Fields
