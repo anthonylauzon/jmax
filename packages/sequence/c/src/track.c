@@ -1859,6 +1859,8 @@ _track_insert(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   else
     fts_object_error(o, "insert: bad time value");
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
 
@@ -1890,8 +1892,11 @@ _track_append(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
   else
     fts_object_error(o, "insert: bad time value");
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
+
 
 static fts_method_status_t
 _track_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -1909,8 +1914,11 @@ _track_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
     event = next;
   }
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
+
 
 static fts_method_status_t
 _track_shift(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
