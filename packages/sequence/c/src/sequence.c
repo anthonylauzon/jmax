@@ -450,6 +450,9 @@ sequence_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   return fts_ok;
 }
 
+
+
+
 /******************************************************
  *
  *  add, remove, move, dump
@@ -492,8 +495,11 @@ sequence_add_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const fts
     }
   }
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
+
 
 /* remove track by client request */
 static fts_method_status_t
@@ -508,8 +514,11 @@ sequence_remove_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const 
   /* fts_name_update(o); */
   fts_object_set_state_dirty(o);
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
+
 
 static fts_method_status_t
 sequence_move_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -524,8 +533,11 @@ sequence_move_track_and_update(fts_object_t *o, fts_symbol_t s, int ac, const ft
   /* fts_name_update(o); */
   fts_object_set_state_dirty(o);
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
+
 
 static fts_method_status_t
 sequence_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -585,8 +597,11 @@ sequence_append_event_at_last_loaded_track(fts_object_t *o, fts_symbol_t s, int 
   if(this->last_loaded_track!=NULL)
     fts_send_message((fts_object_t *)this->last_loaded_track, fts_s_append, ac, at, fts_nix); 
   
+  /* return self */
+  fts_set_object(ret, o);
   return fts_ok;
 }
+
 
 /*static fts_method_status_t
 sequence_set_save_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
