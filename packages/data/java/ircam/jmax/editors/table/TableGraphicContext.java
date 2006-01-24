@@ -152,10 +152,10 @@ public class TableGraphicContext extends GraphicContext{
     return (itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height));
   }
 
-  public boolean isVerticalScrollbarVisible()
+  /*public boolean isVerticalScrollbarVisible()
   {
     return ((TableDisplay)getGraphicDestination()).panel.itsVerticalControl.isVisible();
-  }
+  }*/
   public boolean isHorizontalScrollbarVisible()
   {
     return ((TableDisplay)getGraphicDestination()).panel.itsHorizontalControl.isVisible();

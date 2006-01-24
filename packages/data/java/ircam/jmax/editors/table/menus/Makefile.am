@@ -2,6 +2,7 @@ packagedir=$(pkglibdir)/packages/data/java/classes/ircam/jmax/editors/table/acti
 package_JAVA = \
 EditMenu.java \
 TablePopupMenu.java \
+TableSimpleMenu.java \
 ViewMenu.java 
 
 JAVAC = @JAVACX@

@@ -50,9 +50,9 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   final static int PANEL_WIDTH = 500;
   static int PANEL_HEIGHT;
   final static int IVEC_PANEL_HEIGHT = 270;
-  final static int FVEC_PANEL_HEIGHT = 200;
+  final static int FVEC_PANEL_HEIGHT = /*200*/ 400;
 	
-  public JScrollBar itsVerticalControl, itsHorizontalControl;
+  public JScrollBar itsHorizontalControl;
 	
   Dimension size;
 	
@@ -92,8 +92,6 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     itsCenterPanel.setRenderer(itsTableRenderer);
     gc.setRenderManager(itsTableRenderer);
     
-    //... the vertical position controller
-    prepareVerticalScrollbar();    
     prepareHorizontalScrollbar();
 		
     // Add listeners for data model changes
@@ -112,8 +110,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
 		  {
-        /*updateHorizontalScrollbar();
-        updateVerticalScrollbar();*/
+        updateHorizontalScrollbar();//????
+        
         gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
                                                    ((TableAdapter)gc.getAdapter()).getXZoom(), 
                                                    gc.getVisiblePixelsSize());
@@ -161,8 +159,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setBorder(new EtchedBorder());
 		
-    itsCenterPanel.setBounds(0,0, getSize().width-SCROLLBAR_SIZE, 
-														 getSize().height-SCROLLBAR_SIZE);
+    /*itsCenterPanel.setBounds(0,0, getSize().width-SCROLLBAR_SIZE, 
+														 getSize().height-SCROLLBAR_SIZE);*/
 		
     add(itsCenterPanel, BorderLayout.CENTER);
     validate();
@@ -188,7 +186,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				{
 					if(oldZoom-zoom>0)
 					{
-						int lvi = gc.getLastVisibleIndex()+10;
+						int lvi = (gc.getLastVisibleIndex()+10 >= gc.getFtsObject().getSize()) ? gc.getFtsObject().getSize() : gc.getLastVisibleIndex()+10;
 						int lastId =  gc.getFtsObject().getLastUpdatedIndex();
 						if(lvi > lastId)
 							gc.getFtsObject().requestGetValues(lastId, lvi, false);
@@ -203,69 +201,10 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				gc.display("X : "+(int)(gc.getAdapter().getXZoom()*100)+" %   ");
 		}
 		});
-    ta.addYZoomListener(new ZoomListener() {
-			public void zoomChanged(float zoom, float old)
-		{
-				updateVerticalScrollbar();
-				repaint();	  
-				gc.displayInfo("Y : "+(int)(gc.getAdapter().getYZoom()*100)+" %   ");
-		}
-		});
 		
     gc.setAdapter(ta);
   }
 	
-  private void prepareVerticalScrollbar()
-  {
-    itsVerticalControl = new JScrollBar(Scrollbar.VERTICAL);
-    itsVerticalControl.setMaximum(  gc.getVerticalRange());
-    itsVerticalControl.setMinimum(  0);
-    itsVerticalControl.setEnabled(false);
-    itsVerticalControl.setVisible(false);
-		
-    itsVerticalControl.addAdjustmentListener( new AdjustmentListener() {
-			public void adjustmentValueChanged( AdjustmentEvent e)
-		{
-				int yT = itsVerticalControl.getMaximum() - itsVerticalControl.getModel().getExtent() - e.getValue();
-				gc.getAdapter().setYTransposition( yT);	  
-				repaint();
-		}
-		});
-		
-    add( itsVerticalControl, BorderLayout.EAST);
-  }
-	
-  void updateVerticalScrollbar()
-  {
-    int verticalScope = (gc.isIvec()) ? (int)gc.getVisibleVerticalScope() : (int)(gc.getVisibleVerticalScope()*100);
-		
-    if(verticalScope >= gc.getVerticalRange())
-		{
-			if(itsVerticalControl.isVisible())
-			{    
-				itsVerticalControl.setEnabled(false);
-				itsVerticalControl.setVisible(false);
-			}
-		}
-    else
-		{
-			if(!itsVerticalControl.isVisible())
-			{
-				itsVerticalControl.setEnabled(true);
-				itsVerticalControl.setVisible(true);		      
-			}
-			int oldAmount = itsVerticalControl.getVisibleAmount();
-			int oldValue = itsVerticalControl.getValue();
-			
-			itsVerticalControl.setVisibleAmount( verticalScope);
-			if( oldAmount != 0)
-			{
-				int val = oldValue*verticalScope/oldAmount;
-				if( val+itsVerticalControl.getModel().getExtent() < itsVerticalControl.getMaximum())
-					itsVerticalControl.setValue( oldValue*verticalScope/oldAmount);	  
-			}
-		}
-  }
   private int hScrollVal = 0;
   private void prepareHorizontalScrollbar()
   {
@@ -287,7 +226,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				if(gc.getAdapter().getXZoom()>0.5)
 					if(hDelta<0)
 					{
-						int lvi = gc.getLastVisibleIndex()+10;
+            int lvi = (gc.getLastVisibleIndex()+10 >= gc.getFtsObject().getSize()) ? gc.getFtsObject().getSize() : gc.getLastVisibleIndex()+10;
 						if(lvi > gc.getFtsObject().getLastUpdatedIndex())
 							gc.getFtsObject().requestGetValues(last+1, lvi, true);
 						else repaint();
@@ -347,16 +286,12 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   public void setMaximumValue(int value)
   {
     gc.setVerticalMaximum(value);
-    itsVerticalControl.setMaximum( gc.isIvec() ? value : value*100);
-    updateVerticalScrollbar();
     repaint();
   }
 	
   public void setMinimumValue(int value)
   {
     gc.setVerticalMinimum(value);
-    itsVerticalControl.setMinimum( gc.isIvec() ? value : value*100);
-    updateVerticalScrollbar();
     repaint();
   }
 	

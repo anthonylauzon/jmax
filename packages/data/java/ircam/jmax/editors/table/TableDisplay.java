@@ -30,128 +30,128 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- * A JPanel that is able to show the content of a TableDataModel.*/
+* A JPanel that is able to show the content of a TableDataModel.*/
 public class TableDisplay extends PopupToolbarPanel
 {
-
+  
   /**
-   * Constructor. */
+  * Constructor. */
   public TableDisplay(TablePanel tp)
-  {
+{
     super();
-
+    
     panel = tp;
     setBackground(Color.white);
-
+    
     addMouseListener(new MouseListener(){
-	public void mouseClicked(MouseEvent e){}
-	public void mousePressed(MouseEvent e){}
-	public void mouseReleased(MouseEvent e){}
-	public void mouseEntered(MouseEvent e){}
-	public void mouseExited(MouseEvent e){
-	  gc.display("");
-	  gc.displayInfo("");
-	}
-      });
+      public void mouseClicked(MouseEvent e){}
+      public void mousePressed(MouseEvent e){}
+      public void mouseReleased(MouseEvent e){}
+      public void mouseEntered(MouseEvent e){}
+      public void mouseExited(MouseEvent e){
+        gc.display("");
+        gc.displayInfo("");
+      }
+    });
     addMouseMotionListener(new MouseMotionListener(){
-	public void mouseMoved(MouseEvent e)
-	{
-	  if(getMenu().isVisible()) return;
-      
-	  if(!gc.getToolManager().getCurrentTool().getName().equals("zoomer"))
-	    {
-	      int index = gc.getAdapter().getInvX( e.getX());
-	      double value = gc.getAdapter().getInvY( e.getY());
-	      if( index < 0) index = 0;
+      public void mouseMoved(MouseEvent e)
+    {
+        if(getMenu().isVisible()) return;
+        
+        if(!gc.getToolManager().getCurrentTool().getName().equals("zoomer"))
+        {
+          int index = gc.getAdapter().getInvX( e.getX());
+          double value = gc.getAdapter().getInvY( e.getY());
+          if( index < 0) index = 0;
+          
+          if (index < gc.getDataModel().getSize() && index >=0)
+            if( gc.isIvec())
+              gc.display( "( "+index+" , "+(int)value+" )");
+            else
+              gc.display( "( "+index+" , "+value+" )");
+        }
+    }
+      public void mouseDragged(MouseEvent e)
+    {
+        if(getMenu().isVisible()) return;
+        
+        String toolName = gc.getToolManager().getCurrentTool().getName();
+        if(!toolName.equals("zoomer"))
+        {
+          int index = gc.getAdapter().getInvX( e.getX());
+          double value = gc.getAdapter().getInvY( e.getY());
+          if( index < 0) index = 0;
+          
+          if (index < gc.getDataModel().getSize() && index >=0)
+            if( gc.isIvec())
+              gc.display( "( "+index+" , "+(int)value+" )");
+            else
+              gc.display( "( "+index+" , "+value+" )");
+        }
+    }
+    });
+}
 
-	      if (index < gc.getDataModel().getSize() && index >=0)
-		if( gc.isIvec())
-		  gc.display( "( "+index+" , "+(int)value+" )");
-		else
-		  gc.display( "( "+index+" , "+value+" )");
-	    }
-	}
-	public void mouseDragged(MouseEvent e)
-	{
-	  if(getMenu().isVisible()) return;
-	  
-	  String toolName = gc.getToolManager().getCurrentTool().getName();
-	  if(!toolName.equals("zoomer"))
-	    {
-	      int index = gc.getAdapter().getInvX( e.getX());
-	      double value = gc.getAdapter().getInvY( e.getY());
-	      if( index < 0) index = 0;
-	      
-	      if (index < gc.getDataModel().getSize() && index >=0)
-		if( gc.isIvec())
-		  gc.display( "( "+index+" , "+(int)value+" )");
-		else
-		  gc.display( "( "+index+" , "+value+" )");
-	    }
-	}
-      });
-  }
+/**
+* Constructor with a table render */
+public TableDisplay(TableRenderer tr, TableGraphicContext gc, TablePanel tp)
+{
+  super();
+  this.tr = tr;
+  panel = tp;
+  this.gc = gc;
+  setBackground(Color.white);
+  popup = new TablePopupMenu(this);
+}
 
-  /**
-   * Constructor with a table render */
-  public TableDisplay(TableRenderer tr, TableGraphicContext gc, TablePanel tp)
-  {
-    super();
-    this.tr = tr;
-    panel = tp;
-    this.gc = gc;
-    setBackground(Color.white);
-    popup = new TablePopupMenu(this);
-  }
+public JPopupMenu getMenu()
+{
+  return popup;
+}
 
-  public JPopupMenu getMenu()
-  {
-      return popup;
-  }
+/**
+* Specify which render to use for this TableDisplay */
+public void setRenderer(TableRenderer tr)
+{
+  this.tr = tr;
+}
 
-  /**
-   * Specify which render to use for this TableDisplay */
-  public void setRenderer(TableRenderer tr)
-  {
-    this.tr = tr;
-  }
-  
-  public TableRenderer getRenderer()
-  {
-    return this.tr;
-  }
+public TableRenderer getRenderer()
+{
+  return this.tr;
+}
 
-  public void setGraphicContext(TableGraphicContext tgc)
-  {
-    gc = tgc;
-    popup = new TablePopupMenu(this);
-  }
-  public TableGraphicContext getGraphicContext()
-  {
-      return gc;
-  }
-  /**
-   * The paint routine just delegates to the RenderManager
-   * the representation of its data.*/
-  public void paintComponent(Graphics g) 
-  {
-    tr.render(g, g.getClipBounds());
-  }
-  
-  public int getDisplayMode()
-  {
-    return tr.getMode();
-  }
-  
-  public Frame getFrame()
-  {
-    return panel.getEditorContainer().getFrame();
-  }
-  
-  //--- Fields
-  TableRenderer tr;
-  TablePopupMenu popup;
-  TableGraphicContext gc;
-  public TablePanel panel;
+public void setGraphicContext(TableGraphicContext tgc)
+{
+  gc = tgc;
+  popup = new TablePopupMenu(this);
+}
+public TableGraphicContext getGraphicContext()
+{
+  return gc;
+}
+/**
+* The paint routine just delegates to the RenderManager
+ * the representation of its data.*/
+public void paintComponent(Graphics g) 
+{
+  tr.render(g, g.getClipBounds());
+}
+
+public int getDisplayMode()
+{
+  return tr.getMode();
+}
+
+public Frame getFrame()
+{
+  return panel.getEditorContainer().getFrame();
+}
+
+//--- Fields
+TableRenderer tr;
+TablePopupMenu popup;
+TableGraphicContext gc;
+public TablePanel panel;
 }
 

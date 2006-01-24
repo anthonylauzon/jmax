@@ -39,12 +39,13 @@ public class Tabler extends JMaxEditor{
   
   //--- Fields 
   TablePanel itsPanel;
-
+  TableRuler tableRuler;
+  
   private EditorMenu itsFileMenu;
   private EditMenu   itsEditMenu;	
   private ViewMenu   itsViewMenu;
   private JMenu   itsWindowsMenu;
-  final static int CONTROLBAR_HEIGHT = 20;
+  //final static int CONTROLBAR_HEIGHT = 20;
   static public Font displayFont = new Font("SansSerif", Font.PLAIN, 10);
 
   /** Constructor */
@@ -59,7 +60,9 @@ public class Tabler extends JMaxEditor{
     itsPanel.frameAvailable(); 
 
     //makeControlBar();
-
+    tableRuler = new TableRuler( itsPanel.getGraphicContext());
+    getContentPane().add(tableRuler, BorderLayout.NORTH);
+    
     addWindowListener( new WindowListener(){
       public void windowOpened(WindowEvent e){}
       public void windowClosed(WindowEvent e){}
@@ -111,6 +114,15 @@ public class Tabler extends JMaxEditor{
     setJMenuBar(mb);
   }
 
+  EditorMenu simpleMenu = null;
+  public EditorMenu getSimpleMenu()
+  {
+    if(simpleMenu == null)
+      simpleMenu = new TableSimpleMenu(this);
+    
+    return simpleMenu; 
+  }  
+  
   /*JTextField maxValueField, minValueField;
   JPanel controlBar;
   JLabel displayMouseLabel, infoLabel;

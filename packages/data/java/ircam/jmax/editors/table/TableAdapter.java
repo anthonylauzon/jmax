@@ -62,20 +62,16 @@ public class TableAdapter {
     if(maxY < gc.getVerticalMaximum()) maxY = gc.getVerticalMaximum();
     
     setDefaultZooms();
-
-    setYTransposition( 0);
-  } 
+} 
 
   public void setDefaultZooms()
   {
     setXZoom( (float)1.0);
-    setYZoom( (float)1.0);
-  }
+   }
   
   public void zoomToWindow()
   {
     setXZoom( findZoomRatioClosestTo( (float)gc.getGraphicDestination().getSize().width/dataModel.getSize()));
-    setYZoom( (float)gc.getGraphicDestination().getSize().height/gc.getVerticalRange());	
   }
   
   /**
@@ -98,24 +94,10 @@ public class TableAdapter {
   }
 
   /**
-   * add a listener for the yZoom factor */
-  public void addYZoomListener(ZoomListener zl)
-  {
-    yZoomListeners.addElement(zl);
-  }
-
-  /**
    * remove a listener for the xZoom factor */
   public void removeXZoomListener(ZoomListener zl)
   {
     xZoomListeners.removeElement(zl);
-  }
-
-  /**
-   * remove a listener for the yZoom factor */
-  public void removeYZoomListener(ZoomListener zl)
-  {
-    yZoomListeners.removeElement(zl);
   }
 
   /**
@@ -141,11 +123,9 @@ public class TableAdapter {
     
     double V = value - gc.getVerticalMinimum();
     int h = gc.getGraphicDestination().getSize().height;
-    
-    if( gc.isVerticalScrollbarVisible())
-      return h - (int)((V - yTransposition) * itsYZoom);
-    else
-      return h - (int)(V * itsYZoom);
+    float range = gc.getVerticalRange();
+    float step = (float)h/range;
+    return (int)(h - V * step);
   }
 
   /**
@@ -154,12 +134,13 @@ public class TableAdapter {
   {
     double value;
     int h = gc.getGraphicDestination().getSize().height;
+    float range = gc.getVerticalRange();
+    float step = range/(float)h;
     
-    if( gc.isVerticalScrollbarVisible())
-      value = (h - y)/itsYZoom + yTransposition + gc.getVerticalMinimum();
-    else
-      value = (h - y)/itsYZoom + gc.getVerticalMinimum();
-  
+    value = (int)((h - y) * step + gc.getVerticalMinimum());
+    if(value < gc.getVerticalMinimum()) value = (int)gc.getVerticalMinimum();
+    else if(value > gc.getVerticalMaximum()) value = (int)gc.getVerticalMaximum();
+    
     if( !gc.isIvec()) value = (double)(value/100.0); 
     
     return value;
@@ -173,47 +154,28 @@ public class TableAdapter {
     setXZoom(((float)numerator)/denominator);
   }
 
-  /**
-   * A method that allows setting the Y zoom factor under the form
-   * of a rational number. Use this to avoid pixel interpolation. */
-  public void setYZoomFraction(int numerator, int denominator)
-  {
-    setYZoom(((float)numerator)/denominator);
-  }
-
   private void notifyZoomChanged(int whichOne, float value, float oldValue)
   {
-    MaxVector listeners;
-    if (whichOne == X_ZOOM) listeners = xZoomListeners; 
-    else if (whichOne == Y_ZOOM) listeners = yZoomListeners; 
-    else return; //can add other zooms here (?)
-    
+    MaxVector listeners = xZoomListeners;
     ZoomListener zl;
     for (int i = 0; i< listeners.size(); i++)
-      {
-	zl = (ZoomListener) listeners.elementAt(i);
-	zl.zoomChanged( value, oldValue);
-      }
+    {
+      zl = (ZoomListener) listeners.elementAt(i);
+      zl.zoomChanged( value, oldValue);
+    }
   }
   
   //--- Fields & accessors ---//
   float itsXZoom;
-  float itsYZoom;
 
   MaxVector xZoomListeners = new MaxVector();
-  MaxVector yZoomListeners = new MaxVector();
+  MaxVector transpositionListeners = new MaxVector();
 
   public static int X_ZOOM = 0;
-  public static int Y_ZOOM = 1;
-
   /** the first index in the table we're showing */
   int xTransposition; 
   /** the graphic x offset of oX */
   int xOffset;
-  /** the first value in the table we're vertically showing */
-  int yTransposition;
-  /** the graphic y offset of oY */
-  int yOffset;
 
   public float getXZoom()
   {
@@ -227,26 +189,6 @@ public class TableAdapter {
     notifyZoomChanged(X_ZOOM, zoom, old);
   }
 
-  public float getYZoom()
-  {
-    return itsYZoom;
-  }
-
-  public void setYZoom(float zoom)
-  {
-    float old = itsYZoom;
-    itsYZoom = zoom;
-    notifyZoomChanged(Y_ZOOM, zoom, old);
-  }
-
-  public void incrYZoom(int delta)
-  {
-    float dlt = (float)delta;
-    if(itsYZoom < 1) dlt = delta*itsYZoom;
-
-    setYZoom( ( itsYZoom*100+dlt)/(float)100);
-  }
-
   public int getXTransposition()
   {
     return xTransposition;
@@ -255,28 +197,27 @@ public class TableAdapter {
   public void setXTransposition(int xT)
   {
     xTransposition = xT;
+    notifyTranspositionChanged(xTransposition);
   }
 
-  public int getYTransposition()
+  public void addTranspositionListener(TranspositionListener tl)
   {
-    return yTransposition;
+    transpositionListeners.addElement(tl);
   }
-
-  public void setYTransposition(int yT)
+  public void removeTranspositionListener(TranspositionListener tl)
   {
-    yTransposition = yT;
+    transpositionListeners.removeElement(tl);
   }
-
-  public int getYOffset()
+  private void notifyTranspositionChanged(int value)
   {
-    return yOffset;
-  }
-
-  public void setYOffset(int theOY)
-  {
-    yOffset = theOY;
-  }
-
+    TranspositionListener tl;
+    for (int i = 0; i< transpositionListeners.size(); i++)
+    {
+      tl = (TranspositionListener) transpositionListeners.elementAt(i);
+      tl.transpositionChanged( value);
+    }
+  }  
+  
   public int getXOffset()
   {
     return xOffset;

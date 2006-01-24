@@ -61,10 +61,10 @@ public class TablePopupMenu extends JPopupMenu
     });
     add(item);
     
-    addSeparator();
+    //addSeparator();
     
     /////////// Tools /////////////////////////////////////////
-    Tool tool;
+    /*Tool tool;
     ButtonGroup toolsMenuGroup = new ButtonGroup();
     JRadioButtonMenuItem aMenuItem;
     for(Enumeration e = TableTools.instance.getTools(); e.hasMoreElements();)
@@ -76,7 +76,7 @@ public class TablePopupMenu extends JPopupMenu
       add(aMenuItem);
     }
     
-    ((JRadioButtonMenuItem)getComponent(2)).setSelected(true);
+    ((JRadioButtonMenuItem)getComponent(2)).setSelected(true);*/
     
     //addSeparator();
 

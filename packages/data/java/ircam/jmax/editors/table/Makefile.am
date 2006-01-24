@@ -20,6 +20,7 @@ TableInspector.java \
 TableInteractionModule.java \
 TableMouseDragTracker.java \
 TablePanel.java \
+TableRuler.java \
 TableSelection.java \
 TableToolManager.java \
 Tabler.java \
