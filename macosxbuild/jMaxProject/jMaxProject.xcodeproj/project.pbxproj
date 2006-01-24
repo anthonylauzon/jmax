@@ -339,6 +339,8 @@
 		3B13200C09348CD0001F5860 /* seq_resizer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200A09348CD0001F5860 /* seq_resizer.gif */; };
 		3B13200D09348CD0001F5860 /* seq_zoomer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B13200B09348CD0001F5860 /* seq_zoomer.gif */; };
 		3B14B14909814060009F9B0C /* TableInspector.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B14B14809814060009F9B0C /* TableInspector.java */; };
+		3B175E3B09869B5B005D052F /* TableSimpleMenu.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B175E3A09869B5B005D052F /* TableSimpleMenu.java */; };
+		3B175E3D09869B89005D052F /* TableRuler.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B175E3C09869B88005D052F /* TableRuler.java */; };
 		3B178D450935CF6400AEA7EC /* data_arrow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B178D3F0935CF6400AEA7EC /* data_arrow.gif */; };
 		3B178D460935CF6400AEA7EC /* data_delete.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B178D400935CF6400AEA7EC /* data_delete.gif */; };
 		3B178D470935CF6400AEA7EC /* data_edit.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B178D410935CF6400AEA7EC /* data_edit.gif */; };
@@ -2583,6 +2585,8 @@
 		3B13200A09348CD0001F5860 /* seq_resizer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_resizer.gif; path = ../../packages/sequence/images/seq_resizer.gif; sourceTree = SOURCE_ROOT; };
 		3B13200B09348CD0001F5860 /* seq_zoomer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_zoomer.gif; path = ../../packages/sequence/images/seq_zoomer.gif; sourceTree = SOURCE_ROOT; };
 		3B14B14809814060009F9B0C /* TableInspector.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableInspector.java; path = ../../packages/data/java/ircam/jmax/editors/table/TableInspector.java; sourceTree = SOURCE_ROOT; };
+		3B175E3A09869B5B005D052F /* TableSimpleMenu.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableSimpleMenu.java; path = ../../packages/data/java/ircam/jmax/editors/table/menus/TableSimpleMenu.java; sourceTree = SOURCE_ROOT; };
+		3B175E3C09869B88005D052F /* TableRuler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableRuler.java; path = ../../packages/data/java/ircam/jmax/editors/table/TableRuler.java; sourceTree = SOURCE_ROOT; };
 		3B178D3F0935CF6400AEA7EC /* data_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = data_arrow.gif; path = ../../packages/data/images/data_arrow.gif; sourceTree = SOURCE_ROOT; };
 		3B178D400935CF6400AEA7EC /* data_delete.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = data_delete.gif; path = ../../packages/data/images/data_delete.gif; sourceTree = SOURCE_ROOT; };
 		3B178D410935CF6400AEA7EC /* data_edit.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = data_edit.gif; path = ../../packages/data/images/data_edit.gif; sourceTree = SOURCE_ROOT; };
@@ -6194,6 +6198,7 @@
 				F8B8E527028680BB01664092 /* TableMouseDragTracker.java */,
 				F8B8E528028680BB01664092 /* TablePanel.java */,
 				F8B8E529028680BB01664092 /* Tabler.java */,
+				3B175E3C09869B88005D052F /* TableRuler.java */,
 				F8B8E52A028680BB01664092 /* TableSelection.java */,
 				F8B8E52B028680BB01664092 /* UndoableValueSet.java */,
 				F56C3E180338D3DC01664092 /* Actions.java */,
@@ -6208,6 +6213,7 @@
 			children = (
 				F8B8E50A028680BB01664092 /* EditMenu.java */,
 				F8B8E50B028680BB01664092 /* TablePopupMenu.java */,
+				3B175E3A09869B5B005D052F /* TableSimpleMenu.java */,
 				F8B8E50C028680BB01664092 /* ViewMenu.java */,
 			);
 			name = menus;
@@ -8669,6 +8675,8 @@
 				3B1A919406D352DF009882D6 /* MatSimpleMenu.java in Sources */,
 				3B56498106F729CC0065C807 /* MatEditMenu.java in Sources */,
 				3B14B14909814060009F9B0C /* TableInspector.java in Sources */,
+				3B175E3B09869B5B005D052F /* TableSimpleMenu.java in Sources */,
+				3B175E3D09869B89005D052F /* TableRuler.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
