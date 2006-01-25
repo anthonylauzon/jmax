@@ -55,7 +55,7 @@ public class Selecter extends InteractionModule implements XORPainter {
 
     if (e.getClickCount() > 1) itsListener.selectionPointDoubleClicked(x, y, e.getModifiers());
     interactionBeginAt(x, y);
-    itsListener.selectionPointChoosen(x, y, e.getModifiers());
+    itsListener.selectionPointChoosen(x, y, e);
     /*active = true;*/
     InteractionSemaphore.lock();    
   } 

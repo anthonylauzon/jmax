@@ -21,6 +21,8 @@
 
 package ircam.jmax.toolkit;
 
+import java.awt.event.*;
+
 /**
  * Interface of the objects that wants to listen to a geometric
  * selection in a plane
@@ -31,7 +33,7 @@ public interface GraphicSelectionListener {
   public abstract void selectionChoosen(int x, int y, int w, int h, int modifiers);
 
   /** a point have been choosen */
-  public abstract void selectionPointChoosen(int x, int y, int modifiers);
+  public abstract void selectionPointChoosen(int x, int y, MouseEvent e);
   /** a point have been choosen */
   public abstract void selectionPointDoubleClicked(int x, int y, int modifiers);
 }

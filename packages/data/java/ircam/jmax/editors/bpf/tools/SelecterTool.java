@@ -67,11 +67,13 @@ public abstract class SelecterTool extends Tool implements GraphicSelectionListe
   /**
    * called by the Selecter UI module at mouse down
    */
-  public void selectionPointChoosen(int x, int y, int modifiers) 
+  public void selectionPointChoosen(int x, int y, MouseEvent e) 
   {
-      if((modifiers & SHORTCUT)!=0)
-	  controlAction(x, y, modifiers);
-      else
+    int modifiers = e.getModifiers();
+    
+    if((modifiers & SHORTCUT)!=0)
+      controlAction(x, y, modifiers);
+    else
 	  {
 	      BpfSelection selection = ((BpfGraphicContext)gc).getSelection();
 	      gc.getGraphicDestination().requestFocus();//???

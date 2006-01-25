@@ -106,7 +106,6 @@ public class TableRuler extends JPanel
     String indexString;
     Dimension d = getSize();
     Rectangle r = tgc.getGraphicDestination().getBounds();
-    Rectangle clip = g.getClipBounds();
     
     int index = tgc.getAdapter().getInvX( r.x);
     int visibleSize = tgc.getAdapter().getInvX( r.x+r.width);

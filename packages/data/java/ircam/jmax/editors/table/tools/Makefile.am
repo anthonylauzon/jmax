@@ -1,8 +1,5 @@
 packagedir=$(pkglibdir)/packages/data/java/classes/ircam/jmax/editors/table/actions/tools
 package_JAVA = \
-LinerTool.java \
-PencilTool.java \
-TableSelecter.java \
 TableTool.java \
 TableTools.java \
 ZoomTool.java 

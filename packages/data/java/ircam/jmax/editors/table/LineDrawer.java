@@ -44,7 +44,10 @@ public class LineDrawer extends TableInteractionModule implements XORPainter{
     itsListener = theListener;
   }
   
-
+  public void activate(MouseEvent e)
+  {
+    mousePressed(e);
+  }
   /**
    * overrides InteractionModule mousePressed()
    */

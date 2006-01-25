@@ -89,7 +89,12 @@ public class FreeHandDrawer extends TableInteractionModule {
     itsListener.dragEnd(e.getX(), e.getY(), e);
     active = false;
   }
-
+  
+  public void activate(MouseEvent e)
+  {
+    mousePressed(e);
+  }
+  
   //---- Fields
   DynamicDragListener itsListener;
   boolean active = false;

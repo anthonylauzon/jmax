@@ -31,13 +31,13 @@ import javax.swing.*;
 
 /**
 * A JPanel that is able to show the content of a TableDataModel.*/
-public class TableDisplay extends PopupToolbarPanel
+public class TableDisplay extends /*PopupToolbarPanel*/JPanel
 {
   
   /**
   * Constructor. */
   public TableDisplay(TablePanel tp)
-{
+  {
     super();
     
     panel = tp;
@@ -56,7 +56,7 @@ public class TableDisplay extends PopupToolbarPanel
     addMouseMotionListener(new MouseMotionListener(){
       public void mouseMoved(MouseEvent e)
     {
-        if(getMenu().isVisible()) return;
+        //if(getMenu().isVisible()) return;
         
         if(!gc.getToolManager().getCurrentTool().getName().equals("zoomer"))
         {
@@ -73,7 +73,7 @@ public class TableDisplay extends PopupToolbarPanel
     }
       public void mouseDragged(MouseEvent e)
     {
-        if(getMenu().isVisible()) return;
+        //if(getMenu().isVisible()) return;
         
         String toolName = gc.getToolManager().getCurrentTool().getName();
         if(!toolName.equals("zoomer"))
@@ -101,13 +101,13 @@ public TableDisplay(TableRenderer tr, TableGraphicContext gc, TablePanel tp)
   panel = tp;
   this.gc = gc;
   setBackground(Color.white);
-  popup = new TablePopupMenu(this);
+  //popup = new TablePopupMenu(this);
 }
 
-public JPopupMenu getMenu()
+/*public JPopupMenu getMenu()
 {
   return popup;
-}
+}*/
 
 /**
 * Specify which render to use for this TableDisplay */
@@ -124,7 +124,7 @@ public TableRenderer getRenderer()
 public void setGraphicContext(TableGraphicContext tgc)
 {
   gc = tgc;
-  popup = new TablePopupMenu(this);
+  //popup = new TablePopupMenu(this);
 }
 public TableGraphicContext getGraphicContext()
 {
@@ -150,7 +150,7 @@ public Frame getFrame()
 
 //--- Fields
 TableRenderer tr;
-TablePopupMenu popup;
+//TablePopupMenu popup;
 TableGraphicContext gc;
 public TablePanel panel;
 }

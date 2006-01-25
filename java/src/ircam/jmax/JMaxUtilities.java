@@ -38,6 +38,11 @@ public class JMaxUtilities {
   {
     return loadAux( ClassLoader.getSystemResourceAsStream( name));
   }
+  
+  public static ImageIcon loadIconFromResource( Class cl, String name)
+  {
+    return loadAux( cl.getClassLoader().getResourceAsStream( name));
+  }
 
   private static ImageIcon loadAux( InputStream in)
   {
@@ -70,6 +75,11 @@ public class JMaxUtilities {
   public static Font loadFontFromResource(int fontType, String name) throws FontFormatException, IOException 
   {
     return Font.createFont(fontType, ClassLoader.getSystemResourceAsStream( name)); 
+  }
+  
+  public static Font loadFontFromResource(Class cl, int fontType, String name) throws FontFormatException, IOException 
+  {
+    return Font.createFont(fontType, cl.getClassLoader().getSystemResourceAsStream( name)); 
   }
 }
 

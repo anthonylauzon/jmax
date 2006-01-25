@@ -139,20 +139,11 @@ public void render(Graphics g, int order)
 /** 
 * Layer interface */
 public void render(Graphics g, Rectangle r, int order)
-{    
-  /*int yMax = gc.getAdapter().getY( (gc.isIvec()) ? gc.getVerticalMaximum() : gc.getVerticalMaximum()/100);
-  int yMin = gc.getAdapter().getY( (gc.isIvec()) ? gc.getVerticalMinimum() :  gc.getVerticalMinimum()/100);
-    
-  g.setColor( outRangeColor);
-  g.fillRect(r.x, r.y, r.width, r.height);
+{      
   g.setColor( backColor);
-  g.fillRect(r.x-10, yMax, r.width+20, (yMin-yMax));
-  g.setColor( borderRangeColor);
-  g.drawLine( r.x, yMax, r.x+r.width, yMax);
-  g.drawLine( r.x, yMin, r.x+r.width, yMin);*/
+  g.fillRect(r.x, r.y, r.width, r.height);
   
-  g.setColor( backColor);
-  g.fillRect(r.x, r.y, r.width, r.height);
+  drawVerticalGrid(g);
   
   g.setColor( foreColor);
   
@@ -235,6 +226,32 @@ public void render(Graphics g, Rectangle r, int order)
   g.drawLine( r.x, zero, r.x + r.width, zero);
 }
 
+void drawVerticalGrid(Graphics g)
+{
+  int xPosition;
+  int snappedIndex;
+  Rectangle r = gc.getGraphicDestination().getBounds();
+  
+  int index = gc.getAdapter().getInvX( r.x);
+  int visibleSize = gc.getAdapter().getInvX( r.x+r.width);
+  int tableSize = gc.getFtsObject().getSize();
+  int firstVisible = gc.getFirstVisibleIndex();
+  int visibleScope = gc.getVisibleHorizontalScope();
+  int indexStep = TableRuler.findBestIndexStep(visibleSize);
+  int logicalIndex = firstVisible;
+  
+  int delta = gc.getAdapter().getX(logicalIndex+indexStep)-gc.getAdapter().getX(logicalIndex);
+		
+  g.setColor(gridColor);
+  for (int i=logicalIndex+indexStep; i<logicalIndex+visibleScope; i+=indexStep) 
+  {
+    snappedIndex = (i/indexStep)*indexStep;
+    xPosition = gc.getAdapter().getX(snappedIndex);
+    g.drawLine(xPosition, 0, xPosition, r.height);
+  }
+  
+}
+
 /**
 * set the POINTS, FILLED or LINES mode */
 public void setMode(int mode)
@@ -249,6 +266,11 @@ public int getMode()
 public void setBackColor(Color bc)
 {
   backColor = bc;
+  
+  float[] hsb = Color.RGBtoHSB(backColor.getRed(), backColor.getGreen(), backColor.getBlue(), null);
+  float brigth = (hsb[2] > 0.7) ? hsb[2]-(float)0.07 : hsb[2]+(float)0.07;
+  float satur = (hsb[1] > 0.7) ? hsb[1]-(float)0.05 : hsb[1]+(float)0.05;
+  gridColor = Color.getHSBColor(hsb[0], satur, brigth);
 }
 public Color getBackColor()
 {
@@ -274,7 +296,7 @@ public final static int FILLED = 1;
 public final static int LINES = 2;
 
 Color backColor = new Color(220, 220, 255);
-Color borderRangeColor = new Color(200, 200, 255);
+Color gridColor = new Color(200, 200, 255);
 Color outRangeColor = new Color(237, 237, 237);
 Color foreColor = new Color(101, 153, 255);
 }

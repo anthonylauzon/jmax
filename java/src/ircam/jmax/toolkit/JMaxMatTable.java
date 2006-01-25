@@ -80,7 +80,7 @@ public class JMaxMatTable extends JTable
     {
       Container cont = table.getTopLevelAncestor();
       if(cont instanceof Window)
-        ((Window)cont).hide();
+        ((Window)cont).setVisible(false);
     }
     JMaxMatTable table;
   } 

@@ -67,11 +67,11 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
   protected void bindToProducer(Component eventProducer) 
   {  
     if (eventProducer != null) 
-      {
-	gc.getGraphicSource().addMouseListener(this);
-	gc.getGraphicSource().addMouseMotionListener(this);
-	gc.getGraphicSource().addKeyListener(this);
-      }
+    {
+      gc.getGraphicSource().addMouseListener(this);
+      gc.getGraphicSource().addMouseMotionListener(this);
+      gc.getGraphicSource().addKeyListener(this);
+    }
   }
 
 
@@ -81,11 +81,11 @@ public class InteractionModule implements MouseListener, MouseMotionListener, Ke
   protected void unBindFromProducer() 
   {
     if (gc.getGraphicSource() != null) 
-      {   
-	gc.getGraphicSource().removeMouseListener(this);
-	gc.getGraphicSource().removeMouseMotionListener(this);
-	gc.getGraphicSource().removeKeyListener(this);	
-      }
+    {   
+      gc.getGraphicSource().removeMouseListener(this);
+      gc.getGraphicSource().removeMouseMotionListener(this);
+      gc.getGraphicSource().removeKeyListener(this);	
+    }
   }
 
   /**

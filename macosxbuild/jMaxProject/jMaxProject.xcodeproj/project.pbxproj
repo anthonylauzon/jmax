@@ -1340,12 +1340,8 @@
 		5C5429F905AB0B990042B7A2 /* SelectionLayer.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E50E028680BB01664092 /* SelectionLayer.java */; };
 		5C5429FA05AB0B990042B7A2 /* TableRenderer.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E50F028680BB01664092 /* TableRenderer.java */; };
 		5C5429FB05AB0B990042B7A2 /* TopLayer.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E510028680BB01664092 /* TopLayer.java */; };
-		5C5429FC05AB0B990042B7A2 /* LinerTool.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E512028680BB01664092 /* LinerTool.java */; };
-		5C5429FD05AB0B990042B7A2 /* PencilTool.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E513028680BB01664092 /* PencilTool.java */; };
-		5C5429FE05AB0B990042B7A2 /* TableSelecter.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E514028680BB01664092 /* TableSelecter.java */; };
 		5C5429FF05AB0B990042B7A2 /* TableTool.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E515028680BB01664092 /* TableTool.java */; };
 		5C542A0005AB0B990042B7A2 /* TableTools.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E516028680BB01664092 /* TableTools.java */; };
-		5C542A0105AB0B990042B7A2 /* ZoomTool.java in Sources */ = {isa = PBXBuildFile; fileRef = F8B8E517028680BB01664092 /* ZoomTool.java */; };
 		5C542A0205AB0B990042B7A2 /* Actions.java in Sources */ = {isa = PBXBuildFile; fileRef = F56C3E180338D3DC01664092 /* Actions.java */; };
 		5C542A0305AB0B990042B7A2 /* TableToolManager.java in Sources */ = {isa = PBXBuildFile; fileRef = F59A8459033F11C901664092 /* TableToolManager.java */; };
 		5C542A0905AB0B9A0042B7A2 /* Guiobj.java in Sources */ = {isa = PBXBuildFile; fileRef = F8DC5E72028683C301664092 /* Guiobj.java */; };
@@ -3847,12 +3843,8 @@
 		F8B8E50E028680BB01664092 /* SelectionLayer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = SelectionLayer.java; path = ../../packages/data/java/ircam/jmax/editors/table/renderers/SelectionLayer.java; sourceTree = SOURCE_ROOT; };
 		F8B8E50F028680BB01664092 /* TableRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableRenderer.java; path = ../../packages/data/java/ircam/jmax/editors/table/renderers/TableRenderer.java; sourceTree = SOURCE_ROOT; };
 		F8B8E510028680BB01664092 /* TopLayer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TopLayer.java; path = ../../packages/data/java/ircam/jmax/editors/table/renderers/TopLayer.java; sourceTree = SOURCE_ROOT; };
-		F8B8E512028680BB01664092 /* LinerTool.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = LinerTool.java; path = ../../packages/data/java/ircam/jmax/editors/table/tools/LinerTool.java; sourceTree = SOURCE_ROOT; };
-		F8B8E513028680BB01664092 /* PencilTool.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = PencilTool.java; path = ../../packages/data/java/ircam/jmax/editors/table/tools/PencilTool.java; sourceTree = SOURCE_ROOT; };
-		F8B8E514028680BB01664092 /* TableSelecter.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableSelecter.java; path = ../../packages/data/java/ircam/jmax/editors/table/tools/TableSelecter.java; sourceTree = SOURCE_ROOT; };
 		F8B8E515028680BB01664092 /* TableTool.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableTool.java; path = ../../packages/data/java/ircam/jmax/editors/table/tools/TableTool.java; sourceTree = SOURCE_ROOT; };
 		F8B8E516028680BB01664092 /* TableTools.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableTools.java; path = ../../packages/data/java/ircam/jmax/editors/table/tools/TableTools.java; sourceTree = SOURCE_ROOT; };
-		F8B8E517028680BB01664092 /* ZoomTool.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = ZoomTool.java; path = ../../packages/data/java/ircam/jmax/editors/table/tools/ZoomTool.java; sourceTree = SOURCE_ROOT; };
 		F8B8E51A028680BB01664092 /* FreeHandDrawer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = FreeHandDrawer.java; path = ../../packages/data/java/ircam/jmax/editors/table/FreeHandDrawer.java; sourceTree = SOURCE_ROOT; };
 		F8B8E51B028680BB01664092 /* FtsTableObject.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = FtsTableObject.java; path = ../../packages/data/java/ircam/jmax/editors/table/FtsTableObject.java; sourceTree = SOURCE_ROOT; };
 		F8B8E51C028680BB01664092 /* LineDrawer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = LineDrawer.java; path = ../../packages/data/java/ircam/jmax/editors/table/LineDrawer.java; sourceTree = SOURCE_ROOT; };
@@ -6232,12 +6224,8 @@
 		F8B8E511028680BB01664092 /* tools */ = {
 			isa = PBXGroup;
 			children = (
-				F8B8E512028680BB01664092 /* LinerTool.java */,
-				F8B8E513028680BB01664092 /* PencilTool.java */,
-				F8B8E514028680BB01664092 /* TableSelecter.java */,
 				F8B8E515028680BB01664092 /* TableTool.java */,
 				F8B8E516028680BB01664092 /* TableTools.java */,
-				F8B8E517028680BB01664092 /* ZoomTool.java */,
 			);
 			name = tools;
 			sourceTree = "<group>";
@@ -8654,12 +8642,8 @@
 				5C5429F905AB0B990042B7A2 /* SelectionLayer.java in Sources */,
 				5C5429FA05AB0B990042B7A2 /* TableRenderer.java in Sources */,
 				5C5429FB05AB0B990042B7A2 /* TopLayer.java in Sources */,
-				5C5429FC05AB0B990042B7A2 /* LinerTool.java in Sources */,
-				5C5429FD05AB0B990042B7A2 /* PencilTool.java in Sources */,
-				5C5429FE05AB0B990042B7A2 /* TableSelecter.java in Sources */,
 				5C5429FF05AB0B990042B7A2 /* TableTool.java in Sources */,
 				5C542A0005AB0B990042B7A2 /* TableTools.java in Sources */,
-				5C542A0105AB0B990042B7A2 /* ZoomTool.java in Sources */,
 				5C542A0205AB0B990042B7A2 /* Actions.java in Sources */,
 				5C542A0305AB0B990042B7A2 /* TableToolManager.java in Sources */,
 				3B513E2A06A4277B00F1664A /* FtsMatObject.java in Sources */,
