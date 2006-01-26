@@ -1040,9 +1040,7 @@ import_format_txt_init(const fts_object_t *o, int ac, const fts_atom_t *at, fts_
                        const fts_symbol_t filename, fts_atomfile_t ** file,
                        int * time_index, int * m_max_index)
 {
-  
-  fts_post("ac = %d (waiting for the fix)\n", ac);
-  
+    
   if (!(*file = fts_atomfile_open_read(filename)))
   { /* we were responsible for this file, but can't open it: 
     don't return void */
@@ -1050,10 +1048,10 @@ import_format_txt_init(const fts_object_t *o, int ac, const fts_atom_t *at, fts_
     fts_set_object(ret, o);     
     return 0;
   }
-  
-  if(ac > 3)
+
+  if(ac > 2)
   {
-    if (! (fts_is_number(at+3) && (*time_index = fts_get_number_int(at+3)) >= 0))
+    if (! (fts_is_number(at+2) && (*time_index = fts_get_number_int(at+2)) >= 0))
     {
       fts_post("bad time index (import argument number(2))\n");
       fts_set_object(ret, o);     
@@ -1061,9 +1059,9 @@ import_format_txt_init(const fts_object_t *o, int ac, const fts_atom_t *at, fts_
     }
   }
   
-  if(ac > 2)
+  if(ac > 1)
   {
-    if(!(fts_is_number(at+2) && (*m_max_index = fts_get_number_int(at+2)) >= 0))
+    if(!(fts_is_number(at+1) && (*m_max_index = fts_get_number_int(at+1)) >= 0))
     {
       fts_post("bad number of rows index (import argument number(1))\n");
       fts_set_object(ret, o);     
