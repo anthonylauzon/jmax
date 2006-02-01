@@ -352,7 +352,13 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     updateHorizontalScrollbar();
     itsCenterPanel.repaint();
   }
-	
+  
+	public void tableRange(float min_val, float max_val)
+  {
+    setMinimumValue(min_val);
+    setMaximumValue(max_val);
+  }
+  
   /**
 		* Sets the "hollow" representation mode */
   public void setPointsView()

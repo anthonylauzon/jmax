@@ -103,8 +103,11 @@ public class TableInspector extends JDialog
             return;
 		      }
           if( tableEditor.getGraphicContext().getVerticalMaximum() != value)
+          {
             tableEditor.panel.setMaximumValue(value);
-        }  
+            tableEditor.getGraphicContext().getFtsObject().requestSetRange( tableEditor.getGraphicContext().getVerticalMinValue(), value);
+          }  
+        }
       }
       public void keyReleased(KeyEvent e){}
       public void keyTyped(KeyEvent e){}
@@ -136,8 +139,11 @@ public class TableInspector extends JDialog
             return;
 		      }
           if( tableEditor.getGraphicContext().getVerticalMinimum() != value)
+          {
             tableEditor.panel.setMinimumValue(value);
-        }  
+            tableEditor.getGraphicContext().getFtsObject().requestSetRange( value, tableEditor.getGraphicContext().getVerticalMinValue());
+          }  
+        }
       }
       public void keyReleased(KeyEvent e){}
       public void keyTyped(KeyEvent e){}

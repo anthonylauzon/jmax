@@ -118,91 +118,6 @@ fvec_create_row(fmat_t *fmat)
   return make_fvec(fmat, fvec_type_row);
 }
 
-/********************************************************************
-*
-*   upload methods
-*
-*/
-
-#if 0   /* copied from fmat.c */
-
-#define FVEC_CLIENT_BLOCK_SIZE 128
-
-static void 
-fvec_upload_size(fvec_t *self)
-{
-  fts_atom_t a[2];
-  int m = fvec_get_m(self);
-  int n = fvec_get_n(self);
-  
-  fts_set_int(a, m);
-  fts_set_int(a+1, n);
-  fts_client_send_message((fts_object_t *)self, fts_s_size, 2, a);
-}
-
-static void 
-fvec_upload_from_index(fvec_t *self, int row_id, int col_id, int size)
-{
-  fts_atom_t a[FVEC_CLIENT_BLOCK_SIZE];  
-  int n_cols = fvec_get_n(self);
-  int sent = 0;
-  int data_size = size;
-  int ms = row_id;
-  int ns = col_id;
-  int start_id = (ms*n_cols + ns);
-  
-  fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
-  
-  while( data_size > 0)
-  {
-    int i = 0;
-    int n = (data_size > FVEC_CLIENT_BLOCK_SIZE-2)? FVEC_CLIENT_BLOCK_SIZE-2: data_size;
-    
-    /* starting row and column index */
-    if( sent)
-    {
-      ms = sent/n_cols;
-      ns = sent - ms*n_cols;
-    }
-    fts_set_int(a, ms);
-    fts_set_int(a+1, ns);
-    
-    for(i=0; i < n ; i++)
-      fts_set_float(&a[2+i], self->values[start_id  + sent + i]);      
-    
-    fts_client_send_message((fts_object_t *)self, fts_s_set, n+2, a);
-    
-    sent += n;
-    data_size -= n;
-  }
-  
-  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
-}
-
-static void 
-fvec_upload_data(fvec_t *self)
-{  
-  fvec_upload_from_index(self, 0, 0, fvec_get_m(self) * fvec_get_n(self));
-}
-
-static void
-fvec_upload(fvec_t *self)
-{
-  fvec_upload_size(self);
-  fvec_upload_data(self);
-}
-
-#else
-
-static void
-fvec_upload (fvec_t *self)
-{
-  fts_post("UPLOAD DUMMY does nothing!\n");
-}
-
-#endif
-
-
 /*********************************************************
 *
 *  editor
@@ -210,7 +125,6 @@ fvec_upload (fvec_t *self)
 */
 
 static void *fvec_editor = NULL;
-
 
 static void
 fvec_editor_callback (fts_object_t *o, void *e)
@@ -256,25 +170,9 @@ fvec_editor_callback (fts_object_t *o, void *e)
 
    fts_object_add_listener(o, fvec_editor, fvec_editor_callback);
    fts_object_add_listener((fts_object_t *)this->fmat, this, fvec_editor_callback);
-   /*fvec_upload(self);   */
    
    return fts_ok;
  }
-
-/*static fts_method_status_t
-fvec_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  fvec_t *self = (fvec_t *) o;
-  
-  fvec_set_editor_open(self);
-  fts_client_send_message(o, fts_s_openEditor, 0, 0);
-  
-  fts_object_add_listener(o, fvec_editor, fvec_editor_callback);
-  
-  fvec_upload(self);
-  
-  return fts_ok;
-}*/
 
 static fts_method_status_t
 fvec_destroy_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -298,6 +196,26 @@ fvec_close_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     fts_client_send_message(o, fts_s_closeEditor, 0, 0);  
     fts_object_remove_listener(o, fvec_editor);
   }
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+fvec_table_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  fts_symbol_t selector;
+  
+  if(self->editor == NULL)
+  {
+    fts_atom_t a;
+    fts_set_object(&a, o);
+    self->editor = fts_object_create( tabeditor_type, 1, &a);
+    fts_object_refer( self->editor);
+  }
+  
+  selector = fts_get_symbol(at);
+  fts_send_message((fts_object_t *)self->editor, selector, ac - 1, at + 1, fts_nix);
   
   return fts_ok;
 }
@@ -1992,6 +1910,9 @@ fvec_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     fts_dumper_message_send(dumper, mess);
   }
   
+  if(self->editor != NULL)
+    tabeditor_dump_gui(self->editor, dumper);
+  
   return fts_ok;
 }
 
@@ -2161,6 +2082,8 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor,    fvec_open_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor,   fvec_close_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, fvec_destroy_editor);
+  
+  fts_class_message_varargs(cl, seqsym_editor, fvec_table_editor);
   
   /* access methods */
   fts_class_message_varargs(cl, fts_s_print, fvec_print);

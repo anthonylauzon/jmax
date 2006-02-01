@@ -104,6 +104,7 @@ public class TableRuler extends JPanel
       public void tableCleared(){}
       public void sizeChanged(int size, int oldSize){repaint();}
       public void tableUpdated(){repaint();}
+      public void tableRange(float min_val, float max_val){}
     });
   }
 

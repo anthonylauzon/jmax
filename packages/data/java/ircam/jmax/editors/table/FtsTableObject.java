@@ -93,6 +93,12 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((FtsTableObject)obj).resetEditor();
 	}
   });
+  FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("range"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+	{
+      ((FtsTableObject)obj).setRange(args.getFloat( 0), args.getFloat( 1));
+	}
+  });
 }
 
 /**
@@ -355,6 +361,14 @@ public void addPixels(int nArgs , FtsAtom args[])
       notifySet();
 }
 
+
+public void setRange(float min_val, float max_val)
+{
+  this.min_val = min_val;
+  this.max_val = max_val;
+  notifyRange( min_val, max_val);
+}
+
 /*
  ** Requests to the server
  */
@@ -571,6 +585,22 @@ public void requestInsert(int startIndex, int vsize, int pixsize)
   clearAllUndoRedo();
 }
 
+public void requestSetRange(float min_value, float max_value)
+{
+  args.clear();
+  args.addFloat( min_value);
+  args.addFloat( max_value);
+  
+  try{
+    send( FtsSymbol.get("range"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTableObject: I/O Error sending range Message!");
+    e.printStackTrace(); 
+  }
+}
+
 private double[] visibles;
 private int visibleSize = 0;
 private double[] t_pixels;
@@ -751,13 +781,19 @@ private void notifyTableUpdated()
     ((TableDataListener) e.nextElement()).tableUpdated();
 }
 
-
+private void notifyRange(float min_val, float max_val)
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+    ((TableDataListener) e.nextElement()).tableRange(min_val, max_val);
+}
 ///////////////////////////////////////////////////////////
 private Vector points = new Vector();
 MaxVector listeners = new MaxVector();
 private int size = 0;
 private FtsObject vector;
 private boolean type; /* true if vector is an FtsIvecObject */
+float min_val = -1;
+float max_val = 1;
 }
 
 

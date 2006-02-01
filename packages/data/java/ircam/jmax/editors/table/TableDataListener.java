@@ -36,5 +36,6 @@ public interface TableDataListener {
   abstract public void tableCleared();
   abstract public void sizeChanged(int size, int oldSize);
   abstract public void tableUpdated();
+  abstract public void tableRange(float min_val, float max_val);
 }
 

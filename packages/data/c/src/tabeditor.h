@@ -38,6 +38,9 @@ typedef struct _tabeditor_
   float zoom; /* current zoom */
   int pixsize; /* visible pixels size */
 
+  float min_val;/* range */
+  float max_val;
+  
   fts_object_t *vec;
   fts_object_t *copy;
 
@@ -50,5 +53,8 @@ DATA_API void tabeditor_insert_append(tabeditor_t *tabeditor, int onset, int ac,
 DATA_API void tabeditor_send( tabeditor_t *tabeditor);
 
 DATA_API int tabeditor_get_size( tabeditor_t *tabeditor);
+
+DATA_API void tabeditor_dump_gui(tabeditor_t *tabeditor, fts_dumper_t *dumper);
+DATA_API void tabeditor_upload_gui(tabeditor_t *tabeditor);
 
 #endif
