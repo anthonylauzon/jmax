@@ -102,7 +102,6 @@ public class TableRuler extends JPanel
   public void paintComponent(Graphics g)
   {
     int xPosition;
-    int snappedIndex;
     String indexString;
     Dimension d = getSize();
     Rectangle r = tgc.getGraphicDestination().getBounds();
@@ -114,7 +113,9 @@ public class TableRuler extends JPanel
     int visibleScope = tgc.getVisibleHorizontalScope();
     int indexStep = findBestIndexStep(visibleSize);
     int logicalIndex = firstVisible;
-
+    int snappedIndex = 0; 
+    
+    
     int stringLenght = fm.stringWidth(""+(logicalIndex+indexStep));
     int delta = tgc.getAdapter().getX(logicalIndex+indexStep)-tgc.getAdapter().getX(logicalIndex);
     int k, stringWidth;
@@ -129,6 +130,14 @@ public class TableRuler extends JPanel
       indexString = ""+snappedIndex;
       stringWidth = fm.stringWidth(indexString);
       g.drawString(indexString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
+    }
+    /*draw always last index */
+    if(visibleSize >= tableSize && snappedIndex != tableSize)
+    {
+      xPosition = tgc.getAdapter().getX(tableSize);
+      indexString = ""+tableSize;
+      stringWidth = fm.stringWidth(indexString);
+      g.drawString(indexString, xPosition-stringWidth/2, RULER_HEIGHT-3);	
     }
   }
 

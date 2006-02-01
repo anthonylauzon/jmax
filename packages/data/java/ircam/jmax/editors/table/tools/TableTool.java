@@ -99,12 +99,12 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
 
     double startY = ta.getInvY(y1);
     double endY = ta.getInvY(y2);
-    double max = ((TableGraphicContext)gc).getVerticalMaxValue();
-    double min = ((TableGraphicContext)gc).getVerticalMinValue();
-    if( startY >  max) startY = max;
-    else if( startY < min) startY = min;
-    if( endY >  max) endY = max;
-    else if( endY < min) endY = min;
+    float max = ((TableGraphicContext)gc).getVerticalMaxValue();
+    float min = ((TableGraphicContext)gc).getVerticalMinValue();
+    if( startY >  max) startY = (double)max;
+    else if( startY < min) startY = (double)min;
+    if( endY >  max) endY = (double)max;
+    else if( endY < min) endY = (double)min;
 
     ((TableGraphicContext)gc).getFtsObject().interpolate(start, end, startY, endY);
 
@@ -125,10 +125,10 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
   private void setPoint(int x, int y)
   {
     double Y = ((TableGraphicContext)gc).getAdapter().getInvY(y);
-    double max = ((TableGraphicContext)gc).getVerticalMaxValue();
-    double min = ((TableGraphicContext)gc).getVerticalMinValue();
-    if( Y >  max) Y = max;
-    else if( Y < min) Y = min;
+    float max = ((TableGraphicContext)gc).getVerticalMaxValue();
+    float min = ((TableGraphicContext)gc).getVerticalMinValue();
+    if( Y >  max) Y = (double)max;
+    else if( Y < min) Y = (double)min;
   
     ((TableGraphicContext)gc).getFtsObject().requestSetValue(((TableGraphicContext)gc).getAdapter().getInvX(x), Y);
   }

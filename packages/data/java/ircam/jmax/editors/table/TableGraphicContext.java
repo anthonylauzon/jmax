@@ -152,10 +152,6 @@ public class TableGraphicContext extends GraphicContext{
     return (itsAdapter.getInvY(0) - itsAdapter.getInvY(getGraphicDestination().getSize().height));
   }
 
-  /*public boolean isVerticalScrollbarVisible()
-  {
-    return ((TableDisplay)getGraphicDestination()).panel.itsVerticalControl.isVisible();
-  }*/
   public boolean isHorizontalScrollbarVisible()
   {
     return ((TableDisplay)getGraphicDestination()).panel.itsHorizontalControl.isVisible();
@@ -178,42 +174,42 @@ public class TableGraphicContext extends GraphicContext{
     return pixsize;
   }
 
-  int itsVerticalMaximum, itsVerticalMinimum;
-  final public static int IVEC_DEFAULT_V_MAXIMUM = 135;
-  final public static int IVEC_DEFAULT_V_MINIMUM = -135;
-  final public static int FVEC_DEFAULT_V_MAXIMUM = 1;
-  final public static int FVEC_DEFAULT_V_MINIMUM = -1;
+  float itsVerticalMaximum, itsVerticalMinimum;
+  final public static float IVEC_DEFAULT_V_MAXIMUM = 135;
+  final public static float IVEC_DEFAULT_V_MINIMUM = -135;
+  final public static float FVEC_DEFAULT_V_MAXIMUM = 1;
+  final public static float FVEC_DEFAULT_V_MINIMUM = -1;
 
-  public int getVerticalMaximum()
+  public float getVerticalMaximum()
   {
     return itsVerticalMaximum;
   }
-  public double getVerticalMaxValue()
+  public float getVerticalMaxValue()
   {
     if( isIvec())
-      return (double)itsVerticalMaximum;
+      return (float)itsVerticalMaximum;
     else
-      return (double)(itsVerticalMaximum/100);
+      return (float)(itsVerticalMaximum/100);
   }
-  public void setVerticalMaximum(int max)
+  public void setVerticalMaximum(float max)
   {
     if( isIvec())
       itsVerticalMaximum = max;
     else
       itsVerticalMaximum = max*100;
   }
-  public int getVerticalMinimum()
+  public float getVerticalMinimum()
   {
     return itsVerticalMinimum;
   }
-  public double getVerticalMinValue()
+  public float getVerticalMinValue()
   {
     if( isIvec())
-      return (double)itsVerticalMinimum;
+      return (float)itsVerticalMinimum;
     else
-      return (double)(itsVerticalMinimum/100);
+      return (float)(itsVerticalMinimum/100);
   }
-  public void setVerticalMinimum(int min)
+  public void setVerticalMinimum(float min)
   {
     if( isIvec())
       itsVerticalMinimum = min;
@@ -221,7 +217,7 @@ public class TableGraphicContext extends GraphicContext{
       itsVerticalMinimum = min*100;
   }
 
-  public int getVerticalRange()
+  public float getVerticalRange()
   {
     return (itsVerticalMaximum - itsVerticalMinimum);
   }

@@ -87,6 +87,12 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((FtsTableObject)obj).addPixels( args.getLength(), args.getAtoms());
 	}
   });
+  FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("resetEditor"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+	{
+      ((FtsTableObject)obj).resetEditor();
+	}
+  });
 }
 
 /**
@@ -128,6 +134,12 @@ public void setSize(int newSize)
   }
 }
 
+public void resetEditor()
+{
+  lastIndex = 0; 
+  firstTime = false;
+}
+
 private int lastIndex = 0;
 public void setVisibles(int nArgs , FtsAtom args[])
 {
@@ -136,7 +148,7 @@ public void setVisibles(int nArgs , FtsAtom args[])
   size = args[0].intValue;    
   visibleSize = args[1].intValue;    
   visibles = new double[size];
-  
+
   if( isIvec())
   {
     if (isInGroup()) 
@@ -231,49 +243,56 @@ public void setPixels(int nArgs , FtsAtom args[])
 {
   int i = 0;
   int j = 0;
-  pixelsSize = args[0].intValue;    
+  pixelsSize = args[0].intValue;
+  int oldSize = size;
+  size = args[1].intValue;  
   t_pixels = new double[pixelsSize + 10];
   b_pixels = new double[pixelsSize + 10];
+  boolean notify = false;
   
   if( isIvec())
-    for(i = 0; i < nArgs-2; i+=2)
+    for(i = 0; i < nArgs-3; i+=2)
     {	
-      t_pixels[j] = (double)args[i+1].intValue;
-      b_pixels[j] = (double)args[i+2].intValue;
+      t_pixels[j] = (double)args[i+2].intValue;
+      b_pixels[j] = (double)args[i+3].intValue;
       j++;
     }
       else
-        for(i = 0; i<nArgs-2; i+=2)
+        for(i = 0; i<nArgs-3; i+=2)
         {
-          t_pixels[j] = args[i+1].doubleValue;
-          b_pixels[j] = args[i+2].doubleValue;
+          t_pixels[j] = args[i+2].doubleValue;
+          b_pixels[j] = args[i+3].doubleValue;
           j++;
         }
-          if(pixelsSize <= nArgs-1)
-            notifySet();
+          if(oldSize != size)
+            notifyTableUpdated();
+    else
+      if(pixelsSize <= nArgs-2)
+        notifySet();
 }
 
 public void appendPixels(int nArgs , FtsAtom args[])
 {
   int startIndex = args[0].intValue;
+  size = args[1].intValue;  
   int i = 0; int j = 0;
   
   if( isIvec())
-    for(i = 0; (i < nArgs-2)&&(startIndex+j < t_pixels.length) ; i+=2)
+    for(i = 0; (i < nArgs-3)&&(startIndex+j < t_pixels.length) ; i+=2)
     {
-      t_pixels[startIndex+j] = (double)args[i+1].intValue;
-      b_pixels[startIndex+j] = (double)args[i+2].intValue;
+      t_pixels[startIndex+j] = (double)args[i+2].intValue;
+      b_pixels[startIndex+j] = (double)args[i+3].intValue;
       j++;
     }
       else
-        for(i = 0; (i < nArgs-2)&&(startIndex+j < t_pixels.length) ; i+=2)
+        for(i = 0; (i < nArgs-3)&&(startIndex+j < t_pixels.length) ; i+=2)
         {
-          t_pixels[startIndex+j] = args[i+1].doubleValue;
-          b_pixels[startIndex+j] = args[i+2].doubleValue;
+          t_pixels[startIndex+j] = args[i+2].doubleValue;
+          b_pixels[startIndex+j] = args[i+3].doubleValue;
           j++;
         }
-          if(pixelsSize <= startIndex+nArgs-1)
-            notifyPixelsChanged( startIndex, startIndex+j-1);
+          if(pixelsSize <= startIndex+nArgs-2)
+            notifyPixelsChanged( startIndex, startIndex+j-2);
 }
 
 public void addPixels(int nArgs , FtsAtom args[])
@@ -381,11 +400,12 @@ public void requestSetValues(double[] values, int startIndex, int size)
   }
 }
 
-public void requestSetVisibleWindow(int size, int startIndex, double zoom, int sizePixels)
+public void requestSetVisibleWindow(int size, int startIndex, int windowSize, double zoom, int sizePixels)
 {
   args.clear();
   args.addInt(size+10);
   args.addInt(startIndex);
+  args.addInt(windowSize);
   args.addDouble(zoom);
   args.addInt(sizePixels);
   
@@ -404,10 +424,10 @@ public void requestEndEdit()
     send( FtsSymbol.get("end_edit"));
   }
   catch(IOException e)
-  {
+{
     System.err.println("FtsTableObject: I/O Error sending end_edit Message!");
     e.printStackTrace(); 
-  }
+}
 }
 
 private boolean firstTime = false;
@@ -417,12 +437,12 @@ public void requestGetValues()
     send( FtsSymbol.get("get_from_client"));
   }
   catch(IOException e)
-  {
+{
     System.err.println("FtsTableObject: I/O Error sending get_from_client Message!");
     e.printStackTrace(); 
-  }
+}
 
-  firstTime = true;
+firstTime = true;
 } 
 private boolean fromScroll = false;
 public void requestGetValues(int first, int last, boolean fromScroll)
@@ -724,6 +744,13 @@ private void notifyClear()
   for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
     ((TableDataListener) e.nextElement()).tableCleared();
 }
+
+private void notifyTableUpdated()
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+    ((TableDataListener) e.nextElement()).tableUpdated();
+}
+
 
 ///////////////////////////////////////////////////////////
 private Vector points = new Vector();

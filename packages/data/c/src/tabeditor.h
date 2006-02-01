@@ -33,6 +33,7 @@ typedef struct _tabeditor_
   
   int opened; /* non zero if editor open */
   int vsize; /* visible points */
+  int win_size; /* possible visible scope in window */
   int vindex; /* first visible point */
   float zoom; /* current zoom */
   int pixsize; /* visible pixels size */

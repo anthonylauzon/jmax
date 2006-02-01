@@ -113,7 +113,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
         updateHorizontalScrollbar();//????
         
         gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-                                                   ((TableAdapter)gc.getAdapter()).getXZoom(), 
+                                                   gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
                                                    gc.getVisiblePixelsSize());
         if(gc.getAdapter().getXZoom() > 0.5)		    
           gc.getFtsObject().requestGetValues();
@@ -122,7 +122,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
       }
 		});
     //470 is the default size of the TableDisplay .......
-    gc.getFtsObject().requestSetVisibleWindow( 470, 0, (double)1.0, gc.getVisiblePixelsSize());
+    gc.getFtsObject().requestSetVisibleWindow( 470, 0, gc.getWindowHorizontalScope(), (double)1.0, gc.getVisiblePixelsSize());
     gc.getFtsObject().requestGetValues();
 
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
@@ -179,15 +179,15 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 			public void zoomChanged(float zoom, float oldZoom)
 		{
 				gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-																									zoom, gc.getVisiblePixelsSize());
+																									gc.getWindowHorizontalScope(), zoom, gc.getVisiblePixelsSize());
 				updateHorizontalScrollbar();
 				
 				if(zoom > 0.5)
 				{
-					if(oldZoom-zoom>0)
+          int lastId =  gc.getFtsObject().getLastUpdatedIndex();
+					if((oldZoom-zoom>0) || (oldZoom-zoom<0 && lastId == 0))
 					{
 						int lvi = (gc.getLastVisibleIndex()+10 >= gc.getFtsObject().getSize()) ? gc.getFtsObject().getSize() : gc.getLastVisibleIndex()+10;
-						int lastId =  gc.getFtsObject().getLastUpdatedIndex();
 						if(lvi > lastId)
 							gc.getFtsObject().requestGetValues(lastId, lvi, false);
 						else repaint();
@@ -221,7 +221,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				int first = gc.getFirstVisibleIndex();
 				gc.getAdapter().setXTransposition(hScrollVal);
 				gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-																									gc.getAdapter().getXZoom(), gc.getVisiblePixelsSize());
+																									gc.getWindowHorizontalScope(), gc.getAdapter().getXZoom(), 
+                                                  gc.getVisiblePixelsSize());
 				
 				if(gc.getAdapter().getXZoom()>0.5)
 					if(hDelta<0)
@@ -283,13 +284,13 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		}    
   }
 	
-  public void setMaximumValue(int value)
+  public void setMaximumValue(float value)
   {
     gc.setVerticalMaximum(value);
     repaint();
   }
 	
-  public void setMinimumValue(int value)
+  public void setMinimumValue(float value)
   {
     gc.setVerticalMinimum(value);
     repaint();
@@ -336,10 +337,18 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     if( oldSize == 0)
 		{
 			gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-																								 ((TableAdapter)gc.getAdapter()).getXZoom(), 
+																								 gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
 																								 gc.getVisiblePixelsSize());
 			gc.getFtsObject().requestGetValues();
 		}
+    updateHorizontalScrollbar();
+    itsCenterPanel.repaint();
+  }
+  public void tableUpdated()
+  {
+    gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+                                               gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
+                                               gc.getVisiblePixelsSize());
     updateHorizontalScrollbar();
     itsCenterPanel.repaint();
   }

@@ -43,7 +43,7 @@ public class TableDisplay extends /*PopupToolbarPanel*/JPanel
     panel = tp;
     setBackground(Color.white);
     
-    addMouseListener(new MouseListener(){
+   /* addMouseListener(new MouseListener(){
       public void mouseClicked(MouseEvent e){}
       public void mousePressed(MouseEvent e){}
       public void mouseReleased(MouseEvent e){}
@@ -89,7 +89,7 @@ public class TableDisplay extends /*PopupToolbarPanel*/JPanel
               gc.display( "( "+index+" , "+value+" )");
         }
     }
-    });
+    });*/
 }
 
 /**

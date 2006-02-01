@@ -93,11 +93,11 @@ public class TableInspector extends JDialog
     maximumField.setMaximumSize(new Dimension(120, 28));
     maximumField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
-	      int value;
+	      float value;
 	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
         {
 		      try { 
-            value = Integer.valueOf(maximumField.getText()).intValue(); // parse int
+            value = Float.valueOf(maximumField.getText()).floatValue(); // parse float
 		      } catch (NumberFormatException exc) {
             System.err.println("Error:  invalid number format!");
             return;
@@ -126,11 +126,11 @@ public class TableInspector extends JDialog
     minimumField.setMaximumSize(new Dimension(120, 28));
     minimumField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
-	      int value;
+	      float value;
 	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
         {
 		      try { 
-            value = Integer.valueOf(minimumField.getText()).intValue(); // parse float
+            value = Float.valueOf(minimumField.getText()).floatValue(); // parse float
 		      } catch (NumberFormatException exc) {
             System.err.println("Error:  invalid number format!");
             return;
