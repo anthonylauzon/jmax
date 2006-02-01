@@ -601,11 +601,11 @@ public void requestSequenceName()
 public void importMidiFile()
 {
 	try{
-		send( FtsSymbol.get("import_midifile_dialog"));
+		send( FtsSymbol.get("import"));
 	}
 	catch(IOException e)
 {
-		System.err.println("FtsSequenceObject: I/O Error sending import_midifile_dialog Message!");
+		System.err.println("FtsSequenceObject: I/O Error sending import Message!");
 		e.printStackTrace(); 		
 }
 }

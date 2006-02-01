@@ -44,7 +44,7 @@ static void
 retard_input_atom(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   retard_t *this = (retard_t *)o;
-
+  
   if(this->time > 0.0)
     fts_timebase_add_call(fts_get_timebase(), o, retard_output, at, this->time);
   else

@@ -74,8 +74,10 @@ public void edit(int x, int y, int modifiers)
 /**
 * called by the Selecter UI module at mouse down
  */
-public void selectionPointChoosen(int x, int y, int modifiers) 
+public void selectionPointChoosen(int x, int y, MouseEvent e) 
 {
+  int modifiers = e.getModifiers();
+  
 	if((modifiers & SHORTCUT)!=0 && (modifiers & MouseEvent.ALT_MASK)==0)
 		controlAction(x, y, modifiers);
 	else

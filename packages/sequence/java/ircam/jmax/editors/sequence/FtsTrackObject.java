@@ -512,7 +512,7 @@ public void importMidiFile()
   }
   catch(IOException e)
 {
-    System.err.println("FtsTrackObject: I/O Error sending import_midifile_dialog Message!");
+    System.err.println("FtsTrackObject: I/O Error sending import_midifile Message!");
     e.printStackTrace();
 }
 }

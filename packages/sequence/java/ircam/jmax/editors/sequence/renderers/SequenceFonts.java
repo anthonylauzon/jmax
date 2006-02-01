@@ -69,7 +69,7 @@ public class SequenceFonts
     {
       try
       {
-        originalFont = JMaxUtilities.loadFontFromResource(Font.TRUETYPE_FONT, "fonts/MusiSync.ttf");
+        originalFont = JMaxUtilities.loadFontFromResource( Font.TRUETYPE_FONT, "fonts/MusiSync.ttf");
       }
       catch(java.io.FileNotFoundException  e)
       {
