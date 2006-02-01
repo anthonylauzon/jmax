@@ -97,6 +97,14 @@ public class TableRuler extends JPanel
 				repaint();
 			}
 		});
+    tgc.getDataModel().addListener( new TableDataListener(){
+      public void valueChanged(int index1, int index2, boolean fromScroll){}
+      public void pixelsChanged(int index1, int index2){}
+      public void tableSetted(){repaint();}
+      public void tableCleared(){}
+      public void sizeChanged(int size, int oldSize){repaint();}
+      public void tableUpdated(){repaint();}
+    });
   }
 
   public void paintComponent(Graphics g)
