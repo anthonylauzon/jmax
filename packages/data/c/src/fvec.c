@@ -1742,7 +1742,7 @@ static fts_method_status_t
 fvec_get_prod (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
-  double  prod = 0.0;
+  double  prod = 1.0;
   float  *p;
   int     size, stride;
   int     i;
@@ -1773,6 +1773,27 @@ fvec_get_mean(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
     sum += p[i];
   
   fts_set_float(ret, sum / (double)size);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+fvec_get_geomean (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+  double  prod = 1.0;
+  float  *p;
+  int     size, stride;
+  int     i;
+  double  root = 1.0 / (double) size;
+
+  fvec_get_vector(self, &p, &size, &stride);
+  
+  for (i = 0; i < size * stride; i += stride)
+    prod *= pow(p[i], root);
+  
+  fts_set_float(ret, prod);
   
   return fts_ok;
 }
@@ -2137,6 +2158,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("sum"), fvec_get_sum);
   fts_class_message_void(cl, fts_new_symbol("prod"), fvec_get_prod);
   fts_class_message_void(cl, fts_new_symbol("mean"), fvec_get_mean);
+  fts_class_message_void(cl, fts_new_symbol("geomean"),  fvec_get_geomean);
   fts_class_message_void(cl, fts_new_symbol("variance"), fvec_get_variance);
   fts_class_message_void(cl, fts_new_symbol("zc"), fvec_get_zc);
   
@@ -2183,7 +2205,8 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("absmax"), NULL, "get maximum absolute value");
   fts_class_doc(cl, fts_new_symbol("sum"),  NULL, "get sum of all values");
   fts_class_doc(cl, fts_new_symbol("prod"), NULL, "get product of all values");
-  fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get mean value of all values");
+  fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get arithmetic mean value of all values");  
+  fts_class_doc(cl, fts_new_symbol("geomean"), NULL, "get geometric mean value of all values");
   fts_class_doc(cl, fts_new_symbol("variance"), NULL, "get variance of all values");
   fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");  
   
