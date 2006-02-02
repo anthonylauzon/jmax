@@ -181,7 +181,8 @@ public void setVisibles(int nArgs , FtsAtom args[])
   }
   lastIndex = i;
   
-  notifySizeChanged(size, oldSize);
+  if(oldSize != 0 && size != oldSize)
+    notifySizeChanged(size, oldSize);
   
   if((size <= lastIndex)||(visibleSize <= lastIndex))
     notifySet();
@@ -363,7 +364,7 @@ public void addPixels(int nArgs , FtsAtom args[])
 
 
 public void setRange(float min_val, float max_val)
-{
+{  
   this.min_val = min_val;
   this.max_val = max_val;
   notifyRange( min_val, max_val);
@@ -592,7 +593,7 @@ public void requestSetRange(float min_value, float max_value)
   args.addFloat( max_value);
   
   try{
-    send( FtsSymbol.get("range"), args);
+    send( FtsSymbol.get("change_range"), args);
   }
   catch(IOException e)
   {

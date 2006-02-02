@@ -63,7 +63,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   TableDisplay itsCenterPanel;
   TableToolManager toolManager;
   FtsObjectWithEditor ftsObj;
-	
+	boolean tableShown = false;
   /**
 		* Constructor. */
   public TablePanel(EditorContainer container, FtsObjectWithEditor ftsObj, TableDataModel tm) {
@@ -110,20 +110,38 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
 		  {
-        updateHorizontalScrollbar();//????
+        if(tableShown)
+        {
+          updateHorizontalScrollbar();//????
         
-        gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
-                                                   gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
-                                                   gc.getVisiblePixelsSize());
-        if(gc.getAdapter().getXZoom() > 0.5)		    
-          gc.getFtsObject().requestGetValues();
-        else
-          gc.getFtsObject().requestGetPixels(0, 0);
+          gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+                                                     gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
+                                                     gc.getVisiblePixelsSize());
+          if(gc.getAdapter().getXZoom() > 0.5)		    
+            gc.getFtsObject().requestGetValues();
+          else
+            gc.getFtsObject().requestGetPixels(0, 0);
+        }
+      }
+      public void componentMoved(ComponentEvent e)
+		  {
+        if(!tableShown)
+        {
+          gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+                                                     gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
+                                                     gc.getVisiblePixelsSize());
+          if(gc.getAdapter().getXZoom() > 0.5)		    
+            gc.getFtsObject().requestGetValues();
+          else
+            gc.getFtsObject().requestGetPixels(0, 0);
+          
+          tableShown = true;
+        }
       }
 		});
     //470 is the default size of the TableDisplay .......
-    gc.getFtsObject().requestSetVisibleWindow( 470, 0, gc.getWindowHorizontalScope(), (double)1.0, gc.getVisiblePixelsSize());
-    gc.getFtsObject().requestGetValues();
+    /*gc.getFtsObject().requestSetVisibleWindow( 470, 0, gc.getWindowHorizontalScope(), (double)1.0, gc.getVisiblePixelsSize());
+    gc.getFtsObject().requestGetValues();*/
 
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setPreferredSize(size);
@@ -355,8 +373,9 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   
 	public void tableRange(float min_val, float max_val)
   {
-    setMinimumValue(min_val);
-    setMaximumValue(max_val);
+    gc.setVerticalMinimum(min_val);
+    gc.setVerticalMaximum(max_val);
+    repaint();
   }
   
   /**

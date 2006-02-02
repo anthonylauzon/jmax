@@ -806,7 +806,7 @@ fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at)
   int stride;
   int i, j;
     
-  fvec_vector(vec, &ptr, &size, &stride);
+  fvec_vector((fts_object_t *)vec, &ptr, &size, &stride);
   
   for(i=0, j=onset*stride; i < ac && i < size; i++, j+=stride)
     if(fts_is_number(at + i))
@@ -2104,7 +2104,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_closeEditor,   fvec_close_editor);
   fts_class_message_varargs(cl, fts_s_destroyEditor, fvec_destroy_editor);
   
-  fts_class_message_varargs(cl, seqsym_editor, fvec_table_editor);
+  fts_class_message_varargs(cl, fts_s_editor, fvec_table_editor);
   
   /* access methods */
   fts_class_message_varargs(cl, fts_s_print, fvec_print);

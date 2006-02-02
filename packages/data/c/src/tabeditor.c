@@ -28,6 +28,8 @@
 #include <stdlib.h>
 
 #define CLIENT_BLOCK_SIZE 256
+#define TABEDITOR_DEFAULT_MIN  -1.0
+#define TABEDITOR_DEFAULT_MAX  1.0
 
 static fts_symbol_t sym_text = 0;
 
@@ -47,7 +49,6 @@ static fts_symbol_t sym_paste_client = 0;
 static fts_symbol_t sym_cut_client = 0;
 static fts_symbol_t sym_insert_client = 0;
 static fts_symbol_t sym_reset_editor = 0;
-
 
 /********************************************************
 *
@@ -84,7 +85,7 @@ fvec_get_min_max_in_range(float *ptr, int size, int stride, int i_min, int i_max
 static void
 tabeditor_send_visibles(tabeditor_t *tabeditor)
 {
-  int i;
+  int i = 0;
   fts_atom_t a[CLIENT_BLOCK_SIZE];
   int vecsize = tabeditor_get_size( tabeditor);
   int n = (tabeditor->vindex + tabeditor->vsize <= vecsize)? (tabeditor->vindex + tabeditor->vsize) : vecsize;
@@ -356,13 +357,16 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
 void
 tabeditor_upload_gui(tabeditor_t *this)
 {
-  /*if(this)
+  if(this)
   {
-    fts_atom_t a[2];
-    fts_set_int(a, this->min_val);
-    fts_set_int(a+1, this->max_val);
-    fts_client_send_message((fts_object_t *)this, fts_s_range, 2, a);
-  }*/
+    if(this->min_val != TABEDITOR_DEFAULT_MIN || this->max_val != TABEDITOR_DEFAULT_MAX)
+    {
+      fts_atom_t a[2];    
+      fts_set_float(a, this->min_val);
+      fts_set_float(a+1, this->max_val);
+      fts_client_send_message((fts_object_t *)this, fts_s_range, 2, a);
+    }
+  }
 }
 
 static fts_method_status_t
@@ -749,7 +753,8 @@ int tabeditor_get_size( tabeditor_t *tabeditor)
 static fts_method_status_t
 tabeditor_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  /*tabeditor_t *this = (tabeditor_t *)o;
+  tabeditor_t *this = (tabeditor_t *)o;
+  
 	if(ac == 2 && fts_is_float(at) && fts_is_float(at+1))
 	{
 		float min_val = fts_get_float(at);
@@ -758,25 +763,44 @@ tabeditor_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
     {
       this->min_val = min_val;
 			this->max_val = max_val;
-      //if(track_do_save_editor(this->vec))
-        //fts_object_set_dirty((fts_object_t *)this->vec);
     }
-  }	*/
+  }	
   
   return fts_ok;
 }	
 
+static fts_method_status_t
+tabeditor_set_range_from_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tabeditor_t *this = (tabeditor_t *)o;
+  
+  if(ac == 2 && fts_is_float(at) && fts_is_float(at+1))
+	{
+		float min_val = fts_get_float(at);
+		float max_val =  fts_get_float(at+1);
+    if(this->min_val != min_val || this->max_val != max_val)
+    {
+      this->min_val = min_val;
+			this->max_val = max_val;
+      fts_object_set_dirty((fts_object_t *)this->vec);
+      tabeditor_upload_gui(this);
+    }
+  }	  
+  return fts_ok;
+}
+
 void 
 tabeditor_dump_gui(tabeditor_t *this, fts_dumper_t *dumper)
 {
-  /*fts_atom_t a[3];
-  
-  fts_set_symbol(a, fts_s_range);
-  fts_set_int(a + 1, this->min_val);
-  fts_set_int(a + 2, this->max_val);
-  fts_dumper_send(dumper, fts_s_editor, 3, a);*/
+  if(this->min_val != TABEDITOR_DEFAULT_MIN || this->max_val != TABEDITOR_DEFAULT_MAX)
+  {
+    fts_atom_t a[3];  
+    fts_set_symbol(a, fts_s_range);
+    fts_set_float(a + 1, this->min_val);
+    fts_set_float(a + 2, this->max_val);
+    fts_dumper_send(dumper, fts_s_editor, 3, a);
+  }
 }
-
 /*********************************************************
 *
 *  class
@@ -794,8 +818,8 @@ tabeditor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   this->zoom = 1.0;
   this->pixsize = 1;
   
-  this->min_val = -1.0;
-  this->max_val = 1.0;
+  this->min_val = TABEDITOR_DEFAULT_MIN;
+  this->max_val = TABEDITOR_DEFAULT_MAX;
   
   if(ac == 1 && fts_is_object(at))
   {
@@ -844,6 +868,7 @@ tabeditor_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_new_symbol("insert_from_client"), tabeditor_insert_by_client_request);
   
   fts_class_message_varargs(cl, fts_s_range, tabeditor_set_range);
+  fts_class_message_varargs(cl, fts_new_symbol("change_range"), tabeditor_set_range_from_client);
 }
 
 /********************************************************************
