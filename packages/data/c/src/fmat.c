@@ -1207,6 +1207,50 @@ _fmat_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
   else
   {
+#if USE_LINEAR_INDEXING
+    switch (ac)
+    {
+      default:
+      case 2:
+        if (fts_is_number(at))
+	  i = fts_get_number_int(at);
+        
+        if (fts_is_number(at + 1))
+	  j = fts_get_number_int(at  + 1);
+	
+	while (i < 0)
+	  i += m;
+  
+	while (j < 0)
+	  j += n;
+  
+	if (i >= m)
+	  i = m - 1;
+  
+	if (j >= n)
+	  j = n - 1;
+  
+  	fts_set_float(ret, fmat_get_element(self, i, j));
+      break;
+      
+      case 1:  /* linear indexing of unrolled matrix */
+        if (fts_is_number(at))
+	  j = fts_get_number_int(at);
+
+ 	while (j < 0)
+	  j += n * m;
+  
+	if (j >= n * m)
+	  j = n * m - 1;
+	
+	fts_set_float(ret, fmat_get_element(self, 0, j));
+      break;
+      
+      case 0:
+        fts_return_float(fmat_get_element(self, 0, 0));
+      break;
+    }
+#else
     if (ac > 0  &&  fts_is_number(at))
       i = fts_get_number_int(at);
 
@@ -1226,6 +1270,7 @@ _fmat_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
       j = n - 1;
   
     fts_set_float(ret, fmat_get_element(self, i, j));
+#endif
   }
   
   return fts_ok;
@@ -3824,7 +3869,7 @@ fmat_apply_expr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   int n = fmat_get_n(self);
   float *ptr = fmat_get_ptr(self);
   fts_hashtable_t locals;
-  fts_atom_t key_self, key_x, value;
+  fts_atom_t key_self, key_x, key_i, value, index;
   fts_atom_t r;
   int i;
   
@@ -3835,13 +3880,16 @@ fmat_apply_expr(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   fts_hashtable_put(&locals, &key_self, &value);
   
   fts_set_symbol(&key_x, fts_s_x);
+  fts_set_symbol(&key_i, fts_s_i);
 
   /* apply expression to each value */  
   for(i=0; i<m*n; i++)
   {
     double f = (double)ptr[i];
   
+    fts_set_int  (&index, i);
     fts_set_float(&value, f);
+    fts_hashtable_put(&locals, &key_i, &index);
     fts_hashtable_put(&locals, &key_x, &value);
 
     expr_evaluate(expr, &locals, ac - 1, at + 1, &r);
@@ -3868,6 +3916,67 @@ fmat_apply_expr_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
       
   return fts_ok;
 }
+
+
+static fts_method_status_t
+_fmat_find (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *)o;
+  expr_t *expr = (expr_t *)fts_get_object(at);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  float *ptr = fmat_get_ptr(self);
+  fts_hashtable_t locals;
+  fts_atom_t key_self, key_x, key_i, value, index;
+  fts_atom_t r;
+  int i, j;
+  
+  fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
+  
+  fts_set_symbol(&key_self, fts_s_self);
+  fts_set_symbol(&key_x,    fts_s_x);
+  fts_set_symbol(&key_i,    fts_s_i);
+
+  fts_set_object(&value, self);
+  fts_hashtable_put(&locals, &key_self, &value);
+  
+  /* find all indices where expression on value is true */  
+  for (i = 0, j = 0; i < m * n; i++)
+  {
+    double f = (double) ptr[i];
+  
+    fts_set_int  (&index, i);
+    fts_set_float(&value, f);
+    fts_hashtable_put(&locals, &key_i, &index);
+    fts_hashtable_put(&locals, &key_x, &value);
+
+    expr_evaluate(expr, &locals, ac - 1, at + 1, &r);
+    
+    if (fts_is_number(&r)  &&  fts_get_number_int(&r) != 0)
+      ptr[j++] = i;
+  }
+  
+  fts_hashtable_destroy(&locals);
+
+  /* keep only found linear indices */
+  fmat_reshape(self, j, 1);
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+_fmat_find_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if (ac > 0  &&  fts_is_a(at, expr_class))
+    _fmat_find(o, s, ac, at, ret);
+      
+  return fts_ok;
+}
+
+
 
 
 /*********************************************************
@@ -4260,6 +4369,8 @@ fmat_instantiate(fts_class_t *cl)
 
   fts_class_message(cl, fts_new_symbol("apply"), expr_class, fmat_apply_expr);
   fts_class_message_varargs(cl, fts_new_symbol("apply"), fmat_apply_expr_varargs);
+  fts_class_message        (cl, fts_new_symbol("find"), expr_class, _fmat_find);
+  fts_class_message_varargs(cl, fts_new_symbol("find"), _fmat_find_varargs);
   
   fts_class_inlet_bang(cl, 0, data_object_output);
 
