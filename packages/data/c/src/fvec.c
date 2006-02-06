@@ -1782,14 +1782,14 @@ static fts_method_status_t
 fvec_get_geomean (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *) o;
-  double  prod = 1.0;
+  double  prod = 1.0, root;
   float  *p;
-  int     size, stride;
-  int     i;
-  double  root = 1.0 / (double) size;
+  int     i, size, stride;
 
   fvec_get_vector(self, &p, &size, &stride);
-  
+
+  root = 1.0 / (double) size;
+
   for (i = 0; i < size * stride; i += stride)
     prod *= pow(p[i], root);
   
@@ -2206,7 +2206,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("sum"),  NULL, "get sum of all values");
   fts_class_doc(cl, fts_new_symbol("prod"), NULL, "get product of all values");
   fts_class_doc(cl, fts_new_symbol("mean"), NULL, "get arithmetic mean value of all values");  
-  fts_class_doc(cl, fts_new_symbol("geomean"), NULL, "get geometric mean value of all values");
+  fts_class_doc(cl, fts_new_symbol("geomean"),  NULL, "get geometric mean value of all values");
   fts_class_doc(cl, fts_new_symbol("variance"), NULL, "get variance of all values");
   fts_class_doc(cl, fts_new_symbol("zc"), NULL, "get number of zerocrossings");  
   
