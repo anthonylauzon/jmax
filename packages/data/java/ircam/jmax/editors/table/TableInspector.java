@@ -141,7 +141,7 @@ public class TableInspector extends JDialog
           if( tableEditor.getGraphicContext().getVerticalMinimum() != value)
           {
             tableEditor.panel.setMinimumValue(value);
-            tableEditor.getGraphicContext().getFtsObject().requestSetRange( value, tableEditor.getGraphicContext().getVerticalMinValue());
+            tableEditor.getGraphicContext().getFtsObject().requestSetRange( value, tableEditor.getGraphicContext().getVerticalMaxValue());
           }  
         }
       }
