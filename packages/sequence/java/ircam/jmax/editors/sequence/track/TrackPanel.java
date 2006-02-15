@@ -267,6 +267,13 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   {
     return trackEditor;
   }
+  
+  public void setContainer(EditorContainer container)
+  {
+    itsContainer = container;
+    trackEditor.getGraphicContext().setFrame( itsContainer.getFrame());
+    trackEditor.setContainer(this);
+  }
 	
   /**
 		* called when the database is changed: DataTrackListener interface
@@ -424,9 +431,8 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   }
   public void close(boolean doCancel)
   {
-    itsContainer.getFrame().setVisible(false);
+    ftsTrackObject.closeEditor();
     ftsTrackObject.requestDestroyEditor(); 
-    MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
   public void save(){}
   public void saveAs(){}

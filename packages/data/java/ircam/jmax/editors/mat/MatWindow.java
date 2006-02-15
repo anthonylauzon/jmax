@@ -48,12 +48,52 @@ public class MatWindow extends JMaxEditor {
     super();
     
     matData = data;
-    
-    makeTitle();
         
     itsMatPanel = new MatPanel(this, data);
     getContentPane().add(itsMatPanel);
     
+    makeMatWindow();
+    
+    setLocation(200, 200);
+    setSize( matData.getDefaultSize());
+  }
+
+  public MatWindow(MatWindow winCopy)
+  {
+    super();
+    
+    matData = winCopy.matData;
+    
+    itsMatPanel = winCopy.itsMatPanel;
+    itsMatPanel.setContainer(this);
+    Rectangle bounds = winCopy.getBounds();
+    winCopy.getContentPane().remove(itsMatPanel);
+    getContentPane().add(itsMatPanel);
+    
+    winCopy.dispose();
+    System.gc();
+    
+    makeMatWindow();
+    setBounds(bounds);
+  }
+  
+  private void makeMatWindow()
+  {
+    makeTitle();
+    makeListeners();
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();
+    else
+      makeSimpleMenuBar();
+    
+    getContentPane().validate();
+    itsMatPanel.validate();
+    validate();
+  }
+  
+  private void makeListeners()
+  {
     matData.addMatListener( new MatDataListener(){
       public void matCleared()
       {
@@ -63,16 +103,34 @@ public class MatWindow extends JMaxEditor {
       }
       public void matDataChanged()
       {
-        getContentPane().validate();
-        itsMatPanel.validate();
-        validate();
+        if(!uploading)
+        {
+          getContentPane().validate();
+          itsMatPanel.validate();
+          validate();
+        }
       }
       public void matSizeChanged(int n_rows, int n_cols)
       {
-        validate();
-        pack();
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run()
+          { 
+            validate();
+            pack();
+          }
+        });
       }
-      public void uploading(boolean uploading){}
+      public void uploading(boolean uploading)
+      {
+        MatWindow.this.uploading = uploading;
+        if(!uploading)
+        {
+          getContentPane().validate();
+          itsMatPanel.validate();
+          validate();
+          pack();
+        }
+      }      
       public void matNameChanged(String name)
       {
         setWindowName(name);
@@ -99,18 +157,6 @@ public class MatWindow extends JMaxEditor {
       }
       public void windowDeactivated(WindowEvent e){}
     });
-    
-    if(JMaxApplication.getProperty("no_menus") == null)
-      makeMenuBar();
-    else
-      makeSimpleMenuBar();
-    
-    setLocation(200, 200);
-    setSize( matData.getDefaultSize());
-    
-    getContentPane().validate();
-    itsMatPanel.validate();
-    validate();
   }
   
   private final void makeTitle()
@@ -163,6 +209,8 @@ public class MatWindow extends JMaxEditor {
   public Rectangle getViewRectangle(){
     return null;
   }
+  
+  boolean uploading = false;
 }
 
 

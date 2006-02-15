@@ -54,15 +54,43 @@ public class Tabler extends JMaxEditor{
     super();
     
     getContentPane().setLayout( new BorderLayout());
-    makeTitle();
     itsPanel = new TablePanel( this, ftsObj, tm);
     getContentPane().add(itsPanel, BorderLayout.CENTER);
     itsPanel.frameAvailable(); 
 
-    //makeControlBar();
     tableRuler = new TableRuler( itsPanel.getGraphicContext());
     getContentPane().add(tableRuler, BorderLayout.NORTH);
     
+    makeTablerWindow();
+    
+    setSize(itsPanel.getPreferredSize().width, itsPanel.getPreferredSize().height + 10);
+  }
+  
+  public Tabler( Tabler copyTabler) 
+  {
+    super();
+    
+    getContentPane().setLayout( new BorderLayout());
+    Rectangle bounds = copyTabler.getBounds();
+    
+    itsPanel = copyTabler.itsPanel;
+    itsPanel.setContainer(this);
+    copyTabler.getContentPane().remove(itsPanel);
+    getContentPane().add(itsPanel, BorderLayout.CENTER);
+    
+    tableRuler = copyTabler.tableRuler;
+    copyTabler.getContentPane().remove(tableRuler);
+    getContentPane().add(tableRuler, BorderLayout.NORTH);
+    copyTabler.dispose();
+    System.gc();
+    
+    makeTablerWindow();
+    
+    setBounds(bounds);
+  }  
+  
+  private void makeTablerWindow()
+  {
     addWindowListener( new WindowListener(){
       public void windowOpened(WindowEvent e){}
       public void windowClosed(WindowEvent e){}
@@ -76,18 +104,14 @@ public class Tabler extends JMaxEditor{
       public void windowDeactivated(WindowEvent e){}
     });
     
-    //pack();
-    
+    makeTitle();
     if(JMaxApplication.getProperty("no_menus") == null)
       makeMenuBar();   
     else
       makeSimpleMenuBar();
     validate();
-    
-    setSize(itsPanel.getPreferredSize().width, itsPanel.getPreferredSize().height + 10);
-    //pack();
   }
-
+  
   private final void makeTitle()
   { 
     setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table"));

@@ -243,7 +243,7 @@ mat_upload_size(mat_t *self)
 }
 
 static void 
-mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
+mat_upload_from_index(mat_t *self, int row_id, int col_id, int size, int upload)
 {
   fts_atom_t a[MAT_CLIENT_BLOCK_SIZE];
   fts_atom_t *d;
@@ -255,7 +255,8 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
   int ns = col_id;
   int start_id = (ms*n_cols + ns);
   
-  fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
+  if(upload)
+    fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
   
   while( data_size > 0)
   {
@@ -295,20 +296,23 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size)
     data_size -= n;
   }    
   
-  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
+  if(upload)
+    fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
 }
 
 static void 
-mat_upload_data(mat_t *self)
+mat_upload_data(mat_t *self, int upload)
 {  
-  mat_upload_from_index(self, 0, 0, mat_get_m(self) * mat_get_n(self));
+  mat_upload_from_index(self, 0, 0, mat_get_m(self) * mat_get_n(self), upload);
 }
 
 void
 mat_upload(mat_t *self)
 {
+  fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
   mat_upload_size(self);
-  mat_upload_data(self);
+  mat_upload_data(self, 0);
+  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
 }
 
 /********************************************************************
@@ -327,7 +331,7 @@ mat_fill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
     mat_set_const(self, at);
   
     if(mat_editor_is_open(self))
-      mat_upload_data(self);
+      mat_upload_data(self, 1);
     
     fts_object_set_state_dirty(o);
   }
@@ -352,7 +356,7 @@ mat_set_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
       mat_set_with_onset_from_atoms(self, i * n + j, ac - 2, at + 2);
     
       if(mat_editor_is_open(self))
-        mat_upload_from_index(self, i, j, ac-2);
+        mat_upload_from_index(self, i, j, ac-2, 1);
       
       fts_object_set_state_dirty(o);
     }
@@ -389,7 +393,7 @@ mat_set_row_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
       mat_set_with_onset_from_atoms(self, i * n, ac, at);
     
       if(mat_editor_is_open(self))
-        mat_upload_from_index(self, i, 0, ac);
+        mat_upload_from_index(self, i, 0, ac, 1);
       
       fts_object_set_state_dirty(o);
     }
@@ -426,7 +430,7 @@ mat_append_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   if(mat_editor_is_open(self))
   {
     fts_client_send_message(o, sym_mat_append_row, 0, 0);
-    mat_upload_from_index(self, m, 0, n);
+    mat_upload_from_index(self, m, 0, n, 1);
   }
   fts_object_set_state_dirty(o);
   
@@ -890,7 +894,7 @@ mat_sort(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
 #endif /* HAVE_QSORT_R */
   
   if (mat_editor_is_open(self))
-    mat_upload_data(self);
+    mat_upload_data(self, 1);
   
   fts_set_object(ret, o);
   
@@ -928,7 +932,7 @@ mat_unique (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
     }
 
     if (mat_editor_is_open(self))
-      mat_upload_data(self);
+      mat_upload_data(self, 1);
   }
   /* else: the column doesn't exist, do nothing */
 

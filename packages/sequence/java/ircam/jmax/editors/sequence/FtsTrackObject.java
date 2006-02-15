@@ -115,13 +115,13 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       ((FtsTrackObject)obj).setType( args.getSymbol( 0).toString());
   }
   });
-  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
       ((FtsTrackObject)obj).startUpload( args.getInt( 0));
   }
   });
-  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("end_upload"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
       ((FtsTrackObject)obj).endUpload();
@@ -1726,6 +1726,11 @@ public void createEditor()
 {  
   if(getEditorFrame() == null)
     setEditorFrame( new TrackWindow(this));
+}
+
+public void reinitEditorFrame()
+{
+  setEditorFrame( new TrackWindow((TrackWindow)getEditorFrame()));
 }
 
 public void destroyEditor()

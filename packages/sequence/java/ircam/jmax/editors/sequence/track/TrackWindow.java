@@ -59,16 +59,58 @@ public class TrackWindow extends JMaxEditor {
     super();
 		
     trackData = data;
-		
     TrackEditorFactoryTable.init();
-    
-    makeTitle();
 		
     //... then the SequencePanel
     trackPanel = new TrackPanel( this, data);
-				
     getContentPane().add( trackPanel);
     
+    makeTrackWindow();
+    
+    if(trackData.editorObject != null && !trackData.editorObject.haveContent())
+    {
+      Dimension size = trackPanel.getPreferredSize(); 
+      size.height+=(getJMenuBar().getPreferredSize().height + SequenceRuler.RULER_HEIGHT + 7);
+      setSize(size);
+    }
+  }
+  
+  public TrackWindow(TrackWindow copyWin)
+  {
+    super();
+		
+    trackData = copyWin.trackData;
+    TrackEditorFactoryTable.init();
+		
+    //... then the SequencePanel
+    trackPanel = copyWin.trackPanel;
+    trackPanel.setContainer(this);
+    Rectangle bounds = copyWin.getBounds();
+    copyWin.getContentPane().remove( trackPanel);
+    getContentPane().add( trackPanel);
+    
+    makeTrackWindow();
+    
+    setBounds(bounds);
+    copyWin.dispose();
+    System.gc();
+  }
+	
+  private void makeTrackWindow()
+  {
+    makeTitle();
+    makeListeners();
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();
+    else
+      makeSimpleMenuBar();
+		
+    validate();
+  }
+  
+  private void makeListeners()
+  {
     addWindowListener(new WindowListener(){
 			public void windowOpened(WindowEvent e)
 		  {
@@ -117,22 +159,8 @@ public class TrackWindow extends JMaxEditor {
         setWindowName(name);
       }
 		});		
-        
-    if(JMaxApplication.getProperty("no_menus") == null)
-      makeMenuBar();
-    else
-      makeSimpleMenuBar();
-		
-    validate();
-    
-    if(trackData.editorObject != null && !trackData.editorObject.haveContent())
-    {
-      Dimension size = trackPanel.getPreferredSize(); 
-      size.height+=(getJMenuBar().getPreferredSize().height + SequenceRuler.RULER_HEIGHT + 7);
-      setSize(size);
-    }
   }
-	
+  
   private final void makeTitle(){
     setWindowName( trackData.getFtsName());
   } 

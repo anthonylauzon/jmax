@@ -47,29 +47,69 @@ public class TableRuler extends JPanel
 			public void mouseDragged(MouseEvent e)
 		  {		    
 				if(!SwingUtilities.isLeftMouseButton(e)) return;
+        boolean shift = e.isShiftDown();
         TableAdapter a = tgc.getAdapter();
 				float xZoom = a.getXZoom();
+        float newZoom = xZoom;
         int delta = e.getX()-previousX;		
 				previousX = e.getX();		
-			
+        /*int visScope = tgc.getVisibleHorizontalScope();
+        if(visScope > 10000) 
+        {
+          System.err.println("xZoom "+xZoom+" percent "+((float)10000/visScope)+" risultato "+xZoom*((float)10000/visScope));
+          if(xZoom > 0.0)
+            xZoom = (float)(xZoom*((double)1000/visScope));       
+        }*/
         dddx+=delta;
         if(dddx>35)
         {
           if (xZoom>=0.9)
-            a.setXZoom(Math.round(xZoom)+1);
+          {
+            newZoom = Math.round(xZoom)+1;
+          }
           else
-            a.setXZoom(xZoom*(1/(1-xZoom)));
-             
+          {
+            newZoom = xZoom*(1/(1-xZoom));
+            if(shift) newZoom*=(float)2.0;
+          }  
+          a.setXZoom(newZoom);
           dddx=0;
         }
         else if(dddx<-35)
         {
           if (xZoom>1.9) 
-            a.setXZoom(Math.round(xZoom)-1);
+          {
+            newZoom = Math.round(xZoom)-1;
+          }
           else
-            a.setXZoom(xZoom*(1/(1+xZoom)));
+          {
+            newZoom = xZoom*(1/(1+xZoom));
+           if(shift) newZoom*=(float)0.5;
+          }
+          a.setXZoom(newZoom);
           dddx=0;
-        }	
+        }
+        
+        /*
+         if(dddx>35)
+         {
+           if (xZoom>=0.9)
+             a.setXZoom(Math.round(xZoom * (1 + dddx / 35)));
+           else
+             a.setXZoom(1 / Math.round((1 / xZoom) * (1 + dddx / 35)));
+           
+           dddx=0;
+         }
+         else if(dddx<-35)
+         {
+           if (xZoom>=0.9)
+             a.setXZoom(Math.round(xZoom * (1 - dddx / 35)));
+           else
+             a.setXZoom(1 / Math.round((1 / xZoom) * (1 - dddx / 35)));
+           
+           dddx=0;
+         }	         
+         */
       } 
 			public void mouseMoved(MouseEvent e){} 
 		});

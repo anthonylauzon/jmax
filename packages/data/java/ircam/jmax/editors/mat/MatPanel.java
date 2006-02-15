@@ -77,6 +77,18 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
 		});
   }
   
+  public void setContainer(EditorContainer container)
+  {
+    itsContainer = container;
+    itsContainer.getFrame().addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e)
+      {
+				updateTableToSize( e.getComponent().getSize().width);
+      }
+			public void componentMoved(ComponentEvent e){}
+		});
+  }
+  
   void createTable()
   {
     setLayout(new BorderLayout());
@@ -190,11 +202,11 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
   }
   public void matDataChanged()
   {
-    if(! uploading)
-    {
+    //if(! uploading)
+    //{
       /*table.revalidate();*/
       repaint();
-    }
+    //}
   }
   public void matSizeChanged(int n_rows, int n_cols)
   {
@@ -234,10 +246,9 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
   public EditorContainer getEditorContainer(){
     return itsContainer;
   }
-  public void close(boolean doCancel){
-    itsContainer.getFrame().setVisible(false);
+  public void close(boolean doCancel){    
+    ((FtsObjectWithEditor)matData).closeEditor();
     ((FtsObjectWithEditor)matData).requestDestroyEditor(); 
-    MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
   public void save(){}
   public void saveAs(){}

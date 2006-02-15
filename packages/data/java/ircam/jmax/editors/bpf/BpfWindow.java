@@ -47,23 +47,50 @@ public class BpfWindow extends JMaxEditor {
   public final static int DEFAULT_HEIGHT = 150;
   public final static int MAX_HEIGHT     = 800;
   public final static int EMPTY_HEIGHT   = 78;
-  /**
-    * Constructor with FtsSequenceObject
-   */
+
   public BpfWindow(FtsBpfObject data)
   {
     super();
     
     bpfData = data;
     
-    makeTitle();
-    
-    setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    
-    //... then the SequencePanel
     itsBpfPanel = new BpfPanel(this, data);
     getContentPane().add(itsBpfPanel);
     
+    makeBpfWindow();
+    setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+  }
+  
+  public BpfWindow(BpfWindow copyWin)
+  {
+    super();
+    
+    bpfData = copyWin.bpfData;
+    itsBpfPanel = copyWin.itsBpfPanel;
+    itsBpfPanel.setContainer(this);
+    Rectangle bounds = copyWin.getBounds();
+    copyWin.getContentPane().remove(itsBpfPanel);
+    getContentPane().add(itsBpfPanel);
+    
+    makeBpfWindow();
+    setBounds(bounds);
+  }  
+  
+  private void makeBpfWindow()
+  {
+    makeTitle();
+    makeListeners();
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();
+    else
+      makeSimpleMenuBar();
+    
+    validate();
+  }
+  
+  private void makeListeners()
+  {
     bpfData.addBpfListener( new BpfDataListener(){
       public void pointsDeleted(int index, int size){}
       public void pointAdded(int index){}
@@ -80,27 +107,16 @@ public class BpfWindow extends JMaxEditor {
       public void windowOpened(WindowEvent e){}
       public void windowClosed(WindowEvent e){}
       public void windowClosing(WindowEvent e)
-	    {
+      {
         MaxWindowManager.getWindowManager().removeWindow(getFrame());
         itsBpfPanel.close(true);
       }
       public void windowDeiconified(WindowEvent e){}
       public void windowIconified(WindowEvent e){}
-      public void windowActivated(WindowEvent e)
-	    {
-      }
-      public void windowDeactivated(WindowEvent e)
-	    {
-      }
+      public void windowActivated(WindowEvent e){}
+      public void windowDeactivated(WindowEvent e){}
     });
-    
-    if(JMaxApplication.getProperty("no_menus") == null)
-      makeMenuBar();
-    else
-      makeSimpleMenuBar();
-    
-    validate();
-  }
+  }  
   
   private final void makeTitle(){
     setWindowName( bpfData.getName());

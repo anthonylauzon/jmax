@@ -61,17 +61,48 @@ public class SequenceWindow extends JMaxEditor {
     sequenceData = data;
     
     TrackEditorFactoryTable.init();
-    
-    makeTitle();
-    
     sequenceData.requestSequenceName();
     
-    //... then the SequencePanel
-    itsSequencePanel = new SequencePanel(this, data);
-    
+    itsSequencePanel = new SequencePanel(this, data);    
     getContentPane().add(itsSequencePanel);
-    setSize(new Dimension(DEFAULT_WIDTH + TrackContainer.BUTTON_WIDTH, EMPTY_HEIGHT));
     
+    makeSequenceWindow();
+    
+    setSize(new Dimension(DEFAULT_WIDTH + TrackContainer.BUTTON_WIDTH, EMPTY_HEIGHT));
+  }
+  
+  public SequenceWindow(SequenceWindow seqCopy)
+  {
+    super();
+    
+    sequenceData = seqCopy.sequenceData;
+    
+    itsSequencePanel = seqCopy.itsSequencePanel;   
+    itsSequencePanel.setContainer(this);
+    Rectangle bounds = seqCopy.getBounds();
+    seqCopy.getContentPane().remove(itsSequencePanel);
+    getContentPane().add(itsSequencePanel);
+    seqCopy.dispose();
+    System.gc();
+    
+    makeSequenceWindow();
+    setBounds(bounds);
+  }
+  
+  private void makeSequenceWindow()
+  {
+    makeTitle();
+    makeListeners();
+    
+    if(JMaxApplication.getProperty("no_menus") == null)
+      makeMenuBar();
+    else
+      makeSimpleMenuBar();
+    validate();
+  }
+  
+  private void makeListeners()
+  {
     addWindowListener(new WindowListener(){
       public void windowOpened(WindowEvent e)
       {
@@ -90,32 +121,32 @@ public class SequenceWindow extends JMaxEditor {
       public void windowDeiconified(WindowEvent e){}
       public void windowIconified(WindowEvent e){}
       public void windowActivated(WindowEvent e)
-    {
+      {
         TrackEditor current = itsSequencePanel.getCurrentTrackEditor();
         if(current!=null)
           SequenceSelection.setCurrent(current.getSelection());
-    }
+      }
       public void windowDeactivated(WindowEvent e){}
     });
     
-    addComponentListener( new ComponentAdapter() {
+    /*addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
 		  {
-        /*if(!sequenceData.isUploading())
+        if(!sequenceData.isUploading())
         {
           Rectangle bounds = SequenceWindow.this.getBounds();
           sequenceData.setSize(bounds.width, bounds.height);
-        }*/
+        }
       }
 			public void componentMoved(ComponentEvent e)
 		  {
-        /*if(!sequenceData.isUploading())
+        if(!sequenceData.isUploading())
         {
           Rectangle bounds = SequenceWindow.this.getBounds();
           sequenceData.setLocation(bounds.x, bounds.y);
-        }*/
+        }
       }
-		});
+		});*/
     
     sequenceData.addTrackListener( new TrackListener(){
       public void trackAdded(Track track, boolean isUploading){}
@@ -130,13 +161,6 @@ public class SequenceWindow extends JMaxEditor {
       public void sequenceStartUpload(){};
       public void sequenceEndUpload(){}; 
     });
-    
-    if(JMaxApplication.getProperty("no_menus") == null)
-      makeMenuBar();
-    else
-      makeSimpleMenuBar();
-    
-    validate();
   }
   
   private final void makeTitle(){

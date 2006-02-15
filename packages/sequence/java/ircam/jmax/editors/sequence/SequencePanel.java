@@ -227,6 +227,20 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
 		});
 	}
 	
+  public void setContainer(EditorContainer container)
+  {
+    TrackEditor teditor;
+    
+    itsContainer = container;
+    
+    for(Enumeration e = trackContainers.elements(); e.hasMoreElements();)
+    {
+      teditor = ((TrackContainer)e.nextElement()).getTrackEditor();
+      teditor.getGraphicContext().setFrame(itsContainer.getFrame());
+      teditor.setContainer(this);
+    }
+  }
+  
 	public JPopupMenu getMenu()
 	{	
 		if(popup == null)
@@ -766,9 +780,8 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
   }
 	
   public void close(boolean doCancel){
-    itsContainer.getFrame().setVisible(false);
+    ftsSequenceObject.closeEditor();
     ftsSequenceObject.requestDestroyEditor(); 
-    MaxWindowManager.getWindowManager().removeWindow((Frame)itsContainer);
   }
   public void save(){}
   public void saveAs(){}

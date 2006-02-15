@@ -1937,9 +1937,6 @@ fvec_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   return fts_ok;
 }
 
-
-
-
 /****************************************************************************
 *
 *  post and print

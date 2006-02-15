@@ -74,9 +74,15 @@ public class FtsIvecObject extends FtsObjectWithEditor
       setEditorFrame( new Tabler( this, ftsEditor));
   }
 
+  public void reinitEditorFrame()
+  {
+    setEditorFrame( new Tabler((Tabler)getEditorFrame()));
+  }
+  
   public void destroyEditor()
   {
     disposeEditor();
+    System.gc();
   }
 
   FtsTableObject ftsEditor;

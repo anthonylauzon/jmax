@@ -240,6 +240,11 @@ public class TableGraphicContext extends GraphicContext{
     info = infoLabel;
   }
 
+  public boolean isCompletelyUpdated()
+  {
+    return (getFtsObject().getLastUpdatedIndex() == getFtsObject().getSize());
+  }
+  
   JLabel display, info;
 }
 

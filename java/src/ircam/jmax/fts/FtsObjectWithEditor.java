@@ -92,7 +92,7 @@ public void setEditorFrame(Frame frame)
 }
 
 public void disposeEditor()
-{
+{  
   if(editorFrame!= null)
   {
     hideEditor();
@@ -106,39 +106,55 @@ public void disposeEditor()
 	  }); 
   }
 }
-public void showEditor()
-{
+public void showEditor(boolean firstTime)
+{  
   if(editorFrame != null)
   {
     if(!editorFrame.isVisible())
-    {
-      editorFrame.setVisible(true);
-      MaxWindowManager.getWindowManager().addWindow(editorFrame);
+    { 
+      if(!firstTime)
+      {
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run()
+          {   
+            reinitEditorFrame();
+            editorFrame.setVisible(true);
+            MaxWindowManager.getWindowManager().addWindow(editorFrame);
+          }
+        });
+      }
+      else
+      {
+        editorFrame.setVisible(true);
+        MaxWindowManager.getWindowManager().addWindow(editorFrame);
+      }
     }
     else
     {
-      SwingUtilities.invokeLater(new Runnable() {
-        public void run()
-        { 
-          if(editorFrame.getState()==Frame.ICONIFIED) 
-            editorFrame.setState(Frame.NORMAL);
-          editorFrame.toFront();
-        }
-      });
+      if(editorFrame.getState()==Frame.ICONIFIED) 
+        editorFrame.setState(Frame.NORMAL);
+      editorFrame.toFront();
     }
   }
 }
-public void hideEditor()
+
+public void showEditor()
 {
+  showEditor(true);
+}
+public void hideEditor()
+{  
   editorFrame.setVisible(false);
   MaxWindowManager.getWindowManager().removeWindow(editorFrame);
 }
 
 public void closeEditor()
-{
+{  
   if(getEditorFrame() != null)	    
     hideEditor();
 }
+
+public void reinitEditorFrame(){}
 
 void releaseData()
 {
@@ -146,7 +162,7 @@ void releaseData()
 }
 
 public void requestDestroyEditor()
-{
+{  
   try{
     send(FtsSymbol.get("destroyEditor"));
   }
@@ -171,11 +187,15 @@ public void requestOpenEditor()
 
 public void openEditor(int argc, FtsAtom[] argv)
 {  
-  createEditor();  
-  showEditor();
+  if(getEditorFrame() == null)
+  {
+    createEditor();  
+    showEditor(true);
+  }
+  else
+    showEditor(false);
   FtsObject.requestResetGui();
 }
-
 public abstract void createEditor();
 public abstract void destroyEditor();
 

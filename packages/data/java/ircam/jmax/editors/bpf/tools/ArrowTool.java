@@ -107,11 +107,11 @@ public class ArrowTool extends SelecterTool implements DragListener{
     int deltaX = x-startingPoint.x;
 
     if((deltaX==0)&&(deltaY==0)) 
-      {
-	mountIModule(itsSelecter);
-	gc.getGraphicDestination().repaint();    
-	return;
-      }
+    {
+      mountIModule(itsSelecter);
+      gc.getGraphicDestination().repaint();    
+      return;
+    }
 
     ((BpfGraphicContext)gc).getSelection().moveSelection(deltaX, deltaY, (BpfGraphicContext)gc);
     

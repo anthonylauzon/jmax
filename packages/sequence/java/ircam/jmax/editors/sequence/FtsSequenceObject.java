@@ -80,13 +80,13 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
 			((FtsSequenceObject)obj).setName(args.getSymbol( 0).toString());
 	}
 	});
-  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("startUpload"), new FtsMessageHandler(){
+  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
       ((FtsSequenceObject)obj).startUpload();
   }
   });
-  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("endUpload"), new FtsMessageHandler(){
+  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("end_upload"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
       ((FtsSequenceObject)obj).endUpload();
@@ -147,16 +147,6 @@ void notifyUpdateMarkers()
     track = (Track)e.nextElement();
     track.getFtsTrack().notifyUpdateMarkers( markers, markSel);
   }
-}
-/**
-* Fts callback: open the editor associated with this FtsSequenceObject.
- * If not exist create them else show them.
- */
-
-public void createEditor()
-{
-	if( getEditorFrame() == null)
-		setEditorFrame( new SequenceWindow(this));
 }
 
 /*boolean saveEditor = false;
@@ -406,7 +396,7 @@ void endUpload()
     public void run()
     {
       getEditorFrame().pack();
-      showEditor();
+      showEditor(firstTime);
       FtsObject.requestResetGui();
       uploading = false;
       notifySequenceEndUpload();
@@ -414,9 +404,27 @@ void endUpload()
   });
 }
 
+boolean firstTime = true;
 public void openEditor(int argc, FtsAtom[] argv)
 {  
-  createEditor();/* rest moved in endUpload */  
+  if(getEditorFrame() == null)
+  {
+    createEditor();/* rest moved in endUpload */  
+    firstTime = true;
+  }
+  else
+    firstTime = false;
+}
+
+public void createEditor()
+{
+	if( getEditorFrame() == null)
+		setEditorFrame( new SequenceWindow(this));
+}
+
+public void reinitEditorFrame()
+{
+  setEditorFrame( new SequenceWindow((SequenceWindow)getEditorFrame()));
 }
 
 public boolean isUploading()

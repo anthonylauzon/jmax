@@ -64,6 +64,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   TableToolManager toolManager;
   FtsObjectWithEditor ftsObj;
 	boolean tableShown = false;
+  int oldVisibleScope = 0;
   /**
 		* Constructor. */
   public TablePanel(EditorContainer container, FtsObjectWithEditor ftsObj, TableDataModel tm) {
@@ -111,16 +112,22 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 			public void componentResized(ComponentEvent e)
 		  {
         if(tableShown)
-        {
+        {          
           updateHorizontalScrollbar();//????
-        
-          gc.getFtsObject().requestSetVisibleWindow( gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
+          int visibleScope = gc.getVisibleHorizontalScope();
+          gc.getFtsObject().requestSetVisibleWindow( visibleScope, gc.getFirstVisibleIndex(), 
                                                      gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
                                                      gc.getVisiblePixelsSize());
-          if(gc.getAdapter().getXZoom() > 0.5)		    
-            gc.getFtsObject().requestGetValues();
-          else
-            gc.getFtsObject().requestGetPixels(0, 0);
+          
+          if(visibleScope != oldVisibleScope && !gc.isCompletelyUpdated())
+          {
+            if(gc.getAdapter().getXZoom() > 0.5)		    
+              gc.getFtsObject().requestGetValues();
+            else
+              gc.getFtsObject().requestGetPixels(0, 0);
+            
+            oldVisibleScope = visibleScope;
+          }
         }
       }
       public void componentMoved(ComponentEvent e)
@@ -145,6 +152,14 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setPreferredSize(size);
+  }
+  
+  public void setContainer(EditorContainer container)
+  {
+    itsEditorContainer = container;
+    gc.setFrame(GraphicContext.getFrame(this));
+    toolManager.addContextSwitcher(new WindowContextSwitcher(gc.getFrame(), gc));
+    toolManager.activate(TableTools.getDefaultTool(), gc);
   }
   
   void frameAvailable()
@@ -537,9 +552,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   }
 	
   public void close(boolean doCancel){
-    ((Component)itsEditorContainer).setVisible(false);
+    ftsObj.closeEditor();
     ftsObj.requestDestroyEditor();
-    MaxWindowManager.getWindowManager().removeWindow((Frame)itsEditorContainer);
   }
   public void save(){}
   public void saveAs(){}

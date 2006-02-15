@@ -90,10 +90,17 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     if(getEditorFrame() == null)
       setEditorFrame( new MatWindow(this));
   }
-
+  
+  public void reinitEditorFrame()
+  {
+    setEditorFrame( new MatWindow((MatWindow)getEditorFrame()));
+  }
+  
   public void destroyEditor()
   {
     disposeEditor();
+    listeners.removeAllElements();
+    System.gc();
   }
     
   public void clear()
