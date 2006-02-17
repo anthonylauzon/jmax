@@ -270,7 +270,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				else
 				{
 					int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
-					gc.getFtsObject().requestGetPixels(deltax, -hDelta);
+					gc.getFtsObject().requestGetPixels(deltax, -hDelta);          
 				}
 		}
 		});

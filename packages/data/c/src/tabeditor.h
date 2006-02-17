@@ -56,5 +56,6 @@ DATA_API int tabeditor_get_size( tabeditor_t *tabeditor);
 
 DATA_API void tabeditor_dump_gui(tabeditor_t *tabeditor, fts_dumper_t *dumper);
 DATA_API void tabeditor_upload_gui(tabeditor_t *tabeditor);
+DATA_API void tabeditor_upload_interval(tabeditor_t *tabeditor, int start, int end);
 
 #endif

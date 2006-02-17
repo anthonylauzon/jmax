@@ -154,7 +154,7 @@ public void setVisibles(int nArgs , FtsAtom args[])
   size = args[0].intValue;    
   visibleSize = args[1].intValue;    
   visibles = new double[size];
-
+  
   if( isIvec())
   {
     if (isInGroup()) 
@@ -291,15 +291,16 @@ public void appendPixels(int nArgs , FtsAtom args[])
       b_pixels[startIndex+j] = (double)args[i+3].intValue;
       j++;
     }
-      else
-        for(i = 0; (i < nArgs-3)&&(startIndex+j < t_pixels.length) ; i+=2)
-        {
-          t_pixels[startIndex+j] = args[i+2].doubleValue;
-          b_pixels[startIndex+j] = args[i+3].doubleValue;
-          j++;
-        }
-          if(pixelsSize <= startIndex+nArgs-2)
-            notifyPixelsChanged( startIndex, startIndex+j-2);
+  else
+    for(i = 0; (i < nArgs-3)&&(startIndex+j < t_pixels.length) ; i+=2)
+    {
+      t_pixels[startIndex+j] = args[i+2].doubleValue;
+      b_pixels[startIndex+j] = args[i+3].doubleValue;
+      j++;
+    }
+      
+  //if(pixelsSize <= startIndex+nArgs-2)
+  notifyPixelsChanged( startIndex, startIndex+j-2);
 }
 
 public void addPixels(int nArgs , FtsAtom args[])
@@ -307,8 +308,8 @@ public void addPixels(int nArgs , FtsAtom args[])
   int startIndex = args[0].intValue;
   int i=0; int j=0;
   int newp = (int)(nArgs-1)/2;
-  double[] t_temp = new double[pixelsSize + 10];    
-  double[] b_temp = new double[pixelsSize + 10];    
+  double[] t_temp = new double[pixelsSize + /*10*/newp];    
+  double[] b_temp = new double[pixelsSize + /*10*/newp];    
   
   if(startIndex==0)
   {
@@ -687,25 +688,52 @@ public void interpolate(int start, int end, double startValue, double endValue)
     buffer[i-start] = (double)(startValue-Math.abs(i-start)*coeff);
   
   requestSetValues(buffer, start, end-start);
+    
+  //interpolateAndCut(start, end, startValue, endValue, 0.0, 0.0);
 }
 
 public void interpolateAndCut(int start, int end, double startValue, double endValue, double max, double min)
 {    
-  double coeff;
+  /*double coeff;
   
   if (startValue != endValue) 
-    coeff = ((double)(startValue - endValue))/(end - start);
+  coeff = ((double)(startValue - endValue))/(end - start);
   else coeff = 0;
   
   prepareBuffer(end-start+1);
   
   if (end >= getSize()) 
-    end = getSize()-1;
+  end = getSize()-1;
   
   for (int i = start; i < end; i+=1)
-    buffer[i-start] = cutToBounds( (double)(startValue-Math.abs(i-start)*coeff), max, min);
+  buffer[i-start] = cutToBounds( (double)(startValue-Math.abs(i-start)*coeff), max, min);
   
-  requestSetValues(buffer, start, end-start);
+  requestSetValues(buffer, start, end-start);*/
+  if (end >= getSize()) 
+    end = getSize()-1;
+  
+  args.clear();
+  args.addInt( start);
+  args.addInt( end);
+  if( isIvec())
+  {
+    args.addInt( (int)startValue);
+    args.addInt( (int)endValue);
+  }
+  else
+  {
+    args.addDouble( startValue);
+    args.addDouble( endValue);
+  }
+  
+  try{
+    send( FtsSymbol.get("interpolate"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTableObject: I/O Error sending interpolate Message!");
+    e.printStackTrace(); 
+  }  
 }
 
 double cutToBounds( double y, double max, double min)
