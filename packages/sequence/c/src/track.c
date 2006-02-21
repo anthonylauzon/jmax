@@ -1373,6 +1373,9 @@ _track_collapse_markers(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
   return fts_ok;
 }
 
+
+
+
 /******************************************************
  * 
  *  track edit utilities
@@ -1394,19 +1397,22 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   {
     int i;
     event_t *evt;
+    scoob_t *first;
     int too_much_pitch = 0;
     double time, start, end, duration;
     double first_pitch = 0.0;
     double second_pitch = 0.0;
     double pitch = 0.0;
-    fts_atom_t a[9];
+    fts_atom_t a[16];	/* new event creation atom list */
+    int        na = 0;  /* number of atoms */
     
     /* first object */
     evt = (event_t *)fts_get_object(at);
     start = event_get_time(evt);
     end = start + event_get_duration(evt);
     
-    first_pitch = scoob_get_pitch((scoob_t *)fts_get_object(event_get_value(evt)));
+    first = (scoob_t *) fts_get_object(event_get_value(evt));
+    first_pitch = scoob_get_pitch(first);
     second_pitch = scoob_get_pitch((scoob_t *)fts_get_object(event_get_value((event_t *)fts_get_object(at+1))));
     if(first_pitch > second_pitch) 
     {
@@ -1436,28 +1442,48 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     {      
       fts_set_int(a, 0);
       fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 1, a);
-      
+
+#if 0
       /* create new event and add to track */
-      fts_set_symbol(a, seqsym_scoob);
-      fts_set_symbol(a+1, seqsym_type);
-      fts_set_symbol(a+2, seqsym_trill);
-      fts_set_symbol(a+3, seqsym_pitch);
-      fts_set_int(a+4, first_pitch);
-      fts_set_symbol(a+5, seqsym_interval);
-      fts_set_int(a+6, second_pitch - first_pitch);
-      fts_set_symbol(a+7, seqsym_duration);
-      fts_set_float(a+8, end-start);
-      evt = track_event_create( 9, a);
+      fts_set_symbol(a + na, seqsym_scoob);    na++;
+      fts_set_symbol(a + na, seqsym_type);     na++;
+      fts_set_symbol(a + na, seqsym_trill);    na++;
+      fts_set_symbol(a + na, seqsym_pitch);    na++;
+      fts_set_int   (a + na, first_pitch);     na++;
+      fts_set_symbol(a + na, seqsym_interval); na++;
+      fts_set_int   (a + na, second_pitch - first_pitch); na++;
+      fts_set_symbol(a + na, seqsym_duration); na++;
+      fts_set_float (a + na, end - start);     na++;
+
+      evt = track_event_create(na, a);
       if(evt)
         track_add_event_and_upload( self, start, evt);    
     
       /* remove events */
       for(i = 0/*1*/; i<ac ; i++)
         track_remove_event(self, (event_t *)fts_get_object(at+i));
-      
+
       /* remove events at client */
       fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);      
-      
+#else      
+      /* change first event, remove others */
+      scoob_set_type    (first, seqsym_trill);
+      scoob_set_pitch   (first, first_pitch);	/* might have been swapped */
+      scoob_set_interval(first, second_pitch - first_pitch);
+      scoob_set_duration(first, end - start);      
+
+      /* try to upload changed event (TODO: fix this) */
+      track_upload_event(self, evt);
+
+      /* remove events */
+      for(i = 1; i<ac ; i++)
+        track_remove_event(self, (event_t *) fts_get_object(at + i));
+
+      /* remove events at client */
+      fts_client_send_message((fts_object_t *) self, seqsym_removeEvents, 
+			      ac - 1, at + 1);      
+#endif
+
       fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
     }
     else
@@ -1466,6 +1492,9 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   
   return fts_ok;
 }
+
+
+
 
 /******************************************************
  *
@@ -1772,6 +1801,23 @@ track_move_events_at_client(track_t *self, event_t *first, event_t *after)
 *  user methods
 *
 */
+
+
+static fts_method_status_t
+_track_get (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  track_t *self  = (track_t *) o;
+  double   index = fts_get_number_float(at);
+  event_t *ev    = track_get_event_by_time(self, index);
+
+  if (ev)
+    fts_atom_assign(ret, event_get_value(ev));
+  else
+    /* leave ret void */;
+
+  return fts_ok;
+}
+
 
 static fts_method_status_t
 track_active(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -2599,7 +2645,7 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_dump_state, track_dump_state);
   fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui);
-  
+
   /* persistence compatibility */
   fts_class_message_varargs(cl, seqsym_add_event, track_compatible_add_event_from_file);
   fts_class_message_varargs(cl, seqsym_add_marker, track_compatible_add_marker_from_file);
@@ -2627,13 +2673,12 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_clear, _track_clear);
   fts_class_message(cl, fts_new_symbol("merge"), cl, _track_merge);
   
+  fts_class_message_number (cl, fts_s_get_element, _track_get);
   fts_class_message_varargs(cl, seqsym_insert, _track_insert);  
   fts_class_message_varargs(cl, fts_s_append, _track_append);
   fts_class_message_varargs(cl, seqsym_remove, _track_remove);
   
   fts_class_message_varargs(cl, fts_s_ping, track_ping);
-  
-  /* fts_class_message_number(cl, fts_s_get_element, track_get_element); */
   
   fts_class_message_varargs(cl, seqsym_shift, _track_shift);
   fts_class_message_varargs(cl, seqsym_stretch, _track_stretch);
