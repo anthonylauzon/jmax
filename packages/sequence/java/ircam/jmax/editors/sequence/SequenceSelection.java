@@ -283,12 +283,16 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   
   public void objectChanged(Object spec, int index, String propName, Object propValue) 
   {
+    if( !((FtsTrackObject)itsModel).isUploading() && undoRedoing)
+		{ 
+      select(spec); 
+    }
   }
 	
   public void objectAdded(Object spec, int index) 
   {
     int i;
-		    
+
     /* during upload don't select */
     if( !((FtsTrackObject)itsModel).isUploading())
 		{    
@@ -392,7 +396,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   }
   public void endTrackUpload( TrackDataModel track) 
   {
-    uploading = false;
+    uploading = false;    
     SwingUtilities.invokeLater( new Runnable(){
       public void run(){
         deselectAll();
@@ -412,6 +416,7 @@ public class SequenceSelection extends DefaultListSelectionModel implements Trac
   public void startUndoRedo() 
   {
     undoRedoing = true;
+    deselectAll();
   }
   public void endUndoRedo() 
   {

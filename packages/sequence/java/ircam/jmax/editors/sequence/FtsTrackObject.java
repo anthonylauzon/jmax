@@ -1793,7 +1793,7 @@ void endPaste()
 
 public void requestUndo()
 {
-  notifyStartUndoRedo();  
+  startUndoRedo();  
   try 
   {
     ((UndoableData) this).undo();
@@ -1825,14 +1825,22 @@ public void requestRedo()
   });
 }
 
+public boolean isUndoRedoing = false;
 public void startUndoRedo()
 {
+  isUndoRedoing = true;
   notifyStartUndoRedo();
 }
 
 public void endUndoRedo()
 {
+  isUndoRedoing = false;
   notifyEndUndoRedo();
+}
+
+public boolean getUndoRedoing()
+{
+  return isUndoRedoing;
 }
 
 public void ping( String ping)

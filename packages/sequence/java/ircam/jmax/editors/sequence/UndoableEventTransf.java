@@ -113,10 +113,7 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
         
       if(evt!=null)
-      {
         evt.setProperty(propName, undoProp);
-        SequenceSelection.getCurrent().select(evt);
-      }
       else
         die();
     }
@@ -131,7 +128,6 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
       {
         for(int i = 0; i< numberOfProperty; i++)
           evt.setProperty(propNames[i], undoProps[i]);
-        SequenceSelection.getCurrent().select(evt);
       }
       else
         die();
@@ -148,10 +144,7 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       
       if(evt!=null)
-      {
         evt.setProperty(propName, redoProp);
-        SequenceSelection.getCurrent().select(evt);
-      }
       else
         die();
     }
@@ -165,7 +158,6 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
       {
         for(int i = 0; i< numberOfProperty; i++)
           evt.setProperty(propNames[i], redoProps[i]);
-        SequenceSelection.getCurrent().select(evt);
       }
       else
         die();
