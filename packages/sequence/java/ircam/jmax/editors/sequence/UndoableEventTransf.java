@@ -50,11 +50,16 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
   String propName;
   Object undoProp;
   Object redoProp;
-
+  int numberOfProperty;
+  
+  String[] propNames;
+  Object[] undoProps;
+  Object[] redoProps;
+  
   /**
    * Constructor. theEvent is the event that is going to be modified. */
   public UndoableEventTransf(TrackEvent theEvent, String propName, Object newValue)
-  {
+  {    
     try {
       itsEvent = theEvent.duplicate();
     } catch (Exception ex) {System.err.println("error while cloning event");}
@@ -64,8 +69,30 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
     this.propName  = propName;
     undoProp  = theEvent.getProperty(propName);
     redoProp  = newValue;
+    numberOfProperty = 1;
   }
-
+  
+  public UndoableEventTransf(TrackEvent theEvent, int numOfProp, String[] undoPropNames, Object[] oldUndoVals, Object[] newUndoVals)
+  {
+    try {
+      itsEvent = theEvent.duplicate();
+    } catch (Exception ex) {System.err.println("error while cloning event");}
+    
+    trkObj = ((FtsTrackObject)theEvent.getDataModel());
+    
+    numberOfProperty = numOfProp;
+    propNames = new String[numberOfProperty];
+    undoProps = new Object[numberOfProperty];
+    redoProps = new Object[numberOfProperty];
+    
+    for(int i = 0; i< numberOfProperty; i++)
+    {
+      propNames[i] = undoPropNames[i];
+      undoProps[i] = oldUndoVals[i];
+      redoProps[i] = newUndoVals[i];
+    }
+  }
+  
   public boolean addEdit(UndoableEdit anEdit)
   {
     return false; //these actions don't absorbe other actions
@@ -80,26 +107,69 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
    * Undo the trasformation */
   public void undo()
   {
-    itsEvent.setProperty(propName, redoProp);
-    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+    if(numberOfProperty == 1)
+    {
+      itsEvent.setProperty(propName, redoProp);
+      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+        
+      if(evt!=null)
+      {
+        evt.setProperty(propName, undoProp);
+        SequenceSelection.getCurrent().select(evt);
+      }
+      else
+        die();
+    }
+    else 
+    {
+      for(int i = 0; i< numberOfProperty; i++)
+        itsEvent.setProperty(propNames[i], redoProps[i]);
       
-    if(evt!=null)
-      evt.setProperty(propName, undoProp);
-    else
-      die();
+      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+      
+      if(evt!=null)
+      {
+        for(int i = 0; i< numberOfProperty; i++)
+          evt.setProperty(propNames[i], undoProps[i]);
+        SequenceSelection.getCurrent().select(evt);
+      }
+      else
+        die();
+    }
   }
 
   /**
    * redo the trasformation */
   public void redo()
   {
-    itsEvent.setProperty(propName, undoProp);
-    TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+    if(numberOfProperty == 1)
+    {
+      itsEvent.setProperty(propName, undoProp);
+      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
       
-    if(evt!=null)
-      evt.setProperty(propName, redoProp);
+      if(evt!=null)
+      {
+        evt.setProperty(propName, redoProp);
+        SequenceSelection.getCurrent().select(evt);
+      }
+      else
+        die();
+    }
     else
-      die();
+    {
+      for(int i = 0; i< numberOfProperty; i++)
+        itsEvent.setProperty(propNames[i], undoProps[i]);
+      
+      TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
+      if(evt!=null)
+      {
+        for(int i = 0; i< numberOfProperty; i++)
+          evt.setProperty(propNames[i], redoProps[i]);
+        SequenceSelection.getCurrent().select(evt);
+      }
+      else
+        die();
+    }
   }
 }
 

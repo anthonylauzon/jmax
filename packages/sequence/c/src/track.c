@@ -1396,7 +1396,7 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   if(track_get_type(self) == scoob_class && ac > 1)
   {
     int i;
-    event_t *evt;
+    event_t *evt, *first_evt;
     scoob_t *first;
     int too_much_pitch = 0;
     double time, start, end, duration;
@@ -1404,10 +1404,10 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     double second_pitch = 0.0;
     double pitch = 0.0;
     fts_atom_t a[16];	/* new event creation atom list */
-    int        na = 0;  /* number of atoms */
     
     /* first object */
-    evt = (event_t *)fts_get_object(at);
+    first_evt = (event_t *)fts_get_object(at);
+    evt = first_evt;
     start = event_get_time(evt);
     end = start + event_get_duration(evt);
     
@@ -1443,46 +1443,20 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
       fts_set_int(a, 0);
       fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 1, a);
 
-#if 0
-      /* create new event and add to track */
-      fts_set_symbol(a + na, seqsym_scoob);    na++;
-      fts_set_symbol(a + na, seqsym_type);     na++;
-      fts_set_symbol(a + na, seqsym_trill);    na++;
-      fts_set_symbol(a + na, seqsym_pitch);    na++;
-      fts_set_int   (a + na, first_pitch);     na++;
-      fts_set_symbol(a + na, seqsym_interval); na++;
-      fts_set_int   (a + na, second_pitch - first_pitch); na++;
-      fts_set_symbol(a + na, seqsym_duration); na++;
-      fts_set_float (a + na, end - start);     na++;
-
-      evt = track_event_create(na, a);
-      if(evt)
-        track_add_event_and_upload( self, start, evt);    
-    
-      /* remove events */
-      for(i = 0/*1*/; i<ac ; i++)
-        track_remove_event(self, (event_t *)fts_get_object(at+i));
-
-      /* remove events at client */
-      fts_client_send_message((fts_object_t *)self, seqsym_removeEvents, ac, at);      
-#else      
       /* change first event, remove others */
       scoob_set_type    (first, seqsym_trill);
       scoob_set_pitch   (first, first_pitch);	/* might have been swapped */
       scoob_set_interval(first, second_pitch - first_pitch);
       scoob_set_duration(first, end - start);      
-
-      /* try to upload changed event (TODO: fix this) */
-      track_upload_event(self, evt);
+      
+      event_set_at_client(first_evt, 0);
 
       /* remove events */
       for(i = 1; i<ac ; i++)
         track_remove_event(self, (event_t *) fts_get_object(at + i));
 
       /* remove events at client */
-      fts_client_send_message((fts_object_t *) self, seqsym_removeEvents, 
-			      ac - 1, at + 1);      
-#endif
+      fts_client_send_message((fts_object_t *) self, seqsym_removeEvents, ac - 1, at + 1);      
 
       fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
     }

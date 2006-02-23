@@ -141,7 +141,7 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
   String name;
   Object newVal, oldVal;
   double doubleVal;
-    
+      
   if( nArgs == 1)
   {
     newVal = args[0].getValue();
@@ -156,18 +156,24 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
     itsTrackDataModel.changeEvent( this, "value", newVal);
   }
   else
+  {  
+    int numUndoProp = 0;
     for(int i = 0; i < nArgs-1; i+=2)
     {
       name = args[i].symbolValue.toString();
       newVal = args[i+1].getValue();
       oldVal = value.getProperty(name);
-      
+            
       if( oldVal == null || !oldVal.toString().equals(newVal.toString()))
       {
-        if (itsTrackDataModel != null)
+        if(itsTrackDataModel != null && ((UndoableData) itsTrackDataModel).isInGroup() && !name.equals("time"))
         {
-          if (((UndoableData) itsTrackDataModel).isInGroup()&& !name.equals("time"))
-            ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));
+          /*if (((UndoableData) itsTrackDataModel).isInGroup()&& !name.equals("time"))
+            ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, name, newVal));*/
+          newUndoVals[numUndoProp] = newVal;
+          oldUndoVals[numUndoProp] = oldVal;
+          undoPropNames[numUndoProp] = name;
+          numUndoProp++;
         }
         
         if (newVal instanceof Double) 
@@ -191,8 +197,11 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
       else
         itsTrackDataModel.changeEvent(this, null, null);
     }
-      
-      //((UndoableData) itsTrackDataModel).endUpdate();
+    
+    if(numUndoProp > 0)
+      ((UndoableData) itsTrackDataModel).postEdit( new UndoableEventTransf( this, numUndoProp, 
+                                                                            undoPropNames, oldUndoVals, newUndoVals));
+  }
 }
 
 /**
@@ -397,6 +406,10 @@ public static double DEFAULT_TIME = 0;
 
 private TrackDataModel itsTrackDataModel;
 static Object[] evtArgs = new Object[128];
+
+static Object[] newUndoVals = new Object[64];
+static Object[] oldUndoVals = new Object[64];
+static String[] undoPropNames = new String[64];
 
 protected FtsArgs args = new FtsArgs();
 }
