@@ -210,8 +210,8 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
     }
     int start = ta.getInvX(x1); 
     int end = ta.getInvX(x2);
-
-    ((TableGraphicContext)gc).getFtsObject().interpolateAndCut(start, end, ta.getInvY(y1), ta.getInvY(y2), ((TableGraphicContext)gc).getVerticalMaxValue(), ((TableGraphicContext)gc).getVerticalMinValue());
+    
+    ((TableGraphicContext)gc).getFtsObject().interpolate(start, end, ta.getInvY(y1), ta.getInvY(y2));
   }
   /********************************************************************************************/
   //-------------- fields drawer -----------------------/

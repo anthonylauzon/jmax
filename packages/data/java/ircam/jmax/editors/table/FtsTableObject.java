@@ -310,7 +310,7 @@ public void addPixels(int nArgs , FtsAtom args[])
   int newp = (int)(nArgs-1)/2;
   double[] t_temp = new double[pixelsSize + /*10*/newp];    
   double[] b_temp = new double[pixelsSize + /*10*/newp];    
-  
+    
   if(startIndex==0)
   {
     if( isIvec())
@@ -673,42 +673,7 @@ public int getValue(int index)
 }
 
 public void interpolate(int start, int end, double startValue, double endValue)
-{
-  double coeff;
-  if (startValue != endValue) 
-    coeff = ((double)(startValue - endValue))/(end - start);
-  else coeff = 0;
-  
-  prepareBuffer(end-start+1);
-  
-  if (end >= getSize()) 
-    end = getSize()-1;
-  
-  for (int i = start; i < end; i+=1)
-    buffer[i-start] = (double)(startValue-Math.abs(i-start)*coeff);
-  
-  requestSetValues(buffer, start, end-start);
-    
-  //interpolateAndCut(start, end, startValue, endValue, 0.0, 0.0);
-}
-
-public void interpolateAndCut(int start, int end, double startValue, double endValue, double max, double min)
 {    
-  /*double coeff;
-  
-  if (startValue != endValue) 
-  coeff = ((double)(startValue - endValue))/(end - start);
-  else coeff = 0;
-  
-  prepareBuffer(end-start+1);
-  
-  if (end >= getSize()) 
-  end = getSize()-1;
-  
-  for (int i = start; i < end; i+=1)
-  buffer[i-start] = cutToBounds( (double)(startValue-Math.abs(i-start)*coeff), max, min);
-  
-  requestSetValues(buffer, start, end-start);*/
   if (end >= getSize()) 
     end = getSize()-1;
   

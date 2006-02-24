@@ -215,29 +215,28 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
   }
 }
 
-
 static void
 tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int val_size)
 {
-  int i, j, n, current, send, count;
+  int i, j, n, current, send, current_pix;
   fts_atom_t a[CLIENT_BLOCK_SIZE];
   int vecsize = tabeditor_get_size( tabeditor);
   float k = (float)(1.0 / tabeditor->zoom);
   
-  n = ((int)(val_size / tabeditor->pixsize) + 1)*2;
+  n = ((int)(val_size * tabeditor->zoom) + 1)*2;
   current = startId;
+  current_pix = (int)((current - tabeditor->vindex) * tabeditor->zoom);
   send = 0;
-  count = 0;
   
-  while(n>0)
+  while(n > 0)
   {
     send = (n > CLIENT_BLOCK_SIZE-2) ? CLIENT_BLOCK_SIZE-2 : n;
-    
-    fts_set_int(&a[0], (int)((current - tabeditor->vindex) * tabeditor->zoom));
+        
+    fts_set_int(&a[0], current_pix);
     fts_set_int(&a[1], vecsize);
     j = 0;
     if( tabeditor_is_ivec( tabeditor))
-      for(i = 0; ((i < send-2) && ((int)(current + j * k) < vecsize)); i+=2)
+      for(i = 0; ((i < send-1) && ((int)(current + j * k) < vecsize)); i+=2)
       {
         fts_set_int(&a[i+2], ivec_get_max_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
         fts_set_int(&a[i+3], ivec_get_min_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
@@ -251,7 +250,7 @@ tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int val_size)
     
       fvec_vector(tabeditor->vec, &ptr, &size, &stride);
     
-      for(i = 0, j = 0; (i < send-2 && ((int)(current + j * k) < size)); i+=2)
+      for(i = 0, j = 0; (i < send-1 && ((int)(current + j * k) < size)); i+=2)
       {    
         float min, max;
         
@@ -262,12 +261,15 @@ tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int val_size)
         j++;
       }
     }
-    if(i+2 < send) send = i+2;
-  
-    fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send, a);
+    if(i < send-1) 
+    {
+      send = i;
+      n = 0;
+    }
+    fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send+2, a);
     
-    current+=send;
-    count+=send;
+    current+=(int)((send/2)*k);
+    current_pix+=send/2;
     n -= send;
   }
 }
@@ -405,10 +407,8 @@ tabeditor_upload_interval(tabeditor_t *this, int start, int end)
   if(this->zoom > 0.5)
     tabeditor_append_visibles(this, start, end);
   else
-  {
-    this->pixsize = (int) (this->vsize * this->zoom);     
+
     tabeditor_insert_pixels(this, start, (end-start));
-  }
 }
 
 static fts_method_status_t
