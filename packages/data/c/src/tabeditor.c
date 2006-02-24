@@ -793,27 +793,33 @@ tabeditor_interpolate_by_client_request(fts_object_t *o, fts_symbol_t s, int ac,
       float startVal = (float)fts_get_number_float(at+2);
       float endVal = (float)fts_get_number_float(at+3);
       double coeff;
-      int n, current, send, count;
+      int n, current, setted, count;
       
       if (startVal != endVal) 
         coeff = ((double)(startVal - endVal))/(end - start);
       else coeff = 0;
-
+      
+      if(start < 0)
+      {
+        startVal = startVal+start*coeff;
+        start = 0;
+      }
+      
       n = buffsize;
       current = start;
       count = 0;
       while(n > 0)
       {
-        send = (n > MAX_BLOCK_SIZE) ? MAX_BLOCK_SIZE : n;
+        setted = (n > MAX_BLOCK_SIZE) ? MAX_BLOCK_SIZE : n;
         
-        for (i = 0; i < send; i+=1)
+        for (i = 0; i < setted; i+=1)
           fts_set_float(buffer+i, CUT_TO_BOUNDS( (float)(startVal-(count+i)*coeff), this->min_val, this->max_val));
       
-        fvec_set_from_atoms((fvec_t *)this->vec, current, send, buffer);
+        fvec_set_from_atoms((fvec_t *)this->vec, current, setted, buffer);
         
-        current+=send;
-        n-=send;
-        count+=send;
+        current+=setted;
+        n-=setted;
+        count+=setted;
       }
       tabeditor_upload_interval(this, start, end);
     }
