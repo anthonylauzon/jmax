@@ -155,12 +155,11 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
   int n = tabeditor->pixsize;
   int num_val = n*2;
   float k = (float)(1/tabeditor->zoom);
-  
   int append = 0;
   int count = 0;
   int send = 0;
   int current = tabeditor->vindex;
-  
+    
   while(num_val > 0)
   {
     if(!append)
@@ -174,7 +173,7 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
     
     j = 0;
     if( tabeditor_is_ivec( tabeditor))
-      for(i = 0; ((i < send-2)&&((int)(current+j*k)<vecsize)); i+=2)
+      for(i = 0; ((i < send-1)&&((int)(current+j*k)<vecsize)); i+=2)
       {	  
         fts_set_int(&a[i+2], ivec_get_max_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
         fts_set_int(&a[i+3], ivec_get_min_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
@@ -188,7 +187,7 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
       
       fvec_vector(tabeditor->vec, &ptr, &size, &stride);
       
-      for(i = 0, j = 0; (i < send-2 && ((int)(current+j*k)<vecsize)); i+=2)
+      for(i = 0, j = 0; (i < send-1 && ((int)(current+j*k)<vecsize)); i+=2)
       {
         float min, max;
         
@@ -199,16 +198,16 @@ tabeditor_send_pixels(tabeditor_t *tabeditor)
         j++;
       }
     }
-    if(i+2 < send) send = i+2; 
+    if(i < send-1) send = i; 
     
     if(!append)
     {
-      fts_client_send_message((fts_object_t *)tabeditor, sym_set_pixels, send, a);
+      fts_client_send_message((fts_object_t *)tabeditor, sym_set_pixels, send+2, a);
       append = 1;
     }
     else
-      fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send, a);
-    
+      fts_client_send_message((fts_object_t *)tabeditor, sym_append_pixels, send+2, a);
+
     current += (int)k*j;
     count+=j;
     num_val -= send;
@@ -331,7 +330,7 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
   
   while(num_val > 0)
   {
-    int send = (num_val > CLIENT_BLOCK_SIZE-1)? CLIENT_BLOCK_SIZE-1: num_val;
+    int send = (num_val > CLIENT_BLOCK_SIZE-2)? CLIENT_BLOCK_SIZE-2: num_val;
     
     fts_set_int(&a[0], start);
     
@@ -360,9 +359,9 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
         j++;
       }
     }
-    if(i+1 < send) send = i+1; 
+    if(i < send-1) send = i;
     
-    fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send, a);
+    fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send+1, a);
     
     current+= (int)k*j;
     start+=j;
@@ -785,8 +784,37 @@ tabeditor_interpolate_by_client_request(fts_object_t *o, fts_symbol_t s, int ac,
     {
       int startVal = fts_get_number_int(at+2);
       int endVal = fts_get_number_int(at+3);
+      double coeff;
+      int n, current, setted, count;
       
-      /* fare la stessa cosa con gli interi */
+      if (startVal != endVal) 
+        coeff = ((double)(startVal - endVal))/(end - start);
+      else coeff = 0;
+      
+      if(start < 0)
+      {
+        startVal = startVal+start*coeff;
+        start = 0;
+      }
+      
+      n = buffsize;
+      current = start;
+      count = 0;
+      while(n > 0)
+      {
+        setted = (n > MAX_BLOCK_SIZE) ? MAX_BLOCK_SIZE : n;
+        
+        for (i = 0; i < setted; i+=1)
+          fts_set_int(buffer+i, CUT_TO_BOUNDS( (int)(startVal-(count+i)*coeff), this->min_val, this->max_val));
+        
+        ivec_set_with_onset_from_atoms((ivec_t *)this->vec, current, setted, buffer);
+        
+        current+=setted;
+        n-=setted;
+        count+=setted;
+      }
+      tabeditor_upload_interval(this, start, end);
+      
     }
     else
     {
