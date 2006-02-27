@@ -579,7 +579,8 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
     for(i = start; i < size-copy_size; i++)
       ptr[i] = ptr[i + copy_size];
     
-    ivec_set_size((ivec_t *)this->vec, ivec_get_size( (ivec_t *)this->vec) - copy_size);
+    for(i = size-copy_size; i < size; i++)
+      ptr[i] = 0; 
   }  
   else
   {
@@ -593,16 +594,14 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
     for(i = start; i < size-copy_size; i++)
       ptr[i] = ptr[i + copy_size];
     
-    fmat_set_m((fmat_t *)this->vec, fmat_get_m( (fmat_t *)this->vec) - copy_size);
+    for(i = size-copy_size; i < size; i++)
+      ptr[i] = 0.0;    
   }
   
   this->vsize = v_size;
   this->pixsize = pix_size;
   
-  if(this->zoom < 0.5)
-    tabeditor_send_pixels( this);
-  
-  tabeditor_send_visibles( this);
+  tabeditor_upload_interval(this, start, size);
   
   return fts_ok;
 }

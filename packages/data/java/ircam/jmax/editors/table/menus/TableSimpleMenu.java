@@ -41,9 +41,10 @@ public class TableSimpleMenu extends EditorMenu
 {
   EditorContainer container;
 
-  /*public EditorAction cutAction       	  = new Actions.CutAction();
+  public EditorAction cutAction       	  = new Actions.CutAction();
   public EditorAction copyAction          = new Actions.CopyAction();
-  public EditorAction duplicateAction 	  = new Actions.DuplicateAction();*/
+  public EditorAction pasteAction          = new Actions.PasteAction();
+  /*public EditorAction duplicateAction 	  = new Actions.DuplicateAction();*/
 
   public TableSimpleMenu(EditorContainer container)
   {
@@ -51,10 +52,10 @@ public class TableSimpleMenu extends EditorMenu
 
     this.container = container;
 
-    /*setHorizontalTextPosition(AbstractButton.LEFT);
+    setHorizontalTextPosition(AbstractButton.LEFT);
     setMnemonic(KeyEvent.VK_T);
     
-    add(Actions.undoAction);
+    /*add(Actions.undoAction);
     add(Actions.redoAction);
     addSeparator();
     add(cutAction);
@@ -78,14 +79,19 @@ public class TableSimpleMenu extends EditorMenu
         System.gc();
     }
     });
+    
+    addSeparator();
+    add(cutAction);
+    add(copyAction);
+    add(pasteAction);
   }
 
   public void updateMenu()
   {
-    /*boolean enable = !((SequenceSelection.getCurrent() == null)||(SequenceSelection.getCurrent().isSelectionEmpty()));
+    boolean enable = !((TableSelection.getCurrent() == null)||(TableSelection.getCurrent().isSelectionEmpty()));
     cutAction.setEnabled(enable);
     copyAction.setEnabled(enable);
-    duplicateAction.setEnabled(enable);*/
+    /*duplicateAction.setEnabled(enable);*/
   }  
 }
 
