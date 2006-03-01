@@ -91,6 +91,7 @@ public class TableSimpleMenu extends EditorMenu
     boolean enable = !((TableSelection.getCurrent() == null)||(TableSelection.getCurrent().isSelectionEmpty()));
     cutAction.setEnabled(enable);
     copyAction.setEnabled(enable);
+    pasteAction.setEnabled(((TablePanel)container.getEditor()).getGraphicContext().getFtsObject().thereIsACopy());
     /*duplicateAction.setEnabled(enable);*/
   }  
 }

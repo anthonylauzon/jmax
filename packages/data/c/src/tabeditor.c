@@ -406,7 +406,6 @@ tabeditor_upload_interval(tabeditor_t *this, int start, int end)
   if(this->zoom > 0.5)
     tabeditor_append_visibles(this, start, end);
   else
-
     tabeditor_insert_pixels(this, start, (end-start));
 }
 
@@ -536,22 +535,22 @@ tabeditor_copy_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const 
     else
     {
       float *src, *dst;
+      int stride;
       
-      this_size = fvec_get_size( (fvec_t *)this->vec);
-      
+      fvec_vector(this->vec, &src, &this_size, &stride); 
+ 
       if(!this->copy)
         this->copy = fts_object_create(fmat_class, 1, at + 1);
       else
         fmat_set_m((fmat_t *)this->copy, size);
       
-      src = fmat_get_ptr( ((fvec_t *)this->vec)->fmat);
       dst = fmat_get_ptr( (fmat_t *)this->copy);
       
       if(start + size > this_size)
         size = this_size - start;
       
       for(i=0; i<size; i++)
-        dst[i] = src[start + i];
+        dst[i] = src[(start + i)*stride];
     }
   }
   
@@ -566,7 +565,7 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
   int pix_size = fts_get_int(at + 1);
   int start = fts_get_int(at + 2);
   int copy_size, size;
-  int i;
+  int i, j;
   
   tabeditor_copy_by_client_request(o, NULL, ac - 2, at + 2, fts_nix);
   if( tabeditor_is_ivec( this))
@@ -576,11 +575,8 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
     size = ivec_get_size( (ivec_t *)this->vec);
     ptr = ivec_get_ptr( (ivec_t *)this->vec);
     
-    for(i = start; i < size-copy_size; i++)
-      ptr[i] = ptr[i + copy_size];
-    
-    for(i = size-copy_size; i < size; i++)
-      ptr[i] = 0; 
+    for(i = start; i < start+copy_size; i++)
+      ptr[i] = 0;
   }  
   else
   {
@@ -591,17 +587,21 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
     fvec_vector(this->vec, &ptr, &size, &stride);    
     copy_size = fmat_get_m( (fmat_t *)this->copy);
     
-    for(i = start; i < size-copy_size; i++)
-      ptr[i] = ptr[i + copy_size];
+    /*for(i = start, j = start*stride; i < size-copy_size; i++, j+=stride)
+      ptr[j] = ptr[i + copy_size];
     
-    for(i = size-copy_size; i < size; i++)
-      ptr[i] = 0.0;    
+    for(i = (size-copy_size)*stride; i < size; i+=stride)
+      ptr[i] = 0.0;*/
+    for(i = start; i < start+copy_size; i++)
+      ptr[i*stride] = 0.0;
   }
   
   this->vsize = v_size;
   this->pixsize = pix_size;
   
-  tabeditor_upload_interval(this, start, size);
+  //tabeditor_upload_interval(this, start, size);
+  tabeditor_upload_interval(this, start, start+copy_size);
+  fts_object_set_state_dirty( this->vec);
   
   return fts_ok;
 }
@@ -640,12 +640,14 @@ tabeditor_paste_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const
     }
     else
     {
-      float *src, *dst;
-      this_size = fmat_get_m((fmat_t *)this->vec);
-      copy_size = fmat_get_m((fmat_t *)this->copy);
+      int stride;
+      float *src;
+      float *dst;
       
+      fvec_vector(this->vec, &dst, &this_size, &stride);
+      copy_size = fmat_get_m((fmat_t *)this->copy);
+
       src = fmat_get_ptr((fmat_t *)this->copy);
-      dst = fmat_get_ptr((fmat_t *)this->vec);
       
       if(size == 0)
         size = copy_size;
@@ -656,12 +658,10 @@ tabeditor_paste_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const
         size = this_size - start;
       
       for(i=0; i<size; i++)
-        dst[start+ i] = src[i];
+        dst[(start+ i)*stride] = src[i];
     }
     
-    if(this->zoom < 0.5) tabeditor_send_pixels( this);
-    tabeditor_send_visibles( this);
-    
+    tabeditor_upload_interval(this, start, start+size);  
     fts_object_set_state_dirty( this->vec);
   }  
   
