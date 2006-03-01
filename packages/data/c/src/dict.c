@@ -490,11 +490,9 @@ dict_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
       fts_iterator_next(&key_iterator, &key);
       fts_iterator_next(&value_iterator, &value);
       
-      if(fts_is_int(&key))
-        fts_spost(stream, "  %d: ", fts_get_int(&key));
-      else
-        fts_spost(stream, "  %s: ", fts_symbol_name(fts_get_symbol(&key)));
-      
+      fts_spost(stream, "  ");
+      fts_spost_atoms(stream, 1, &key);
+      fts_spost(stream, ": ");
       fts_spost_atoms(stream, 1, &value);
       fts_spost(stream, "\n");
     }
