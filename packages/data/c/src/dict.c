@@ -557,14 +557,7 @@ dict_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   
   for(i=0; i<ac; i+=2)
   {
-    if(fts_is_int(at + i) || fts_is_symbol(at + i))
       dict_store(self, at + i, at + i + 1);
-    else
-    {
-      dict_remove_all(self);
-      fts_object_error(o, "wrong key type in initialization");
-    }
-    
   }
   
   return fts_ok;
