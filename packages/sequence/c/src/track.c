@@ -39,7 +39,6 @@
 fts_class_t *track_class = 0;
 
 static void track_upload_markers(track_t *self);
-static void track_upload(track_t *this);
 
 /*********************************************************
 *
@@ -973,7 +972,7 @@ track_upload_event(track_t *self, event_t *event)
   fts_array_destroy(&temp_array);
 }
 
-static void
+void
 track_upload(track_t *self)
 {
   fts_symbol_t name = track_get_name(self);

@@ -106,6 +106,7 @@ SEQUENCE_API void track_clear_and_upload(track_t *track);
 SEQUENCE_API void track_update_editor(track_t *self);
 SEQUENCE_API void track_upload_event(track_t *self, event_t *event);
 SEQUENCE_API void track_clear_at_client(track_t *self);
+SEQUENCE_API void track_upload(track_t *self);
 
 SEQUENCE_API void track_set_dirty(track_t *track);
 
