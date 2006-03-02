@@ -1857,6 +1857,7 @@ public void trackMoved(Track track, int oldPosition, int newPosition){}
 public void ftsNameChanged(String name){}      
 public void sequenceStartUpload(){ sequenceUploading = true;};
 public void sequenceEndUpload(){sequenceUploading = false;}; 
+public void sequenceClear(){}; 
 
 boolean sequenceUploading = false;
 public boolean isSequenceUploading()

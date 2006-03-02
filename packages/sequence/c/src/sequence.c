@@ -353,21 +353,21 @@ static fts_method_status_t
 sequence_clear(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   sequence_t *this = (sequence_t *)o;
-
-  if(ac == 0)
+  int i = 0;
+  
+  if(ac == 0 && sequence_get_size(this) > 0)
   {
     track_t *track = sequence_get_first_track(this);
 
     while(track)
     {
       sequence_remove_track(this, track);
-
-      if(sequence_editor_is_open(this))
-        fts_client_send_message(o, seqsym_removeTracks, 1, at);
-
       track = sequence_get_first_track(this);
+      i++;
     }
-
+    
+    //if(sequence_editor_is_open(this))    
+    fts_client_send_message(o, fts_s_clear, 0, 0);
     /* fts_name_update(o); */
   }
   

@@ -35,4 +35,5 @@ public interface TrackListener
     public abstract void ftsNameChanged(String name);
     public abstract void sequenceStartUpload();
     public abstract void sequenceEndUpload(); 
+    public abstract void sequenceClear(); 
 }

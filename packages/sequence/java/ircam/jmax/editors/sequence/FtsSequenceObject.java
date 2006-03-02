@@ -92,6 +92,12 @@ public class FtsSequenceObject extends FtsObjectWithEditor implements SequenceDa
       ((FtsSequenceObject)obj).endUpload();
   }
   });
+  FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+    {
+      ((FtsSequenceObject)obj).clear();
+    }
+  });
   /*FtsObject.registerMessageHandler( FtsSequenceObject.class, FtsSymbol.get("editor"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
     {
@@ -338,6 +344,18 @@ public void removeTracks(int nArgs , FtsAtom args[])
 	}    
 }
 
+public void clear()
+{
+  Track track;
+  for(Enumeration e = tracks.elements(); e.hasMoreElements();)
+  {
+    track = ((Track)e.nextElement());  
+    removeTrackListener(track.getFtsTrack());
+	}    
+  tracks.removeAllElements();
+  notifySequenceClear();
+}
+
 public void moveTrack(FtsTrackObject trackObj, int newPosition)
 {
 	int time;
@@ -395,9 +413,12 @@ void endUpload()
    SwingUtilities.invokeLater(new Runnable(){
     public void run()
     {
-      getEditorFrame().pack();
-      showEditor(firstTime);
-      FtsObject.requestResetGui();
+      if(getEditorFrame()!=null)
+      {
+        getEditorFrame().pack();
+        showEditor(firstTime);
+        FtsObject.requestResetGui();
+      }
       uploading = false;
       notifySequenceEndUpload();
     }
@@ -681,6 +702,12 @@ void notifySequenceEndUpload()
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();)
     ((TrackListener) e.nextElement()).sequenceEndUpload();
+}
+
+void notifySequenceClear()
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();)
+    ((TrackListener) e.nextElement()).sequenceClear();
 }
 
 transient Vector tracks = new Vector();

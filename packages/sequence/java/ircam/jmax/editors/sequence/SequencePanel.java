@@ -463,6 +463,27 @@ public class SequencePanel extends PopupToolbarPanel implements SequenceEditor, 
     resetTrackIndexs();
   }
 	
+  public void sequenceClear()
+  {
+    TrackContainer trackContainer;
+    for(Enumeration e = trackContainers.elements(); e.hasMoreElements();)
+    {
+      trackContainer = ((TrackContainer)e.nextElement());
+      trackPanel.remove(trackContainer);
+      trackContainer.getTrackEditor().dispose();
+      mutex.remove(trackContainer.getTrack());
+    }
+    trackContainers.clear();
+    
+    /*trackPanel.validate();
+    trackPanel.repaint();
+    scrollTracks.validate();*/
+    
+    //resize of the frame
+    /*Dimension dim = itsContainer.getFrame().getSize();
+    itsContainer.getFrame().setSize(dim.width, SequenceWindow.EMPTY_HEIGHT);	*/
+  }
+  
   
   /**
 		* Callback from the model. It can be called when a track changed */

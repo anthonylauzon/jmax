@@ -1397,7 +1397,8 @@ sequence_import_format_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
     
     fts_atomfile_close(file);
     
-    sequence_upload(self);
+    if(sequence_editor_is_open(self))
+      sequence_upload(self);
   }
   // else: no fmat track or wrong args -> do not handle this file
   fts_set_object(ret, (fts_object_t *) self);       

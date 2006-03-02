@@ -613,6 +613,7 @@ public void trackChanged(Track track){};
 public void trackMoved(Track track, int oldPosition, int newPosition){};   
 public void sequenceStartUpload(){};
 public void sequenceEndUpload(){}; 
+public void sequenceClear(){}; 
 
 //--- Ruler fields
 FontMetrics fm;

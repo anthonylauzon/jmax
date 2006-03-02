@@ -160,6 +160,7 @@ public class SequenceWindow extends JMaxEditor {
       }      
       public void sequenceStartUpload(){};
       public void sequenceEndUpload(){}; 
+      public void sequenceClear(){}; 
     });
   }
   
