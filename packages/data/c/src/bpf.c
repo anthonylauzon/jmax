@@ -492,8 +492,8 @@ _bpf_insert(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
     
     for(i=0; i<ac-1; i+=2)
     {
-      double time = fts_get_float(at + i);
-      double value = fts_get_float(at + i + 1);
+      double time = fts_get_number_float(at + i);
+      double value = fts_get_number_float(at + i + 1);
       
       bpf_insert_point(this, time, value);
     }
