@@ -33,8 +33,17 @@ public class TableInspector extends JDialog
 {
   JTextField maximumField, minimumField;
   TableDisplay tableEditor;
+  FtsTableObject ftsTableObject;
   JRadioButton filledViewButton, pointsViewButton, linesViewButton;
   JButton foregroundButton, backgroundButton;
+  JComboBox typeRefCombo, indexRefCombo;
+  JTextField onsetRefField, sizeRefField;
+  String type_ref;
+  int idx_ref, onset_ref, size_ref;
+  JButton applyRefButton;
+  boolean reference_changed = false;
+  TableDataListener listener;
+  
   boolean updating = false;
   
   public TableInspector(TableDisplay editor, Frame frame)
@@ -43,6 +52,31 @@ public class TableInspector extends JDialog
     setResizable(false);
     
     tableEditor = editor;
+    ftsTableObject = tableEditor.getGraphicContext().getFtsObject();
+    
+    listener = new TableDataListener(){
+      public void valueChanged(int index1, int index2, boolean fromScroll){}
+      public void pixelsChanged(int index1, int index2){}
+      public void tableSetted(){}
+      public void tableCleared(){}
+      public void sizeChanged(int size, int oldSize){}
+      public void tableUpdated(){}
+      public void tableRange(float min_val, float max_val){}
+      public void tableReference(int nRowsRef, int nColsRef, String typeRef, int indexRef, int onsetRef, int sizeRef)
+      {
+        updating = true;
+        updateReference();
+        updating = false;
+      }
+    };
+    ftsTableObject.addListener( listener);
+    
+    addWindowListener( new WindowAdapter() {
+	    public void windowClosing(WindowEvent e)
+		  {
+		    ftsTableObject.removeListener( listener);
+      }
+    });
     
     /* root panel */
     JPanel rootPanel = new JPanel();
@@ -89,8 +123,7 @@ public class TableInspector extends JDialog
     maximumField = new JTextField();
     maximumField.setBorder(BorderFactory.createEtchedBorder());
     maximumField.setEditable(true);     
-    maximumField.setPreferredSize(new Dimension(120, 28));  
-    maximumField.setMaximumSize(new Dimension(120, 28));
+    maximumField.setPreferredSize(new Dimension(140, 28));  
     maximumField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
 	      float value;
@@ -105,7 +138,7 @@ public class TableInspector extends JDialog
           if( tableEditor.getGraphicContext().getVerticalMaximum() != value)
           {
             tableEditor.panel.setMaximumValue(value);
-            tableEditor.getGraphicContext().getFtsObject().requestSetRange( tableEditor.getGraphicContext().getVerticalMinValue(), value);
+            ftsTableObject.requestSetRange( tableEditor.getGraphicContext().getVerticalMinValue(), value);
           }  
         }
       }
@@ -125,8 +158,7 @@ public class TableInspector extends JDialog
     minimumField = new JTextField();
     minimumField.setBorder(BorderFactory.createEtchedBorder());
     minimumField.setEditable(true);
-    minimumField.setPreferredSize(new Dimension(120, 28));  
-    minimumField.setMaximumSize(new Dimension(120, 28));
+    minimumField.setPreferredSize(new Dimension(140, 28));  
     minimumField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
 	      float value;
@@ -141,7 +173,7 @@ public class TableInspector extends JDialog
           if( tableEditor.getGraphicContext().getVerticalMinimum() != value)
           {
             tableEditor.panel.setMinimumValue(value);
-            tableEditor.getGraphicContext().getFtsObject().requestSetRange( value, tableEditor.getGraphicContext().getVerticalMaxValue());
+            ftsTableObject.requestSetRange( value, tableEditor.getGraphicContext().getVerticalMaxValue());
           }  
         }
       }
@@ -166,9 +198,9 @@ public class TableInspector extends JDialog
     backgroundButton = new JButton(" ");
     backgroundButton.setBorder(BorderFactory.createEtchedBorder());
     backgroundButton.setUI( new javax.swing.plaf.metal.MetalButtonUI());
-    backgroundButton.setPreferredSize(new Dimension(120, 28));
-    backgroundButton.setMinimumSize(new Dimension(120, 28));
-    backgroundButton.setSize(new Dimension(120, 28));
+    backgroundButton.setPreferredSize(new Dimension(140, 28));
+    backgroundButton.setMinimumSize(new Dimension(140, 28));
+    backgroundButton.setSize(new Dimension(140, 28));
     backgroundButton.addActionListener( new ActionListener(){
       public void actionPerformed(ActionEvent e)
       {
@@ -189,9 +221,9 @@ public class TableInspector extends JDialog
     foregroundButton.setOpaque(true);
     foregroundButton.setBorder(BorderFactory.createEtchedBorder());
     foregroundButton.setUI( new javax.swing.plaf.metal.MetalButtonUI());
-    foregroundButton.setPreferredSize(new Dimension(120, 28));
-    foregroundButton.setMinimumSize(new Dimension(120, 28));
-    foregroundButton.setSize(new Dimension(120, 28));
+    foregroundButton.setPreferredSize(new Dimension(140, 28));
+    foregroundButton.setMinimumSize(new Dimension(140, 28));
+    foregroundButton.setSize(new Dimension(140, 28));
     foregroundButton.addActionListener( new ActionListener(){
       public void actionPerformed(ActionEvent e)
       {
@@ -209,6 +241,127 @@ public class TableInspector extends JDialog
     
     rootPanel.add(colorPanel);
     
+    /* reference panel */
+    JPanel referencePanel = new JPanel();
+    referencePanel.setLayout(new BoxLayout(referencePanel, BoxLayout.X_AXIS));
+    /*type*/
+    JPanel typeRefPanel = new JPanel();
+    typeRefPanel.setLayout(new BoxLayout(typeRefPanel, BoxLayout.Y_AXIS));
+    typeRefPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "type"));
+    String[] types = {"col", "row", "diag", "unwrap"};
+    typeRefCombo = new JComboBox(types);
+    typeRefCombo.addItemListener( new ItemListener(){
+      public void itemStateChanged(ItemEvent e)
+      {
+        if(!updating)
+          setTypeRef((String)e.getItem());
+      };
+    });
+    typeRefPanel.add(typeRefCombo);
+    referencePanel.add(typeRefPanel);
+    /*index*/
+    JPanel indexRefPanel = new JPanel();
+    indexRefPanel.setLayout(new BoxLayout(indexRefPanel, BoxLayout.Y_AXIS));
+    indexRefPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "index"));
+    indexRefCombo = new JComboBox();
+    indexRefCombo.addItemListener( new ItemListener(){
+      public void itemStateChanged(ItemEvent e)
+      {
+        if(!updating)
+        {
+          String sidx = (String)e.getItem();
+          int idx = 0;
+          try{
+            idx = (Integer.valueOf(sidx)).intValue();
+          } catch(NumberFormatException exc){}
+          setIndexRef(idx);
+        }
+      };
+    });
+    indexRefPanel.add(indexRefCombo);
+    referencePanel.add(indexRefPanel);
+    
+    /*onset*/
+    JPanel onsetRefPanel = new JPanel();
+    onsetRefPanel.setLayout(new BoxLayout(onsetRefPanel, BoxLayout.Y_AXIS));
+    onsetRefPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "onset"));
+    onsetRefField = new JTextField();
+    onsetRefField.setPreferredSize(new Dimension(40, 23));
+    onsetRefField.setSize(new Dimension(40, 23));
+    onsetRefField.setBorder(BorderFactory.createEtchedBorder());
+    onsetRefField.setEditable(true);
+    onsetRefField.addKeyListener(new KeyListener(){
+      public void keyPressed(KeyEvent e){
+	      int onset = 0;
+	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
+        {
+		      try { 
+            onset = Integer.valueOf(onsetRefField.getText()).intValue();
+		      } catch (NumberFormatException exc) {
+            System.err.println("Error:  invalid number format!");
+            return;
+		      }
+          setOnsetRef(onset);
+        }
+      }
+      public void keyReleased(KeyEvent e){}
+      public void keyTyped(KeyEvent e){}
+    });
+    onsetRefPanel.add(onsetRefField);
+    referencePanel.add(onsetRefPanel);
+    
+    /*size*/
+    JPanel sizeRefPanel = new JPanel();
+    sizeRefPanel.setLayout(new BoxLayout(sizeRefPanel, BoxLayout.Y_AXIS));
+    sizeRefPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "size"));
+    sizeRefField = new JTextField();
+    sizeRefField.setSize(new Dimension(40, 23));
+    sizeRefField.setPreferredSize(new Dimension(40, 23));
+    sizeRefField.setBorder(BorderFactory.createEtchedBorder());
+    sizeRefField.setEditable(true);
+    sizeRefField.addKeyListener(new KeyListener(){
+      public void keyPressed(KeyEvent e){
+	      int size = 0;
+	      if(e.getKeyCode()==KeyEvent.VK_ENTER)
+        {
+		      try { 
+            size = Integer.valueOf(sizeRefField.getText()).intValue();
+		      } catch (NumberFormatException exc) {
+            System.err.println("Error:  invalid number format!");
+            return;
+		      }
+          setSizeRef(size);
+        }
+      }
+      public void keyReleased(KeyEvent e){}
+      public void keyTyped(KeyEvent e){}
+    });
+    sizeRefPanel.add(sizeRefField);
+    referencePanel.add(sizeRefPanel);
+    
+    JPanel extRefPanel = new JPanel();
+    extRefPanel.setLayout(new BoxLayout(extRefPanel, BoxLayout.Y_AXIS));
+    extRefPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mat Reference"));
+    
+    extRefPanel.add(referencePanel);
+    
+    /*apply button*/
+    applyRefButton = new JButton("      ok      ");
+    applyRefButton.setBorder(BorderFactory.createEtchedBorder());
+    applyRefButton.setUI( new javax.swing.plaf.metal.MetalButtonUI());
+    applyRefButton.addActionListener( new ActionListener(){
+      public void actionPerformed(ActionEvent e)
+      {
+        setReferenceChanged(false);
+      }
+    });
+    applyRefButton.setEnabled(false);
+    applyRefButton.setAlignmentX((float)0.5);
+    
+    extRefPanel.add(applyRefButton);
+    
+    rootPanel.add(extRefPanel);
+   
     getContentPane().add(rootPanel);
     getContentPane().validate();
     
@@ -245,9 +398,77 @@ public class TableInspector extends JDialog
     backgroundButton.setBackground(tableEditor.getRenderer().getBackColor());
     backgroundButton.setForeground(tableEditor.getRenderer().getBackColor());
     
+    updateReference();
+   
     updating = false;
   }
-    
+  
+  void updateReference()
+  {
+    typeRefCombo.setSelectedItem(ftsTableObject.typeRef);
+    initIndexRefCombo(ftsTableObject.typeRef);
+    if(indexRefCombo.isEnabled())
+    indexRefCombo.setSelectedIndex(ftsTableObject.indexRef);
+    onsetRefField.setText(""+ftsTableObject.onsetRef);
+    sizeRefField.setText(""+ftsTableObject.sizeRef);
+  }
+  
+  void initIndexRefCombo(String type)
+  {
+    if(type.equals("col"))
+    {
+      indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nColsRef)));
+      indexRefCombo.setEnabled(true);
+    }
+    else if(type.equals("row"))
+    {
+      indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nRowsRef)));
+      indexRefCombo.setEnabled(true);
+    }
+    else if(type.equals("diag"))
+    {
+      indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nRowsRef)));
+      indexRefCombo.setEnabled(true);
+    }
+    else if(type.equals("unwrap"))
+      indexRefCombo.setEnabled(false);
+  }
+  
+  void setTypeRef(String type)
+  {
+    type_ref = type;
+    setReferenceChanged(true);
+  }
+  void setIndexRef(int idx)
+  {
+    idx_ref = idx;
+    setReferenceChanged(true);
+  }
+  void setOnsetRef(int ons)
+  {
+    onset_ref = ons;
+    setReferenceChanged(true);
+  }
+  void setSizeRef(int size)
+  {
+    size_ref = size;
+    setReferenceChanged(true);
+  }
+  
+  void setReferenceChanged(boolean changed)
+  {
+    reference_changed = changed;
+    applyRefButton.setEnabled(changed);
+  }
+  
+  Vector getRefIndexes(int size)
+  {
+    Vector vec = new Vector();
+    for(int i=0; i < size; i++)
+      vec.addElement(""+i);
+    return vec;
+  }
+  
   public static void inspect(TableDisplay tableEditor, Frame frame, Point position)
   {
     TableInspector inspector = new TableInspector(tableEditor, frame);

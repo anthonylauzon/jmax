@@ -393,6 +393,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     repaint();
   }
   
+  public void tableReference(int nRowsRef, int nColsRef, String typeRef, int indexRef, int onsetRef, int sizeRef){}
   /**
 		* Sets the "hollow" representation mode */
   public void setPointsView()

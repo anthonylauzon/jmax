@@ -54,7 +54,7 @@ static fts_symbol_t sym_paste_client = 0;
 static fts_symbol_t sym_cut_client = 0;
 static fts_symbol_t sym_insert_client = 0;
 static fts_symbol_t sym_reset_editor = 0;
-
+static fts_symbol_t sym_reference = 0;
 /********************************************************
 *
 *  utility functions
@@ -374,18 +374,47 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
 *  client methods
 *
 */
+static void 
+tabeditor_upload_reference(tabeditor_t *this)
+{
+  if(this)
+  {
+    fts_atom_t a[6];
+
+    if( !tabeditor_is_ivec( this))
+    {
+      fvec_t *fvec = (fvec_t *)this->vec;
+      fmat_t *fmat = fvec_get_fmat(fvec);
+      int n = fmat_get_n(fmat);
+      if(n>1)
+      {
+        fts_set_int(a, fmat_get_m(fmat));
+        fts_set_int( a+1, n);
+        fts_set_symbol(a+2, fvec_get_type_as_symbol(fvec));
+        fts_set_int(a+3, fvec_get_index(fvec));
+        fts_set_int(a+4, fvec_get_onset(fvec));
+        fts_set_int(a+5, fvec_get_size(fvec));
+        fts_client_send_message((fts_object_t *)this, sym_reference, 6, a);
+      }
+    }
+  }
+}
+
 void
 tabeditor_upload_gui(tabeditor_t *this)
 {
   if(this)
   {
+    fts_atom_t a[2];
+    
     if(this->min_val != TABEDITOR_DEFAULT_MIN || this->max_val != TABEDITOR_DEFAULT_MAX)
     {
-      fts_atom_t a[2];    
       fts_set_float(a, this->min_val);
       fts_set_float(a+1, this->max_val);
       fts_client_send_message((fts_object_t *)this, fts_s_range, 2, a);
     }
+    
+    tabeditor_upload_reference(this);
   }
 }
 
@@ -487,6 +516,8 @@ tabeditor_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
     this->vsize = vecsize;
     
   fts_client_send_message(o, sym_reset_editor, 0, 0);
+  
+  tabeditor_upload_gui(this);
   
   if(this->zoom > 0.5)
     tabeditor_send_visibles(this);
@@ -1016,6 +1047,7 @@ FTS_MODULE_INIT(tabeditor)
   sym_paste_client = fts_new_symbol("paste");
   sym_cut_client = fts_new_symbol("cut");
   sym_insert_client = fts_new_symbol("insert");
+  sym_reference = fts_new_symbol("reference");
   
   sym_set_visibles = fts_new_symbol("setVisibles");
   sym_append_visibles = fts_new_symbol("appendVisibles");

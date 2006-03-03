@@ -71,6 +71,11 @@ fvec_get_type_from_symbol(fts_symbol_t sym)
     return fvec_type_column;
 }
 
+fts_symbol_t
+fvec_get_type_as_symbol(fvec_t *this)
+{
+  return fvec_type_names[fvec_get_type(this)];
+}
 /********************************************************************
 *
 *  easy creators

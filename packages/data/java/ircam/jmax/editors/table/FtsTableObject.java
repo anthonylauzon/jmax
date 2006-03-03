@@ -99,6 +99,12 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((FtsTableObject)obj).setRange(args.getFloat( 0), args.getFloat( 1));
 	}
   });
+  FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("reference"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+	{
+      ((FtsTableObject)obj).setReference(args.getLength(), args.getAtoms());
+	}
+  });
 }
 
 /**
@@ -369,6 +375,20 @@ public void setRange(float min_val, float max_val)
   this.min_val = min_val;
   this.max_val = max_val;
   notifyRange( min_val, max_val);
+}
+
+int nRowsRef, nColsRef, indexRef, onsetRef, sizeRef; 
+String typeRef;
+public void setReference(int nArgs , FtsAtom args[])
+{
+  nRowsRef = args[0].intValue;
+  nColsRef = args[1].intValue;
+  typeRef = args[2].symbolValue.toString();
+  indexRef = args[3].intValue; 
+  onsetRef = args[4].intValue; 
+  sizeRef = args[5].intValue; 
+  
+  notifyReference(nRowsRef, nColsRef, typeRef, indexRef, onsetRef, sizeRef);
 }
 
 /*
@@ -779,6 +799,12 @@ private void notifyRange(float min_val, float max_val)
 {
   for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
     ((TableDataListener) e.nextElement()).tableRange(min_val, max_val);
+}
+
+private void notifyReference(int nRowsRef, int nColsRef, String typeRef, int indexRef, int onsetRef, int sizeRef)
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+    ((TableDataListener) e.nextElement()).tableReference( nRowsRef, nColsRef, typeRef, indexRef, onsetRef, sizeRef);
 }
 ///////////////////////////////////////////////////////////
 private Vector points = new Vector();

@@ -77,6 +77,7 @@ DATA_API fvec_t *fvec_create_column(fmat_t *fmat);
 DATA_API fvec_t *fvec_create_row(fmat_t *fmat);
 
 DATA_API int   fvec_get_size (fvec_t *self);
+DATA_API fts_symbol_t  fvec_get_type_as_symbol(fvec_t *self);
 
 /** get element, no checks */
 DATA_API float fvec_get_element(fvec_t *self, int i);

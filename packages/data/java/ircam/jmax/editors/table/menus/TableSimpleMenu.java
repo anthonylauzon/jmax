@@ -71,7 +71,12 @@ public class TableSimpleMenu extends EditorMenu
     });
     
     addSeparator();
-        
+    add(cutAction);
+    add(copyAction);
+    add(pasteAction);
+  
+    addSeparator();
+    
     add( new EditorAction("Close", "close", KeyEvent.VK_C, KeyEvent.VK_W, true){
       public void doAction(EditorContainer container)
     {
@@ -79,11 +84,6 @@ public class TableSimpleMenu extends EditorMenu
         System.gc();
     }
     });
-    
-    addSeparator();
-    add(cutAction);
-    add(copyAction);
-    add(pasteAction);
   }
 
   public void updateMenu()
