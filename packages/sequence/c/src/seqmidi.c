@@ -996,7 +996,6 @@ float_track_import_bpf_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
           {
             fts_set_float(&value, fts_get_number_float(&a));
             event = (event_t *)fts_object_create(event_class, 1, &value);
-            /*track_add_event_and_upload(self, time, event);*/
             track_add_event(self, time, event);
             waitingfor = wEOL;
             // do not break, because EOL can follow
@@ -1023,8 +1022,9 @@ float_track_import_bpf_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
     }
     
     fts_atomfile_close(file);
-    
-    track_upload(self);
+
+    if(track_editor_is_open(self))
+      track_upload(self);
   }
   /* else: no float track or wrong args -> don't handle this file */
 
@@ -1154,7 +1154,7 @@ import_format_txt_header(track_t * self, int * n_head, int * n_head_max, fmat_t 
     
     fts_set_object(&value, *headerValues);
     currentEvent = (event_t *)fts_object_create(event_class, 1, &value);
-    track_add_event/*_and_upload*/(self, *time, currentEvent);
+    track_add_event(self, *time, currentEvent);
     
     *headerValues = fmat_create(1, *n_head_max);    
     
@@ -1203,7 +1203,7 @@ import_format_txt_row(track_t * self, const fts_atom_t * a, const char * c, doub
       {
         fts_set_object(&value, *partials);
         currentEvent = (event_t *)fts_object_create(event_class, 1, &value);
-        track_add_event/*_and_upload*/(self, *time, currentEvent);
+        track_add_event(self, *time, currentEvent);
         *waitingfor = wHEAD;
       }
       *n = -1;
@@ -1290,7 +1290,9 @@ fmat_track_import_format_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_
       }
     }
     
-    track_upload(self);
+    if(track_editor_is_open(self))
+      track_upload(self);
+    
     fts_atomfile_close(file);
   }
   // else: no fmat track or wrong args -> do not handle this file
@@ -1360,7 +1362,6 @@ sequence_import_format_txt(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
     sequence_add_track(self, headerTrack);
     headerTrack->type = fmat_class;
     
-    // TODO sequence_upload(self);
     
     // stop on error, do not risk a mess
     while (waitingfor != wERROR && fts_atomfile_read(file, &a, &c))
