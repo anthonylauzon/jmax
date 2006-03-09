@@ -925,7 +925,6 @@ tabeditor_set_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
 			this->max_val = max_val;
     }
   }	
-  
   return fts_ok;
 }	
 
@@ -946,6 +945,21 @@ tabeditor_set_range_from_client(fts_object_t *o, fts_symbol_t s, int ac, const f
       tabeditor_upload_gui(this);
     }
   }	  
+  return fts_ok;
+}
+
+static fts_method_status_t
+tabeditor_set_reference_from_client(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  tabeditor_t *this = (tabeditor_t *)o;
+  if(!tabeditor_is_ivec(this))
+  {
+    if(ac >= 3 && fts_is_symbol(at) && fts_is_int(at+1) && fts_is_int(at+2))
+    {
+      fts_symbol_t type = fts_get_symbol(at);
+      fts_send_message( (fts_object_t *)this->vec, type, ac-1, at+1, ret);
+    }	  
+  }
   return fts_ok;
 }
 
@@ -1030,6 +1044,7 @@ tabeditor_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_range, tabeditor_set_range);
   fts_class_message_varargs(cl, fts_new_symbol("change_range"), tabeditor_set_range_from_client);
+  fts_class_message_varargs(cl, fts_new_symbol("reference"), tabeditor_set_reference_from_client);
 }
 
 /********************************************************************

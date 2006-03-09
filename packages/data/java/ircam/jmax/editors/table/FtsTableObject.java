@@ -623,6 +623,23 @@ public void requestSetRange(float min_value, float max_value)
   }
 }
 
+public void requestChangeReference(String type_ref, int idx_ref, int onset_ref, int size_ref)
+{
+  args.clear();
+  args.addSymbol( FtsSymbol.get(type_ref));
+  args.addInt( idx_ref);
+  args.addInt( onset_ref);
+  if(size_ref > 0) args.addInt( size_ref);
+  try{    
+    send( FtsSymbol.get("reference"), args);
+  }
+  catch(IOException e)
+  {
+    System.err.println("FtsTableObject: I/O Error sending reference Message!");
+    e.printStackTrace(); 
+  }
+}
+
 private double[] visibles;
 private int visibleSize = 0;
 private double[] t_pixels;

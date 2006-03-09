@@ -374,8 +374,13 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 																								 gc.getVisiblePixelsSize());
 			gc.getFtsObject().requestGetValues();
 		}
-    updateHorizontalScrollbar();
-    itsCenterPanel.repaint();
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      {
+        updateHorizontalScrollbar();
+        itsCenterPanel.repaint();
+      }
+    });
   }
   public void tableUpdated()
   {

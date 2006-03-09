@@ -48,7 +48,7 @@ public class TableInspector extends JDialog
   
   public TableInspector(TableDisplay editor, Frame frame)
   {
-    super(frame, "Table Inspector", true);
+    super(frame, "Table Inspector", /*true*/false);
     setResizable(false);
     
     tableEditor = editor;
@@ -290,6 +290,7 @@ public class TableInspector extends JDialog
     onsetRefField.setSize(new Dimension(40, 23));
     onsetRefField.setBorder(BorderFactory.createEtchedBorder());
     onsetRefField.setEditable(true);
+    onsetRefField.setNextFocusableComponent(TableInspector.this);
     onsetRefField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
 	      int onset = 0;
@@ -302,6 +303,7 @@ public class TableInspector extends JDialog
             return;
 		      }
           setOnsetRef(onset);
+          onsetRefField.transferFocus();
         }
       }
       public void keyReleased(KeyEvent e){}
@@ -319,6 +321,7 @@ public class TableInspector extends JDialog
     sizeRefField.setPreferredSize(new Dimension(40, 23));
     sizeRefField.setBorder(BorderFactory.createEtchedBorder());
     sizeRefField.setEditable(true);
+    sizeRefField.setNextFocusableComponent(TableInspector.this);
     sizeRefField.addKeyListener(new KeyListener(){
       public void keyPressed(KeyEvent e){
 	      int size = 0;
@@ -330,7 +333,8 @@ public class TableInspector extends JDialog
             System.err.println("Error:  invalid number format!");
             return;
 		      }
-          setSizeRef(size);
+          setSizeRef(size);          
+          sizeRefField.transferFocus();
         }
       }
       public void keyReleased(KeyEvent e){}
@@ -353,6 +357,7 @@ public class TableInspector extends JDialog
       public void actionPerformed(ActionEvent e)
       {
         setReferenceChanged(false);
+        ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
       }
     });
     applyRefButton.setEnabled(false);
@@ -398,45 +403,50 @@ public class TableInspector extends JDialog
     backgroundButton.setBackground(tableEditor.getRenderer().getBackColor());
     backgroundButton.setForeground(tableEditor.getRenderer().getBackColor());
     
-    updateReference();
-   
+    updateReference();   
     updating = false;
   }
   
   void updateReference()
   {
-    typeRefCombo.setSelectedItem(ftsTableObject.typeRef);
-    initIndexRefCombo(ftsTableObject.typeRef);
-    if(indexRefCombo.isEnabled())
-    indexRefCombo.setSelectedIndex(ftsTableObject.indexRef);
-    onsetRefField.setText(""+ftsTableObject.onsetRef);
-    sizeRefField.setText(""+ftsTableObject.sizeRef);
+    idx_ref =ftsTableObject.indexRef;
+    onset_ref = ftsTableObject.onsetRef;
+    size_ref = ftsTableObject.sizeRef;
+    
+    if(type_ref != ftsTableObject.typeRef)
+    {
+      type_ref = ftsTableObject.typeRef;
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+	      {  
+          initIndexRefCombo();      
+          indexRefCombo.setSelectedIndex(idx_ref);
+        }
+      });
+    }
+    else
+    {
+      if(indexRefCombo.getSelectedIndex() != idx_ref)
+        indexRefCombo.setSelectedIndex(idx_ref);
+    }
+    if(typeRefCombo.getSelectedItem() != type_ref)
+      typeRefCombo.setSelectedItem(type_ref);
+    onsetRefField.setText(""+onset_ref);
+    sizeRefField.setText(""+size_ref);
   }
   
-  void initIndexRefCombo(String type)
+  void initIndexRefCombo()
   {
-    if(type.equals("col"))
-    {
+    if(type_ref.equals("col"))
       indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nColsRef)));
-      indexRefCombo.setEnabled(true);
-    }
-    else if(type.equals("row"))
-    {
+    else if(type_ref.equals("row") || type_ref.equals("diag") || type_ref.equals("unwrap"))
       indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nRowsRef)));
-      indexRefCombo.setEnabled(true);
-    }
-    else if(type.equals("diag"))
-    {
-      indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nRowsRef)));
-      indexRefCombo.setEnabled(true);
-    }
-    else if(type.equals("unwrap"))
-      indexRefCombo.setEnabled(false);
   }
   
   void setTypeRef(String type)
   {
     type_ref = type;
+    initIndexRefCombo();
     setReferenceChanged(true);
   }
   void setIndexRef(int idx)
