@@ -75,6 +75,7 @@ public class TableInspector extends JDialog
 	    public void windowClosing(WindowEvent e)
 		  {
 		    ftsTableObject.removeListener( listener);
+        tableEditor.panel.setCurrentInspector(null);
       }
     });
     
@@ -479,13 +480,18 @@ public class TableInspector extends JDialog
     return vec;
   }
   
+  
   public static void inspect(TableDisplay tableEditor, Frame frame, Point position)
   {
-    TableInspector inspector = new TableInspector(tableEditor, frame);
-    inspector.update();
-    inspector.setLocation(frame.getLocation().x + position.x, frame.getLocation().y + position.y);
-    inspector.requestFocus();
-    inspector.setVisible(true);
+    if(tableEditor.panel.getCurrentInspector() == null)
+    {
+      TableInspector inspector = new TableInspector(tableEditor, frame);
+      tableEditor.panel.setCurrentInspector(inspector);
+      inspector.update();
+      inspector.setLocation(frame.getLocation().x + position.x, frame.getLocation().y + position.y);
+      inspector.requestFocus();
+      inspector.setVisible(true);
+    }
   }
 }
 

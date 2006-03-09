@@ -550,6 +550,16 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		return (FtsTableObject)tableData;
   }
 	
+  TableInspector currentInspector;
+  public void setCurrentInspector(TableInspector inspector)
+  {
+    currentInspector = inspector;
+  }
+  public TableInspector getCurrentInspector()
+  {
+    return currentInspector;
+  }
+  
   //------------------- Editor interface ---------------
   EditorContainer itsEditorContainer;
 	
