@@ -369,7 +369,6 @@ public void addPixels(int nArgs , FtsAtom args[])
       notifySet();
 }
 
-
 public void setRange(float min_val, float max_val)
 {  
   this.min_val = min_val;
@@ -379,6 +378,7 @@ public void setRange(float min_val, float max_val)
 
 int nRowsRef, nColsRef, indexRef, onsetRef, sizeRef; 
 String typeRef;
+boolean hasReference = false;
 public void setReference(int nArgs , FtsAtom args[])
 {
   nRowsRef = args[0].intValue;
@@ -387,8 +387,14 @@ public void setReference(int nArgs , FtsAtom args[])
   indexRef = args[3].intValue; 
   onsetRef = args[4].intValue; 
   sizeRef = args[5].intValue; 
+  hasReference = true;
   
   notifyReference(nRowsRef, nColsRef, typeRef, indexRef, onsetRef, sizeRef);
+}
+
+public boolean hasReference()
+{
+  return hasReference;
 }
 
 /*
