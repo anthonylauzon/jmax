@@ -74,8 +74,7 @@ public class TableInspector extends JDialog
     addWindowListener( new WindowAdapter() {
 	    public void windowClosing(WindowEvent e)
 		  {
-		    ftsTableObject.removeListener( listener);
-        tableEditor.panel.setCurrentInspector(null);
+        close();
       }
     });
     
@@ -359,8 +358,13 @@ public class TableInspector extends JDialog
       applyRefButton.addActionListener( new ActionListener(){
         public void actionPerformed(ActionEvent e)
         {
-          setReferenceChanged(false);
-          ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
+          SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+              setReferenceChanged(false);
+              ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
+            }
+          });
         }
       });
       applyRefButton.setEnabled(false);
@@ -450,9 +454,18 @@ public class TableInspector extends JDialog
   
   void setTypeRef(String type)
   {
-    type_ref = type;
-    initIndexRefCombo();
-    setReferenceChanged(true);
+    if(type_ref==null || !type_ref.equals(type))
+    {
+      type_ref = type;
+      initIndexRefCombo();
+    
+      if(type_ref.equals("unwrap"))
+      {
+        size_ref = 0;
+        sizeRefField.setText(""+size_ref);
+      }
+      setReferenceChanged(true);
+    }
   }
   void setIndexRef(int idx)
   {
@@ -482,6 +495,12 @@ public class TableInspector extends JDialog
     for(int i=0; i < size; i++)
       vec.addElement(""+i);
     return vec;
+  }
+  
+  public void close()
+  {
+    ftsTableObject.removeListener( listener);
+    tableEditor.panel.setCurrentInspector(null);
   }
   
   public static void inspect(TableDisplay tableEditor, Frame frame, Point position)

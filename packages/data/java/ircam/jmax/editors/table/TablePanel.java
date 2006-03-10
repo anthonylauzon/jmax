@@ -568,6 +568,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   }
 	
   public void close(boolean doCancel){
+    if(currentInspector!=null)
+      currentInspector.close();
     ftsObj.closeEditor();
     ftsObj.requestDestroyEditor();
   }
