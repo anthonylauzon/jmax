@@ -104,12 +104,12 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 			public void objectAdded(Object whichObject, int index)
 		  {
 				if( !uploading)
-					table.revalidate();
-			}
+          table.revalidate();
+      }
 			public void objectsAdded(int maxTime)
 		  {
-				table.revalidate();
-			}
+        table.revalidate();
+      }
 			public void objectDeleted(Object whichObject, int oldIndex)
 		  {
 				table.revalidate();
@@ -222,9 +222,10 @@ void restoreColumnNames()
 /*
  listSelectionListener interface
  */
+Rectangle lastRect;
 public void valueChanged(ListSelectionEvent e)
-{
-	Rectangle rect;
+{  
+  Rectangle rect;
 	ListSelectionModel selection = table.getSelectionModel();
 	
 	if(selection.isSelectionEmpty() || selection.getValueIsAdjusting()) return;
@@ -236,10 +237,15 @@ public void valueChanged(ListSelectionEvent e)
 	
 	if(minIndex!=maxIndex)
 		rect = rect.union(table.getCellRect(maxIndex, 0, true));
-	
-	table.scrollRectToVisible(rect);      
+	  
+  lastRect = rect;
+  SwingUtilities.invokeLater(new Runnable() {
+    public void run()
+    { 
+      table.scrollRectToVisible(lastRect);      
+    }
+  });
 }
-
 /*
  CellEditor for "type" parameter
  */

@@ -284,7 +284,15 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
   public void objectAdded(Object spec, int index) 
   {
     if( !uploading)
-      resizePanelToEventTime((TrackEvent)spec);
+    {
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+	      { 
+          //resizePanelToEventTime((TrackEvent)spec);
+          resizePanelToLastEventTime();
+        }
+      });
+    }
   }
   public void objectsAdded(int maxTime) 
   {
@@ -327,6 +335,11 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
         evtTime = (int)(evt.getTime()) + ((Double)evt.getProperty("duration")).intValue();
 			resizePanelToTime(evtTime);
 		}
+  }
+  
+  private void resizePanelToLastEventTime()
+  {
+    resizePanelToEventTime(ftsTrackObject.getLastEvent());
   }
 	
   private void resizePanelToTime(int time)

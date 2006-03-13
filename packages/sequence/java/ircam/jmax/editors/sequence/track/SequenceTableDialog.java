@@ -193,23 +193,8 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
      * TrackDataListener interface
      */
   public void objectChanged(Object spec, int index, String propName, Object propValue){}
-      
-  public void objectAdded(Object spec, int index) 
-  {
-    if( !uploading)
-      {
-			getContentPane().validate();
-			eventsPanel.validate();
-			validate();
-      }
-  }
-      
-  public void objectsAdded(int maxTime) 
-  {
-    getContentPane().validate();
-    eventsPanel.validate();
-    validate();
-  }
+  public void objectAdded(Object spec, int index){}
+  public void objectsAdded(int maxTime){}
     
   public void objectDeleted(Object whichObject, int index) 
   {
