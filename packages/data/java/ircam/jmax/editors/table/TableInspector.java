@@ -250,7 +250,7 @@ public class TableInspector extends JDialog
       JPanel typeRefPanel = new JPanel();
       typeRefPanel.setLayout(new BoxLayout(typeRefPanel, BoxLayout.Y_AXIS));
       typeRefPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "type"));
-      String[] types = {"col", "row", "diag", "unwrap"};
+      String[] types = {"col", "row", "diag", "unwrap", "vec"};
       typeRefCombo = new JComboBox(types);
       typeRefCombo.addItemListener( new ItemListener(){
         public void itemStateChanged(ItemEvent e)
@@ -427,7 +427,7 @@ public class TableInspector extends JDialog
       type_ref = ftsTableObject.typeRef;
       SwingUtilities.invokeLater(new Runnable() {
         public void run()
-	      {  
+	      {            
           initIndexRefCombo();      
           indexRefCombo.setSelectedIndex(idx_ref);
         }
@@ -445,8 +445,8 @@ public class TableInspector extends JDialog
   }
   
   void initIndexRefCombo()
-  {
-    if(type_ref.equals("col"))
+  {    
+    if(type_ref.equals("col") || type_ref.equals("vec"))
       indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nColsRef)));
     else if(type_ref.equals("row") || type_ref.equals("diag") || type_ref.equals("unwrap"))
       indexRefCombo.setModel(new DefaultComboBoxModel(getRefIndexes(ftsTableObject.nRowsRef)));
@@ -458,12 +458,10 @@ public class TableInspector extends JDialog
     {
       type_ref = type;
       initIndexRefCombo();
-    
-      if(type_ref.equals("unwrap"))
-      {
-        size_ref = 0;
-        sizeRefField.setText(""+size_ref);
-      }
+      if(idx_ref <= indexRefCombo.getItemCount())
+        indexRefCombo.setSelectedIndex(idx_ref);
+      else
+        indexRefCombo.setSelectedIndex(0);
       setReferenceChanged(true);
     }
   }

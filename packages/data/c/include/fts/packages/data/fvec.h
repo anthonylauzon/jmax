@@ -54,6 +54,7 @@ typedef struct
 #define fvec_get_type(f) ((f)->type)
 #define fvec_get_index(f) ((f)->index)
 #define fvec_get_onset(f) ((f)->onset)
+#define fvec_get_raw_size(f) ((f)->size)
 
 #define fvec_set_fmat(f, x) do{fts_object_release((fts_object_t *)(f)->fmat); (f)->fmat = (x); fts_object_refer((fts_object_t *)(x)); } while(0)
 #define fvec_set_type(f, x) ((f)->type = (x))

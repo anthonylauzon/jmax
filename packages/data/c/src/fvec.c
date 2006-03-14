@@ -547,6 +547,18 @@ fvec_array_function(fts_object_t *o, fts_array_t *array)
     fts_set_float(atoms + i, values[j]);
 }
 
+static void
+fvec_description_function(fts_object_t *o,  fts_array_t *array)
+{
+  fvec_t *self = (fvec_t *)o;
+  fts_symbol_t *type = fvec_get_type_as_symbol(self);
+
+  fts_array_append_symbol(array, fvec_symbol);
+
+  if(self->type != fvec_type_vector)
+    fts_array_append_symbol(array, type);
+}
+
 /******************************************************************************
 *
 *  envelopes
@@ -940,12 +952,15 @@ _fvec_set_unwrap(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
 {
   fvec_t *self = (fvec_t *)o;
   
-  self->type = fvec_type_unwrap;
-  fvec_set_dimensions(self, ac, at);
-  
-  fts_object_changed(o);
-  
-  fts_set_object(ret, o);
+  if(self->type != fvec_type_vector)
+  {
+    self->type = fvec_type_unwrap;
+    fvec_set_dimensions(self, ac, at);
+    
+    fts_object_changed(o);
+    
+    fts_set_object(ret, o);
+  }
   
   return fts_ok;
 }
@@ -954,7 +969,7 @@ static fts_method_status_t
 _fvec_set_vector(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fvec_t *self = (fvec_t *)o;
-  int     size = 0;
+  int size = 0;
   
   if(ac > 0 && fts_is_number(at))
     size = fts_get_number_int(at);
@@ -2032,7 +2047,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
         fts_symbol_t sym = fts_get_symbol(at + 1);
         self->type = fvec_get_type_from_symbol(sym);
       }
-      
+
       if(ac > 2)
         fvec_set_dimensions(self, ac - 2, at + 2);
     }
@@ -2055,7 +2070,7 @@ fvec_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   {
     /* no init args given: create empty column vector with own fmat */
     self->fmat = fmat_create(0, 1);
-    self->type = fvec_type_vector;
+    self->type = fvec_type_vector;  
   }
 
 fts_object_refer((fts_object_t *)self->fmat);
@@ -2095,6 +2110,7 @@ fvec_instantiate(fts_class_t *cl)
   /* standard functions */
   fts_class_set_copy_function (cl, fvec_copy_function);
   fts_class_set_array_function(cl, fvec_array_function);
+  fts_class_set_description_function(cl, fvec_description_function);
   
   /* standard methods for naming, persistence, and dump */
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);

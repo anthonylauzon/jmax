@@ -635,7 +635,7 @@ public void requestChangeReference(String type_ref, int idx_ref, int onset_ref, 
   args.addSymbol( FtsSymbol.get(type_ref));
   args.addInt( idx_ref);
   args.addInt( onset_ref);
-  if(size_ref > 0) args.addInt( size_ref);
+  args.addInt( size_ref);
   try{    
     send( FtsSymbol.get("reference"), args);
   }

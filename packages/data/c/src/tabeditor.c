@@ -35,6 +35,7 @@
 #define MAX_BLOCK_SIZE 8192
 #define TABEDITOR_DEFAULT_MIN  -1.0
 #define TABEDITOR_DEFAULT_MAX  1.0
+#define FVEC_DEFAULT_SIZE (INT_MAX >> 2)
 
 static fts_symbol_t sym_text = 0;
 
@@ -386,14 +387,21 @@ tabeditor_upload_reference(tabeditor_t *this)
       fvec_t *fvec = (fvec_t *)this->vec;
       fmat_t *fmat = fvec_get_fmat(fvec);
       int n = fmat_get_n(fmat);
-      if(n>1)
+      int m = fmat_get_m(fmat);
+      
+      if(n > 0 && m > 0)
       {
-        fts_set_int(a, fmat_get_m(fmat));
+        int size = fvec_get_raw_size(fvec);
+        
+        if(size == FVEC_DEFAULT_SIZE)
+          size = -1;
+        
+        fts_set_int(a, m);
         fts_set_int( a+1, n);
         fts_set_symbol(a+2, fvec_get_type_as_symbol(fvec));
         fts_set_int(a+3, fvec_get_index(fvec));
         fts_set_int(a+4, fvec_get_onset(fvec));
-        fts_set_int(a+5, fvec_get_size(fvec));
+        fts_set_int(a+5, size);
         fts_client_send_message((fts_object_t *)this, sym_reference, 6, a);
       }
     }
@@ -953,9 +961,13 @@ tabeditor_set_reference_from_client(fts_object_t *o, fts_symbol_t s, int ac, con
 {
   tabeditor_t *this = (tabeditor_t *)o;
   if(!tabeditor_is_ivec(this))
-  {
-    if(ac >= 3 && fts_is_symbol(at) && fts_is_int(at+1) && fts_is_int(at+2))
+  {    
+    if(ac >= 4 && fts_is_symbol(at) && fts_is_int(at+1) && fts_is_int(at+2) && fts_is_int(at+3))
     {
+      /* trans form size -1 in max. size */
+      if(fts_get_int(at + 3) == -1)
+        fts_set_int((fts_atom_t *)(at+3), FVEC_DEFAULT_SIZE);
+      
       fts_symbol_t type = fts_get_symbol(at);
       fts_send_message( (fts_object_t *)this->vec, type, ac-1, at+1, ret);
     }	  
