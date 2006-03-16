@@ -329,44 +329,89 @@ tabeditor_append_pixels(tabeditor_t *tabeditor, int deltax, int deltap)
   
   if(current >= vecsize) current = vecsize-1;
   
-  while(num_val > 0)
-  {
-    int send = (num_val > CLIENT_BLOCK_SIZE-2)? CLIENT_BLOCK_SIZE-2: num_val;
-    
-    fts_set_int(&a[0], start);
-    
-    if( tabeditor_is_ivec( tabeditor))
-      for(i = 0, j=0; ((i < send-1)&&((int)(current+j*k) < vecsize)); i+=2)
-      {
-        fts_set_int(&a[i+1], ivec_get_max_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
-        fts_set_int(&a[i+2], ivec_get_min_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
-        j++;
-      }     
-    else
+  if(deltax > 0)
+    while(num_val > 0)
     {
-      float *ptr;
-      int size;
-      int stride;
+      int send = (num_val > CLIENT_BLOCK_SIZE-2)? CLIENT_BLOCK_SIZE-2: num_val;
+    
+      fts_set_int(&a[0], start);
+    
+      if( tabeditor_is_ivec( tabeditor))
+        for(i = 0, j=0; ((i < send-1)&&((int)(current+j*k) < vecsize)); i+=2)
+        {
+          fts_set_int(&a[i+1], ivec_get_max_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
+          fts_set_int(&a[i+2], ivec_get_min_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
+          j++;
+        }     
+        else
+        {
+          float *ptr;
+          int size;
+          int stride;
+          
+          fvec_vector(tabeditor->vec, &ptr, &size, &stride);
       
-      fvec_vector(tabeditor->vec, &ptr, &size, &stride);
-      
-      for(i = 0, j = 0; (i < send-1 && ((int)(current + j * k) < size)); i+=2)
-      {
-        float min, max;
-        fvec_get_min_max_in_range(ptr, size, stride, (int)(current + k * j), (int)(current + k * (j + 1)), &min, &max);
-        
-        fts_set_float(a + i + 1, max);	
-        fts_set_float(a + i + 2, min);	
-        j++;
-      }
+          for(i = 0, j = 0; (i < send-1 && ((int)(current + j * k) < size)); i+=2)
+          {
+            float min, max;
+            fvec_get_min_max_in_range(ptr, size, stride, (int)(current + k * j), (int)(current + k * (j + 1)), &min, &max);
+            
+            fts_set_float(a + i + 1, max);	
+            fts_set_float(a + i + 2, min);	
+            j++;
+          }
+        }
+        if(i < send-1) send = i;
+    
+      fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send+1, a);
+    
+      current+= (int)(send/2)*k;
+      start+= send/2;
+      num_val -= send;
     }
-    if(i < send-1) send = i;
-    
-    fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send+1, a);
-    
-    current+= (int)k*j;
-    start+=j;
-    num_val -= send;
+  else
+  {    
+    while(num_val > 0)
+    {
+      int send = num_val;
+      while(send > CLIENT_BLOCK_SIZE-2)
+        send-=(CLIENT_BLOCK_SIZE-2);
+      current = tabeditor->vindex + (int)(((num_val-send)/2)*k); 
+      
+      fts_set_int(&a[0], start);
+      
+      if(tabeditor_is_ivec( tabeditor))
+      {
+        for(i = 0, j=0; ((i < send-1)&&((int)(current+j*k) < vecsize)); i+=2)
+        {
+          fts_set_int(&a[i+1], ivec_get_max_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
+          fts_set_int(&a[i+2], ivec_get_min_value_in_range((ivec_t *)tabeditor->vec, (int)(current+k*j), (int)(current+k*(j+1))));
+          j++;
+        }
+      }
+      else
+      {
+        float *ptr;
+        int size;
+        int stride;
+        
+        fvec_vector(tabeditor->vec, &ptr, &size, &stride);
+            
+        for(i = 0, j = 0; (i < send-1 && ((int)(current + j * k) < size)); i+=2)
+        {
+          float min, max;
+          fvec_get_min_max_in_range(ptr, size, stride, (int)(current + k * j), (int)(current + k * (j + 1)), &min, &max);
+          
+          fts_set_float(a + i + 1, max);	
+          fts_set_float(a + i + 2, min);	
+          j++;
+        }
+      }
+            
+      fts_client_send_message((fts_object_t *)tabeditor, sym_add_pixels, send+1, a);
+      
+      num_val -= send;
+    }
   }
 }
 

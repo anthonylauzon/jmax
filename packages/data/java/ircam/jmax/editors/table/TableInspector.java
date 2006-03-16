@@ -40,7 +40,7 @@ public class TableInspector extends JDialog
   JTextField onsetRefField, sizeRefField;
   String type_ref;
   int idx_ref, onset_ref, size_ref;
-  JButton applyRefButton;
+  //JButton applyRefButton;
   boolean reference_changed = false;
   TableDataListener listener;
   
@@ -352,7 +352,7 @@ public class TableInspector extends JDialog
       extRefPanel.add(referencePanel);
       
       /*apply button*/
-      applyRefButton = new JButton("      ok      ");
+      /*applyRefButton = new JButton("      ok      ");
       applyRefButton.setBorder(BorderFactory.createEtchedBorder());
       applyRefButton.setUI( new javax.swing.plaf.metal.MetalButtonUI());
       applyRefButton.addActionListener( new ActionListener(){
@@ -370,7 +370,7 @@ public class TableInspector extends JDialog
       applyRefButton.setEnabled(false);
       applyRefButton.setAlignmentX((float)0.5);
     
-      extRefPanel.add(applyRefButton);
+      extRefPanel.add(applyRefButton);*/
     
       rootPanel.add(extRefPanel);
     }
@@ -461,31 +461,47 @@ public class TableInspector extends JDialog
       if(idx_ref <= indexRefCombo.getItemCount())
         indexRefCombo.setSelectedIndex(idx_ref);
       else
+      {
         indexRefCombo.setSelectedIndex(0);
-      setReferenceChanged(true);
+        idx_ref = 0;
+      }
+      //setReferenceChanged(true);
+      ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
     }
   }
   void setIndexRef(int idx)
   {
-    idx_ref = idx;
-    setReferenceChanged(true);
+    if(idx_ref != idx)
+    {
+      idx_ref = idx;
+      //setReferenceChanged(true);
+      ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
+    }
   }
   void setOnsetRef(int ons)
   {
-    onset_ref = ons;
-    setReferenceChanged(true);
+    if(onset_ref != ons)
+    {
+      onset_ref = ons;
+      /*setReferenceChanged(true);*/
+      ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
+    }
   }
   void setSizeRef(int size)
   {
-    size_ref = size;
-    setReferenceChanged(true);
+    if(size_ref != size)
+    {
+      size_ref = size;
+      //setReferenceChanged(true);
+      ftsTableObject.requestChangeReference(type_ref, idx_ref, onset_ref, size_ref);
+    }
   }
   
-  void setReferenceChanged(boolean changed)
+  /*void setReferenceChanged(boolean changed)
   {
     reference_changed = changed;
     applyRefButton.setEnabled(changed);
-  }
+  }*/
   
   Vector getRefIndexes(int size)
   {

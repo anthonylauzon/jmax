@@ -39,7 +39,7 @@ import javax.swing.undo.*;
 
 /**
 * The panel in the Table editor's window, containing the toolbar, the CenterPanel 
- * (the graphic representation), the vertical scrollbar.
+ * (the graphic representation).
  * This class takes care of creating all the components of an editing session
  * (tools, Renderer, ...) and link them togheter.
  */
@@ -245,13 +245,14 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     
     itsHorizontalControl.addAdjustmentListener( new AdjustmentListener() {
       public void adjustmentValueChanged( AdjustmentEvent e)
-		{
+		  {
 				if(hScrollVal == e.getValue()) return;
 				
 				int hDelta = hScrollVal-e.getValue();	    
 				hScrollVal = e.getValue();
 				int last = gc.getLastVisibleIndex();
 				int first = gc.getFirstVisibleIndex();
+                        
 				gc.getAdapter().setXTransposition(hScrollVal);
 				gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
 																									gc.getWindowHorizontalScope(), gc.getAdapter().getXZoom(), 
@@ -270,9 +271,9 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				else
 				{
 					int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
-					gc.getFtsObject().requestGetPixels(deltax, -hDelta);          
+					gc.getFtsObject().requestGetPixels(deltax, -hDelta);                 
 				}
-		}
+      }
 		});
     
     add(itsHorizontalControl, BorderLayout.SOUTH);
