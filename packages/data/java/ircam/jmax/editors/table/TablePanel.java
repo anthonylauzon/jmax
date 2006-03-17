@@ -283,38 +283,33 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	
   void updateHorizontalScrollbar()
   {
-    int extent = gc.getWindowHorizontalScope();
-    
+    int extent = gc.getWindowHorizontalScope();    
     if(extent >= tableData.getSize())
 		{
-			if(itsHorizontalControl.isVisible())
-			{
-				itsHorizontalControl.setValue(0);
-				itsHorizontalControl.setEnabled(false);
-				itsHorizontalControl.setVisible(false);		      
-			}
-		}
+      itsHorizontalControl.setValue(0);
+      if(tableData.getSize()>0)
+      {
+        itsHorizontalControl.setMaximum(tableData.getSize()-1);
+        itsHorizontalControl.setVisibleAmount(tableData.getSize()-1);
+      }
+      itsHorizontalControl.setEnabled(false);    
+    }
     else
 		{
 			int last = gc.getLastVisibleIndex();
 			int first = gc.getFirstVisibleIndex();
-			
-			if(!itsHorizontalControl.isVisible())
-			{
-				itsHorizontalControl.setEnabled(true);
-				itsHorizontalControl.setVisible(true);
-			}
-			
-			itsHorizontalControl.setVisibleAmount(extent);
-			
-			if(tableData.getSize() > 0)
+
+      itsHorizontalControl.setEnabled(true);			
+		
+      if(tableData.getSize() > 0)
 				itsHorizontalControl.setMaximum(tableData.getSize()-1);
-			
+      itsHorizontalControl.setVisibleAmount(extent);
+      
 			if(last < first+extent) 
 			{
 				itsHorizontalControl.setValue(itsHorizontalControl.getValue()-(first+extent-last));
 				itsHorizontalControl.setVisibleAmount(gc.getVisibleHorizontalScope());
-			}
+      }
 		}    
   }
 	

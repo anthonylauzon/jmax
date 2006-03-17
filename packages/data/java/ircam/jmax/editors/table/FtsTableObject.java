@@ -160,7 +160,7 @@ public void setVisibles(int nArgs , FtsAtom args[])
   size = args[0].intValue;    
   visibleSize = args[1].intValue;    
   visibles = new double[size];
-  
+    
   if( isIvec())
   {
     if (isInGroup()) 
@@ -187,7 +187,7 @@ public void setVisibles(int nArgs , FtsAtom args[])
   }
   lastIndex = i;
   
-  if(oldSize != 0 && size != oldSize)
+  if(/*oldSize != 0 &&*/ size != oldSize)
     notifySizeChanged(size, oldSize);
   
   if((size <= lastIndex)||(visibleSize <= lastIndex))
@@ -202,7 +202,7 @@ public void appendVisibles(int nArgs , FtsAtom args[])
 {
   int startIndex = args[0].intValue;
   int i=0;
-  
+      
   if( isIvec())
   {
     if (isInGroup()) 
@@ -262,7 +262,7 @@ public void setPixels(int nArgs , FtsAtom args[])
   t_pixels = new double[pixelsSize + 10];
   b_pixels = new double[pixelsSize + 10];
   boolean notify = false;
-  
+    
   if( isIvec())
     for(i = 0; i < nArgs-3; i+=2)
     {	
@@ -289,7 +289,7 @@ public void appendPixels(int nArgs , FtsAtom args[])
   int startIndex = args[0].intValue;
   size = args[1].intValue;  
   int i = 0; int j = 0;
-  
+    
   if( isIvec())
     for(i = 0; (i < nArgs-3)&&(startIndex+j < t_pixels.length) ; i+=2)
     {
@@ -786,13 +786,13 @@ public void removeListener(TableDataListener theListener)
  */
 
 private void notifySizeChanged(int size, int oldSize)
-{
+{  
   for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
     ((TableDataListener) e.nextElement()).sizeChanged(size, oldSize);
 }
 
 private void notifySet()
-{
+{  
   for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
     ((TableDataListener) e.nextElement()).tableSetted();
 }

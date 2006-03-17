@@ -124,7 +124,7 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
       float *ptr;
       int size;
       int stride;
-      int i, j;
+      int j;
       
       fvec_vector(tabeditor->vec, &ptr, &size, &stride);
       
@@ -277,12 +277,10 @@ tabeditor_insert_pixels(tabeditor_t *tabeditor, int startId, int val_size)
 static void
 tabeditor_append_visibles(tabeditor_t *tabeditor, int first, int last)
 {
-  int i;
-  fts_atom_t a[CLIENT_BLOCK_SIZE];
-  
+  fts_atom_t a[CLIENT_BLOCK_SIZE];  
   int n = (last-first);
-  
   int current = first;
+  int i;
   
   while(n > 0)
   {
@@ -298,7 +296,7 @@ tabeditor_append_visibles(tabeditor_t *tabeditor, int first, int last)
       float *ptr;
       int size;
       int stride;
-      int i, j;
+      int j;
       
       fvec_vector(tabeditor->vec, &ptr, &size, &stride);
       

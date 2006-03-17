@@ -161,12 +161,12 @@ public void render(Graphics g, Rectangle r, int order)
     int visibleScope = gc.getVisibleHorizontalScope();
     
     if( itsMode == FILLED)
-      for (int i = index; (i < visibleSize)&&(i<tableSize); i++)
+      for (int i = index; (i <= visibleSize)&&(i<tableSize); i++)
         drawSolidPoint(g, gc.getAdapter().getX(i), 
                        gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)), zero);	    
     else 
       if( itsMode == POINTS)
-        for (int i = index; (i < visibleSize)&&(i<tableSize); i++)
+        for (int i = index; (i <= visibleSize)&&(i<tableSize); i++)
           drawHollowPoint(g, gc.getAdapter().getX(i), 
                           gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)));
 	  else
@@ -178,7 +178,7 @@ public void render(Graphics g, Rectangle r, int order)
                        gc.getAdapter().getX(index), 
                        gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(index)));
       
-      for (i = index; (i < visibleSize)&&(i<tableSize-1); i++)
+      for (i = index; (i <= visibleSize)&&(i<tableSize-1); i++)
         drawBoundPoint(g, gc.getAdapter().getX(i), 
                        gc.getAdapter().getY( gc.getFtsObject().getVisibleValue(i)),
                        gc.getAdapter().getX(i+1), 
