@@ -53,13 +53,7 @@ public class TableRuler extends JPanel
         float newZoom = xZoom;
         int delta = e.getX()-previousX;		
 				previousX = e.getX();		
-        /*int visScope = tgc.getVisibleHorizontalScope();
-        if(visScope > 10000) 
-        {
-          System.err.println("xZoom "+xZoom+" percent "+((float)10000/visScope)+" risultato "+xZoom*((float)10000/visScope));
-          if(xZoom > 0.0)
-            xZoom = (float)(xZoom*((double)1000/visScope));       
-        }*/
+     
         dddx+=delta;
         if(dddx>35)
         {
@@ -89,8 +83,7 @@ public class TableRuler extends JPanel
           a.setXZoom(newZoom);
           dddx=0;
         }
-        
-        /*
+        /* old code//////////////////////////////
          if(dddx>35)
          {
            if (xZoom>=0.9)
@@ -155,17 +148,24 @@ public class TableRuler extends JPanel
     String indexString;
     Dimension d = getSize();
     Rectangle r = tgc.getGraphicDestination().getBounds();
+    Rectangle clipRect = g.getClipBounds();
+    
+    g.setColor(Color.white);
+    g.drawLine(clipRect.x + TableVerticalRuler.RULER_WIDTH+1,  clipRect.y, clipRect.x + TableVerticalRuler.RULER_WIDTH+1, clipRect.height);
+    g.setColor(Color.lightGray);
+    g.drawLine(clipRect.x + TableVerticalRuler.RULER_WIDTH,  clipRect.y, clipRect.x + TableVerticalRuler.RULER_WIDTH, clipRect.height);
+    
+    g.setClip(clipRect.x + TableVerticalRuler.RULER_WIDTH+1, clipRect.y, clipRect.width, clipRect.height);
     
     int index = tgc.getAdapter().getInvX( r.x);
-    int visibleSize = tgc.getAdapter().getInvX( r.x+r.width);
+    int visibleSize = tgc.getAdapter().getInvX(r.width) - tgc.getAdapter().getInvX(r.x);
     int tableSize = tgc.getFtsObject().getSize();
     int firstVisible = tgc.getFirstVisibleIndex();
     int visibleScope = tgc.getVisibleHorizontalScope();
     int indexStep = findBestIndexStep(visibleSize);
+
     int logicalIndex = firstVisible;
-    int snappedIndex = 0; 
-    
-    
+    int snappedIndex = 0;     
     int stringLenght = fm.stringWidth(""+(logicalIndex+indexStep));
     int delta = tgc.getAdapter().getX(logicalIndex+indexStep)-tgc.getAdapter().getX(logicalIndex);
     int k, stringWidth;
@@ -176,15 +176,29 @@ public class TableRuler extends JPanel
     for (int i=logicalIndex+indexStep; i<logicalIndex+visibleScope; i+=indexStep*k) 
     {
       snappedIndex = (i/indexStep)*indexStep;
-      xPosition = tgc.getAdapter().getX(snappedIndex);
+      xPosition = tgc.getAdapter().getX(snappedIndex) + TableVerticalRuler.RULER_WIDTH;
       indexString = ""+snappedIndex;
       stringWidth = fm.stringWidth(indexString);
-      g.drawString(indexString, xPosition-stringWidth/2, RULER_HEIGHT-3);		  
+      g.drawString(indexString, xPosition-stringWidth/2, RULER_HEIGHT-3);		        
+    }
+    for (int i=logicalIndex; (i < logicalIndex+visibleScope && i < tableSize); i+=indexStep) 
+    {
+      float pstep = (float)(delta/10.0);
+      int xpos;
+      int z = (pstep < 5) ? 2 : 1;
+        
+      for(int j = 1; j<10; j+=z)
+      {
+        snappedIndex = (i/indexStep)*indexStep;
+        xPosition = tgc.getAdapter().getX(snappedIndex) + TableVerticalRuler.RULER_WIDTH;
+        xpos = xPosition+(int)(j*pstep);
+        g.drawLine(xpos, d.height, xpos, d.height-1);
+      }
     }
     /*draw always last index */
     if(visibleSize >= tableSize && snappedIndex != tableSize)
     {
-      xPosition = tgc.getAdapter().getX(tableSize);
+      xPosition = tgc.getAdapter().getX(tableSize) + TableVerticalRuler.RULER_WIDTH;
       indexString = ""+tableSize;
       stringWidth = fm.stringWidth(indexString);
       g.drawString(indexString, xPosition-stringWidth/2, RULER_HEIGHT-3);	
@@ -200,6 +214,7 @@ public class TableRuler extends JPanel
     pow = pow/10;
     if (indexScope/pow < 5) pow = pow/5;
     if (pow == 0) return 1;
+      
     return pow;
   }
   

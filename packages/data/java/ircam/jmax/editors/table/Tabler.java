@@ -90,7 +90,7 @@ public class Tabler extends JMaxEditor{
   }  
   
   private void makeTablerWindow()
-  {
+  {    
     addWindowListener( new WindowListener(){
       public void windowOpened(WindowEvent e){}
       public void windowClosed(WindowEvent e){}

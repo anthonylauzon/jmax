@@ -317,6 +317,9 @@
 		3B02488006B94BDA002BEB0D /* JMaxObjectManager.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B02487F06B94BDA002BEB0D /* JMaxObjectManager.java */; };
 		3B02488106B94BDA002BEB0D /* JMaxObjectManager.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B02487F06B94BDA002BEB0D /* JMaxObjectManager.java */; };
 		3B04C62C06D26F9F004E63C5 /* SequenceSimpleMenu.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B04C62B06D26F9F004E63C5 /* SequenceSimpleMenu.java */; };
+		3B0A63D409E3C584005B4F5E /* TableVerticalRuler.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B0A63D309E3C584005B4F5E /* TableVerticalRuler.java */; };
+		3B0A63D609E3C5B5005B4F5E /* TablePositionListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B0A63D509E3C5B5005B4F5E /* TablePositionListener.java */; };
+		3B0A63E109E3C5FE005B4F5E /* PositionDrawer.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B0A63E009E3C5FE005B4F5E /* PositionDrawer.java */; };
 		3B131FE309348B40001F5860 /* seq_fmat.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE209348B40001F5860 /* seq_fmat.gif */; };
 		3B131FE609348B78001F5860 /* seq_anything.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE409348B78001F5860 /* seq_anything.gif */; };
 		3B131FE709348B78001F5860 /* seq_arrow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3B131FE509348B78001F5860 /* seq_arrow.gif */; };
@@ -2558,6 +2561,9 @@
 /* Begin PBXFileReference section */
 		3B02487F06B94BDA002BEB0D /* JMaxObjectManager.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = JMaxObjectManager.java; path = ../../java/src/ircam/jmax/JMaxObjectManager.java; sourceTree = SOURCE_ROOT; };
 		3B04C62B06D26F9F004E63C5 /* SequenceSimpleMenu.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = SequenceSimpleMenu.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/menus/SequenceSimpleMenu.java; sourceTree = SOURCE_ROOT; };
+		3B0A63D309E3C584005B4F5E /* TableVerticalRuler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TableVerticalRuler.java; path = ../../packages/data/java/ircam/jmax/editors/table/TableVerticalRuler.java; sourceTree = SOURCE_ROOT; };
+		3B0A63D509E3C5B5005B4F5E /* TablePositionListener.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = TablePositionListener.java; path = ../../packages/data/java/ircam/jmax/editors/table/TablePositionListener.java; sourceTree = SOURCE_ROOT; };
+		3B0A63E009E3C5FE005B4F5E /* PositionDrawer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = PositionDrawer.java; path = ../../packages/data/java/ircam/jmax/editors/table/PositionDrawer.java; sourceTree = SOURCE_ROOT; };
 		3B131FE209348B40001F5860 /* seq_fmat.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_fmat.gif; path = ../../packages/sequence/images/seq_fmat.gif; sourceTree = SOURCE_ROOT; };
 		3B131FE409348B78001F5860 /* seq_anything.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_anything.gif; path = ../../packages/sequence/images/seq_anything.gif; sourceTree = SOURCE_ROOT; };
 		3B131FE509348B78001F5860 /* seq_arrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = seq_arrow.gif; path = ../../packages/sequence/images/seq_arrow.gif; sourceTree = SOURCE_ROOT; };
@@ -2631,7 +2637,7 @@
 		3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerEventRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java; sourceTree = SOURCE_ROOT; };
 		5C43B82F05AB304800E7FB5C /* libfunctions.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libfunctions.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C43B8F205ABFF6900E7FB5C /* libfunctions-info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; path = "libfunctions-info.plist"; sourceTree = SOURCE_ROOT; };
-		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426BB05AB0B8A0042B7A2 /* version-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "version-info.plist"; sourceTree = "<group>"; };
 		5C5426BC05AB0B8A0042B7A2 /* version.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = version.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426C005AB0B8A0042B7A2 /* parser-tokenizer-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "parser-tokenizer-info.plist"; sourceTree = "<group>"; };
@@ -6189,9 +6195,12 @@
 				F8B8E526028680BB01664092 /* TableInteractionModule.java */,
 				F8B8E527028680BB01664092 /* TableMouseDragTracker.java */,
 				F8B8E528028680BB01664092 /* TablePanel.java */,
+				3B0A63E009E3C5FE005B4F5E /* PositionDrawer.java */,
+				3B0A63D509E3C5B5005B4F5E /* TablePositionListener.java */,
 				F8B8E529028680BB01664092 /* Tabler.java */,
 				3B175E3C09869B88005D052F /* TableRuler.java */,
 				F8B8E52A028680BB01664092 /* TableSelection.java */,
+				3B0A63D309E3C584005B4F5E /* TableVerticalRuler.java */,
 				F8B8E52B028680BB01664092 /* UndoableValueSet.java */,
 				F56C3E180338D3DC01664092 /* Actions.java */,
 				3B14B14809814060009F9B0C /* TableInspector.java */,
@@ -8661,6 +8670,9 @@
 				3B14B14909814060009F9B0C /* TableInspector.java in Sources */,
 				3B175E3B09869B5B005D052F /* TableSimpleMenu.java in Sources */,
 				3B175E3D09869B89005D052F /* TableRuler.java in Sources */,
+				3B0A63D409E3C584005B4F5E /* TableVerticalRuler.java in Sources */,
+				3B0A63D609E3C5B5005B4F5E /* TablePositionListener.java in Sources */,
+				3B0A63E109E3C5FE005B4F5E /* PositionDrawer.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

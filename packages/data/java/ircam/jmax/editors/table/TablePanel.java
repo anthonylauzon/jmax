@@ -65,6 +65,11 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   FtsObjectWithEditor ftsObj;
 	boolean tableShown = false;
   int oldVisibleScope = 0;
+  
+  TableVerticalRuler verticalRuler;
+  
+  ActionListener getValuesPerformer; 
+  javax.swing.Timer getValuesTimer;
   /**
 		* Constructor. */
   public TablePanel(EditorContainer container, FtsObjectWithEditor ftsObj, TableDataModel tm) {
@@ -88,6 +93,8 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     prepareGraphicContext();
     itsCenterPanel.setGraphicContext(gc);
 		
+    prepareVerticalRuler();
+      
     //... the renderer
     itsTableRenderer = new TableRenderer(gc);
     itsCenterPanel.setRenderer(itsTableRenderer);
@@ -107,25 +114,39 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				itsCenterPanel.repaint();
 		}
 		});
-
+    
+    getValuesPerformer = new ActionListener() {
+      public void actionPerformed(ActionEvent evt) {        
+        if(gc.getAdapter().getXZoom() > 0.5)		    
+          gc.getFtsObject().requestGetValues();
+        else
+          gc.getFtsObject().requestGetPixels(0, 0);        
+      }
+    };
+    
     addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
-		  {
+		  {        
         if(tableShown)
         {          
           updateHorizontalScrollbar();//????
           int visibleScope = gc.getVisibleHorizontalScope();
+          
           gc.getFtsObject().requestSetVisibleWindow( visibleScope, gc.getFirstVisibleIndex(), 
                                                      gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
                                                      gc.getVisiblePixelsSize());
           
-          if(visibleScope != oldVisibleScope && !gc.isCompletelyUpdated())
+          if(visibleScope > oldVisibleScope && !gc.isCompletelyUpdated())
           {
-            if(gc.getAdapter().getXZoom() > 0.5)		    
-              gc.getFtsObject().requestGetValues();
+            if(getValuesTimer == null)
+            {
+              getValuesTimer = new javax.swing.Timer(300, getValuesPerformer);
+              getValuesTimer.setRepeats(false);
+              getValuesTimer.start();
+            }
             else
-              gc.getFtsObject().requestGetPixels(0, 0);
-            
+              getValuesTimer.restart();
+
             oldVisibleScope = visibleScope;
           }
         }
@@ -149,7 +170,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     //470 is the default size of the TableDisplay .......
     /*gc.getFtsObject().requestSetVisibleWindow( 470, 0, gc.getWindowHorizontalScope(), (double)1.0, gc.getVisiblePixelsSize());
     gc.getFtsObject().requestGetValues();*/
-
+    
     setSize(PANEL_WIDTH, PANEL_HEIGHT);
     setPreferredSize(size);
   }
@@ -186,18 +207,32 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     toolbar = new EditorToolbar(toolManager, EditorToolbar.HORIZONTAL);
   }
 	
+  JPanel firstCenterPanel;
   private void prepareCenterPanel()
   {      
     itsCenterPanel = new TableDisplay(this); 
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setBorder(new EtchedBorder());
-		
-    /*itsCenterPanel.setBounds(0,0, getSize().width-SCROLLBAR_SIZE, 
-														 getSize().height-SCROLLBAR_SIZE);*/
-		
-    add(itsCenterPanel, BorderLayout.CENTER);
+
+    /*add(itsCenterPanel, BorderLayout.CENTER);
+    validate();*/
+
+    firstCenterPanel = new JPanel();
+    firstCenterPanel.setLayout(new BoxLayout(firstCenterPanel, BoxLayout.X_AXIS));
+    //aPanel.add(Box.createHorizontalStrut(2));
+    firstCenterPanel.add(itsCenterPanel);
+    firstCenterPanel.add(Box.createHorizontalStrut(2));
+    
+    add(firstCenterPanel, BorderLayout.CENTER);
     validate();
   }
+  
+  private void prepareVerticalRuler()
+  {
+    verticalRuler = new TableVerticalRuler(gc);
+    firstCenterPanel.add(verticalRuler, 0);
+  }
+  
 	private void prepareGraphicContext()
   { 
     //prepares the graphic context

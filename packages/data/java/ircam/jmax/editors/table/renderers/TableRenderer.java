@@ -148,6 +148,7 @@ public void render(Graphics g, Rectangle r, int order)
   g.setColor( foreColor);
   
   int zero = gc.getAdapter().getY(0);
+    
   if(gc.getAdapter().getXZoom() > 0.501)
   {
     if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
@@ -233,7 +234,7 @@ void drawVerticalGrid(Graphics g)
   Rectangle r = gc.getGraphicDestination().getBounds();
   
   int index = gc.getAdapter().getInvX( r.x);
-  int visibleSize = gc.getAdapter().getInvX( r.x+r.width);
+  int visibleSize = gc.getAdapter().getInvX(r.width)-gc.getAdapter().getInvX(r.x);
   int tableSize = gc.getFtsObject().getSize();
   int firstVisible = gc.getFirstVisibleIndex();
   int visibleScope = gc.getVisibleHorizontalScope();

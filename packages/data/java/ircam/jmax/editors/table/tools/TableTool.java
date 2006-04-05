@@ -35,7 +35,7 @@ import javax.swing.*;
  * It uses a FreeHandDrawer Interaction Module
  * @see TableTool
  */ 
-public class TableTool extends Tool implements DynamicDragListener, GraphicSelectionListener, LineListener
+public class TableTool extends Tool implements DynamicDragListener, GraphicSelectionListener, LineListener, TablePositionListener
 {
 
   /**
@@ -48,6 +48,7 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
     itsFreeHand = new FreeHandDrawer(this);
     itsSelecter = new StripeSelecter(this);
     itsLiner = new LineDrawer(this);
+    itsPositioner = new PositionDrawer(this);
   }
 
   /**
@@ -63,7 +64,8 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
    */
   public InteractionModule getDefaultIM() 
   {
-    return itsSelecter;
+    //return itsSelecter;
+    return itsPositioner;
   }
   
 /********************** DynamicDragListener interface ******************************/
@@ -169,14 +171,18 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
   {
     TableAdapter a = ((TableGraphicContext)gc).getAdapter();
   
-    if (w==0) return;
+    if (w!=0)
+    {
+      ((TableGraphicContext)gc).getSelection().setCaretPosition(TableSelection.NO_CARET);
+      int start = (a.getInvX(x)>0) ? a.getInvX(x) : 0;
+      int end = (a.getInvX(x+w) < ((TableGraphicContext)gc).getFtsObject().getSize()) ? a.getInvX(x+w) : (((TableGraphicContext)gc).getFtsObject().getSize());
+      ((TableGraphicContext)gc).getSelection().select(start, end);
     
-    ((TableGraphicContext)gc).getSelection().setCaretPosition(TableSelection.NO_CARET);
-    int start = (a.getInvX(x)>0) ? a.getInvX(x) : 0;
-    int end = (a.getInvX(x+w) < ((TableGraphicContext)gc).getFtsObject().getSize()) ? a.getInvX(x+w) : (((TableGraphicContext)gc).getFtsObject().getSize());
-    ((TableGraphicContext)gc).getSelection().select(start, end);
+      gc.getGraphicDestination().requestFocus();
+    }
     
-    gc.getGraphicDestination().requestFocus();
+    itsPositioner.activate(x, y);
+    mountIModule(itsPositioner, x, y); 
   }
   public void selectionPointDoubleClicked(int x, int y, int modifiers){}
   /********************************************************************************************/
@@ -212,6 +218,16 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
     int end = ta.getInvX(x2);
     ((TableGraphicContext)gc).getFtsObject().interpolate(start, end, ta.getInvY(y1), ta.getInvY(y2));
   }
+  
+  /********************************************************************************************/
+  /********************************** TablePositionListener *****************************************************/
+  public void startFollowPosition(){}
+  public void stopFollowPosition(int x, int y, MouseEvent e)
+  {
+    mountIModule(itsSelecter, x, y); 
+    itsSelecter.mousePressed(e);
+  }
+  
   /********************************************************************************************/
   //-------------- fields drawer -----------------------/
   FreeHandDrawer itsFreeHand;
@@ -223,6 +239,8 @@ public class TableTool extends Tool implements DynamicDragListener, GraphicSelec
   Point startingPoint = new Point();
   //--- liner fields ----------/
   LineDrawer itsLiner;
+  //--- positioner fields ----------/
+  PositionDrawer itsPositioner;
 }
 
 

@@ -24,6 +24,7 @@
 #include <fts/packages/utils/utils.h>
 #include <fts/packages/data/data.h>
 #include "tabeditor.h"
+#include <limits.h>
 
 #include <stdlib.h>
 
