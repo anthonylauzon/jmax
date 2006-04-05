@@ -70,7 +70,7 @@ public class TableVerticalRuler extends JPanel
     int yzero = tgc.getAdapter().getY(0);
     float valueStep = (float)findBestValueStep(valueRange);
     int graphStep = yzero - tgc.getAdapter().getY(valueStep);
-     
+         
     if(graphStep <= 0) return;
     
     g.setColor(violetColor);

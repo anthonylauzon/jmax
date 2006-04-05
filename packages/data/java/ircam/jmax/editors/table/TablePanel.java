@@ -116,7 +116,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		});
     
     getValuesPerformer = new ActionListener() {
-      public void actionPerformed(ActionEvent evt) {        
+      public void actionPerformed(ActionEvent evt) {                
         if(gc.getAdapter().getXZoom() > 0.5)		    
           gc.getFtsObject().requestGetValues();
         else
@@ -136,7 +136,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
                                                      gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
                                                      gc.getVisiblePixelsSize());
           
-          if(visibleScope > oldVisibleScope && !gc.isCompletelyUpdated())
+          if((visibleScope > oldVisibleScope && !gc.isCompletelyUpdated()) || (gc.getAdapter().getXZoom() <= 0.5))
           {
             if(getValuesTimer == null)
             {
