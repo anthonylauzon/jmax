@@ -70,20 +70,15 @@ FTS_API enumeration_t *scoob_type_enumeration;
 #define scoob_set_duration(s, x) ((s)->duration = (x))
 #define scoob_get_duration(s) ((s)->duration)
 
-void scoob_set_velocity(scoob_t *self, int velocity);
-int scoob_get_velocity(scoob_t *self);
-void scoob_set_channel(scoob_t *self, int channel);
-int scoob_get_channel(scoob_t *self);
-
 #define scoob_get_type_index(s) (enumeration_get_index(scoob_type_enumeration, (s)->type))
 #define scoob_set_type_by_index(s, i) ((s)->type = enumeration_get_name(scoob_type_enumeration, (i)))
 
 /* scoob default MIDI properties */
-void scoob_set_velocity(scoob_t *self, int velocity);
-int scoob_get_velocity(scoob_t *self);
+FTS_API void scoob_set_velocity(scoob_t *self, int velocity);
+FTS_API int scoob_get_velocity(scoob_t *self);
 
-void scoob_set_channel(scoob_t *self, int channel);
-int scoob_get_channel(scoob_t *self);
+FTS_API void scoob_set_channel(scoob_t *self, int channel);
+FTS_API int scoob_get_channel(scoob_t *self);
 
 /* scoob properties */
 #define scoob_property_get(s, n, p) propobj_get_property_by_name((propobj_t *)(s), (n), (p))

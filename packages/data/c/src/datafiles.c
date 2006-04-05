@@ -670,8 +670,6 @@ mat_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
   
   if(!file_name)
     return fts_ok;
-  
-  
   if (separator)
     size = mat_read_atomfile_separator(self, file_name, separator, ac - 3, at + 3);
   else

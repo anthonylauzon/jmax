@@ -88,8 +88,8 @@ typedef struct
 enumeration_t *enumeration_new(fts_symbol_t name);
 enumeration_t *enumeration_get_by_name(fts_symbol_t name);
 fts_symbol_t enumeration_add_name(enumeration_t *e, const fts_symbol_t name);
-int enumeration_get_index(enumeration_t *e, const fts_symbol_t name);
-fts_symbol_t enumeration_get_name(enumeration_t *e, int index);
+DATA_API int enumeration_get_index(enumeration_t *e, const fts_symbol_t name);
+DATA_API fts_symbol_t enumeration_get_name(enumeration_t *e, int index);
 
 
 
@@ -127,14 +127,14 @@ typedef struct
 
 #define propobj_get_type(p) ((p)->type)
 
-void propobj_get_property(propobj_t *self, propobj_property_t *prop, fts_atom_t *p);
-void propobj_set_property(propobj_t *self, propobj_property_t *prop, const fts_atom_t *value);
-void propobj_get_property_by_index(propobj_t *self, int index, fts_atom_t *p);
-void propobj_set_property_by_index(propobj_t *self, int index, const fts_atom_t *value);
-void propobj_get_property_by_name(propobj_t *self, fts_symbol_t name, fts_atom_t *p);
-void propobj_set_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value);
-void propobj_set_int_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value);
-void propobj_set_float_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value);
+DATA_API void propobj_get_property(propobj_t *self, propobj_property_t *prop, fts_atom_t *p);
+DATA_API void propobj_set_property(propobj_t *self, propobj_property_t *prop, const fts_atom_t *value);
+DATA_API void propobj_get_property_by_index(propobj_t *self, int index, fts_atom_t *p);
+DATA_API void propobj_set_property_by_index(propobj_t *self, int index, const fts_atom_t *value);
+DATA_API void propobj_get_property_by_name(propobj_t *self, fts_symbol_t name, fts_atom_t *p);
+DATA_API void propobj_set_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value);
+DATA_API void propobj_set_int_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value);
+DATA_API void propobj_set_float_property_by_name(propobj_t *self, fts_symbol_t name, const fts_atom_t *value);
 
 void propobj_init(fts_object_t *o);
 void propobj_delete(fts_object_t *o);
@@ -144,11 +144,11 @@ void propobj_class_init(fts_class_t *cl);
 propobj_class_description_t *propobj_class_get_descritption(fts_class_t *cl);
 propobj_class_description_t *propobj_get_descritption(propobj_t *self);
 
-propobj_property_t *propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method);
-propobj_property_t *propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method);
-propobj_property_t *propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method);
-propobj_property_t *propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name);
-propobj_property_t *propobj_class_get_property_by_index(fts_class_t *cl, int index);
+DATA_API propobj_property_t *propobj_class_add_int_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method);
+DATA_API propobj_property_t *propobj_class_add_float_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method);
+DATA_API propobj_property_t *propobj_class_add_symbol_property(fts_class_t *cl, fts_symbol_t name, fts_method_t set_method);
+DATA_API propobj_property_t *propobj_class_get_property_by_name(fts_class_t *cl, fts_symbol_t name);
+DATA_API propobj_property_t *propobj_class_get_property_by_index(fts_class_t *cl, int index);
 
 /* utilities */
 void propobj_class_append_properties(fts_class_t *cl, fts_array_t *array);
