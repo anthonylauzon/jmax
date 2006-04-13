@@ -67,7 +67,9 @@ FTS_API void event_set_duration(event_t *event, double duration);
 /**
 * Upload changes in event or event's value to client
  */
-FTS_API void event_set_at_client(event_t *this, int uploading);
+
+FTS_API void event_set_at_client(event_t *self, int uploading);
+
 
 FTS_API void event_unset_property(event_t *event, fts_symbol_t prop);
 

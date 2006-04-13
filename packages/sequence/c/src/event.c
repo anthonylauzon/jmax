@@ -103,7 +103,7 @@ void event_unset_property(event_t *event, fts_symbol_t prop)
 static fts_array_t event_client_array;
 
 void 
-event_set_at_client(event_t *this, int uploading)
+event_set_at_client(event_t *self, int uploading)
 {
   if(fts_is_object(&this->value))
   {
