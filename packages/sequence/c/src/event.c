@@ -105,9 +105,9 @@ static fts_array_t event_client_array;
 void 
 event_set_at_client(event_t *self, int uploading)
 {
-  if(fts_is_object(&this->value))
+  if(fts_is_object(&self->value))
   {
-    fts_object_t *obj = fts_get_object(&this->value);
+    fts_object_t *obj = fts_get_object(&self->value);
     fts_method_t method_append_properties = fts_class_get_method_varargs(fts_object_get_class(obj), seqsym_append_properties);
     int size = 0;
     fts_atom_t *atoms = 0;
@@ -126,10 +126,10 @@ event_set_at_client(event_t *self, int uploading)
     else /* not a score object but other object as fmat */ 
     {
       /* register value and send object id as value-property */
-      fts_object_t *valobj = fts_get_object( event_get_value( this));
+      fts_object_t *valobj = fts_get_object( event_get_value( self));
       
       if(fts_object_has_client(valobj) == 0)
-        fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)this));	
+        fts_client_register_object(valobj, fts_object_get_client_id((fts_object_t *)self));	
       
       fts_array_append_symbol(&event_client_array, seqsym_objid);
       fts_array_append_int(&event_client_array, fts_object_get_id(valobj));                  
@@ -140,23 +140,23 @@ event_set_at_client(event_t *self, int uploading)
     
     /* send properties to client */
     if(size > 0)
-      fts_client_send_message((fts_object_t *)this, fts_s_set, size, atoms);
+      fts_client_send_message((fts_object_t *)self, fts_s_set, size, atoms);
   }
   else
-    fts_client_send_message((fts_object_t *)this, fts_s_set, 1, &this->value);
+    fts_client_send_message((fts_object_t *)self, fts_s_set, 1, &self->value);
   
   if(!uploading)
-    fts_object_set_state_dirty((fts_object_t *)event_get_track(this));
+    fts_object_set_state_dirty((fts_object_t *)event_get_track(self));
 }
 
 static fts_method_status_t
 event_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  event_t *this = (event_t *)o;
+  event_t *self = (event_t *)o;
   
-  if(fts_is_object(&this->value))
+  if(fts_is_object(&self->value))
   {
-    fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
+    fts_object_t *obj = (fts_object_t *)fts_get_object(&self->value);
     int i;
     for(i=0; i<ac; i+=2)
     {
@@ -167,10 +167,10 @@ event_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
       }
     }
   }
-  else if(ac > 1 && fts_is_symbol(at) && fts_atom_same_type(&this->value, at+1))
-    this->value = at[1];
+  else if(ac > 1 && fts_is_symbol(at) && fts_atom_same_type(&self->value, at+1))
+    self->value = at[1];
   
-  event_set_at_client(this, 0);
+  event_set_at_client(self, 0);
   
   return fts_ok;
 }
@@ -178,11 +178,11 @@ event_set(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
 static fts_method_status_t
 event_unset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  event_t *this = (event_t *)o;
+  event_t *self = (event_t *)o;
   
-  if(fts_is_object(&this->value))
+  if(fts_is_object(&self->value))
   {
-    fts_object_t *obj = (fts_object_t *)fts_get_object(&this->value);
+    fts_object_t *obj = (fts_object_t *)fts_get_object(&self->value);
     int i;
     
     for(i=0; i<ac; i++)
@@ -192,7 +192,7 @@ event_unset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
     }
   }
   
-  event_set_at_client(this, 0);
+  event_set_at_client(self, 0);
   
   return fts_ok;
 }
@@ -205,17 +205,17 @@ event_unset(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 static fts_method_status_t
 event_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  event_t *this = (event_t *)o;
+  event_t *self = (event_t *)o;
   
-  fts_set_void(&this->value);
+  fts_set_void(&self->value);
   
-  this->time = 0.0;
-  this->track = 0;
-  this->prev = 0;
-  this->next = 0;
+  self->time = 0.0;
+  self->track = 0;
+  self->prev = 0;
+  self->next = 0;
   
   if(ac > 0)
-    fts_atom_assign(&this->value, at);
+    fts_atom_assign(&self->value, at);
   
   return fts_ok;
 }
@@ -223,9 +223,9 @@ event_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
 static fts_method_status_t
 event_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  event_t *this = (event_t *)o;
+  event_t *self = (event_t *)o;
   
-  fts_atom_void(&this->value);
+  fts_atom_void(&self->value);
   
   return fts_ok;
 }
