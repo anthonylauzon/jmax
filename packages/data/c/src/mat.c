@@ -718,7 +718,7 @@ mat_change_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   int n = 0;
   
   if (ac == 1  &&  fts_is_number(at))
-  {
+  { /* only change # of rows */
     m = fts_get_number_int(at);
     n = mat_get_n(self);
     
@@ -1203,6 +1203,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_void (cl, fts_s_size, mat_return_size);
   fts_class_message_void (cl, fts_s_rows, mat_return_size);
   fts_class_message_void (cl, fts_s_cols, mat_return_size);
+  fts_class_message_number (cl, fts_s_rows, mat_change_size);
   fts_class_message_varargs(cl, fts_s_size, mat_change_size);
 
   fts_class_message_varargs(cl, fts_s_get_element, mat_return_element);
@@ -1232,7 +1233,7 @@ mat_instantiate(fts_class_t *cl)
 
   fts_class_doc(cl, fts_s_fill, "<atom: value>", "fill matrix with given value");
   fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (default is 1)>]]", "get/set size");
-  fts_class_doc(cl, fts_s_rows, "<void>", "get # of rows");
+  fts_class_doc(cl, fts_s_rows, "<void | int: num>", "get or set # of rows");
   fts_class_doc(cl, fts_s_cols, "<void>", "get # of columns");
   
   fts_class_doc(cl, fts_s_get_element, "<num: row index> <num: column index>", "get value at given index");
