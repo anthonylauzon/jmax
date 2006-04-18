@@ -1062,13 +1062,20 @@ track_get_or_make_markers(track_t *track)
     
     fts_set_symbol(&a, seqsym_scomark);
     markers = (track_t *)fts_object_create(track_class, 1, &a);
-    fts_object_set_context((fts_object_t *)markers, (fts_context_t *)track);
-    
+    /*WRONG???*/
+    fts_object_set_context((fts_object_t *) markers, 
+			   fts_object_get_context((fts_object_t *) track));
+/*    fts_post("track_get_or_make_markers: no clue how to set new marker track's context, leave it NULL.\n");*/
+  
+     
     fts_object_refer((fts_object_t *) markers);
     track_set_markers(track, markers);
   }
   else if(fts_object_get_context((fts_object_t *)markers) == NULL)
-    fts_object_set_context((fts_object_t *)markers, (fts_context_t *)track);
+      /*WRONG???*/
+      fts_object_set_context((fts_object_t *) markers, 
+			     fts_object_get_context((fts_object_t *) track));
+/*  fts_post("track_get_or_make_markers: marker track context is NULL, what can I do about it?\n");*/
   
   return markers;
 }
@@ -1162,8 +1169,12 @@ _track_set_markers (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
         fts_object_release(track_get_markers(self));
       
       track_set_markers(self, markers);
-      fts_object_set_context((fts_object_t *)markers, (fts_context_t *)self);
-      
+      /*WRONG???*/
+      fts_object_set_context((fts_object_t *) markers, 
+			     fts_object_get_context((fts_object_t *) self));
+
+/*      fts_post("_track_set_markers: no clue how to set marker track's context, leave it NULL.\n");*/
+
       fts_object_refer(markers);
       
       /* update editor */
@@ -1502,7 +1513,11 @@ track_compatible_add_marker_from_file(fts_object_t *o, fts_symbol_t s, int ac, c
   track_t *markers = track_get_or_make_markers(self);
   double time = fts_get_float(at);
   event_t *marker_event = track_event_create(ac - 1, at + 1);
-  fts_object_set_context((fts_object_t *)marker_event, (fts_context_t *)markers);
+
+  /*WRONG???*/
+  fts_object_set_context((fts_object_t *) marker_event, 
+			 fts_object_get_context((fts_object_t *) markers));
+  /*fts_post("track_compatible_add_marker_from_file: no clue how to set new marker event's context, leave it NULL.\n"); */
   
   /* add event to track (strictly ordered by time) */
   if(marker_event != NULL)
