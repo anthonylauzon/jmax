@@ -41,17 +41,22 @@
 #include <time.h>
 #endif
 
+
+
 static fts_status_description_t wrong_args_error_description = {"wrong arguments"};
 static fts_status_t wrong_args_error = &wrong_args_error_description;
 
 static fts_status_description_t no_args_error_description = {"argument(s) required"};
 static fts_status_t no_args_error = &no_args_error_description;
 
+
+
+
 /**********************************************************************
-*
-*  wrappers to C math functions with one argument are automatically generated
-*
-*/
+ *
+ *  wrappers to C math functions with one argument are automatically generated
+ *
+ */
 
 #define DEFINE_FUN(FUN) \
 static fts_status_t FUN##_function( int ac, const fts_atom_t *at, fts_atom_t *ret) \
@@ -69,10 +74,10 @@ static fts_status_t FUN##_function( int ac, const fts_atom_t *at, fts_atom_t *re
 
 
 /**********************************************************************
-*
-*  misc math functions with name change or multiple arguments
-*
-*/
+ *
+ *  misc math functions with name change or multiple arguments
+ *
+ */
 
 static fts_status_t 
 abs_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -94,9 +99,8 @@ pow_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
 }
 
 /**  modulo function according to fmod
-*   @fn float mod (float a, float b) 
-*/
-
+ *   @fn float mod (float a, float b) 
+ */
 static fts_status_t 
 mod_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -210,6 +214,8 @@ _function_min(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return wrong_args_error;
 }
 
+/* TODO: gauss / normal distribution */
+
 static fts_status_t
 _function_max(int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -240,11 +246,30 @@ _function_max(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return wrong_args_error;
 }
 
+/** logical not 
+ */
+static fts_status_t 
+_function_not (int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+    if (ac > 0)
+    {  
+	if (fts_is_number(at))
+	    fts_set_int(ret, !fts_get_number_int(at));
+	else /* not <something> is false */
+	    fts_set_int(ret, 0);
+	
+	return fts_ok;
+    }
+    else
+	return wrong_args_error;
+}
+
+
 /**********************************************************************
-*
-*  random function
-*
-*/
+ *
+ *  random function
+ *
+ */
 
 #define RA 16807 /* multiplier */
 #define RM 2147483647L /* 2**31 - 1 */
@@ -311,10 +336,10 @@ random_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
 
 
 /**********************************************************************
-*
-*  symbol functions
-*
-*/
+ *
+ *  symbol functions
+ *
+ */
 
 #define MAX_CONCAT_LENGTH 512
 
@@ -347,11 +372,14 @@ cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+
+
+
 /**********************************************************************
-*
-*  conditional functions
-*
-*/
+ *
+ *  conditional functions
+ *
+ */
 
 /* (if cond argtrue argfalse) */
 
@@ -363,35 +391,35 @@ if_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
     double cond = 0.0;
     
     if (fts_is_number(at))
-	    cond = fts_get_number_float(at);
+      cond = fts_get_number_float(at);
     else if (!fts_is_void(at))
-	    cond = 1.0;
+      cond = 1.0;
     
     if (cond != 0.0)
-    {   /* true */
-	    if (ac > 1)
-        fts_atom_assign(ret, at + 1);
-	    /* else: nothing */
+    { /* true */
+      if (ac > 1)
+	  fts_atom_assign(ret, at + 1);
+      /* else: nothing */
     }
     else
-    {   /* false */
-	    if (ac > 2)
-        fts_atom_assign(ret, at + 2);
-	    /* else: really nothing */
+    { /* false */
+      if (ac > 2)
+	  fts_atom_assign(ret, at + 2);
+      /* else: really nothing */
     }
 
-return fts_ok;
+    return fts_ok;
   }
-else
-return fts_ignore;	
+  else
+    return fts_ignore;	
 }
 
 
 /* (case cond arg1 ... argn) is 1-based, cond = 0 meaning that nothing is output.
 
-Note that this is not like a real case statment, where only one of
-several cases is executed, but an expression where all arguments are
-evaluated before one of them is chosen!
+   Note that this is not like a real case statment, where only one of
+   several cases is executed, but an expression where all arguments are
+   evaluated before one of them is chosen!
 */
 
 static fts_status_t
@@ -402,10 +430,10 @@ case_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
     int cond = 0;	/* default: no output */
     
     if (fts_is_number(at))
-	    cond = fts_get_number_int(at);
+      cond = fts_get_number_int(at);
     
     if (0 < cond  &&  cond < ac)
-	    fts_atom_assign(ret, at + cond);
+      fts_atom_assign(ret, at + cond);
     /* else: nothing */
     
     return fts_ok;
@@ -415,13 +443,16 @@ case_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
 }
 
 
+
+
 /**********************************************************************
  *
  *  system functions
  *
  */
+
 static fts_status_t
-typeof_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
+_function_typeof (int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   if (ac > 0)
   {
@@ -435,6 +466,7 @@ typeof_function (int ac, const fts_atom_t *at, fts_atom_t *ret)
   }
 }
 
+
 static fts_status_t
 _function_print(int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -446,11 +478,15 @@ _function_print(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+
+
+
 /******************************************************************************
  *
  *  doc & info function
  *
  */
+
 static void
 info_class(fts_class_t *cl, mat_t *outmat)
 {
@@ -672,11 +708,19 @@ _function_info(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+
+
+/* todo: (count [from] to [step]) -> tuple { from .. to } 
+   to use with ftm.iter or ftm.list */
+
+
+
 /**********************************************************************
  *
  *  functions setup
  *
  */
+
 FTS_PACKAGE_INIT(functions)
 {
 #undef FUN
@@ -697,12 +741,14 @@ FTS_PACKAGE_INIT(functions)
   fts_function_install(fts_new_symbol( "ceil"), _function_ceil);
   fts_function_install(fts_new_symbol( "min"), _function_min);
   fts_function_install(fts_new_symbol( "max"), _function_max);
-  
-  fts_function_install(fts_new_symbol("cat"), cat_function);
-  fts_function_install(fts_new_symbol("if"), if_function);
+
+  fts_function_install(fts_new_symbol("not"),  _function_not);
+  fts_function_install(fts_new_symbol("cat"),  cat_function);
+  fts_function_install(fts_new_symbol("if"),   if_function);
   fts_function_install(fts_new_symbol("case"), case_function);
   
-  fts_function_install(fts_new_symbol("typeof"), typeof_function);
-  fts_function_install(fts_new_symbol( "print"), _function_print);
-  fts_function_install(fts_new_symbol( "info"), _function_info);
+  /* system functions */
+  fts_function_install(fts_new_symbol("typeof"), _function_typeof);
+  fts_function_install(fts_new_symbol("print"),  _function_print);
+  fts_function_install(fts_new_symbol("info"),   _function_info);
 }
