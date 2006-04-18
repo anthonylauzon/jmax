@@ -51,7 +51,7 @@ static int yylex ();
 
 static int yyerror( const char *msg);
 
-static fts_atom_t a_times;
+static fts_atom_t a_times, a_tail;
 
 %}
 
@@ -90,7 +90,7 @@ static fts_atom_t a_times;
 %left TK_GREATER TK_GREATER_EQUAL TK_SMALLER TK_SMALLER_EQUAL
 %left TK_SHIFT_LEFT TK_SHIFT_RIGHT
 %left TK_PLUS TK_MINUS
-%left TK_TIMES TK_DIV TK_PERCENT
+%left TK_TIMES TK_DIV TK_PERCENT TK_BIT_AND TK_BIT_OR
 %right TK_UMINUS, TK_UPLUS
 %right TK_LOGICAL_NOT
 %left TK_POWER
@@ -154,6 +154,7 @@ tuple: TK_OPEN_CPAR { ((parser_data_t *)parm)->mode[++(((parser_data_t *)parm)->
 reference: TK_DOLLAR TK_SYMBOL { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
   | TK_DOLLAR TK_INT { $$ = fts_parsetree_new( TK_DOLLAR, &($2), 0, 0); }
   | TK_DOLLAR TK_TIMES { $$ = fts_parsetree_new( TK_DOLLAR, &a_times, 0, 0); }
+  | TK_DOLLAR TK_BIT_OR { $$ = fts_parsetree_new( TK_DOLLAR, &a_tail, 0, 0); }
 ;
 
 element: term TK_OPEN_SQPAR { ((parser_data_t *)parm)->mode[++(((parser_data_t *)parm)->par_level)] = mode_prefix; } term_list { ((parser_data_t *)parm)->par_level--; } TK_CLOSED_SQPAR { $$ = fts_parsetree_new( TK_ELEMENT, 0, $1, $4); }
@@ -176,6 +177,8 @@ binary: infix_term TK_EQUAL infix_term { $$ = fts_parsetree_new( TK_EQUAL, 0, $1
 	| infix_term TK_PERCENT infix_term { $$ = fts_parsetree_new( TK_PERCENT, 0, $1, $3); }
 	| infix_term TK_SHIFT_LEFT infix_term { $$ = fts_parsetree_new( TK_SHIFT_LEFT, 0, $1, $3); }
 	| infix_term TK_SHIFT_RIGHT infix_term { $$ = fts_parsetree_new( TK_SHIFT_RIGHT, 0, $1, $3); }
+	| infix_term TK_BIT_AND infix_term { $$ = fts_parsetree_new( TK_BIT_AND, 0, $1, $3); }
+	| infix_term TK_BIT_OR infix_term { $$ = fts_parsetree_new( TK_BIT_OR, 0, $1, $3); }
 	| infix_term TK_LOGICAL_AND infix_term { $$ = fts_parsetree_new( TK_LOGICAL_AND, 0, $1, $3); }
 	| infix_term TK_LOGICAL_OR infix_term { $$ = fts_parsetree_new( TK_LOGICAL_OR, 0, $1, $3); }
 	| infix_term TK_EQUAL_EQUAL infix_term { $$ = fts_parsetree_new( TK_EQUAL_EQUAL, 0, $1, $3); }
@@ -303,6 +306,8 @@ token_table_init(void)
   token_table_put_entry( fts_s_percent, TK_PERCENT, 1);
   token_table_put_entry( fts_s_shift_left, TK_SHIFT_LEFT, 1);
   token_table_put_entry( fts_s_shift_right, TK_SHIFT_RIGHT, 1);
+  token_table_put_entry( fts_s_bit_and, TK_BIT_AND, 1);
+  token_table_put_entry( fts_s_bit_or, TK_BIT_OR, 1);
   token_table_put_entry( fts_s_logical_and, TK_LOGICAL_AND, 1);
   token_table_put_entry( fts_s_logical_or, TK_LOGICAL_OR, 1);
   token_table_put_entry( fts_s_logical_not, TK_LOGICAL_NOT, 1);
@@ -396,6 +401,7 @@ FTS_MODULE_INIT(parser)
   token_table_init();
   
   fts_set_symbol(&a_times, fts_s_times);
+  fts_set_symbol(&a_tail,  fts_s_bit_or);
 
 #if YYDEBUG
   yydebug = 1;

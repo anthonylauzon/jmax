@@ -579,7 +579,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
 
   case TK_DOLLAR:
     if (fts_is_int( &tree->value))
-    {
+    { /* $<int>: argument lookup */
       int index = fts_get_int( &tree->value) - FTS_EXPRESSION_ARG_ONSET;
       
       if (index >= 0 && index < env_ac)
@@ -595,7 +595,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       fts_symbol_t sym = fts_get_symbol(name);
       
       if(sym == fts_s_times)
-      {
+      { /* $*: push all args to stack */
         int i;
         
         for(i=0; i<env_ac; i++)
@@ -607,8 +607,21 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
           }
         }
       }
+      else if (sym == fts_s_bit_or)
+      { /* $|: push all args except first one (tail) */
+        int i;
+        
+        for (i = 1; i < env_ac; i++)
+        {
+          if (!fts_is_void(env_at + i))
+          {
+            expression_stack_push(exp, env_at + i);
+            fts_atom_refer(env_at + i);
+          }
+        }
+      }
       else
-      {
+      { /* $<name>: variable lookup */
         fts_atom_t value;
         
         fts_set_void(&value);
@@ -728,6 +741,14 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
 
   case TK_LOGICAL_OR:
     IABINOP_EVAL(||);
+    break;
+
+  case TK_BIT_AND:
+    IABINOP_EVAL(&);
+    break;
+
+  case TK_BIT_OR:
+    IABINOP_EVAL(|);
     break;
 
   case TK_EQUAL_EQUAL:
