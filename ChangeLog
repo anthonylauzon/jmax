@@ -1,4 +1,245 @@
-2006-01-12  diemo  <diemo@m1213.ircam.fr>
+===============================================================================	
+FTM 1.7.4
+	
+2006-04-18  diemo  <diemo@nospam>
+
+	* packages/data/c/src/mat.c: register rows method to set number of rows
+
+	* packages/sequence/c/src/track.c:
+	hopefully fixed bug on post with bogus marker (track) context
+
+	* fts/expression.c, fts/parser.y:
+	added tail reference $| (remove first from list)
+	added binary and/or
+
+	* packages/functions/c/src/functions.c:
+	added function logical "not", because (! ...) is a syntax error
+
+2006-04-18  diemo  <diemo@nospam>
+
+	* fts/expression.c, fts/parser.y:
+	added tail reference $| (remove first from list)
+	added binary and/or
+
+	* packages/functions/c/src/functions.c:
+	added function logical "not", because (! ...) is a syntax error
+
+2006-04-13  remymuller  <remymuller@nospam>
+
+	* packages/data/c/src/tabeditor.c, packages/sequence/c/src/event.c:
+	replace this by self
+	and added scopes when variables are declared on the fly, this is not allowed by standard C!
+
+	* packages/sequence/c/include/fts/packages/sequence/event.h, packages/sequence/c/src/event.c:
+	replaced this by self
+
+2006-04-05  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/TableVerticalRuler.java, macosxbuild/jMaxProject/jMaxProject.xcodeproj/project.pbxproj, packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/tools/TableTool.java, packages/data/java/ircam/jmax/editors/table/PositionDrawer.java, packages/data/java/ircam/jmax/editors/table/TablePositionListener.java, packages/data/java/ircam/jmax/editors/table/TableRuler.java, packages/data/java/ircam/jmax/editors/table/Tabler.java, packages/data/java/ircam/jmax/editors/table/renderers/SelectionLayer.java, packages/data/java/ircam/jmax/editors/table/renderers/TableRenderer.java:
+	*** empty log message ***
+
+	* packages/data/c/src/datafiles.c, packages/sequence/c/include/fts/packages/sequence/event.h, packages/sequence/c/include/fts/packages/sequence/note.h, packages/data/c/include/fts/packages/data/data.h:
+	some methods exported to compile suivi windows version
+
+2006-03-17  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/renderers/TableRenderer.java, packages/data/c/src/tabeditor.c:
+	*** empty log message ***
+
+2006-03-16  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/TableInspector.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/c/src/tabeditor.c:
+	*** empty log message ***
+
+2006-03-14  borghesi  <borghesi@nospam>
+
+	* packages/data/c/include/fts/packages/data/fvec.h, packages/data/c/src/fvec.c, packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/TableInspector.java:
+	*** empty log message ***
+
+2006-03-13  borghesi  <borghesi@nospam>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTableDialog.java, packages/sequence/java/ircam/jmax/editors/sequence/track/SequenceTablePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java:
+	track editor: fixed lockup when addign events with listview opened
+
+2006-03-10  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/TableInspector.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java:
+	*** empty log message ***
+
+2006-03-09  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/TableInspector.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java:
+	*** empty log message ***
+
+2006-03-06  jp_lambert  <jp_lambert@nospam>
+
+	* packages/sequence/c/src/seqmidi.c: upload on import finalisation
+	- comments removed
+	- upload if editor is open
+
+2006-03-03  borghesi  <borghesi@nospam>
+
+	* packages/data/c/include/fts/packages/data/fvec.h, packages/data/c/src/fvec.c, packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/TableDataListener.java, packages/data/java/ircam/jmax/editors/table/TableInspector.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/TableRuler.java, packages/data/java/ircam/jmax/editors/table/menus/TableSimpleMenu.java:
+	TableEditor: added fmat reference in TableInspector
+
+2006-03-02  borghesi  <borghesi@nospam>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsSequenceObject.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/SequencePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceWindow.java, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackListener.java, packages/sequence/c/src/sequence.c, packages/sequence/c/src/seqmidi.c:
+	multitrack: fixed clear
+
+	* packages/sequence/c/src/seqmidi.c, packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/track.h:
+	*** empty log message ***
+
+2006-03-02  jp_lambert  <jp_lambert@nospam>
+
+	* packages/data/c/src/bpf.c:
+	changed fts_get_float to fts_get_number_float for the 'insert' message
+
+2006-03-01  diemo  <diemo@nospam>
+
+	* packages/data/c/src/dict.c: allow all types for key in init
+
+	* packages/data/c/src/dict.c:
+	fixed crash when printing dict with float key
+	todo: repair init of dict with float key (gives invalid object)
+
+2006-03-01  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/menus/TableSimpleMenu.java, packages/data/c/src/tabeditor.c:
+	*** empty log message ***
+
+2006-02-27  borghesi  <borghesi@nospam>
+
+	* packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/menus/TableSimpleMenu.java:
+	*** empty log message ***
+
+2006-02-24  borghesi  <borghesi@nospam>
+
+	* packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/tools/TableTool.java, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java:
+	*** empty log message ***
+
+2006-02-23  borghesi  <borghesi@nospam>
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceSelection.java, packages/sequence/java/ircam/jmax/editors/sequence/UndoableEventTransf.java:
+	*** empty log message ***
+
+	* packages/sequence/java/ircam/jmax/editors/sequence/UndoableEventTransf.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackEvent.java, packages/sequence/c/src/track.c:
+	track: fixed upload bug in make_trill function
+
+2006-02-21  diemo  <diemo@nospam>
+
+	* packages/sequence/c/src/track.c:
+	- keep the cue of the first scoob and all other properties when using
+	  "make trill".  The trill doesn't show up at first, but when you
+	  double click on the track object again, all is there.
+	- _track_get indexed by time
+
+2006-02-17  borghesi  <borghesi@nospam>
+
+	* packages/data/c/src/tabeditor.c, packages/data/c/src/tabeditor.h, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java:
+	*** empty log message ***
+
+2006-02-15  borghesi  <borghesi@nospam>
+
+	* java/src/ircam/jmax/fts/FtsObjectWithEditor.java, java/src/ircam/jmax/toolkit/Selecter.java, packages/data/c/src/fvec.c, packages/data/c/src/mat.c, packages/data/java/ircam/jmax/editors/bpf/BpfPanel.java, packages/data/java/ircam/jmax/editors/bpf/BpfWindow.java, packages/data/java/ircam/jmax/editors/bpf/FtsBpfObject.java, packages/data/java/ircam/jmax/editors/bpf/tools/ArrowTool.java, packages/data/java/ircam/jmax/editors/mat/FtsDictObject.java, packages/data/java/ircam/jmax/editors/mat/FtsFmatObject.java, packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java, packages/data/java/ircam/jmax/editors/mat/MatPanel.java, packages/data/java/ircam/jmax/editors/mat/MatWindow.java, packages/data/java/ircam/jmax/editors/table/FtsFvecObject.java, packages/data/java/ircam/jmax/editors/table/FtsIvecObject.java, packages/data/java/ircam/jmax/editors/table/TableGraphicContext.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/TableRuler.java, packages/data/java/ircam/jmax/editors/table/Tabler.java, packages/ispw/java/ircam/jmax/editors/explode/SelecterTool.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsSequenceObject.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/SequencePanel.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceWindow.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackWindow.java, include/fts/predefsymbols.h:
+	fixed editing bug when java editors opened (after close and reopening editors)
+
+2006-02-13  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/tools/ZoomTool.java:
+	*** empty log message ***
+
+2006-02-06  diemo  <diemo@nospam>
+
+	* packages/data/c/src/fvec.c: fix uninitialised root
+
+	* include/fts/predefsymbols.h:
+	add symbol "i" for fmat find and apply methods
+
+2006-02-06  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/TableInspector.java:
+	*** empty log message ***
+
+2006-02-03  diemo  <diemo@nospam>
+
+	* packages/data/c/src/fmat.c:
+	- <fmat> find <expr> method returns linear indices of elements for
+	  which <expr> returns true
+	- $i linear index for apply method
+	- sketch of get element with linear indexing
+
+2006-02-02  borghesi  <borghesi@nospam>
+
+	* packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/c/src/fvec.c:
+	fvec editor: added range persistence (message is "editor change_range min max")
+
+2006-02-02  diemo  <diemo@nospam>
+
+	* packages/data/c/src/fvec.c: fixed prod nice try
+	added geomean (expensive pow in loop to avoid numerical overflow)
+
+2006-02-01  borghesi  <borghesi@nospam>
+
+	* packages/data/java/ircam/jmax/editors/table/TableDataListener.java, packages/data/java/ircam/jmax/editors/table/TableInspector.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/TableRuler.java, packages/data/c/src/tabeditor.c, packages/data/c/src/tabeditor.h, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/c/src/fvec.c, packages/control/c/src/retard.c, packages/sequence/java/ircam/jmax/editors/sequence/FtsSequenceObject.java, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackObject.java, packages/sequence/java/ircam/jmax/editors/sequence/renderers/SequenceFonts.java, packages/sequence/java/ircam/jmax/editors/sequence/tools/SelecterTool.java, packages/data/java/ircam/jmax/editors/table/TableAdapter.java, packages/data/java/ircam/jmax/editors/table/TableDisplay.java, packages/data/java/ircam/jmax/editors/table/TableGraphicContext.java, packages/data/java/ircam/jmax/editors/table/tools/TableTool.java:
+	*** empty log message ***
+
+2006-01-26  jp_lambert  <jp_lambert@nospam>
+
+	* packages/sequence/c/src/seqmidi.c:
+	fix following the arguments fix (importas)
+
+2006-01-25  borghesi  <borghesi@nospam>
+
+	* macosxbuild/jMaxProject/jMaxProject.xcodeproj/project.pbxproj, java/src/ircam/jmax/toolkit/GraphicSelectionListener.java, java/src/ircam/jmax/toolkit/InteractionModule.java, java/src/ircam/jmax/toolkit/JMaxMatTable.java, java/src/ircam/jmax/toolkit/Selecter.java, java/src/ircam/jmax/toolkit/Tool.java, java/src/ircam/jmax/JMaxUtilities.java, packages/data/java/ircam/jmax/editors/table/renderers/TableRenderer.java, packages/data/java/ircam/jmax/editors/table/tools/LinerTool.java, packages/data/java/ircam/jmax/editors/table/tools/Makefile.am, packages/data/java/ircam/jmax/editors/table/tools/PencilTool.java, packages/data/java/ircam/jmax/editors/table/tools/TableSelecter.java, packages/data/java/ircam/jmax/editors/table/tools/TableTool.java, packages/data/java/ircam/jmax/editors/table/tools/TableTools.java, packages/data/java/ircam/jmax/editors/bpf/tools/SelecterTool.java, packages/data/java/ircam/jmax/editors/table/FreeHandDrawer.java, packages/data/java/ircam/jmax/editors/table/LineDrawer.java, packages/data/java/ircam/jmax/editors/table/TableDisplay.java, packages/data/java/ircam/jmax/editors/table/TableRuler.java:
+	*** empty log message ***
+
+2006-01-24  borghesi  <borghesi@nospam>
+
+	* macosxbuild/jMaxProject/jMaxProject.xcodeproj/project.pbxproj:
+	*** empty log message ***
+
+	* packages/data/java/ircam/jmax/editors/table/Makefile.am, packages/data/java/ircam/jmax/editors/table/TableAdapter.java, packages/data/java/ircam/jmax/editors/table/TableDisplay.java, packages/data/java/ircam/jmax/editors/table/TableGraphicContext.java, packages/data/java/ircam/jmax/editors/table/TablePanel.java, packages/data/java/ircam/jmax/editors/table/TableRuler.java, packages/data/java/ircam/jmax/editors/table/Tabler.java, packages/data/java/ircam/jmax/editors/table/menus/Makefile.am, packages/data/java/ircam/jmax/editors/table/menus/TablePopupMenu.java, packages/data/java/ircam/jmax/editors/table/menus/TableSimpleMenu.java, packages/data/java/ircam/jmax/editors/table/renderers/TableRenderer.java, packages/data/java/ircam/jmax/editors/table/tools/TableTools.java:
+	fvec editor ...
+
+2006-01-20  borghesi  <borghesi@nospam>
+
+	* macosxbuild/jMaxProject/jMaxProject.xcodeproj/project.pbxproj:
+	*** empty log message ***
+
+	* packages/data/java/ircam/jmax/editors/table/menus/TablePopupMenu.java, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/java/ircam/jmax/editors/table/Makefile.am, packages/data/java/ircam/jmax/editors/table/TableAdapter.java, packages/data/java/ircam/jmax/editors/table/TableDisplay.java, packages/data/java/ircam/jmax/editors/table/TableInspector.java, packages/data/java/ircam/jmax/editors/table/Tabler.java:
+	added inspector to fvec editor
+
+2006-01-20  diemo  <diemo@nospam>
+
+	* packages/sequence/c/src/track.c:
+	return self on event insert/append/remove
+
+	* packages/sequence/c/src/sequence.c:
+	return self on add/remove/move track
+
+2006-01-19  remymuller  <remymuller@nospam>
+
+	* packages/data/c/src/datafiles.c:
+	on the fly declaration of a variable is not allowed in C!
+
+2006-01-18  borghesi  <borghesi@nospam>
+
+	* packages/data/c/src/fmat.c, packages/data/c/src/fvec.c, packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/tools/PencilTool.java:
+	*** empty log message ***
+
+2006-01-13  borghesi  <borghesi@nospam>
+
+	* packages/data/c/src/fmat.c, packages/data/c/src/fvec.c, packages/data/c/src/tabeditor.c, packages/data/java/ircam/jmax/editors/table/FtsTableObject.java, packages/data/c/include/fts/packages/data/fvec.h:
+	reactivation of fvec editor...
+
+2006-01-13  diemo  <diemo@nospam>
+
+	* packages/data/c/src/datafiles.c: Hoppla, missing case and init.
+
+	* ChangeLog: update changelog
+
+2006-01-12  diemo  <diemo@nospam>
 
 	* packages/sequence/c/src/track.c:
 	track_copy_to_[f]mat/fvec completed for float/int/any track
@@ -22,33 +263,33 @@
 	* packages/data/c/src/datafiles.c:
 	preliminary: import only part of soundfile (for cataRT)
 
-2006-01-11  jp_lambert  <jp_lambert@m1213.ircam.fr>
+2006-01-11  jp_lambert  <jp_lambert@nospam>
 
 	* packages/sequence/c/src/seqmidi.c:
 	added extformat import for sequence
 	(TODO: check the editor's uplaod)
 
-2006-01-10  diemo  <diemo@m1213.ircam.fr>
+2006-01-10  diemo  <diemo@nospam>
 
 	* fts/object.c:
 	fix object_imexport calling object_imexport_dialog with "-" as filename:
 	remove "-", keep args and type in case of importas
 
-2006-01-10  nschnell  <nschnell@m1213.ircam.fr>
+2006-01-10  nschnell  <nschnell@nospam>
 
 	* packages/data/c/src/fmat.c, packages/data/c/src/fvec.c:
 	 - made fmat and fvec methods using log 0-safe
 
-2006-01-06  jp_lambert  <jp_lambert@m1213.ircam.fr>
+2006-01-06  jp_lambert  <jp_lambert@nospam>
 
 	* packages/sequence/c/src/seqmidi.c: added format import for fmat track
 
-2006-01-03  diemo  <diemo@m1213.ircam.fr>
+2006-01-03  diemo  <diemo@nospam>
 
 	* packages/data/c/src/fmat.c:
 	return value was not set for some cases in fmat row/column insert/delete
 
-2005-12-22  nschnell  <nschnell@m1213.ircam.fr>
+2005-12-22  nschnell  <nschnell@nospam>
 
 	* packages/data/c/src/fmat.c: forgotten log message at last commit:
 	 - removed sample rate from fmat and fvec
@@ -59,11 +300,11 @@
 	 - introduced fts_audio_get_sr() and fts_audio_get_vs
 	---> jMax compiles and seems to run properly
 
-2005-12-20  borghesi  <borghesi@m1213.ircam.fr>
+2005-12-20  borghesi  <borghesi@nospam>
 
 	* packages/sequence/c/src/track.c: fixed bug in track_editor_is_open
 
-2005-12-20  nschnell  <nschnell@m1213.ircam.fr>
+2005-12-20  nschnell  <nschnell@nospam>
 
 	* packages/data/c/include/fts/packages/data/bpf.h, packages/data/c/include/fts/packages/data/dict.h, packages/data/c/include/fts/packages/data/ivec.h, packages/data/c/include/fts/packages/data/mat.h, packages/data/c/src/bpf.c, packages/data/c/src/data.c, packages/data/c/src/datafiles.c, packages/data/c/src/dict.c, packages/data/c/src/fmat.c, packages/data/c/src/fvec.c, packages/data/c/src/ivec.c, packages/data/c/src/mat.c, packages/data/c/src/tabeditor.c, packages/functions/c/src/functions.c, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/include/fts/packages/sequence/sequence.h, packages/sequence/c/include/fts/packages/sequence/track.h, packages/sequence/c/src/marker.c, packages/sequence/c/src/seqmidi.c, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/sequence.c, packages/sequence/c/src/track.c, fts/class.c:
 	Isolated file access (import/export) methods for the FTS data classes into separate C-modules.
@@ -73,18 +314,18 @@
 	FTS can now be easily linked without file acess.
 	Other modularizations of FTS in this sense might follow.
 
-2005-12-09  diemo  <diemo@m1213.ircam.fr>
+2005-12-09  diemo  <diemo@nospam>
 
 	* packages/data/c/include/fts/packages/data/fvec.h, packages/data/c/src/fvec.c:
 	fixed fvec_get_size which worked only for fcol
 
-2005-12-06  diemo  <diemo@m1213.ircam.fr>
+2005-12-06  diemo  <diemo@nospam>
 
 	* packages/data/c/include/fts/packages/data/mat.h, packages/data/c/src/fvec.c, packages/data/c/src/mat.c:
 	completed fvec methods (copy function, onset, size, sr)
 	consistent mat_class instead of mat_type
 
-2005-12-05  borghesi  <borghesi@m1213.ircam.fr>
+2005-12-05  borghesi  <borghesi@nospam>
 
 	* packages/data/c/src/fvec.c:
 	fvec.c: fixed fill function on fvec with no size
@@ -93,56 +334,56 @@
 
 	* packages/data/c/src/mat.c: mat.c: added initialisation from atom list
 
-2005-12-05  remymuller  <remymuller@m1213.ircam.fr>
+2005-12-05  remymuller  <remymuller@nospam>
 
 	* packages/data/c/include/fts/packages/data/mat.h:
 	mat_class was missing
 
-2005-12-02  diemo  <diemo@m1213.ircam.fr>
+2005-12-02  diemo  <diemo@nospam>
 
 	* packages/sequence/c/src/track.c:
 	mat, fmat, fvec methods to set from track
 
-2005-11-29  nschnell  <nschnell@m1213.ircam.fr>
+2005-11-29  nschnell  <nschnell@nospam>
 
 	* packages/sequence/c/include/fts/packages/sequence/sequence.h, packages/sequence/c/include/fts/packages/sequence/track.h, packages/sequence/c/src/event.c, packages/sequence/c/src/marker.c, packages/sequence/c/src/module.c, packages/sequence/c/src/note.c, packages/sequence/c/src/seqmess.c, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/sequence.c, packages/sequence/c/src/track.c, packages/sequence/c/src/trackeditor.c, packages/utils/c/include/fts/packages/utils/utils.h, packages/utils/c/src/cubic.c, packages/utils/c/src/floatfuns.c, packages/utils/c/src/random.c, packages/utils/c/src/utils.c, fts/list.c, fts/mem.c, fts/message.c, fts/midievent.c, fts/objectset.c, fts/parser.y, fts/post.c, fts/tuple.c, fts/variable.c, include/fts/class.h, include/fts/fts.h, include/fts/hashtable.h, include/fts/malloc.h, include/fts/predefsymbols.h, include/ftsprivate/class.h, macosxbuild/jMaxProject/jMaxProject.xcodeproj/project.pbxproj, packages/data/c/include/fts/packages/data/data.h, packages/data/c/include/fts/packages/data/dict.h, packages/data/c/include/fts/packages/data/mat.h, packages/data/c/include/fts/packages/data/tree.h, packages/data/c/src/bpf.c, packages/data/c/src/data.c, packages/data/c/src/dict.c, packages/data/c/src/fmat.c, packages/data/c/src/fvec.c, packages/data/c/src/ivec.c, packages/data/c/src/mat.c, packages/data/c/src/tabeditor.c, packages/data/c/src/tree.c, packages/functions/c/src/functions.c, fts/atom.c, fts/atomfile.c, fts/audiofile.c, fts/bytestream.c, fts/class.c, fts/dumper.c, fts/expression.c, fts/function.c, fts/hashtable.c:
 	 - introduced shared pointers
 
-2005-11-29  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-11-29  nschnell  <nschnell@nospam>
 
 	* bpf.c, data.c, dict.c, fmat.c, fvec.c, ivec.c, mat.c, tabeditor.c, tree.c:
 	 - introduced shared pointers
 
-2005-11-23  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-11-23  borghesi  <borghesi@nospam>
 
 	* fvec.c, tabeditor.c:
 	added "seq" prefix to all sequence editor image names
 
-2005-10-06  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-10-06  nschnell  <nschnell@nospam>
 
 	* fvec.c:  - fvec.[ch]: added fvec_create_row/column functions
 
-2005-09-29  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-09-29  diemo  <diemo@nospam>
 
 	* fmat.c, tree.c, fvec.c:
 	aftermath of last fvec init arg fix: size remained always zero after init
 	fix: replaced fvec_create_column, fvec_create_row, fvec_create_diagonal,
 	fvec_create_unwrap by optimized fvec_create with type given
 
-2005-09-28  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-09-28  borghesi  <borghesi@nospam>
 
 	* tree.c, fmat.c: *** empty log message ***
 
-2005-09-09  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-09-09  nschnell  <nschnell@nospam>
 
 	* fmat.c, fvec.c:
 	fvec.c: fixed error in initialisation (size was set to zero when no args)
 
-2005-09-09  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-09-09  borghesi  <borghesi@nospam>
 
 	* fvec.c: *** empty log message ***
 
-2005-08-30  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-08-30  diemo  <diemo@nospam>
 
 	* mat.c: still one more missing self-return
 
@@ -159,7 +400,7 @@
 
 	* dict.c: added size message to dict class
 
-2005-08-19  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-08-19  diemo  <diemo@nospam>
 
 	* mat.c: consistent return of self after set
 	element lookup wraps around just like fmat
@@ -171,118 +412,118 @@
 
 	* dict.c: consistent return of self after set
 
-2005-07-27  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-27  nschnell  <nschnell@nospam>
 
 	* fvec.c, fmat.c:  - introduced new (altivec implemented) FFT routines
 
-2005-07-20  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-20  diemo  <diemo@nospam>
 
 	* tree.c: more jmax methods to test tree algorithms
 
-2005-07-20  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-20  borghesi  <borghesi@nospam>
 
 	* dict.c, fmat.c: various fixes in multitrack  editor
 
-2005-07-20  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-20  diemo  <diemo@nospam>
 
 	* tree.c: sgulluni: build and display methods for tree class
 
-2005-07-18  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-18  diemo  <diemo@nospam>
 
 	* fmat.c: document insert/delete methods
 
-2005-07-12  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-12  nschnell  <nschnell@nospam>
 
 	* fmat.c:  - fmat.c: fixed very bad bug in fmat persistence
 	 - tokenizer.l/parser.y/expression.c finalized simplifications
 
-2005-07-07  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-07-07  nschnell  <nschnell@nospam>
 
 	* fvec.c, fmat.c:  - fmat.c/fvec.c: added method clip
 	 - finalized parser changes
 
-2005-06-28  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-06-28  diemo  <diemo@nospam>
 
 	* dict.c: export functions used in sdif.info
 
-2005-06-27  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-06-27  borghesi  <borghesi@nospam>
 
 	* tree.c: some fix in marker track
 
-2005-06-10  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-06-10  nschnell  <nschnell@nospam>
 
 	* fvec.c:  - object.h: added macro fts_object_is_a()
 	 - fvec.h: fixed macro fvec_get_size()
 
-2005-06-09  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-06-09  diemo  <diemo@nospam>
 
 	* Makefile.am, floatfuns.h, fmat.c:
 	adapted to now missing vec, cvec, col, row
 
 	* data.c: documentability
 
-2005-05-31  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-31  diemo  <diemo@nospam>
 
 	* tree.c: no tree_add yet
 
-2005-05-27  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-27  diemo  <diemo@nospam>
 
 	* bpf.c, tree.c: fix typos, make first sketch of tree class compile
 
 	* tree.c, Makefile.am, data.c: first sketch of tree class
 
-2005-05-24  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-24  diemo  <diemo@nospam>
 
 	* fmat.c: correct column index protection
 
-2005-05-23  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-23  diemo  <diemo@nospam>
 
 	* fvec.c, fmat.c: no warnings
 
-2005-05-20  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-20  nschnell  <nschnell@nospam>
 
 	* mat.c, dict.c, fmat.c:  - fixed line returns for textfile import
 
-2005-05-16  remymuller  <remymuller@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-16  remymuller  <remymuller@nospam>
 
 	* fmat.c: visual C needs explicit type-cast
 
-2005-05-15  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-15  nschnell  <nschnell@nospam>
 
 	* tabeditor.c, bpf.c, data.c, dict.c, dumpfile.c, fmat.c, fvec.c, getrange.c, ivec.c, mat.c:
 	introduced return value and status to FTS methods
 
-2005-05-13  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-13  nschnell  <nschnell@nospam>
 
 	* ivec.c, mat.c, dict.c, dumpfile.c, fmat.c:
 	 - reimported FTM code of audio, midi and atomfile
 
-2005-05-11  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-11  nschnell  <nschnell@nospam>
 
 	* col.c, col.h, cvec.c, data.c, row.c, row.h, vec.c:
 	 - removed dead classes cvec, col and row
 
 	* data.c, fmat.c:  - restructuring code (for FTM)
 
-2005-05-09  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-05-09  borghesi  <borghesi@nospam>
 
 	* fmat.c: fmat: fixed append row (with less arguments than columns)
 
-2005-04-21  borghesi  <borghesi@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-04-21  borghesi  <borghesi@nospam>
 
 	* mat.c: fixed multitrack dump
 
-2005-04-20  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-04-20  nschnell  <nschnell@nospam>
 
 	* ivec.c, mat.c, vec.c, fvec.c, bpf.c, dict.c, fmat.c:
 	 - message.[ch] fixed recursive saving (was reusing the same message object in recursive calls)
 	 - adapted classes
 
-2005-04-19  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-04-19  diemo  <diemo@nospam>
 
 	* mat.c: check column existence for unique method
 
-2005-04-14  diemo  <diemo@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-04-14  diemo  <diemo@nospam>
 
 	* mat.c, fvec.c, fmat.c:
 	- correct diag index parameter: super or subdiagonal
@@ -291,15 +532,13 @@
 	- used first to make fmat_fill_number work on fmat and fvec
 	- untabified
 
-2005-04-13  nschnell  <nschnell@vol75-8-82-233-236-55.fbx.proxad.net>
+2005-04-13  nschnell  <nschnell@nospam>
 
 	* fmat.c:  - modified fmat methods (introduced colref, rowref, etc.)
 
-<<<<<<< ChangeLog
-===============================================================================	
-FTM 1.5.1  (April 13, 2005)
+===============================================================================	FTM 1.5.1  (April 13, 2005)
 
-2005-04-13  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-04-13  Diemo Schwarz  <diemo@nospam>
 
 	* packages/functions/c/src/functions.c: if and case functions:
 	  (if cond argtrue argfalse)
@@ -309,7 +548,7 @@ FTM 1.5.1  (April 13, 2005)
 	several cases is executed, but an expression where all arguments are
 	evaluated before one of them is chosen!
 
-2005-04-12  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-04-12  Diemo Schwarz  <diemo@nospam>
 
 	* packages/data/c/src/fmat.c:
 	renamed ee message to more common eq, leave ee for now
@@ -318,13 +557,13 @@ FTM 1.5.1  (April 13, 2005)
 	fixed incredible bug for binary comparison operators
 	(wrong int/float type checks)
 
-2005-04-12  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-04-12  nschnell  <nschnell@nospam>
 
 	* packages/ispw/c/src/pt_tools.c, packages/data/c/src/fmat.c:
 	 - fmat.c: minor bug fix in idexing
 	 - pt_tools.c: no changes
 
-2005-04-07  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-04-07  borghesi  <borghesi@nospam>
 
 	* packages/sequence/fonts/fonts.zip: *** empty log message ***
 
@@ -333,41 +572,41 @@ FTM 1.5.1  (April 13, 2005)
 
 	* packages/sequence/fonts/fonts.zip: *** empty log message ***
 
-2005-04-06  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-04-06  borghesi  <borghesi@nospam>
 
 	* packages/sequence/fonts/MusiSync.ttf, packages/sequence/fonts/MusiTone.ttf, packages/sequence/fonts/README, packages/sequence/fonts/fonts.zip:
 	fonts are now committed as an archive
 
-2005-04-05  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-04-05  Diemo Schwarz  <diemo@nospam>
 
 	* fts/atom.c: once again, had to make primitive class follow the
 	changes in class struct definition to avoid crashes
 
 	* include/fts/atom.h, include/fts/file.h: clearer doc, correct spec
 
-2005-04-01  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-04-01  borghesi  <borghesi@nospam>
 
 	* packages/sequence/fonts/MusiTone.ttf, fts/class.c, packages/sequence/fonts/MusiSync.ttf:
 	class.c: corrected wrong condition in export_handler installation
 
-2005-03-31  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-03-31  Diemo Schwarz  <diemo@nospam>
 
 	* packages/data/c/src/fmat.c:
 	I suppose this is what was meant.  What about testing?
 
-2005-03-30  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-03-30  nschnell  <nschnell@nospam>
 
 	* packages/data/c/src/fvec.c, packages/data/c/src/fmat.c:
 	 - fvec.c: added message to set_get sample rate and persistence for sample rate
 
-2005-03-28  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-03-28  nschnell  <nschnell@nospam>
 
 	* packages/sequence/c/src/track.c, packages/data/c/src/fvec.c, include/fts/object.h, include/fts/predefsymbols.h, packages/data/c/src/fmat.c, include/fts/atomfile.h, include/fts/class.h, fts/object.c, fts/class.c:
 	 - class.c/object.c: new implementation of import/export handlers using hashtables (API changed)
 	 - added fts_atomfile_, fts_midifile_ and fts_audiofile_im(ex)port_handler()
 	 - adapted concerned classes
 
-2005-03-23  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-23  borghesi  <borghesi@nospam>
 
 	* packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java:
 	*** empty log message ***
@@ -375,33 +614,33 @@ FTM 1.5.1  (April 13, 2005)
 ===============================================================================	
 FTM 1.4.1  (March 21, 2005)
 	
-2005-03-17  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-17  borghesi  <borghesi@nospam>
 
 	* fts/mem.c: mem.c: fixed heap alloc problem for windows version
 
-2005-03-16  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-16  borghesi  <borghesi@nospam>
 
 	* include/fts/status.h: status.h: fts_ignore exported as FTS_API
 
-2005-03-16  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-03-16  Diemo Schwarz  <diemo@nospam>
 
 	* fts/atom.c, include/fts/class.h:
 	Fixed bug (class name crash) due to forgetting to adapt the primitive
 	class generating macro.
 
-2005-03-16  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-03-16  nschnell  <nschnell@nospam>
 
 	* packages/utils/c/src/cfft.c, packages/utils/c/src/vec_fft.c, fts/object.c, packages/sequence/c/src/seqmidi.c, packages/sequence/c/src/track.c:
 	 - object.c: fixed argument passing in impot/export via file chooser
 	 - seqmidi.c: now deleting scoobs with 0-duration in MIDI import
 	 - no changes in fft utilities!
 
-2005-03-15  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-15  borghesi  <borghesi@nospam>
 
 	* packages/ispw/c/src/sigtable.c, packages/data/c/src/fmat.c, packages/dtd/c/src/readsf.c, packages/dtd/c/src/writesf.c, include/fts/malloc.h, include/fts/patcherobject.h, packages/data/c/src/data.c, fts/mem.c, fts/patcherobject.c:
 	changed signature of fts_object_save_dialog and fts_object_open_dialog
 
-2005-03-15  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-03-15  nschnell  <nschnell@nospam>
 
 	* packages/sequence/java/ircam/jmax/editors/sequence/menus/SequenceSimpleMenu.java, packages/sequence/java/ircam/jmax/editors/sequence/SequenceWindow.java, packages/sequence/c/src/track.c, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/sequence.c, packages/sequence/c/src/note.c, packages/data/c/src/vec.c, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/data/c/src/mat.c, packages/data/c/src/ivec.c, packages/data/c/src/dict.c, packages/data/c/src/fmat.c, packages/data/c/src/bpf.c, java/src/ircam/jmax/toolkit/JMaxMatTable.java, include/fts/status.h, fts/status.c, fts/tuple.c, include/fts/midifile.h, fts/hashtable.c, fts/midifile.c, fts/object.c, fts/atom.c, fts/expression.c:
 	 - added chennel and track selection to MIDI file input
@@ -411,11 +650,11 @@ FTM 1.4.1  (March 21, 2005)
 	 - renamed "sequence" class to "multitrack" (addidng "sequence" alias)
 	 - fixed tuple representation in Java table editor (removed name)
 
-2005-03-10  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-10  borghesi  <borghesi@nospam>
 
 	* packages/data/c/src/fvec.c: fixed save bug
 
-2005-03-10  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-03-10  Diemo Schwarz  <diemo@nospam>
 
 	* packages/data/c/include/fts/packages/data/fvec.h:
 	export fvec_get_vector
@@ -432,21 +671,21 @@ FTM 1.4.1  (March 21, 2005)
 	persistence doesn't work
 	reinstalled editor methods, but they don't work
 
-2005-03-10  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-03-10  nschnell  <nschnell@nospam>
 
 	* packages/data/c/src/fmat.c:  - fixed bug in complex multiplication
 
-2005-03-10  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-03-10  Diemo Schwarz  <diemo@nospam>
 
 	* packages/data/c/src/fvec.c:
 	reinstalled standard naming methods and in/outlets
 
-2005-03-02  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-02  borghesi  <borghesi@nospam>
 
 	* packages/sequence/fonts/README, packages/sequence/java/ircam/jmax/editors/sequence/FtsTrackEditorObject.java, packages/sequence/java/ircam/jmax/editors/sequence/TempoBar.java, packages/sequence/java/ircam/jmax/editors/sequence/track/TrackPanel.java, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/include/fts/packages/sequence/trackeditor.h, packages/sequence/c/src/seqsym.c, packages/sequence/c/src/trackeditor.c:
 	track editor: list of properties displayed in TempoBar is saved with editor
 
-2005-03-01  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-03-01  borghesi  <borghesi@nospam>
 
 	* macosxbuild/jMaxProject/jMaxProject.xcode/project.pbxproj:
 	*** empty log message ***
@@ -454,33 +693,33 @@ FTM 1.4.1  (March 21, 2005)
 	* packages/sequence/c/src/track.c:
 	track: clear uploaded also if track have ID but editor is closed
 
-2005-02-28  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-02-28  Diemo Schwarz  <diemo@nospam>
 
 	* packages/data/c/include/fts/packages/data/fvec.h:
 	get/set element methods also for the programmer
 
-2005-02-28  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-02-28  borghesi  <borghesi@nospam>
 
 	* packages/data/c/src/fmat.c: *** empty log message ***
 
-2005-02-28  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-02-28  nschnell  <nschnell@nospam>
 
 	* packages/data/c/src/fmat.c, packages/data/c/src/fvec.c:
 	 - fmat.c and fvec.c: minor fixes in new fvec class
 	 - fmat.c: went back to compatible col and row methods
 	 - fmat.c: added new methods setcol, getcol, setrow, getrow
 
-2005-02-25  remymuller  <remymuller@mac-borghesi.ircam.fr>
+2005-02-25  remymuller  <remymuller@nospam>
 
 	* packages/sequence/c/src/trackeditor.c, packages/utils/c/src/floatfuns.c, packages/sequence/c/include/fts/packages/sequence/track.h, packages/sequence/c/src/track.c, packages/data/c/src/data.c, packages/data/c/src/fmat.c, packages/data/c/src/fvec.c, include/ftsconfig.h, include/fts/tokenizer.h, include/fts/class.h:
 	added exports
 
-2005-02-25  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-02-25  Diemo Schwarz  <diemo@nospam>
 
 	* fts/tuple.c:
 	9.2.2005: fts_atom_copy handles release/refer of copy_atoms
 
-2005-02-24  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-02-24  Diemo Schwarz  <diemo@nospam>
 
 	* packages/sequence/c/src/track.c:
 	a marker track shouldn't have a marker track
@@ -488,12 +727,12 @@ FTM 1.4.1  (March 21, 2005)
 	* packages/sequence/c/src/track.c:
 	prevent crash when calling "import 0"
 
-2005-02-24  remymuller  <remymuller@mac-borghesi.ircam.fr>
+2005-02-24  remymuller  <remymuller@nospam>
 
 	* packages/sequence/c/include/fts/packages/sequence/event.h, packages/sequence/c/include/fts/packages/sequence/marker.h, packages/sequence/c/include/fts/packages/sequence/note.h, packages/sequence/c/include/fts/packages/sequence/seqsym.h, packages/sequence/c/include/fts/packages/sequence/trackeditor.h, packages/sequence/c/include/fts/packages/sequence/track.h:
 	added FTS_API instead of extern to export things automatically on windows
 
-2005-02-23  borghesi  <borghesi@mac-borghesi.ircam.fr>
+2005-02-23  borghesi  <borghesi@nospam>
 
 	* packages/data/c/src/fvec.c: fvec: fixed var init in various functions
 
@@ -502,22 +741,22 @@ FTM 1.4.1  (March 21, 2005)
 	* packages/signal/help/signal.summary.jmax, packages/signal/c/src/recfvec.c, packages/signal/c/src/samplepool.c, packages/signal/c/src/samplepool.h, packages/signal/c/src/signal.c, packages/signal/c/src/sogs.c, packages/signal/c/src/wave.c, packages/signal/c/src/wave.h, packages/signal/c/src/wave_ieeewrap.c, packages/signal/c/src/wave_intphase.c, packages/signal/help/osc~.help.jmax, packages/signal/c/src/osc.h, packages/signal/c/src/osc_ieeewrap.c, packages/signal/c/src/osc_intphase.c, packages/signal/c/src/paste.c, packages/signal/c/src/pick.c, packages/signal/c/src/playfvec.c, packages/signal/c/src/osc.c, packages/sequence/c/src/note.c, packages/sequence/c/src/marker.c, packages/guiobj/c/src/vecdisplay.c, packages/guiobj/c/src/matdisplay.c, packages/data/help/fvec.help.jmax, packages/data/c/src/tabeditor.c, packages/data/help/data.summary.jmax, packages/data/c/src/getrange.c, packages/data/c/src/fvec.c, packages/data/c/src/fmat.c:
 	jmax adapted to "new generation" fvec
 
-2005-02-22  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-02-22  Diemo Schwarz  <diemo@nospam>
 
 	* packages/sequence/c/src/track.c, packages/sequence/c/include/fts/packages/sequence/track.h:
 	fixed bug that made track_copy crash because of an undetected
 	out of memory condition.
 
-2005-02-22  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-02-22  nschnell  <nschnell@nospam>
 
 	* fts/tokenizer.l:
 	 - fixed tokenizer for '1.1' (now makes 3-char symbol 1.1 instead of 5-char '1.1')
 
-2005-02-22  remymuller  <remymuller@mac-borghesi.ircam.fr>
+2005-02-22  remymuller  <remymuller@nospam>
 
 	* include/fts/patcherobject.h: changed line ending to Unix format
 
-2005-02-22  Diemo Schwarz  <diemo@mac-borghesi.ircam.fr>
+2005-02-22  Diemo Schwarz  <diemo@nospam>
 
 	* ChangeLog:
 	automatic compilation of changes (log messages) since 26.8.2004
@@ -538,18 +777,16 @@ FTM 1.4.1  (March 21, 2005)
 	position is stored as properties, but the (now removed) wx, wy, ww, wh
 	fields in patcher.h were still used in bmaxfile.c
 
-2005-02-22  nschnell  <nschnell@mac-borghesi.ircam.fr>
+2005-02-22  nschnell  <nschnell@nospam>
 
 	* packages/sequence/c/src/track.c, packages/data/c/src/tabeditor.c, packages/data/c/src/fvec.c, packages/data/c/src/data.c, packages/data/c/src/fmat.c, packages/data/c/include/fts/packages/data/data.h, packages/data/c/include/fts/packages/data/fmat.h, packages/data/c/include/fts/packages/data/fvec.h, packages/data/c/src/cvec.c, packages/data/c/include/fts/packages/data/cvec.h, include/fts/message.h, include/fts/class.h, fts/object.c, fts/class.c:
 	 - the return of fvec (replacing fcol and frow)
 
-=======
 2005-06-30  Patrice Tisserand  <p_tisserand@users.sourceforge.net>
 
 	* configure.in: added a configure flag
 	(--enable-client-compilation) to disable client library compilation.
 
->>>>>>> 1.348
 2005-02-22  Diemo Schwarz  <diemo>
 
 	* packages/control/c/src/tup.c:
