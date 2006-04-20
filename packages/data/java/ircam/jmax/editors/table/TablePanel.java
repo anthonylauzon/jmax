@@ -149,7 +149,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 
             oldVisibleScope = visibleScope;
           }
-        }
+        }        
       }
       public void componentMoved(ComponentEvent e)
 		  {

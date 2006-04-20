@@ -160,7 +160,7 @@ public void setVisibles(int nArgs , FtsAtom args[])
   size = args[0].intValue;    
   visibleSize = args[1].intValue;    
   visibles = new double[size];
-    
+      
   if( isIvec())
   {
     if (isInGroup()) 
@@ -202,7 +202,7 @@ public void appendVisibles(int nArgs , FtsAtom args[])
 {
   int startIndex = args[0].intValue;
   int i=0;
-      
+    
   if( isIvec())
   {
     if (isInGroup()) 
@@ -477,7 +477,7 @@ public void requestEndEdit()
 
 private boolean firstTime = false;
 public void requestGetValues()
-{  
+{    
   try{
     send( FtsSymbol.get("get_from_client"));
   }

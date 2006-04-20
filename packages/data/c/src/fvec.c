@@ -551,7 +551,7 @@ static void
 fvec_description_function(fts_object_t *o,  fts_array_t *array)
 {
   fvec_t *self = (fvec_t *)o;
-  fts_symbol_t *type = fvec_get_type_as_symbol(self);
+  fts_symbol_t *type = (fts_symbol_t *)fvec_get_type_as_symbol(self);
 
   fts_array_append_symbol(array, fvec_symbol);
 
@@ -1952,7 +1952,7 @@ fvec_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   }
   
   if(self->editor != NULL)
-    tabeditor_dump_gui(self->editor, dumper);
+    tabeditor_dump_gui((tabeditor_t *)self->editor, dumper);
   
   return fts_ok;
 }

@@ -26,6 +26,7 @@
 #include <fts/fts.h>
 #include <fts/packages/data/data.h>
 #include "floatfuns.h"
+#include "mateditor.h"
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -420,7 +421,7 @@ fmat_copy_function(const fts_object_t *from, fts_object_t *to)
   fmat_copy((fmat_t *)from, dest);
   
   if(fmat_editor_is_open(dest))
-    fmat_upload(dest);
+    fts_send_message( (fts_object_t *)dest->editor, fts_s_upload, 0, 0, fts_nix);
 }
 
 static int
@@ -597,7 +598,7 @@ fmat_error_complex(fmat_t *fmat, const char *prefix)
 *   upload methods
 *
 */
-#define FMAT_CLIENT_BLOCK_SIZE 128
+/*#define FMAT_CLIENT_BLOCK_SIZE 128
 
 static void 
 fmat_upload_size(fmat_t *self)
@@ -629,7 +630,7 @@ fmat_upload_from_index(fmat_t *self, int row_id, int col_id, int size)
     int i = 0;
     int n = (data_size > FMAT_CLIENT_BLOCK_SIZE-2)? FMAT_CLIENT_BLOCK_SIZE-2: data_size;
     
-    /* starting row and column index */
+    // starting row and column index
     if( sent)
     {
       ms = sent/n_cols;
@@ -661,7 +662,7 @@ fmat_upload(fmat_t *self)
 {
   fmat_upload_size(self);
   fmat_upload_data(self);
-}
+}*/
 
 /********************************************************************
  ********************************************************************
@@ -778,7 +779,7 @@ static fts_method_status_t
 fmat_set_from_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
-
+  
   if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1))
   {
     int m = fmat_get_m(self);
@@ -3976,9 +3977,6 @@ _fmat_find_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   return fts_ok;
 }
 
-
-
-
 /*********************************************************
  *
  *  editor
@@ -3993,21 +3991,36 @@ fmat_editor_callback(fts_object_t *o, void *e)
   fmat_t *self = (fmat_t *)o;
 
   if(fmat_editor_is_open(self))
-    fmat_upload(self);
+    fts_send_message( (fts_object_t *)self->editor, fts_s_upload, 0, 0, fts_nix);
 }
 
 static fts_method_status_t
 fmat_open_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t *self = (fmat_t *)o;
+  fmat_t *this = (fmat_t *)o;
+  fts_atom_t a;
   
-  fmat_set_editor_open( self);
+  if(this->editor == NULL)
+  {
+    fts_set_object(&a, o);
+    this->editor = fts_object_create( mateditor_type, 1, &a);
+    fts_object_refer( this->editor);
+  }
+  if(fts_object_has_client( (fts_object_t *)this->editor) == 0)
+  { 
+    fts_client_register_object( (fts_object_t *)this->editor, fts_object_get_client_id( o));
+    
+    fts_set_int(&a, fts_object_get_id( (fts_object_t *)this->editor));
+    fts_client_send_message( o, fts_s_editor, 1, &a);
+  }     
+
+  fmat_set_editor_open( this);
   fts_client_send_message(o, fts_s_openEditor, 0, 0);
   
+  fts_send_message( (fts_object_t *)this->editor, fts_s_upload, 0, 0, fts_nix);
+  
   fts_object_add_listener(o, fmat_editor, fmat_editor_callback);
-  
-  fmat_upload(self);
-  
+    
   return fts_ok;
 }
 
@@ -4044,7 +4057,28 @@ _fmat_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   fmat_t *self = (fmat_t *) o;
   
   if(fmat_editor_is_open(self))
-    fmat_upload(self);
+    fts_send_message( (fts_object_t *)self->editor, fts_s_upload, 0, 0, fts_nix);
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+fmat_table_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *)o;
+  fts_symbol_t selector;
+  
+  if(self->editor == NULL)
+  {
+    fts_atom_t a;
+    fts_set_object(&a, o);
+    self->editor = fts_object_create( mateditor_type, 1, &a);
+    fts_object_refer( self->editor);
+  }
+  
+  selector = fts_get_symbol(at);
+  fts_send_message((fts_object_t *)self->editor, selector, ac - 1, at + 1, fts_nix);
   
   return fts_ok;
 }
@@ -4127,6 +4161,9 @@ fmat_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     fts_dumper_message_send(dumper, mess);
   }
 
+  /*if(self->editor != NULL)
+    mateditor_dump_gui(self->editor, dumper);
+  */
   return fts_ok;
 }
 
@@ -4149,6 +4186,7 @@ fmat_initialize(fmat_t *self)
   self->onset = 0.0;
   self->domain = 0.0;
   self->opened = 0;
+  self->editor = 0;
 }
 
 
@@ -4377,6 +4415,8 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_openEditor, fmat_open_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, fmat_close_editor); 
   fts_class_message_varargs(cl, fts_s_destroyEditor, fmat_destroy_editor);
+  
+  fts_class_message_varargs(cl, fts_s_editor, fmat_table_editor);
   
   fts_class_message_varargs(cl, fts_s_upload, _fmat_upload);
   

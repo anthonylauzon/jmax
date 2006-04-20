@@ -42,10 +42,12 @@ import ircam.jmax.toolkit.*;
 public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTableListener
 {    
   MatDataModel matData;
+  FtsObjectWithEditor ftsObj;
   EditorContainer itsContainer;
   MatTableModel tableModel;
   MatRowIndex rowIndex;
   JPanel topCorner, westPanel;
+  int verticalScrollValue = 0;
   
   transient JScrollPane scrollPane; 
   transient JTable table;
@@ -53,10 +55,11 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
   public static final int COLUMN_MIN_WIDTH = 60;
   public static final int ROW_HEIGHT = 17;
   
-  public MatPanel(EditorContainer container, MatDataModel data) 
+  public MatPanel(EditorContainer container, FtsObjectWithEditor ftsObj, MatDataModel data) 
   {  
     itsContainer = container;
 
+    this.ftsObj = ftsObj;
     matData = data;
     matData.addMatListener(this);
 
@@ -71,7 +74,34 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
     itsContainer.getFrame().addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
       {
-				updateTableToSize( e.getComponent().getSize().width);
+        Dimension d = e.getComponent().getSize();
+				updateTableToSize( d.width, d.height);
+      }
+			public void componentMoved(ComponentEvent e){}
+		});
+  }
+  
+  public MatPanel(EditorContainer container, MatDataModel data) 
+  {  
+    itsContainer = container;
+    
+    matData = data;
+    this.ftsObj = (FtsObjectWithEditor)matData;
+    matData.addMatListener(this);
+    
+    setBorder(BorderFactory.createEtchedBorder());
+    
+    tableModel = new MatTableModel(matData);
+    
+    createTable();
+    
+    validate();
+    
+    itsContainer.getFrame().addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e)
+      {
+        Dimension d = e.getComponent().getSize();
+				updateTableToSize( d.width, d.height);
       }
 			public void componentMoved(ComponentEvent e){}
 		});
@@ -83,7 +113,8 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
     itsContainer.getFrame().addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e)
       {
-				updateTableToSize( e.getComponent().getSize().width);
+        Dimension d = e.getComponent().getSize();
+				updateTableToSize( d.width, d.height);
       }
 			public void componentMoved(ComponentEvent e){}
 		});
@@ -138,7 +169,18 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
       westPanel.add(rowIndex);
       
       add(BorderLayout.WEST, westPanel);
-    }    
+    } 
+    
+    scrollPane.getVerticalScrollBar().addAdjustmentListener( new AdjustmentListener() {
+      public void adjustmentValueChanged( AdjustmentEvent e)
+		  {
+        if(verticalScrollValue != e.getValue())
+        {
+          verticalScrollValue = e.getValue();
+          updateLastVisibleRow();  
+        }
+      }
+		});
   }
   void updateTableModel()
   {
@@ -149,7 +191,7 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
       table.getColumnModel().getColumn(i).setMinWidth(COLUMN_MIN_WIDTH);
   }
   
-  void updateTableToSize(int width)
+  void updateTableToSize(int width, int height)
   {
     if( matData.getColumns() * COLUMN_MIN_WIDTH < width)
       table.setAutoResizeMode( JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -174,8 +216,26 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
         validate();
       }
     }
+    
+    updateLastVisibleRow();
   }
   
+  int getVisibleRowsCount()
+  {
+    return getSize().height/ROW_HEIGHT;
+  }
+  
+  void updateLastVisibleRow()
+  {
+    if(matData instanceof FtsMatEditorObject)
+    {
+      int lastRow = (int)((getSize().height + verticalScrollValue)/ROW_HEIGHT) -2 + getVisibleRowsCount();
+      if(lastRow < 0) lastRow = 0;
+      else if(lastRow > matData.getRows()) lastRow = matData.getRows();
+      
+      ((FtsMatEditorObject)matData).requestSetLastVisibleRow(lastRow); 
+    }
+  }
   public MatDataModel getMatModel()
   {
     return matData;
@@ -247,8 +307,8 @@ public class MatPanel extends JPanel implements Editor, MatDataListener, JMaxTab
     return itsContainer;
   }
   public void close(boolean doCancel){    
-    ((FtsObjectWithEditor)matData).closeEditor();
-    ((FtsObjectWithEditor)matData).requestDestroyEditor(); 
+    ftsObj.closeEditor();
+    ftsObj.requestDestroyEditor(); 
   }
   public void save(){}
   public void saveAs(){}

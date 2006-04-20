@@ -64,6 +64,18 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
         ((FtsDictObject)obj).appendRow();
     }
     });
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsDictObject)obj).startUpload();
+    }
+    });
+    FtsObject.registerMessageHandler( FtsDictObject.class, FtsSymbol.get("end_upload"), new FtsMessageHandler(){
+      public void invoke( FtsObject obj, FtsArgs args)
+    {
+        ((FtsDictObject)obj).endUpload();
+    }
+    });  
   }
 
   /**
@@ -102,7 +114,27 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     listeners.removeAllElements();
     System.gc();
   }
-    
+  
+  /**/
+  boolean firstTime = true;
+  public void openEditor(int argc, FtsAtom[] argv)
+  {  
+    if(getEditorFrame() == null)
+    {
+      createEditor();// rest moved in endUpload   
+      firstTime = true;
+    }
+    else
+      firstTime = false;
+  }  
+  
+  public void showEditor()
+  {
+    showEditor(firstTime);
+  }
+  
+  /**/  
+  
   public void clear()
   {
     for(int i = 0; i < n_rows; i++)
@@ -176,6 +208,25 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
         notifySizeChanged(n_rows, n_cols);
       }});
   }
+  
+  boolean uploading = false;
+  public void startUpload()
+  {
+    uploading = true;
+    notifyUpload(true);
+  }
+  public void endUpload()
+  {
+    SwingUtilities.invokeLater(new Runnable(){
+      public void run()
+    {
+        showEditor();
+        FtsObject.requestResetGui();
+        uploading = false;
+        notifyUpload(false);
+    } 
+    });   
+  }     
   
   public void nameChanged( String name)
   {
@@ -409,6 +460,12 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   {
     for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
       ((MatDataListener) e.nextElement()).matNameChanged(name);
+  }
+  
+  private void notifyUpload(boolean uploading)
+  {
+    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+      ((MatDataListener) e.nextElement()).uploading(uploading);
   }
   /*******************************************************************/
   private Object[][] values;

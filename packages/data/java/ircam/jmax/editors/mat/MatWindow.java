@@ -43,13 +43,13 @@ public class MatWindow extends JMaxEditor {
   MatPanel itsMatPanel;
   MatDataModel matData;
   
-  public MatWindow(MatDataModel data)
+  public MatWindow( FtsObjectWithEditor ftsObj, MatDataModel data)
   {
     super();
     
     matData = data;
         
-    itsMatPanel = new MatPanel(this, data);
+    itsMatPanel = new MatPanel(this, ftsObj, data);
     getContentPane().add(itsMatPanel);
     
     makeMatWindow();
@@ -58,6 +58,21 @@ public class MatWindow extends JMaxEditor {
     setSize( matData.getDefaultSize());
   }
 
+  public MatWindow( MatDataModel data)
+  {
+    super();
+    
+    matData = data;
+    
+    itsMatPanel = new MatPanel(this, data);
+    getContentPane().add(itsMatPanel);
+    
+    makeMatWindow();
+    
+    setLocation(200, 200);
+    setSize( matData.getDefaultSize());
+  }
+  
   public MatWindow(MatWindow winCopy)
   {
     super();

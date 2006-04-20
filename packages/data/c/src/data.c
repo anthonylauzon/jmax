@@ -758,6 +758,7 @@ FTS_PACKAGE_INIT(data)
   FTS_MODULE_INIT_CALL(dict);
   FTS_MODULE_INIT_CALL(tree);
   FTS_MODULE_INIT_CALL(tabeditor);
+  FTS_MODULE_INIT_CALL(mateditor);
   
   FTS_MODULE_INIT_CALL(getrange);  
   FTS_MODULE_INIT_CALL(dumpfile);

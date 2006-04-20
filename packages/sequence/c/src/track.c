@@ -457,10 +457,11 @@ track_move_event_and_upload(track_t *track, event_t *event, double time)
   
   if(track_editor_is_open(track))
   {
-    fts_atom_t a;
+    fts_atom_t a[2];
     
-    fts_set_object(&a, (fts_object_t *)event);
-    fts_client_send_message((fts_object_t *)track, seqsym_moveEvents, 1, &a);
+    fts_set_object(a, (fts_object_t *)event);
+    fts_set_float(a + 1, time);
+    fts_client_send_message((fts_object_t *)track, seqsym_moveEventsFromServer, 2, a);
   }
   
   fts_object_set_state_dirty((fts_object_t *)track);

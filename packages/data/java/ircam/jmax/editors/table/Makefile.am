@@ -9,6 +9,7 @@ FtsIvecObject.java \
 FtsTableObject.java \
 LineDrawer.java \
 LineListener.java \
+PositionDrawer.java \
 StripeSelecter.java \
 TableAdapter.java \
 TableDataListener.java \
@@ -20,10 +21,12 @@ TableInspector.java \
 TableInteractionModule.java \
 TableMouseDragTracker.java \
 TablePanel.java \
+TablePositionListener.java \
 TableRuler.java \
 TableSelection.java \
 TableToolManager.java \
 Tabler.java \
+TableVerticalRuler.java \
 UndoableValueSet.java 
 
 JAVAC = @JAVACX@

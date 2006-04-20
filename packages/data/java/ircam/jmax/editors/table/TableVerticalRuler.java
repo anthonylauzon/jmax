@@ -44,7 +44,7 @@ public class TableVerticalRuler extends JPanel
     fm = getFontMetrics( Tabler.displayFont);
     this.tgc = gc;
     setSize(rulerDimension);
-    
+        
     tgc.getDataModel().addListener( new TableDataListener(){
       public void valueChanged(int index1, int index2, boolean fromScroll){}
       public void pixelsChanged(int index1, int index2){}
@@ -60,7 +60,15 @@ public class TableVerticalRuler extends JPanel
   {
     Graphics2D g2d = (Graphics2D)g;
     Dimension d = getSize();
-      
+    
+    g.setColor(getBackground());
+    g.fillRect(0, 0, d.width, d.height);
+    
+    g.setColor(Color.lightGray); 
+    g.drawLine(1, 0, d.width-1, 0);
+    g.setColor(Color.white);
+    g.drawLine(1, 1, d.width-1, 1);
+    
     AffineTransform at = new AffineTransform();
     int yPosition, stringWidth;
     String valueString;
@@ -147,9 +155,6 @@ public class TableVerticalRuler extends JPanel
   }*/
 
   public Dimension getPreferredSize()
-  { return rulerDimension; }
-
-  public Dimension getMinimumSize()
   { return rulerDimension; }
 
   public Dimension getMaximumSize()

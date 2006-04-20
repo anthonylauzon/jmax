@@ -53,6 +53,7 @@ typedef struct
   double onset; /* fractional onset */
   double domain; /* fractional size (rows) */
   int opened;
+  fts_object_t *editor;
 } fmat_t;
 
 #define HEAD_ROWS 8 /* extra points for interpolation at start of vector */
@@ -147,10 +148,7 @@ void _fmat_sort (fmat_t *self, int col, int (*compare)(const void *, const void 
 
 DATA_API fmat_t *fmat_null;
 
-DATA_API void fmat_upload(fmat_t *mat);
-
 /** @} end of group fmat */
-
 
 /* used by fvec, too, but not exported */
 fts_method_status_t fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);

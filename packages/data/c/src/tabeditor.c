@@ -102,7 +102,7 @@ tabeditor_send_visibles(tabeditor_t *tabeditor)
   int send = 0;
   int current = 0;
   int veconset = 2;
-  
+      
   while(n > 0)
   {
     if(!append)

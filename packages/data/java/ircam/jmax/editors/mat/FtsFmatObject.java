@@ -36,40 +36,16 @@ import java.awt.*;
  * A concrete implementation of the SequenceDataModel,
  * this class represents a model of a set of tracks.
  */
-public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
+public class FtsFmatObject extends FtsObjectWithEditor
 {
   static
   {
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("clear"), new FtsMessageHandler(){
+    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("editor"), new FtsMessageHandler(){
       public void invoke( FtsObject obj, FtsArgs args)
       {
-          ((FtsFmatObject)obj).clear();
+        ((FtsFmatObject)obj).setFtsEditor( args.getInt( 0));
       }
     });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("set"), new FtsMessageHandler(){
-      public void invoke( FtsObject obj, FtsArgs args)
-      {
-        ((FtsFmatObject)obj).set( args.getLength(), args.getAtoms());
-      }
-   });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("size"), new FtsMessageHandler(){
-      public void invoke( FtsObject obj, FtsArgs args)
-    {
-        ((FtsFmatObject)obj).setSize( args.getInt(0), args.getInt(1));
-    }
-    });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("start_upload"), new FtsMessageHandler(){
-      public void invoke( FtsObject obj, FtsArgs args)
-    {
-        ((FtsFmatObject)obj).startUpload();
-    }
-    });
-    FtsObject.registerMessageHandler( FtsFmatObject.class, FtsSymbol.get("end_upload"), new FtsMessageHandler(){
-      public void invoke( FtsObject obj, FtsArgs args)
-    {
-        ((FtsFmatObject)obj).endUpload();
-    }
-    });    
   }
 
   /**
@@ -77,408 +53,66 @@ public class FtsFmatObject extends FtsObjectWithEditor implements MatDataModel
    */
   public FtsFmatObject(FtsServer server, FtsObject parent, int objId, String classname, FtsAtom args[], int offset, int length)
   {
-    super(server, parent, objId, classname, args, offset, length); 
-    
-    listeners = new MaxVector();
-      
-    if( length > offset+1 && args[offset].isInt() && args[offset+1].isInt())
-    {
-      n_rows = args[offset].intValue;
-      n_cols = args[offset+1].intValue;
-    }
+    super(server, parent, objId, classname, args, offset, length);     
   }
 
-  public FtsFmatObject(FtsServer server, FtsObject parent, int objId)
-  {
-    super(server, parent, objId); 
-    listeners = new MaxVector();
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////
   //// MESSAGES called from the server
   //////////////////////////////////////////////////////////////////////////////////////
+  FtsMatEditorObject ftsEditor;
+  
+  public void setFtsEditor(int id)
+  {
+    this.ftsEditor = new FtsMatEditorObject( getServer(), this, id);
+  }
+
+  public FtsMatEditorObject getFtsEditor()
+  {
+    return ftsEditor;
+  }
+
   public void createEditor()
   {
     if(getEditorFrame() == null)
-      setEditorFrame( new MatWindow(this));
+      setEditorFrame( new MatWindow(this, ftsEditor));
   }
-  
+
   public void reinitEditorFrame()
   {
     setEditorFrame( new MatWindow((MatWindow)getEditorFrame()));
   }
-  
+    
   boolean firstTime = true;
   public void openEditor(int argc, FtsAtom[] argv)
   {  
     if(getEditorFrame() == null)
     {
-      createEditor();/* rest moved in endUpload */  
+      createEditor();// rest moved in endUpload   
       firstTime = true;
     }
     else
       firstTime = false;
-    
   }
 
   public void destroyEditor()
   {
     disposeEditor();
-    listeners.removeAllElements();
     System.gc();
   }
     
-  public void clear()
+  public void showEditor()
   {
-    for(int i = 0; i < n_rows; i++)
-      for(int j = 0; j < n_cols; j++)
-        values[i][j] = null;
-    
-    SwingUtilities.invokeLater(new Runnable(){
-      public void run()
-      {
-        notifyClear();
-      }});
-  }
-
-  public void set(int nArgs , FtsAtom args[])
-  {        
-    if(nArgs > 2)
-    {
-      int m = args[0].intValue;
-      int n = args[1].intValue;
-            
-      for(int i = 2; i < nArgs; i++)
-      {
-        if(n >= n_cols)
-        {
-          n = 0;
-          m++;
-        }
-                
-        values[m][n++] = new Float(args[i].doubleValue);
-      }
-      
-      SwingUtilities.invokeLater(new Runnable(){
-        public void run()
-        {
-          notifyDataChanged();
-        }});
-    }
-  }
-
-  public void setSize(int m, int n)
-  {    
-    if(n_rows != m || n_cols != n)
-    {
-      Object[][] temp = new Object[m][n];
-      for(int i = 0; i < m; i++)
-        for(int j = 0; j < n; j++)
-        {
-          if(i < n_rows && j < n_cols)
-            temp[i][j] = values[i][j];
-          else
-            temp[i][j] = new Float(0.0);
-        }
-      n_rows = m;
-      n_cols = n;
-      values = temp;
-      
-      SwingUtilities.invokeLater(new Runnable(){
-        public void run()
-        {
-          notifySizeChanged(n_rows, n_cols);
-        }});
-    }
-  }
-    
-  boolean uploading = false;
-  public void startUpload()
-  {
-    uploading = true;
-    notifyUpload(true);
+    showEditor(firstTime);
   }
   
-  public void endUpload()
-  {
-    SwingUtilities.invokeLater(new Runnable(){
-      public void run()
-      {
-        showEditor(firstTime);
-        FtsObject.requestResetGui();
-        uploading = false;
-        notifyUpload(false);
-      } 
-    });    
-  } 
-  
-  public void nameChanged( String name)
-  {
-    super.nameChanged( name);
-    notifyNameChanged( name);
-  }
-  //////////////////////////////////////////////////////////////////////////////////////
-  //// MESSAGES to the server
-  //////////////////////////////////////////////////////////////////////////////////////
-  
-  public void requestSetValue( java.lang.Object aValue, int rowIndex, int columnIndex)
-  {
-    args.clear();
-    args.addInt( rowIndex);
-    args.addInt( columnIndex);
-    if(aValue instanceof String)
-      args.addSymbol( FtsSymbol.get((String) aValue));
-    else
-      args.add( aValue);
-    
-    try{
-      send( FtsSymbol.get("set"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFmatObject: I/O Error sending set Message!");
-      e.printStackTrace(); 
-    }    
-  }
-  
-  public void requestAppendRow()
-  {
-    args.clear();
-    args.addInt( n_rows+1);
-    try{
-      send( FtsSymbol.get("rows"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFmatObject: I/O Error sending append_row Message!");
-      e.printStackTrace(); 
-    }    
-  }
-  
-  public void requestAppendColumn()
-  {
-    args.clear();
-    args.addInt( n_cols+1);
-    try{
-      send( FtsSymbol.get("cols"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending append_column Message!");
-      e.printStackTrace(); 
-    }   
-  }
-  
-  public void requestInsertRow(int index)
-  {
-    args.clear();
-    args.addInt( index);
-    
-    try{
-      send( FtsSymbol.get("insert"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending insert Message!");
-      e.printStackTrace(); 
-    }    
-  }    
-  
-  public void requestInsertColumn(int index)
-  {
-    args.clear();
-    args.addInt( index);
-    
-    try{
-      send( FtsSymbol.get("insert_cols"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending insert_cols Message!");
-      e.printStackTrace(); 
-    }    
-  }    
-  
-  public void requestDeleteRows(int startIndex, int size)
-  {
-    args.clear();
-    args.addInt( startIndex);
-    if(size > 1)
-      args.addInt(size);
-    
-    try{
-      send( FtsSymbol.get("delete"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending delete Message!");
-      e.printStackTrace(); 
-    }    
-  }  
-  
-  public void requestDeleteCols(int startIndex, int size)
-  {
-    args.clear();
-    args.addInt( startIndex);
-    if(size > 1)
-      args.addInt(size);
-    
-    try{
-      send( FtsSymbol.get("delete_cols"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending delete_cols Message!");
-      e.printStackTrace(); 
-    }    
-  }  
-  
-  public void requestImport()
-  {
-    try{
-      send( FtsSymbol.get("import"));
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending import Message!");
-      e.printStackTrace(); 
-    }    
-  }  
-
-  public void requestExport()
-  {
-    try{
-      send( FtsSymbol.get("export"));
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsFMatObject: I/O Error sending export Message!");
-      e.printStackTrace(); 
-    }    
-  }    
-  
-  /************************************************************************************
-  ** MatDataModel interface
-  *************************************************************************************/
-  public int getSize()
-  {
-    return n_rows * n_cols;
-  }
-  
-  public int getRows()
-  {
-    return n_rows;
-  }
-  
-  public int getColumns()
-  {
-    return n_cols;
-  }
-  
-  public boolean haveRowIdCol()
-  {
-    return true;
-  }
-  
-  public boolean canAppendColumn()
-  {
-    return true;
-  }
-  
-  public String getColumnName(int col_id)
-  {
-    return ""+col_id;
-  }
-  
-  public String getType()
-  {
-    return "fmat";
-  }  
-  
-  public String getName()
-  {
-    return super.getVariableName();
-  }
-  
-  public void setRows(int m)
-  {
-    setSize(m, n_cols);
-  }
-  
-  public void setColumns(int n)
-  {
-    setSize(n_rows, n);
-  }
-  
-  Float prut = new Float(0.0); 
-  public Object getValueAt(int m, int n)
-  {
-    if((m < n_rows) && (n < n_cols))
-      return values[m][n];
-    else
-      return prut;/* to avoid out_of_range access */
-  }
-  public void setValueAt(int m, int n, Object value)
-  {
-    values[m][n] = values;
-  }
-
-  public void addMatListener(MatDataListener theListener) 
-  {
-    listeners.addElement(theListener);
-  }
-  
-  public void removeMatListener(MatDataListener theListener) 
-  {
-    listeners.removeElement(theListener);
-  }
-
   public Dimension getDefaultSize()
   {
     return defaultSize;
   }
   
- /********************************************************************
-  * notifications
-  */
-    
-  private void notifyClear()
-  {
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((MatDataListener) e.nextElement()).matCleared();
-  }
-
-  private void notifyDataChanged()
-  {
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((MatDataListener) e.nextElement()).matDataChanged();
-  }
-  
-  private void notifySizeChanged(int n_rows, int n_cols)
-  {
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((MatDataListener) e.nextElement()).matSizeChanged(n_rows, n_cols);
-  }
-  private void notifyUpload(boolean uploading)
-  {
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((MatDataListener) e.nextElement()).uploading(uploading);
-  }
-  private void notifyNameChanged(String name)
-  {
-    for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
-      ((MatDataListener) e.nextElement()).matNameChanged(name);
-  }
-  /*******************************************************************/
-  private Object[][] values;
-  MaxVector listeners = new MaxVector();
-  protected FtsArgs args = new FtsArgs();
-  int n_rows = 0;
-  int n_cols = 0;
-
   public final static int FMAT_DEFAULT_WIDTH  = 370;
   public final static int FMAT_DEFAULT_HEIGHT = 250;
-  static Dimension defaultSize = new Dimension(FMAT_DEFAULT_WIDTH, FMAT_DEFAULT_HEIGHT);  
+  static Dimension defaultSize = new Dimension(FMAT_DEFAULT_WIDTH, FMAT_DEFAULT_HEIGHT);
 }
 
 

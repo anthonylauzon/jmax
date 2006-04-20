@@ -9,6 +9,7 @@ fvec.c \
 getrange.c \
 ivec.c \
 mat.c \
+mateditor.c \
 dict.c \
 tree.c \
 tabeditor.c \
@@ -18,6 +19,7 @@ INCLUDES=-I$(top_srcdir)/packages/utils/c/include -I$(top_srcdir)/packages/data/
 
 noinst_HEADERS= \
 floatfuns.h \
+mateditor.h \
 tabeditor.h
 
 libdata_la_LDFLAGS= -L$(top_builddir)/fts -lfts -module -release @JMAX_VERSION@

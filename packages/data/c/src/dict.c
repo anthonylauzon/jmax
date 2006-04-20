@@ -242,6 +242,9 @@ dict_upload_data(dict_t *self)
   ms = 0;
   ns = 0;
   sent = 0;
+  
+  fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
+  
   while( data_size > 0)
   {
     int i = 0;
@@ -277,6 +280,8 @@ dict_upload_data(dict_t *self)
     sent += n;
     data_size -= n;
   }
+  
+  fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
   
   fts_array_destroy(&array);
 }

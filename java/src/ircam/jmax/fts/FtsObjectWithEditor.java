@@ -92,7 +92,7 @@ public void setEditorFrame(Frame frame)
 }
 
 public void disposeEditor()
-{  
+{    
   if(editorFrame!= null)
   {
     hideEditor();
@@ -124,13 +124,13 @@ public void showEditor(boolean firstTime)
         });
       }
       else
-      {
+      {        
         editorFrame.setVisible(true);
         MaxWindowManager.getWindowManager().addWindow(editorFrame);
       }
     }
     else
-    {
+    {      
       if(editorFrame.getState()==Frame.ICONIFIED) 
         editorFrame.setState(Frame.NORMAL);
       editorFrame.toFront();

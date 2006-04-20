@@ -381,6 +381,8 @@
 		3B26BB16085DDE7D005AD945 /* tree.h in Sources */ = {isa = PBXBuildFile; fileRef = F458A41808471D63006AB8CF /* tree.h */; };
 		3B26BB46085DE318005AD945 /* dumper.c in Sources */ = {isa = PBXBuildFile; fileRef = F458A3F308470CD3006AB8CF /* dumper.c */; };
 		3B28F8AF06EF45CA009639A3 /* JMaxMatTable.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B28F8AE06EF45CA009639A3 /* JMaxMatTable.java */; };
+		3B2DED9009F77FB4006C0A5C /* mateditor.c in Sources */ = {isa = PBXBuildFile; fileRef = 3B2DED8F09F77FB4006C0A5C /* mateditor.c */; };
+		3B2DED9209F77FE9006C0A5C /* FtsMatEditorObject.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B2DED9109F77FE9006C0A5C /* FtsMatEditorObject.java */; };
 		3B513E2A06A4277B00F1664A /* FtsMatObject.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B513E2906A4277B00F1664A /* FtsMatObject.java */; };
 		3B513E3006A4299A00F1664A /* MatDataListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B513E2D06A4299A00F1664A /* MatDataListener.java */; };
 		3B513E3106A4299A00F1664A /* MatDataModel.java in Sources */ = {isa = PBXBuildFile; fileRef = 3B513E2E06A4299A00F1664A /* MatDataModel.java */; };
@@ -2597,6 +2599,8 @@
 		3B178D440935CF6400AEA7EC /* data_zoomer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = data_zoomer.gif; path = ../../packages/data/images/data_zoomer.gif; sourceTree = SOURCE_ROOT; };
 		3B1A919306D352DF009882D6 /* MatSimpleMenu.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MatSimpleMenu.java; path = ../../packages/data/java/ircam/jmax/editors/mat/MatSimpleMenu.java; sourceTree = SOURCE_ROOT; };
 		3B28F8AE06EF45CA009639A3 /* JMaxMatTable.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = JMaxMatTable.java; path = ../../java/src/ircam/jmax/toolkit/JMaxMatTable.java; sourceTree = SOURCE_ROOT; };
+		3B2DED8F09F77FB4006C0A5C /* mateditor.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = mateditor.c; path = ../../packages/data/c/src/mateditor.c; sourceTree = SOURCE_ROOT; };
+		3B2DED9109F77FE9006C0A5C /* FtsMatEditorObject.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = FtsMatEditorObject.java; path = ../../packages/data/java/ircam/jmax/editors/mat/FtsMatEditorObject.java; sourceTree = SOURCE_ROOT; };
 		3B51225F074CF53900C68D4D /* timebase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = timebase.h; path = ../../include/ftsprivate/timebase.h; sourceTree = SOURCE_ROOT; };
 		3B512261074CF55300C68D4D /* timebase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = timebase.h; path = ../../include/fts/timebase.h; sourceTree = SOURCE_ROOT; };
 		3B513E2906A4277B00F1664A /* FtsMatObject.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = FtsMatObject.java; path = ../../packages/data/java/ircam/jmax/editors/mat/FtsMatObject.java; sourceTree = SOURCE_ROOT; };
@@ -2637,7 +2641,7 @@
 		3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerEventRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java; sourceTree = SOURCE_ROOT; };
 		5C43B82F05AB304800E7FB5C /* libfunctions.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libfunctions.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C43B8F205ABFF6900E7FB5C /* libfunctions-info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; path = "libfunctions-info.plist"; sourceTree = SOURCE_ROOT; };
-		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426BB05AB0B8A0042B7A2 /* version-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "version-info.plist"; sourceTree = "<group>"; };
 		5C5426BC05AB0B8A0042B7A2 /* version.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = version.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C5426C005AB0B8A0042B7A2 /* parser-tokenizer-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "parser-tokenizer-info.plist"; sourceTree = "<group>"; };
@@ -4124,12 +4128,13 @@
 		3B513E2806A4274500F1664A /* mat */ = {
 			isa = PBXGroup;
 			children = (
-				3B56498006F729CB0065C807 /* MatEditMenu.java */,
 				3BA9870506AD60A600D18F4E /* FtsDictObject.java */,
 				3B8B4B8906AFC7E90067B1E0 /* FtsFmatObject.java */,
+				3B2DED9109F77FE9006C0A5C /* FtsMatEditorObject.java */,
 				3B513E2906A4277B00F1664A /* FtsMatObject.java */,
 				3B513E2D06A4299A00F1664A /* MatDataListener.java */,
 				3B513E2E06A4299A00F1664A /* MatDataModel.java */,
+				3B56498006F729CB0065C807 /* MatEditMenu.java */,
 				3BA405E106A572AD0097A99B /* MatPanel.java */,
 				3B84FF2606AEAF6300862F13 /* MatRowIndex.java */,
 				3B1A919306D352DF009882D6 /* MatSimpleMenu.java */,
@@ -6076,6 +6081,7 @@
 				F8B8E49702867E1C01664092 /* fvec.c */,
 				F8B8E49E02867E1C01664092 /* ivec.c */,
 				F8B8E4A002867E1C01664092 /* mat.c */,
+				3B2DED8F09F77FB4006C0A5C /* mateditor.c */,
 				F8EE4BA0031CEE1701664092 /* dict.c */,
 				F560D89303D486B7016640F1 /* tabeditor.c */,
 				F8B8E49B02867E1C01664092 /* getrange.c */,
@@ -7990,6 +7996,7 @@
 				5C54274005AB0B8B0042B7A2 /* tabeditor.c in Sources */,
 				F458A41508471D3C006AB8CF /* tree.c in Sources */,
 				5CBF1918095A29F800492815 /* datafiles.c in Sources */,
+				3B2DED9009F77FB4006C0A5C /* mateditor.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8673,6 +8680,7 @@
 				3B0A63D409E3C584005B4F5E /* TableVerticalRuler.java in Sources */,
 				3B0A63D609E3C5B5005B4F5E /* TablePositionListener.java in Sources */,
 				3B0A63E109E3C5FE005B4F5E /* PositionDrawer.java in Sources */,
+				3B2DED9209F77FE9006C0A5C /* FtsMatEditorObject.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
