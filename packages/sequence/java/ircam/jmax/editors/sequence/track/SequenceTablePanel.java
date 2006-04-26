@@ -116,8 +116,13 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 			}
 			public void trackCleared()
 		  {
-				table.revalidate();
-			}
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run()
+          { 
+            table.revalidate();
+          }
+        });
+      }
 			boolean uploading = false;
 			public void startTrackUpload( TrackDataModel track, int size)
 			{

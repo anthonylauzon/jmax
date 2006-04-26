@@ -205,9 +205,15 @@ class SequenceTableDialog extends JDialog implements TrackDataListener{
 
   public void trackCleared() 
   {
-    getContentPane().validate();
-    eventsPanel.validate();
-    validate();
+    
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      { 
+        getContentPane().validate();
+        eventsPanel.validate();
+        validate();
+      }
+    });
   }
   boolean uploading = false;
   public void startTrackUpload( TrackDataModel track, int size)
