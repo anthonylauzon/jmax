@@ -162,18 +162,24 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
   }
   //------- HighlightListener interface
   Rectangle paintRect = new Rectangle(); 
+  double highTime;
   public void highlight(Enumeration elements, double time)
   {
-    if(!hh)
-    {
-      add( marker);
-      marker.setVisible(true);
-      //---------
-      hh = true;
-    }
-    marker.setTime(time);
+    highTime = time;
+    SwingUtilities.invokeLater(new Runnable() {
+	    public void run()
+      { 
+        if(!hh)
+        {
+          add( marker);
+          marker.setVisible(true);
+          //---------
+          hh = true;
+        }
+        marker.setTime(highTime);
+      }
+    });
   }
-  
   //--- Ruler fields
   boolean hh = false;
 

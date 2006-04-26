@@ -447,7 +447,9 @@ public void highlightEvents(int nArgs, FtsAtom args[])
     events.addElement((TrackEvent)(args[i].objectValue));
 
   double time = ((TrackEvent)args[0].objectValue).getTime();
-  notifyHighlighting(events, time);
+  
+  if(getEditorFrame() != null && !uploading)
+    notifyHighlighting(events, time);
 }
 
 public void highlightEventsAndTime(int nArgs, FtsAtom args[])
@@ -458,8 +460,9 @@ public void highlightEventsAndTime(int nArgs, FtsAtom args[])
   if( nArgs > 1)
     for(int i = 1; i < nArgs; i++)
       events.addElement((TrackEvent)(args[i].objectValue));
-
-  notifyHighlighting(events, time);
+  
+  if(getEditorFrame() != null && !uploading)
+    notifyHighlighting(events, time);
 }
 
 public void requestClearTrack()

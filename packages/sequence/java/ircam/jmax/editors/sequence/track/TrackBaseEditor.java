@@ -143,41 +143,43 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
 				TrackEvent temp;
 				boolean first = true;
 				
-				Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
+				//Rectangle clipRect = gc.getTrackClip().intersection(gc.getScrollManager().getViewRectangle());
 				Graphics g = getGraphics();
-				g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
-				
-				for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
-				{
-					temp = (TrackEvent) e.nextElement();
-					temp.setHighlighted(false);
-					temp.getRenderer().render(temp, g, false, gc);			    
-				}
-				oldElements.removeAllElements();
-				
-				for (Enumeration e = elements; e.hasMoreElements();) 
-				{
-					temp = (TrackEvent) e.nextElement();
-					if(first)
-					{
-						scrollEvent = temp;
-						SwingUtilities.invokeLater(new Runnable(){
-							public void run()
-						{
-								if(scrollEvent != null)
-								{
-									gc.getScrollManager().makeVisible(scrollEvent);
-									scrollEvent = null;
-								}
-						}
-						});
+				//g.setClip(clipRect.x, clipRect.y, clipRect.width, clipRect.height);
+				if(g!=null)
+        {
+          for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+          {
+            temp = (TrackEvent) e.nextElement();
+            temp.setHighlighted(false);
+            temp.getRenderer().render(temp, g, false, gc);			    
+          }
+          oldElements.removeAllElements();
+          
+          for (Enumeration e = elements; e.hasMoreElements();) 
+          {
+            temp = (TrackEvent) e.nextElement();
+            if(first)
+            {
+              scrollEvent = temp;
+              SwingUtilities.invokeLater(new Runnable(){
+                public void run()
+                {
+                  if(scrollEvent != null)
+                  {
+                    gc.getScrollManager().makeVisible(scrollEvent);
+                    scrollEvent = null;
+                  }
+                }
+              });
 						
-						first = false;
-					}
-					temp.setHighlighted(true);
-					temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
-					oldElements.addElement(temp);			    
-				}
+              first = false;
+            }
+            temp.setHighlighted(true);
+            temp.getRenderer().render(temp, g, Event.HIGHLIGHTED, gc);
+            oldElements.addElement(temp);			    
+          }
+        }
       }
 		});
     

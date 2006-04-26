@@ -118,6 +118,7 @@ public class TrackWindow extends JMaxEditor {
         {
           Rectangle bounds = TrackWindow.this.getBounds();
           trackData.editorObject.setSize(bounds.width, bounds.height);
+          trackData.opening = false;
         }
       }
 			public void windowClosed(WindowEvent e){}
@@ -181,7 +182,6 @@ public class TrackWindow extends JMaxEditor {
       MaxWindowManager.getWindowManager().windowChanged(this);
     }
 	}
-  
 	
   private final void makeMenuBar()
   {
