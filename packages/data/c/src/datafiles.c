@@ -162,7 +162,7 @@ fmat_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
         fts_object_error(o, "export: coudn't write any text data to file \"%s\"", fts_symbol_name(file_name));
     }
     else
-      fts_object_error(o, "export: cannot open audio file \"%s\"", fts_symbol_name(file_name));
+      fts_object_error(o, "export: cannot open text file \"%s\"", fts_symbol_name(file_name));
   }
   
   return fts_ok;
@@ -312,7 +312,7 @@ fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
         fts_object_error(o, "export: coudn't write any audio data to file \"%s\"", fts_symbol_name(file_name));
     }
     else
-      fts_object_error(o, "export: cannot create audio file \"%s\"", fts_symbol_name(file_name));
+      fts_object_error(o, "export: cannot open audio file \"%s\"", fts_symbol_name(file_name));
   }
   
   return fts_ok;
