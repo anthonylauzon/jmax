@@ -62,6 +62,7 @@ public class TableInspector extends JDialog
       public void sizeChanged(int size, int oldSize){}
       public void tableUpdated(){}
       public void tableRange(float min_val, float max_val){}
+      public void tableNameChanged(String name){}
       public void tableReference(int nRowsRef, int nColsRef, String typeRef, int indexRef, int onsetRef, int sizeRef)
       {
         updating = true;

@@ -84,6 +84,13 @@ public class FtsIvecObject extends FtsObjectWithEditor
     disposeEditor();
     System.gc();
   }
+  
+  public void nameChanged( String name)
+  {
+    super.nameChanged( name);
+    if(ftsEditor != null)
+      ftsEditor.nameChanged( name);
+  }
 
   FtsTableObject ftsEditor;
 }

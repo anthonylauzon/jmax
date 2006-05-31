@@ -67,6 +67,10 @@ public interface TableDataModel {
    */
     //public abstract void setValues(int values[], int startIndex, int lenght);
 
+    public abstract String getType(); /* ivec or fvec */
+    
+    public abstract String getName(); 
+    
   /**
    * Sets the range of points between start and end interpolating between the initial
    * and ending values. This operation corresponds to draw a line in the model. */

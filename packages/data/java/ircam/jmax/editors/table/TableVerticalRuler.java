@@ -54,6 +54,7 @@ public class TableVerticalRuler extends JPanel
       public void tableUpdated(){repaint();}
       public void tableRange(float min_val, float max_val){repaint();}
       public void tableReference(int nRowsRef, int nColsRef, String typeRef, int indexRef, int onsetRef, int sizeRef){}
+      public void tableNameChanged(String name){}
     });
   }
   public void paintComponent(Graphics g)

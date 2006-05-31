@@ -755,6 +755,22 @@ double cutToBounds( double y, double max, double min)
   return y;
 }
 
+public String getType()
+{
+  return (isIvec()) ? "ivec" : "fvec";
+}  
+
+public String getName()
+{
+  return ((FtsGraphicObject)vector).getVariableName();
+}
+
+public void nameChanged( String name)
+{
+  super.nameChanged( name);
+  notifyNameChanged( name);
+}
+
 /**
 * Utility private function to allocate a buffer used during the interpolate operations.
  * The computation is done in a private vector that is stored in one shot. */  
@@ -832,6 +848,13 @@ private void notifyReference(int nRowsRef, int nColsRef, String typeRef, int ind
   for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
     ((TableDataListener) e.nextElement()).tableReference( nRowsRef, nColsRef, typeRef, indexRef, onsetRef, sizeRef);
 }
+
+private void notifyNameChanged(String name)
+{
+  for (Enumeration e = listeners.elements(); e.hasMoreElements();) 
+    ((TableDataListener) e.nextElement()).tableNameChanged(name);
+}
+
 ///////////////////////////////////////////////////////////
 private Vector points = new Vector();
 MaxVector listeners = new MaxVector();

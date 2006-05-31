@@ -40,6 +40,7 @@ public class Tabler extends JMaxEditor{
   //--- Fields 
   TablePanel itsPanel;
   TableRuler tableRuler;
+  TableDataModel tableModel;
   
   private EditorMenu itsFileMenu;
   private EditMenu   itsEditMenu;	
@@ -53,8 +54,10 @@ public class Tabler extends JMaxEditor{
     
     super();
     
+    tableModel = tm;
+    
     getContentPane().setLayout( new BorderLayout());
-    itsPanel = new TablePanel( this, ftsObj, tm);
+    itsPanel = new TablePanel( this, ftsObj, tableModel);
     getContentPane().add(itsPanel, BorderLayout.CENTER);
     itsPanel.frameAvailable(); 
 
@@ -84,6 +87,8 @@ public class Tabler extends JMaxEditor{
     copyTabler.dispose();
     System.gc();
     
+    tableModel = itsPanel.getData();
+    
     makeTablerWindow();
     
     setBounds(bounds);
@@ -91,6 +96,21 @@ public class Tabler extends JMaxEditor{
   
   private void makeTablerWindow()
   {    
+    tableModel.addListener( new TableDataListener(){
+      public void valueChanged(int index1, int index2, boolean fromScroll){}
+      public void pixelsChanged(int index1, int index2){}
+      public void tableSetted(){}
+      public void tableCleared(){}
+      public void sizeChanged(int size, int oldSize){}
+      public void tableUpdated(){}
+      public void tableRange(float min_val, float max_val){}
+      public void tableNameChanged(String name)
+      {
+        setWindowName( name);
+      }
+      public void tableReference(int nRowsRef, int nColsRef, String typeRef, int indexRef, int onsetRef, int sizeRef){}
+    });
+    
     addWindowListener( new WindowListener(){
       public void windowOpened(WindowEvent e){}
       public void windowClosed(WindowEvent e){}
@@ -113,10 +133,24 @@ public class Tabler extends JMaxEditor{
   }
   
   private final void makeTitle()
-  { 
-    setTitle(MaxWindowManager.getWindowManager().makeUniqueWindowTitle("Table"));
-    MaxWindowManager.getWindowManager().windowChanged(this);
-  }
+  {
+    setWindowName(tableModel.getName());
+  } 
+   
+  public void setWindowName(String name)
+  {    
+    String title;
+    if(name != null && !name.equals(""))
+      title = tableModel.getType() +"  "+name;
+    else
+      title = tableModel.getType() +" #"+((FtsGraphicObject)tableModel).getObjectID();
+    
+    if( !getTitle().equals(title))
+    {
+      setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));    
+      MaxWindowManager.getWindowManager().windowChanged(this);
+    }
+  }   
 
   private final void makeMenuBar(){
     JMenuBar mb = new JMenuBar();
