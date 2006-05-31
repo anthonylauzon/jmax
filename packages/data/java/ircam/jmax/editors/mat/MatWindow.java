@@ -143,7 +143,7 @@ public class MatWindow extends JMaxEditor {
           getContentPane().validate();
           itsMatPanel.validate();
           validate();
-          pack();
+          //pack();
         }
       }      
       public void matNameChanged(String name)
@@ -216,7 +216,7 @@ public class MatWindow extends JMaxEditor {
     
     return simpleMenu; 
   }  
-  
+    
   // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsMatPanel;

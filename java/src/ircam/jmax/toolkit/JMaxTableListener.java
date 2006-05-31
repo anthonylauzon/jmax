@@ -24,5 +24,6 @@ package ircam.jmax.toolkit;
 public interface JMaxTableListener
 {
   public void deleteSelection();
+  public int getVerticalTransposition();
 }
 

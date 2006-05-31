@@ -129,8 +129,8 @@ mateditor_upload_from_to_row(mateditor_t *self, int start_row, int end_row)
       /* starting row and column index */
       if( sent)
       {
-        ms = sent/n_cols;
-        ns = sent - ms*n_cols;
+        ms = start_row + sent/n_cols;
+        ns = sent - (ms-start_row)*n_cols;
       }
       fts_set_int(a, ms);
       fts_set_int(a+1, ns);
@@ -157,9 +157,7 @@ mateditor_upload_from_index(mateditor_t *self, int row_id, int col_id, int size)
   int ms = row_id;
   int ns = col_id;
   int start_id = (ms*n_cols + ns);
-  
-  //fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
-  
+    
   if(mateditor_is_fmat(self))
   {
     while( data_size > 0)
@@ -185,14 +183,16 @@ mateditor_upload_from_index(mateditor_t *self, int row_id, int col_id, int size)
       data_size -= n;
     }
   }
-  //fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
 }
 
 static void 
 mateditor_upload_data(mateditor_t *self)
 {  
   fts_client_send_message((fts_object_t *)self, fts_s_start_upload, 0, 0);
-  mateditor_upload_from_index(self, 0, 0, mateditor_get_m(self) * mateditor_get_n(self));
+  /*&&&&*/
+  /*mateditor_upload_from_index(self, 0, 0, mateditor_get_m(self) * mateditor_get_n(self));*/
+  if(self->last_vis_row > 0)
+    mateditor_upload_from_to_row(self, self->first_vis_row, self->last_vis_row);
   //mateditor_upload_from_to_row(self, 0, self->last_vis_row);
   fts_client_send_message((fts_object_t *)self, fts_s_end_upload, 0, 0);
 }
@@ -201,7 +201,7 @@ static fts_method_status_t
 mateditor_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mateditor_t *this = (mateditor_t *)o;  
- 
+  
   mateditor_upload_size(this);
   mateditor_upload_data(this);
   
@@ -210,18 +210,32 @@ mateditor_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
 
 
 static fts_method_status_t
-mateditor_set_last_visible_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+mateditor_set_visible_range(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   mateditor_t *this = (mateditor_t *)o;
   
-  if(ac > 0 && fts_is_number(at))
+  /*if(ac > 1 && fts_is_number(at))
   {
     int old_last_row = this->last_vis_row;
     this->last_vis_row = fts_get_number_int(at);
     
-    /*if(old_last_row < this->last_vis_row)
-      mateditor_upload_from_to_row(this, old_last_row, this->last_vis_row);*/
+    post("mateditor mateditor_set_last_visible_row last_vis_row %d", this->last_vis_row);
+    
+    if(old_last_row < this->last_vis_row)
+      mateditor_upload_from_to_row(this, old_last_row, this->last_vis_row);
+  }*/
+  
+  if(ac > 1 && fts_is_number(at) && fts_is_number(at+1))
+  {
+    int old_last_row = this->last_vis_row;
+    this->first_vis_row = fts_get_number_int(at);
+    this->last_vis_row = fts_get_number_int(at+1);
+    
+    //post("mateditor mateditor_set_last_visible_row last_vis_row %d", this->last_vis_row);
+    
+    mateditor_upload_from_to_row(this, this->first_vis_row, this->last_vis_row);
   }
+  
   return fts_ok;
 }
 
@@ -300,6 +314,7 @@ mateditor_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   mateditor_t *this = (mateditor_t *)o;
   
   this->opened = 0; 
+  this->first_vis_row = 0; 
   this->last_vis_row = 0; 
   
   if(ac == 1 && fts_is_object(at))
@@ -331,7 +346,7 @@ mateditor_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_set, mateditor_set_from_list);
   fts_class_message_varargs(cl, fts_s_upload, mateditor_upload);
-  fts_class_message_varargs(cl, fts_new_symbol("set_last_visible_row"), mateditor_set_last_visible_row);
+  fts_class_message_varargs(cl, fts_new_symbol("set_visible_range"), mateditor_set_visible_range);
 }
 
 /********************************************************************

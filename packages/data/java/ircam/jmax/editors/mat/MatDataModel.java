@@ -59,7 +59,10 @@ public interface MatDataModel {
     public abstract void setValueAt(int m, int n, Object value);
     
     public abstract void addMatListener(MatDataListener theListener);
-    public abstract void removeMatListener(MatDataListener theListener);    
+    public abstract void removeMatListener(MatDataListener theListener); 
+    
+    public abstract void addJMaxTableListener(JMaxTableListener theListener);
+    public abstract void removeJMaxTableListener(JMaxTableListener theListener); 
     
     public abstract void requestSetValue( java.lang.Object aValue, int rowIndex, int columnIndex);
     public abstract void requestAppendRow();

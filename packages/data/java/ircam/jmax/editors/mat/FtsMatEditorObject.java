@@ -95,7 +95,7 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
   
   public void clear()
   {
-    for(int i = 0; i < n_rows; i++)
+    for(int i = 0; i < /*n_rows*/values.length; i++)
       for(int j = 0; j < n_cols; j++)
         values[i][j] = null;
     
@@ -120,13 +120,18 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
           n = 0;
           m++;
         }
+        int row = m-firstVisibleRow;
         
-        if(matrix instanceof FtsFmatObject)
-          values[m][n++] = new Float(args[i].doubleValue);
-        else
-          values[m][n++] =  args[i].getValue();
+        if(row >= 0 && row < values.length)
+        {
+          if(matrix instanceof FtsFmatObject)
+            values[row][n++] = new Float(args[i].doubleValue);
+          else
+            values[row][n++] =  args[i].getValue();
+        }
+        else n++;
       }
-    
+      
       SwingUtilities.invokeLater(new Runnable(){
         public void run()
         {
@@ -141,7 +146,7 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
   {    
     if(n_rows != m || n_cols != n)
     {
-      Object[][] temp = new Object[m][n];
+      /*Object[][] temp = new Object[m][n];
       for(int i = 0; i < m; i++)
       {
         for(int j = 0; j < n; j++)
@@ -151,10 +156,11 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
           else
             temp[i][j] = zeroFloat;
         }
-      }
+      }*/
       n_rows = m;
       n_cols = n;
-      values = temp;
+      //values = temp;
+      changeValuesArray();
       
       SwingUtilities.invokeLater(new Runnable(){
         public void run()
@@ -330,21 +336,58 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
     }    
   }
   
-  int lastVisibleRow = 0;
-  public void requestSetLastVisibleRow(int lastVRow)
-  {    
-    if(lastVRow > lastVisibleRow)
+  void changeValuesArray()
+  {
+    int m = lastVisibleRow-firstVisibleRow;
+    int n = n_cols; 
+    
+    if(values == null)
     {
+      Object[][] temp = new Object[m][n];
+    
+      for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+          temp[i][j] = zeroFloat;
+    
+      values = temp;
+    }
+    else 
+    {
+      Object[][] temp = new Object[m][n];
+      
+      if(m >= values.length || n >= values[0].length)
+        for(int i = 0; i < m; i++)
+          for(int j = 0; j < n; j++)
+            if(i < values.length && j < values[0].length)
+              temp[i][j] = values[i][j];
+            else
+              temp[i][j] = zeroFloat;
+    
+      values = temp;
+    }
+  }
+  
+  int lastVisibleRow = 0;
+  int firstVisibleRow = 0;
+  public void requestSetVisibleRange(int firstVRow, int lastVRow)
+  {    
+    if(firstVRow != firstVisibleRow || lastVRow != lastVisibleRow)
+    {
+      firstVisibleRow = firstVRow;
       lastVisibleRow = lastVRow;
+      
       args.clear();
+      args.addInt(firstVisibleRow);
       args.addInt(lastVisibleRow);
       
+      changeValuesArray();
+      
       try{
-        send( FtsSymbol.get("set_last_visible_row"), args);
+        send( FtsSymbol.get("set_visible_range"), args);
       }
       catch(IOException e)
       {
-        System.err.println("FtsMatEditorObject: I/O Error sending set_last_visible_row Message!");
+        System.err.println("FtsMatEditorObject: I/O Error sending set_visible_range Message!");
         e.printStackTrace(); 
       }
     }
@@ -390,7 +433,7 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
   
   public String getName()
   {
-    return super.getVariableName();
+    return ((FtsGraphicObject)matrix).getVariableName();
   }
   
   public void setRows(int m)
@@ -407,13 +450,25 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
   public Object getValueAt(int m, int n)
   {
     if((m < n_rows) && (n < n_cols))
-      return values[m][n];
+    {
+      if((m-firstVisibleRow) >= 0 && (m-firstVisibleRow) < values.length)
+        return values[m-firstVisibleRow][n];
+      else
+      {        
+        int scroll = tableListener.getVerticalTransposition();
+        if((m-scroll) >= 0 && (m-scroll) < values.length)
+          return values[m-scroll][n];
+        else 
+          return prut;// to avoid out_of_range access 
+      }
+    }
     else
-      return prut;// to avoid out_of_range access 
+      return prut;// to avoid out_of_range access
   }
   public void setValueAt(int m, int n, Object value)
   {
-    values[m][n] = values;
+    if((m-firstVisibleRow) >= 0 && (m-firstVisibleRow) < values.length)
+      values[m-firstVisibleRow][n] = values;
   }
   
   public void addMatListener(MatDataListener theListener) 
@@ -424,6 +479,16 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
   public void removeMatListener(MatDataListener theListener) 
   {
     listeners.removeElement(theListener);
+  }
+  
+  public void addJMaxTableListener(JMaxTableListener theListener) 
+  {
+    tableListener = theListener;
+  }
+  
+  public void removeJMaxTableListener(JMaxTableListener theListener) 
+  {
+     tableListener = null;
   }
   
   public Dimension getDefaultSize()
@@ -465,7 +530,10 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
   
   private FtsObject matrix;
   private boolean type; /* true if vector is an FtsFvecObject */
-  private Object[][] values;
+  private Object[][] values = null;
+  
+  JMaxTableListener tableListener = null;
+  
   MaxVector listeners = new MaxVector();
   protected FtsArgs args = new FtsArgs();
   int n_rows = 0;

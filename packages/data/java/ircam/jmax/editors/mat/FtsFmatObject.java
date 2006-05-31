@@ -110,6 +110,13 @@ public class FtsFmatObject extends FtsObjectWithEditor
     return defaultSize;
   }
   
+  public void nameChanged( String name)
+  {
+    super.nameChanged( name);
+    if(ftsEditor != null)
+      ftsEditor.nameChanged( name);
+  }
+  
   public final static int FMAT_DEFAULT_WIDTH  = 370;
   public final static int FMAT_DEFAULT_HEIGHT = 250;
   static Dimension defaultSize = new Dimension(FMAT_DEFAULT_WIDTH, FMAT_DEFAULT_HEIGHT);

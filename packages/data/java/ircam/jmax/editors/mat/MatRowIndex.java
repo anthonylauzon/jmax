@@ -41,15 +41,14 @@ public class MatRowIndex extends PopupToolbarPanel
     this.matPanel = panel;
     
     ROW_HEIGHT = data.getDefaultSize().width; 
-    fiveNumDimension = new Dimension(ROW_WIDTH, ROW_HEIGHT);
-    sixNumDimension = new Dimension(ROW_WIDTH+10, ROW_HEIGHT);
+    defaultDimension = new Dimension(ROW_WIDTH + 2, ROW_HEIGHT);
     
     rowIndexFont = matPanel.table.getTableHeader().getFont();
       
     setFont( rowIndexFont);
     fm = getFontMetrics( rowIndexFont);
 
-    setPreferredSize(fiveNumDimension);
+    setPreferredSize(defaultDimension);
     
     addMouseListener(new MouseAdapter(){
 			public void mousePressed(MouseEvent e)
@@ -83,18 +82,26 @@ public class MatRowIndex extends PopupToolbarPanel
 
 void updateSize()
 {
+  Dimension dim;
   if(data.getRows() < 100000)
-  {
-    setPreferredSize(fiveNumDimension);
-    setSize(fiveNumDimension.width, fiveNumDimension.height);
-    validate();
+    dim = defaultDimension;
+  else {
+    if(data.getRows() < 1000000)
+      dim = new Dimension(defaultDimension.width+8, defaultDimension.height);
+    else {
+      if(data.getRows() < 10000000)
+        dim = new Dimension(defaultDimension.width+16, defaultDimension.height);
+      else {
+        if(data.getRows() < 100000000)
+          dim = new Dimension(defaultDimension.width+24, defaultDimension.height);
+        else
+          dim = new Dimension(defaultDimension.width+32, defaultDimension.height);
+      }
+    }
   }
-  else
-  {
-    setPreferredSize(sixNumDimension);
-    setSize(sixNumDimension.width, sixNumDimension.height);
-    validate(); 
-  }
+  setPreferredSize(dim);
+  setSize(dim.width, dim.height);
+  validate();
 }
 
 int getRowIndex(int y)
@@ -138,12 +145,13 @@ public void paintComponent(Graphics g)
   }
 }
 
-Dimension fiveNumDimension, sixNumDimension;
+Dimension defaultDimension;
 FontMetrics fm;
 MatDataModel data;
 MatPanel matPanel;
 RowIndexPopupMenu popup;
 public final static int ROW_WIDTH = 38; 
+public final static int MAX_WIDTH = 10000;
 public int ROW_HEIGHT; 
 Font rowIndexFont;
 int yTransp = 0;

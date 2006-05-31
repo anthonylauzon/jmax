@@ -280,6 +280,11 @@ public void deleteSelection()
    selection.deleteAll();
 }
 
+public int getVerticalTransposition()
+{
+  return 0;
+}
+
 transient TrackTableModel tmodel;
 transient FtsTrackObject trackObj;
 transient SequenceGraphicContext gc;

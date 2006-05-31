@@ -446,6 +446,9 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   {
     listeners.removeElement(theListener);
   }
+  
+  public void addJMaxTableListener(JMaxTableListener theListener){}
+  public void removeJMaxTableListener(JMaxTableListener theListener){}
 
   public Dimension getDefaultSize()
   {

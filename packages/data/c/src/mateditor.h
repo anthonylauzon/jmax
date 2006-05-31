@@ -32,6 +32,7 @@ typedef struct _mateditor_
   int type;
   
   int opened; /* non zero if editor open */
+  int first_vis_row; /* first visible row index */
   int last_vis_row; /* last visible row index */
   
   fts_object_t *mat;

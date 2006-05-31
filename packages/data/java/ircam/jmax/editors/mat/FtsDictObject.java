@@ -219,12 +219,12 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   {
     SwingUtilities.invokeLater(new Runnable(){
       public void run()
-    {
+      {
         showEditor();
         FtsObject.requestResetGui();
         uploading = false;
         notifyUpload(false);
-    } 
+      } 
     });   
   }     
   
@@ -429,7 +429,10 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   {
     listeners.removeElement(theListener);
   }
-
+  
+  public void addJMaxTableListener(JMaxTableListener theListener){}
+  public void removeJMaxTableListener(JMaxTableListener theListener){} 
+  
   public Dimension getDefaultSize()
   {
     return defaultSize;
