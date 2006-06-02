@@ -954,7 +954,6 @@ void tabeditor_send( tabeditor_t *tabeditor)
 {
   if( tabeditor->zoom < 0.5) 
     tabeditor_send_pixels( tabeditor);
-  
   tabeditor_send_visibles( tabeditor);
 }
 
@@ -1013,14 +1012,13 @@ tabeditor_set_reference_from_client(fts_object_t *o, fts_symbol_t s, int ac, con
   {    
     if(ac >= 4 && fts_is_symbol(at) && fts_is_int(at+1) && fts_is_int(at+2) && fts_is_int(at+3))
     {
+      fts_symbol_t type = fts_get_symbol(at);
+      
       /* trans form size -1 in max. size */
       if(fts_get_int(at + 3) == -1)
         fts_set_int((fts_atom_t *)(at+3), FVEC_DEFAULT_SIZE);
 
-      {// C doesn't allow to declare variables in the middle of a scope!!
-        fts_symbol_t type = fts_get_symbol(at);
-        fts_send_message( (fts_object_t *)self->vec, type, ac-1, at+1, ret);
-      }
+      fts_send_message( (fts_object_t *)self->vec, type, ac-1, at+1, ret);
     }	  
   }
   return fts_ok;
