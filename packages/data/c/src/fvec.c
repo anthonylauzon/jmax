@@ -551,7 +551,7 @@ static void
 fvec_description_function(fts_object_t *o,  fts_array_t *array)
 {
   fvec_t *self = (fvec_t *)o;
-  fts_symbol_t *type = (fts_symbol_t *)fvec_get_type_as_symbol(self);
+  fts_symbol_t type = fvec_get_type_as_symbol(self);
 
   fts_array_append_symbol(array, fvec_symbol);
 

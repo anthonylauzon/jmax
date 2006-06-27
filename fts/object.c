@@ -358,27 +358,28 @@ object_imexport(fts_object_t *o, fts_symbol_t mode, int ac, const fts_atom_t *at
   
   /* without name or "-" as name open file chooser */
   if (ac == 0  ||  (as  &&  ac == 1))
-  { /* no name given */ 
+  { 
+    /* no name given */ 
     object_imexport_dialog(o, mode, ac, at);
   }
   else if(ac > 0 && fts_is_symbol(at + as))
   {
     fts_symbol_t name = fts_get_symbol(at + as);
-  
+    
     if (name == fts_s_minus)
     { /* name is "-", skip it */
       if (as  &&  ac > 1)
       { /*  keep type for im/exportas:
-	    at = "type - args...", copy to a = "type args..." */
-	fts_atom_t a[64];
-	
-	a[0] = at[0];
-	memcpy(a + 1, at + 2, (ac - 1) * sizeof(fts_atom_t));
-
-	object_imexport_dialog(o, mode, ac - 1, a);
+        at = "type - args...", copy to a = "type args..." */
+        fts_atom_t a[64];
+        
+        a[0] = at[0];
+        memcpy(a + 1, at + 2, (ac - 1) * sizeof(fts_atom_t));
+        
+        object_imexport_dialog(o, mode, ac - 1, a);
       }
       else
-	object_imexport_dialog(o, mode, ac - 1, at + 1);
+        object_imexport_dialog(o, mode, ac - 1, at + 1);
     }
     else
     {

@@ -48,8 +48,10 @@ typedef struct stack_elem
 
 static void stack_push (fts_stack_t *s, int p, double d)
 {
+/* doesn't work with CodeWorrior
     stack_elem_t _new = { p, d }; 
     fts_stack_push(s, stack_elem_t, _new); 
+    */
 }
 
 static int stack_pop (fts_stack_t *s, int *p, double *d)
@@ -460,7 +462,9 @@ tree_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
 	      self->ndim = fmat_get_n(x);
 	      fts_post("set dimension to %d\n", self->ndim);
 	  }
-	  else;
+	  else
+	  {
+	  }
 
 	  self->data[self->ndata++] = x;
 	  fts_object_refer(x);
@@ -534,9 +538,9 @@ tree_instantiate(fts_class_t *cl)
 
 
   fts_class_message_varargs(cl, fts_s_set, _tree_set);
-  fts_class_message(cl, fmat_class, fts_new_symbol("add"), _tree_add);
+  fts_class_message(cl, fts_new_symbol("add"), fmat_class, _tree_add);
 
-  fts_class_message_varargs(cl, fts_s_get,		  _tree_getknn);
+  fts_class_message_varargs(cl, fts_s_get, _tree_getknn);
   fts_class_message_varargs(cl, fts_new_symbol("getknn"), _tree_getknn);
 
   /* $tree[x] calls these methods, depending on the type of x */
