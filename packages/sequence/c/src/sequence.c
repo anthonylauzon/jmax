@@ -92,7 +92,7 @@ static fts_heap_t *sequence_context_heap = NULL;
 static sequence_context_t *
 sequence_context_get(fts_object_t *obj)
 {
-  sequence_context_t *context = (sequence_context_t *)obj->context;
+  sequence_context_t *context = (sequence_context_t *)fts_object_get_context(obj);
 
   if(context == NULL)
   {
@@ -112,7 +112,7 @@ sequence_context_get(fts_object_t *obj)
 static void
 sequence_context_remove(fts_object_t *obj)
 {
-  sequence_context_t *context = (sequence_context_t *)obj->context;
+  sequence_context_t *context = (sequence_context_t *)fts_object_get_context(obj);
   
   if(context != NULL)
   {

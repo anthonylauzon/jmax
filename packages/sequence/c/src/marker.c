@@ -505,6 +505,7 @@ scomark_array_function(fts_object_t *o, fts_array_t *array)
   
   if(self->marker_track != NULL)
     fts_array_append_object(array, (fts_object_t *)self->marker_track);
+  
   fts_array_append_symbol(array, self->type);
   propobj_append_properties((propobj_t *)self, array);
 }

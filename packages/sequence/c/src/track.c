@@ -265,10 +265,51 @@ track_get_left_by_time_from(track_t *track, double time, event_t *here)
 
 
 /*********************************************************
-*
-*  event track: add/remove and move
-*
-*/
+ *
+ *  track context
+ *
+ */
+typedef struct
+{
+	track_t *container;
+} track_context_t;
+
+static fts_heap_t *track_context_heap = NULL;
+
+static void
+track_object_set_context(fts_object_t *obj, track_t *track)
+{
+  track_context_t *context = (track_context_t *)fts_object_get_context(obj);
+  
+  if(context == NULL)
+  {
+    if(track_context_heap == NULL)
+      track_context_heap = fts_heap_new(sizeof(track_context_t));
+    
+    context = fts_heap_alloc(track_context_heap);    
+    obj->context = (fts_context_t *)context;    
+  }
+  
+  context->container = track;
+}
+
+static void
+track_object_remove_context(fts_object_t *obj)
+{
+  track_context_t *context = (track_context_t *)fts_object_get_context(obj);
+  
+  if(context != NULL)
+  {
+    fts_heap_free((void *)context, track_context_heap);
+    obj->context = NULL;
+  }
+}
+
+/*********************************************************
+ *
+ *  event track: add/remove and move
+ *
+ */
 
 static event_t *
 track_event_create(int ac, const fts_atom_t *at)
@@ -818,13 +859,6 @@ track_editor_is_open(track_t *self)
     return (self->open != 0);
 }
 
-int
-track_is_in_multitrack(track_t *track)
-{
-  fts_object_t *container = fts_object_get_container((fts_object_t *)track);
-  return (container != NULL && fts_object_is_a(container, multitrack_class));
-}
-
 static void
 track_copy_function(const fts_object_t *from, fts_object_t *to)
 {
@@ -1063,24 +1097,13 @@ track_get_or_make_markers(track_t *track)
     
     fts_set_symbol(&a, seqsym_scomark);
     markers = (track_t *)fts_object_create(track_class, 1, &a);
-    /*WRONG???*/
-    fts_object_set_context((fts_object_t *) markers, 
-			   fts_object_get_context((fts_object_t *) track));
-/*    fts_post("track_get_or_make_markers: no clue how to set new marker track's context, leave it NULL.\n");*/
-  
-     
-    fts_object_refer((fts_object_t *) markers);
+    track_object_set_context((fts_object_t *)markers, track);
     track_set_markers(track, markers);
+    fts_object_refer((fts_object_t *)markers);
   }
-  else if(fts_object_get_context((fts_object_t *)markers) == NULL)
-      /*WRONG???*/
-      fts_object_set_context((fts_object_t *) markers, 
-			     fts_object_get_context((fts_object_t *) track));
-/*  fts_post("track_get_or_make_markers: marker track context is NULL, what can I do about it?\n");*/
   
   return markers;
 }
-
 
 static void 
 track_upload_markers(track_t *self)
@@ -1155,7 +1178,7 @@ _track_get_markers (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
 
 /* set marker track for a track */
 static fts_method_status_t
-_track_set_markers (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+_track_set_markers(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_t *self = (track_t *) o;
   track_t *markers = (track_t *) fts_get_object(at);
@@ -1165,18 +1188,18 @@ _track_set_markers (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
     /* args are ok */
     if (!track_is_marker(self))
     {
-      /* we're a normal track: release old markers, set new */
-      if (track_get_markers(self))
-        fts_object_release(track_get_markers(self));
+      track_t *old_markers = track_get_markers(self);
       
-      track_set_markers(self, markers);
-      /*WRONG???*/
-      fts_object_set_context((fts_object_t *) markers, 
-			     fts_object_get_context((fts_object_t *) self));
-
-/*      fts_post("_track_set_markers: no clue how to set marker track's context, leave it NULL.\n");*/
-
-      fts_object_refer(markers);
+      /* we're a normal track: release old markers, set new */
+      if(old_markers != NULL)
+      {
+        track_object_remove_context(old_markers);
+        fts_object_release(old_markers);
+      }
+      
+      track_object_set_context((fts_object_t *)markers, self);
+      track_set_markers(self, markers);      
+      fts_object_refer((fts_object_t *)markers);
       
       /* update editor */
       if (track_editor_is_open(self))
@@ -1184,8 +1207,7 @@ _track_set_markers (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *a
     }
     else
     {
-      /* todo: a track that is already a marker track replaces
-      itself by the argument within its containing track? */
+      fts_object_error(self, "cannot set marker track for marker track");
     }
   }
   
@@ -1384,9 +1406,6 @@ _track_collapse_markers(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
   return fts_ok;
 }
 
-
-
-
 /******************************************************
  * 
  *  track edit utilities
@@ -1479,8 +1498,6 @@ _track_make_trill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
 }
 
 
-
-
 /******************************************************
  *
  *  persistence compatibility
@@ -1515,11 +1532,6 @@ track_compatible_add_marker_from_file(fts_object_t *o, fts_symbol_t s, int ac, c
   double time = fts_get_float(at);
   event_t *marker_event = track_event_create(ac - 1, at + 1);
 
-  /*WRONG???*/
-  fts_object_set_context((fts_object_t *) marker_event, 
-			 fts_object_get_context((fts_object_t *) markers));
-  /*fts_post("track_compatible_add_marker_from_file: no clue how to set new marker event's context, leave it NULL.\n"); */
-  
   /* add event to track (strictly ordered by time) */
   if(marker_event != NULL)
   {
@@ -1529,7 +1541,7 @@ track_compatible_add_marker_from_file(fts_object_t *o, fts_symbol_t s, int ac, c
     {
       self->load_obj = fts_get_object(a);
       track_append_event(markers, time, marker_event);
-      fts_object_set_context(self->load_obj, (fts_context_t *)marker_event);
+      track_object_set_context((fts_object_t *)marker_event, markers);      
     }
   }
   
@@ -2280,6 +2292,13 @@ track_end_update(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   return fts_ok;
 }
 
+int
+track_is_in_multitrack(track_t *track)
+{
+  fts_object_t *container = fts_object_get_container((fts_object_t *)track);
+  return (container != NULL && fts_object_is_a(container, multitrack_class));
+}
+
 static fts_method_status_t
 track_set_save_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -2291,6 +2310,7 @@ track_set_save_editor(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     if(track_editor_is_open(self))
       fts_client_send_message(o, seqsym_save_editor, 1, at);
     
+    /* REPLACE this by the multitrack being listener of the track!!! */
     if( track_is_in_multitrack(self))
       fts_object_set_dirty(fts_object_get_container(o));
     else
@@ -2611,7 +2631,10 @@ track_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   track_erase_events(self);
   
   if(self->markers != NULL)
+  {
+    track_object_remove_context((fts_object_t *)self->markers);
     fts_object_release((fts_object_t *)self->markers);
+  }
   
   if(self->editor != NULL)
     fts_object_release((fts_object_t *)self->editor);
