@@ -58,10 +58,10 @@ protected void processMouseEvent(MouseEvent e)
 {
 	boolean isPopup;
 	if( JMaxApplication.getProperty("macosx") != null)
-		isPopup = e.isPopupTrigger() && e.isControlDown();
+		isPopup = e.isPopupTrigger() && (e.isControlDown() || e.getButton() == 3);
 	else
 		isPopup = e.isPopupTrigger();
-		
+		  
 	if( isPopup) 
 	{
     JPopupMenu menu = null;
