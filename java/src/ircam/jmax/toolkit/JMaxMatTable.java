@@ -126,10 +126,19 @@ public class JMaxMatTable extends JTable
   
   public TableCellRenderer getCellRenderer(int row,int col)
   {
+    TableCellRenderer renderer;
     if( getModel().getValueAt(row, col) instanceof FtsObject)
-      return ftsObjRenderer;
+      renderer = ftsObjRenderer;
     else
-      return super.getCellRenderer(row, col);
+      renderer =  super.getCellRenderer(row, col);
+    
+    Component comp = renderer.getTableCellRendererComponent(this, getModel().getValueAt(row, col), false, false, row, col);
+    if(highlighted.contains(new Integer(row)))
+      comp.setBackground(Color.green);
+    else
+      comp.setBackground(Color.white);
+    
+    return renderer;
   }
   
   protected void processKeyEvent(KeyEvent e)
@@ -178,6 +187,18 @@ public class JMaxMatTable extends JTable
   }
   /* ??????????????????????????????????????????????????????? */
   
+  Vector highlighted = new Vector();
+  public void highlightLine(int index)
+  {
+    if(index < 0)
+      highlighted.removeAllElements();
+    else
+    {
+      /*Component comp = getCellRenderer(index, 0).getTableCellRendererComponent(this, getModel().getValueAt(index, 0), false, false, index, 0);
+      comp.setBackground(Color.green);*/
+      highlighted.addElement( new Integer(index));
+    }
+  }
   /************************     FtsObject Table CellEditor ***********************************/
   public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor/*, ActionListener*/ 
   {
