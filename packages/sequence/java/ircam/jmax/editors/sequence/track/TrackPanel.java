@@ -279,17 +279,19 @@ public class TrackPanel extends JPanel implements SequenceEditor, TrackDataListe
 		* called when the database is changed: DataTrackListener interface
    */
   boolean uploading = false;
-	
+	TrackEvent lastAddedObject = null;
+  
   public void objectChanged(Object spec, int index, String propName, Object propValue) {}
   public void objectAdded(Object spec, int index) 
   {
     if( !uploading)
     {
+      lastAddedObject = (TrackEvent)spec;
       SwingUtilities.invokeLater(new Runnable() {
         public void run()
 	      { 
-          //resizePanelToEventTime((TrackEvent)spec);
-          resizePanelToLastEventTime();
+          resizePanelToEventTime(lastAddedObject);
+          //resizePanelToLastEventTime();
         }
       });
     }
