@@ -39,12 +39,12 @@ import ircam.jmax.toolkit.*;
 class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTableListener {
 	
   SequenceTablePanel(TrackTableModel model, SequenceGraphicContext gc, SequenceSelection selection)
-  {
+{
     this.tmodel = model;
     this.gc = gc;
     this.trackObj = (FtsTrackObject)tmodel.getTrackDataModel();
     this.selection = selection;
-
+    
     table = new JMaxMatTable(tmodel, this);
 		
     /************/
@@ -76,6 +76,9 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 				TrackEvent evt;
 				int index;	      
 				Rectangle rect = null;
+        
+        table.highlightLine(-1);
+        
 				for (Enumeration e = hhElements; e.hasMoreElements();) 
 				{
 					evt = (TrackEvent) e.nextElement();			  
@@ -85,10 +88,13 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 						rect = rect.union(table.getCellRect(index, 0, true));
 					else
 						rect = table.getCellRect(index, 0, true);
-				}
+          
+          table.highlightLine(index);
+        }
+        table.repaint();
 				if(rect != null)
 					table.scrollRectToVisible(rect);
-		}
+      }
 		});
     
     // make this panel a listener of the Sequence data base: changing
@@ -118,9 +124,9 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 		  {
         SwingUtilities.invokeLater(new Runnable() {
           public void run()
-          { 
+        { 
             table.revalidate();
-          }
+        }
         });
       }
 			boolean uploading = false;
@@ -156,13 +162,13 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 		
     addMouseListener( new MouseAdapter() {
 			public void mouseEntered(MouseEvent e)
-      {
+    {
         table.requestFocus();
-      }
+    }
 			public void mousePressed(MouseEvent e)
-      {
+    {
         table.requestFocus();
-      }
+    }
 		});
     
 		if( trackObj.editorObject!=null)
@@ -174,7 +180,7 @@ Vector getTableColumnNames()
 	Vector names = new Vector();
 	for(int i = 0; i< table.getColumnCount(); i++)
 		names.add(table.getColumnName(i));
-
+  
 	return names;
 }
 
@@ -242,13 +248,13 @@ public void valueChanged(ListSelectionEvent e)
 	
 	if(minIndex!=maxIndex)
 		rect = rect.union(table.getCellRect(maxIndex, 0, true));
-	  
+  
   lastRect = rect;
   SwingUtilities.invokeLater(new Runnable() {
     public void run()
-    { 
+  { 
       table.scrollRectToVisible(lastRect);      
-    }
+  }
   });
 }
 /*
@@ -273,11 +279,11 @@ public class ComboCellEditor extends DefaultCellEditor
 }
 
 /***
- * JMaxTableListener interface
- */
+* JMaxTableListener interface
+*/
 public void deleteSelection()
 {
-   selection.deleteAll();
+  selection.deleteAll();
 }
 
 public int getVerticalTransposition()
@@ -290,7 +296,7 @@ transient FtsTrackObject trackObj;
 transient SequenceGraphicContext gc;
 SequenceSelection selection;
 transient JScrollPane scrollPane; 
-transient JTable table;
+transient JMaxMatTable table;
 ComboCellEditor typeEditor;
 boolean restoring = false;
 static final int COL_WIDTH = 100;
