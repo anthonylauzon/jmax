@@ -181,6 +181,17 @@ public abstract class TrackBaseEditor extends PopupToolbarPanel implements Track
           }
         }
       }
+      public void highlightReset()
+      {
+        TrackEvent temp;
+        for (Enumeration e = oldElements.elements(); e.hasMoreElements();) 
+        {
+          temp = (TrackEvent) e.nextElement();
+          temp.setHighlighted(false);
+        }
+        oldElements.removeAllElements();
+        repaint();
+      }
 		});
     
     addMouseListener(new MouseListener(){

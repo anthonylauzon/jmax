@@ -26,6 +26,7 @@ import java.util.*;
 public interface HighlightListener
 {
   public abstract void highlight(Enumeration elements, double time);
+  public abstract void highlightReset();
 }
 
 

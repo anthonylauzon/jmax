@@ -112,6 +112,7 @@ FTS_API fts_symbol_t seqsym_moveEvents;
 FTS_API fts_symbol_t seqsym_moveEventsFromServer;
 FTS_API fts_symbol_t seqsym_highlightEvents;
 FTS_API fts_symbol_t seqsym_highlightEventsAndTime;
+FTS_API fts_symbol_t seqsym_highlightReset;
 FTS_API fts_symbol_t seqsym_openFileDialog;
 FTS_API fts_symbol_t seqsym_endPaste;
 

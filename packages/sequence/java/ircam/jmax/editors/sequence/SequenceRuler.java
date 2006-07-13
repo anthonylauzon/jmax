@@ -180,6 +180,7 @@ public class SequenceRuler extends PopupToolbarPanel implements HighlightListene
       }
     });
   }
+  public void highlightReset(){marker.setVisible(false);}
   //--- Ruler fields
   boolean hh = false;
 

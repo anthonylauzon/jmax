@@ -1775,6 +1775,13 @@ track_highlight_and_next(track_t *track, event_t *event)
 }
 
 void
+track_highlight_reset(track_t *track)
+{
+  if(track_editor_is_open(track))
+      fts_client_send_message((fts_object_t *)track, seqsym_highlightReset, 0, NULL);
+}
+
+void
 track_move_events_at_client(track_t *self, event_t *first, event_t *after)
 {
   if(track_editor_is_open(self) && first != NULL)

@@ -183,6 +183,14 @@ SEQUENCE_API void track_highlight_cluster(track_t *track, event_t *event, event_
  */
 SEQUENCE_API event_t *track_highlight_and_next(track_t *track, event_t *event);
 
+/**
+ * Reset highlighted events in track
+ *
+ * @param track	pointer to track
+ */
+SEQUENCE_API void track_highlight_reset(track_t *track);
+
+
 /** @}	end of doc group highlighting */
 
 SEQUENCE_API fts_method_status_t track_dump_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);

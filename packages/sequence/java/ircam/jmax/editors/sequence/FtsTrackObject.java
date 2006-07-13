@@ -109,6 +109,12 @@ public class FtsTrackObject extends FtsObjectWithEditor implements TrackDataMode
       ((FtsTrackObject)obj).highlightEventsAndTime( args.getLength(), args.getAtoms());
   }
   });
+  FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("highlightReset"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+  {
+      ((FtsTrackObject)obj).highlightReset();
+  }
+  });
   FtsObject.registerMessageHandler( FtsTrackObject.class, FtsSymbol.get("type"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
   {
@@ -463,6 +469,12 @@ public void highlightEventsAndTime(int nArgs, FtsAtom args[])
   
   if(getEditorFrame() != null && !uploading)
     notifyHighlighting(events, time);
+}
+
+public void highlightReset()
+{
+  if(getEditorFrame() != null && !uploading)
+    notifyHighlightReset();
 }
 
 public void requestClearTrack()
@@ -1176,6 +1188,11 @@ private void notifyHighlighting(MaxVector hhobj, double time)
 {
   for (Enumeration e = hhListeners.elements(); e.hasMoreElements();)
     ((HighlightListener) e.nextElement()).highlight(hhobj.elements(), time);
+}
+private void notifyHighlightReset()
+{
+  for (Enumeration e = hhListeners.elements(); e.hasMoreElements();)
+    ((HighlightListener) e.nextElement()).highlightReset();
 }
 private void notifyLock(boolean lock)
 {

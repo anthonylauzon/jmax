@@ -95,7 +95,13 @@ class SequenceTablePanel extends JPanel implements ListSelectionListener, JMaxTa
 				if(rect != null)
 					table.scrollRectToVisible(rect);
       }
-		});
+      public void highlightReset()
+      { 
+        table.highlightLine(-1);
+        table.repaint();
+        repaint();
+      }
+		  });
     
     // make this panel a listener of the Sequence data base: changing
     // of the content will result in the right repaint()

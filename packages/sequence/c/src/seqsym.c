@@ -109,6 +109,7 @@ fts_symbol_t seqsym_moveEvents = 0;
 fts_symbol_t seqsym_moveEventsFromServer = 0;
 fts_symbol_t seqsym_highlightEvents = 0;
 fts_symbol_t seqsym_highlightEventsAndTime = 0;
+fts_symbol_t seqsym_highlightReset = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 fts_symbol_t seqsym_endPaste = 0;
 
@@ -201,6 +202,7 @@ FTS_MODULE_INIT(seqsym)
   seqsym_moveEventsFromServer = fts_new_symbol("moveEventsFromServer");
   seqsym_highlightEvents = fts_new_symbol("highlightEvents");
   seqsym_highlightEventsAndTime = fts_new_symbol("highlightEventsAndTime");
+  seqsym_highlightReset = fts_new_symbol("highlightReset");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
   seqsym_endPaste = fts_new_symbol("endPaste");
 }

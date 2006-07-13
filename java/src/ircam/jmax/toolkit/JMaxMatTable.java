@@ -193,11 +193,7 @@ public class JMaxMatTable extends JTable
     if(index < 0)
       highlighted.removeAllElements();
     else
-    {
-      /*Component comp = getCellRenderer(index, 0).getTableCellRendererComponent(this, getModel().getValueAt(index, 0), false, false, index, 0);
-      comp.setBackground(Color.green);*/
       highlighted.addElement( new Integer(index));
-    }
   }
   /************************     FtsObject Table CellEditor ***********************************/
   public class FtsObjectCellEditor extends AbstractCellEditor implements TableCellEditor/*, ActionListener*/ 
