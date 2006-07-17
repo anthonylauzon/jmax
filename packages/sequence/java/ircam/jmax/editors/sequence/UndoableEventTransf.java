@@ -81,15 +81,24 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
     trkObj = ((FtsTrackObject)theEvent.getDataModel());
     
     numberOfProperty = numOfProp;
-    propNames = new String[numberOfProperty];
-    undoProps = new Object[numberOfProperty];
-    redoProps = new Object[numberOfProperty];
-    
-    for(int i = 0; i< numberOfProperty; i++)
+    if( numberOfProperty > 1)
     {
-      propNames[i] = undoPropNames[i];
-      undoProps[i] = oldUndoVals[i];
-      redoProps[i] = newUndoVals[i];
+      propNames = new String[numberOfProperty];
+      undoProps = new Object[numberOfProperty];
+      redoProps = new Object[numberOfProperty];
+      
+      for(int i = 0; i< numberOfProperty; i++)
+      {
+        propNames[i] = undoPropNames[i];
+        undoProps[i] = oldUndoVals[i];
+        redoProps[i] = newUndoVals[i];
+      }
+    }
+    else if(numberOfProperty == 1)
+    {
+      this.propName  = undoPropNames[0];
+      undoProp  = oldUndoVals[0];
+      redoProp  = newUndoVals[0];
     }
   }
   
@@ -106,9 +115,9 @@ public class UndoableEventTransf extends AbstractUndoableEdit {
   /**
    * Undo the trasformation */
   public void undo()
-  {
+  {    
     if(numberOfProperty == 1)
-    {
+    {     
       itsEvent.setProperty(propName, redoProp);
       TrackEvent evt = trkObj.getEventLikeThis(itsEvent);
         

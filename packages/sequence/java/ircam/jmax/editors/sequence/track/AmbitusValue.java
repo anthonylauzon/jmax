@@ -53,7 +53,7 @@ private void setDefaultProperties()
 Object pitch, duration, velocity, channel, ambitus;
 
 public void setProperty(String name, Object value)
-{
+{  
 	if(name.equals("pitch"))
 	{
 		/*if(value instanceof Double)

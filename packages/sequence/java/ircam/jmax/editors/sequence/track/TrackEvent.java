@@ -141,7 +141,7 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
   String name;
   Object newVal, oldVal;
   double doubleVal;
-      
+     
   if( nArgs == 1)
   {
     newVal = args[0].getValue();
@@ -163,7 +163,7 @@ public void setCurrentProperties( int nArgs, FtsAtom[] args)
       name = args[i].symbolValue.toString();
       newVal = args[i+1].getValue();
       oldVal = value.getProperty(name);
-            
+           
       if( oldVal == null || !oldVal.toString().equals(newVal.toString()))
       {
         if(itsTrackDataModel != null && ((UndoableData) itsTrackDataModel).isInGroup() && !name.equals("time"))
@@ -245,7 +245,7 @@ void sendSetProperty( String propName, Object propValue)
     args.addSymbol( FtsSymbol.get( (String)propValue));
   else
     args.add( propValue);
-		
+		  
   try{
     send( FtsSymbol.get("set"), args);
   }
@@ -264,7 +264,7 @@ void sendSetProperties( int nArgs, Object arguments[])
       args.addSymbol( FtsSymbol.get( (String)arguments[i]));
     else
       args.add(arguments[i]);
-  
+    
   try{
     send( FtsSymbol.get("set"), args);
   }
