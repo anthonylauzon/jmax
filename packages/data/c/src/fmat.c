@@ -817,6 +817,59 @@ fmat_set_from_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   return fts_ok;
 }
 
+
+/* set fmat row or column from list, tuple, fmat, or fvec */
+static int
+fmat_set_slice_varargs (fmat_t *self, int onset, int size, int stride, 
+                        int ac, const fts_atom_t *at)
+{
+  int istup = 0;
+
+  if (ac > 0)
+  {
+    if (fts_is_number(at)  ||  ((istup = fts_is_a(at, fts_tuple_class))))
+    {
+      if (istup)
+      { /* take atom list from tuple */
+        fts_tuple_t *tup = (fts_tuple_t *) fts_get_object(at);
+        ac = fts_tuple_get_size(tup);
+        at = fts_tuple_get_atoms(tup);
+      }
+
+      /* clip to # of slice elements */
+      if(ac > size)
+        ac = size;
+        
+      fmat_set_from_atoms(self, onset, stride, ac, at);
+
+      return ac;  /* return number of elements set */
+    }
+    else if (fts_is_object(at))
+    {
+      fts_object_t *obj = fts_get_object(at);
+      int           vec_size = 0, vec_stride;
+      float        *vec;
+    
+      if (fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride))
+      {
+        float *ptr = fmat_get_ptr(self) + onset;
+        int i, j;
+      
+        if (vec_size > size)
+          vec_size = size;
+          
+        for (i = 0, j = 0; i < vec_size * stride; i += stride, j += vec_stride)
+          ptr[i] = vec[j];
+      }
+
+      return vec_size;  /* return number of elements set */
+    }
+  }
+
+  return 0;
+}
+
+
 static fts_method_status_t
 fmat_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -827,6 +880,7 @@ fmat_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
     int row = fts_get_number_int(at);
+    int istup = 0;
     
     /* skip index argument */
     ac--;
@@ -840,32 +894,7 @@ fmat_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
         m = row + 1;
       }
       
-      if(fts_is_number(at))
-      {
-        /* clip to # of cloumns */
-        if(ac > n)
-          ac = n;
-        
-        fmat_set_from_atoms(self, row * n, 1, ac, at);
-      }
-      else if(fts_is_object(at))
-      {
-        fts_object_t *obj = fts_get_object(at);
-        int vec_size, vec_stride;
-        float *vec;
-        
-        if(fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride))
-        {
-          float *ptr = fmat_get_ptr(self) + row * n;
-          int i, j;
-                    
-          if(vec_size > n)
-            vec_size = n;
-          
-          for(i=0, j=0; i<vec_size; i++, j+=vec_stride)
-            ptr[i] = vec[j];
-        }
-      }    
+      fmat_set_slice(self, row * n, n, 1, ac, at);
     }
   }
   
@@ -885,7 +914,8 @@ fmat_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
     int col = fts_get_number_int(at);
-        
+    int istup = 0;
+
     /* skip index argument */
     ac--;
     at++;
@@ -898,32 +928,7 @@ fmat_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
         n = col + 1;
       }
       
-      if(fts_is_number(at))
-      {
-        /* clip to # of rows */
-        if(ac > m)
-          ac = m;
-        
-        fmat_set_from_atoms(self, col, n, ac, at);
-      }
-      else if(fts_is_object(at))
-      {
-        fts_object_t *obj = fts_get_object(at);
-        int vec_size, vec_stride;
-        float *vec;
-        
-        if(fmat_or_slice_vector(obj, &vec, &vec_size, &vec_stride))
-        {
-          float *ptr = fmat_get_ptr(self) + col;
-          int i, j;
-          
-          if(vec_size > m)
-            vec_size = m;
-          
-          for(i=0, j=0; i<vec_size*n; i+=n, j+=vec_stride)
-            ptr[i] = vec[j];
-        }
-      }
+      fmat_set_slice_varargs(self, col, m, n, ac, at);
     }
   }
   
@@ -1505,30 +1510,17 @@ fmat_append_row_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_
   fmat_t *self = (fmat_t *) o;
   int m = fmat_get_m(self);
   int n = fmat_get_n(self);
-  float *ptr;
-  
-  /* clip to row */
-  if (ac > n)
-    ac = n;
+  float *ptr;  /* pointer to row */
+  int i, num;
   
   /* add space, append data */
   fmat_reshape(self, m + 1, n);
   ptr = fmat_get_ptr(self) + m * n;
-  
-  if(ac > 0)
-  {
-    int i;
-    
-    for(i=0; i<ac; i++)
-    {
-      if(fts_is_number(at + i))
-        ptr[i] = fts_get_number_float(at + i);
-      else
-        ptr[i] = 0.0;
-    }
-    for(i=ac; i<n; i++)
-      ptr[i] = 0.0;
-  }
+  num = fmat_set_slice_varargs(self, m * n, n, 1, ac, at);
+
+  /* fill rest with zeros */
+  for (i = num; i < n; i++)
+    ptr[i] = 0.0;
   
   fts_object_changed(o);
   fts_set_object(ret, o);
@@ -4440,6 +4432,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
 
   fts_class_doc(cl, fts_s_append, "[<num: value> ...]", "append row with given values");
+  fts_class_doc(cl, fts_s_append, "<tuple: value>",     "append row with values from tuple");
   fts_class_doc(cl, fts_s_append, "<fvec: row values>", "append row with values from fvec");
   fts_class_doc(cl, fts_s_append, "<fmat: row values>", "append rows with values from fmat");
 
@@ -4455,8 +4448,10 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, fts_new_symbol("setcol"), "<num: index> [<num: value> ...]", "set values of given column from list");
   fts_class_doc(cl, fts_new_symbol("setcol"), "<num: index> <fvec: values>", "set values of given column from fmat or fvec");
+  fts_class_doc(cl, fts_new_symbol("setcol"), "<num: index> <tuple: values>", "set values of given column from tuple");
   fts_class_doc(cl, fts_new_symbol("setrow"), "<num: index> [<num: value> ...]", "set values of given row from list");
   fts_class_doc(cl, fts_new_symbol("setrow"), "<num: index> <fvec: values>", "set values of given row from fmat or fvec");
+  fts_class_doc(cl, fts_new_symbol("setrow"), "<num: index> <tuple: values>", "set values of given row from tuple");
   
   fts_class_doc(cl, fts_new_symbol("min"), NULL, "get minimum value");
   fts_class_doc(cl, fts_new_symbol("max"), NULL, "get maximum value");
