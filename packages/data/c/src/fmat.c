@@ -894,7 +894,7 @@ fmat_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
         m = row + 1;
       }
       
-      fmat_set_slice(self, row * n, n, 1, ac, at);
+      fmat_set_slice_varargs(self, row * n, n, 1, ac, at);
     }
   }
   
