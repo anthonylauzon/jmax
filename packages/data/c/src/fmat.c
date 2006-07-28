@@ -142,14 +142,14 @@ fmat_resample (fmat_t *self, fmat_t *in, double factor)
 
   if (m > 3)
   {
-    double  	 inv = 1.0 / factor;
-    float	*ptr;
-    float  	*out_ptr;
-    int     	 out_m = (int) ceil((double) m * inv);
-    int     	 head  = (int) ceil(inv);
+    double       inv = 1.0 / factor;
+    float       *ptr;
+    float       *out_ptr;
+    int          out_m = (int) ceil((double) m * inv);
+    int          head  = (int) ceil(inv);
     fts_idefix_t idefix;
     fts_idefix_t incr;
-    int		 i, j;
+    int          i, j;
       
     /* zero pad for interpolation */
     fmat_set_m(in, m + 2);
@@ -168,15 +168,15 @@ fmat_resample (fmat_t *self, fmat_t *in, double factor)
       /* copy first points without interpolation */
       for (i = j; i < head * n; i += n)
       {
-	out_ptr[i] = ptr[j];
-	fts_idefix_incr(&idefix, incr);
+        out_ptr[i] = ptr[j];
+        fts_idefix_incr(&idefix, incr);
       }
         
       /* interpolate */
       for(; i < out_m * n; i += n)
       {
-	fts_cubic_idefix_interpolate_stride(ptr + j, idefix, n, out_ptr + i);
-	fts_idefix_incr(&idefix, incr);
+        fts_cubic_idefix_interpolate_stride(ptr + j, idefix, n, out_ptr + i);
+        fts_idefix_incr(&idefix, incr);
       }
     }
   }
@@ -565,7 +565,29 @@ fmat_or_slice_pointer(fts_object_t *obj, float **ptr, int *size, int *stride)
     *size = fmat_get_m(fmat) * fmat_get_n(fmat);
     *stride = 1;
     
-    return 1;
+    return 2;   /* distinguish fvec from fmat: return number of dimensions */
+  }
+  else
+    return fvec_vector(obj, ptr, size, stride);
+}
+
+
+
+/** return parameters to iterate over first column of fmat or fvec */
+int
+fmat_or_slice_column (fts_object_t *obj, float **ptr, int *size, int *stride)
+{
+  fts_class_t *cl = fts_object_get_class(obj);
+
+  if (cl == fmat_class)
+  {
+    fmat_t *fmat = (fmat_t *) obj;
+    
+    *ptr    = fmat_get_ptr(fmat);
+    *size   = fmat_get_m(fmat);
+    *stride = fmat_get_n(fmat);
+    
+    return 2;   /* distinguish fvec from fmat: return number of dimensions */
   }
   else
     return fvec_vector(obj, ptr, size, stride);
@@ -952,43 +974,43 @@ fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   return fts_ok;
 }
 
-static fts_method_status_t
+/* works on fmat and fvec! */
+fts_method_status_t
 fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t *self = (fmat_t *)o;
-  float *ptr = fmat_get_ptr(self);
-  int m = fmat_get_m(self);
-  int n = fmat_get_n(self);
-  int i;
-  
+  fmat_t *self = (fmat_t *) o;
+  float  *ptr;
+  int     dim, size, stride;
+  int     i, j;
+
+  dim = fmat_or_slice_vector((fts_object_t *) self, &ptr, &size, &stride);
+
   if(ac > 0)
   {
     if(fts_is_number(at))
-    {
-      if(ac > m * n)
-        ac = m * n;
+    { /* repeat list of numbers (one number handled by fmat_fill_number) */
+      if (ac > size)
+        ac = size;
 
-      for(i=0; i<ac; i++)
+      for (i = 0, j = 0; j < ac; i += stride, j++)
       {
-        if(fts_is_number(at + i))
-          ptr[i] = (float)fts_get_number_float(at + i);
+        if (fts_is_number(at + j))
+          ptr[i] = (float) fts_get_number_float(at + j);
         else
           ptr[i] = 0.0;
       }
       
-      for(; i<m*n; i++)
-        ptr[i] = ptr[i % ac];
+      for (; i < size * stride; i += stride)
+        ptr[i] = ptr[i % (ac * stride)];
     }
     else if(fts_is_a(at, expr_class))
-    {
-      expr_t *expr = (expr_t *)fts_get_object(at);
-      int m = fmat_get_m(self);
-      int n = fmat_get_n(self);
-      float *ptr = fmat_get_ptr(self);
+    { /* evaluate expression for each element, providing $self, $row, $col */
+      expr_t    *expr = (expr_t *)fts_get_object(at);
+      int        m    = dim == 2 ? fmat_get_m(self) : size;
+      int        n    = dim == 2 ? fmat_get_n(self) : 1;
       fts_hashtable_t locals;
       fts_atom_t key_self, key_row, key_col, value;
       fts_atom_t ret;
-      int i, j;
       
       fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
       
@@ -1012,9 +1034,9 @@ fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
           expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
           
           if(fts_is_number(&ret))
-            ptr[i * n + j] = fts_get_number_float(&ret);
+            ptr[i * stride + j] = fts_get_number_float(&ret);
           else
-            ptr[i * n + j] = 0.0;
+            ptr[i * stride + j] = 0.0;
         }
       }
       
@@ -1219,37 +1241,37 @@ _fmat_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
       default:
       case 2:
         if (fts_is_number(at))
-	  i = fts_get_number_int(at);
+          i = fts_get_number_int(at);
         
         if (fts_is_number(at + 1))
-	  j = fts_get_number_int(at  + 1);
-	
-	while (i < 0)
-	  i += m;
+          j = fts_get_number_int(at  + 1);
+        
+        while (i < 0)
+          i += m;
   
-	while (j < 0)
-	  j += n;
+        while (j < 0)
+          j += n;
   
-	if (i >= m)
-	  i = m - 1;
+        if (i >= m)
+          i = m - 1;
   
-	if (j >= n)
-	  j = n - 1;
+        if (j >= n)
+          j = n - 1;
   
-  	fts_set_float(ret, fmat_get_element(self, i, j));
+        fts_set_float(ret, fmat_get_element(self, i, j));
       break;
       
       case 1:  /* linear indexing of unrolled matrix */
         if (fts_is_number(at))
-	  j = fts_get_number_int(at);
+          j = fts_get_number_int(at);
 
- 	while (j < 0)
-	  j += n * m;
+        while (j < 0)
+          j += n * m;
   
-	if (j >= n * m)
-	  j = n * m - 1;
-	
-	fts_set_float(ret, fmat_get_element(self, 0, j));
+        if (j >= n * m)
+          j = n * m - 1;
+        
+        fts_set_float(ret, fmat_get_element(self, 0, j));
       break;
       
       case 0:
@@ -3795,8 +3817,9 @@ fmat_env_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
   }
   else
   {
-    double incr = (double)env_size / (double)m;
-    double f_index = incr;
+    double incr    = (double) (env_size - 1) / (double) m;
+    double f_index = 0;         /* start with index 0 like fmat_env_bpf */
+    /* double f_index = incr;      start with second env value */
     int i, j;
     
     /* apply envelope function to each column */
@@ -3806,10 +3829,10 @@ fmat_env_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
     for(i=n; i<m*n; i+=n)
     {
       double i_index = floor(f_index);
-      int index = (int)i_index;
-      double frac = f_index - i_index;
-      double env_0 = env[index * env_stride];
-      double env_1 = env[index * env_stride + env_stride];
+      int    index   = (int) i_index;
+      double frac    = f_index - i_index;
+      double env_0   = env[index * env_stride];
+      double env_1   = env[index * env_stride + env_stride];
       
       for(j=0; j<n; j++)
         ptr[i + j] *= (1.0 - frac) * env_0 + frac * env_1;

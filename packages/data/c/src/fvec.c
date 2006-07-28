@@ -650,19 +650,22 @@ fvec_env_fmat_or_slice(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
   }
   else
   {
-    double incr = (double)env_size / (double)size;
-    double f_index = incr;
+    double incr    = (double) (env_size - 1) / (double) size;
+    double f_index = 0;         /* start with index 0 like fvec_env_bpf */
+    /* double f_index = incr;      start with second env value */
     int i;
     
     /* apply envelope by linear interpolation */
     for(i=0; i<size*stride; i+=stride)
     {
       double i_index = floor(f_index);
-      int index = (int)i_index;
-      double frac = f_index - i_index;
-      double env_0 = env[index * env_stride];
-      double env_1 = env[index * env_stride + env_stride];
-      
+      int    index   = (int) i_index;
+      double frac    = f_index - i_index;
+      double env_0   = env[index * env_stride];
+      double env_1   = env[index * env_stride + env_stride];
+
+      /* fts_post("i %d (n %d)  index %d (size %d)  frac %f\n", 
+                  i, size, index, env_size, frac); */
       ptr[i] *= (1.0 - frac) * env_0 + frac * env_1;
       
       f_index += incr;
@@ -2184,7 +2187,8 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_sortrev, fvec_sortrev);
   
   /* fmat methods that work on fvec, too: */
-  fts_class_message_number(cl, fts_s_fill, fmat_fill_number);
+  fts_class_message_number (cl, fts_s_fill, fmat_fill_number);
+  fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
   
   fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);
@@ -2245,6 +2249,9 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("clip"), "[<lower limit>] <upper limit>", "clip values within given limits");
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
   
+  fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
+  fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row for index)");
+
   fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fvec|bpf: function>", "apply given function (by linear interpolation)");
   fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope");
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");

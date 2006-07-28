@@ -538,9 +538,9 @@ tree_instantiate(fts_class_t *cl)
 
 
   fts_class_message_varargs(cl, fts_s_set, _tree_set);
-  fts_class_message(cl, fts_new_symbol("add"), fmat_class, _tree_add);
+  fts_class_message        (cl, fmat_class, fts_new_symbol("add"), _tree_add);
 
-  fts_class_message_varargs(cl, fts_s_get, _tree_getknn);
+  fts_class_message_varargs(cl, fts_s_get,		  _tree_getknn);
   fts_class_message_varargs(cl, fts_new_symbol("getknn"), _tree_getknn);
 
   /* $tree[x] calls these methods, depending on the type of x */

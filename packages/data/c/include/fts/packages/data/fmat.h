@@ -125,10 +125,15 @@ DATA_API void fmat_set_n(fmat_t *fmat, int n);
 #define fmat_set_domain(fm, f) ((fm)->domain = (f))
 #define fmat_get_domain(fm) (((fm)->domain > 0.0)? ((fm)->domain): ((double)(fm)->m))
 
-/** check class and get dimensions for fmat, fvec vector */
+/** check class and get dimensions for fmat, fvec vector, 
+    returns 1 for fvec, 2 for fmat */
 DATA_API int fmat_or_slice_vector(fts_object_t *obj, float **ptr, int *size, int *stride);
 
-/** */
+/** check class and get parameters to iterate over first column of fmat or fvec
+    returns 1 for fvec, 2 for fmat */
+DATA_API int fmat_or_slice_column (fts_object_t *obj, float **ptr, int *size, int *stride);
+
+/** set fmat or fvec to constant value */
 DATA_API void fmat_set_const(fmat_t *mat, float c);
 
 /** */
@@ -152,6 +157,7 @@ DATA_API fmat_t *fmat_null;
 
 /* used by fvec, too, but not exported */
 fts_method_status_t fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+fts_method_status_t fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 
 
 #endif
