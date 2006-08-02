@@ -136,7 +136,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
                                                      gc.getWindowHorizontalScope(), ((TableAdapter)gc.getAdapter()).getXZoom(), 
                                                      gc.getVisiblePixelsSize());
           
-          if((visibleScope > oldVisibleScope && !gc.isCompletelyUpdated()) || (gc.getAdapter().getXZoom() <= 0.5))
+          if((visibleScope > oldVisibleScope /*&& !gc.isCompletelyUpdated()*/) || (gc.getAdapter().getXZoom() <= 0.5))
           {
             if(getValuesTimer == null)
             {
@@ -191,10 +191,10 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		
     toolManager.addToolListener(new ToolListener() {
 	    public void toolChanged(ToolChangeEvent e) 
-		{		    
+		  {		    
 				if (e.getTool() != null) 
 					itsCenterPanel.setCursor(e.getTool().getCursor());
-		}
+		  }
 		});
   }
 	
@@ -236,30 +236,28 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 	private void prepareGraphicContext()
   { 
     //prepares the graphic context
-    gc = new TableGraphicContext(tableData);
-    gc.setGraphicSource(itsCenterPanel);
-    gc.setGraphicDestination(itsCenterPanel);
+    gc = new TableGraphicContext( tableData);
+    gc.setGraphicSource( itsCenterPanel);
+    gc.setGraphicDestination( itsCenterPanel);
     gc.setToolManager( toolManager);
-    gc.setSelection(new TableSelection( tableData));
+    gc.setSelection( new TableSelection( tableData));
     TableAdapter ta = new TableAdapter( tableData, gc);
 		
-    ta.addXZoomListener(new ZoomListener() {
+    ta.addXZoomListener( new ZoomListener() {
 			public void zoomChanged(float zoom, float oldZoom)
-		{
+		  {
+        int lastId = gc.getFtsObject().getLastVisibleIndex();
+        int first = gc.getFtsObject().getFirstVisibleIndex();
+        int size = gc.getFtsObject().getSize();   
+        
 				gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
 																									gc.getWindowHorizontalScope(), zoom, gc.getVisiblePixelsSize());
 				updateHorizontalScrollbar();
 				
 				if(zoom > 0.5)
-				{
-          int lastId =  gc.getFtsObject().getLastUpdatedIndex();
-					if((oldZoom-zoom>0) || (oldZoom-zoom<0 && lastId == 0))
-					{
-						int lvi = (gc.getLastVisibleIndex()+10 >= gc.getFtsObject().getSize()) ? gc.getFtsObject().getSize() : gc.getLastVisibleIndex()+10;
-						if(lvi > lastId)
-							gc.getFtsObject().requestGetValues(lastId, lvi, false);
-						else repaint();
-					}		
+				{          
+          if((oldZoom-zoom>0) || (oldZoom-zoom<0 && lastId == 0))
+            gc.getFtsObject().requestGetValues(first, gc.getFtsObject().getLastVisibleIndex(), false);
 					else 
 						repaint();
 				}
@@ -267,7 +265,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 					gc.getFtsObject().requestGetPixels(0, 0);
 				
 				gc.display("X : "+(int)(gc.getAdapter().getXZoom()*100)+" %   ");
-		}
+		  }
 		});
 		
     gc.setAdapter(ta);
@@ -285,25 +283,27 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 				
 				int hDelta = hScrollVal-e.getValue();	    
 				hScrollVal = e.getValue();
-				int last = gc.getLastVisibleIndex();
-				int first = gc.getFirstVisibleIndex();
-                        
+        int last = gc.getFtsObject().getLastVisibleIndex();
+        int first = gc.getFtsObject().getFirstVisibleIndex();
+        int size = gc.getFtsObject().getSize();
+                
 				gc.getAdapter().setXTransposition(hScrollVal);
 				gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
 																									gc.getWindowHorizontalScope(), gc.getAdapter().getXZoom(), 
                                                   gc.getVisiblePixelsSize());
-				
-				if(gc.getAdapter().getXZoom()>0.5)
+        
+				if(gc.getAdapter().getXZoom() > 0.5)
 					if(hDelta<0)
 					{
-            int lvi = (gc.getLastVisibleIndex()+10 >= gc.getFtsObject().getSize()) ? gc.getFtsObject().getSize() : gc.getLastVisibleIndex()+10;
-						if(lvi > gc.getFtsObject().getLastUpdatedIndex())
-							gc.getFtsObject().requestGetValues(last+1, lvi, true);
-						else repaint();
+            int end = gc.getFtsObject().getLastVisibleIndex();
+            gc.getFtsObject().requestGetValues(last, end, true);            
 					}	    
-						else
-							repaint();
-				else
+          else
+          {
+            int end = gc.getFtsObject().getFirstVisibleIndex();
+            gc.getFtsObject().requestGetValues(first, end, true);/* INVERTED! to see negative scroll */
+          }
+        else
 				{
 					int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
 					gc.getFtsObject().requestGetPixels(deltax, -hDelta);                 

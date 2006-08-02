@@ -57,6 +57,12 @@ public class FtsTableObject extends FtsUndoableObject implements TableDataModel
       ((FtsTableObject)obj).appendVisibles(  args.getLength(), args.getAtoms());
 	}
   });
+  FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("addVisibles"), new FtsMessageHandler(){
+    public void invoke( FtsObject obj, FtsArgs args)
+	{
+      ((FtsTableObject)obj).addVisibles(  args.getLength(), args.getAtoms());
+	}
+  });
   FtsObject.registerMessageHandler( FtsTableObject.class, FtsSymbol.get("startEdit"), new FtsMessageHandler(){
     public void invoke( FtsObject obj, FtsArgs args)
 	{
@@ -134,68 +140,76 @@ public void setSize(int newSize)
   {
     int oldSize = size;
     size = newSize;
-    
-    double[] temp =  new double[size];
-    if(lastIndex > size-1) lastIndex = size-1; 
-    for(int i = 0; i< lastIndex; i++)
-      temp[i] = visibles[i];
-    
-    visibles = temp;
-    
+            
     notifySizeChanged(size, oldSize);
   }
 }
 
 public void resetEditor()
 {
-  lastIndex = 0; 
   firstTime = false;
+  firstVisIndex = 0;
+  lastVisIndex = 0;
 }
 
-private int lastIndex = 0;
+void extendVisiblesVector(int newSize)
+{
+  if(newSize > visibleSize)
+  {
+    double[] temp = new double[newSize+10];
+    int start = 0;
+    if(visibles != null)
+    {
+      for(int i=0; i<visibleSize; i++)
+        temp[i] = visibles[i];
+      start = visibleSize;
+    }
+    for(int i = start; i < temp.length; i++)
+      temp[i] = 0.0;
+    
+    visibleSize = newSize;    
+    visibles = temp;
+  }
+}
+
 public void setVisibles(int nArgs , FtsAtom args[])
 {
   int i = 0;
   int oldSize = size;
   size = args[0].intValue;    
   visibleSize = args[1].intValue;    
-  visibles = new double[size];
-      
+  firstVisIndex = args[2].intValue; 
+  visibles = new double[visibleSize+10];
+  
   if( isIvec())
   {
     if (isInGroup()) 
-      for(i = 0; i<nArgs-2; i++)
+      for(i = 0; i<nArgs-3; i++)
 	    {
 	      postEdit(new UndoableValueSet(this, i, visibles[i]));
-	      visibles[i] = (double)args[i+2].intValue;
+	      visibles[i] = (double)args[i+3].intValue;
 	    }
         else
-          for(i = 0; i<nArgs-2; i++)
-            visibles[i] = (double)args[i+2].intValue;
+          for(i = 0; i<nArgs-3; i++)
+            visibles[i] = (double)args[i+3].intValue;
   }
   else
   {
     if (isInGroup()) 
-      for(i = 0; i<nArgs-2; i++)
+      for(i = 0; i<nArgs-3 && i<visibles.length; i++)
 	    {
 	      postEdit(new UndoableValueSet(this, i, visibles[i]));
-	      visibles[i] = args[i+2].doubleValue;
+	      visibles[i] = args[i+3].doubleValue;
 	    }
-        else
-          for(i = 0; i<nArgs-2; i++)
-            visibles[i] = args[i+2].doubleValue;
+    else
+      for(i = 0; i<nArgs-3 && i<visibles.length; i++)
+        visibles[i] = args[i+3].doubleValue;
   }
-  lastIndex = i;
   
-  if(/*oldSize != 0 &&*/ size != oldSize)
+  if(size != oldSize)
     notifySizeChanged(size, oldSize);
   
-  if((size <= lastIndex)||(visibleSize <= lastIndex))
-    notifySet();
-}
-public int getLastUpdatedIndex()
-{
-  return lastIndex;
+  notifySet();
 }
 
 public void appendVisibles(int nArgs , FtsAtom args[])
@@ -208,31 +222,72 @@ public void appendVisibles(int nArgs , FtsAtom args[])
     if (isInGroup()) 
       for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
 	    {      
-	      postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i]));
-	      visibles[startIndex+i] = (double)args[i+1].intValue;
+	      postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i-firstVisIndex]));
+	      visibles[startIndex + i - firstVisIndex] = (double)args[i+1].intValue;
 	    }
         else
           for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
-            visibles[startIndex+i] = (double)args[i+1].intValue;
+            visibles[startIndex + i - firstVisIndex] = (double)args[i+1].intValue;
   }
   else
   {
+    
+    if(startIndex-firstVisIndex<0)
+      System.err.println("appendVisibles: startIndex "+visibleSize+" firstVisIndex "+firstVisIndex);
+    
     if (isInGroup()) 
-      for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
+      for(i = 0; (i<nArgs-1) && (startIndex+i<size); i++)
 	    {      
-	      postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i]));
-	      visibles[startIndex+i] = args[i+1].doubleValue;
+	      postEdit(new UndoableValueSet(this, startIndex+i, visibles[startIndex+i-firstVisIndex]));
+	      visibles[startIndex + i - firstVisIndex] = args[i+1].doubleValue;
 	    }
-        else
-          for(i = 0; ((i<nArgs-1)&&(startIndex+i<size)); i++)
-            visibles[startIndex+i] = args[i+1].doubleValue;
+    else
+      for(i = 0; (i<nArgs-1) && (startIndex+i<size); i++)
+        visibles[startIndex + i - firstVisIndex] = args[i+1].doubleValue;
   }
-  
-  if(startIndex+i > lastIndex)
-    lastIndex = startIndex+i;
   
   notifyValueChanged( startIndex, startIndex+i-1, fromScroll);
 }  
+
+public void addVisibles(int nArgs , FtsAtom args[])
+{
+  int startIndex = args[0].intValue;
+  int direction = args[1].intValue;
+  int i=0; 
+  int newp = nArgs-2;
+  
+  double[] vis_temp = new double[visibles.length]; 
+      
+  if(direction==1)/*to left*/
+  {     
+    if( isIvec())
+      for(i = 0; i < newp; i++)
+	      vis_temp[i] = (double)args[i+2].intValue;
+    else
+      for(i = 0; i < newp; i++)
+        vis_temp[i] = args[i+2].doubleValue;
+ 
+    for(i = 0; newp+i < vis_temp.length; i++)
+      vis_temp[newp+i] = visibles[i];
+  }
+  else/*to right*/
+  {    
+    for(i = 0; (i<visibleSize-newp); i++)
+      vis_temp[i] = visibles[i+newp];
+  
+    if(visibleSize-newp<0)
+      System.err.println("visibleSize "+visibleSize+" newp "+newp);
+    
+    if( isIvec())
+      for(i = 0; i< nArgs-2; i++)
+        vis_temp[visibleSize-newp+i] = (double)args[i+2].intValue;
+    else
+      for(i = 0; i< nArgs-2; i++)
+        vis_temp[visibleSize-newp+i] = args[i+2].doubleValue;
+  }
+  visibles = vis_temp;
+  notifySet();
+}
 
 public void startEdit()
 {
@@ -305,7 +360,6 @@ public void appendPixels(int nArgs , FtsAtom args[])
       j++;
     }
       
-  //if(pixelsSize <= startIndex+nArgs-2)
   notifyPixelsChanged( startIndex, startIndex+j-2);
 }
 
@@ -314,9 +368,10 @@ public void addPixels(int nArgs , FtsAtom args[])
   int startIndex = args[0].intValue;
   int i=0; int j=0;
   int newp = (int)(nArgs-1)/2;
-  double[] t_temp = new double[pixelsSize + /*10*/newp];    
-  double[] b_temp = new double[pixelsSize + /*10*/newp];    
-        
+  
+  double[] t_temp = new double[pixelsSize + newp];    
+  double[] b_temp = new double[pixelsSize + newp];    
+  
   if(startIndex==0)
   {
     if( isIvec())
@@ -345,7 +400,7 @@ public void addPixels(int nArgs , FtsAtom args[])
   }
   else
   {
-    for(i = 0; i<pixelsSize-newp; i++)
+    for(i = 0; (i<pixelsSize-newp) && (i+newp<t_temp.length); i++)
     {
       t_temp[i] = t_pixels[i+newp];
       b_temp[i] = b_pixels[i+newp];
@@ -360,7 +415,7 @@ public void addPixels(int nArgs , FtsAtom args[])
         j++;
       }	
     else
-      for(i = 1; i<= (nArgs-1); i+=2)
+      for(i = 1; (i<= (nArgs-2)) && (pixelsSize-newp-1+j < t_temp.length); i+=2)
       {
         t_temp[pixelsSize-newp-1+j] = args[i].doubleValue;
         b_temp[pixelsSize-newp-1+j] = args[i+1].doubleValue;
@@ -445,10 +500,21 @@ public void requestSetValues(double[] values, int startIndex, int size)
   }
 }
 
-public void requestSetVisibleWindow(int size, int startIndex, int windowSize, double zoom, int sizePixels)
-{
+int firstVisIndex = 0;
+int lastVisIndex = 0;
+public void requestSetVisibleWindow(int vsize, int startIndex, int windowSize, double zoom, int sizePixels)
+{ 
+  this.firstVisIndex = startIndex;
+  
+  if(vsize > visibleSize)
+    extendVisiblesVector(vsize);
+  visibleSize = vsize;
+    
+  lastVisIndex = firstVisIndex + visibleSize;
+  if(lastVisIndex > size) lastVisIndex = size;  
+    
   args.clear();
-  args.addInt(size+10);
+  args.addInt(vsize+10);
   args.addInt(startIndex);
   args.addInt(windowSize);
   args.addDouble(zoom);
@@ -491,7 +557,7 @@ firstTime = true;
 } 
 private boolean fromScroll = false;
 public void requestGetValues(int first, int last, boolean fromScroll)
-{ 
+{   
   this.fromScroll = fromScroll;
   if(!firstTime) requestGetValues();
   else
@@ -499,7 +565,9 @@ public void requestGetValues(int first, int last, boolean fromScroll)
     args.clear();
     args.addInt(first);
     args.addInt(last);
-		
+		  
+    System.err.println("requestGetValues first "+first+" last "+last);
+    
     try{
       send( FtsSymbol.get("get_from_client"), args);
     }
@@ -512,7 +580,7 @@ public void requestGetValues(int first, int last, boolean fromScroll)
 }
 
 public void requestGetPixels(int deltax, int deltap)
-{ 
+{   
   if(deltax==0)	    
     try{
       send( FtsSymbol.get("get_pixels_from_client"));
@@ -661,7 +729,7 @@ public int getVisibleSize()
 }
 public double getVisibleValue(int index)
 {
-  return visibles[index];
+  return visibles[index - firstVisIndex];
 }
 public int getPixelsSize()
 {
@@ -683,6 +751,15 @@ public double getBottomPixel(int index)
 public int getSize()
 {
   return size;
+}
+
+public int getFirstVisibleIndex() 
+{
+  return firstVisIndex; 
+}
+public int getLastVisibleIndex() 
+{
+  return lastVisIndex; 
 }
 
 private int[] values;

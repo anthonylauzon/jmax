@@ -151,7 +151,7 @@ public void render(Graphics g, Rectangle r, int order)
     
   if(gc.getAdapter().getXZoom() > 0.501)
   {
-    if((gc.getFtsObject().getVisibleSize()==0)||(gc.getFtsObject().getLastUpdatedIndex()==0)) return;
+    if((gc.getFtsObject().getVisibleSize()==0)/*||(gc.getFtsObject().getLastUpdatedIndex()==0)*/) return;
     
     int index = gc.getAdapter().getInvX( r.x);
     int visibleSize = gc.getAdapter().getInvX( r.x+r.width);
@@ -160,7 +160,7 @@ public void render(Graphics g, Rectangle r, int order)
     
     int firstVisible = gc.getFirstVisibleIndex();
     int visibleScope = gc.getVisibleHorizontalScope();
-    
+        
     if( itsMode == FILLED)
       for (int i = index; (i <= visibleSize)&&(i<tableSize); i++)
         drawSolidPoint(g, gc.getAdapter().getX(i), 

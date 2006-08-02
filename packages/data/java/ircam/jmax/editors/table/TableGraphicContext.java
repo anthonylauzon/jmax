@@ -44,7 +44,6 @@ public class TableGraphicContext extends GraphicContext{
     itsVerticalMinimum = itsFtsObject.isIvec() ? IVEC_DEFAULT_V_MINIMUM : FVEC_DEFAULT_V_MINIMUM*100;
   }
 
-
   /**
    * Redefined to switch the selection ownership */
   public void activate()
@@ -138,7 +137,7 @@ public class TableGraphicContext extends GraphicContext{
     return last;
   } 
   public int getWindowHorizontalScope()
-  {
+  {    
     return (itsAdapter.getInvX(getGraphicDestination().getSize().width) - itsAdapter.getInvX(0));
   }
   
@@ -156,7 +155,7 @@ public class TableGraphicContext extends GraphicContext{
   {
     return ((TableDisplay)getGraphicDestination()).panel.itsHorizontalControl.isVisible();
   }
-
+ 
   public void scrollTo(int x)
   {
     ((TableDisplay)getGraphicDestination()).panel.itsHorizontalControl.setValue( x);
@@ -240,10 +239,10 @@ public class TableGraphicContext extends GraphicContext{
     info = infoLabel;
   }
 
-  public boolean isCompletelyUpdated()
+  /*public boolean isCompletelyUpdated()
   {
     return (getFtsObject().getLastUpdatedIndex() == getFtsObject().getSize());
-  }
+  }*/
   
   JLabel display, info;
 }
