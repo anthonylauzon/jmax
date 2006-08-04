@@ -335,6 +335,8 @@ mat_fill(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom
     
     fts_object_set_state_dirty(o);
   }
+
+  fts_set_object(ret, o);
   
   return fts_ok;
 }
@@ -361,10 +363,10 @@ mat_set_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
       fts_object_set_state_dirty(o);
     }
 
-    /* return ourselves */
     fts_object_changed(o);
-    fts_set_object(ret, o);
   }
+
+  fts_set_object(ret, o);         /* return ourself */
 
   return fts_ok;
 }
@@ -400,8 +402,9 @@ mat_set_row_elements(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
   
     /* return ourselves */
     fts_object_changed(o);
-    fts_set_object(ret, o);
   }
+
+  fts_set_object(ret, o);         /* return ourself */
 
   return fts_ok;
 }
@@ -476,6 +479,8 @@ mat_insert_rows (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
   if (ac > 1  &&  fts_is_number(at+1))
     numrows = fts_get_number_int(at+1) ;
   
+  fts_set_object(ret, o);  /* return ourself in any case */
+
   if (numrows <= 0)
     return fts_ok;
 
@@ -542,6 +547,8 @@ mat_insert_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
+  fts_set_object(ret, o);  /* return ourself in any case */
+  
   if (numcols <= 0)
     return fts_ok;
   
@@ -592,6 +599,8 @@ mat_delete_columns(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
   if (ac > 1  &&  fts_is_number(at+1))
     numcols = fts_get_number_int(at+1) ;
   
+  fts_set_object(ret, o);  /* return ourself in any case */
+
   if (numcols <= 0)
     return fts_ok;
   
@@ -656,6 +665,8 @@ _mat_delete_rows (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   /* get and check args */
   if (ac > 0  &&  fts_is_number(at))
     pos = fts_get_number_int(at);
+  
+  fts_set_object(ret, o);  /* return ourself in any case */
     
   if (pos <  0)
     pos = 0;
@@ -748,6 +759,8 @@ mat_change_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
     }
   }
   
+  fts_set_object(ret, o);  /* return ourself */
+
   return fts_ok;
 }
 
@@ -802,7 +815,8 @@ mat_set_from_instance(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     mat_upload(self);
 
   fts_object_set_state_dirty(o);
-  
+  fts_set_object(ret, o);
+
   return fts_ok;
 }
 
@@ -1009,6 +1023,8 @@ mat_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     fts_spost(stream, "}\n");
   }
   
+  fts_set_object(ret, o);  /* return ourself */
+
   return fts_ok;
 }
 
@@ -1177,12 +1193,12 @@ mat_instantiate(fts_class_t *cl)
   fts_class_set_copy_function(cl, mat_copy_function);
 
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
-  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
+  fts_class_message_varargs(cl,fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
-  fts_class_message (cl, fts_s_set, mat_class, mat_set_from_instance);
+  fts_class_message        (cl, fts_s_set, mat_class,    mat_set_from_instance);
   
   fts_class_message_varargs(cl, fts_s_fill, mat_fill);      
   fts_class_message_varargs(cl, fts_s_set, mat_set_elements);
@@ -1204,6 +1220,7 @@ mat_instantiate(fts_class_t *cl)
   fts_class_message_void (cl, fts_s_rows, mat_return_size);
   fts_class_message_void (cl, fts_s_cols, mat_return_size);
   fts_class_message_number (cl, fts_s_rows, mat_change_size);
+/* set cols??? */
   fts_class_message_varargs(cl, fts_s_size, mat_change_size);
 
   fts_class_message_varargs(cl, fts_s_get_element, mat_return_element);
