@@ -108,6 +108,7 @@ fts_array_set_element(fts_array_t *array, int index, const fts_atom_t *at)
   fts_atom_assign(array->atoms + index, at);
 }
 
+
 void
 fts_array_insert(fts_array_t *array, int index, int ac, const fts_atom_t *at)
 {
@@ -124,8 +125,12 @@ fts_array_insert(fts_array_t *array, int index, int ac, const fts_atom_t *at)
     array->atoms[ac + i] = array->atoms[i];
 
   for(i=0; i<ac; i++)
-    fts_atom_assign(array->atoms + index + i, at + i);
+  {
+    array->atoms[index + i] = at[i];
+    fts_atom_refer(&array->atoms[index + i]);
+  }
 }
+
 
 void
 fts_array_prepend(fts_array_t *array, int ac, const fts_atom_t *at)
@@ -214,8 +219,12 @@ fts_array_cut(fts_array_t *array, int index, int n)
     n = 0;
 
   for(i=0; i<n; i++)
-    fts_atom_assign(array->atoms + index + i, array->atoms + n + index + i);
-  
+  {
+    fts_atom_release(&array->atoms[index + i]); /* release atoms to be overwritten */
+    array->atoms[index + i] = array->atoms[n + index + i];     /* shift */
+    fts_set_void(&array->atoms[n + index + i]); /* void space to be cut */
+  }
+
   fts_array_set_size(array, size - n);
 }
 
@@ -228,7 +237,6 @@ fts_array_copy(fts_array_t *org, fts_array_t *copy)
   fts_array_clear(copy);
   fts_array_set_size(copy, size);
 
-  /* shift array towards end */
   for(i=0; i<size; i++)
     fts_atom_assign(copy->atoms + i, org->atoms + i);
 }
