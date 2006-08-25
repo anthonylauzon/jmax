@@ -198,56 +198,56 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
       float  *ptr;
       
       /* parse further import arguments <offset> <length> <channel> <sr>
-         no arg or 0 or string mean: all/as is */
+        no arg or 0 or string mean: all/as is */
       switch (ac)
       { /* fallthrough! */
         default:
         case 5:
-	  if (fts_is_number(at + 4))
-	    sr = fts_get_number_float(at + 4);
-
+          if (fts_is_number(at + 4))
+            sr = fts_get_number_float(at + 4);
+          
         case 4: /* channel selection ignored so far */
-	  if (fts_is_number(at + 3))
-	    channel = fts_get_number_int(at + 3);
-
+          if (fts_is_number(at + 3))
+            channel = fts_get_number_int(at + 3);
+          
         case 3:
-	  if (fts_is_number(at + 2))
-	    wanted = fts_get_number_int(at + 2);
-
+          if (fts_is_number(at + 2))
+            wanted = fts_get_number_int(at + 2);
+          
         case 2:
-	  if (fts_is_number(at + 1))
-	    offset = fts_get_number_int(at + 1);
-
+          if (fts_is_number(at + 1))
+            offset = fts_get_number_int(at + 1);
+          
         case 1:
-	  /* no additional arguments, filename already parsed, do nothing */
-	break;
+          /* no additional arguments, filename already parsed, do nothing */
+          break;
       }
-
+      
       /* check args */
       if (sr <= 0  ||  sr == fts_audiofile_get_sample_rate(sf))
-	sr = 0;
-
+        sr = 0;
+      
       if (offset > 0  &&  offset < m)
-	m -= offset;
-	
+        m -= offset;
+      
       if (wanted > 0  &&  wanted < m)
-	m = wanted;
-
+        m = wanted;
+      
       if (sr == 0)
       {
-	fmat_reshape(self, m, n);
-	ptr = fmat_get_ptr(self);
+        fmat_reshape(self, m, n);
+        ptr = fmat_get_ptr(self);
       }
       else  /* temp buffer to be resampled */
       {
-	orig = fmat_create(m + 2, n);
-	ptr  = fmat_get_ptr(orig);
+        orig = fmat_create(m + 2, n);
+        ptr  = fmat_get_ptr(orig);
       }
-
+      
       /* move to position and read samples */
       if (offset)
-	fts_audiofile_seek(sf, offset);
-
+        fts_audiofile_seek(sf, offset);
+      
       m = fts_audiofile_read_interleaved(sf, ptr, n, m);
       fmat_reshape(self, m, n);
       
@@ -255,12 +255,12 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
       
       if (m > 0)
       {
-	if (sr != 0)
-	{
-	  fmat_resample(self, orig, sr / fts_audiofile_get_sample_rate(sf));
-	  fts_object_destroy((fts_object_t *) orig);
-	}
-
+        if (sr != 0)
+        {
+          fmat_resample(self, orig, sr / fts_audiofile_get_sample_rate(sf));
+          fts_object_destroy((fts_object_t *) orig);
+        }
+        
         fts_object_changed(o);
         fts_set_object(ret, o);
       }
@@ -270,8 +270,8 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     else
       fts_object_error(o, "import: cannot open audio file \"%s\"", fts_symbol_name(file_name));
   }
-  
-  return fts_ok;
+
+return fts_ok;
 }
 
 static fts_method_status_t
