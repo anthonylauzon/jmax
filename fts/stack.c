@@ -87,6 +87,7 @@ fts_string_init(fts_stack_t *stack, char *str)
   stack->alloc = FTS_STACK_BLOCK_SIZE;
   stack->element_size = sizeof(char);
   stack->buffer = fts_malloc(stack->alloc);
+  stack->size = 0;
   
   if(str != NULL)
     __fts_stack_append(stack, str, strlen(str) + 1);
