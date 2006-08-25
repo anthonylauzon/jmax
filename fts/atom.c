@@ -32,6 +32,9 @@
 static fts_atom_t __fts_null;
 fts_atom_t *fts_null = NULL;
 
+static fts_atom_t __fts_zero;
+fts_atom_t *fts_zero = NULL;
+
 static fts_atom_t __fts_nix;
 fts_atom_t *fts_nix = NULL;
 
@@ -230,8 +233,11 @@ FTS_PRIMITIVE_CLASS(string_class, FTS_TYPEID_STRING);
 
 FTS_MODULE_INIT(atom)
 {
-  fts_void_class = fts_shared_get(fts_s_void);
+  fts_zero = &__fts_zero;
+  fts_set_int( &__fts_zero, 0);
   
+  fts_void_class = fts_shared_get(fts_s_void);
+
   if(fts_void_class == NULL)
   {
     /* init primitive classes */
