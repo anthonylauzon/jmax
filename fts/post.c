@@ -402,7 +402,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
       char *idstr = fts_object_get_identifier_string(obj, buf, 255);
       
       if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "[%s]<", idstr);
+        fts_spost(stream, "%s:<", idstr);
       else
         fts_spost(stream, "<");
     }
@@ -449,9 +449,32 @@ fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       else
         fts_spost(stream, "<unknown 0x%x>", fts_get_int( at));
 
-      if ( i != ac-1)        
+      if (i != ac-1)        
         fts_spost(stream, " ");
     }
+}
+
+void 
+fts_spost_primitive_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
+{
+  int i;
+  
+  for(i=0; i<ac; i++)
+  {   
+    if (fts_is_int( at + i))
+      fts_spost(stream, "%d", fts_get_int( at + i));
+    else if (fts_is_float( at + i))
+      fts_spost_float(stream, fts_get_float( at + i));
+    else if (fts_is_symbol( at + i))
+      fts_spost(stream, "%s", fts_symbol_name(fts_get_symbol( at + i)));
+    else if (fts_is_string( at + i))
+      fts_spost(stream, "%s", fts_get_string( at + i));
+    else
+      continue;
+    
+    if(i < ac-1)
+      fts_spost(stream, " ");
+  }
 }
 
 void 
