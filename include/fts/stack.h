@@ -150,9 +150,9 @@ FTS_API int __fts_stack_append(fts_stack_t *stack, void *p, int n);
 /* typed stacks */
 #define fts_stack_init_int(s) __fts_stack_init(s, sizeof(int))
 #define fts_stack_push_int(s, i) fts_stack_push(s, int, (i))
-#define fts_stack_top_int(s) (((s)->size > 0)? (((int *)fts_stack_base(s))[(s)->size-1]): NULL)
-#define fts_stack_pop_int(s) (((s)->size > 0)? (((int *)fts_stack_base(s))[--((s)->size)]): NULL)
-#define fts_stack_get_int(s, i) (((i) >= 0 && (i) < (s)->size)? (((int *)fts_stack_base(s))[(i)]): NULL)
+#define fts_stack_top_int(s) (((s)->size > 0)? (((int *)fts_stack_base(s))[(s)->size-1]): 0)
+#define fts_stack_pop_int(s) (((s)->size > 0)? (((int *)fts_stack_base(s))[--((s)->size)]): 0)
+#define fts_stack_get_int(s, i) (((i) >= 0 && (i) < (s)->size)? (((int *)fts_stack_base(s))[(i)]): 0)
 
 #define fts_stack_init_pointer(s) __fts_stack_init(s, sizeof(void *))
 #define fts_stack_push_pointer(s, o) fts_stack_push(s, void *, o)
