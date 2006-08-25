@@ -465,7 +465,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
       fts_atom_refer(&ret);
       
       expression_stack_pop_frame( exp);
-      expression_stack_push( exp, &ret);
+      expression_stack_push(exp, &ret);
     }
     else
       return operand_type_mismatch_error;
@@ -652,7 +652,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
           }
         }
         
-        return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
+        return fts_status_format("undefined name '%s'", fts_symbol_name(fts_get_symbol(name)));
       }
     }
     else
