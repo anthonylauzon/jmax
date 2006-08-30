@@ -459,11 +459,55 @@ _function_typeof (int ac, const fts_atom_t *at, fts_atom_t *ret)
     fts_set_symbol(ret, fts_get_class_name(at));
     return fts_ok;  
   }
-  else
+
+  fts_set_void(ret);
+  return fts_status_new(fts_new_symbol("missing argument"));
+}
+
+
+static fts_status_t
+_function_getid(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if(ac > 0 && fts_is_object(at))
   {
-    fts_set_void(ret);
-    return fts_status_new(fts_new_symbol("missing argument"));
+    fts_object_t *obj = fts_get_object(at);
+    
+    if(!fts_object_has_client(obj))
+      fts_client_register_object(obj, -1);
+    
+    fts_set_int(ret, fts_object_get_id(obj));
+    
+    return fts_ok;  
   }
+  
+  fts_set_void(ret);
+  return wrong_args_error;
+}
+
+
+static fts_status_description_t invalid_object_id_error_description = {"invalid object id"};
+static fts_status_t invalid_object_id_error = &invalid_object_id_error_description;
+
+static fts_status_t
+_function_getobj(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if(ac > 0 && fts_is_number(at))
+  {
+    int id = fts_get_number_int(at);
+    fts_object_t *obj = fts_client_get_object(id, 0);;
+    
+    if(obj != NULL)
+    {
+      fts_set_object(ret, obj);
+      return fts_ok;  
+    }
+
+    fts_set_void(ret);
+    return invalid_object_id_error;
+  }
+  
+  fts_set_void(ret);
+  return wrong_args_error;
 }
 
 
@@ -477,9 +521,6 @@ _function_print(int ac, const fts_atom_t *at, fts_atom_t *ret)
   
   return fts_ok;
 }
-
-
-
 
 /******************************************************************************
  *
@@ -749,6 +790,8 @@ FTS_PACKAGE_INIT(functions)
   
   /* system functions */
   fts_function_install(fts_new_symbol("typeof"), _function_typeof);
-  fts_function_install(fts_new_symbol("print"),  _function_print);
-  fts_function_install(fts_new_symbol("info"),   _function_info);
+  fts_function_install(fts_new_symbol("getid"), _function_getid);
+  fts_function_install(fts_new_symbol("getobj"), _function_getobj);
+  fts_function_install(fts_new_symbol("print"), _function_print);
+  fts_function_install(fts_new_symbol("info"), _function_info);
 }

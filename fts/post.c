@@ -383,7 +383,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
     int ac;
     fts_array_t array;
     
-    fts_array_init(&array, 0, 0);
+    fts_array_init(&array, 0, NULL);
 
     (*fts_class_get_description_function(cl))(obj, &array);
     
@@ -397,22 +397,19 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
       at++; /* skip class name */
     }
     else
-    {
-      char buf[256];
-      char *idstr = fts_object_get_identifier_string(obj, buf, 255);
-      
-      if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "%s:<", idstr);
-      else
-        fts_spost(stream, "<");
-    }
+      fts_spost(stream, "<");
     
     fts_spost_atoms(stream, ac, at);
 
     if(cl == fts_tuple_class)
       fts_spost(stream, "}");
     else
-      fts_spost(stream, ">");
+    {
+      if(!fts_object_has_client(obj))
+        fts_client_register_object(obj, -1);
+      
+      fts_spost(stream, " #%d>", fts_object_get_id(obj));
+    }
     
     fts_array_destroy(&array);
   }
@@ -572,7 +569,7 @@ fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       fts_atom_t a;
       
       if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "[%s]", idstr);
+        fts_spost(stream, "[%s]:", idstr);
       
       if(meth)
       {
