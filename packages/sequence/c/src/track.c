@@ -2442,9 +2442,6 @@ track_notify_gui_listeners(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
   return fts_ok;
 }
 
-
-
-
 /*******************************************************************************
 *
 *  foreign class methods
@@ -2592,7 +2589,7 @@ track_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
   self->size = 0;
   self->type = NULL;
   
-  self->gui_listeners = 0;
+  /*self->gui_listeners = 0;*/
   
   self->editor = NULL;
   self->save_editor = 0;
@@ -2683,9 +2680,9 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_destroyEditor, track_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, track_close_editor);
   
-  fts_class_message_varargs(cl, fts_s_add_gui_listener, track_add_gui_listener);
+  /*fts_class_message_varargs(cl, fts_s_add_gui_listener, track_add_gui_listener);
   fts_class_message_varargs(cl, fts_s_remove_gui_listener, track_remove_gui_listener);
-  fts_class_message_varargs(cl, fts_s_notify_gui_listeners, track_notify_gui_listeners);
+  fts_class_message_varargs(cl, fts_s_notify_gui_listeners, track_notify_gui_listeners);*/
   
   fts_class_message_number(cl, seqsym_active, track_active);
   

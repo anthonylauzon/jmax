@@ -112,6 +112,7 @@ fts_symbol_t seqsym_highlightEventsAndTime = 0;
 fts_symbol_t seqsym_highlightReset = 0;
 fts_symbol_t seqsym_openFileDialog = 0;
 fts_symbol_t seqsym_endPaste = 0;
+fts_symbol_t seqsym_listenersNotify = 0;
 
 FTS_MODULE_INIT(seqsym)
 {
@@ -205,4 +206,5 @@ FTS_MODULE_INIT(seqsym)
   seqsym_highlightReset = fts_new_symbol("highlightReset");
   seqsym_openFileDialog = fts_new_symbol("openFileDialog");
   seqsym_endPaste = fts_new_symbol("endPaste");
+  seqsym_listenersNotify = fts_new_symbol("listenersNotify");
 }

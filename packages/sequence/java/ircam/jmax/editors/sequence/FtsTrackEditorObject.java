@@ -521,6 +521,30 @@ public void requestSetEditorState(Rectangle bounds)
   } 
 }
 
+public void requestListenersNotify(FtsArgs listenerArgs)
+{
+	/*args.clear();
+
+	for(int i=0; i<nArgs; i++)
+		if(arguments[i] instanceof Double)
+			args.addDouble(((Double)arguments[i]).doubleValue());
+		else
+			if( arguments[i] instanceof String)
+				args.addSymbol( FtsSymbol.get( (String)arguments[i]));
+		else
+			args.add(arguments[i]);*/
+	
+	try{
+		send( FtsSymbol.get("listenersNotify"), listenerArgs);
+	}
+	catch(IOException e)
+	{
+		System.err.println("FtsTrackEditorObject: I/O Error sending listenersNotify Message!");
+		e.printStackTrace(); 
+	}   
+}
+
+
 public boolean haveContent()
 {
   if( !trackObj.isInSequence())

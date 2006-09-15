@@ -235,7 +235,7 @@ void moveSelection(int deltaX, int deltaY)
 	TrackEvent newEvent;
 	SequenceGraphicContext egc = (SequenceGraphicContext) gc;
 	Adapter a = egc.getAdapter();
-	  
+  
 	if(deltaX != 0) 
 	{	    
 		((UndoableData) egc.getDataModel()).beginUpdate();
