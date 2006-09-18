@@ -28,6 +28,8 @@ import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.editors.sequence.menus.*;
 
+import ircam.fts.client.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -419,6 +421,28 @@ void setLastBar(TrackEvent evt)
 		lastBar.getValue().setProperty("last_bar", Boolean.TRUE);
 	}	
 }
+
+public void notifySelectionToListeners(SequenceSelection s, String message)
+{
+  if( !isInSequence && (((FtsTrackObject)ftsObj).editorObject != null))
+  {
+    if(s.size() > 0)
+    {
+      TrackEvent evt;
+      listener_args.clear();
+      listener_args.addSymbol(FtsSymbol.get("selection"));
+      listener_args.addSymbol(FtsSymbol.get(message));
+      for(Enumeration e = s.getSelected(); e.hasMoreElements(); )
+      {
+        evt = (TrackEvent)e.nextElement();
+        listener_args.addDouble(evt.getTime());
+        listener_args.addObject(evt);
+      }
+      ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
+    }
+  }
+}
+
 //=================== MouseListener interface ===========================
 public void mouseClicked(MouseEvent e){}
 public void mousePressed(MouseEvent e)
@@ -455,6 +479,18 @@ public void mousePressed(MouseEvent e)
           
           markersSelection.select( currMark);
         }
+        
+        if( !isInSequence && (((FtsTrackObject)ftsObj).editorObject != null))
+        {
+          listener_args.clear();
+          listener_args.addSymbol(FtsSymbol.get("click"));
+          listener_args.addSymbol(FtsSymbol.get("marker"));
+          listener_args.addDouble(pa.getInvX(x));
+          listener_args.addObject(currMark);
+          ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
+          
+          notifySelectionToListeners( markersSelection, "markers");
+        }
       }
       else	
       {//click on empty
@@ -465,6 +501,20 @@ public void mousePressed(MouseEvent e)
         }
         if(!isInSequence)
           ((FtsTrackObject)ftsObj).requestNotifyGuiListeners( pa.getInvX(x), null);
+        
+        if( !isInSequence && (((FtsTrackObject)ftsObj).editorObject != null))
+        {
+          listener_args.clear();
+          listener_args.addSymbol(FtsSymbol.get("click"));
+          listener_args.addSymbol(FtsSymbol.get("background"));
+          listener_args.addDouble(pa.getInvX(x));
+          listener_args.addDouble(pa.getInvY(y));
+          ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
+          
+          listener_args.clear();
+          listener_args.addSymbol(FtsSymbol.get("selection"));
+          ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
+        }
       }
     }
   }
@@ -645,6 +695,8 @@ Color selLabelColor = new Color(255, 0, 0, 70);
 
 Color selLineColor = new Color(255, 0, 0, 20);
 Color lineColor = new Color(165, 165, 165, 25);
+
+protected transient static FtsArgs listener_args = new FtsArgs();
 }    
 
 

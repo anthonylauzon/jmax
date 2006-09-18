@@ -517,6 +517,28 @@ scomark_description_function(fts_object_t *o, fts_array_t *array)
   scomark_array_function(o, array);
 }
 
+static void 
+scomark_spost_function(fts_object_t *o, fts_bytestream_t *stream)
+{ 
+  scomark_t *self = (scomark_t *)o;
+  fts_array_t array;
+  fts_atom_t *at;
+  int ac;
+
+  fts_array_init(&array, 0, NULL);
+  
+  fts_array_append_symbol(&array, self->type);
+  propobj_append_properties((propobj_t *)self, &array);
+  
+  ac = fts_array_get_size(&array);
+  at = fts_array_get_atoms(&array);
+  
+  if(ac > 0)
+    fts_spost_atoms(stream, ac, at);
+  
+  fts_array_destroy(&array);
+}
+
 void
 scomark_set_properties(scomark_t *self, int ac, const fts_atom_t *at)
 {
@@ -600,6 +622,7 @@ scomark_instantiate(fts_class_t *cl)
   
   fts_class_set_array_function(cl, scomark_array_function);
   fts_class_set_description_function(cl, scomark_description_function);
+  fts_class_set_spost_function(cl, scomark_spost_function);
 
   fts_class_message_symbol(cl, fts_s_remove, _scomark_remove_property);
 
