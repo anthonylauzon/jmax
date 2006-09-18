@@ -29,7 +29,7 @@
 #define FTS_OBJECT_BITS_CLIENT 4
 #define FTS_OBJECT_BITS_ID (32 - FTS_OBJECT_BITS_STATUS - FTS_OBJECT_BITS_CLIENT)
 
-typedef void (*fts_object_listener_callback_t)(fts_object_t *o, void *l);
+typedef void (*fts_object_listener_callback_t)(fts_object_t *o, void *l, fts_symbol_t s, int ac, const fts_atom_t *at);
 
 typedef struct
 {
@@ -112,9 +112,9 @@ FTS_API void fts_object_upload(fts_object_t *obj);
 /* object listeners */
 FTS_API void fts_object_add_listener(fts_object_t *o, void *listener, fts_object_listener_callback_t callback);
 FTS_API void fts_object_remove_listener(fts_object_t *o, void *listener);
-FTS_API void fts_object_call_listeners(fts_object_t *o);
+FTS_API void fts_object_call_listeners(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at);
 
-#define fts_object_changed fts_object_call_listeners
+#define fts_object_changed(o) fts_object_call_listeners((o), fts_s_state, 0, NULL)
 
 /** try import handlers from class with the given arguments until one returns true */
 FTS_API fts_method_status_t fts_object_import(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);

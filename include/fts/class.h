@@ -27,6 +27,8 @@ typedef int (*fts_class_equals_function_t)( const fts_object_t *, const fts_obje
 typedef void (*fts_class_description_function_t)(fts_object_t *obj, fts_array_t *array);
 typedef void (*fts_class_copy_function_t)( const fts_object_t *, fts_object_t *);
 typedef void (*fts_class_array_function_t)(fts_object_t *obj, fts_array_t *array);
+typedef void (*fts_class_spost_function_t)(fts_object_t *obj, fts_bytestream_t *stream);
+typedef fts_object_t *(*fts_class_guiobject_function_t)(fts_object_t *obj);
 
 typedef struct fts_class_outlet fts_class_outlet_t;
 
@@ -80,6 +82,8 @@ struct fts_class
   fts_class_description_function_t description_function;
   fts_class_copy_function_t copy_function;
   fts_class_array_function_t array_function;
+  fts_class_spost_function_t spost_function;
+  fts_class_guiobject_function_t guiobject_function;
   fts_hashtable_t import_handlers; /* table of import handlers */
   fts_hashtable_t export_handlers; /* table of export handlers */
   
@@ -117,6 +121,8 @@ struct fts_class
 #define fts_class_get_description_function(cl) ((cl)->description_function)
 #define fts_class_get_copy_function(cl) ((cl)->copy_function)
 #define fts_class_get_array_function(cl) ((cl)->array_function)
+#define fts_class_get_spost_function(cl) ((cl)->spost_function)
+#define fts_class_get_guiobject_function(cl) ((cl)->guiobject_function)
 
 #define fts_class_get_import_handlers(c) (&(c)->import_handlers)
 #define fts_class_get_export_handlers(c) (&(c)->export_handlers)
@@ -128,6 +134,8 @@ struct fts_class
 #define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
 #define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
 #define fts_class_set_array_function( cl, f) ((cl)->array_function = (f))
+#define fts_class_set_spost_function( cl, f) ((cl)->spost_function = (f))
+#define fts_class_set_guiobject_function(cl, f) ((cl)->guiobject_function = (f))
 
 #define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
 
