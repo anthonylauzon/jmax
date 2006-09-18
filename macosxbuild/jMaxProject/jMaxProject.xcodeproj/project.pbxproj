@@ -12,18 +12,6 @@
 			buildConfigurationList = 3BE7C24E088287FA00D214C4 /* Build configuration list for PBXAggregateTarget "Mat-Dev" */;
 			buildPhases = (
 			);
-			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Development;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				3BA4061906A57ADA0097A99B /* PBXTargetDependency */,
 				3BA4061706A57AD10097A99B /* PBXTargetDependency */,
@@ -37,18 +25,6 @@
 			buildConfigurationList = 3BE7C253088287FA00D214C4 /* Build configuration list for PBXAggregateTarget "all_JAVA" */;
 			buildPhases = (
 			);
-			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = all;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				3BBF89C70769F7FF00EB776F /* PBXTargetDependency */,
 				3BBF89C80769F7FF00EB776F /* PBXTargetDependency */,
@@ -66,18 +42,6 @@
 			buildConfigurationList = 3BE7C249088287FA00D214C4 /* Build configuration list for PBXAggregateTarget "Seq-Dev" */;
 			buildPhases = (
 			);
-			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Development;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				3B55A6750626F711004953A4 /* PBXTargetDependency */,
 				3BCA10FB062406FF008FC824 /* PBXTargetDependency */,
@@ -91,18 +55,6 @@
 			buildConfigurationList = 3BE7C235088287FA00D214C4 /* Build configuration list for PBXAggregateTarget "packages" */;
 			buildPhases = (
 			);
-			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = packages;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				5C43B8AF05AB44C300E7FB5C /* PBXTargetDependency */,
 				5C43B8B105AB44C300E7FB5C /* PBXTargetDependency */,
@@ -132,18 +84,6 @@
 			buildConfigurationList = 3BE7C23F088287FA00D214C4 /* Build configuration list for PBXAggregateTarget "all" */;
 			buildPhases = (
 			);
-			buildSettings = {
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = all;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				5C542B3B05AB0BA20042B7A2 /* PBXTargetDependency */,
 				5C542B3D05AB0BA20042B7A2 /* PBXTargetDependency */,
@@ -198,27 +138,6 @@
 				5C5426AA05AB0B8A0042B7A2 /* CopyFiles */,
 				5C5426B205AB0B8A0042B7A2 /* CopyFiles */,
 			);
-			buildSettings = {
-				DEBUGGING_SYMBOLS = NO;
-				FRAMEWORK_SEARCH_PATHS = "";
-				JAVA_ARCHIVE_CLASSES = NO;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_ONLY = YES;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_SEARCH_PATHS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jMax;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = app;
-			};
 			dependencies = (
 			);
 			name = jMax.app;
@@ -1639,43 +1558,6 @@
 		F458A3F608470CFB006AB8CF /* dumper.h in Headers */ = {isa = PBXBuildFile; fileRef = F458A3F508470CFB006AB8CF /* dumper.h */; };
 		F458A41508471D3C006AB8CF /* tree.c in Sources */ = {isa = PBXBuildFile; fileRef = F458A41408471D3C006AB8CF /* tree.c */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXBuildStyle section */
-		F5CE98EA035CAA1801664090 /* Debug */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				OPTIMIZATION_CFLAGS = "-g";
-				OTHER_CFLAGS = "";
-			};
-			name = Debug;
-		};
-		F880FCEB0282F7CE01664092 /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		F880FCEC0282F7CE01664092 /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 3.8.6;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
 		3B55A6740626F711004953A4 /* PBXContainerItemProxy */ = {
@@ -6558,29 +6440,6 @@
 				5C43B83B05AB333100E7FB5C /* JavaArchive */,
 				5C02E9EF05AB282B00173E77 /* Frameworks */,
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				INSTALL_PATH = "";
-				JAVA_ARCHIVE_CLASSES = YES;
-				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_STYLE = STATIC;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = ftsclient;
-				PURE_JAVA = YES;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = ftsclient.jar;
@@ -6597,28 +6456,6 @@
 				5C02E9F205AB286700173E77 /* Frameworks */,
 				5C542C3E05AB18D30042B7A2 /* ShellScript */,
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				INSTALL_PATH = "";
-				JAVA_ARCHIVE_CLASSES = YES;
-				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = build/ftsclient.jar;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_STYLE = STATIC;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jmax;
-				PURE_JAVA = YES;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = jmax.jar;
@@ -6634,29 +6471,6 @@
 				5C43B84505AB340000E7FB5C /* JavaArchive */,
 				5C02E9F305AB287C00173E77 /* Frameworks */,
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				JAVA_ARCHIVE_CLASSES = YES;
-				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_STYLE = STATIC;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = data;
-				PURE_JAVA = YES;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = data.jar;
@@ -6672,30 +6486,6 @@
 				5C02E9F405AB288A00173E77 /* Frameworks */,
 				5C542C4005AB192F0042B7A2 /* ShellScript */,
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				INSTALL_PATH = "";
-				JAVA_ARCHIVE_CLASSES = YES;
-				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_STYLE = STATIC;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = guiobj;
-				PURE_JAVA = YES;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = guiobj.jar;
@@ -6711,30 +6501,6 @@
 				5C43B84805AB343600E7FB5C /* JavaArchive */,
 				5C02E9F505AB28A300173E77 /* Frameworks */,
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				INSTALL_PATH = "";
-				JAVA_ARCHIVE_CLASSES = YES;
-				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/jmax.jar build/ftsclient.jar";
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_STYLE = STATIC;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = sequence;
-				PURE_JAVA = YES;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = sequence.jar;
@@ -6751,30 +6517,6 @@
 				5C02E9F605AB28B100173E77 /* Frameworks */,
 				5C542C4105AB19570042B7A2 /* ShellScript */,
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				INSTALL_PATH = "";
-				JAVA_ARCHIVE_CLASSES = YES;
-				JAVA_ARCHIVE_TYPE = JAR;
-				JAVA_CLASS_SEARCH_PATHS = "build/ftsclient.jar build/jmax.jar";
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_SOURCE_SUBDIR = .;
-				LIBRARY_STYLE = STATIC;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = ispw;
-				PURE_JAVA = YES;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = ispw.jar;
@@ -6793,20 +6535,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				INFOPLIST_FILE = "version-info.plist";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = version;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = version;
@@ -6823,20 +6551,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				INFOPLIST_FILE = "parser-tokenizer-info.plist";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = "parser-tokenizer";
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = "parser-tokenizer";
@@ -6856,41 +6570,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = build;
-				FRAMEWORK_VERSION = A;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../client/include,
-					../../include,
-					/usr/local/include,
-				);
-				INFOPLIST_FILE = "libfts-info.plist";
-				INSTALL_PATH = "@executable_path/../lib";
-				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
-				LIBRARY_STYLE = DYNAMIC;
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_LIBTOOL_FLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRINCIPAL_CLASS = "";
-				PRODUCT_NAME = libfts;
-				SECTORDER_FLAGS = "";
-				SKIP_INSTALL = YES;
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = framework;
-			};
 			dependencies = (
 			);
 			name = libfts.framework;
@@ -6908,29 +6587,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				BUILD_SETTING = "";
-				FRAMEWORK_SEARCH_PATHS = build;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				LIBRARY_SEARCH_PATHS = "";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = fts;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				5C542B6B05AB0BA30042B7A2 /* PBXTargetDependency */,
 			);
@@ -6952,30 +6608,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = build;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = (
-					../../packages/utils/c/include,
-					../../include,
-				);
-				INFOPLIST_FILE = "libutils-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libutils;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libutils.bundle;
@@ -6992,33 +6624,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = build;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../include,
-					../../packages/data/c/include,
-					../../packages/utils/c/include,
-				);
-				INFOPLIST_FILE = "libdata-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-					"-lmx",
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libdata;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 				5C542B6D05AB0BA30042B7A2 /* PBXTargetDependency */,
 			);
@@ -7037,27 +6642,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				INFOPLIST_FILE = "libsystem-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libsystem;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libsystem.bundle;
@@ -7074,32 +6658,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = build;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../packages/data/c/include,
-					../../packages/utils/c/include,
-					../../include,
-				);
-				INFOPLIST_FILE = "libguiobj-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libguiobj;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 				5C542B6F05AB0BA30042B7A2 /* PBXTargetDependency */,
 				5C542B7105AB0BA30042B7A2 /* PBXTargetDependency */,
@@ -7118,27 +6676,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				INFOPLIST_FILE = "libcontrol-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libcontrol;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libcontrol.bundle;
@@ -7155,30 +6692,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../packages/utils/c/include,
-					../../include,
-				);
-				INFOPLIST_FILE = "libnumeric-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libnumeric;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 				5C542B7305AB0BA30042B7A2 /* PBXTargetDependency */,
 			);
@@ -7196,31 +6709,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../packages/data/c/include,
-					../../packages/utils/c/include,
-					../../include,
-				);
-				INFOPLIST_FILE = "libsignal-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libsignal;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 				5C542B7505AB0BA30042B7A2 /* PBXTargetDependency */,
 				5C542B7705AB0BA30042B7A2 /* PBXTargetDependency */,
@@ -7239,27 +6727,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				INFOPLIST_FILE = "libio-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libio;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libio.bundle;
@@ -7276,27 +6743,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				INFOPLIST_FILE = "libmidi-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libmidi;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libmidi.bundle;
@@ -7313,33 +6759,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../include,
-					../../packages/utils/c/include,
-					../../packages/data/c/include,
-					../../packages/sequence/c/include,
-				);
-				INFOPLIST_FILE = "libsequence-info.plist";
-				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libsequence;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libsequence.bundle;
@@ -7356,31 +6775,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../packages/data/c/include,
-					../../packages/utils/c/include,
-					../../include,
-				);
-				INFOPLIST_FILE = "libispw-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libispw;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 				5C542B7905AB0BA30042B7A2 /* PBXTargetDependency */,
 				5C542B7B05AB0BA30042B7A2 /* PBXTargetDependency */,
@@ -7399,27 +6793,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				INFOPLIST_FILE = "libispwmath-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libispwmath;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libispwmath;
@@ -7436,30 +6809,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../include,
-					../../packages,
-				);
-				INFOPLIST_FILE = "libdtd-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libdtd;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libdtd.bundle;
@@ -7477,27 +6826,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../../include;
-				INFOPLIST_FILE = "libmacosx-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libmacosx;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libmacosx.bundle;
@@ -7518,21 +6846,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				INFOPLIST_FILE = "SDK-info.plist";
-				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = SDK;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = SDK;
@@ -7549,64 +6862,11 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = build;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = (
-					../../packages/data/c/include,
-					../../packages/utils/c/include,
-					../../include,
-				);
-				INFOPLIST_FILE = "libfunctions-info.plist";
-				OTHER_CFLAGS = "-Wno-unused";
-				OTHER_LDFLAGS = (
-					"-flat_namespace",
-					"-undefined",
-					suppress,
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = libfunctions;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = bundle;
-			};
 			dependencies = (
 			);
 			name = libfunctions.bundle;
 			productName = libfunctions;
 			productReference = 5C43B82F05AB304800E7FB5C /* libfunctions.bundle */;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>libfunctions</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string>com.MySoftwareCompany.libfunctions</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>1.0.0d1</string>
-</dict>
-</plist>
-";
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -7615,13 +6875,6 @@
 		F880FCE90282F7CE01664092 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 3BE7C258088287FA00D214C4 /* Build configuration list for PBXProject "jMaxProject" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				F880FCEC0282F7CE01664092 /* Deployment */,
-				F880FCEB0282F7CE01664092 /* Development */,
-				F5CE98EA035CAA1801664090 /* Debug */,
-			);
 			hasScannedForEncodings = 1;
 			mainGroup = F880FCEA0282F7CE01664092;
 			productRefGroup = F880FCF00282F80D01664092 /* Products */;
