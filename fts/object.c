@@ -299,12 +299,12 @@ fts_object_remove_listener(fts_object_t *o, void *listener)
 }
 
 void
-fts_object_call_listeners(fts_object_t *o)
+fts_object_call_listeners(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fts_object_listener_t *l;
   
   for(l=o->listeners; l!=NULL; l=l->next)
-    (*l->callback)(o, l->listener);
+    (*l->callback)(o, l->listener, s, ac, at);
 }
 
 /*****************************************************************************

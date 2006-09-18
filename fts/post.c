@@ -379,27 +379,39 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
   if(obj != NULL)
   {
     fts_class_t *cl = fts_object_get_class(obj);
-    fts_atom_t *at;
-    int ac;
-    fts_array_t array;
-    
-    fts_array_init(&array, 0, NULL);
-
-    (*fts_class_get_description_function(cl))(obj, &array);
-    
-    ac = fts_array_get_size(&array);
-    at = fts_array_get_atoms(&array);    
+    fts_class_spost_function_t spost_fun = fts_class_get_spost_function(cl);
     
     if(cl == fts_tuple_class)
-    {
       fts_spost(stream, "{");
-      ac--;
-      at++; /* skip class name */
-    }
     else
       fts_spost(stream, "<");
     
-    fts_spost_atoms(stream, ac, at);
+    if(spost_fun != NULL)
+      (*spost_fun)(obj, stream);
+    else
+    {
+      fts_class_description_function_t description_fun = fts_class_get_description_function(cl);
+      fts_array_t array;
+      fts_atom_t *at;
+      int ac;
+      
+      fts_array_init(&array, 0, NULL);
+      
+      (*description_fun)(obj, &array);
+      
+      ac = fts_array_get_size(&array);
+      at = fts_array_get_atoms(&array);    
+      
+      if(cl == fts_tuple_class)
+      {
+        ac--;
+        at++; /* skip class name */
+      }
+      
+      fts_spost_atoms(stream, ac, at);
+      
+      fts_array_destroy(&array);
+    }
 
     if(cl == fts_tuple_class)
       fts_spost(stream, "}");
@@ -409,9 +421,7 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
         fts_client_register_object(obj, -1);
       
       fts_spost(stream, " #%d>", fts_object_get_id(obj));
-    }
-    
-    fts_array_destroy(&array);
+    }    
   }
   else
   {
