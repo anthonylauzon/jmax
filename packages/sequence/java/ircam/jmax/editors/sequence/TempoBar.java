@@ -431,18 +431,28 @@ public void notifySelectionToListeners(SequenceSelection s, String message)
       TrackEvent evt;
       listener_args.clear();
       listener_args.addSymbol(FtsSymbol.get("selection"));
-      listener_args.addSymbol(FtsSymbol.get(message));
+      listener_args.addSymbol(FtsSymbol.get("start"));
+     ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
+        
       for(Enumeration e = s.getSelected(); e.hasMoreElements(); )
       {
         evt = (TrackEvent)e.nextElement();
+          
+        listener_args.clear();
+        listener_args.addSymbol(FtsSymbol.get("selection"));
+        listener_args.addSymbol(FtsSymbol.get(message));
         listener_args.addDouble(evt.getTime());
         listener_args.addObject(evt);
+        ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);      
       }
-      ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
+        
+      listener_args.clear();
+      listener_args.addSymbol(FtsSymbol.get("selection"));
+      listener_args.addSymbol(FtsSymbol.get("end"));    
+      ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);  
     }
   }
 }
-
 //=================== MouseListener interface ===========================
 public void mouseClicked(MouseEvent e){}
 public void mousePressed(MouseEvent e)
@@ -489,7 +499,7 @@ public void mousePressed(MouseEvent e)
           listener_args.addObject(currMark);
           ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
           
-          notifySelectionToListeners( markersSelection, "markers");
+          notifySelectionToListeners( markersSelection, "marker");
         }
       }
       else	
@@ -513,6 +523,7 @@ public void mousePressed(MouseEvent e)
           
           listener_args.clear();
           listener_args.addSymbol(FtsSymbol.get("selection"));
+          listener_args.addSymbol(FtsSymbol.get("empty"));
           ((FtsTrackObject)ftsObj).editorObject.requestListenersNotify(listener_args);
         }
       }

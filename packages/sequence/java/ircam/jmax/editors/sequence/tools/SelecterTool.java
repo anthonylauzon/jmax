@@ -79,14 +79,25 @@ public static void notifySelectionToListeners(SequenceSelection s, String messag
     TrackEvent evt;
     listener_args.clear();
     listener_args.addSymbol(FtsSymbol.get("selection"));
-    listener_args.addSymbol(FtsSymbol.get(message));
+    listener_args.addSymbol(FtsSymbol.get("start"));
+    ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+    
     for(Enumeration e = s.getSelected(); e.hasMoreElements(); )
     {
       evt = (TrackEvent)e.nextElement();
+      
+      listener_args.clear();
+      listener_args.addSymbol(FtsSymbol.get("selection"));
+      listener_args.addSymbol(FtsSymbol.get(message));
       listener_args.addDouble(evt.getTime());
       listener_args.addObject(evt);
+      ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);      
     }
-    ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+    
+    listener_args.clear();
+    listener_args.addSymbol(FtsSymbol.get("selection"));
+    listener_args.addSymbol(FtsSymbol.get("end"));    
+    ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);  
   }
 }
 /**
@@ -135,7 +146,7 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
       listener_args.addObject(aTrackEvent);
       egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
     
-      notifySelectionToListeners( egc.getSelection(), "events");
+      notifySelectionToListeners( egc.getSelection(), "event");
     }
 		else 
 		{
@@ -161,7 +172,7 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
           listener_args.addObject(marker);
           egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
         
-          notifySelectionToListeners( egc.getMarkersSelection(), "markers");
+          notifySelectionToListeners( egc.getMarkersSelection(), "marker");
         }
         
         singleObjectSelected(x, y, modifiers);
@@ -185,6 +196,7 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
 			
         listener_args.clear();
         listener_args.addSymbol(FtsSymbol.get("selection"));
+        listener_args.addSymbol(FtsSymbol.get("empty"));
         egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
       }
 		}
@@ -227,7 +239,7 @@ void selectArea(int x, int y, int w, int h, int modifiers)
 		if( egc.getMarkersSelection() != null)
     {
 			egc.getMarkersSelection().select( ((AbstractTrackRenderer)egc.getRenderManager()).markersIntersecting(x, y, w, h));
-      notifySelectionToListeners( egc.getMarkersSelection(), "markers");
+      notifySelectionToListeners( egc.getMarkersSelection(), "marker");
     }
 }
 
@@ -238,7 +250,7 @@ void selectArea(int x, int y, int w, int h, int modifiers)
 public static void selectArea(RenderManager r, SequenceSelection s, int x, int y, int w, int h) 
 {
 	s.select(r.objectsIntersecting(x, y, w, h));
-  notifySelectionToListeners(s, "events");
+  notifySelectionToListeners(s, "event");
 }
 /**
 * a single object has been selected, in coordinates x, y */
