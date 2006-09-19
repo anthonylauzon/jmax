@@ -47,6 +47,8 @@
 fts_class_t *fvec_class = NULL;
 fts_symbol_t fvec_symbol = NULL;
 
+static fts_symbol_t sym_idx = NULL;
+
 static fts_symbol_t sym_col = NULL;
 static fts_symbol_t sym_row = NULL;
 static fts_symbol_t sym_diag = NULL;
@@ -132,7 +134,7 @@ fvec_create_row(fmat_t *fmat)
 static void *fvec_editor = NULL;
 
 static void
-fvec_editor_callback (fts_object_t *o, void *e)
+fvec_editor_callback (fts_object_t *o, void *e, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(fts_object_is_a(o, fvec_class))
   {
@@ -1049,6 +1051,96 @@ _fvec_set_size(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
   
   fts_object_changed(o);
   
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+/* used by fvec, too! */
+static fts_method_status_t
+fvec_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;  
+  float f = fts_get_number_float(at);
+  int size, stride;
+  float *ptr;
+  int i, j;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  for(i=0, j=0; i<size; i++, j+=stride)
+    ptr[j] = f;
+  
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+/* works on fmat and fvec! */
+static fts_method_status_t
+fvec_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *) o;
+  int size, stride;
+  float *ptr;
+  int i, j;
+  
+  fvec_get_vector(self, &ptr, &size, &stride);
+  
+  if(ac > 0)
+  {
+    if(fts_is_number(at))
+    { 
+      /* repeat list of numbers (one number handled by fmat_fill_number) */
+      if (ac > size)
+        ac = size;
+      
+      for (i = 0, j = 0; j < ac; i += stride, j++)
+      {
+        if (fts_is_number(at + j))
+          ptr[i] = (float) fts_get_number_float(at + j);
+        else
+          ptr[i] = 0.0;
+      }
+      
+      for (; i < size * stride; i += stride)
+        ptr[i] = ptr[i % (ac * stride)];
+    }
+    else if(fts_is_a(at, expr_class))
+    { 
+      /* evaluate expression for each element, providing $self, $idx */
+      expr_t *expr = (expr_t *)fts_get_object(at);
+      fts_hashtable_t locals;
+      fts_atom_t key, value;
+      fts_atom_t ret;
+      
+      fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
+      
+      fts_set_symbol(&key, fts_s_self);
+      fts_set_object(&value, self);
+      fts_hashtable_put(&locals, &key, &value);
+      
+      fts_set_symbol(&key, sym_idx);
+
+      for(i=0, j=0; i<size; i++, j+=stride)
+      {
+        fts_set_int(&value, i);
+        fts_hashtable_put(&locals, &key, &value);
+        
+        expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
+          
+        if(fts_is_number(&ret))
+          ptr[j] = fts_get_number_float(&ret);
+        else
+          ptr[j] = 0.0;
+      }
+      
+      fts_hashtable_destroy(&locals);
+    }
+  }
+  
+  fts_object_changed(o);
   fts_set_object(ret, o);
   
   return fts_ok;
@@ -2187,8 +2279,8 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_s_sortrev, fvec_sortrev);
   
   /* fmat methods that work on fvec, too: */
-  fts_class_message_number (cl, fts_s_fill, fmat_fill_number);
-  fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
+  fts_class_message_number (cl, fts_s_fill, fvec_fill_number);
+  fts_class_message_varargs(cl, fts_s_fill, fvec_fill_varargs);
   
   fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);
@@ -2269,6 +2361,7 @@ FTS_MODULE_INIT(fvec)
   sym_unwrap = fts_new_symbol("unwrap");
   sym_vec = fts_new_symbol("vec");
   sym_refer = fts_new_symbol("refer");
+  sym_idx = fts_new_symbol("idx");
   
   fvec_type_names[fvec_type_column] = sym_col;
   fvec_type_names[fvec_type_row] = sym_row;

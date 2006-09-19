@@ -473,7 +473,7 @@ _function_getid(int ac, const fts_atom_t *at, fts_atom_t *ret)
     fts_object_t *obj = fts_get_object(at);
     
     if(!fts_object_has_client(obj))
-      fts_client_register_object(obj, -1);
+      fts_client_register_object(obj, 0);
     
     fts_set_int(ret, fts_object_get_id(obj));
     
@@ -494,7 +494,7 @@ _function_getobj(int ac, const fts_atom_t *at, fts_atom_t *ret)
   if(ac > 0 && fts_is_number(at))
   {
     int id = fts_get_number_int(at);
-    fts_object_t *obj = fts_client_get_object(id, 0);;
+    fts_object_t *obj = fts_client_get_object(id, 0);
     
     if(obj != NULL)
     {

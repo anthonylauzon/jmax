@@ -578,11 +578,11 @@ fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       char *idstr = fts_object_get_identifier_string(obj, buf, 255);
       fts_atom_t a;
       
-      if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "[%s]:", idstr);
-      
       if(meth)
       {
+        if(idstr != NULL && idstr[0] != '\0')
+          fts_spost(stream, "[%s]:", idstr);
+        
         fts_set_object(&a, stream);      
         meth(obj, NULL, 1, &a, fts_nix);
         return;
@@ -782,7 +782,7 @@ void fts_log_atoms( int ac, const fts_atom_t *at)
  *
  */
 
-static fts_bytestream_t *default_console_stream;
+static fts_bytestream_t *default_console_stream = NULL;
 
 fts_bytestream_t *fts_get_default_console_stream( void)
 {
