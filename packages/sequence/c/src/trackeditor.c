@@ -504,17 +504,18 @@ track_editor_listeners_notify(fts_object_t *o, fts_symbol_t s, int ac, const fts
   {
     fts_atom_t a[ac];
     int i = 0;
+    
     for(i = 0; i < ac; i++)
     {
       if(fts_is_a(at+i, event_class))
       {
         event_t *evt = (event_t *)fts_get_object(at + i);
-        fts_atom_assign(a+i, event_get_value(evt));
+        a[i] = *(event_get_value(evt));
       }
       else
-        fts_atom_assign(a+i, at+i);
-        
+        a[i] = at[i];        
     }
+    
     fts_object_call_listeners( (fts_object_t *)this, NULL, ac, a);
   }	
   
