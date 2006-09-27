@@ -27,9 +27,20 @@
 #include <fts/packages/data/data.h>
 #include <fts/packages/sequence/event.h>
 
-/*{ 
-*  scooob, score object (generalization of note)
-*/
+/** scooob, score object (generalization of note)
+ *
+ *  @file fmat.h
+ *  @ingroup data
+ *  @ingroup fts_classes
+ */
+
+/** @defgroup scoob scoob: score object
+ *  @ingroup  data
+ *  @ingroup  fts_classes
+ *  
+ *  score object (generalization of note)
+ */
+
 typedef struct
 {
   propobj_t propobj;
@@ -94,5 +105,4 @@ FTS_API int scoob_get_channel(scoob_t *self);
 
 void scoob_copy(scoob_t *org, scoob_t *copy);
 
-/*} */
 #endif

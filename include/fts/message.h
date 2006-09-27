@@ -24,12 +24,6 @@
 #define _FTS_MESSAGE_H_
 
 /**
- * Messages
- *
- * @defgroup message message 
- */
-
-/**
  * The message class.
  * A message object can be created empty or with a symbol as the first argument.
  *
@@ -37,7 +31,8 @@
  *   fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, NULL, ac, at);
  * @endcode
  *
- * @defgroup mess_class message class
+ * @defgroup message message
+ * @ingroup fts_obj_class_method
  */
 FTS_API fts_class_t *fts_message_class;
 
@@ -147,12 +142,6 @@ FTS_API void fts_message_cache_free(fts_message_cache_t *cache);
 #define fts_message_cache_set_selector(c, s) ((c)->selector = (s))
 #define fts_message_cache_set_type(c, t) ((c)->type = (t))
 #define fts_message_cache_set_method(c, m) ((c)->method = (m))
-
-/**
- * Method invokation, message sending and outlet API.
- *
- * @defgroup mess_api method invokation, message sending and outlet API
- */
 
 /**
  * Invoke a method.

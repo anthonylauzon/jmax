@@ -31,8 +31,15 @@
  *
  *  @file mat.h
  *  @ingroup data
+ *  @ingroup fts_classes
+ *
  */
 
+/** @defgroup mat mat: atom matrix
+ *  @ingroup  fts_classes
+ *  
+ *  atom matrix
+ */
 
 DATA_API fts_class_t *mat_class;
 DATA_API fts_symbol_t mat_symbol;

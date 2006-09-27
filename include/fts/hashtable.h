@@ -33,14 +33,10 @@
  * big capacity; this will avoid a lot of intermediate automatic rehashing.
  *
  * @defgroup hashtable hashtable
+ * @ingroup ftm_utils
  */
 
 typedef struct _fts_hashtable_cell_t fts_hashtable_cell_t;
-
-/**
- * @name The FTS hashtable structure
- */
-/*@{*/
 
 /**
  * The FTS hashtable.
@@ -50,25 +46,58 @@ typedef struct _fts_hashtable_cell_t fts_hashtable_cell_t;
  * @ingroup hashtable
  */
 
-typedef struct {
-  unsigned int length;
-  int count;
-  int rehash_count;
-  fts_hashtable_cell_t **table;
+/**
+ * @typedef struct _fts_hashtable_ fts_hashtable_t
+ * @brief fts hashtable  
+ * @ingroup hashtable
+ */
+/**
+ * @struct _fts_hashtable_
+ * @brief fts_hashtable struct
+ * @ingroup hashtable
+ */
+typedef struct _fts_hashtable_ 
+{
+  unsigned int length; /**< length ... */
+  int count; /**< count ... */
+  int rehash_count; /**< rehash_count */
+  fts_hashtable_cell_t **table;/**< table ...*/
 } fts_hashtable_t;
 
-/*@}*/
 
+/**
+ * @def FTS_HASHTABLE_SMALL 
+ * @brief fts hashtable small size
+ * @ingroup hashtable
+ */
 #define FTS_HASHTABLE_SMALL 1
+/**
+ * @def FTS_HASHTABLE_MEDIUM 
+ * @brief fts hashtable medium int
+ * @ingroup hashtable
+ */
 #define FTS_HASHTABLE_MEDIUM 2
+/**
+ * @def FTS_HASHTABLE_BIG 
+ * @brief fts hashtable big int
+ * @ingroup hashtable
+ */
 #define FTS_HASHTABLE_BIG 3
 
+/**
+ * @def fts_hashtable_get_size(h)
+ * @brief get size of given hashtable
+ * @param h hashtable
+ * @return hashtable size
+ * @ingroup ftm_externals
+ */
 #define fts_hashtable_get_size(h) ((h)->count)
 
 /**
- * Initializes a hashtable
+ * Initializes an hashtable
  *
  * @fn void fts_hashtable_init( fts_hashtable_t *h, int initial_capacity)
+ * @brief hashtable init function
  * @param h the hashtable
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
@@ -80,6 +109,7 @@ FTS_API void fts_hashtable_init( fts_hashtable_t *h, int initial_capacity);
  * Deinitializes a hashtable.
  *
  * @fn void fts_hashtable_destroy( fts_hashtable_t *h)
+ * @brief hashtable deinit
  * @param h the hashtable
  * @ingroup hashtable
  */
@@ -89,6 +119,7 @@ FTS_API void fts_hashtable_destroy( fts_hashtable_t *h);
  * Allocates and initializes a hashtable
  *
  * @fn fts_hashtable_t *fts_hashtable_new( int initial_capacity)
+ * @brief allocates and initializes a hashtable
  * @param initial_capacity the initial capacity of the hashtable. Can be one of: 
  * FTS_HASHTABLE_SMALL, FTS_HASHTABLE_MEDIUM, FTS_HASHTABLE_BIG 
  * @return the allocated hashtable
@@ -100,6 +131,7 @@ FTS_API fts_hashtable_t *fts_hashtable_new( int initial_capacity);
  * Frees a hashtable that was obtained by fts_hashtable_new().
  *
  * @fn void fts_hashtable_free( fts_hashtable_t *h)
+ * @brief frees a hashtable
  * @param h the hashtable
  * @ingroup hashtable
  */
@@ -111,6 +143,7 @@ FTS_API void fts_hashtable_free( fts_hashtable_t *h);
  * will keep its allocation state (i.e. its capacity will be its capacity before call).
  *
  * @fn void fts_hashtable_clear( fts_hashtable_t *h)
+ * @brief clear hashtable's content
  * @param h the hashtable
  * @ingroup hashtable
  */
@@ -120,6 +153,7 @@ FTS_API void fts_hashtable_clear( fts_hashtable_t *h);
  * Retrieve value mapped to specified key.
  *
  * @fn int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
+ * @brief get value by key
  * @param h the hashtable
  * @param key a pointer to the key to be inserted
  * @param value a pointer for returning the retrieved value
@@ -132,6 +166,7 @@ FTS_API int fts_hashtable_get( const fts_hashtable_t *h, const fts_atom_t *key, 
  * Insert specified key mapped to specified value.
  *
  * @fn int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_atom_t *value)
+ * @brief insert value with key
  * @param h the hashtable
  * @param key a pointer to the key to be inserted
  * @param value a pointer to the value to be inserted
@@ -144,6 +179,7 @@ FTS_API int fts_hashtable_put( fts_hashtable_t *h, const fts_atom_t *key, fts_at
  * Removes specified key 
  *
  * @fn int fts_hashtable_remove( fts_hashtable_t *h, const fts_atom_t *key)
+ * @brief remove given key
  * @param h the hashtable
  * @param key a pointer to the key to be removed
  * @return 1 if entry was mapped, 0 if not
@@ -157,6 +193,7 @@ FTS_API void fts_hashtable_stats( fts_hashtable_t *h);
  * Returns an iterator to enumerate the keys contained in the hashtable
  *
  * @fn void fts_hashtable_get_keys( fts_hashtable_t *h, fts_iterator_t *i)
+ * @brief get iterator on keys
  * @param h the hashtable
  * @param i the iterator
  * @ingroup hashtable
@@ -167,6 +204,7 @@ FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i
  * Returns an iterator to enumerate the values contained in the hashtable
  *
  * @fn void fts_hashtable_get_values( fts_hashtable_t *h, fts_iterator_t *i)
+ * @brief get iterator on values
  * @param h the hashtable
  * @param i the iterator
  * @ingroup hashtable

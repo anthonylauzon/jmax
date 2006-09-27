@@ -20,6 +20,15 @@
  * 
  */
 
+/**
+ * Class
+ *
+ * The FTS class
+ *
+ * @defgroup class class
+ * @ingroup fts_obj_class_method
+ */
+
 /* "system methods" every class should implement */
 typedef void (*fts_instantiate_fun_t)(fts_class_t *);
 typedef unsigned int (*fts_class_hash_function_t)( const fts_atom_t *);
@@ -180,12 +189,6 @@ FTS_API const int fts_system_inlet;
 FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
 
 /**
-* Class API
- *
- * @defgroup class_api class API
- */
-
-/**
 * Install a class
  * Create a class (without initializing) and register it by name in the current package.
  *
@@ -193,7 +196,7 @@ FTS_API fts_status_description_t fts_ClassAlreadyInitialized;
  * @param name the name (NULL for unregistered classes)
  * @param instantiate_fun class initialization function
  * @return the class (handle)
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t instantiate_fun);
 
@@ -203,7 +206,7 @@ FTS_API fts_class_t *fts_class_install( fts_symbol_t name, fts_instantiate_fun_t
  * @fn void fts_class_alias(fts_class_t *cl, fts_symbol_t alias)
  * @param cl the class
  * @param alias alias name
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
 
@@ -215,7 +218,7 @@ FTS_API void fts_class_alias(fts_class_t *cl, fts_symbol_t alias);
  * @param size the size of its associated C structure (must have fts_object_t as first entry)
  * @param constructor constructor method
  * @param deconstructor deconstructor method
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t constructor, fts_method_t deconstructor);
 
@@ -226,7 +229,7 @@ FTS_API void fts_class_init(fts_class_t *cl, unsigned int size, fts_method_t con
  * @fn void fts_class_input_handler(fts_class_t *cl, fts_method_t method)
  * @param cl the class
  * @param method input handler method
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
 
@@ -254,7 +257,7 @@ FTS_API void fts_class_export_handler(fts_class_t *cl, fts_symbol_t suffix, fts_
  * @param s message symbol
  * @param type class of argument (NULL for a single argument of any type, fts_void_class for a void method)
  * @param mth the method
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *type, fts_method_t mth);
 
@@ -279,7 +282,7 @@ FTS_API void fts_class_message(fts_class_t *cl, fts_symbol_t s, fts_class_t *typ
  * @param winlet index of the inlet
  * @param type class of argument (NULL for a single argument of any type, fts_void_class for a void method)
  * @param mth the method
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts_method_t mth);
 
@@ -303,7 +306,7 @@ FTS_API void fts_class_inlet(fts_class_t *cl, int winlet, fts_class_t *type, fts
  * @fn void fts_class_inlet_thru(fts_class_t *cl, int winlet)
  * @param cl the class
  * @param winlet index of the inlet
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_inlet_thru(fts_class_t *cl, int winlet);
 
@@ -314,7 +317,7 @@ FTS_API void fts_class_inlet_thru(fts_class_t *cl, int winlet);
  * @param cl the class
  * @param woutlet index of the outlet
  * @param type of the outlet (NULL for an untyped outlet)
- * @ingroup class_api
+ * @ingroup class
  */
 FTS_API void fts_class_outlet(fts_class_t *cl, int woutlet, fts_class_t *type);
 

@@ -27,6 +27,7 @@
 
 /** @defgroup fvec fvec: fmat slice ref
  *  @ingroup  data
+ * @ingroup fts_classes 
  *
  *  an fvec is a reference to a colum, row or diagonal of an fmat
  *

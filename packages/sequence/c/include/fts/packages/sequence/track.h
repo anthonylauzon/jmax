@@ -32,6 +32,17 @@
 #define fmax(a,b) (((a)>(b))? (a) : (b))
 #endif
 
+/** Sequence of time-tagged values
+ *
+ *  @file track.h
+ *  @ingroup fts_classes
+ */
+
+/** @defgroup track track: sequence of time-tagged values
+ *  @ingroup  fts_classes
+ *  
+ *  sequence of time-tagged values
+ */
 SEQUENCE_API fts_class_t *track_class;
 
 struct _track_

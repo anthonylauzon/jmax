@@ -194,7 +194,7 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
       int offset  = 0;
       int channel = 0;
       double  sr  = 0;	/* resample if not zero */
-      fmat_t *orig;
+      fmat_t *orig = NULL;
       float  *ptr;
       
       /* parse further import arguments <offset> <length> <channel> <sr>

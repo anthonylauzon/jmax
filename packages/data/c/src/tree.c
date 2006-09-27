@@ -356,7 +356,7 @@ static fts_method_status_t _tree_add (fts_object_t *o, fts_symbol_t s, int ac, c
 static fts_method_status_t _tree_getknn (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   tree_t *self = (tree_t *) o;
-  fmat_t *x;	/* search vector */
+  fmat_t *x = NULL;	/* search vector */
   int     k = 1, n;
   int     *result;
 

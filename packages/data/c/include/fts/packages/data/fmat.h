@@ -30,16 +30,16 @@
  *
  *  @file fmat.h
  *  @ingroup data
+ *  @ingroup fts_classes
  */
 
 
 /*****************************************************************************/
 /** @defgroup fmat fmat: float matrix
  *  @ingroup  data
+ *  @ingroup  fts_classes
  *  
  *  float matrices and vectors
- *
- *  @{
  */
 
 /** fmat struct */
@@ -152,7 +152,5 @@ int  _fmat_element_compare_descending (const void *left, const void *right);
 void _fmat_sort (fmat_t *self, int col, int (*compare)(const void *, const void *));
 
 DATA_API fmat_t *fmat_null;
-
-/** @} end of group fmat */
 
 #endif

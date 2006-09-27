@@ -20,7 +20,6 @@
  * 
  */
 
-
 /**
  * Array
  *
@@ -34,34 +33,28 @@
  * can be made larger before adding a large number of elements.
  *
  * @defgroup array array
+ * @ingroup ftm_utils
  */
 
 /**
- * @name The FTS array structure
- */
-/*@{*/
-
-/**
- * The FTS array.
- *
- * @typedef fts_array_t
- *
+ * @struct fts_array
+ * @brief the fts array structure
  * @ingroup array
  */
+
 struct fts_array
 {
-  fts_atom_t *atoms;
-  int size;
-  int alloc_increment;
-  int alloc;
+  fts_atom_t *atoms; /**< atoms ...*/
+  int size; /**<size ...*/
+  int alloc_increment; /**< alloc_increment ... */
+  int alloc; /**<lloc ...*/
 };
-
-/*@}*/
 
 /**
  * Initializes an array
  *
- * @fn void fts_array_init( fts_array_t *array, int ac, const fts_atom_t *at);
+ * @fn void fts_array_init( fts_array_t *array, int ac, const fts_atom_t *at)
+ * @brief initializes an array
  * @param array the array
  * @param ac the atoms count
  * @param at atoms to initialize the content of the array
@@ -73,6 +66,7 @@ FTS_API void fts_array_init( fts_array_t *array, int ac, const fts_atom_t *at);
  * Deinitializes an array
  *
  * @fn void fts_array_destroy( fts_array_t *array);
+ * @brief deinitializes an array
  * @param array the array
  * @ingroup array
  */
@@ -84,6 +78,7 @@ FTS_API void fts_array_destroy( fts_array_t *array);
  * will keep its allocation state (i.e. its capacity will be its capacity before call).
  *
  * @fn void fts_array_clear( fts_array_t *array);
+ * @brief clears the content of the array
  * @param array the array
  * @ingroup array
  */
@@ -96,6 +91,7 @@ FTS_API void fts_array_clear( fts_array_t *array);
  * made VOID.
  * 
  * @fn void fts_array_set_size( fts_array_t *array, int new_size);
+ * @brief set the size of the array
  * @param array the array
  * @param new_size the new size
  * @ingroup array
@@ -106,6 +102,7 @@ FTS_API void fts_array_set_size( fts_array_t *array, int new_size);
  * Set the content of the array
  * 
  * @fn void fts_array_set( fts_array_t *array, int ac, const fts_atom_t *at)
+ * @brief set content of the array
  * @param array the array
  * @param ac the atoms count
  * @param at atoms to initialize the content of the array
@@ -117,6 +114,7 @@ FTS_API void fts_array_set( fts_array_t *array, int ac, const fts_atom_t *at);
  * Append elements at the end of the array
  * 
  * @fn void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at)
+ * @brief append elements at the end of the array
  * @param array the array
  * @param ac the atoms count
  * @param at atoms to append
@@ -128,6 +126,7 @@ FTS_API void fts_array_append( fts_array_t *array, int ac, const fts_atom_t *at)
  * Append an int element at the end of array
  * 
  * @fn void fts_array_append_int(fts_array_t* array, int i)
+ * @brief append int at the end of array
  * @param array the array 
  * @param i the int to append
  * @ingroup array
@@ -138,6 +137,7 @@ FTS_API void fts_array_append_int( fts_array_t *array, int i);
  * Append a float element at the end of array
  * 
  * @fn void fts_array_append_float(fts_array_t* array, float f)
+ * @brief append float at the end of array
  * @param array the array
  * @param f the float to append
  * @ingroup array
@@ -148,6 +148,7 @@ FTS_API void fts_array_append_float( fts_array_t *array, float f);
 * Append a symbol element at the end of array
 * 
 * @fn void fts_array_append_symbol(fts_array_t* array, fts_symbol_t s)
+* @brief append symbol at the end of array
 * @param array the array
 * @param s the symbol to append
 * @ingroup array
@@ -158,6 +159,7 @@ FTS_API void fts_array_append_symbol( fts_array_t *array, fts_symbol_t s);
 * Append an object element at the end of array
 * 
 * @fn void fts_array_append_symbol(fts_array_t* array, fts_symbol_t s)
+* @brief append object at the end of array
 * @param array the array
 * @param obj the object
 * @ingroup array
@@ -179,6 +181,7 @@ FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at
  * Prepend elements at the beginning of the array
  * 
  * @fn void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at)
+ * @brief prepend elements to the array
  * @param array the array
  * @param ac the atoms count
  * @param at atoms to append
@@ -190,6 +193,7 @@ FTS_API void fts_array_prepend( fts_array_t *array, int ac, const fts_atom_t *at
  * Prepend an int element at the beginning of the array
  * 
  * @fn void fts_array_prepend_int( fts_array_t *array, int i)
+ * @brief prepend int to the array
  * @param array the array
  * @param i the int to prepend
  * @ingroup array
@@ -200,6 +204,7 @@ FTS_API void fts_array_prepend_int( fts_array_t *array, int i);
  * Prepend a float element at the beginning of the array
  * 
  * @fn void fts_array_prepend_float( fts_array_t *array, float f)
+ * @brief prepend float to the array
  * @param array the array
  * @param f the float to prepend
  * @ingroup array
@@ -210,6 +215,7 @@ FTS_API void fts_array_prepend_float( fts_array_t *array, float f);
  * Prepend a symbol element at the beginning of the array
  * 
  * @fn void fts_array_prepend_float( fts_array_t *array, fts_symbol_t s)
+ * @brief prepend symbol to the array
  * @param array the array
  * @param s the symbol to prepend
  * @ingroup array
@@ -220,6 +226,7 @@ FTS_API void fts_array_prepend_symbol( fts_array_t *array, fts_symbol_t s);
  * Insert elements at given index of the array
  *
  * @fn void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at)
+ * @brief insert elements at given index
  * @param array the array
  * @param index the index
  * @param ac the atoms count
@@ -229,9 +236,10 @@ FTS_API void fts_array_prepend_symbol( fts_array_t *array, fts_symbol_t s);
 FTS_API void fts_array_insert( fts_array_t *array, int index, int ac, const fts_atom_t *at);
 
 /**
- * Cut given numer of elements from given index of the array
+ * Cut given number of elements from given index of the array
  *
  * @fn void fts_array_cut( fts_array_t *array, int index, int n)
+ * @brief cut elements from array
  * @param array the array
  * @param index the index
  * @param n the atoms count
@@ -243,6 +251,7 @@ FTS_API void fts_array_cut( fts_array_t *array, int index, int n);
  * Copy array
  *
  * @fn void fts_array_copy(fts_array_t *org, fts_array_t *copy)
+ * @brief copy array content
  * @param org the source
  * @param copy the destination of the copy
  * @ingroup array
@@ -250,9 +259,8 @@ FTS_API void fts_array_cut( fts_array_t *array, int index, int n);
 FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
 
 /**
- * Get the content of an array
- * 
- * @fn fts_atom_t *fts_array_get_atoms( fts_array_t *array)
+ * @def fts_array_get_atoms(array)
+ * @brief get array content
  * @param array the array
  * @return a pointer to the content of the array
  * @ingroup array
@@ -260,18 +268,19 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
 #define fts_array_get_atoms( array) ((array)->atoms)
 
 /**
- * Get the number of elements in an array
- * 
+ * @def fts_array_get_size(array)
+ * @brief get array size
  * @param array the array
  * @return the size of the array
  * @ingroup array
+ *
+ * Get the number of elements in an array
  */
 #define fts_array_get_size( array) ((array)->size)
 
 /**
- * Get an element by index
- * 
- * @fn fts_atom_t *fts_array_get_element( fts_array_t *array, int index)
+ * @def fts_array_get_element( array, index)
+ * @brief get element by index
  * @param array the array
  * @param index the index
  * @return a pointer to the specified element of the array
@@ -280,9 +289,8 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
 #define fts_array_get_element( array, index) ((array)->atoms + (index))
 
 /** 
- * Set an element at index
- * 
  * @fn void fts_array_set_element(fts_array_t* array, int index, const fts_atom_t* at)
+ * @brief set element at index
  * @param array the array
  * @param index the index
  * @param at element value
@@ -291,9 +299,8 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
 FTS_API void fts_array_set_element(fts_array_t *array, int index, const fts_atom_t *at);
 
 /** 
- * Get an iterator on array elements
- * 
  * @fn void fts_array_get_values(fts_array_t* array, fts_iterator_t* iter)
+ * @brief get an iterator on array elements
  * @param array the array
  * @param iter the iterator
  * @ingroup array

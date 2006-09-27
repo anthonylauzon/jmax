@@ -30,8 +30,15 @@
  *
  *  @file dict.h
  *  @ingroup data
+ *  @ingroup fts_classes
+ *
  */
 
+/** @defgroup dict dict: dictionary associative list
+ *  @ingroup  fts_classes
+ *  
+ *  dictionary associative list
+ */
 
 typedef struct dict
 {
