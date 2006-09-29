@@ -29,8 +29,6 @@
  * @ingroup fts_obj_class_method
  */
 
-/*@{*/
-
 #ifndef _FTS_OBJECT_H_
 #define _FTS_OBJECT_H_
 
@@ -134,7 +132,5 @@ FTS_API fts_method_status_t fts_object_import_as(fts_object_t *o, fts_symbol_t s
 /** try export handlers from class with the given arguments until one returns true */
 FTS_API fts_method_status_t fts_object_export(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
 FTS_API fts_method_status_t fts_object_export_as(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
-
-/*@}*/
 
 #endif  /* _FTS_OBJECT_H_ */

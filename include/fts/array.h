@@ -258,17 +258,17 @@ FTS_API void fts_array_cut( fts_array_t *array, int index, int n);
  */
 FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
 
+#ifdef AVOID_MACROS
 /**
- * @def fts_array_get_atoms(array)
+ * @def fts_atom_t *fts_array_get_atoms(fts_array_t *array)
  * @brief get array content
  * @param array the array
  * @return a pointer to the content of the array
  * @ingroup array
  */
-#define fts_array_get_atoms( array) ((array)->atoms)
-
+FTS_API fts_atom_t *fts_array_get_atoms(fts_array_t *array);
 /**
- * @def fts_array_get_size(array)
+ * @fn int fts_array_get_size(fts_array_t *array)
  * @brief get array size
  * @param array the array
  * @return the size of the array
@@ -276,18 +276,21 @@ FTS_API void fts_array_copy(fts_array_t *org, fts_array_t *copy);
  *
  * Get the number of elements in an array
  */
-#define fts_array_get_size( array) ((array)->size)
-
+FTS_API int fts_array_get_size(fts_array_t *array);
 /**
- * @def fts_array_get_element( array, index)
+ * @fn fts_atom_t *fts_array_get_element( fts_array_t *array, int index)
  * @brief get element by index
  * @param array the array
  * @param index the index
  * @return a pointer to the specified element of the array
  * @ingroup array
  */
+FTS_API fts_atom_t *fts_array_get_element( fts_array_t *array, int index);
+#else
+#define fts_array_get_atoms( array) ((array)->atoms)
+#define fts_array_get_size( array) ((array)->size)
 #define fts_array_get_element( array, index) ((array)->atoms + (index))
-
+#endif
 /** 
  * @fn void fts_array_set_element(fts_array_t* array, int index, const fts_atom_t* at)
  * @brief set element at index
