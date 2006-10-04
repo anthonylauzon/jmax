@@ -84,14 +84,18 @@ typedef struct _fts_hashtable_
  */
 #define FTS_HASHTABLE_BIG 3
 
+#ifdef AVOID_MACROS
 /**
- * @def fts_hashtable_get_size(h)
+ * @fn int fts_hashtable_get_size(fts_hashtable_t *h)
  * @brief get size of given hashtable
- * @param h hashtable
+ * @param ht hashtable
  * @return hashtable size
- * @ingroup ftm_externals
+ * @ingroup hashtable
  */
+int fts_hashtable_get_size(fts_hashtable_t *ht);
+#else
 #define fts_hashtable_get_size(h) ((h)->count)
+#endif
 
 /**
  * Initializes an hashtable

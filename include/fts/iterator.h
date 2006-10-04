@@ -73,6 +73,7 @@ struct _fts_iterator_t {
   void *data; /**< data ... */
 };
 
+#ifdef AVOID_MACROS
 /**
  * Tests if iterator contains more elements
  *
@@ -80,22 +81,24 @@ struct _fts_iterator_t {
  * To reuse the same iterator, you must reinitialize if before calling
  * any of its functions.
  *
- * @def fts_iterator_has_more(I)
- * @brief tests if iterator contains more elements \n --> int fts_iterator_has_more(fts_iterator_t *i)
- * @param i the iterator
+ * @fn int fts_iterator_has_more(fts_iterator_t *iter)
+ * @brief tests if iterator contains more elements
+ * @param iter the iterator
  * @return 1 if iterator has more elements, 0 otherwise
  * @ingroup iterator
  */
-#define fts_iterator_has_more(I) ((*(I)->has_more)( I))
-
+int fts_iterator_has_more(fts_iterator_t *iter);
 /**
  * Store value and advance to next element in iteration
  *
- * @def fts_iterator_next(I, A)
- * @brief store value and advance to next element in iteration \n --> void fts_iterator_next(fts_iterator_t *i, fts_atom_t *a)
- * @param i the iterator
+ * @fn void fts_iterator_next(fts_iterator_t *iter, fts_atom_t *a)
+ * @brief store value and advance to next element in iteration
+ * @param iter the iterator
  * @param a the atom
  * @ingroup iterator
  */
+void fts_iterator_next(fts_iterator_t *iter, fts_atom_t *a);
+#else
+#define fts_iterator_has_more(I) ((*(I)->has_more)( I))
 #define fts_iterator_next(I,A) ((*(I)->next)( I, A))
-
+#endif
