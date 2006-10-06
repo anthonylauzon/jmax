@@ -59,38 +59,45 @@ typedef struct fts_message
   fts_symbol_t s;/**< message selector */
 } fts_message_t;
 
+#ifdef AVOID_MACROS
 /**
- * @def fts_message_get_selector(m) 
- * @brief returns message selector \n --> fts_symbol_t fts_message_get_selector(fts_message_t *m)
+ * @fn fts_symbol_t fts_message_get_selector(fts_message_t *m)
+ * @brief returns message selector
  * @param m fts message
  * @return message selector
  * @ingroup message
  */
-#define fts_message_get_selector(m) ((m)->s)
+fts_symbol_t fts_message_get_selector(fts_message_t *m);
 /**
- * @def fts_message_get_args(m) 
- * @brief returns message args \n --> fts_array_t *fts_message_get_args(fts_message_t *m)
+ * @fn fts_array_t *fts_message_get_args(fts_message_t *m)
+ * @brief returns message args
  * @param m fts message
  * @return message args
  * @ingroup message
  */
-#define fts_message_get_args(m) (&(m)->args)
+fts_array_t *fts_message_get_args(fts_message_t *m);
 /**
- * @def fts_message_get_ac(m) 
- * @brief returns message arguments count \n --> int fts_message_get_ac(fts_message_t *m)
+ * @fn int fts_message_get_ac(fts_message_t *m) 
+ * @brief returns message arguments count
  * @param m fts message
  * @return arguments count
  * @ingroup message
  */
-#define fts_message_get_ac(m) (fts_array_get_size(&(m)->args))
+int fts_message_get_ac(fts_message_t *m);
 /**
- * @def fts_message_get_at(m) 
- * @brief returns message args as atoms array \n --> fts_atom_t * fts_message_get_at(fts_message_t *m)
+ * @fn fts_atom_t *fts_message_get_at(fts_message_t *m)
+ * @brief returns message args as atoms array
  * @param m fts message
  * @return args as atoms array
  * @ingroup message
  */
+fts_atom_t *fts_message_get_at(fts_message_t *m);
+#else
+#define fts_message_get_selector(m) ((m)->s)
+#define fts_message_get_args(m) (&(m)->args)
+#define fts_message_get_ac(m) (fts_array_get_size(&(m)->args))
 #define fts_message_get_at(m) (fts_array_get_atoms(&(m)->args))
+#endif
 
 /**
  * Clear message (reset selector and arguments).
@@ -333,55 +340,63 @@ FTS_API fts_message_cache_t *fts_message_cache_new(void);
  */
 FTS_API void fts_message_cache_free(fts_message_cache_t *cache);
 
+#ifdef AVOID_MACROS
 /**
- * @def fts_message_cache_get_selector(c)
- * @brief returns message cache selector \n --> fts_symbol_t fts_message_cache_get_selector(fts_message_cache_t *c)
+ * @fn fts_symbol_t fts_message_cache_get_selector(fts_message_cache_t *c)
+ * @brief returns message cache selector
  * @param c message cache
  * @return massage cache selector
  * @ingroup message
  */
-#define fts_message_cache_get_selector(c) ((c)->selector)
+fts_symbol_t fts_message_cache_get_selector(fts_message_cache_t *c);
 /**
- * @def fts_message_cache_get_type(c)
- * @brief returns message cache type \n --> fts_class_t * fts_message_cache_get_type(fts_message_cache_t *c)
+ * @def fts_class_t *fts_message_cache_get_type(fts_message_cache_t *c)
+ * @brief returns message cache type
  * @param c message cache
  * @return massage cache type
  * @ingroup message
  */
-#define fts_message_cache_get_type(c) ((c)->type)
+fts_class_t *fts_message_cache_get_type(fts_message_cache_t *c);
 /**
- * @def fts_message_cache_get_method(c)
- * @brief returns message cache type \n --> fts_method_t fts_message_cache_get_method(fts_message_cache_t *c)
+ * @fn fts_method_t fts_message_cache_get_method(fts_message_cache_t *c)
+ * @brief returns message cache type
  * @param c message cache
  * @return massage cache method
  * @ingroup message
  */
-#define fts_message_cache_get_method(c) ((c)->method)
+fts_method_t fts_message_cache_get_method(fts_message_cache_t *c);
 /**
- * @def fts_message_cache_set_selector(c, s)
- * @brief set message cache selector \n --> void fts_message_cache_set_selector(fts_message_cache_t *c,  fts_symbol_t s)
+ * @fn void fts_message_cache_set_selector(fts_message_cache_t *c,  fts_symbol_t s)
+ * @brief set message cache selector
  * @param c message cache
  * @param selector
  * @ingroup message
  */
-#define fts_message_cache_set_selector(c, s) ((c)->selector = (s))
+void fts_message_cache_set_selector(fts_message_cache_t *c,  fts_symbol_t s);
 /**
- * @def fts_message_cache_set_type(c, t)
- * @brief set message cache type \n --> void fts_message_cache_set_type(fts_message_cache_t *c,  fts_class_t *t)
+ * @fn void fts_message_cache_set_type(fts_message_cache_t *c,  fts_class_t *t)
+ * @brief set message cache type
  * @param c message cache
  * @param type
  * @ingroup message
  */
-#define fts_message_cache_set_type(c, t) ((c)->type = (t))
+void fts_message_cache_set_type(fts_message_cache_t *c,  fts_class_t *t);
 /**
- * @def fts_message_cache_set_method(c, m)
- * @brief set message cache method \n --> void fts_message_cache_set_method(fts_message_cache_t *c,  fts_method_t t)
+ * @fn void fts_message_cache_set_method(fts_message_cache_t *c,  fts_method_t t)
+ * @brief set message cache method
  * @param c message cache
  * @param method
  * @ingroup message
  */
+void fts_message_cache_set_method(fts_message_cache_t *c,  fts_method_t t);
+#else
+#define fts_message_cache_get_selector(c) ((c)->selector)
+#define fts_message_cache_get_type(c) ((c)->type)
+#define fts_message_cache_get_method(c) ((c)->method)
+#define fts_message_cache_set_selector(c, s) ((c)->selector = (s))
+#define fts_message_cache_set_type(c, t) ((c)->type = (t))
 #define fts_message_cache_set_method(c, m) ((c)->method = (m))
-
+#endif
 /**
  * Invoke a method.
  *

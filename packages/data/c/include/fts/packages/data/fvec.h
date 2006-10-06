@@ -160,19 +160,19 @@ void fvec_set_size(fvec_t *fvec, int size);
  */
 void fvec_set_editor_open(fvec_t *fvec);
 /** 
-* @fn void fvec_set_editor_close(fvec_t *fvec)
-* @brief set fvec editor as closed
-* @param fvec the fvec
-* @ingroup fvec
-*/
+ * @fn void fvec_set_editor_close(fvec_t *fvec)
+ * @brief set fvec editor as closed
+ * @param fvec the fvec
+ * @ingroup fvec
+ */
 void fvec_set_editor_close(fvec_t *fvec);
 /** 
-* @fn int fvec_editor_is_open(fvec_t *fvec)
-* @brief tell if fvec editor is open
-* @param fvec the fvec
-* @return 1 if true, 0 if false
-* @ingroup fvec
-*/
+ * @fn int fvec_editor_is_open(fvec_t *fvec)
+ * @brief tell if fvec editor is open
+ * @param fvec the fvec
+ * @return 1 if true, 0 if false
+ * @ingroup fvec
+ */
 int fvec_editor_is_open(fvec_t *fvec);
 #else
 #define fvec_get_fmat(f) ((f)->fmat)

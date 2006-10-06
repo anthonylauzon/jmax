@@ -119,38 +119,45 @@ typedef struct fts_class_doc_line
   struct fts_class_doc_line *next;/** pointer to next doc line */ 
 } fts_class_doc_t;
 
+#ifdef AVOID_MACROS
 /**
- * @def fts_class_doc_get_name(l) 
- * @brief returns class doc name as fts_symbol_t \n --> fts_symbol_t fts_class_doc_get_name(fts_class_doc_t *l)
+ * @fn fts_symbol_t fts_class_doc_get_name(fts_class_doc_t *l) 
+ * @brief returns class doc name as fts_symbol_t
  * @param l class doc
  * @return class doc name as fts_symbol_t
  * @ingroup class
  */
-#define fts_class_doc_get_name(l) ((l)->name)
+fts_symbol_t fts_class_doc_get_name(fts_class_doc_t *l);
 /**
- * @def fts_class_doc_get_args(l) 
- * @brief returns class doc args \n --> char * fts_class_doc_get_args(fts_class_doc_t *l)
+ * @fn char *fts_class_doc_get_args(fts_class_doc_t *l)
+ * @brief returns class doc args
  * @param l class doc
  * @return class doc args
  * @ingroup class
  */
-#define fts_class_doc_get_args(l) ((l)->args)
+char *fts_class_doc_get_args(fts_class_doc_t *l);
 /**
- * @def fts_class_doc_get_comment(l) 
- * @brief returns class doc comment \n --> char * fts_class_doc_get_comment(fts_class_doc_t *l)
+ * @fn char *fts_class_doc_get_comment(fts_class_doc_t *l)
+ * @brief returns class doc comment
  * @param l class doc
  * @return class doc comment
  * @ingroup class
  */
-#define fts_class_doc_get_comment(l) ((l)->comment)
+char *fts_class_doc_get_comment(fts_class_doc_t *l);
 /**
- * @def fts_class_doc_get_next(l) 
- * @brief returns next class doc \n --> fts_class_doc_t * fts_class_doc_get_next(fts_class_doc_t *l)
+ * @fn fts_class_doc_t * fts_class_doc_get_next(fts_class_doc_t *l)
+ * @brief returns next class doc
  * @param l class doc
  * @return next class doc
  * @ingroup class
  */
+fts_class_doc_t * fts_class_doc_get_next(fts_class_doc_t *l);
+#else
+#define fts_class_doc_get_name(l) ((l)->name)
+#define fts_class_doc_get_args(l) ((l)->args)
+#define fts_class_doc_get_comment(l) ((l)->comment)
 #define fts_class_doc_get_next(l) ((l)->next)
+#endif
 /**
  * @fn void fts_class_doc(fts_class_t *cl, fts_symbol_t name, const char *args, const char *comment)
  * @brief set documentation for given class 
@@ -232,205 +239,232 @@ struct fts_class
   fts_class_doc_t *doc;/**< doc ... */
 };
 
+#ifdef AVOID_MACROS
 /**
- * @def fts_class_get_name(C) 
- * @brief get class name \n --> fts_symbol_t fts_class_get_name(fts_class_t *c)
+ * @fn fts_symbol_t fts_class_get_name(fts_class_t *c)
+ * @brief get class name
  * @param c the ftmext_class
  * @return class_name as fts_symbol_t
  * @ingroup class
  */
-#define fts_class_get_name(C) ((C)->name)
+fts_symbol_t fts_class_get_name(fts_class_t *c);
 /**
- * @def fts_class_get_super(C) 
+ * @fn fts_class_t *fts_class_get_super(fts_class_t *c)
  * @brief get super class of given class \n --> fts_class_t * fts_class_get_super(fts_class_t *c)
  * @param c the class
  * @return super class
  * @ingroup class
  */
-#define fts_class_get_super(C) ((C)->super_class)
+fts_class_t *fts_class_get_super(fts_class_t *c);
 
 /**
- * @def fts_class_get_constructor(c) 
- * @brief get decobstructor of given class \n --> fts_method_t fts_class_get_constructor(fts_class_t *c)
+ * @fn fts_method_t fts_class_get_constructor(fts_class_t *c)
+ * @brief get decobstructor of given class
  * @param c the class
  * @return constructor method
  * @ingroup class
  */
-#define fts_class_get_constructor(c) ((c)->constructor)
+fts_method_t fts_class_get_constructor(fts_class_t *c);
 /**
- * @def fts_class_get_deconstructor(c) 
- * @brief get decobstructor of given class \n --> fts_method_t fts_class_get_deconstructor(fts_class_t *c)
+ * @fn fts_method_t fts_class_get_deconstructor(fts_class_t *c)
+ * @brief get decobstructor of given class
  * @param c the class
  * @return deconstructor method
  * @ingroup class
  */
-#define fts_class_get_deconstructor(c) ((c)->deconstructor)
+fts_method_t fts_class_get_deconstructor(fts_class_t *c);
 /**
- * @def fts_class_get_input_handler(c) 
- * @brief get input handler of given class \n --> fts_method_t fts_class_get_input_handler(fts_class_t *c)
+ * @fn fts_method_t fts_class_get_input_handler(fts_class_t *c) 
+ * @brief get input handler of given class
  * @param c the class
  * @return input handler
  * @ingroup class
  */
-#define fts_class_get_input_handler(c) ((c)->input_handler)
+fts_method_t fts_class_get_input_handler(fts_class_t *c);
 
 /**
- * @def fts_class_get_hash_function(cl) 
- * @brief get hash function of given class \n --> fts_class_hash_function_t fts_class_get_hash_function(fts_class_t *cl)
+ * @fn fts_class_hash_function_t fts_class_get_hash_function(fts_class_t *cl) 
+ * @brief get hash function of given class
  * @param c the class
  * @return hash function
  * @ingroup class
  */
-#define fts_class_get_hash_function(cl) ((cl)->hash_function)
+fts_class_hash_function_t fts_class_get_hash_function(fts_class_t *cl);
 /**
- * @def fts_class_get_equals_function(cl) 
- * @brief get equals function of given class \n --> fts_class_equals_function_t fts_class_get_equals_function(fts_class_t *cl)
+ * @fn fts_class_equals_function_t fts_class_get_equals_function(fts_class_t *cl) 
+ * @brief get equals function of given class
  * @param c the class
  * @return equals function
  * @ingroup class
  */
-#define fts_class_get_equals_function(cl) ((cl)->equals_function)
+fts_class_equals_function_t fts_class_get_equals_function(fts_class_t *cl);
 /**
- * @def fts_class_get_description_function(cl) 
- * @brief get description function of given class \n --> fts_class_description_function_t fts_class_get_description_function(fts_class_t *cl)
+ * @fn fts_class_description_function_t fts_class_get_description_function(fts_class_t *cl)
+ * @brief get description function of given class
  * @param c the class
  * @return description function
  * @ingroup class
  */
-#define fts_class_get_description_function(cl) ((cl)->description_function)
+fts_class_description_function_t fts_class_get_description_function(fts_class_t *cl);
 /**
- * @def fts_class_get_copy_function(cl) 
- * @brief get copy function of given class \n --> fts_class_copy_function_t fts_class_get_copy_function(fts_class_t *cl)
+ * @fn fts_class_copy_function_t fts_class_get_copy_function(fts_class_t *cl)
+ * @brief get copy function of given class
  * @param c the class
  * @return copy function
  * @ingroup class
  */
-#define fts_class_get_copy_function(cl) ((cl)->copy_function)
+fts_class_copy_function_t fts_class_get_copy_function(fts_class_t *cl);
 /**
- * @def fts_class_get_array_function(cl) 
- * @brief get array function of given class \n --> fts_class_array_function_t fts_class_get_array_function(fts_class_t *cl)
+ * @fn fts_class_array_function_t fts_class_get_array_function(fts_class_t *cl) 
+ * @brief get array function of given class
  * @param c the class
  * @return array function
  * @ingroup class
  */
-#define fts_class_get_array_function(cl) ((cl)->array_function)
+fts_class_array_function_t fts_class_get_array_function(fts_class_t *cl);
 /**
- * @def fts_class_get_spost_function(cl) 
- * @brief get spost function of given class \n --> fts_class_spost_function_t fts_class_get_spost_function(fts_class_t *cl)
+ * @fn fts_class_spost_function_t fts_class_get_spost_function(fts_class_t *cl)
+ * @brief get spost function of given class
  * @param c the class
  * @return spost function
  * @ingroup class
  */
-#define fts_class_get_spost_function(cl) ((cl)->spost_function)
+fts_class_spost_function_t fts_class_get_spost_function(fts_class_t *cl);
 /**
- * @def fts_class_get_guiobject_function(cl) 
- * @brief get guiobject function of given class \n --> fts_class_guiobject_function_t fts_class_get_guiobject_function(fts_class_t *cl)
+ * @fn fts_class_guiobject_function_t fts_class_get_guiobject_function(fts_class_t *cl)
+ * @brief get guiobject function of given class
  * @param c the class
  * @return guiobject function
  * @ingroup class
  */
-#define fts_class_get_guiobject_function(cl) ((cl)->guiobject_function)
+fts_class_guiobject_function_t fts_class_get_guiobject_function(fts_class_t *cl)
 
 /**
- * @def fts_class_get_import_handlers(cl) 
- * @brief get import function of given class \n --> fts_hashtable_t fts_class_get_import_handlers(fts_class_t *cl)
+ * @fn fts_hashtable_t fts_class_get_import_handlers(fts_class_t *cl)
+ * @brief get import function of given class
  * @param c the class
  * @return hashtable of import handlers
  * @ingroup class
  */
-#define fts_class_get_import_handlers(c) (&(c)->import_handlers)
+fts_hashtable_t fts_class_get_import_handlers(fts_class_t *cl)
 /**
- * @def fts_class_get_export_handlers(cl) 
- * @brief get export function of given class \n --> fts_hashtable_t fts_class_get_export_handlers(fts_class_t *cl)
+ * @fn fts_hashtable_t fts_class_get_export_handlers(fts_class_t *cl)
+ * @brief get export function of given class
  * @param c the class
  * @return hashtable of export handlers
  * @ingroup class
  */
-#define fts_class_get_export_handlers(c) (&(c)->export_handlers)
+fts_hashtable_t fts_class_get_export_handlers(fts_class_t *cl);
 
 /**
- * @def fts_class_set_super(cl, s) 
- * @brief set super class for given class \n --> void fts_class_set_super(fts_class_t *cl, fts_class_t *s)
+ * @fn void fts_class_set_super(fts_class_t *cl, fts_class_t *s)
+ * @brief set super class for given class
  * @param c the class
  * @param c the super class
  * @ingroup class
  */
-#define fts_class_set_super(C, s) ((C)->super_class = s)
+void fts_class_set_super(fts_class_t *cl, fts_class_t *s);
 
 /**
- * @def fts_class_set_hash_function(cl, f) 
- * @brief set hash function to given class \n --> void fts_class_set_hash_function(fts_class_t *cl, fts_class_hash_function_t *f)
+ * @fn void fts_class_set_hash_function(fts_class_t *cl, fts_class_hash_function_t *f)
+ * @brief set hash function to given class
  * @param c the class
  * @param f hash function
  * @ingroup class
  */
-#define fts_class_set_hash_function( cl, f) ((cl)->hash_function = (f))
+void fts_class_set_hash_function(fts_class_t *cl, fts_class_hash_function_t *f);
 /**
- * @def fts_class_set_equals_function(cl, f) 
- * @brief set equals function to given class \n --> void fts_class_set_equals_function(fts_class_t *cl, fts_class_equals_function_t *f)
+ * @fn void fts_class_set_equals_function(fts_class_t *cl, fts_class_equals_function_t *f)
+ * @brief set equals function to given class
  * @param c the class
  * @param f equals function
  * @ingroup class
  */
-#define fts_class_set_equals_function( cl, f) ((cl)->equals_function = (f))
+void fts_class_set_equals_function(fts_class_t *cl, fts_class_equals_function_t *f);
 /**
- * @def fts_class_set_description_function(cl, f) 
- * @brief set description function to given class \n --> void fts_class_set_description_function(fts_class_t *cl, fts_class_description_function_t *f)
+ * @fn void fts_class_set_description_function(fts_class_t *cl, fts_class_description_function_t *f)
+ * @brief set description function to given class
  * @param c the class
  * @param f description function
  * @ingroup class
  */
-#define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
+void fts_class_set_description_function(fts_class_t *cl, fts_class_description_function_t *f);
 /**
- * @def fts_class_set_copy_function(cl, f) 
- * @brief set copy function to given class \n --> void fts_class_set_copy_function(fts_class_t *cl, fts_class_copy_function_t *f)
+ * @fn void fts_class_set_copy_function(fts_class_t *cl, fts_class_copy_function_t *f)
+ * @brief set copy function to given class
  * @param c the class
  * @param f copy function
  * @ingroup class
  */
-#define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
+void fts_class_set_copy_function(fts_class_t *cl, fts_class_copy_function_t *f);
 /**
- * @def fts_class_set_array_function(cl, f) 
- * @brief set array function to given class \n --> void fts_class_set_array_function(fts_class_t *cl, fts_class_array_function_t *f)
+ * @fn void fts_class_set_array_function(fts_class_t *cl, fts_class_array_function_t *f)
+ * @brief set array function to given class
  * @param c the class
  * @param f copy function
  * @ingroup class
  */
-#define fts_class_set_array_function( cl, f) ((cl)->array_function = (f))
+void fts_class_set_array_function(fts_class_t *cl, fts_class_array_function_t *f);
 /**
- * @def fts_class_set_spost_function(cl, f) 
- * @brief set spost function to given class \n --> void fts_class_set_spost_function(fts_class_t *cl, fts_class_spost_function_t *f)
+ * @fn void fts_class_set_spost_function(fts_class_t *cl, fts_class_spost_function_t *f)
+ * @brief set spost function to given class
  * @param c the class
  * @param f spost function
  * @ingroup class
  */
-#define fts_class_set_spost_function( cl, f) ((cl)->spost_function = (f))
+void fts_class_set_spost_function(fts_class_t *cl, fts_class_spost_function_t *f);
 /**
- * @def fts_class_set_guiobject_function(cl, f) 
- * @brief set guiobject function to given class \n --> void fts_class_set_guiobject_function(fts_class_t *cl, fts_class_guiobject_function_t *f)
+ * @fn void fts_class_set_guiobject_function(fts_class_t *cl, fts_class_guiobject_function_t *f)
+ * @brief set guiobject function to given class
  * @param c the class
  * @param f guiobject function
  * @ingroup class
  */
-#define fts_class_set_guiobject_function(cl, f) ((cl)->guiobject_function = (f))
+void fts_class_set_guiobject_function(fts_class_t *cl, fts_class_guiobject_function_t *f);
 
 /**
- * @def fts_class_is_primitive(cl) 
- * @brief tells if given class is a primitive class \n --> int fts_class_is_primitive(fts_class_t *cl)
+ * @fn int fts_class_is_primitive(fts_class_t *cl)
+ * @brief tells if given class is a primitive class
  * @param c the class
  * @return 1 if yes, 0 if not
  * @ingroup class
  */
-#define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
+int fts_class_is_primitive(fts_class_t *cl);
 
 /**
- * @def fts_class_get_doc(cl) 
- * @brief get class documentation \n --> fts_class_doc_t *fts_class_get_doc(fts_class_t *cl)
+ * @fn fts_class_doc_t *fts_class_get_doc(fts_class_t *cl)
+ * @brief get class documentation
  * @param c the class
  * @return class documentation
  * @ingroup class
  */
+fts_class_doc_t *fts_class_get_doc(fts_class_t *cl);
+#else
+#define fts_class_get_name(C) ((C)->name)
+#define fts_class_get_super(C) ((C)->super_class)
+#define fts_class_get_constructor(c) ((c)->constructor)
+#define fts_class_get_deconstructor(c) ((c)->deconstructor)
+#define fts_class_get_input_handler(c) ((c)->input_handler)
+#define fts_class_get_hash_function(cl) ((cl)->hash_function)
+#define fts_class_get_equals_function(cl) ((cl)->equals_function)
+#define fts_class_get_description_function(cl) ((cl)->description_function)
+#define fts_class_get_copy_function(cl) ((cl)->copy_function)
+#define fts_class_get_array_function(cl) ((cl)->array_function)
+#define fts_class_get_spost_function(cl) ((cl)->spost_function)
+#define fts_class_get_guiobject_function(cl) ((cl)->guiobject_function)
+#define fts_class_get_import_handlers(c) (&(c)->import_handlers)
+#define fts_class_get_export_handlers(c) (&(c)->export_handlers)
+#define fts_class_set_super(C, s) ((C)->super_class = s)
+#define fts_class_set_hash_function( cl, f) ((cl)->hash_function = (f))
+#define fts_class_set_equals_function( cl, f) ((cl)->equals_function = (f))
+#define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
+#define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
+#define fts_class_set_array_function( cl, f) ((cl)->array_function = (f)
+#define fts_class_set_spost_function( cl, f) ((cl)->spost_function = (f))
+#define fts_class_set_guiobject_function(cl, f) ((cl)->guiobject_function = (f))
+#define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
 #define fts_class_get_doc(C) ((C)->doc)
+#endif
 
 /**
  * @fn void fts_class_get_messages(const fts_class_t *cl, fts_iterator_t *i)
@@ -553,15 +587,20 @@ FTS_API void fts_class_input_handler(fts_class_t *cl, fts_method_t method);
  * @ingroup class
  */
 FTS_API void fts_class_import_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth);
+
+#ifdef AVOID_MACROS
 /**
- * @def fts_class_import_handler_default(c, m) 
- * @brief add default import handler \n --> void fts_class_import_handler_default(fts_class_t *c, fts_method_t m)
+ * @fn void fts_class_import_handler_default(fts_class_t *c, fts_method_t m) 
+ * @brief add default import handler
  * @param c the class
  * @param m import handler method
  * @ingroup class
  */
+void fts_class_import_handler_default(fts_class_t *c, fts_method_t m);
+#else
 #define fts_class_import_handler_default(c, m) fts_class_import_handler(c, fts_s_default, m)
-
+#endif
+                                              
 /**
  * Add export handler to table of handlers to try.
  * An export handler is called with the object to import from, and the list of filename and arguments.
@@ -574,15 +613,20 @@ FTS_API void fts_class_import_handler(fts_class_t *cl, fts_symbol_t suffix, fts_
  * @ingroup class
  */
 FTS_API void fts_class_export_handler(fts_class_t *cl, fts_symbol_t suffix, fts_method_t meth);
+
+#ifdef AVOID_MACROS
 /**
- * @def fts_class_export_handler_default(c, m) 
- * @brief add default export handler \n --> void fts_class_export_handler_default(fts_class_t *c, fts_method_t m)
+ * @fn void fts_class_export_handler_default(fts_class_t *c, fts_method_t m) 
+ * @brief add default export handler
  * @param c the class
  * @param m export handler method
  * @ingroup class
  */
-#define fts_class_export_handler_default(c, m) fts_class_export_handler(c, fts_s_default, m)
-
+void fts_class_export_handler_default(fts_class_t *c, fts_method_t m);
+#else
+#define fts_class_export_handler_default(c, m) fts_class_export_handler(c, fts_s_default, m)                                              
+#endif
+                                              
 /**
  * Register a method for a given message and argument type (of a single argument or void).
  *
