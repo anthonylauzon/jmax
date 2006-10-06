@@ -32,7 +32,7 @@
  * @endcode
  *
  * @defgroup message message
- * @ingroup fts_obj_class_method
+ * @ingroup fts_obj_class_method_sym
  */
 
 /** 

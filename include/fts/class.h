@@ -26,7 +26,7 @@
  * The FTS class
  *
  * @defgroup class class
- * @ingroup fts_obj_class_method
+ * @ingroup fts_obj_class_method_sym
  */
 
 /* "system methods" every class should implement */

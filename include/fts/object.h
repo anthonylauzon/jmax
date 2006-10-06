@@ -26,7 +26,7 @@
  * The FTS object
  *
  * @defgroup object fts object
- * @ingroup fts_obj_class_method
+ * @ingroup fts_obj_class_method_sym
  */
 
 #ifndef _FTS_OBJECT_H_

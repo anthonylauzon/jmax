@@ -25,19 +25,10 @@
 
 #include <fts/packages/data/data.h>
 
-
 /** 
- *  @file bpf.h
- *  @brief break point functions
- *  @ingroup data
- *  @ingroup  fts_classes
- *
- *  break point functions
- */
-
-/** @defgroup bpf bpf: break point functions
- *  @ingroup  data
- *  @ingroup  fts_classes
+ * @defgroup bpf bpf: break point functions
+ * @ingroup  data
+ * @ingroup  fts_classes
  *  
  *  break point functions
  */
