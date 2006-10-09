@@ -459,7 +459,7 @@ fts_class_doc_t *fts_class_get_doc(fts_class_t *cl);
 #define fts_class_set_equals_function( cl, f) ((cl)->equals_function = (f))
 #define fts_class_set_description_function(cl, f) ((cl)->description_function = (f))
 #define fts_class_set_copy_function( cl, f) ((cl)->copy_function = (f))
-#define fts_class_set_array_function( cl, f) ((cl)->array_function = (f)
+#define fts_class_set_array_function( cl, f) ((cl)->array_function = (f))
 #define fts_class_set_spost_function( cl, f) ((cl)->spost_function = (f))
 #define fts_class_set_guiobject_function(cl, f) ((cl)->guiobject_function = (f))
 #define fts_class_is_primitive(CL) ((CL)->type_id < FTS_FIRST_OBJECT_TYPEID)
