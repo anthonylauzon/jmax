@@ -22,35 +22,36 @@
 
 #include <fts/fts.h>
 
-static fts_heap_t *cell_heap;
+static fts_symbol_t sym_objectlist = NULL;
+static fts_heap_t *objectlist_cell_heap = NULL;
 
-void fts_objectlist_init( fts_objectlist_t *list)
+void 
+fts_objectlist_init( fts_objectlist_t *list)
 {
   list->head = 0;
-
-  if ( !cell_heap)
-    cell_heap = fts_heap_new( sizeof( fts_objectlist_cell_t));
 }
 
-void fts_objectlist_destroy( fts_objectlist_t *list)
+void
+fts_objectlist_destroy( fts_objectlist_t *list)
 {
   fts_objectlist_cell_t *p, *next;
 
   for( p = list->head; p; p = next)
-    {
-      next = p->next;
-
-      fts_heap_free( p, cell_heap);
-    }
-
+  {
+    next = p->next;
+    
+    fts_heap_free( p, objectlist_cell_heap);
+  }
+  
   list->head = 0;
 }
 
-void fts_objectlist_insert( fts_objectlist_t *list, fts_object_t *object)
+void
+fts_objectlist_insert( fts_objectlist_t *list, fts_object_t *object)
 {
   fts_objectlist_cell_t *p;
   
-  p = (fts_objectlist_cell_t *) fts_heap_alloc( cell_heap);
+  p = (fts_objectlist_cell_t *) fts_heap_alloc( objectlist_cell_heap);
   
   p->object = object;
   p->next = list->head;
@@ -58,7 +59,8 @@ void fts_objectlist_insert( fts_objectlist_t *list, fts_object_t *object)
   list->head = p;
 }
 
-void fts_objectlist_remove( fts_objectlist_t *list, fts_object_t *object)
+void
+fts_objectlist_remove( fts_objectlist_t *list, fts_object_t *object)
 {
   fts_objectlist_cell_t **p, *c;
   
@@ -68,9 +70,26 @@ void fts_objectlist_remove( fts_objectlist_t *list, fts_object_t *object)
     {
       c = *p;
       *p = c->next;
-      fts_heap_free( c, cell_heap);
+      fts_heap_free( c, objectlist_cell_heap);
       
       return;
     }
+  }
+}
+
+/***********************************************************************
+*
+* initialization
+*
+*/
+FTS_MODULE_INIT(objectlist)
+{
+  sym_objectlist = fts_new_symbol("objectlist");
+  objectlist_cell_heap = fts_shared_get(sym_objectlist);
+  
+  if(objectlist_cell_heap == NULL)
+  {
+    objectlist_cell_heap = fts_heap_new(sizeof( fts_objectlist_cell_t));  
+    fts_shared_set(sym_objectlist, objectlist_cell_heap);
   }
 }
