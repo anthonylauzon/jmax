@@ -978,39 +978,40 @@ fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
 fts_method_status_t
 fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
-  fmat_t *self = (fmat_t *) o;
-  float  *ptr;
-  int     dim, size, stride;
-  int     i, j;
-
-  dim = fmat_or_slice_vector((fts_object_t *) self, &ptr, &size, &stride);
-
+  fmat_t *self = (fmat_t *)o;
+  float *ptr = fmat_get_ptr(self);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int i;
+  
   if(ac > 0)
   {
     if(fts_is_number(at))
-    { /* repeat list of numbers (one number handled by fmat_fill_number) */
-      if (ac > size)
-        ac = size;
-
-      for (i = 0, j = 0; j < ac; i += stride, j++)
+    {
+      if(ac > m * n)
+        ac = m * n;
+      
+      for(i=0; i<ac; i++)
       {
-        if (fts_is_number(at + j))
-          ptr[i] = (float) fts_get_number_float(at + j);
+        if(fts_is_number(at + i))
+          ptr[i] = (float)fts_get_number_float(at + i);
         else
           ptr[i] = 0.0;
       }
       
-      for (; i < size * stride; i += stride)
-        ptr[i] = ptr[i % (ac * stride)];
+      for(; i<m*n; i++)
+        ptr[i] = ptr[i % ac];
     }
     else if(fts_is_a(at, expr_class))
-    { /* evaluate expression for each element, providing $self, $row, $col */
-      expr_t    *expr = (expr_t *)fts_get_object(at);
-      int        m    = dim == 2 ? fmat_get_m(self) : size;
-      int        n    = dim == 2 ? fmat_get_n(self) : 1;
+    {
+      expr_t *expr = (expr_t *)fts_get_object(at);
+      int m = fmat_get_m(self);
+      int n = fmat_get_n(self);
+      float *ptr = fmat_get_ptr(self);
       fts_hashtable_t locals;
       fts_atom_t key_self, key_row, key_col, value;
       fts_atom_t ret;
+      int i, j;
       
       fts_hashtable_init(&locals, FTS_HASHTABLE_SMALL);
       
@@ -1020,7 +1021,7 @@ fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
       
       fts_set_symbol(&key_row, fts_s_row);
       fts_set_symbol(&key_col, fts_s_col);
-
+      
       for(i=0; i<m; i++)
       {
         fts_set_int(&value, i);
@@ -1030,13 +1031,13 @@ fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
         {
           fts_set_int(&value, j);
           fts_hashtable_put(&locals, &key_col, &value);
-
+          
           expr_evaluate(expr, &locals, ac - 1, at + 1, &ret);
           
           if(fts_is_number(&ret))
-            ptr[i * stride + j] = fts_get_number_float(&ret);
+            ptr[i * n + j] = fts_get_number_float(&ret);
           else
-            ptr[i * stride + j] = 0.0;
+            ptr[i * n + j] = 0.0;
         }
       }
       
