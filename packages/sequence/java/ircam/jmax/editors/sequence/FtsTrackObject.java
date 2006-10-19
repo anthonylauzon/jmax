@@ -1782,9 +1782,14 @@ void endUpload()
 {
   uploading = false;
   uploadingSize = 0;
-	if( saveEditor)
-    restoreEditorState();
-  notifyUploadEnd();
+	SwingUtilities.invokeLater(new Runnable() {
+    public void run()
+    { 
+      if( saveEditor)
+        restoreEditorState();
+      notifyUploadEnd();
+    }
+  });
 }
 
 public boolean isUploading()
