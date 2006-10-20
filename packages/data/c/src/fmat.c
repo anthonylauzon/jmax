@@ -960,7 +960,7 @@ fmat_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
 }
 
 /* used by fvec, too! */
-fts_method_status_t
+static fts_method_status_t
 fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
@@ -975,7 +975,7 @@ fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, 
 }
 
 /* works on fmat and fvec! */
-fts_method_status_t
+static fts_method_status_t
 fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   fmat_t *self = (fmat_t *)o;
@@ -4002,7 +4002,7 @@ _fmat_find_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
 static void *fmat_editor = NULL;
 
 static void
-fmat_editor_callback(fts_object_t *o, void *e)
+fmat_editor_callback(fts_object_t *o, void *e, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   fmat_t *self = (fmat_t *)o;
 

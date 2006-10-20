@@ -115,6 +115,7 @@ FTS_API fts_symbol_t seqsym_highlightEventsAndTime;
 FTS_API fts_symbol_t seqsym_highlightReset;
 FTS_API fts_symbol_t seqsym_openFileDialog;
 FTS_API fts_symbol_t seqsym_endPaste;
+FTS_API fts_symbol_t seqsym_listenersNotify;
 
 #endif
 

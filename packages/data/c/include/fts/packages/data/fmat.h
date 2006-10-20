@@ -155,9 +155,4 @@ DATA_API fmat_t *fmat_null;
 
 /** @} end of group fmat */
 
-/* used by fvec, too, but not exported */
-fts_method_status_t fmat_fill_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
-fts_method_status_t fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
-
-
 #endif

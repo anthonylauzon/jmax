@@ -379,42 +379,49 @@ fts_spost_object(fts_bytestream_t *stream, fts_object_t *obj)
   if(obj != NULL)
   {
     fts_class_t *cl = fts_object_get_class(obj);
-    fts_atom_t *at;
-    int ac;
-    fts_array_t array;
-    
-    fts_array_init(&array, 0, 0);
-
-    (*fts_class_get_description_function(cl))(obj, &array);
-    
-    ac = fts_array_get_size(&array);
-    at = fts_array_get_atoms(&array);    
+    fts_class_spost_function_t spost_fun = fts_class_get_spost_function(cl);
     
     if(cl == fts_tuple_class)
-    {
       fts_spost(stream, "{");
-      ac--;
-      at++; /* skip class name */
-    }
+    else
+      fts_spost(stream, "<");
+    
+    if(spost_fun != NULL)
+      (*spost_fun)(obj, stream);
     else
     {
-      char buf[256];
-      char *idstr = fts_object_get_identifier_string(obj, buf, 255);
+      fts_class_description_function_t description_fun = fts_class_get_description_function(cl);
+      fts_array_t array;
+      fts_atom_t *at;
+      int ac;
       
-      if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "[%s]<", idstr);
-      else
-        fts_spost(stream, "<");
+      fts_array_init(&array, 0, NULL);
+      
+      (*description_fun)(obj, &array);
+      
+      ac = fts_array_get_size(&array);
+      at = fts_array_get_atoms(&array);    
+      
+      if(cl == fts_tuple_class)
+      {
+        ac--;
+        at++; /* skip class name */
+      }
+      
+      fts_spost_atoms(stream, ac, at);
+      
+      fts_array_destroy(&array);
     }
     
-    fts_spost_atoms(stream, ac, at);
-
     if(cl == fts_tuple_class)
       fts_spost(stream, "}");
     else
-      fts_spost(stream, ">");
-    
-    fts_array_destroy(&array);
+    {
+      if(!fts_object_has_client(obj))
+        fts_client_register_object(obj, -1);
+      
+      fts_spost(stream, " #%d>", fts_object_get_id(obj));
+    }    
   }
   else
   {
@@ -452,6 +459,29 @@ fts_spost_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       if ( i != ac-1)        
         fts_spost(stream, " ");
     }
+}
+
+void 
+fts_spost_primitive_atoms( fts_bytestream_t *stream, int ac, const fts_atom_t *at)
+{
+  int i;
+  
+  for(i=0; i<ac; i++)
+  {   
+    if (fts_is_int( at + i))
+      fts_spost(stream, "%d", fts_get_int( at + i));
+    else if (fts_is_float( at + i))
+      fts_spost_float(stream, fts_get_float( at + i));
+    else if (fts_is_symbol( at + i))
+      fts_spost(stream, "%s", fts_symbol_name(fts_get_symbol( at + i)));
+    else if (fts_is_string( at + i))
+      fts_spost(stream, "%s", fts_get_string( at + i));
+    else
+      continue;
+    
+    if(i < ac-1)
+      fts_spost(stream, " ");
+  }
 }
 
 void 
@@ -548,11 +578,11 @@ fts_sprint_atoms(fts_bytestream_t *stream, int ac, const fts_atom_t *at)
       char *idstr = fts_object_get_identifier_string(obj, buf, 255);
       fts_atom_t a;
       
-      if(idstr != NULL && idstr[0] != '\0')
-        fts_spost(stream, "[%s]", idstr);
-      
       if(meth)
       {
+        if(idstr != NULL && idstr[0] != '\0')
+          fts_spost(stream, "[%s]:", idstr);
+      
         fts_set_object(&a, stream);      
         meth(obj, NULL, 1, &a, fts_nix);
         return;
@@ -752,7 +782,7 @@ void fts_log_atoms( int ac, const fts_atom_t *at)
  *
  */
 
-static fts_bytestream_t *default_console_stream;
+static fts_bytestream_t *default_console_stream = NULL;
 
 fts_bytestream_t *fts_get_default_console_stream( void)
 {

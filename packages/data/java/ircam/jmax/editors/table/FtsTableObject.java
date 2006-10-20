@@ -941,14 +941,3 @@ private boolean type; /* true if vector is an FtsIvecObject */
 float min_val = -1;
 float max_val = 1;
 }
-
-
-
-
-
-
-
-
-
-
-

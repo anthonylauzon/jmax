@@ -301,6 +301,3 @@ Color gridColor = new Color(200, 200, 255);
 Color outRangeColor = new Color(237, 237, 237);
 Color foreColor = new Color(101, 153, 255);
 }
-
-
-

@@ -25,6 +25,7 @@ import ircam.jmax.editors.sequence.*;
 import ircam.jmax.editors.sequence.renderers.*;
 import ircam.jmax.editors.sequence.track.*;
 import ircam.jmax.toolkit.*;
+import ircam.fts.client.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -71,6 +72,34 @@ public void edit(int x, int y, int modifiers)
 {
 }
 
+public static void notifySelectionToListeners(SequenceSelection s, String message)
+{
+  if(s.size() > 0)
+  {
+    TrackEvent evt;
+    listener_args.clear();
+    listener_args.addSymbol(FtsSymbol.get("selection"));
+    listener_args.addSymbol(FtsSymbol.get("start"));
+    ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+    
+    for(Enumeration e = s.getSelected(); e.hasMoreElements(); )
+    {
+      evt = (TrackEvent)e.nextElement();
+      
+      listener_args.clear();
+      listener_args.addSymbol(FtsSymbol.get("selection"));
+      listener_args.addSymbol(FtsSymbol.get(message));
+      listener_args.addDouble(evt.getTime());
+      listener_args.addObject(evt);
+      ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);      
+    }
+    
+    listener_args.clear();
+    listener_args.addSymbol(FtsSymbol.get("selection"));
+    listener_args.addSymbol(FtsSymbol.get("end"));    
+    ((SequenceGraphicContext)gc).getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);  
+  }
+}
 /**
 * called by the Selecter UI module at mouse down
  */
@@ -83,7 +112,7 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
 	else
 	{
 		SequenceGraphicContext egc = (SequenceGraphicContext)gc;
-		
+    
 		egc.getTrack().setProperty("selected", Boolean.TRUE);	    		
 		egc.getGraphicDestination().requestFocus();
 		
@@ -109,7 +138,16 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
 			singleObjectSelected(x, y, modifiers);
 			
 			egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), aTrackEvent);
-		}
+		
+      listener_args.clear();
+      listener_args.addSymbol(FtsSymbol.get("click"));
+      listener_args.addSymbol(FtsSymbol.get("event"));
+      listener_args.addDouble(egc.getAdapter().getInvX(x));
+      listener_args.addObject(aTrackEvent);
+      egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+    
+      notifySelectionToListeners( egc.getSelection(), "event");
+    }
 		else 
 		{
 			/* search for markers */
@@ -126,7 +164,16 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
 						egc.getSelection().deselectAll(); 
 					}
  					egc.getMarkersSelection().select( marker);
-				}
+				
+          listener_args.clear();
+          listener_args.addSymbol(FtsSymbol.get("click"));
+          listener_args.addSymbol(FtsSymbol.get("marker"));
+          listener_args.addDouble(egc.getAdapter().getInvX(x));
+          listener_args.addObject(marker);
+          egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+        
+          notifySelectionToListeners( egc.getMarkersSelection(), "marker");
+        }
         
         singleObjectSelected(x, y, modifiers);
 			}
@@ -139,7 +186,19 @@ public void selectionPointChoosen(int x, int y, MouseEvent e)
 						egc.getMarkersSelection().deselectAll();
 				}
 				egc.getTrack().getFtsTrack().requestNotifyGuiListeners( egc.getAdapter().getInvX(x), null);
-			}
+
+        listener_args.clear();
+        listener_args.addSymbol(FtsSymbol.get("click"));
+        listener_args.addSymbol(FtsSymbol.get("background"));
+        listener_args.addDouble(egc.getAdapter().getInvX(x));
+        listener_args.addDouble(egc.getAdapter().getInvY(y));
+        egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+			
+        listener_args.clear();
+        listener_args.addSymbol(FtsSymbol.get("selection"));
+        listener_args.addSymbol(FtsSymbol.get("empty"));
+        egc.getTrack().getFtsTrack().editorObject.requestListenersNotify(listener_args);
+      }
 		}
 	}
 }
@@ -178,9 +237,11 @@ void selectArea(int x, int y, int w, int h, int modifiers)
 		selectArea(egc.getRenderManager(), egc.getSelection(), x, y,  w,  h);
 	else
 		if( egc.getMarkersSelection() != null)
+    {
 			egc.getMarkersSelection().select( ((AbstractTrackRenderer)egc.getRenderManager()).markersIntersecting(x, y, w, h));
+      notifySelectionToListeners( egc.getMarkersSelection(), "marker");
+    }
 }
-
 
 /**
 * Graphically selects all the objects in a given rectangle, given a Render
@@ -189,8 +250,8 @@ void selectArea(int x, int y, int w, int h, int modifiers)
 public static void selectArea(RenderManager r, SequenceSelection s, int x, int y, int w, int h) 
 {
 	s.select(r.objectsIntersecting(x, y, w, h));
+  notifySelectionToListeners(s, "event");
 }
-
 /**
 * a single object has been selected, in coordinates x, y */
 abstract void singleObjectSelected(int x, int y, int modifiers);
@@ -204,6 +265,5 @@ SequenceSelecter itsSelecter;
 
 Point startingPoint = new Point();
 public static int SHORTCUT = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+protected transient static FtsArgs listener_args = new FtsArgs();
 }
-
-

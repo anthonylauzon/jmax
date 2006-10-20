@@ -496,6 +496,32 @@ track_editor_set_state(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t
   return fts_ok;
 }
 
+static fts_method_status_t
+track_editor_listeners_notify(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  track_editor_t *this = (track_editor_t *)o;
+	if(ac >= 0)
+  {
+    fts_atom_t a[ac];
+    int i = 0;
+    
+    for(i = 0; i < ac; i++)
+    {
+      if(fts_is_a(at+i, event_class))
+      {
+        event_t *evt = (event_t *)fts_get_object(at + i);
+        a[i] = *(event_get_value(evt));
+      }
+      else
+        a[i] = at[i];        
+    }
+    
+    fts_object_call_listeners( (fts_object_t *)this, NULL, ac, a);
+  }	
+  
+  return fts_ok;
+}	
+
 /******************************************************
  *
  *  class
@@ -568,6 +594,7 @@ track_editor_instantiate(fts_class_t *cl)
 	fts_class_message_varargs(cl, seqsym_editor_state, track_editor_set_state);
   fts_class_message_varargs(cl, seqsym_props_to_draw, track_editor_set_properties_to_draw);
   fts_class_message_varargs(cl, seqsym_range, track_editor_set_range);
+  fts_class_message_varargs(cl, seqsym_listenersNotify, track_editor_listeners_notify);
 }
 
 FTS_MODULE_INIT(track_editor)

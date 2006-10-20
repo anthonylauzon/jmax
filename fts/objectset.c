@@ -22,10 +22,11 @@
 
 #include <fts/fts.h>
 
-fts_symbol_t objectset_symbol = 0;
+static fts_symbol_t sym___objectset = 0;
+static fts_symbol_t sym_objectset_append = 0;
+static fts_symbol_t sym_objectset_remove = 0;
+
 fts_class_t *fts_objectset_type = 0;
-fts_symbol_t sym_objectset_append = 0;
-fts_symbol_t sym_objectset_remove = 0;
 
 /***********************************************************************
  *
@@ -120,8 +121,8 @@ objectset_instantiate(fts_class_t *cl)
  */
 FTS_MODULE_INIT(objectset)
 {
-  objectset_symbol = fts_new_symbol("__objectset");
+  sym___objectset = fts_new_symbol("__objectset");
   sym_objectset_append = fts_new_symbol("append");
   sym_objectset_remove = fts_new_symbol("remove");
-  fts_objectset_type = fts_class_install(objectset_symbol, objectset_instantiate);
+  fts_objectset_type = fts_class_install(sym___objectset, objectset_instantiate);
 }

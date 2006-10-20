@@ -875,6 +875,22 @@ track_description_function(fts_object_t *o,  fts_array_t *array)
   fts_array_append_symbol(array, fts_class_get_name(type));
 }
 
+static fts_object_t *
+track_guiobject_function(fts_object_t *o)
+{
+  track_t *self = (track_t *)o;
+  
+  if(self->editor == NULL)
+  {
+    fts_atom_t a;
+    fts_set_object(&a, o);
+    self->editor = (track_editor_t *)fts_object_create(track_editor_class, 1, &a);  
+    fts_object_refer((fts_object_t *)self->editor);
+  }
+  
+  return (fts_object_t *)self->editor;
+}
+
 /******************************************************
  *
  *  upload
@@ -1193,8 +1209,8 @@ _track_set_markers(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
       /* we're a normal track: release old markers, set new */
       if(old_markers != NULL)
       {
-        track_object_remove_context(old_markers);
-        fts_object_release(old_markers);
+        track_object_remove_context((fts_object_t *)old_markers);
+        fts_object_release((fts_object_t *)old_markers);
       }
       
       track_object_set_context((fts_object_t *)markers, self);
@@ -1207,7 +1223,7 @@ _track_set_markers(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     }
     else
     {
-      fts_object_error(self, "cannot set marker track for marker track");
+      fts_object_error( o, "cannot set marker track for marker track");
     }
   }
   
@@ -2592,7 +2608,7 @@ track_init(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_at
   self->size = 0;
   self->type = NULL;
   
-  self->gui_listeners = 0;
+  /*self->gui_listeners = 0;*/
   
   self->editor = NULL;
   self->save_editor = 0;
@@ -2656,6 +2672,7 @@ track_instantiate(fts_class_t *cl)
   
   fts_class_set_copy_function(cl, track_copy_function);
   fts_class_set_description_function(cl, track_description_function);
+  fts_class_set_guiobject_function(cl, track_guiobject_function);
   
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
   fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
@@ -2683,9 +2700,9 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, fts_s_destroyEditor, track_destroy_editor);
   fts_class_message_varargs(cl, fts_s_closeEditor, track_close_editor);
   
-  fts_class_message_varargs(cl, fts_s_add_gui_listener, track_add_gui_listener);
+  /*fts_class_message_varargs(cl, fts_s_add_gui_listener, track_add_gui_listener);
   fts_class_message_varargs(cl, fts_s_remove_gui_listener, track_remove_gui_listener);
-  fts_class_message_varargs(cl, fts_s_notify_gui_listeners, track_notify_gui_listeners);
+  fts_class_message_varargs(cl, fts_s_notify_gui_listeners, track_notify_gui_listeners);*/
   
   fts_class_message_number(cl, seqsym_active, track_active);
   

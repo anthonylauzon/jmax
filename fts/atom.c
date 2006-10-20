@@ -32,6 +32,9 @@
 static fts_atom_t __fts_null;
 fts_atom_t *fts_null = NULL;
 
+static fts_atom_t __fts_zero;
+fts_atom_t *fts_zero = NULL;
+
 static fts_atom_t __fts_nix;
 fts_atom_t *fts_nix = NULL;
 
@@ -203,7 +206,9 @@ static fts_class_t VAR =                                        \
   0, /* description_function */                                 \
   0, /* copy_function */                                        \
   0, /* array_function */                                       \
-  { 0, 0, 0, 0 }, /* fts_hashtable_t import_handlers */		\
+  0, /* spost_function */                                       \
+  0, /* guiobject_function */                                   \
+  { 0, 0, 0, 0 }, /* fts_hashtable_t import_handlers */		      \
   { 0, 0, 0, 0 }, /* fts_hashtable_t export_handlers */         \
   0, /* instantiate_fun */                                      \
   0, /* constructor */                                          \
@@ -230,6 +235,9 @@ FTS_PRIMITIVE_CLASS(string_class, FTS_TYPEID_STRING);
 
 FTS_MODULE_INIT(atom)
 {
+  fts_zero = &__fts_zero;
+  fts_set_int( &__fts_zero, 0);
+  
   fts_void_class = fts_shared_get(fts_s_void);
   
   if(fts_void_class == NULL)

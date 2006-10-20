@@ -150,8 +150,8 @@ struct fts_object_loader
 
 static fts_class_t *object_dumper_class = NULL;
 static fts_class_t *object_loader_class = NULL;
-static fts_symbol_t sym_dash_obj = NULL;
-static fts_symbol_t sym_dash_mess = NULL;
+static fts_symbol_t sym_hash_obj = NULL;
+static fts_symbol_t sym_hash_mess = NULL;
 
 static fts_symbol_t
 id_to_symbol(int id)
@@ -249,7 +249,7 @@ object_dumper_dump_object(fts_object_dumper_t *dumper, fts_object_t *obj, int id
   
   /* write dump message #obj <id> <class name> [<args> ...] */
   if(dumper->line_dumper != NULL)
-    fts_dumper_send(dumper->line_dumper, sym_dash_obj, ac, at);
+    fts_dumper_send(dumper->line_dumper, sym_hash_obj, ac, at);
   else
   {
     fts_post("#obj ");
@@ -312,7 +312,7 @@ object_dumper_send(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     }
     
     if(self->line_dumper != NULL)
-      fts_dumper_send(self->line_dumper, sym_dash_mess, ac + 2, args);
+      fts_dumper_send(self->line_dumper, sym_hash_mess, ac + 2, args);
     else
     {
       fts_post("#mess ");
@@ -570,8 +570,8 @@ object_loader_instantiate(fts_class_t *cl)
 {
   fts_class_init(cl, sizeof(fts_object_loader_t), object_loader_init, object_loader_delete);
   
-  fts_class_message_varargs(cl, sym_dash_obj, object_loader_restore_object);
-  fts_class_message_varargs(cl, sym_dash_mess, object_loader_restore_message);
+  fts_class_message_varargs(cl, sym_hash_obj, object_loader_restore_object);
+  fts_class_message_varargs(cl, sym_hash_mess, object_loader_restore_message);
 }
 
 static void
@@ -651,8 +651,8 @@ FTS_MODULE_INIT(dumper)
 {
   object_dumper_class = fts_class_install(NULL, object_dumper_instantiate);
   object_loader_class = fts_class_install(NULL, object_loader_instantiate);
-  sym_dash_obj = fts_new_symbol("#obj");
-  sym_dash_mess = fts_new_symbol("#mess");;
+  sym_hash_obj = fts_new_symbol("#obj");
+  sym_hash_mess = fts_new_symbol("#mess");;
 }
 
 /** EMACS **

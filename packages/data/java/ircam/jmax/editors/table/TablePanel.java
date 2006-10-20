@@ -94,7 +94,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     itsCenterPanel.setGraphicContext(gc);
 		
     prepareVerticalRuler();
-      
+    
     //... the renderer
     itsTableRenderer = new TableRenderer(gc);
     itsCenterPanel.setRenderer(itsTableRenderer);
@@ -146,7 +146,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
             }
             else
               getValuesTimer.restart();
-
+            
             oldVisibleScope = visibleScope;
           }
         }        
@@ -213,10 +213,10 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
     itsCenterPanel = new TableDisplay(this); 
     itsCenterPanel.setBackground(Color.white);
     itsCenterPanel.setBorder(new EtchedBorder());
-
+    
     /*add(itsCenterPanel, BorderLayout.CENTER);
     validate();*/
-
+    
     firstCenterPanel = new JPanel();
     firstCenterPanel.setLayout(new BoxLayout(firstCenterPanel, BoxLayout.X_AXIS));
     //aPanel.add(Box.createHorizontalStrut(2));
@@ -286,7 +286,7 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
         int last = gc.getFtsObject().getLastVisibleIndex();
         int first = gc.getFtsObject().getFirstVisibleIndex();
         int size = gc.getFtsObject().getSize();
-                
+        
 				gc.getAdapter().setXTransposition(hScrollVal);
 				gc.getFtsObject().requestSetVisibleWindow(gc.getVisibleHorizontalScope(), gc.getFirstVisibleIndex(), 
 																									gc.getWindowHorizontalScope(), gc.getAdapter().getXZoom(), 
@@ -298,16 +298,16 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
             int end = gc.getFtsObject().getLastVisibleIndex();
             gc.getFtsObject().requestGetValues(last, end, true);            
 					}	    
-          else
-          {
-            int end = gc.getFtsObject().getFirstVisibleIndex();
-            gc.getFtsObject().requestGetValues(first, end, true);/* INVERTED! to see negative scroll */
-          }
-        else
-				{
-					int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
-					gc.getFtsObject().requestGetPixels(deltax, -hDelta);                 
-				}
+            else
+            {
+              int end = gc.getFtsObject().getFirstVisibleIndex();
+              gc.getFtsObject().requestGetValues(first, end, true);/* INVERTED! to see negative scroll */
+            }
+            else
+            {
+              int deltax =  gc.getAdapter().getX(0)-gc.getAdapter().getX(hDelta); 
+              gc.getFtsObject().requestGetPixels(deltax, -hDelta);                 
+            }
       }
 		});
     
@@ -333,9 +333,9 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		{
 			int last = gc.getLastVisibleIndex();
 			int first = gc.getFirstVisibleIndex();
-
+      
       itsHorizontalControl.setEnabled(true);			
-		
+      
       if(tableData.getSize() > 0)
 				itsHorizontalControl.setMaximum(tableData.getSize()-1);
       itsHorizontalControl.setVisibleAmount(extent);
@@ -407,10 +407,10 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
 		}
     SwingUtilities.invokeLater(new Runnable() {
 	    public void run()
-      {
+    {
         updateHorizontalScrollbar();
         itsCenterPanel.repaint();
-      }
+    }
     });
   }
   public void tableUpdated()
@@ -480,13 +480,13 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   public void Undo()
   {
     try 
-    {
-      ((UndoableData) gc.getFtsObject()).undo();
-    } catch (CannotUndoException e1) {
-      System.out.println("can't undo");	
-    }
+  {
+    ((UndoableData) gc.getFtsObject()).undo();
+  } catch (CannotUndoException e1) {
+    System.out.println("can't undo");	
+  }
   } 
-
+  
   public void Redo()
   {
     try 
@@ -609,10 +609,3 @@ public class TablePanel extends JPanel implements TableDataListener, Editor{
   public void saveAs(){}
   public void print(){}
 }
-
-
-
-
-
-
-

@@ -599,6 +599,7 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_message_void   (cl, fts_s_clear, _dict_clear);
   fts_class_message_varargs(cl, fts_s_set, _dict_set);
+  fts_class_message(cl, fts_s_set, dict_class, _dict_set_from_dict);
   
   fts_class_message_varargs(cl, fts_s_remove, _dict_remove);
   fts_class_message_varargs(cl, sym_remove_entries, _dict_remove);

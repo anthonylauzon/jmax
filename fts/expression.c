@@ -652,7 +652,7 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
           }
         }
         
-        return fts_status_format("undefined variable %s", fts_symbol_name(fts_get_symbol(name)));
+        return fts_status_format("undefined name %s", fts_symbol_name(fts_get_symbol(name)));
       }
     }
     else

@@ -134,7 +134,7 @@ fvec_create_row(fmat_t *fmat)
 static void *fvec_editor = NULL;
 
 static void
-fvec_editor_callback (fts_object_t *o, void *e)
+fvec_editor_callback (fts_object_t *o, void *e, fts_symbol_t s, int ac, const fts_atom_t *at)
 {
   if(fts_object_is_a(o, fvec_class))
   {

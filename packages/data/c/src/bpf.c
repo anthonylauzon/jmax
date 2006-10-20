@@ -565,19 +565,10 @@ _bpf_set_from_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     else
     {
       double time = 0.0;
-      double last_value = ptr[0] - 1.0;
       int i;
       
       for(i=0; i<m; i++)
-      {
-        double value = ptr[i];
-        
-        if(value != last_value)
-          bpf_append_point(this, time, value);
-        
-        time += 1.0;
-        last_value = value;
-      }
+        bpf_append_point(this, time, ptr[i]);
     }
   }
   else

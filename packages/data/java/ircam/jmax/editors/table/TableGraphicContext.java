@@ -247,10 +247,3 @@ public class TableGraphicContext extends GraphicContext{
   JLabel display, info;
 }
 
-
-
-
-
-
-
-
