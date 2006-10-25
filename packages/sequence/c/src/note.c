@@ -246,15 +246,15 @@ _scoob_stretch(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, ft
  * MIDI properties 
  */
 void
-scoob_set_velocity(scoob_t *self, int velocity)
+scoob_set_velocity(scoob_t *self, double velocity)
 {
   fts_atom_t a;
   
-  fts_set_int(&a, velocity);
+  fts_set_float(&a, velocity);
   scoob_property_set_by_index(self, scoob_propidx_velocity, &a);
 }
 
-int
+double
 scoob_get_velocity(scoob_t *self)
 {
   fts_atom_t a;
@@ -263,9 +263,11 @@ scoob_get_velocity(scoob_t *self)
   scoob_property_get_by_index(self, scoob_propidx_velocity, &a);
   
   if(fts_is_int(&a))
-    return fts_get_int(&a);
+    return (float)fts_get_int(&a);
+  else if(fts_is_float(&a))
+    return fts_get_float(&a);
   else
-    return -1;
+    return (double)-1.0;
 }
 
 void
@@ -384,7 +386,7 @@ scoob_instantiate(fts_class_t *cl)
   /* types and properties */
   propobj_class_init(cl);
   
-  propobj_class_add_int_property(cl, seqsym_velocity, NULL); /* scoob_propidx_velocity = 0 */
+  propobj_class_add_float_property(cl, seqsym_velocity, NULL); /* scoob_propidx_velocity = 0 */
   propobj_class_add_int_property(cl, seqsym_channel, NULL); /* scoob_propidx_channel = 1 */
   propobj_class_add_int_property(cl, seqsym_cue, NULL);
   propobj_class_add_float_property(cl, seqsym_offset, NULL);

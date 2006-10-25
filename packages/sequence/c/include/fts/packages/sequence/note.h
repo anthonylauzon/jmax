@@ -174,21 +174,21 @@ double scoob_get_duration(scoob_t *scoob);
 #endif
 
 /** 
- * @fn void scoob_set_velocity(scoob_t *self, int velocity)
+ * @fn void scoob_set_velocity(scoob_t *self, double velocity)
  * @brief set scoob velocity 
  * @param scoob the scoob
  * @param velocity new velocity
  * @ingroup scoob 
  */
-FTS_API void scoob_set_velocity(scoob_t *self, int velocity);
+FTS_API void scoob_set_velocity(scoob_t *self, double velocity);
 /** 
- * @fn int scoob_get_velocity(scoob_t *self)
+ * @fn double scoob_get_velocity(scoob_t *self)
  * @brief get scoob velocity 
  * @param scoob the scoob
  * @return scoob velocity
  * @ingroup scoob 
  */
-FTS_API int scoob_get_velocity(scoob_t *self);
+FTS_API double scoob_get_velocity(scoob_t *self);
 /** 
  * @fn void scoob_set_channel(scoob_t *self, int channel)
  * @brief set scoob channel 
@@ -230,21 +230,21 @@ void scoob_set_type_by_index(scoob_t *scoob, int index);
 
 /* scoob default MIDI properties */
 /** 
- * @fn void scoob_set_velocity(scoob_t *scoob, int velocity)
+ * @fn void scoob_set_velocity(scoob_t *scoob, double velocity)
  * @brief set scoob velocity 
  * @param scoob the scoob
  * @param velocity new velocity
  * @ingroup scoob 
  */
-FTS_API void scoob_set_velocity(scoob_t *scoob, int velocity);
+FTS_API void scoob_set_velocity(scoob_t *scoob, double velocity);
 /** 
- * @fn int scoob_get_velocity(scoob_t *scoob)
+ * @fn double scoob_get_velocity(scoob_t *scoob)
  * @brief get scoob velocity 
  * @param scoob the scoob
  * @return scoob velocity
  * @ingroup scoob 
  */
-FTS_API int scoob_get_velocity(scoob_t *scoob);
+FTS_API double scoob_get_velocity(scoob_t *scoob);
 /** 
  * @fn void scoob_set_channel(scoob_t *scoob, int channel)
  * @brief set scoob channel 

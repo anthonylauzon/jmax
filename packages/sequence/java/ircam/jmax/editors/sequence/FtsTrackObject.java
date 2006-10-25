@@ -1060,7 +1060,7 @@ public void moveEvent(TrackEvent event, double newTime)
 {
 	args.clear();
 	args.add(event);
-	
+  
 	try{
 		send( FtsSymbol.get("removeEvents"), args);
 	}
@@ -1076,7 +1076,7 @@ public void deleteEvents(Enumeration events)
 	args.clear();
 	for (Enumeration e = events; e.hasMoreElements();) 
 		args.add((TrackEvent) e.nextElement());
-	
+	  
 	try{
 		send( FtsSymbol.get("removeEvents"), args);
 	}
@@ -1764,7 +1764,8 @@ public void restoreEditorState()
   if( editorObject!=null && editorObject.haveContent())
   {
     if(!isInSequence() && getEditorFrame()!=null)
-      getEditorFrame().setBounds(editorObject.wx, editorObject.wy, editorObject.ww, editorObject.wh);
+      ((TrackWindow)getEditorFrame()).restoreWindowSize(editorObject.wx, editorObject.wy, editorObject.ww, editorObject.wh);
+  
     notifyRestoreEditorState(editorObject);
   }
 }

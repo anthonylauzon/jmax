@@ -54,7 +54,7 @@ Object pitch, duration, velocity, channel, ambitus;
 
 public void setProperty(String name, Object value)
 {  
-	if(name.equals("pitch"))
+  if(name.equals("pitch"))
 	{
 		/*if(value instanceof Double)
 			value = new Integer( ((Double)value).intValue());
@@ -69,11 +69,15 @@ public void setProperty(String name, Object value)
 	else if(name.equals("duration"))
 		duration = value;
 	else if(name.equals("velocity"))
+  {
 		velocity = value;
-	else if(name.equals("channel"))
+    
+  }
+  else if(name.equals("channel"))
 		channel = value;
 	//else
-	super.setProperty(name, value);
+  
+  super.setProperty(name, value);
 }
 public Object getProperty(String name)
 {
