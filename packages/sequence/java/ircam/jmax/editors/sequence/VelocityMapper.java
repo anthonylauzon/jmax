@@ -26,30 +26,30 @@ import ircam.jmax.editors.sequence.track.*;
 /**
  * a mapper into the velocity value of the SequenceEvents
  */
-public class VelocityMapper extends Mapper {
+public class VelocityMapper extends DoubleMapper {
   
   /**
    * set the given velocity in the given event
    */
-    public void set(Event e, int value) 
+  public void set(Event e, double value) 
   {
-    e.setProperty("velocity", new Integer(value));
+    e.setProperty("velocity", new Double(value));
   }
   
   /**
    * get the velocity of the given event
    */
-    public int get(Event e) 
+  public double get(Event e) 
   {
-    return ((Integer)e.getProperty("velocity")).intValue();
+    return ((Double)e.getProperty("velocity")).doubleValue();
   }
 
-    public String getName()
-    {
-	return "velocity";
-    }
+  public String getName()
+  {
+    return "velocity";
+  }
 
-  static public Mapper getMapper()
+  static public DoubleMapper getMapper()
   {
     return itsVelocityMapper;
   }

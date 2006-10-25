@@ -178,7 +178,7 @@ scoobtrack_read_midievent(fts_midifile_t *file, fts_midievent_t *midievt)
       fts_set_float(a + 2, 0.0);
       scoob = (scoob_t *)fts_object_create(scoob_class, 3, a);
       
-      scoob_set_velocity(scoob, velocity);
+      scoob_set_velocity(scoob, (double)velocity);
       scoob_set_channel(scoob, channel);
       
       /* create a new event with the scoob */
@@ -374,7 +374,7 @@ seqmidi_write_note_on(fts_midifile_t *file, double time, scoob_t *scoob)
 {
   seqmidi_write_data_t *data = (seqmidi_write_data_t *)fts_midifile_get_user_data(file);
   int pitch = scoob_get_pitch(scoob);
-  int velocity = scoob_get_velocity(scoob);
+  int velocity = (int) scoob_get_velocity(scoob);
   int channel = scoob_get_channel(scoob);
   double off_time = time + scoob_get_duration(scoob);
   long time_in_ticks = fts_midifile_time_to_ticks(file, time);

@@ -51,6 +51,9 @@ public class TrackWindow extends JMaxEditor {
   public final static int DEFAULT_HEIGHT = 553;
   public final static int MAX_HEIGHT     = 800;
   public final static int EMPTY_HEIGHT   = 94;
+  public final static int MENUBAR_HEIGHT = 15;
+  
+  boolean editorStateRestored = false;
   /**
 		* Constructor with FtsSequenceObject
    */
@@ -88,6 +91,7 @@ public class TrackWindow extends JMaxEditor {
     Rectangle bounds = copyWin.getBounds();
     copyWin.getContentPane().remove( trackPanel);
     getContentPane().add( trackPanel);
+    editorStateRestored = copyWin.editorStateRestored;
     
     makeTrackWindow();
     
@@ -152,7 +156,10 @@ public class TrackWindow extends JMaxEditor {
     trackData.addTrackStateListener(new TrackStateListener(){
 			public void lock(boolean lock){}
 			public void active(boolean active){}
-			public void restoreEditorState(FtsTrackEditorObject editorState){}
+			public void restoreEditorState(FtsTrackEditorObject editorState)
+      {
+        editorStateRestored = true;
+      }
 			public void hasMarkers(FtsTrackObject markers, SequenceSelection markersSelection){}
 			public void updateMarkers(FtsTrackObject markers, SequenceSelection markersSelection){}
       public void ftsNameChanged(String name)
@@ -208,6 +215,12 @@ public class TrackWindow extends JMaxEditor {
     return simpleMenu; 
   }  
   
+  public void restoreWindowSize(int wx, int wy, int ww, int wh)
+  {
+    setBounds( wx, wy, ww, wh);
+    setPreferredSize(new Dimension(ww, wh));
+    trackPanel.setPreferredSize(new Dimension(ww-4, wh-SequenceRuler.RULER_HEIGHT-MENUBAR_HEIGHT));
+  }
   // ------ JMaxEditor ---------------
   public Editor getEditor(){
     return trackPanel;
