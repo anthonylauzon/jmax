@@ -802,13 +802,14 @@ fmat_set_from_list(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
 {
   fmat_t *self = (fmat_t *)o;
   
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  int size = m * n;
+  
   if(ac > 2 && fts_is_number(at) && fts_is_number(at + 1))
   {
-    int m = fmat_get_m(self);
-    int n = fmat_get_n(self);
     int i = fts_get_number_int(at);
     int j = fts_get_number_int(at + 1);
-    int size = m * n;
     int onset;
     
     ac -= 2;
