@@ -146,6 +146,7 @@ PREDEF_SYMBOL( fts_s_unique,  "unique")
 
 PREDEF_SYMBOL( fts_s_ping,  "ping")
 
+PREDEF_SYMBOL( fts_s_version, "version")
 PREDEF_SYMBOL( fts_s_undefined, "undefined")
 PREDEF_SYMBOL( fts_s_internal, "internal")
 PREDEF_SYMBOL( fts_s_input, "input")
