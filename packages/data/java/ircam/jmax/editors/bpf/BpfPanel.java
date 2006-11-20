@@ -146,6 +146,7 @@ public class BpfPanel extends JPanel implements Editor, BpfDataListener, ListSel
   {
     itsContainer = cont;
     editor.getGraphicContext().setFrame(itsContainer.getFrame());
+    editor.resetListDialog();
     manager.addContextSwitcher(new WindowContextSwitcher(editor.getGraphicContext().getFrame(), editor.getGraphicContext()));
   }
   

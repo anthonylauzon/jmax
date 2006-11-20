@@ -269,6 +269,14 @@ private void createListDialog()
   listDialog = new BpfTableDialog(gc.getFrame(), gc);
 }
 
+public void resetListDialog()
+{
+  if(listDialog!=null)
+  {
+    gc.getDataModel().removeBpfListener(listDialog);
+    listDialog = null;
+  }
+}
 public void updateNewObject(Object obj){};
 
 void updateEventProperties(Object whichObject, String propName, Object propValue){}
