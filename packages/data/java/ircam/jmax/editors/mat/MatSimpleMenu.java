@@ -116,9 +116,10 @@ public class MatSimpleMenu extends EditorMenu implements ListSelectionListener
             
     add( new EditorAction("Close", "close", KeyEvent.VK_C, KeyEvent.VK_W, true){
       public void doAction(EditorContainer container)
-      {
+      {        
+        MaxWindowManager.getWindowManager().removeWindow(container.getFrame());
         container.getEditor().close(true);
-        System.gc();
+        System.gc();        
       }
     });
   }

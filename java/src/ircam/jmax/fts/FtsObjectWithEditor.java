@@ -117,9 +117,12 @@ public void showEditor(boolean firstTime)
         SwingUtilities.invokeLater(new Runnable() {
           public void run()
           {   
-            reinitEditorFrame();
-            editorFrame.setVisible(true);
-            MaxWindowManager.getWindowManager().addWindow(editorFrame);
+            if(!editorFrame.isVisible())//bug fix
+            { 
+              reinitEditorFrame();
+              editorFrame.setVisible(true);
+              MaxWindowManager.getWindowManager().addWindow(editorFrame);
+            }
           }
         });
       }
@@ -198,6 +201,8 @@ public void openEditor(int argc, FtsAtom[] argv)
 }
 public abstract void createEditor();
 public abstract void destroyEditor();
+
+public boolean doingOpenEditor(){return false;}
 
 private transient Frame editorFrame = null;
 }

@@ -123,6 +123,7 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
   
   /**/
   boolean firstTime = true;
+  boolean doing_open_editor = false;
   public void openEditor(int argc, FtsAtom[] argv)
   {  
     if(getEditorFrame() == null)
@@ -132,11 +133,19 @@ public class FtsMatObject extends FtsObjectWithEditor implements MatDataModel
     }
     else
       firstTime = false;
+    
+    doing_open_editor = true;
+  }  
+  
+  public boolean doingOpenEditor()
+  {
+    return doing_open_editor;
   }  
   
   public void showEditor()
   {
     showEditor(firstTime);
+    doing_open_editor = false;
   }
   
   /**/

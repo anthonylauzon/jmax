@@ -83,8 +83,9 @@ public class FtsFmatObject extends FtsObjectWithEditor
   }
     
   boolean firstTime = true;
+  boolean doing_open_editor = false;
   public void openEditor(int argc, FtsAtom[] argv)
-  {  
+  {      
     if(getEditorFrame() == null)
     {
       createEditor();// rest moved in endUpload   
@@ -92,6 +93,13 @@ public class FtsFmatObject extends FtsObjectWithEditor
     }
     else
       firstTime = false;
+    
+    doing_open_editor = true;
+  }
+
+  public boolean doingOpenEditor()
+  {
+    return doing_open_editor;
   }
 
   public void destroyEditor()
@@ -103,6 +111,7 @@ public class FtsFmatObject extends FtsObjectWithEditor
   public void showEditor()
   {
     showEditor(firstTime);
+    doing_open_editor = false;
   }
   
   public Dimension getDefaultSize()

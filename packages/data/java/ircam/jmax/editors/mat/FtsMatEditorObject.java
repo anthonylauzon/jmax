@@ -182,8 +182,11 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
     SwingUtilities.invokeLater(new Runnable(){
       public void run()
       {
-        ((FtsObjectWithEditor)matrix).showEditor();
-        FtsObject.requestResetGui();
+        if(((FtsObjectWithEditor)matrix).doingOpenEditor())
+        {
+          ((FtsObjectWithEditor)matrix).showEditor();
+          FtsObject.requestResetGui();
+        }
         uploading = false;
         notifyUpload(false);
       } 

@@ -100,8 +100,8 @@ public class JMaxMatTable extends JTable
     getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteSelection");
     getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "deleteSelection");
     getActionMap().put("deleteSelection", new DeleteSelectionAction(this));
-    getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "hide");
-    getActionMap().put("hide", new HideAction(this));
+    /*getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "hide");
+    getActionMap().put("hide", new HideAction(this));*/
   
     /*addMouseListener( new MouseAdapter() {
 			public void mouseEntered(MouseEvent e)

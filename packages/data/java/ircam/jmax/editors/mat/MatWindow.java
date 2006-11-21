@@ -216,7 +216,6 @@ public class MatWindow extends JMaxEditor {
     
     return simpleMenu; 
   }  
-    
   // ------ JMaxEditor  ---------------
   public Editor getEditor(){
     return itsMatPanel;
