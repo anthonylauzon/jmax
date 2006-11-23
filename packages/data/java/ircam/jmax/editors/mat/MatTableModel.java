@@ -94,7 +94,10 @@ public int getRowCount() {
 
 public Object getValueAt(int row, int col) 
 { 
-  return  model.getValueAt(row, col);
+  if(row < getRowCount() && col < getColumnCount())
+    return  model.getValueAt(row, col);
+  else
+    return null;
 }
 
 public MatDataModel getMatDataModel()

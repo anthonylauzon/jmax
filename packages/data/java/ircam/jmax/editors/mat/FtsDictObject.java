@@ -158,7 +158,7 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   }
 
   public void set(int nArgs , FtsAtom args[])
-  {        
+  {            
     if(nArgs > 2)
     {
       int m = args[0].intValue;
