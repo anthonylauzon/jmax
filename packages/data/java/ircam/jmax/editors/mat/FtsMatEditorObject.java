@@ -499,6 +499,11 @@ public class FtsMatEditorObject extends FtsUndoableObject implements MatDataMode
     return defaultSize;
   }
   
+  
+  public FtsGraphicObject getFtsMatrixObject()
+  {
+    return (FtsGraphicObject)matrix;
+  }
   /********************************************************************
     * notifications
     */

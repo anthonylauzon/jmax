@@ -74,6 +74,8 @@ public interface MatDataModel {
     
     public abstract void requestExport();
     public abstract void requestImport();
+
+    public FtsGraphicObject getFtsMatrixObject();
 }
 
 

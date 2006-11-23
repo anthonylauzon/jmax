@@ -446,6 +446,11 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
   {
     return defaultSize;
   }
+  
+  public FtsGraphicObject getFtsMatrixObject()
+  {
+    return (FtsGraphicObject)this;
+  }
  /********************************************************************
   * notifications
   */

@@ -4261,15 +4261,13 @@ fmat_delete(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
   if(self->values != NULL)
     fts_free(self->values - HEAD_POINTS);
   
+  if(self->editor != NULL)
+    fts_object_release(self->editor);
+  
   return fts_ok;
 }
 
 /** @} end of fmatmess */
-
-
-
-
-
 
 /*********************************************************
  *

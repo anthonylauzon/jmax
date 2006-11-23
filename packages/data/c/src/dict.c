@@ -268,7 +268,7 @@ dict_upload_data(dict_t *self)
  
         fts_client_upload_object(dobj, fts_object_get_client_id((fts_object_t *)self));
         
-        fts_send_message(dobj, fts_s_update_gui, 0, 0, fts_nix);
+        /*fts_send_message(dobj, fts_s_update_gui, 0, 0, fts_nix);*/
         
         fts_set_object(&a[2+i], dobj);
       }

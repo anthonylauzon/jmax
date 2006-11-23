@@ -283,7 +283,7 @@ mat_upload_from_index(mat_t *self, int row_id, int col_id, int size, int upload)
         
         fts_client_upload_object(dobj, fts_object_get_client_id((fts_object_t *)self));
         
-        fts_send_message(dobj, fts_s_update_gui, 0, 0, fts_nix);
+        /*fts_send_message(dobj, fts_s_update_gui, 0, 0, fts_nix);*/
         
         fts_set_object(&a[2+i], dobj);               
       }

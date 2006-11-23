@@ -185,8 +185,8 @@ public class MatWindow extends JMaxEditor {
     if(name != null && !name.equals(""))
       title = matData.getType() +"  "+name;
     else
-      title = matData.getType() +" #"+((FtsGraphicObject)matData).getObjectID();
-      
+      title = matData.getType() +" #"+matData.getFtsMatrixObject().getObjectID();
+
     if( !getTitle().equals(title))
     {
       setTitle( MaxWindowManager.getWindowManager().makeUniqueWindowTitle(title));    
