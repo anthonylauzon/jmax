@@ -1759,14 +1759,16 @@ public void destroyEditor()
   System.gc();
 }
 
+boolean editorRestored = false;
 public void restoreEditorState()
 {  
   if( editorObject!=null && editorObject.haveContent())
   {
     if(!isInSequence() && getEditorFrame()!=null)
-      ((TrackWindow)getEditorFrame()).restoreWindowSize(editorObject.wx, editorObject.wy, editorObject.ww, editorObject.wh);
+      ((TrackWindow)getEditorFrame()).restoreWindowSize(editorObject.wx, editorObject.wy, editorObject.ww, editorObject.wh-1);
   
     notifyRestoreEditorState(editorObject);
+    editorRestored = true;
   }
 }
 
@@ -1783,14 +1785,19 @@ void endUpload()
 {
   uploading = false;
   uploadingSize = 0;
-	SwingUtilities.invokeLater(new Runnable() {
-    public void run()
-    { 
-      if( saveEditor)
-        restoreEditorState();
-      notifyUploadEnd();
-    }
-  });
+  if(!editorRestored)
+  {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run()
+      {  
+        if( saveEditor)
+          restoreEditorState();
+        notifyUploadEnd();
+        editorRestored = false;
+      }
+    });
+  }
+  else editorRestored = false;
 }
 
 public boolean isUploading()

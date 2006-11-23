@@ -604,7 +604,7 @@ public class FtsGraphicObject extends FtsObject {
     this.varName = name;
     if(getObjectListener() != null)
       ((GraphicObject)getObjectListener()).setCurrentName( name);
-    
+        
     nameChanged(name);
   }
 

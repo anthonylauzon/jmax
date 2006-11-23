@@ -76,6 +76,7 @@ public class TrackWindow extends JMaxEditor {
       size.height+=(getJMenuBar().getPreferredSize().height + SequenceRuler.RULER_HEIGHT + 7);
       setSize(size);
     }
+    validate();
   }
   
   public TrackWindow(TrackWindow copyWin)
@@ -99,7 +100,7 @@ public class TrackWindow extends JMaxEditor {
     copyWin.dispose();
     System.gc();
   }
-	
+  
   private void makeTrackWindow()
   {
     makeTitle();
@@ -167,19 +168,6 @@ public class TrackWindow extends JMaxEditor {
       }
 		});		
   }
-  
-  /*public void setVisible(boolean vis)
-  {
-    super.setVisible(vis);
-   
-    if(editorStateRestored && vis)
-    {
-      editorStateRestored = false;
-      validate();
-      pack();
-      repaint();
-    }
-  }*/
   
   private final void makeTitle(){
     setWindowName( trackData.getFtsName());

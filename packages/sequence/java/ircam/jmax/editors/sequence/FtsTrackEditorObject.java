@@ -129,7 +129,12 @@ public void setEditorState( int nArgs, FtsAtom args[])
 			this.label = label; this.zoom = zoom; this.transp = transp; 
 			this.view = view; this.rangeMode = rMode;
       this.rangeMin = rMin; this.rangeMax = rMax;
-			trackObj.restoreEditorState();   
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+       { 
+        trackObj.restoreEditorState();
+       }
+      });      
  		}
   }
   else
@@ -151,7 +156,11 @@ public void setEditorState( int nArgs, FtsAtom args[])
 			this.label = label; 
 			this.view = view; this.rangeMode = rMode;
       this.rangeMin = rMin; this.rangeMax = rMax;
-      trackObj.restoreEditorState();   		
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run()
+        { 
+          trackObj.restoreEditorState();   		
+        }});
     }
   }
 }

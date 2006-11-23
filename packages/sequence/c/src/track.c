@@ -2186,21 +2186,6 @@ _track_upload(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
 }
 
 static fts_method_status_t
-track_update_gui(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
-{
-  track_t *self = (track_t *)o;
-  fts_atom_t a;
-  
-  if(self->type != NULL)
-  {
-    fts_set_symbol(&a, fts_class_get_name(self->type));
-    fts_client_send_message(o, fts_s_type, 1, &a);
-  }
-  
-  return fts_ok;
-}
-
-static fts_method_status_t
 _track_get_duration(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   track_t *self = (track_t *)o;
@@ -2677,7 +2662,6 @@ track_instantiate(fts_class_t *cl)
   fts_class_message_varargs(cl, seqsym_set_editor, track_set_editor_at_client);
   
   fts_class_message_varargs(cl, fts_s_dump_state, track_dump_state);
-  fts_class_message_varargs(cl, fts_s_update_gui, track_update_gui);
 
   /* persistence compatibility */
   fts_class_message_varargs(cl, seqsym_add_event, track_compatible_add_event_from_file);

@@ -361,6 +361,38 @@ _dict_remove(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
 }
 
 static fts_method_status_t
+_dict_rename(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  dict_t *self = (dict_t *)o;
+  int i;
+  fts_atom_t value;
+  
+  if(ac == 2)
+  {
+    if(fts_hashtable_get(&self->hash, at, &value))
+    {
+      fts_atom_release(at);
+      fts_hashtable_remove(&self->hash, at);
+      
+      dict_store(self, at+1, &value);
+    }
+  
+    fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+  
+    if(dict_editor_is_open(self))
+      dict_upload(self);
+  
+    /* return ourselves */
+    fts_object_changed(o);
+  
+    fts_set_object(ret, o);
+  }
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
 _dict_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
   dict_t *self = (dict_t *)o;
@@ -600,6 +632,8 @@ dict_instantiate(fts_class_t *cl)
   fts_class_message_void   (cl, fts_s_clear, _dict_clear);
   fts_class_message_varargs(cl, fts_s_set, _dict_set);
   fts_class_message(cl, fts_s_set, dict_class, _dict_set_from_dict);
+  
+  fts_class_message_varargs(cl, fts_new_symbol("rename"), _dict_rename);
   
   fts_class_message_varargs(cl, fts_s_remove, _dict_remove);
   fts_class_message_varargs(cl, sym_remove_entries, _dict_remove);

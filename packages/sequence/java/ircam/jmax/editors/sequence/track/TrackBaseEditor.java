@@ -602,7 +602,7 @@ public void paintComponent(Graphics g)
   if( !track.getFtsTrack().isUploading() || (track.getFtsTrack().isUploading() && (track.getFtsTrack().getUploadingSize() <= 0)))
     renderer.render(g, r);
   else
-    SwingUtilities.paintComponent(g, getProgressBar(), this, r.x+50, r.y+r.height/2-10, r.width-100, 20);
+    SwingUtilities.paintComponent(g, getProgressBar(), this, r.x+50, r.y+r.height/2-10, r.width-100, 20);  
 }
 public void forceBackgroundRepaint()
 {

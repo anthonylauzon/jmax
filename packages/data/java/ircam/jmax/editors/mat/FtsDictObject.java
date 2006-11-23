@@ -252,50 +252,52 @@ public class FtsDictObject extends FtsObjectWithEditor implements MatDataModel
     
     if(columnIndex == 0)
     {
+      Object key = getValueAt(rowIndex, 0);
       Object val = getValueAt(rowIndex, 1);
       
-      /* remove old key entry */
-      args.add( getValueAt(rowIndex, 0));
+      if((key instanceof String && aValue instanceof String && ((String)key).equals((String)aValue)) || 
+         (key instanceof FtsSymbol && aValue instanceof String && ((FtsSymbol)key).toString().equals((String)aValue)) ||
+         (key == aValue))
+        return;
+        
+      args.add( key);
+      if(aValue instanceof String)
+        args.addSymbol( FtsSymbol.get((String) aValue));
+      else
+        args.add( aValue);
       try{
-        send( FtsSymbol.get("remove"), args);
+        send( FtsSymbol.get("rename"), args);
       }
       catch(IOException e)
       {
-        System.err.println("FtsDictObject: I/O Error sending remove Message!");
+        System.err.println("FtsDictObject: I/O Error sending rename Message!");
         e.printStackTrace(); 
-      }    
-      
-      /* no new value, only remove entry */
-      if(aValue == null || ((aValue instanceof String) && ((String)aValue).equals("")) )
-        return;
-      
-      /* add new key entry with old value */
-      args.clear();
-      if(aValue instanceof String)
-        args.addSymbol( FtsSymbol.get((String) aValue));
-      else
-        args.add( aValue);
-      
-      args.add(val);
+      } 
     }
     else
     {
-      /* */
+      Object val = getValueAt(rowIndex, 1);
+      if((val instanceof String && aValue instanceof String && ((String)val).equals((String)aValue)) ||
+         (val instanceof FtsSymbol && aValue instanceof String && ((FtsSymbol)val).toString().equals((String)aValue)) ||
+         val == aValue)
+        return;
+      
       args.add( getValueAt(rowIndex, 0));
       
       if(aValue instanceof String)
         args.addSymbol( FtsSymbol.get((String) aValue));
       else
         args.add( aValue);
+  
+      try{
+        send( FtsSymbol.get("set"), args);
+      }
+      catch(IOException e)
+      {
+        System.err.println("FtsDictObject: I/O Error sending set Message!");
+        e.printStackTrace(); 
+      }    
     }
-    try{
-      send( FtsSymbol.get("set"), args);
-    }
-    catch(IOException e)
-    {
-      System.err.println("FtsDictObject: I/O Error sending set Message!");
-      e.printStackTrace(); 
-    }    
   }
   
   public void requestAppendRow()

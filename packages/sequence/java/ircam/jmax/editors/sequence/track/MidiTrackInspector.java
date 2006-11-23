@@ -49,6 +49,7 @@ public class MidiTrackInspector extends JDialog
     trackEditor = editor;
     track = editor.getTrack();
     this.isInSequence = isInSequence;
+    System.err.println(" Ž opaco? "+((JComponent)getContentPane()).isOpaque());
     
     /* root panel */
     JPanel rootPanel = new JPanel();
@@ -295,7 +296,7 @@ public class MidiTrackInspector extends JDialog
   }  
   
   public static void inspect(TrackBaseEditor trackEditor, Frame frame, boolean isInSequence, Point position)
-  {
+  {    
     MidiTrackInspector inspector = new MidiTrackInspector(trackEditor, frame, isInSequence);
     inspector.update();
     inspector.setLocation(frame.getLocation().x + position.x, frame.getLocation().y + position.y);

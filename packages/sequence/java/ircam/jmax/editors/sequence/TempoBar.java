@@ -635,7 +635,7 @@ public void restoreEditorState(FtsTrackEditorObject editorState)
       if(container.getEditorContainer().getFrame().isVisible())
         container.getEditorContainer().getFrame().pack();
       repaint();
-    }
+    }    
     stateRestored = true;
   }
 };

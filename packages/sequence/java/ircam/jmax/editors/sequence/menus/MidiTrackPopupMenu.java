@@ -96,10 +96,10 @@ public class MidiTrackPopupMenu extends TrackBasePopupMenu
     JMenuItem item = new JMenuItem("Inspect ... ");
     item.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e)
-    {
+      {
         MidiTrackInspector.inspect(target, target.getGraphicContext().getFrame(), isInSequence,
                                    SwingUtilities.convertPoint(target, x, y, target.getGraphicContext().getFrame()));
-    }
+      }
     });
     add(item);
   }    
