@@ -381,7 +381,15 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
   int fvec_index = fvec->index;
   int fvec_onset = fvec->onset;
   int fvec_size = fvec->size;
-  
+
+  if (fmat_m * fmat_n == 0)
+  { /* empty matrix -> empty vector */
+    *ptr = NULL;
+    *size = 0;
+    *stride = 0;
+    return;
+  }
+
   switch(fvec->type)
   {
     case fvec_type_column:
@@ -827,7 +835,7 @@ fvec_set_from_atoms(fvec_t *vec, int onset, int ac, const fts_atom_t *at)
   int size;
   int stride;
   int i, j;
-    
+
   fvec_vector((fts_object_t *)vec, &ptr, &size, &stride);
   
   for(i=0, j=onset*stride; i < ac && i < size; i++, j+=stride)
@@ -858,7 +866,7 @@ fvec_set_from_fmat_or_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_at
   
   for(i=0, j=0; i<set_size*stride; i+=stride, j+=set_stride)
     ptr[i] = set[j];
-  
+
   fts_set_object(ret, o);
   
   return fts_ok;
