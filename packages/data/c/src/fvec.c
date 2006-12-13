@@ -463,6 +463,7 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
         fvec_index = fmat_m;
     
       /* column onset */
+
       if(fvec_onset > fmat_n)
         fvec_onset = fmat_n;
       
@@ -1998,7 +1999,7 @@ _fvec_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   
   fvec_get_vector(self, &ptr, &size, &stride);
   
-  if (ptr  &&  size == 0)
+  if (!ptr  ||  size == 0)
     fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
   else
   {
