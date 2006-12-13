@@ -356,14 +356,14 @@ object_imexport(fts_object_t *o, fts_symbol_t mode, int ac, const fts_atom_t *at
   int as = (mode == fts_s_importas || mode == fts_s_exportas);
   int import = (mode == fts_s_import || mode == fts_s_importas);
   
-  /* without name or "-" as name open file chooser */
+  /* without name or "-" as name: open file chooser */
   if (ac == 0  ||  (as  &&  ac == 1))
   { 
     /* no name given */ 
     object_imexport_dialog(o, mode, ac, at);
   }
   else if(ac > 0 && fts_is_symbol(at + as))
-  {
+  { /* name given */
     fts_symbol_t name = fts_get_symbol(at + as);
     
     if (name == fts_s_minus)
