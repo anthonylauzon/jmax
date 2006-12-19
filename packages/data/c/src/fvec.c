@@ -37,8 +37,8 @@
 #define fabsf fabs
 #endif
 
-#define ABS_MIN -3.40282347e+38F
-#define ABS_MAX 3.40282347e+38F
+#define ABS_MIN -3.40282346e+38F 
+#define ABS_MAX 3.40282346e+38F
 #define LOG_MIN -103.28
 #define LOG_ARG_MIN (float)(1.4e-45)
 

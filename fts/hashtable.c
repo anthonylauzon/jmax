@@ -69,6 +69,7 @@ hash( const fts_atom_t *p)
     {
       char *s = fts_get_string( p);
       unsigned int h = 0;
+
       
       while(*s)
       {

@@ -173,35 +173,28 @@ static float hanning( float f)
   return (float)(0.5 - 0.5 * cos(f));
 }
 
-#ifndef HAVE_SINF
-static float sinf( float f)
+static float ff_sin( float f)
 {
-  return (float)sin( f);
+  return (float)sin( (double)f);
 }
-#endif
 
-#ifndef HAVE_COSF
-static float cosf( float f)
+static float ff_cos( float f)
 {
-  return (float)cos( f);
+  return (float)cos( (double)f);
 }
-#endif
 
-#ifndef HAVE_SQRTF
-static float sqrtf (float f)
+static float ff_sqrt (float f)
 {
-  return (float) sqrt(f);
+  return (float) sqrt((double)f);
 }
-#endif
-
 
 FTS_MODULE_INIT(ffuns)
 {
   fts_hashtable_init( &the_fts_ffun_hashtable, FTS_HASHTABLE_SMALL);
 
-  fts_ffun_new( fts_new_symbol( "sin"), sinf);
-  fts_ffun_new( fts_new_symbol( "cos"), cosf);
-  fts_ffun_new( fts_new_symbol( "sqrt"), sqrtf);  
+  fts_ffun_new( fts_new_symbol( "sin"), ff_sin);
+  fts_ffun_new( fts_new_symbol( "cos"), ff_cos);
+  fts_ffun_new( fts_new_symbol( "sqrt"), ff_sqrt);  
 
 #if HAVE_TANF
   fts_ffun_new( fts_new_symbol( "tan"), tanf);

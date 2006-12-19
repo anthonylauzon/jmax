@@ -502,7 +502,7 @@ track_editor_listeners_notify(fts_object_t *o, fts_symbol_t s, int ac, const fts
   track_editor_t *this = (track_editor_t *)o;
 	if(ac >= 0)
   {
-    fts_atom_t a[ac];
+    fts_atom_t a[1024];
     int i = 0;
     
     for(i = 0; i < ac; i++)
