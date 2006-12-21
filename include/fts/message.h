@@ -31,8 +31,8 @@
  *   fts_message_t *mess = (fts_message_t *)fts_object_create(fts_message_class, NULL, ac, at);
  * @endcode
  *
- * @defgroup message message
- * @ingroup fts_obj_class_method_sym
+ * @defgroup message FTS message
+ * @ingroup fts_system
  */
 
 /** 

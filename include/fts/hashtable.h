@@ -32,8 +32,8 @@
  * To construct a big hashtable, it is more efficient to create the hashtable with an initial
  * big capacity; this will avoid a lot of intermediate automatic rehashing.
  *
- * @defgroup hashtable hashtable
- * @ingroup ftm_utils
+ * @defgroup hashtable FTS hashtable
+ * @ingroup fts_utils
  */
 
 typedef struct _fts_hashtable_cell_t fts_hashtable_cell_t;
@@ -196,7 +196,7 @@ FTS_API void fts_hashtable_stats( fts_hashtable_t *h);
 /**
  * Returns an iterator to enumerate the keys contained in the hashtable
  *
- * @fn void fts_hashtable_get_keys( fts_hashtable_t *h, fts_iterator_t *i)
+ * @fn void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i)
  * @brief get iterator on keys
  * @param h the hashtable
  * @param i the iterator
@@ -207,7 +207,7 @@ FTS_API void fts_hashtable_get_keys( const fts_hashtable_t *h, fts_iterator_t *i
 /**
  * Returns an iterator to enumerate the values contained in the hashtable
  *
- * @fn void fts_hashtable_get_values( fts_hashtable_t *h, fts_iterator_t *i)
+ * @fn void fts_hashtable_get_values( const fts_hashtable_t *h, fts_iterator_t *i)
  * @brief get iterator on values
  * @param h the hashtable
  * @param i the iterator

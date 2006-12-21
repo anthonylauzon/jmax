@@ -51,8 +51,8 @@
  for ( fts_atomlist_get_atoms( &h, &i); fts_iterator_has_more( &i); )
  * @endcode
  *
- * @defgroup iterator iterator
- * @ingroup ftm_utils
+ * @defgroup iterator FTS iterator
+ * @ingroup fts_utils
  */
 
 /**

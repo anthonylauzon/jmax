@@ -902,7 +902,6 @@ fmat_set_row(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
     int row = fts_get_number_int(at);
-    int istup = 0;
     
     /* skip index argument */
     ac--;
@@ -936,7 +935,6 @@ fmat_set_col(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
     int m = fmat_get_m(self);
     int n = fmat_get_n(self);
     int col = fts_get_number_int(at);
-    int istup = 0;
 
     /* skip index argument */
     ac--;

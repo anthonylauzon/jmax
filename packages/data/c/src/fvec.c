@@ -1470,9 +1470,9 @@ fvec_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     float f = ptr[i];
     
     if(f > high)
-      f = high;
+      ptr[i] = high;
     else if(f < low)
-      f = low;
+      ptr[i] = low;
   }
   
   fts_set_object(ret, o);
@@ -1741,7 +1741,7 @@ fvec_get_min_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     int mini = 0;
     int i, j;
     
-    for(i=1, j=stride; i<size*stride; i++, j+=stride)
+    for(i=1, j=stride; i<size; i++, j+=stride)
     {
       if(p[j] < min)
       {
@@ -1771,7 +1771,7 @@ fvec_get_max_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     int maxi = 0;
     int i, j;
     
-    for(i=1, j=stride; i<size*stride; i++, j+=stride)
+    for(i=1, j=stride; i<size; i++, j+=stride)
     {
       if (p[j] > max)
       {

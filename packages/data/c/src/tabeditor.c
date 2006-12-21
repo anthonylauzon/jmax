@@ -735,7 +735,7 @@ tabeditor_cut_by_client_request(fts_object_t *o, fts_symbol_t s, int ac, const f
   int pix_size = fts_get_int(at + 1);
   int start = fts_get_int(at + 2);
   int copy_size, size;
-  int i, j;
+  int i;
   
   tabeditor_copy_by_client_request(o, NULL, ac - 2, at + 2, fts_nix);
   if( tabeditor_is_ivec( self))
