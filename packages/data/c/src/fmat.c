@@ -2235,6 +2235,57 @@ fmat_div_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   return fts_ok;
 }
 
+
+static fts_method_status_t
+fmat_pow_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *)o;
+  fmat_t *right = (fmat_t *)fts_get_object(at);
+  int m = fmat_get_m(self);
+  int n = fmat_get_n(self);
+  
+  if(m > fmat_get_m(right))
+    m = fmat_get_m(right);
+  
+  if(fmat_get_n(right) == n)
+  {
+    float *l = fmat_get_ptr(self);
+    float *r = fmat_get_ptr(right);
+    int size = m * n;
+    int i;
+    
+    for(i=0; i<size; i++)
+      l[i] = pow(l[i], r[i]);
+
+    fts_object_changed(o);
+    fts_set_object(ret, o);
+  }
+  else
+    fmat_error_dimensions(self, right, "pow");
+  
+  return fts_ok;
+}
+
+
+static fts_method_status_t
+fmat_pow_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fmat_t *self = (fmat_t *)o;
+  float r = (float)fts_get_number_float(at);
+  int size = fmat_get_m(self) * fmat_get_n(self);
+  float *p = fmat_get_ptr(self);
+  int i;
+
+  for(i=0; i<size; i++)
+    p[i] = pow(p[i], r);
+  
+  fts_object_changed(o);
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+
 static fts_method_status_t
 fmat_bus_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -4362,6 +4413,7 @@ fmat_instantiate(fts_class_t *cl)
   fmat_message(cl, fts_new_symbol("sub"), fmat_sub_fmat, fmat_sub_number);
   fmat_message(cl, fts_new_symbol("mul"), fmat_mul_fmat, fmat_mul_number);
   fmat_message(cl, fts_new_symbol("div"), fmat_div_fmat, fmat_div_number);
+  fmat_message(cl, fts_new_symbol("pow"), fmat_pow_fmat, fmat_pow_number);
   fmat_message(cl, fts_new_symbol("bus"), fmat_bus_fmat, fmat_bus_number);
   fmat_message(cl, fts_new_symbol("vid"), fmat_vid_fmat, fmat_vid_number);
   fmat_message(cl, fts_new_symbol("ee"), fmat_eq_fmat, fmat_eq_number);
@@ -4486,6 +4538,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fmat: operand>", "substract given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("mul"), "<num|fmat: operand>", "multiply current values by given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("div"), "<num|fmat: operand>", "divide current values by given scalar or fmat (element by element)");
+  fts_class_doc(cl, fts_new_symbol("pow"), "<num|fmat: operand>", "take current values to the power of the given scalar or fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("bus"), "<num|fmat: operand>", "subtract current values from given scalar or fmat (element by element)");  
   fts_class_doc(cl, fts_new_symbol("vid"), "<num|fmat: operand>", "divide given scalar or fmat (element by element) by current values");
   fts_class_doc(cl, fts_new_symbol("eq"), "<num|fmat: operand>", "replace current values by result of == comparison (0 or 1) with given scalar or fmat (element by element)");
@@ -4527,6 +4580,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope function to each column");
 
   fts_class_doc(cl, fts_new_symbol("apply"), "<expr: expression>", "apply expression each value (use $self and $x)");
+  fts_class_doc(cl, fts_new_symbol("find"), "<expr: expression>", "leave indices where expression is true (use $x, $i and $self)");
 
   fts_class_doc(cl, sym_rect, NULL, "convert complex polar vector to complex rectangular vector (matrix of 2 columns)");
   fts_class_doc(cl, sym_polar, NULL, "convert complex rectangular vector to complex polar vector (matrix of 2 columns)");

@@ -1345,6 +1345,53 @@ fvec_div_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   return fts_ok;
 }
 
+
+static fts_method_status_t
+fvec_pow_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size;
+  int i;
+  
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
+  
+  if(l_size < r_size)
+    size = l_size;
+  else
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] = pow(l[i * l_stride], r[i * r_stride]);
+  
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+fvec_pow_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &l, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+    l[i] = pow(l[i], r);
+  
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
 static fts_method_status_t
 fvec_bus_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -2257,6 +2304,7 @@ fvec_instantiate(fts_class_t *cl)
   fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);
   fvec_message(cl, fts_new_symbol("mul"), fvec_mul_fvec, fvec_mul_number);
   fvec_message(cl, fts_new_symbol("div"), fvec_div_fvec, fvec_div_number);
+  fvec_message(cl, fts_new_symbol("pow"), fvec_pow_fvec, fvec_pow_number);
   fvec_message(cl, fts_new_symbol("bus"), fvec_bus_fvec, fvec_bus_number);
   fvec_message(cl, fts_new_symbol("vid"), fvec_vid_fvec, fvec_vid_number);
   
@@ -2337,6 +2385,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fvec: operand>", "substract given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("mul"), "<num|fvec: operand>", "multiply current values by given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("div"), "<num|fvec: operand>", "divide current values by given scalar, fvec (element by element)");
+  fts_class_doc(cl, fts_new_symbol("pow"), "<num|fvec: operand>", "take current values to the power of given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("bus"), "<num|fvec: operand>", "subtract current values from given scalar, fvec (element by element)");  
   fts_class_doc(cl, fts_new_symbol("vid"), "<num|fvec: operand>", "divide given scalar, fvec (element by element) by current values");
   
