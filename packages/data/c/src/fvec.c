@@ -1385,7 +1385,7 @@ fvec_pow_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   fvec_get_vector(self, &l, &size, &stride);
   
   for(i=0; i<size*stride; i+=stride)
-    l[i] = pow(l[i], r);
+    l[i] = powf(l[i], r);
   
   fts_set_object(ret, o);
   
@@ -1689,6 +1689,33 @@ fvec_sqrt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   return fts_ok;
 }
 
+
+#define FVEC_METHOD_MATH_FUNC_1(NAME, FUNC)				\
+static fts_method_status_t						\
+fvec_ ## NAME (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret) \
+{									\
+  fvec_t *self = (fvec_t *) o;						\
+  float  *ptr;								\
+  int     size, stride;							\
+  int     i;								\
+									\
+  fvec_get_vector(self, &ptr, &size, &stride);				\
+									\
+  for (i = 0; i < size * stride; i += stride)				\
+    ptr[i] = FUNC(ptr[i]);						\
+									\
+  fts_set_object(ret, o);						\
+  return fts_ok;							\
+}
+
+FVEC_METHOD_MATH_FUNC_1(trunc, truncf)
+FVEC_METHOD_MATH_FUNC_1(round, roundf)
+FVEC_METHOD_MATH_FUNC_1(ceil,  ceilf)
+FVEC_METHOD_MATH_FUNC_1(floor, floorf)
+
+
+
+
 /******************************************************************************
 *
 *  min, max & co
@@ -1962,7 +1989,7 @@ fvec_get_geomean (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   root = 1.0 / (double) size;
 
   for (i = 0; i < size * stride; i += stride)
-    prod *= pow(p[i], root);
+    prod *= powf(p[i], root);
   
   fts_set_float(ret, prod);
   
@@ -2317,6 +2344,10 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("exp"), fvec_exp);
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fvec_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("sqrt"), fvec_sqrt);
+  fts_class_message_void(cl, fts_new_symbol("trunc"), fvec_trunc);
+  fts_class_message_void(cl, fts_new_symbol("round"), fvec_round);
+  fts_class_message_void(cl, fts_new_symbol("ceil"),  fvec_ceil);
+  fts_class_message_void(cl, fts_new_symbol("floor"), fvec_floor);
   fts_class_message_void(cl, fts_new_symbol("cumsum"), fvec_cumsum);
 
   /* return scalar */
@@ -2395,6 +2426,11 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("trunc"), NULL, "truncate to integer values");
+  fts_class_doc(cl, fts_new_symbol("round"), NULL, "round to integral values nearest to current values");
+  fts_class_doc(cl, fts_new_symbol("floor"), NULL, "round to largest integral values not greater than current values");
+  fts_class_doc(cl, fts_new_symbol("ceil"),  NULL, "round to smallest integral values not less than current values");
+  fts_class_doc(cl, fts_new_symbol("cumsum"), NULL, "calculate cumulative sum vector");
   
   fts_class_doc(cl, fts_new_symbol("clip"), "[<lower limit>] <upper limit>", "clip values within given limits");
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");

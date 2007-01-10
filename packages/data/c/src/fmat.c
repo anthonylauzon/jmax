@@ -2255,7 +2255,7 @@ fmat_pow_fmat(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts
     int i;
     
     for(i=0; i<size; i++)
-      l[i] = pow(l[i], r[i]);
+      l[i] = powf(l[i], r[i]);
 
     fts_object_changed(o);
     fts_set_object(ret, o);
@@ -2277,7 +2277,7 @@ fmat_pow_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   int i;
 
   for(i=0; i<size; i++)
-    p[i] = pow(p[i], r);
+    p[i] = powf(p[i], r);
   
   fts_object_changed(o);
   fts_set_object(ret, o);
@@ -2803,6 +2803,31 @@ fmat_sqrt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   
   return fts_ok;
 }
+
+#define FMAT_METHOD_MATH_FUNC_1(NAME, FUNC)                             \
+static fts_method_status_t                                              \
+fmat_ ## NAME (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret) \
+{                                                                       \
+  fmat_t *self = (fmat_t *) o;                                          \
+  float  *ptr  = fmat_get_ptr(self);                                    \
+  int     m    = fmat_get_m(self);                                      \
+  int     n    = fmat_get_n(self);                                      \
+  int     i;                                                            \
+                                                                        \
+  for (i = 0; i < m * n; i++)                                           \
+    ptr[i] = FUNC(ptr[i]);                                              \
+                                                                        \
+  fts_object_changed(o);                                                \
+  fts_set_object(ret, o);                                               \
+  return fts_ok;                                                        \
+}
+
+FMAT_METHOD_MATH_FUNC_1(trunc, truncf)
+FMAT_METHOD_MATH_FUNC_1(round, roundf)
+FMAT_METHOD_MATH_FUNC_1(ceil,  ceilf)
+FMAT_METHOD_MATH_FUNC_1(floor, floorf)
+
+
 
 /******************************************************************************
 *
@@ -4430,6 +4455,10 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("exp"), fmat_exp);
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fmat_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("sqrt"), fmat_sqrt);
+  fts_class_message_void(cl, fts_new_symbol("trunc"), fmat_trunc);
+  fts_class_message_void(cl, fts_new_symbol("round"), fmat_trunc);
+  fts_class_message_void(cl, fts_new_symbol("ceil"),  fmat_ceil);
+  fts_class_message_void(cl, fts_new_symbol("floor"), fmat_floor);
   
   fts_class_message_void(cl, sym_rect, fmat_convert_rect);
   fts_class_message_void(cl, sym_polar, fmat_convert_polar);
@@ -4554,6 +4583,10 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("trunc"), NULL, "truncate to integer values");
+  fts_class_doc(cl, fts_new_symbol("round"), NULL, "round to integral values nearest to current values");
+  fts_class_doc(cl, fts_new_symbol("floor"), NULL, "round to largest integral values not greater than current values");
+  fts_class_doc(cl, fts_new_symbol("ceil"),  NULL, "round to smallest integral values not less than current values");
   
   fts_class_doc(cl, fts_new_symbol("cmul"), "<num|fmat: operand>", "multiply current values of complex vector by given scalar or complex vector fmat (element by element)");
   fts_class_doc(cl, fts_new_symbol("cabs"), NULL, "calulate absolute values of current complex values");
