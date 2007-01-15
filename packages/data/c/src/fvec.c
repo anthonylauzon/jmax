@@ -37,8 +37,8 @@
 #define fabsf fabs
 #endif
 
-#define ABS_MIN -3.40282347e+38F
-#define ABS_MAX 3.40282347e+38F
+#define ABS_MIN -3.40282346e+38F 
+#define ABS_MAX 3.40282346e+38F
 #define LOG_MIN -103.28
 #define LOG_ARG_MIN (float)(1.4e-45)
 
@@ -381,7 +381,15 @@ fvec_get_vector(fvec_t *fvec, float **ptr, int *size, int *stride)
   int fvec_index = fvec->index;
   int fvec_onset = fvec->onset;
   int fvec_size = fvec->size;
-  
+
+  if (fmat_m * fmat_n == 0)
+  { /* empty matrix -> empty vector */
+    *ptr = NULL;
+    *size = 0;
+    *stride = 0;
+    return;
+  }
+
   switch(fvec->type)
   {
     case fvec_type_column:
@@ -1336,6 +1344,53 @@ fvec_div_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, f
   return fts_ok;
 }
 
+
+static fts_method_status_t
+fvec_pow_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  fts_object_t *right = fts_get_object(at);
+  float *l, *r;
+  int l_size, r_size;
+  int l_stride, r_stride;
+  int size;
+  int i;
+  
+  fvec_get_vector(self, &l, &l_size, &l_stride);
+  fmat_or_slice_vector(right, &r, &r_size, &r_stride);
+  
+  if(l_size < r_size)
+    size = l_size;
+  else
+    size = r_size;
+  
+  for(i=0; i<size; i++)
+    l[i * l_stride] = pow(l[i * l_stride], r[i * r_stride]);
+  
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
+static fts_method_status_t
+fvec_pow_number(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  fvec_t *self = (fvec_t *)o;
+  float r = (float)fts_get_number_float(at);
+  float *l;
+  int size, stride;
+  int i;
+  
+  fvec_get_vector(self, &l, &size, &stride);
+  
+  for(i=0; i<size*stride; i+=stride)
+    l[i] = powf(l[i], r);
+  
+  fts_set_object(ret, o);
+  
+  return fts_ok;
+}
+
 static fts_method_status_t
 fvec_bus_fvec(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -1461,9 +1516,9 @@ fvec_clip(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
     float f = ptr[i];
     
     if(f > high)
-      f = high;
+      ptr[i] = high;
     else if(f < low)
-      f = low;
+      ptr[i] = low;
   }
   
   fts_set_object(ret, o);
@@ -1633,6 +1688,33 @@ fvec_sqrt(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   return fts_ok;
 }
 
+
+#define FVEC_METHOD_MATH_FUNC_1(NAME, FUNC)				\
+static fts_method_status_t						\
+fvec_ ## NAME (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret) \
+{									\
+  fvec_t *self = (fvec_t *) o;						\
+  float  *ptr;								\
+  int     size, stride;							\
+  int     i;								\
+									\
+  fvec_get_vector(self, &ptr, &size, &stride);				\
+									\
+  for (i = 0; i < size * stride; i += stride)				\
+    ptr[i] = FUNC(ptr[i]);						\
+									\
+  fts_set_object(ret, o);						\
+  return fts_ok;							\
+}
+
+FVEC_METHOD_MATH_FUNC_1(trunc, truncf)
+FVEC_METHOD_MATH_FUNC_1(round, roundf)
+FVEC_METHOD_MATH_FUNC_1(ceil,  ceilf)
+FVEC_METHOD_MATH_FUNC_1(floor, floorf)
+
+
+
+
 /******************************************************************************
 *
 *  min, max & co
@@ -1732,7 +1814,7 @@ fvec_get_min_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     int mini = 0;
     int i, j;
     
-    for(i=1, j=stride; i<size*stride; i++, j+=stride)
+    for(i=1, j=stride; i<size; i++, j+=stride)
     {
       if(p[j] < min)
       {
@@ -1762,7 +1844,7 @@ fvec_get_max_index(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
     int maxi = 0;
     int i, j;
     
-    for(i=1, j=stride; i<size*stride; i++, j+=stride)
+    for(i=1, j=stride; i<size; i++, j+=stride)
     {
       if (p[j] > max)
       {
@@ -1975,7 +2057,7 @@ fvec_get_zc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 
 /****************************************************************************
 *
-*  system mehods
+*  system methods
 *
 */
 
@@ -1990,7 +2072,7 @@ _fvec_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   
   fvec_get_vector(self, &ptr, &size, &stride);
   
-  if (ptr  &&  size == 0)
+  if (!ptr  ||  size == 0)
     fts_set_float(ret, 0);        /* empty matrix: no error, just return 0 */
   else
   {
@@ -2248,6 +2330,7 @@ fvec_instantiate(fts_class_t *cl)
   fvec_message(cl, fts_new_symbol("sub"), fvec_sub_fvec, fvec_sub_number);
   fvec_message(cl, fts_new_symbol("mul"), fvec_mul_fvec, fvec_mul_number);
   fvec_message(cl, fts_new_symbol("div"), fvec_div_fvec, fvec_div_number);
+  fvec_message(cl, fts_new_symbol("pow"), fvec_pow_fvec, fvec_pow_number);
   fvec_message(cl, fts_new_symbol("bus"), fvec_bus_fvec, fvec_bus_number);
   fvec_message(cl, fts_new_symbol("vid"), fvec_vid_fvec, fvec_vid_number);
   
@@ -2260,6 +2343,10 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_message_void(cl, fts_new_symbol("exp"), fvec_exp);
   fts_class_message_void(cl, fts_new_symbol("sqrabs"), fvec_sqrabs);
   fts_class_message_void(cl, fts_new_symbol("sqrt"), fvec_sqrt);
+  fts_class_message_void(cl, fts_new_symbol("trunc"), fvec_trunc);
+  fts_class_message_void(cl, fts_new_symbol("round"), fvec_round);
+  fts_class_message_void(cl, fts_new_symbol("ceil"),  fvec_ceil);
+  fts_class_message_void(cl, fts_new_symbol("floor"), fvec_floor);
   fts_class_message_void(cl, fts_new_symbol("cumsum"), fvec_cumsum);
 
   /* return scalar */
@@ -2328,6 +2415,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("sub"), "<num|fvec: operand>", "substract given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("mul"), "<num|fvec: operand>", "multiply current values by given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("div"), "<num|fvec: operand>", "divide current values by given scalar, fvec (element by element)");
+  fts_class_doc(cl, fts_new_symbol("pow"), "<num|fvec: operand>", "take current values to the power of given scalar, fvec (element by element)");
   fts_class_doc(cl, fts_new_symbol("bus"), "<num|fvec: operand>", "subtract current values from given scalar, fvec (element by element)");  
   fts_class_doc(cl, fts_new_symbol("vid"), "<num|fvec: operand>", "divide given scalar, fvec (element by element) by current values");
   
@@ -2337,6 +2425,11 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_new_symbol("exp"), NULL, "calulate exponent function of current values");
   fts_class_doc(cl, fts_new_symbol("sqrabs"), NULL, "calulate square of absolute values of current values");
   fts_class_doc(cl, fts_new_symbol("sqrt"), NULL, "calulate square root of absolute values of current values");
+  fts_class_doc(cl, fts_new_symbol("trunc"), NULL, "truncate to integer values");
+  fts_class_doc(cl, fts_new_symbol("round"), NULL, "round to integral values nearest to current values");
+  fts_class_doc(cl, fts_new_symbol("floor"), NULL, "round to largest integral values not greater than current values");
+  fts_class_doc(cl, fts_new_symbol("ceil"),  NULL, "round to smallest integral values not less than current values");
+  fts_class_doc(cl, fts_new_symbol("cumsum"), NULL, "calculate cumulative sum vector");
   
   fts_class_doc(cl, fts_new_symbol("clip"), "[<lower limit>] <upper limit>", "clip values within given limits");
   fts_class_doc(cl, fts_new_symbol("normalize"), NULL, "normalize to between -1.0 and 1.0");
