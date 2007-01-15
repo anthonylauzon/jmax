@@ -1989,7 +1989,7 @@ fvec_get_geomean (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   root = 1.0 / (double) size;
 
   for (i = 0; i < size * stride; i += stride)
-    prod *= powf(p[i], root);
+    prod *= pow(p[i], root);
   
   fts_set_float(ret, prod);
   
@@ -2058,7 +2058,7 @@ fvec_get_zc(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_a
 
 /****************************************************************************
 *
-*  system mehods
+*  system methods
 *
 */
 
