@@ -317,13 +317,16 @@ method_get (fts_class_t * cl, const void *selector, fts_class_t * type)
   if(cl->methods)
   {
     method_key_t *method_key = method_key_new((fts_symbol_t)selector, type);
+    fts_method_t method = NULL;
     
     fts_set_object(&k, (fts_object_t *) method_key);
     
     if(fts_hashtable_get (cl->methods, &k, &a))
-      return (fts_method_t)fts_get_pointer(&a);
+      method = (fts_method_t)fts_get_pointer(&a);
     
     fts_object_destroy((fts_object_t *)method_key);
+    
+    return method;
   }
   
   return NULL;

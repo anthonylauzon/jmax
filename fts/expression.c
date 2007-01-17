@@ -459,13 +459,13 @@ expression_eval_aux( fts_parsetree_t *tree, fts_expression_t *exp, fts_hashtable
           return fts_status_format("get element not defined with given arguments");
       }
       
-      if(fts_is_void(&ret))
-        return fts_ignore;
-      
-      fts_atom_refer(&ret);
-      
       expression_stack_pop_frame( exp);
-      expression_stack_push(exp, &ret);
+
+      if(!fts_is_void(&ret))
+      {
+        fts_atom_refer(&ret);
+        expression_stack_push( exp, &ret);
+      }
     }
     else
       return operand_type_mismatch_error;
