@@ -2447,6 +2447,7 @@ fvec_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
   fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row for index)");
+  fts_class_doc(cl, fts_new_symbol("ramp"), "[<num: start value> <num: end value>]", "fill fvec with linear sequence of values going from start to end");
 
   fts_class_doc(cl, fts_new_symbol("lookup"), "<fmat|fvec|bpf: function>", "apply given function (by linear interpolation)");
   fts_class_doc(cl, fts_new_symbol("env"), "<fmat|fvec|bpf: envelope>", "multiply given envelope");

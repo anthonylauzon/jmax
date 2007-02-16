@@ -4559,6 +4559,7 @@ fmat_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fts_s_cols, "[<num: # of columns>]", "get/set # of columns");
   fts_class_doc(cl, fts_s_fill, "<num: value>", "fill with given value or pattern of values");
   fts_class_doc(cl, fts_s_fill, "<expr: expression>", "fill with given expression (use $self, $row and $col)");
+  fts_class_doc(cl, fts_new_symbol("ramp"), "[<num: start value> <num: end value>]", "fill fmat with linear sequence of values going from start to end");
   fts_class_doc(cl, fts_new_symbol("zero"), "[<num: row index> <num: column index> [<num: # of elements>]]", "zero given number of elements starting from indicated element (row by row)");
 
   fts_class_doc(cl, fts_s_append, "[<num: value> ...]", "append row with given values");
