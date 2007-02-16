@@ -58,6 +58,12 @@ static fts_symbol_t sym_refer = NULL;
 
 static fts_symbol_t fvec_type_names[fvec_n_types];
 
+
+/* fmat functions also working on fvec */
+fts_method_status_t
+fmat_ramp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret);
+
+
 static int
 fvec_get_type_from_symbol(fts_symbol_t sym)
 {
@@ -78,6 +84,9 @@ fvec_get_type_as_symbol(fvec_t *this)
 {
   return fvec_type_names[fvec_get_type(this)];
 }
+
+
+
 /********************************************************************
 *
 *  easy creators
@@ -2369,6 +2378,7 @@ fvec_instantiate(fts_class_t *cl)
   /* fmat methods that work on fvec, too: */
   fts_class_message_number (cl, fts_s_fill, fvec_fill_number);
   fts_class_message_varargs(cl, fts_s_fill, fvec_fill_varargs);
+  fts_class_message_varargs(cl, fts_new_symbol("ramp"), fmat_ramp);
   
   fts_class_message(cl, fts_new_symbol("lookup"), fmat_class, fvec_lookup_fmat_or_slice);
   fts_class_message(cl, fts_new_symbol("lookup"), fvec_class, fvec_lookup_fmat_or_slice);

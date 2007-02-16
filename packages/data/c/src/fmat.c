@@ -1047,6 +1047,36 @@ fmat_fill_varargs(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
   return fts_ok;
 }
 
+
+
+fts_method_status_t
+fmat_ramp(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  float  *ptr;
+  double  lo = 0, hi = 1;
+  int     size, stride;
+
+  if (ac > 0  &&  fts_is_number(at))
+    lo = fts_get_number_float(at);
+
+  if (ac > 1  &&  fts_is_number(at + 1))
+    hi = fts_get_number_float(at + 1);
+
+  if (fmat_or_slice_pointer(o, &ptr, &size, &stride))
+  {
+    int i, j;
+    double fact = size > 1  ?  (hi - lo) / (size - 1)  :  1.0;
+
+    for (i = 0, j = 0; i < size; i++, j+=stride) 
+      ptr[j] = i * fact + lo;
+
+    fts_object_changed(o);
+  } 
+
+  fts_set_object(ret, o);
+  return fts_ok; 
+}
+
 static fts_method_status_t
 fmat_fill_zero(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
 {
@@ -4404,6 +4434,7 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_message_number (cl, fts_s_fill, fmat_fill_number);
   fts_class_message_varargs(cl, fts_s_fill, fmat_fill_varargs);
+  fts_class_message_varargs(cl, fts_new_symbol("ramp"),   fmat_ramp);
   fts_class_message_varargs(cl, fts_new_symbol("zero"),   fmat_fill_zero);
   fts_class_message_varargs(cl, fts_new_symbol("random"), fmat_fill_random);
   
