@@ -2011,22 +2011,25 @@ fvec_get_variance (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at
 {
   fvec_t *self = (fvec_t *)o;
   double  sum = 0.0, sum2 = 0.0;
-  double  mean, var;
+  double  mean, var = 0;
   float  *p;
   int     size, stride;
   int     i;
   
   fvec_get_vector(self, &p, &size, &stride);
   
-  for (i = 0; i < size * stride; i += stride)
+  if (size > 0)
   {
-    sum  += p[i];
-    sum2 += p[i] * p[i];
+    for (i = 0; i < size * stride; i += stride)
+    {
+      sum  += p[i];
+      sum2 += p[i] * p[i];
+    }
+  
+    mean = sum  / (double) size;
+    var  = sum2 / (double) size - mean * mean;
   }
-  
-  mean = sum  / (double) size;
-  var  = sum2 / (double) size - mean * mean;
-  
+
   fts_set_float(ret, var);
   
   return fts_ok;
