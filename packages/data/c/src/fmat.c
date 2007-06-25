@@ -50,10 +50,6 @@ fmat_t *fmat_null = NULL;
 fts_class_t *fmat_class = NULL;
 fts_symbol_t fmat_symbol = NULL;
 
-static fts_symbol_t sym_text = 0;
-static fts_symbol_t sym_getcol = 0;
-static fts_symbol_t sym_getrow = 0;
-
 static fts_symbol_t sym_vec = 0;
 static fts_symbol_t sym_real = 0;
 static fts_symbol_t sym_rect = 0;
@@ -4551,8 +4547,8 @@ fmat_instantiate(fts_class_t *cl)
   
   fts_class_doc(cl, fmat_symbol, "[<num: # of rows> [<num: # of columns (def 1)> [<num: init values> ...]]]", "matrix of floats");
   
-  fts_class_doc(cl, fts_s_col, "<num: index>", "get column reference (creates fvec object)");
-  fts_class_doc(cl, fts_s_row, "<num: index>", "get row reference (creates fvec object)");
+  fts_class_doc(cl, fts_new_symbol("colref"), "<num: index>", "get column reference (creates fvec object)");
+  fts_class_doc(cl, fts_new_symbol("rowref"), "<num: index>", "get row reference (creates fvec object)");
   
   fts_class_doc(cl, fts_s_size, "[<num: # of rows> [<num: # of columns (def 1)>]]", "get/set dimensions");
   fts_class_doc(cl, fts_s_rows, "[<num: # of rows>]", "get/set # of rows");
@@ -4661,10 +4657,6 @@ FTS_MODULE_INIT(fmat)
 {
   fmat_symbol = fts_new_symbol("fmat");
 
-  sym_getcol = fts_new_symbol("getcol");
-  sym_getrow = fts_new_symbol("getrow");
-  sym_text = fts_new_symbol("text");
-  
   sym_vec = fts_new_symbol("vec");
   sym_real = fts_new_symbol("real");
   sym_rect = fts_new_symbol("rect");
