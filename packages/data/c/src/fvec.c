@@ -2408,6 +2408,7 @@ fvec_instantiate(fts_class_t *cl)
   fts_class_doc(cl, fvec_symbol, "<'unwrap'> <num: row onset> [<num: column onset> [<num: size>]]", "vector reference to unwrapped matrix");
   fts_class_doc(cl, fvec_symbol, "<num: size>", "vector reference compatible float vector");
   
+  fts_class_doc(cl, sym_refer, "<fmat> [<sym: mode> <int: index> <int: onset> <int: size>]", "change referred fmat, type and parameters");
   fts_class_doc(cl, fts_new_symbol("onset"), NULL, "get onset");
   fts_class_doc(cl, fts_new_symbol("onset"), "<num: onset>", "set onset");
   fts_class_doc(cl, fts_s_size, NULL, "get size");
