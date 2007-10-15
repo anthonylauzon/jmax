@@ -197,10 +197,10 @@ fmat_import_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
     {
       int m = fts_audiofile_get_num_frames(sf);
       int n = fts_audiofile_get_num_channels(sf);
-      int wanted  = 0;	/* number of sample frames to load */
+      int wanted  = 0;  /* number of sample frames to load */
       int offset  = 0;
       int channel = 0;
-      double  sr  = 0;	/* resample if not zero */
+      double  sr  = 0;  /* resample if not zero */
       fmat_t *orig = NULL;
       float  *ptr;
       
@@ -340,27 +340,27 @@ fmat_export_audiofile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t 
 typedef struct _import_data
 {
   /* from the file to import */
-  int numframes;	
+  int numframes;        
   int numchannels;
   double sr_orig;
   int bits_per_sample;
   float scale_factor;
 
   /* import arguments */
-  int wanted;		/* number of sample frames to load */
+  int wanted;           /* number of sample frames to load */
   int offset;
   int channel;
-  double  sr_wanted;	/* resample if not zero */
+  double  sr_wanted;    /* resample if not zero */
 
   /* importer data */
   fmat_t *fmat;
   fmat_t *orig;
   float  *ptr;
-  int	  numread;	/* number of sample frames actually read */
+  int     numread;      /* number of sample frames actually read */
 } fmat_import_args_t;
 
 static void fmat_import_init (fmat_import_args_t *args, fmat_t *fmat,
-			      int ac, const fts_atom_t *at)
+                              int ac, const fts_atom_t *at)
 {
   bzero(args, sizeof(fmat_import_args_t));
 
@@ -395,11 +395,11 @@ static void fmat_import_init (fmat_import_args_t *args, fmat_t *fmat,
  }
 
 static void fmat_import_begin (fmat_import_args_t *args, 
-			       int m, int n, double sr, int bits)
+                               int m, int n, double sr, int bits)
 {
-  args->numframes   	= m;
-  args->numchannels 	= n;
-  args->sr_orig     	= sr;
+  args->numframes       = m;
+  args->numchannels     = n;
+  args->sr_orig         = sr;
   args->bits_per_sample = bits;
   args->scale_factor    = (double) 1. / (double) (1 << (bits - 1));
 
@@ -443,8 +443,8 @@ static void fmat_import_finish (fmat_import_args_t *args)
 
 /* called when the decoder has decoded a metadata block */
 static void flacdec_metadata_callback (const FLAC__StreamDecoder  *flacdec, 
-				       const FLAC__StreamMetadata *metadata, 
-				       void *client_data)
+                                       const FLAC__StreamMetadata *metadata, 
+                                       void *client_data)
 {
   switch (metadata->type)
   {
@@ -459,14 +459,14 @@ static void flacdec_metadata_callback (const FLAC__StreamDecoder  *flacdec,
       fmat_import_begin(args, m, n, sr, bits);
 
       /* fts_post("flacdec_metadata_callback: type %d  bits %d factor %g\n", 
-	 metadata->type, bits, (double) args->scale_factor); */
+         metadata->type, bits, (double) args->scale_factor); */
 
       /* seek to first wanted sample: at any point after the stream
-	 decoder has been initialized, the client can call this
-	 function to seek to an exact sample within the
-	 stream. Subsequently, the first time the write callback is
-	 called it will be passed a (possibly partial) block starting
-	 at that sample. */
+         decoder has been initialized, the client can call this
+         function to seek to an exact sample within the
+         stream. Subsequently, the first time the write callback is
+         called it will be passed a (possibly partial) block starting
+         at that sample. */
       FLAC__stream_decoder_seek_absolute(flacdec, args->offset * n);
     }
     break;
@@ -480,9 +480,9 @@ static void flacdec_metadata_callback (const FLAC__StreamDecoder  *flacdec,
 
 static FLAC__StreamDecoderWriteStatus 
 flacdec_write_callback (const FLAC__StreamDecoder *flacdec, 
-		 	const FLAC__Frame         *frame, 
-			const FLAC__int32         *const buffer[], 
-			void			  *client_data)
+                        const FLAC__Frame         *frame, 
+                        const FLAC__int32         *const buffer[], 
+                        void                      *client_data)
 {
   fmat_import_args_t *args = (fmat_import_args_t *) client_data;
   float *ptr = args->ptr;
@@ -516,13 +516,13 @@ flacdec_write_callback (const FLAC__StreamDecoder *flacdec,
 }
 
 static void flacdec_error_callback (const FLAC__StreamDecoder *flacdec, 
-				    FLAC__StreamDecoderErrorStatus status, 
-				    void *client_data)
+                                    FLAC__StreamDecoderErrorStatus status, 
+                                    void *client_data)
 {
   fmat_import_args_t *args = (fmat_import_args_t *) client_data;
 
   fts_post("flac decoding error number %d after %d samples read\n", 
-	   status, args->numread);
+           status, args->numread);
 }
 
 
@@ -536,8 +536,8 @@ fmat_import_flac (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
     fmat_import_args_t args;
     fts_symbol_t filesymb = fts_get_symbol(at);
     const char  *filename = (const char *) fts_symbol_name(filesymb);
-    char	 str[1024];
-    char	*fullpath = fts_file_find(filename, str, 1023);
+    char         str[1024];
+    char        *fullpath = fts_file_find(filename, str, 1023);
 
     if (fullpath != NULL)
     { /* create a new instance */
@@ -545,49 +545,49 @@ fmat_import_flac (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at,
 
       if (flacdec)
       { /* No need to override the decoder options with
-	   FLAC__stream_decoder_set_*() since by default, 
-	   only the STREAMINFO block is returned via the metadata callback. */
+           FLAC__stream_decoder_set_*() since by default, 
+           only the STREAMINFO block is returned via the metadata callback. */
 
-	fmat_import_init(&args, self, ac, at);
+        fmat_import_init(&args, self, ac, at);
 
-	/* decoding directly from a file */
-	if (FLAC__stream_decoder_init_file(flacdec, fullpath,
-					   flacdec_write_callback,
-					   flacdec_metadata_callback,
-					   flacdec_error_callback,
-					   &args) 
-	    == FLAC__STREAM_DECODER_INIT_STATUS_OK)
-	{ /* process the stream from the current location until the
-	     read callback returns
-	     FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM or
-	     FLAC__STREAM_DECODER_READ_STATUS_ABORT. The client will
-	     get one metadata, write, or error callback per metadata
-	     block, audio frame, or sync error, respectively. */
-	  FLAC__stream_decoder_process_until_end_of_stream(flacdec);
+        /* decoding directly from a file */
+        if (FLAC__stream_decoder_init_file(flacdec, fullpath,
+                                           flacdec_write_callback,
+                                           flacdec_metadata_callback,
+                                           flacdec_error_callback,
+                                           &args) 
+            == FLAC__STREAM_DECODER_INIT_STATUS_OK)
+        { /* process the stream from the current location until the
+             read callback returns
+             FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM or
+             FLAC__STREAM_DECODER_READ_STATUS_ABORT. The client will
+             get one metadata, write, or error callback per metadata
+             block, audio frame, or sync error, respectively. */
+          FLAC__stream_decoder_process_until_end_of_stream(flacdec);
 
-	  FLAC__stream_decoder_finish(flacdec);
-	}
-	FLAC__stream_decoder_delete(flacdec);
+          FLAC__stream_decoder_finish(flacdec);
+        }
+        FLAC__stream_decoder_delete(flacdec);
 
-	fmat_import_finish(&args);
+        fmat_import_finish(&args);
 
-	if (args.numread > 0)
-	{
-	  fts_object_changed(o);
-	  fts_set_object(ret, o);
-	}
-	else
-	  fts_object_error(o, "import: coudn't read any audio data from file \"%s\" (at \"%s\")", filename, fullpath);
+        if (args.numread > 0)
+        {
+          fts_object_changed(o);
+          fts_set_object(ret, o);
+        }
+        else
+          fts_object_error(o, "import: coudn't read any audio data from file \"%s\" (at \"%s\")", filename, fullpath);
       }
       else
-	fts_object_error(o, "import: cannot open audio file \"%s\" (at \"%s\")", filename, fullpath);
+        fts_object_error(o, "import: cannot open audio file \"%s\" (at \"%s\")", filename, fullpath);
     }
   }
 
   return fts_ok;
 }
 
-#endif	/* HAVE_FLAC */
+#endif  /* HAVE_FLAC */
 
 
 /******************************************************************************
@@ -1051,7 +1051,7 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
       case read_argument:
       {
         if(fts_is_symbol(&a) && (fts_get_symbol(&a) == fts_new_symbol(";")))
-	      {
+              {
           if(n > 0)
           {
             if(fts_is_symbol(atoms + 0))
@@ -1071,9 +1071,9 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
           }
           else
             fts_post("dict: empty message found in coll file %s (ignored)\n", fts_symbol_name(file_name));
-	      }
+              }
         else
-	      {
+              {
           /* read argument */
           if(n >= atoms_alloc)
           {
@@ -1083,7 +1083,7 @@ dict_import_from_coll(dict_t *self, fts_symbol_t file_name)
           
           atoms[n] = a;
           n++;
-	      }
+              }
       }
         
         break;
@@ -1198,7 +1198,7 @@ dict_import_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
     
     if(size > 0)
     {
-      fts_object_set_state_dirty(o);	/* if obj persistent patch becomes dirty */
+      fts_object_set_state_dirty(o);    /* if obj persistent patch becomes dirty */
       
       if(dict_editor_is_open(self))
         dict_upload(self);      
