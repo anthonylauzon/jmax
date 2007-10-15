@@ -1028,16 +1028,6 @@ mat_print(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_ato
   return fts_ok;
 }
 
-/* class copy method compatible wrapper around copy function */
-static void
-mat_copy_function(const fts_object_t *from, fts_object_t *to)
-{
-  mat_t *dest = (mat_t *) to;
-  mat_copy((mat_t *) from, dest);
-  
-  if(mat_editor_is_open(dest))
-    mat_upload(dest);
-}
 
 static int
 mat_equals(const mat_t *a, const mat_t *b)
@@ -1057,6 +1047,28 @@ mat_equals(const mat_t *a, const mat_t *b)
   }
   
   return 0;
+}
+
+static fts_method_status_t
+_mat_equals (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  mat_t *self = (mat_t *) o;
+
+  fts_set_int(ret, mat_equals(self, (mat_t *) fts_get_object(at)));
+
+  return fts_ok;
+}
+
+
+/* class copy method compatible wrapper around copy function */
+static void
+mat_copy_function(const fts_object_t *from, fts_object_t *to)
+{
+  mat_t *dest = (mat_t *) to;
+  mat_copy((mat_t *) from, dest);
+  
+  if(mat_editor_is_open(dest))
+    mat_upload(dest);
 }
 
 static fts_method_status_t
@@ -1193,9 +1205,10 @@ mat_instantiate(fts_class_t *cl)
   fts_class_set_copy_function(cl, mat_copy_function);
 
   fts_class_message_varargs(cl, fts_s_name, fts_object_name);
-  fts_class_message_varargs(cl,fts_s_persistence, fts_object_persistence);
+  fts_class_message_varargs(cl, fts_s_persistence, fts_object_persistence);
   fts_class_message_varargs(cl, fts_s_dump_state, mat_dump_state);
   fts_class_message_varargs(cl, fts_s_print, mat_print); 
+  fts_class_message        (cl, fts_s_equals, mat_class, _mat_equals);
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, mat_set_from_instance);
   fts_class_message        (cl, fts_s_set, mat_class,    mat_set_from_instance);
