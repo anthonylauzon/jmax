@@ -391,6 +391,18 @@ _dict_rename(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_
   return fts_ok;
 }
 
+static fts_method_status_t
+_dict_exists (fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  dict_t    *self = (dict_t *) o;
+  fts_atom_t a;
+
+  if (ac > 0)
+    fts_set_int(ret, fts_hashtable_get(&self->hash, at, &a));
+  
+  return fts_ok;
+}
+
 
 static fts_method_status_t
 _dict_get_element(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -628,7 +640,8 @@ dict_instantiate(fts_class_t *cl)
   
   fts_class_message_varargs(cl, fts_s_set_from_instance, _dict_set_from_dict);
   fts_class_message_varargs(cl, fts_new_symbol("keys"), _dict_get_keys);
-  
+  fts_class_message_varargs(cl, fts_new_symbol("exists"), _dict_exists);
+
   fts_class_message_varargs(cl, fts_s_print, dict_print);
   
   fts_class_message_void   (cl, fts_s_clear, _dict_clear);
