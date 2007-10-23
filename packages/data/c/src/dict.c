@@ -99,14 +99,7 @@ dict_get(dict_t *dict, const fts_atom_t *key, fts_atom_t *atom)
 static void
 dict_remove(dict_t *dict, const fts_atom_t *key)
 {
-  fts_atom_t value;
-  
-  if(fts_hashtable_get(&dict->hash, key, &value))
-  {
-    fts_atom_release(key);
-    fts_atom_release(&value);
-    fts_hashtable_remove(&dict->hash, key);
-  }
+  fts_hashtable_remove(&dict->hash, key);
 }
 
 void
