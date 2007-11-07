@@ -337,11 +337,11 @@ random_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
 
 /**********************************************************************
  *
- *  symbol functions
+ *  symbol and file functions
  *
  */
 
-#define MAX_CONCAT_LENGTH 512
+#define MAX_CONCAT_LENGTH 511
 
 static fts_status_t
 cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
@@ -372,6 +372,85 @@ cat_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
   return fts_ok;
 }
 
+
+static fts_status_t
+basename_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  if (ac > 0  &&  fts_is_symbol(at))
+  {
+      fts_set_symbol(ret, fts_new_symbol(fts_basename(fts_symbol_name(fts_get_symbol(at)))));
+  }
+  else
+  {
+    fts_set_symbol(ret, fts_s_empty_string);
+  }
+
+  return fts_ok;   
+}
+
+
+static fts_status_t
+extension_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  const char *ext;
+
+  if (ac > 0  &&  fts_is_symbol(at)
+      &&  (ext = fts_extension(fts_symbol_name(fts_get_symbol(at)))))
+  {
+      fts_set_symbol(ret, fts_new_symbol(ext));
+  }
+  else
+  {
+    fts_set_symbol(ret, fts_s_empty_string);
+  }
+
+  return fts_ok;   
+}
+
+
+static fts_status_t
+dirname_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  char buf[MAX_CONCAT_LENGTH + 1];
+  
+  if (ac > 0  &&  fts_is_symbol(at))
+  {
+    strncpy(buf, fts_symbol_name(fts_get_symbol(at)), MAX_CONCAT_LENGTH);
+    fts_set_symbol(ret, fts_new_symbol(fts_dirname(buf)));
+  }
+  else
+  {
+    fts_set_symbol(ret, fts_s_empty_string);
+  }
+
+  return fts_ok;   
+}
+
+
+static fts_status_t
+stripext_function(int ac, const fts_atom_t *at, fts_atom_t *ret)
+{
+  char *ext;
+  char buf[MAX_CONCAT_LENGTH + 1];
+  buf[0] = 0;
+
+  if (ac > 0  &&  fts_is_symbol(at))
+  {
+    strncpy(buf, fts_symbol_name(fts_get_symbol(at)), MAX_CONCAT_LENGTH);
+    ext = fts_extension(buf);
+
+    if (ext)
+      *(ext - 1) = 0;
+
+    fts_set_symbol(ret, fts_new_symbol(buf));
+  }
+  else
+  {
+    fts_set_symbol(ret, fts_s_empty_string);
+  }
+
+  return fts_ok;   
+}
 
 
 
@@ -783,8 +862,13 @@ FTS_PACKAGE_INIT(functions)
   fts_function_install(fts_new_symbol( "min"), _function_min);
   fts_function_install(fts_new_symbol( "max"), _function_max);
 
+  fts_function_install(fts_new_symbol("cat"),       cat_function);
+  fts_function_install(fts_new_symbol("basename"),  basename_function);
+  fts_function_install(fts_new_symbol("dirname"),   dirname_function);
+  fts_function_install(fts_new_symbol("extension"), extension_function);
+  fts_function_install(fts_new_symbol("stripext"),  stripext_function);
+
   fts_function_install(fts_new_symbol("not"),  _function_not);
-  fts_function_install(fts_new_symbol("cat"),  cat_function);
   fts_function_install(fts_new_symbol("if"),   if_function);
   fts_function_install(fts_new_symbol("case"), case_function);
   
