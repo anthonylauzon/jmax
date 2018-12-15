@@ -274,14 +274,14 @@ PLATFORM_PACKAGES="oss"
 dnl hard-disable aflib, replaced by libsndfile
 dnl AM_PATH_AUDIOFILE(0.0.2,[PLATFORM_PACKAGES="aflib $PLATFORM_PACKAGES"],[echo package aflib will not be built])
 
-AM_PATH_ALSA(0.9.0,[
-	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
-	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
-	CFLAGS="$CFLAGS -DUSE_ALSA"
-	HAVE_A_SOUND_SUPPORT="true"
-],[
-	DEFAULT_CONFIG_FILE=default_config_linux_oss.jcfg
-])
+#AM_PATH_ALSA(0.9.0,[
+#	DEFAULT_CONFIG_FILE=default_config_linux_alsa.jcfg
+#	PLATFORM_PACKAGES="alsa $PLATFORM_PACKAGES"
+#	CFLAGS="$CFLAGS -DUSE_ALSA"
+#	HAVE_A_SOUND_SUPPORT="true"
+#],[
+#	DEFAULT_CONFIG_FILE=default_config_linux_oss.jcfg
+#])
 
 FTS_SYS_LIBS="-ldl -lpthread `test $check_memory = yes && echo -lmpatrol -lbfd -liberty`"
 ACX_C_RESTRICT

@@ -38,6 +38,7 @@ import java.io.*;
 
 import ircam.fts.client.*;
 import ircam.jmax.*;
+import ircam.jmax.JMaxApplication;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.fts.*;
 import ircam.jmax.editors.patcher.*;

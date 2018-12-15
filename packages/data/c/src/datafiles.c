@@ -1230,7 +1230,7 @@ dict_export_textfile(fts_object_t *o, fts_symbol_t s, int ac, const fts_atom_t *
 FTS_MODULE_INIT(datafiles)
 {
   /* fmat audio file import/export */
-  fts_class_import_handler(fmat_class, fts_new_symbol("flac"), fmat_import_flac);
+  //fts_class_import_handler(fmat_class, fts_new_symbol("flac"), fmat_import_flac);
   fts_audiofile_import_handler(fmat_class, fmat_import_audiofile);
   fts_audiofile_export_handler(fmat_class, fmat_export_audiofile);
   fts_class_import_handler_default(fmat_class, fmat_import_audiofile);

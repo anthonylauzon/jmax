@@ -2521,6 +2521,7 @@
 		3BFBB6F7066E20EB00C7446F /* AbstractTrackRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = AbstractTrackRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/AbstractTrackRenderer.java; sourceTree = SOURCE_ROOT; };
 		3BFD0F51066CC869009D9668 /* MarkerValue.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerValue.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/track/MarkerValue.java; sourceTree = SOURCE_ROOT; };
 		3BFD0F5D066CC9C7009D9668 /* MarkerEventRenderer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = MarkerEventRenderer.java; path = ../../packages/sequence/java/ircam/jmax/editors/sequence/renderers/MarkerEventRenderer.java; sourceTree = SOURCE_ROOT; };
+		4C1FDE7621C0004100F9AEB2 /* sndfile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sndfile.h; sourceTree = "<group>"; };
 		5C43B82F05AB304800E7FB5C /* libfunctions.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libfunctions.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C43B8F205ABFF6900E7FB5C /* libfunctions-info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist; path = "libfunctions-info.plist"; sourceTree = SOURCE_ROOT; };
 		5C5426B605AB0B8A0042B7A2 /* jMax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jMax.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -4090,6 +4091,7 @@
 		5C74560B06098EFF00B69585 /* fts */ = {
 			isa = PBXGroup;
 			children = (
+				4C1FDE7621C0004100F9AEB2 /* sndfile.h */,
 				F458A3F508470CFB006AB8CF /* dumper.h */,
 				5C74560D06098F4700B69585 /* array.h */,
 				5C74560E06098F4700B69585 /* atom.h */,

@@ -1,8 +1,11 @@
-# $Id: Makefile.am,v 1.22 2004/03/29 15:56:23 borghesi Exp $
+# $Id: Makefile.am,v 1.23 2004/10/05 17:31:25 borghesi Exp $
 #
 # sequence package source Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.23  2004/10/05 17:31:25  borghesi
+# markers are now in marker.c
+#
 # Revision 1.22  2004/03/29 15:56:23  borghesi
 # added trackeditor.c, trackeditor.h, FtsTrackEditorObject.java to Makefiles
 #

@@ -39,6 +39,7 @@ import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
 import ircam.jmax.*;
+import ircam.jmax.JMaxIcons;
 import ircam.jmax.fts.*;
 import ircam.jmax.dialogs.*;
 import ircam.jmax.toolkit.*;

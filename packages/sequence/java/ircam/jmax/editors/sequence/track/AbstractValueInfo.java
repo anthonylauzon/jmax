@@ -22,6 +22,7 @@
 package ircam.jmax.editors.sequence.track;
 
 import ircam.jmax.*;
+import ircam.jmax.editors.sequence.AbstractValueDataFlavor;
 import java.awt.Component;
 import ircam.jmax.editors.sequence.SequenceGraphicContext;
 import java.awt.datatransfer.*;

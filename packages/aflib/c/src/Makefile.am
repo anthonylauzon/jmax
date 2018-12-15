@@ -1,8 +1,13 @@
-# $Id$
+# $Id: Makefile.am,v 1.6 2004/08/24 10:01:53 diemo Exp $
 #
 # Makefile.am for building aflib, the audio file lib wrapper
 #
-# $Log$
+# $Log: Makefile.am,v $
+# Revision 1.6  2004/08/24 10:01:53  diemo
+# The configuration option --with-audiofile-prefix wasn't actually used
+# to build the aflib package to find the installed development version
+# of the audiofile lib.
+#
 
 packagedir=$(pkglibdir)/packages/aflib/c
 package_LTLIBRARIES=libaflib.la

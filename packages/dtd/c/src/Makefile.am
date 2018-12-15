@@ -1,8 +1,12 @@
-# $Id: Makefile.am,v 1.6 2004/08/24 10:01:53 diemo Exp $
+# $Id: Makefile.am,v 1.7 2004/08/24 10:03:21 diemo Exp $
 #
 # Makefile.am for building the dtd direct to disk package
 #
 # $Log: Makefile.am,v $
+# Revision 1.7  2004/08/24 10:03:21  diemo
+# The configuration option --with-audiofile-prefix wasn't actually used
+# to find the installed development version of the audiofile lib.
+#
 
 packagedir=$(pkglibdir)/packages/dtd/c
 package_LTLIBRARIES=libdtd.la

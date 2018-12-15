@@ -4,18 +4,18 @@
 # Copyright (C) 1994, 1995, 1998, 1999 by IRCAM-Centre Georges Pompidou, Paris, France.
 # 
 # This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
+# modify it under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation; either version 2.1
 # of the License, or (at your option) any later version.
 # 
-# See file LICENSE for further informations on licensing terms.
+# See file COPYING.LIB for further informations on licensing terms.
 # 
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser General Public License for more details.
 # 
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
@@ -30,10 +30,12 @@
 # JAVA_DEFAULT_OPTIONS="-noclassgc -noasyncgc -mx64m -ms2m"
 JAVA_DEFAULT_OPTIONS="-noclassgc -mx64m -ms2m"
 
+REQUIRED_JAVA_VERSION="1.4.0"
+
 # Substituted by configure script
-prefix=/u/worksta/borghesi/projects/jmax-install
+prefix=/usr
 exec_prefix=${prefix}
-default_rootdir=${prefix}/share/jmax
+default_rootdir=${exec_prefix}/lib/jmax
 ftsdir=${exec_prefix}/bin
 
 # ***************************************************************************
@@ -86,6 +88,7 @@ HELP_EOF
 }
 
 
+
 # ---------------------------------------------------------------------------
 decrypt_options ()
 {
@@ -128,6 +131,392 @@ decrypt_options ()
 	fi
 
     done
+}
+
+
+# ---------------------------------------------------------------------------
+# This function make absolut path for files given at command line
+# Must be called after decrypt_options
+make_absolute_path ()
+{
+    NEW_JMAXOPT=""
+    for args in ${JMAXOPT};
+    do
+      # Check for .jmax in args.
+      cur_arg=`echo $args | sed "s/^[^\/].*\.jmax$//g"`
+      if test "$cur_arg" = ""; then
+	  # We have a file with jMax extension which have
+	  # a relative path, so we append current working directory
+	  NEW_JMAXOPT="$NEW_JMAXOPT `pwd`/$args"
+      else
+	  NEW_JMAXOPT="$NEW_JMAXOPT $args"
+      fi
+    done
+    JMAXOPT="$NEW_JMAXOPT"
+}
+
+# ---------------------------------------------------------------------------
+display_java_error_in_term ()
+{
+    cat > /tmp/$$ << EOF 
+jMax haven't found any suitable Java Virtual Machine 
+
+Please install a Java Virtual Machine >= $REQUIRED_JAVA_VERSION before running jMax.
+
+More information can be found at the following url:
+http://www.ircam.fr/jmax
+EOF
+    cat /tmp/$$
+    rm -f /tmp/$$
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+display_java_error_msg_box ()
+{
+    msg_title="jMax: error with Java Virtual Machine"
+    msg_content="\
+jMax haven't found any suitable Java Virtual Machine \
+\n\n\
+Please install a Java Virtual Machine >= $REQUIRED_JAVA_VERSION before running jMax.\
+\n\
+More information can be found at the following url:\n\
+http://www.ircam.fr/jmax\
+\n"
+    dialog_box="--msgbox"
+    dialog_xtra_arg="120 120"
+    case "$1" in
+	gnome )	    
+	    dialog="gdialog";;
+	kde )
+	    dialog="kdialog"
+	    dialog_box="--error";;
+	xterm )
+	    dialog="xterm -e dialog";;
+    esac
+    
+    $dialog --title "$msg_title" \
+	$dialog_box "$msg_content" $dialog_xtra_arg
+}
+
+# ---------------------------------------------------------------------------
+# This function check if java version is correct
+# Arg1: path to java executable
+# Arg2: required version
+# Return 0 if java version is enough
+# Return 1 if java version is not enough
+check_java_version ()
+{
+    java_to_test="$1"
+    java_version=`$java_to_test -version 2>&1 | grep "version" | sed 's/java version//' | sed 's/\"//g' `
+    if test -z $java_version; then
+	# domething bad with java version
+	return 1
+    fi
+    java_major_version=`echo $java_version | sed 's/\([0-9][0-9]*\)\..*/\1/'`
+    java_minor_version=`echo $java_version | sed 's/[0-9][0-9]*\.\([0-9][0-9]*\)\(\.[0-9][0-9]*\)*/\1/' | sed 's/_.*//g'`
+    java_micro_version=`echo $java_version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)\(.*\)/\3/'`
+    
+    required_java_version="$2"
+    required_major_version=`echo $required_java_version  | sed 's/\([0-9][0-9]*\)\..*/\1/'`
+    required_minor_version=`echo $required_java_version | sed 's/[0-9][0-9]*\.\([0-9][0-9]*\)\(\.[0-9][0-9]*\)*/\1/' | sed 's/_.*//g'` 
+    required_micro_version=`echo $required_java_version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+    
+# debug
+#   echo "java_major_version $java_major_version"
+#   echo "java_minor_version $java_minor_version"
+#   echo "java_micro_version $java_micro_version"
+#   echo "required_java_version $required_java_version"
+#   echo "required_major_version $required_major_version"
+#   echo "required_minor_version $required_minor_version"
+#   echo "required_micro_version $required_micro_version"
+
+  res_check_java_version="no"
+  if test $java_major_version -gt $required_major_version; then
+      res_check_java_version="yes"
+  elif test $java_major_version -eq $required_major_version; then
+      if test $java_minor_version -gt $required_minor_version; then
+	  res_check_java_version="yes"
+      elif test $java_minor_version -eq $required_minor_version; then
+	  if test $java_micro_version -ge $required_micro_version; then
+	      res_check_java_version="yes";
+	  else
+	      res_check_java_version="no";
+	  fi
+      fi
+  fi
+
+  if test "$res_check_java_version" = "yes"; then
+      return 0
+  else
+      return 1
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Check if version of java available in path is engouh
+# Return 0 if enough
+# Return 1 if not enough
+check_path_jvm ()
+{
+    # check if argument are given
+    if test -z $1; then
+	required_java_version=$REQUIRED_JAVA_VERSION
+    else
+	required_java_version=$1
+    fi
+    # check if we have a java in path
+    java_in_path=`which java 2>> /dev/null` 
+    if test $? -eq 0 ; then
+	check_java_version $java_in_path $required_java_version
+	if test $? -eq 0; then
+	    JAVA_CMD=$java_in_path
+	    return 0
+	fi
+    fi
+    return 1
+}
+
+
+# ---------------------------------------------------------------------------
+# Check if version of java given at compilation time is enough
+# Return 0 if enough
+# Return 1 if not enough
+check_compilation_jvm ()
+{
+    if test -z $1; then
+	required_java_version=$REQUIRED_JAVA_VERSION
+    else
+	required_java_version=$1
+    fi
+    # check if we have the java given at compilation time
+    java_compilation_time="java"
+    if test -x $java_compilation_time; then
+	check_java_version $java_compilation_time $required_java_version
+	if test $? -eq 0; then
+	    JAVA_CMD=$java_compilation_time
+	    return 0
+	fi
+    fi
+    return 1
+}
+
+
+# ---------------------------------------------------------------------------
+# Check if version of java installed in standard directory used by SUN is enough
+# Return 0 if enough
+# Return 1 if not enough
+check_sun_jvm ()
+{
+    # SUN installed jvm in /usr/java
+    for jj in `find /usr/java -type f -name "java" 2>> /dev/null`; do
+	if test -x $jj; then
+	    check_java_version $jj $required_java_version
+	    if test $? -eq 0; then
+		JAVA_CMD=$jj
+		return 0
+	    fi
+	fi
+    done
+    
+    return 1
+}
+
+
+# ---------------------------------------------------------------------------
+# Check if version of java installed in standard directory used by IBM is enough
+# Return 0 if enough
+# Return 1 if not enough
+check_ibm_jvm ()
+{
+    # IBM installed jvm in /opt/IBM*
+    for jj in `find /opt/IBM* -type f -name "java" 2>> /dev/null`; do
+	if test -x $jj; then
+	    check_java_version $jj $required_java_version
+	    if test $? -eq 0; then
+		JAVA_CMD=$jj
+		return 0
+	    fi
+	fi
+    done
+
+    return 1
+}
+
+# ---------------------------------------------------------------------------
+# Try to find a suitable java version
+#
+#
+check_java ()
+{
+    # check functions
+    check_functions="check_path_jvm check_compilation_jvm check_sun_jvm check_ibm_jvm"
+    for ff in $check_functions; do
+	$ff
+	if test $? -eq 0; then
+	    return 0
+	fi
+    done
+
+    # If we are here, we haven't found any suitable java virtual machine
+    # Display error msg box
+    echo "Not found"
+    
+    # check for term
+    `which tty` -s 
+    if  test $? -eq 0; then
+	# we are in a terminal => use dialog if found 
+	display_java_error_in_term
+    fi
+    
+    # check for KDE
+    kde_var=`set | grep KDE`
+    if test ! -z "$kde_var"; then
+	# check for kdialog
+	dd=`which kdialog`
+	if test $? -eq 0; then
+	    display_java_error_msg_box kde
+	    exit 1;
+	fi
+    fi
+    # check for gnome
+    gnome_var=`set | grep GNOME`
+    if test ! -z "$gnome_var"; then
+	# check for gdialog
+	dd=`which gdialog`
+	if test $? -eq 0; then
+	    display_java_error_msg_box gnome
+	    exit 1;
+	fi
+    fi
+
+    # else use the xterm call
+    dd=`which dialog`
+    if test $? -eq 0; then
+	display_java_error_msg_box xterm
+	exit 1;
+    fi
+    
+    # Be sure to exit
+    exit 1;
+}
+
+# ---------------------------------------------------------------------------
+# FTS suid root checking
+# ---------------------------------------------------------------------------
+
+display_fts_message_in_msg_box ()
+{
+    local session_type=$1
+    local path_to_fts=$2
+    
+    msg_title="jMax: FTS is not suid root"
+    msg_content="\
+Your fts binary is not suid root \
+\n\n\
+You should consider to make fts suid root in order to allow fts to run in SCHED_FIFO mode\
+\n\
+If you want to disable this test, create a file named $HOME/.jmax/no_fts_check\
+\n"
+    dialog_box="--msgbox"
+    dialog_xtra_arg="120 120"
+    case "$session_type" in
+	gnome )	    
+	    dialog="gdialog";;
+	kde )
+	    dialog="kdialog";;
+	xterm )
+	    dialog="xterm -e dialog";;
+    esac
+    
+    $dialog --title "$msg_title" \
+	$dialog_box "$msg_content" $dialog_xtra_arg
+}
+
+
+display_fts_message_in_term ()
+{
+    cat > /tmp/$$ << EOF 
+Your fts binary is not suid root 
+
+You should consider to make fts suid root in order to allow fts to run in SCHED_FIFO mode
+
+If you want to disable this test, create a file named $HOME/.jmax/no_fts_check
+EOF
+    cat /tmp/$$
+    rm -f /tmp/$$
+    return 0
+
+}
+
+display_fts_message ()
+{
+    local fts_binary=$1
+    # check for term
+    `which tty` -s 
+    if  test $? -eq 0; then
+	# we are in a terminal => use dialog if found 
+	display_fts_message_in_term $fts_binary
+    fi
+    
+    # check for KDE
+    local kde_var=`set | grep KDE`
+    if test ! -z "$kde_var"; then
+	# check for kdialog
+	local dd=`which kdialog`
+	if test $? -eq 0; then
+	    display_fts_message_in_msg_box kde
+	    return 0;
+	fi
+    fi
+    # check for gnome
+    local gnome_var=`set | grep GNOME`
+    if test ! -z "$gnome_var"; then
+	# check for gdialog
+	dd=`which gdialog`
+	if test $? -eq 0; then
+	    display_fts_message_in_msg_box gnome
+	    return 0;
+	fi
+    fi
+
+    # else use the xterm call
+    dd=`which dialog`
+    if test $? -eq 0; then
+	display_fts_message_in_msg_box xterm
+	return 0;
+    fi
+
+}
+
+# Check if file given as argument is suid root
+# Return 0 if true
+# Return 1 if false
+check_suid_root ()
+{
+    local file_to_check=$1
+    local file_owner=`stat --format="%u" $file_to_check`
+    local root_id="0"
+
+    if test -u $file_to_check && test "x$file_owner" = "x$root_id"; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+# Check if fts binary id suid root
+# Display a warning message if this is not the case
+check_fts_suid_root ()
+{
+    local not_check_file=$HOME/.jmax/no_fts_check
+    local fts_binary=$ftsdir/fts
+    # Check if user doesn't want to do the check
+    if ! test -f $not_check_file; then
+	if ! check_suid_root $fts_binary; then
+	    display_fts_message $fts_binary
+	fi
+    fi
 }
 
 # ---------------------------------------------------------------------------
@@ -176,7 +565,7 @@ start_it ()
 	OPTION_ROOTDIR="-jmaxRoot $ROOTDIR"
     fi
 
-    JAVA_CMD="java $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.JMaxApplication -jmaxServerDir ${ftsdir} $OPTION_ROOTDIR $JMAXOPT "
+    JAVA_CMD="$JAVA_CMD $JAVA_DEFAULT_OPTIONS $JAVAOPT ircam.jmax.JMaxApplication -jmaxServerDir ${ftsdir} $OPTION_ROOTDIR $JMAXOPT "
 
     ECHO_CMD="CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD"
 
@@ -192,7 +581,11 @@ start_it ()
 
     if [ _${NOFORK}_ = __ ]
     then
-	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD & )
+	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD &
+	  if [ ${VERBOSE} ]; then
+	      echo jmaxpid $!
+	  fi
+	)
     else
 	( CLASSPATH=${CLASSPATH} ; export CLASSPATH ; $JAVA_CMD )
     fi
@@ -204,10 +597,16 @@ start_it ()
 
 decrypt_options $@
 
+check_java
+
 check_installation
+
+check_fts_suid_root
 
 build_classpath
 
 fix_sgi_fonts
+
+make_absolute_path
 
 start_it

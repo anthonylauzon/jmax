@@ -1,8 +1,12 @@
-# $Id: Makefile.am,v 1.14 2003/07/23 12:16:12 p_tisserand Exp $
+# $Id: Makefile.am,v 1.15 2004/04/05 11:14:31 borghesi Exp $
 #
 # sequence package Makefile.am
 #
 # $Log: Makefile.am,v $
+# Revision 1.15  2004/04/05 11:14:31  borghesi
+# added fonts for music notation in sequence package (MusiSync.ttf and MusiTone.ttf).
+# Fonts are distributed under Free Public Licence and are Copyright of Robert Allgeyer.
+#
 # Revision 1.14  2003/07/23 12:16:12  p_tisserand
 # Changed installation directory of packages.
 # Now packages are installed in ${libdir}/jmax/packages.

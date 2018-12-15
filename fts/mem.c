@@ -46,7 +46,7 @@
 #include <fts/fts.h>
 #include <ftsprivate/platform.h>
 
-/* #define HELP_PURIFY */
+#define HELP_PURIFY 
 
 static fts_heap_t **fts_heaps = NULL;
 

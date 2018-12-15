@@ -141,6 +141,7 @@ PREDEF_SYMBOL( fts_s_remove,  "remove")
 PREDEF_SYMBOL( fts_s_append,  "append")
 PREDEF_SYMBOL( fts_s_reverse, "reverse")
 PREDEF_SYMBOL( fts_s_sort,    "sort")
+PREDEF_SYMBOL( fts_s_equals,  "equals")
 PREDEF_SYMBOL( fts_s_sortrev, "tros")
 PREDEF_SYMBOL( fts_s_unique,  "unique")
 

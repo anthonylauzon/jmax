@@ -31,7 +31,7 @@
 
 /* Define if your processor stores words with the most significant
    byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-#define WORDS_BIGENDIAN 1
+// // // // // // // // // #define WORDS_BIGENDIAN 0
 
 /* Define if lex declares yytext as a char * by default, not a char[].  */
 /* #undef YYTEXT_POINTER */

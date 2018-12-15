@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # unsetenv PERLLIB PERL5LIB
-
+export PATH=/opt/local/bin:$PATH
 # display versions
 echo "[auto-tools versions in your path on $HOST]"
 for f in aclocal automake autoconf autoheader autom4te libtoolize libtool; do

@@ -1,8 +1,14 @@
 #!/usr/bin/perl -p
 
-# $Id$
+# $Id: fake_jmax.pl,v 1.1 2004/05/21 18:20:55 diemo Exp $
 #
-# $Log$
+# $Log: fake_jmax.pl,v $
+# Revision 1.1  2004/05/21 18:20:55  diemo
+# input filter for doxygen to fake certain definitions for automatic
+# documentation:
+# - convert @fn documented macros to functions
+# - todo: fake classes
+#
 
 
 # fake function

@@ -573,7 +573,7 @@ _function_getobj(int ac, const fts_atom_t *at, fts_atom_t *ret)
   if(ac > 0 && fts_is_number(at))
   {
     int id = fts_get_number_int(at);
-    fts_object_t *obj = fts_client_get_object(id, 0);
+    fts_object_t *obj = fts_get_object(at);
     
     if(obj != NULL)
     {
